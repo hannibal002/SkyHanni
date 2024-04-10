@@ -5,19 +5,16 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -34,22 +31,21 @@ class PunchcardHighlight {
     private val playerList: MutableSet<String> = mutableSetOf()
 
     @SubscribeEvent
-    fun onRenderMobColored(event: EntityJoinWorldEvent) {
+    fun onRenderMobColored(event: MobEvent.Spawn.Player) {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandType.THE_RIFT.isInIsland()) return
         val size = playerList.size
         if (size >= 20) return
-        val entity = event.entity
-        if (entity is EntityPlayerSP) return
-        if (entity is EntityPlayer && !entity.isNPC() && !hasPunchedPlayer(entity) && entity.name != ownIGN) {
+        val entity = event.mob
+        if (!playerList.contains(entity.name) && entity.name != ownIGN) {
             val alpha = when (config.color.toChromaColor().alpha) {
                 0 -> 0
                 255 -> 1
                 else -> 255-config.color.toChromaColor().alpha
             }
             val color = config.color.toChromaColor().withAlpha(alpha)
-            RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isInIsland() && playerList.size < 20 }
+            RenderLivingEntityHelper.setEntityColor(entity.baseEntity, color) { IslandType.THE_RIFT.isInIsland() && playerList.size < 20 }
         }
     }
 
@@ -73,6 +69,4 @@ class PunchcardHighlight {
     fun clearList() { playerList.clear() }
 
     private fun addPunch(playerName: String) { playerList.add(playerName) }
-
-    private fun hasPunchedPlayer(player: EntityPlayer) = playerList.contains(player.name)
 }
