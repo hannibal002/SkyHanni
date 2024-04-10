@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.items
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -54,7 +55,7 @@ import java.util.Locale
 
 object EstimatedItemValueCalculator {
 
-    private val config get() = EstimatedItemValue.config
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
         ::addReforgeStone,
