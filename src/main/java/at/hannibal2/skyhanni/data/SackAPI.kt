@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.matchAll
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -124,8 +125,8 @@ object SackAPI {
             val lore = stack.getLore()
 
             if (isGemstoneSack) {
-                lore.matchFirst(gemstonePattern) {
-                    val gem = SackGemstone()
+                val gem = SackGemstone()
+                lore.matchAll(gemstonePattern) {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
                     gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
@@ -159,9 +160,9 @@ object SackAPI {
                                 gem.finePrice = internalName.sackPrice(stored)
                                 gem.price += gem.finePrice
                                 if (savingSacks) setSackItem(internalName, stored)
+                                gemstoneItem[name] = gem
                             }
                         }
-                        gemstoneItem[name] = gem
                     }
                 }
             } else if (isRuneSack) {
