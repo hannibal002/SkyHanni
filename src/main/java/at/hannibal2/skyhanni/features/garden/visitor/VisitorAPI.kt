@@ -22,8 +22,13 @@ object VisitorAPI {
 
     private var visitors = mapOf<String, Visitor>()
     var inInventory = false
+    var lastClickedNpc = 0
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
+
+    const val INFO_SLOT = 13
+    const val ACCEPT_SLOT = 29
+    const val REFUSE_SLOT = 33
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
     val visitorCountPattern by patternGroup.pattern(
@@ -124,10 +129,13 @@ object VisitorAPI {
         val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
-
+        var offersAccepted: Int? = null
+        var pricePerCopper: Int? = null
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
+        var blockedLore = listOf<String>()
+        var blockReason: VisitorBlockReason? = null
 
         fun getEntity() = EntityUtils.getEntityByID(entityId)
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
@@ -183,5 +191,31 @@ object VisitorAPI {
             visitorsRemaining--
         }
         return visitorsInTab
+    }
+
+    fun Visitor.blockReason(): VisitorBlockReason? {
+
+        val visitorHasReward = config.rewardWarning.preventRefusing && this.hasReward() != null
+        if (visitorHasReward) {
+            return VisitorBlockReason.RARE_REWARD
+        }
+        else if (config.rewardWarning.preventRefusingNew && this.offersAccepted == 0) {
+            return VisitorBlockReason.NEVER_ACCEPTED
+        }
+        val pricePerCopper = this.pricePerCopper ?: return VisitorBlockReason.EXPENSIVE_COPPER
+        return if (config.rewardWarning.preventRefusingCopper && pricePerCopper <= config.rewardWarning.coinsPerCopperPrice) {
+            VisitorBlockReason.CHEAP_COPPER
+        }
+        else if (config.rewardWarning.preventAcceptingCopper && pricePerCopper > config.rewardWarning.coinsPerCopperPrice) {
+            VisitorBlockReason.EXPENSIVE_COPPER
+        }
+        else null
+    }
+
+    enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) {
+        NEVER_ACCEPTED("§cNever accepted", true),
+        RARE_REWARD("§aRare visitor reward found", true),
+        CHEAP_COPPER("§aCheap copper", true),
+        EXPENSIVE_COPPER("§cExpensive copper", false)
     }
 }
