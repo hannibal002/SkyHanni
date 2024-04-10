@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
@@ -63,5 +64,6 @@ public class EstimatedItemValueConfig {
     public boolean ignoreRunes = false;
 
     @Expose
+    @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 }
