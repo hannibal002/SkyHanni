@@ -216,13 +216,14 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
+    // TODO create extended function
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
         if (multiplierCache.contains(internalName)) {
             return multiplierCache[internalName]!!
         }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
-                "Cound not load recipe data.",
+                "Could not load recipe data.",
                 "Failed to find item multiplier",
                 "internalName" to internalName
             )

@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -167,6 +168,7 @@ public class MiscConfig {
     public boolean playerMovementSpeed = false;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose

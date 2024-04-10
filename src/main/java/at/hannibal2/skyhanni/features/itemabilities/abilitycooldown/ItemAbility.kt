@@ -127,7 +127,7 @@ enum class ItemAbility(
 
         private fun ItemAbility.getMageCooldownReduction(): Double? {
             if (ignoreMageCooldownReduction) return null
-            if (!LorenzUtils.inDungeons) return null
+            if (!DungeonAPI.inDungeon()) return null
             if (DungeonAPI.playerClass != DungeonAPI.DungeonClass.MAGE) return null
 
             var abilityCooldownMultiplier = 1.0

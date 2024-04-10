@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -81,5 +80,5 @@ object DungeonMilestonesDisplay {
         )
     }
 
-    private fun isEnabled() = LorenzUtils.inDungeons && config.showMilestonesDisplay
+    private fun isEnabled() = DungeonAPI.inDungeon() && config.showMilestonesDisplay
 }

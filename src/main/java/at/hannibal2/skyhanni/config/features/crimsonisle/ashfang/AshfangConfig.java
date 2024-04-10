@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class AshfangConfig {
@@ -37,6 +38,7 @@ public class AshfangConfig {
     public boolean freezeCooldown = false;
 
     @Expose
+    @ConfigLink(owner = AshfangConfig.class, field = "freezeCooldown")
     public Position freezeCooldownPos = new Position(10, 10, false, true);
 
     @Expose
@@ -46,5 +48,6 @@ public class AshfangConfig {
     public boolean nextResetCooldown = false;
 
     @Expose
+    @ConfigLink(owner = AshfangConfig.class, field = "nextResetCooldown")
     public Position nextResetCooldownPos = new Position(10, 10, false, true);
 }
