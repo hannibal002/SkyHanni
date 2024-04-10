@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SkyMartConfig {
@@ -20,5 +21,6 @@ public class SkyMartConfig {
     public double itemScale = 1;
 
     @Expose
+    @ConfigLink(owner = SkyMartConfig.class, field = "copperPrice")
     public Position copperPricePos = new Position(211, 132, false, true);
 }
