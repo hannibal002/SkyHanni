@@ -38,11 +38,13 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class CityProjectFeatures {
 
     private var display = emptyList<List<Any>>()
     private var inInventory = false
+    private var lastReminderSend = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("fame.projects")
     private val contributeAgainPattern by patternGroup.pattern(
@@ -65,8 +67,6 @@ class CityProjectFeatures {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(30)) return
-
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
@@ -75,6 +75,8 @@ class CityProjectFeatures {
 
         if (playerSpecific.nextCityProjectParticipationTime == 0L) return
         if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
+        if (lastReminderSend.passedSince() < 30.seconds) return
+        lastReminderSend = SimpleTimeMark.now()
 
         ChatUtils.clickableChat(
             "Daily City Project Reminder! (Click here to disable this reminder)",

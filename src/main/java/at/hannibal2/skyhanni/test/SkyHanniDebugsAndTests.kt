@@ -337,9 +337,9 @@ class SkyHanniDebugsAndTests {
 
         fun copyLocation(args: Array<String>) {
             val location = LocationUtils.playerLocation()
-            val x = (location.x + 0.001).round(1).addSeparators()
-            val y = (location.y + 0.001).round(1).addSeparators()
-            val z = (location.z + 0.001).round(1).addSeparators()
+            val x = (location.x + 0.001).round(1)
+            val y = (location.y + 0.001).round(1)
+            val z = (location.z + 0.001).round(1)
             if (args.size == 1 && args[0].equals("json", false)) {
                 OSUtils.copyToClipboard("\"$x:$y:$z\"")
                 return

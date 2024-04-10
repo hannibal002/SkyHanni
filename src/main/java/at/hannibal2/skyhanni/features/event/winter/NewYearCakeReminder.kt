@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class NewYearCakeReminder {
 
@@ -21,6 +23,7 @@ class NewYearCakeReminder {
         "event.winter.newyearcake.reminder.sidebar",
         "§dNew Year Event!§f (?<time>.*)"
     )
+    private var lastReminderSend = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -49,12 +52,14 @@ class NewYearCakeReminder {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(30)) return
         if (!LorenzUtils.inSkyBlock) return
         if (!config.newYearCakeReminder) return
         if (!isCakeTime()) return
         if (ReminderUtils.isBusy()) return
         if (isClaimed()) return
+
+        if (lastReminderSend.passedSince() < 30.seconds) return
+        lastReminderSend = SimpleTimeMark.now()
 
         ChatUtils.clickableChat(
             "Reminding you to grab the free New Year Cake. Click here to open the baker menu!",

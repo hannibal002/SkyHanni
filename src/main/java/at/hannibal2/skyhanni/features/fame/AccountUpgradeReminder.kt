@@ -15,11 +15,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 class AccountUpgradeReminder {
 
     private var inInventory = false
     private var duration: Duration? = null
+    private var lastReminderSend = SimpleTimeMark.farPast()
 
     // TODO: find a way to save SimpleTimeMark directly in the config
     private var nextCompletionTime: SimpleTimeMark?
@@ -43,6 +45,8 @@ class AccountUpgradeReminder {
         val upgrade = playerSpecific.currentAccountUpgrade ?: return
         val nextCompletionTime = nextCompletionTime ?: return
         if (!nextCompletionTime.isInPast()) return
+        if (lastReminderSend.passedSince() < 30.seconds) return
+        lastReminderSend = SimpleTimeMark.now()
 
         ChatUtils.clickableChat(
             "The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
