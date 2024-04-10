@@ -482,6 +482,13 @@ private fun getMiningEventsLines() = buildList {
         add(getSbLines().first { SbPattern.yourGoblinKillsPattern.matches(it) })
         add(getSbLines().first { SbPattern.remainingGoblinPattern.matches(it) })
     }
+
+    // Mineshaft Queue
+    if (getSbLines().any { SbPattern.mineshaftQueuedPattern.matches(it) }
+        && getSbLines().any { SbPattern.mineshaftQueuePositionPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.mineshaftQueuedPattern.matches(it) })
+        add(getSbLines().first { SbPattern.mineshaftQueuePositionPattern.matches(it) })
+    }
 }
 
 private fun getMiningEventsShowWhen(): Boolean {

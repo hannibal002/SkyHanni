@@ -227,6 +227,18 @@ object ScoreboardPattern {
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$"
     )
+    val mineshaftNotStartedPattern by miningSb.pattern(
+        "mineshaft.notstarted",
+        "(?:§.)*Not started.*"
+    )
+    val mineshaftQueuedPattern by miningSb.pattern(
+        "mineshaft.queued",
+        "Queued: Glacite Mineshafts"
+    )
+    val mineshaftQueuePositionPattern by miningSb.pattern(
+        "mineshaft.queueposition",
+        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
@@ -422,13 +434,5 @@ object ScoreboardPattern {
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
-    )
-    val boosterCookieEffectsWidgetPattern by tablistGroup.pattern(
-        "boostereffects",
-        "\\s*(?:§.)*Cookie Buff(?:§.)*: (?:§r)*(?<time>.*)"
-    )
-    val cookieNotActivePattern by tablistGroup.pattern(
-        "cookienotactive",
-        "((?:§.)*Not active.*)|(§c§lINACTIVE)"
     )
 }
