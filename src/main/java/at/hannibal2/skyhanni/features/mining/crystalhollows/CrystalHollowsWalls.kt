@@ -200,7 +200,7 @@ class CrystalHollowsWalls {
         val x = if (isMinXEsleMaxX) minX else maxX
 
         val nucleusZ = if (isMinZElseMaxZ) nucleusBBExpand.minZ else nucleusBBExpand.maxZ
-        val middleZ = if (isMinZElseMaxZ) middleX.shiftNZ() else middleX.shiftPZ()
+        val middleZ = if (isMinZElseMaxZ) middleZ.shiftNZ() else middleZ.shiftPZ()
         val z = if (isMinZElseMaxZ) minZ else maxZ
 
         val heatHeight = heatHeight.shiftPY()

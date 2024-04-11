@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -95,6 +96,7 @@ class FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
         event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
+        event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
     }
 
     companion object {
@@ -219,22 +221,22 @@ class FarmingWeightDisplay {
             }
 
             val totalWeight = (localWeight + weight)
-            return "§e" + LorenzUtils.formatDouble(totalWeight, 2)
+            return "§e" + totalWeight.round(2).addSeparators()
         }
 
         private fun getRankGoal(): Int {
-            val value = config.ETAGoalRank
+            val value = config.etaGoalRank
             var goal = 10000
 
             // Check that the provided string is valid
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
-                ChatUtils.error("Invalid Farming Weight Overtake Goal!")
-                ChatUtils.chat(
-                    "§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!",
-                    false
+                ChatUtils.chatAndOpenConfig(
+                    "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
+                        "to a valid number [1-10000] to use this feature!",
+                    GardenAPI.config.eliteFarmingWeights::etaGoalRank
                 )
-                config.ETAGoalRank = goal.toString()
+                config.etaGoalRank = goal.toString()
             } else {
                 goal = parsed
             }
@@ -299,7 +301,7 @@ class FarmingWeightDisplay {
                 " §7(§b$format§7)"
             } else ""
 
-            val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
+            val weightFormat = weightUntilOvertake.round(2).addSeparators()
             val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
             return if (showRankGoal) {
                 Renderable.string(text)
