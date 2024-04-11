@@ -12,10 +12,10 @@ import kotlin.time.Duration.Companion.milliseconds
 class MiningNotifications {
 
     enum class NotificationList(val str: String, val notification: String) {
-        MINESHAFT_SPAWN("§bGlacite Mineshaft", "§b§lMineshaft"),
+        MINESHAFT_SPAWN("§bGlacite Mineshaft", "§bMineshaft"),
         SCRAP("§9Suspicious Scrap", "§9Suspicious Scrap"),
         GOLDEN_GOBLIN("§6Golden Goblin", "§6Golden Goblin"),
-        DIAMOND_GOBLIN("§bDiamond Goblin", "§b§lDiamond Goblin");
+        DIAMOND_GOBLIN("§bDiamond Goblin", "§bDiamond Goblin");
 
         override fun toString(): String {
             return str
