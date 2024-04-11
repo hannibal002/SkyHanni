@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.items
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -55,7 +55,7 @@ import java.util.Locale
 
 object EstimatedItemValueCalculator {
 
-    private val config get() = EstimatedItemValue.config
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
         ::addReforgeStone,
@@ -480,10 +480,7 @@ object EstimatedItemValueCalculator {
         return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
     }
 
-    private fun NEUInternalName.getNameOrRepoError(): String? {
-        val stack = getItemStackOrNull() ?: return null
-        return stack.nameWithEnchantment ?: "§cItem Name Error"
-    }
+    private fun NEUInternalName.getNameOrRepoError(): String? = getItemStackOrNull()?.itemName
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
@@ -684,7 +681,7 @@ object EstimatedItemValueCalculator {
                 totalPrice += if (ingredient.isCoins) {
                     ingredient.count
                 } else {
-                    getPrice(ingredient.internalItemId) * ingredient.count
+                    ingredient.internalItemId.asInternalName().getPrice() * ingredient.count
                 }
             }
 

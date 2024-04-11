@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
+import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
+import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
@@ -80,6 +81,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public int bitsToClaim = -1;
+
+        @Expose
+        public Long boosterCookieExpiryTime = null;
     }
 
     @Expose
@@ -287,6 +291,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public PestProfitTracker.Data pestProfitTracker = new PestProfitTracker.Data();
+
+        @Expose
+        public VinylType activeVinyl = null;
     }
 
     @Expose
@@ -406,7 +413,7 @@ public class ProfileSpecificStorage {
     public static class DungeonStorage {
 
         @Expose
-        public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
+        public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
         public List<DungeonStorage.DungeonRunInfo> runs = Stream.generate(DungeonStorage.DungeonRunInfo::new)

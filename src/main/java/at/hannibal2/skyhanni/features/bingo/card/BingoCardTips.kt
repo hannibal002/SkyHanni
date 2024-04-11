@@ -34,6 +34,10 @@ class BingoCardTips {
         "reward.contribution",
         "§.§.§7Contribution Rewards.*"
     )
+    private val rowNamePattern by patternGroup.pattern(
+        "row.name",
+        "§o§.Row #.*"
+    )
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -44,7 +48,10 @@ class BingoCardTips {
         val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: return
 
         val toolTip = event.toolTip
+        // When hovering over a row
+        if (rowNamePattern.matches(toolTip.firstOrNull())) return
         val bingoTip = goal.getData() ?: return
+
         val communityGoal = goal.type == GoalType.COMMUNITY
 
         val difficulty = Difficulty.valueOf(bingoTip.difficulty.uppercase())
