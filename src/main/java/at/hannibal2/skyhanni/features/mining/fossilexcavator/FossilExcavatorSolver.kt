@@ -4,15 +4,15 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 
 object FossilExcavatorSolver {
 
-    private val startingSequence: Set<Pair<FossilTile, Double>> = setOf(
-        Pair(FossilTile(4, 2), 0.515),
-        Pair(FossilTile(5, 4), 0.413),
-        Pair(FossilTile(3, 3), 0.461),
-        Pair(FossilTile(5, 2), 0.387),
-        Pair(FossilTile(3, 1), 0.342),
-        Pair(FossilTile(7, 3), 0.48),
-        Pair(FossilTile(1, 2), 0.846),
-        Pair(FossilTile(3, 4), 1.0),
+    private val startingSequence: Set<Triple<FossilTile, Double, Int>> = setOf(
+        Triple(FossilTile(4, 2), 0.515, 404),
+        Triple(FossilTile(5, 4), 0.413, 196),
+        Triple(FossilTile(3, 3), 0.461, 115),
+        Triple(FossilTile(5, 2), 0.387, 62),
+        Triple(FossilTile(3, 1), 0.342, 38),
+        Triple(FossilTile(7, 3), 0.48, 25),
+        Triple(FossilTile(1, 2), 0.846, 13),
+        Triple(FossilTile(3, 4), 1.0, 2),
     )
 
     private var currentlySolving = false
@@ -48,7 +48,7 @@ object FossilExcavatorSolver {
             }
 
             val nextMove = startingSequence.elementAt(movesTaken)
-            FossilExcavator.nextData(nextMove.first, nextMove.second)
+            FossilExcavator.nextData(nextMove.first, nextMove.second, nextMove.third)
             currentlySolving = false
             return
         }
@@ -98,7 +98,7 @@ object FossilExcavatorSolver {
         val nextMove = bestPosition.key
         val correctPercentage = bestPosition.value / totalPossibleTiles
         currentlySolving = false
-        FossilExcavator.nextData(nextMove, correctPercentage)
+        FossilExcavator.nextData(nextMove, correctPercentage, totalPossibleTiles.toInt())
     }
 
     private fun isValidFossilPosition(

@@ -45,6 +45,7 @@ object FossilExcavator {
     private var foundPercentage = false
     private var percentage: String? = null
     private var chargesRemaining = 0
+    private var possibleFossilsRemaining = 0
 
     private var slotToClick: Int? = null
     private var correctPercentage: String? = null
@@ -56,7 +57,7 @@ object FossilExcavator {
 
     private const val NOT_POSSIBLE_STRING = "§cNo possible fossils on board."
     private const val SOLVED_STRING = "§aFossil found, get all the loot you can."
-    private const val CHISELS_STRING = "§eChisel Charges Remaining: "
+    private const val FOSSILS_REMAINING_STRING = "§ePossible fossils remaining: "
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -206,15 +207,16 @@ object FossilExcavator {
         val displayString = when {
             isNotPossible -> NOT_POSSIBLE_STRING
             isCompleted -> SOLVED_STRING
-            else -> "$CHISELS_STRING$chargesRemaining"
+            else -> "$FOSSILS_REMAINING_STRING§a$possibleFossilsRemaining"
         }
 
         config.position.renderString(displayString, posLabel = "Fossil Excavator")
     }
 
-    fun nextData(slotToClick: FossilTile, correctPercentage: Double) {
+    fun nextData(slotToClick: FossilTile, correctPercentage: Double, fossilsRemaining: Int) {
         val formattedPercentage = (correctPercentage * 100).round(1)
 
+        this.possibleFossilsRemaining = fossilsRemaining
         this.slotToClick = slotToClick.toSlotIndex()
         this.correctPercentage = "§2$formattedPercentage%"
     }
