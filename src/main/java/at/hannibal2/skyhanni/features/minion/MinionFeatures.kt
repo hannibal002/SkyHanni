@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -29,9 +30,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.formatInteger
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -50,7 +52,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -58,7 +59,7 @@ import java.awt.Color
 
 class MinionFeatures {
 
-    private val config get() = SkyHanniMod.feature.minions
+    private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
     private var newMinion: LorenzVec? = null
     private var newMinionName: String? = null
@@ -87,7 +88,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
 
         val lookingAt = event.pos.offset(event.face).toLorenzVec()
@@ -175,7 +176,7 @@ class MinionFeatures {
         val name = getMinionName(openInventory)
         if (!minions.contains(entity) && LorenzUtils.skyBlockIsland != IslandType.HUB) {
             MinionFeatures.minions = minions.editCopy {
-                this[entity] = Storage.ProfileSpecific.MinionConfig().apply {
+                this[entity] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = name
                     lastClicked = 0
                 }
@@ -218,7 +219,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
         if (coinsPerDay != "") return
 
         if (Minecraft.getMinecraft().currentScreen is GuiChest && config.hopperProfitDisplay) {
@@ -251,13 +252,13 @@ class MinionFeatures {
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
         //§7Held Coins: §b151,389
-        val coins = line.split(": §b")[1].replace(",", "").toDouble()
+        // TODO use regex
+        val coins = line.split(": §b")[1].formatDouble()
 
         val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
 
-        val format = formatInteger(coinsPerDay.toInt())
-        val hopperName = stack.name
-        return "§7Coins/day with $hopperName§7: §6$format coins"
+        val format = coinsPerDay.toInt().addSeparators()
+        return "§7Coins/day with ${stack.name}§7: §6$format coins"
     }
 
     @SubscribeEvent
@@ -271,7 +272,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
@@ -287,7 +288,7 @@ class MinionFeatures {
         }
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
             minions = minions?.editCopy {
-                this[newMinion!!] = Storage.ProfileSpecific.MinionConfig().apply {
+                this[newMinion!!] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = newMinionName
                     lastClicked = 0
                 }
@@ -307,7 +308,7 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onRenderLastEmptied(event: LorenzRenderWorldEvent) {
-        if (!enable()) return
+        if (!isEnabled()) return
 
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
@@ -336,8 +337,8 @@ class MinionFeatures {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
-        if (!enable()) return
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
+        if (!isEnabled()) return
         if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity
@@ -354,9 +355,9 @@ class MinionFeatures {
         }
     }
 
-    private fun enable() = IslandType.PRIVATE_ISLAND.isInIsland()
+    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland()
 
-    private fun enableWithHub() = enable() || IslandType.HUB.isInIsland()
+    private fun enableWithHub() = isEnabled() || IslandType.HUB.isInIsland()
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
@@ -375,7 +376,7 @@ class MinionFeatures {
         var minionInventoryOpen = false
         var minionStorageInventoryOpen = false
 
-        private var minions: Map<LorenzVec, Storage.ProfileSpecific.MinionConfig>?
+        private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
             get() {
                 return ProfileStorageData.profileSpecific?.minions
             }
@@ -396,5 +397,7 @@ class MinionFeatures {
         event.move(3, "minions.lastOpenedMinionTime", "minions.lastClickedMinion.time")
         event.move(3, "minions.emptiedTimeDisplay", "minions.emptiedTime.display")
         event.move(3, "minions.distance", "minions.emptiedTime.distance")
+
+        event.move(31, "minions", "misc.minions")
     }
 }

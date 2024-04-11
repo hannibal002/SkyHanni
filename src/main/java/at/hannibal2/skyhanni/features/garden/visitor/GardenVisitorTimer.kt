@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -13,14 +14,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -33,8 +33,8 @@ class GardenVisitorTimer {
     private val config get() = GardenAPI.config.visitors.timer
 
     private val timePattern by RepoPattern.pattern(
-        "garden.visitor.timer.time",
-        "§b§lVisitors: §r§f\\((?<time>.*)\\)"
+        "garden.visitor.timer.time.new",
+        " Next Visitor: §r(?<info>.*)"
     )
 
     private var display = ""
@@ -65,20 +65,6 @@ class GardenVisitorTimer {
         visitorJustArrived = true
     }
 
-    init {
-        fixedRateTimer(name = "skyhanni-update-visitor-display", period = 1000L) {
-            try {
-                updateVisitorDisplay()
-            } catch (error: Throwable) {
-                ErrorManager.logErrorWithData(error, "Encountered an error when updating visitor display")
-            }
-            try {
-                GardenVisitorDropStatistics.saveAndUpdate()
-            } catch (_: Throwable) {
-            } // no config yet
-        }
-    }
-
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = ""
@@ -88,30 +74,29 @@ class GardenVisitorTimer {
         sixthVisitorReady = false
     }
 
-    private fun updateVisitorDisplay() {
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         var visitorsAmount = VisitorAPI.visitorsInTabList(TabListData.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
-        for (line in TabListData.getTabList()) {
-            if (line == "§b§lVisitors: §r§f(§r§c§lQueue Full!§r§f)") {
-                queueFull = true
-                continue
-            }
-            if (line == "§b§lVisitors: §r§f(§r§cNot Unlocked!§r§f)") {
-                display = ""
+
+        TabListData.getTabList().matchFirst(timePattern) {
+            val timeInfo = group("info").removeColor()
+            if (timeInfo == "Not Unlocked!") {
+                display = "§cVisitors not unlocked!"
                 return
             }
-
-            timePattern.matchMatcher(line) {
-                val rawTime = group("time").removeColor()
-                if (lastTimerValue != rawTime) {
+            if (timeInfo == "Queue Full!") {
+                queueFull = true
+            } else {
+                if (lastTimerValue != timeInfo) {
                     lastTimerUpdate = SimpleTimeMark.now()
-                    lastTimerValue = rawTime
+                    lastTimerValue = timeInfo
                 }
-                millis = TimeUtils.getDuration(rawTime)
+                millis = TimeUtils.getDuration(timeInfo)
             }
         }
 
@@ -206,7 +191,7 @@ class GardenVisitorTimer {
     }
 
     @SubscribeEvent
-    fun onBlockBreak(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 

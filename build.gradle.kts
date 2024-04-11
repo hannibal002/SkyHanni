@@ -10,11 +10,12 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
+    `maven-publish`
     id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.24.Beta.2"
+version = "0.25.Beta.5"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -150,7 +151,7 @@ loom {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
+            arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
     }
@@ -240,7 +241,7 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
-    relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
+    relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
 }
 tasks.jar {
@@ -257,3 +258,31 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
+val sourcesJar by tasks.creating(Jar::class) {
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+    archiveClassifier.set("src")
+    from(sourceSets.main.get().allSource)
+}
+
+publishing.publications {
+    create<MavenPublication>("maven") {
+        artifact(tasks.remapJar)
+        artifact(sourcesJar) { classifier = "sources" }
+        pom {
+            name.set("SkyHanni")
+            licenses {
+                license {
+                    name.set("GNU Lesser General Public License")
+                    url.set("https://github.com/hannibal002/SkyHanni/blob/HEAD/LICENSE")
+                }
+            }
+            developers {
+                developer { name.set("hannibal002") }
+                developer { name.set("The SkyHanni contributors") }
+            }
+        }
+    }
+}
+
+
+

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -28,7 +30,6 @@ import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -68,6 +69,8 @@ class NonGodPotEffectDisplay {
 
         PEST_REPELLENT("§6Pest Repellent I§r"),
         PEST_REPELLENT_MAX("§6Pest Repellent II"),
+
+        CURSE_OF_GREED("§4Curse of Greed I"),
         ;
     }
 
@@ -154,7 +157,7 @@ class NonGodPotEffectDisplay {
             if (effect.isMixin && !config.nonGodPotEffectShowMixins) continue
 
             val remaining = time.remaining.coerceAtLeast(0.seconds)
-            val format = TimeUtils.formatDuration(remaining.inWholeMilliseconds, TimeUnit.HOUR)
+            val format = remaining.format(TimeUnit.HOUR)
             val color = remaining.timerColor()
 
             val displayName = effect.tabListName
@@ -189,7 +192,7 @@ class NonGodPotEffectDisplay {
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
-            val name = stack.name ?: continue
+            val name = stack.name
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
@@ -198,7 +201,7 @@ class NonGodPotEffectDisplay {
                         !line.contains("Remaining Uses")
                     ) {
                         val duration = try {
-                            TimeUtils.getMillis(line.split("§f")[1])
+                            TimeUtils.getDuration(line.split("§f")[1])
                         } catch (e: IndexOutOfBoundsException) {
                             ErrorManager.logErrorWithData(
                                 e, "Error while reading Non God-Potion effects from tab list",
@@ -206,7 +209,7 @@ class NonGodPotEffectDisplay {
                             )
                             continue
                         }
-                        effectDuration[effect] = Timer(duration.milliseconds)
+                        effectDuration[effect] = Timer(duration)
                         update()
                     }
                 }
@@ -232,8 +235,8 @@ class NonGodPotEffectDisplay {
                     if ("$line§r".startsWith(tabListName)) {
                         val string = line.substring(tabListName.length)
                         try {
-                            val duration = TimeUtils.getMillis(string.split("§f")[1])
-                            effectDuration[effect] = Timer(duration.milliseconds)
+                            val duration = TimeUtils.getDuration(string.split("§f")[1])
+                            effectDuration[effect] = Timer(duration)
                             update()
                         } catch (e: IndexOutOfBoundsException) {
                             ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
@@ -269,5 +272,5 @@ class NonGodPotEffectDisplay {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
+        LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 }

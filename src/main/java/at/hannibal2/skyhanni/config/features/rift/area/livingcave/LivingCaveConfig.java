@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.rift.area.livingcave;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class LivingCaveConfig {
 
