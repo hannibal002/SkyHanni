@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -39,14 +40,23 @@ object FossilExcavator {
     )
 
     private var inInventory = false
+    private var inExcavatorMenu = false
+
     private var foundPercentage = false
     private var percentage: String? = null
     private var chargesRemaining = 0
+
     private var slotToClick: Int? = null
     private var correctPercentage: String? = null
+
     private var isNotPossible = false
+    private var isCompleted = false
+
+    private var inventoryItemNames = listOf<String>()
 
     private const val NOT_POSSIBLE_STRING = "§cNo possible fossils on board."
+    private const val SOLVED_STRING = "§aFossil found, get all the loot you can."
+    private const val CHISELS_STRING = "§eChisel Charges Remaining: "
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -67,36 +77,40 @@ object FossilExcavator {
 
     private fun clearData() {
         inInventory = false
+        inExcavatorMenu = false
         foundPercentage = false
         percentage = null
         chargesRemaining = 0
         slotToClick = null
         correctPercentage = null
         isNotPossible = false
+        isCompleted = false
+        inventoryItemNames = emptyList()
     }
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-
-
     }
 
     @SubscribeEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-
-        val eventSlot = event.slot ?: return
-        if (eventSlot.slotIndex == slotToClick) {
-            slotToClick = null
-            correctPercentage = null
+        val slots = InventoryUtils.getItemsInOpenChest()
+        val itemNames = slots.map { it.stack.displayName.removeColor() }
+        if (itemNames != inventoryItemNames) {
+            inventoryItemNames = itemNames
+            inExcavatorMenu = itemNames.any { it == "Start Excavator" }
+            if (!inExcavatorMenu) return
+            // todo remove on merge
+            ChatUtils.chat("Inventory update detected")
+            updateData()
         }
+    }
 
-        val correctItem = eventSlot.stack.name.removeColor() == "Dirt"
-        if (!correctItem) return
-
+    private fun updateData() {
         val fossilLocations = mutableSetOf<Int>()
         val dirtLocations = mutableSetOf<Int>()
 
@@ -137,9 +151,25 @@ object FossilExcavator {
     }
 
     @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isEnabled()) return
+        if (!inInventory) return
+        if (inExcavatorMenu) return
+
+        event.makePickblock()
+
+        val slot = event.slot ?: return
+        if (slot.slotIndex == slotToClick) {
+            slotToClick = null
+            correctPercentage = null
+        }
+    }
+
+    @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
+        if (inExcavatorMenu) return
         if (slotToClick == null) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
@@ -154,6 +184,7 @@ object FossilExcavator {
         if (!isEnabled()) return
         if (!inInventory) return
         if (slotToClick != event.slot.slotNumber) return
+        if (inExcavatorMenu) return
         val correctPercentage = correctPercentage ?: return
 
         event.stackTip = correctPercentage
@@ -165,9 +196,20 @@ object FossilExcavator {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        if (isNotPossible) {
-            config.position.renderString(NOT_POSSIBLE_STRING, posLabel = "Fossil Excavator")
+
+        if (inExcavatorMenu) {
+            // render here so they can move it around. As if you press key while doing the excavator you lose the scrap
+            config.position.renderString("§eExcavator solver gui", posLabel = "Fossil Excavator")
+            return
         }
+
+        val displayString = when {
+            isNotPossible -> NOT_POSSIBLE_STRING
+            isCompleted -> SOLVED_STRING
+            else -> "$CHISELS_STRING$chargesRemaining"
+        }
+
+        config.position.renderString(displayString, posLabel = "Fossil Excavator")
     }
 
     fun nextData(slotToClick: FossilTile, correctPercentage: Double) {
@@ -181,5 +223,9 @@ object FossilExcavator {
         isNotPossible = true
     }
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
+    fun showCompleted() {
+        isCompleted = true
+    }
+
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
 }

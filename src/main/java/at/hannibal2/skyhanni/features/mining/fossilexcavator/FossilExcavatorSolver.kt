@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 import at.hannibal2.skyhanni.utils.ChatUtils
 
 object FossilExcavatorSolver {
+
     private val startingSequence: Set<Pair<FossilTile, Double>> = setOf(
         Pair(FossilTile(4, 2), 0.515),
         Pair(FossilTile(5, 4), 0.413),
@@ -14,11 +15,20 @@ object FossilExcavatorSolver {
         Pair(FossilTile(3, 4), 1.0),
     )
 
+    private var currentlySolving = false
+
     private fun isPositionInStartSequence(position: FossilTile): Boolean {
         return startingSequence.any { it.first == position }
     }
 
     fun findBestTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?) {
+        if (currentlySolving) {
+            // todo remove when merging
+            ChatUtils.chat("Still solving old one maybe events sending too fast :||||")
+            return
+        }
+        currentlySolving = true
+
         val invalidPositions: MutableSet<FossilTile> = mutableSetOf()
         for (i in 0..53) {
             if (i !in fossilLocations && i !in dirtLocations) {
@@ -33,15 +43,17 @@ object FossilExcavatorSolver {
             val movesTaken = invalidPositions.size
             if (movesTaken >= startingSequence.size) {
                 FossilExcavator.showError()
+                currentlySolving = false
                 return
             }
 
             val nextMove = startingSequence.elementAt(movesTaken)
             FossilExcavator.nextData(nextMove.first, nextMove.second)
+            currentlySolving = false
             return
         }
 
-        // todo remove
+        // todo remove on merge
         ChatUtils.chat("dirt: ${dirtLocations.size}, fossils: ${fossilLocations.size}, invalid: ${invalidPositions.size}")
 
         val possibleClickPositions: MutableMap<FossilTile, Int> = mutableMapOf()
@@ -72,12 +84,20 @@ object FossilExcavatorSolver {
         }
 
         val bestPosition = possibleClickPositions.maxByOrNull { it.value } ?: run {
+            if (fossilLocations.isNotEmpty()) {
+                FossilExcavator.showCompleted()
+                currentlySolving = false
+                return
+            }
+
             FossilExcavator.showError()
+            currentlySolving = false
             return
         }
 
         val nextMove = bestPosition.key
         val correctPercentage = bestPosition.value / totalPossibleTiles
+        currentlySolving = false
         FossilExcavator.nextData(nextMove, correctPercentage)
     }
 
