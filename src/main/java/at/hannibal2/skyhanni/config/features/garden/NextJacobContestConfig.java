@@ -5,11 +5,12 @@ import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,5 +100,6 @@ public class NextJacobContestConfig {
     public List<CropType> warnFor = new ArrayList<>(CropType.getEntries());
 
     @Expose
+    @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
     public Position pos = new Position(-200, 10, false, true);
 }

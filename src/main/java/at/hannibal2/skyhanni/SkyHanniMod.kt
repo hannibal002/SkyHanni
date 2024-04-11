@@ -218,6 +218,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer
 import at.hannibal2.skyhanni.features.garden.pests.SprayDisplay
 import at.hannibal2.skyhanni.features.garden.pests.SprayFeatures
+import at.hannibal2.skyhanni.features.garden.pests.StereoHarmonyDisplay
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
@@ -226,6 +227,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfG
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorRewardWarning
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
@@ -431,7 +433,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.2",
+    version = "0.25.Beta.5",
 )
 class SkyHanniMod {
 
@@ -470,6 +472,7 @@ class SkyHanniMod {
         loadModule(GardenCropMilestonesCommunityFix)
         loadModule(GardenCropUpgrades())
         loadModule(VisitorListener())
+        loadModule(VisitorRewardWarning())
         loadModule(OwnInventoryData())
         loadModule(ToolTipData())
         loadModule(HighlightVisitorsOutsideOfGarden())
@@ -711,7 +714,7 @@ class SkyHanniMod {
         loadModule(SackDisplay)
         loadModule(GardenStartLocation)
         loadModule(PetCandyUsedDisplay())
-        loadModule(ServerRestartTitle())
+        loadModule(ServerRestartTitle)
         loadModule(CityProjectFeatures())
         loadModule(GardenPlotIcon)
         loadModule(GardenPlotBorders)
@@ -759,7 +762,7 @@ class SkyHanniMod {
         loadModule(RiftMotesOrb())
         loadModule(ChestValue())
         loadModule(SlayerBossSpawnSoon())
-        loadModule(RiftBloodEffigies())
+        loadModule(RiftBloodEffigies)
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
@@ -804,6 +807,7 @@ class SkyHanniMod {
         loadModule(PestSpawnTimer)
         loadModule(PestFinder())
         loadModule(PestParticleWaypoint())
+        loadModule(StereoHarmonyDisplay())
         loadModule(SprayFeatures())
         loadModule(DojoRankDisplay())
         loadModule(SprayDisplay())

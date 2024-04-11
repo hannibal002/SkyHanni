@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,6 +168,7 @@ public class MiscConfig {
     public boolean playerMovementSpeed = false;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose

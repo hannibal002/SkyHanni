@@ -70,7 +70,7 @@ object SkillAPI {
     )
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab",
-        " (?<type>\\w+) (?<level>\\d+): §r§a(?<progress>.+)%$"
+        "(?:§e§lSkills: §r§a)?\\s*(?<type>\\w+) (?<level>\\d+): §r§.(?<progress>.+)%$"
     )
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max",

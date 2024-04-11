@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -49,8 +50,17 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
 
             // Read the actual JSON Object
             while (reader.peek() != JsonToken.END_OBJECT) {
+                // IllegalStateException: Expected NAME but was BOOLEAN
+                if (reader.peek() != JsonToken.NAME) {
+                    reader.skipValue()
+                    continue
+                }
                 val name = reader.nextName()
-                val field = clazz.getDeclaredField(name)
+                val field = clazz.getDeclaredFieldOrNull(name)
+                if (field == null) {
+                    println("field is in config file, but not in object file: $name")
+                    continue
+                }
                 val fieldType = gson.getAdapter(TypeToken.get(getType(type, field)))
                 // Read the field data
                 val data = fieldType.read(reader)
@@ -70,7 +80,7 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
         // Check if this object has any feature toggles present
         if (t.fields.none {
                 it.isAnnotationPresent(FeatureToggle::class.java) ||
-                        gson.getAdapter(TypeToken.get(getType(type, it))) is Adapter
+                    gson.getAdapter(TypeToken.get(getType(type, it))) is Adapter
             }) return null
 
         val originalWrite = gson.getDelegateAdapter(this, type)

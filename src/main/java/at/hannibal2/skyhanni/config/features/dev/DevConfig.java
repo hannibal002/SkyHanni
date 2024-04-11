@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.config.features.dev;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class DevConfig {
@@ -65,6 +65,9 @@ public class DevConfig {
 
     @Expose
     public Position debugLocationPos = new Position(1, 160, false, true);
+
+    @Expose
+    public Position debugItemPos = new Position(90, 70);
 
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
