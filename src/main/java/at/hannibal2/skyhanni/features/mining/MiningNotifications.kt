@@ -1,12 +1,21 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
 
 class MiningNotifications {
@@ -15,7 +24,8 @@ class MiningNotifications {
         MINESHAFT_SPAWN("§bGlacite Mineshaft", "§bMineshaft"),
         SCRAP("§9Suspicious Scrap", "§9Suspicious Scrap"),
         GOLDEN_GOBLIN("§6Golden Goblin", "§6Golden Goblin"),
-        DIAMOND_GOBLIN("§bDiamond Goblin", "§bDiamond Goblin");
+        DIAMOND_GOBLIN("§bDiamond Goblin", "§bDiamond Goblin"),
+        COLD("§bCold", "§bCold");
 
         override fun toString(): String {
             return str
@@ -39,8 +49,15 @@ class MiningNotifications {
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!"
     )
+    private val coldReset by patternGroup.pattern(
+        "cold.reset",
+        "§cThe warmth of the campfire reduced your §r§b❄ Cold §r§cto 0!"
+    )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
+
+    private var cold = 0
+    private var hasSentCold = false
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -52,6 +69,35 @@ class MiningNotifications {
             scrapDrop.matches(message) -> sendNotification(NotificationList.SCRAP)
             goldenGoblinSpawn.matches(message) -> sendNotification(NotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(NotificationList.DIAMOND_GOBLIN)
+            coldReset.matches(message) -> {
+                cold = 0
+                hasSentCold = false
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onScoreboard(event: ScoreboardChangeEvent) {
+        if (!config.enabled) return
+        if (!LorenzUtils.inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)) return
+        if (!ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }) return
+        cold = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.coldPattern, "cold").toInt().absoluteValue
+        if ((cold >= config.coldThreshold.get()) && !hasSentCold) {
+            hasSentCold = true
+            sendNotification(NotificationList.COLD)
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        cold = 0
+        hasSentCold = false
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.coldThreshold) {
+            if (cold != config.coldThreshold.get()) hasSentCold = false
         }
     }
 

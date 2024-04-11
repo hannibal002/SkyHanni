@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.features.mining.MiningNotifications.NotificationLis
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +29,7 @@ public class MiningNotificationsConfig {
     public List<NotificationList> notifications = new ArrayList<>(Arrays.asList(
             NotificationList.MINESHAFT_SPAWN,
             NotificationList.SCRAP,
+            NotificationList.COLD,
             NotificationList.GOLDEN_GOBLIN,
             NotificationList.DIAMOND_GOBLIN
     ));
@@ -36,4 +39,8 @@ public class MiningNotificationsConfig {
     @ConfigEditorBoolean
     public boolean playSound = true;
 
+    @Expose
+    @ConfigOption(name = "Cold Threshold", desc = "Change when the Cold notification gets triggered")
+    @ConfigEditorSlider(minValue = 1.0F, maxValue = 100.0F, minStep = 1.0F)
+    public Property<Integer> coldThreshold = Property.of(50);
 }
