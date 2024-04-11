@@ -372,10 +372,10 @@ private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBitsDisplayPair(): List<ScoreboardElementType> {
     val bits = BitsAPI.bits.coerceAtLeast(0).formatNum()
-    val bitsToClaim = if (BitsAPI.bitsToClaim == -1) {
+    val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {
         "§cOpen Sbmenu§b"
     } else {
-        BitsAPI.bitsToClaim.coerceAtLeast(0).formatNum()
+        BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
     }
 
     return listOf(
