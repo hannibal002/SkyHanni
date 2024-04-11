@@ -290,7 +290,7 @@ object BitsAPI {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(36, "#profile.bits.bitsToClaim", "#profile.bits.bitsAvailable")
+        event.move(35, "#profile.bits.bitsToClaim", "#profile.bits.bitsAvailable")
     }
 
     class FameRankNotFoundException(rank: String) : Exception("FameRank not found: $rank")

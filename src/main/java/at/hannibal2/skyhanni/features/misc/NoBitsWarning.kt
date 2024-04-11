@@ -29,7 +29,7 @@ class NoBitsWarning {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(36, "misc.noBitsWarning", "misc.noBitsWarning.enabled")
+        event.move(35, "misc.noBitsWarning", "misc.noBitsWarning.enabled")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
