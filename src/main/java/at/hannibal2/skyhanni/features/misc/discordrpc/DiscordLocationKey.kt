@@ -159,6 +159,7 @@ class DiscordLocationKey {
         "Jungle Temple" to "jungle",
         "Khazad-dûm" to "magma-fields",
         "Lost Precursor City" to "precursor-remnants",
+        "Mines of Divan" to "mithril-deposits",
 
         "Diamond Reserve" to "coal-mine",
         "Gunpowder Mines" to "coal-mine",
