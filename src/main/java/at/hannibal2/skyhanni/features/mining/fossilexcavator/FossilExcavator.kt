@@ -104,7 +104,7 @@ object FossilExcavator {
         if (itemNames != inventoryItemNames) {
             inventoryItemNames = itemNames
             inExcavatorMenu = itemNames.any { it == "Start Excavator" }
-            if (!inExcavatorMenu) return
+            if (inExcavatorMenu) return
             // todo remove on merge
             ChatUtils.chat("Inventory update detected")
             updateData()
