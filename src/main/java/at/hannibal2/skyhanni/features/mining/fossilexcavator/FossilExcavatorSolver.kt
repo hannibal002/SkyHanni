@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
+import at.hannibal2.skyhanni.utils.ChatUtils
+
 object FossilExcavatorSolver {
     private val startingSequence: Set<Pair<FossilTile, Double>> = setOf(
         Pair(FossilTile(4, 2), 0.515),
@@ -38,6 +40,9 @@ object FossilExcavatorSolver {
             FossilExcavator.nextData(nextMove.first, nextMove.second)
             return
         }
+
+        // todo remove
+        ChatUtils.chat("dirt: ${dirtLocations.size}, fossils: ${fossilLocations.size}, invalid: ${invalidPositions.size}")
 
         val possibleClickPositions: MutableMap<FossilTile, Int> = mutableMapOf()
         var totalPossibleTiles = 0.0
