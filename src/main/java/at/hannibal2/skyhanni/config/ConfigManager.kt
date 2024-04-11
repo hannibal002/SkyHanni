@@ -217,8 +217,7 @@ class ConfigManager {
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
         UpdateManager.injectConfigProcessor(processor)
-        val configProcessorDriver = ConfigProcessorDriver(processor)
-        configProcessorDriver.processConfig(features)
+        ConfigProcessorDriver(processor).processConfig(features)
 
         try {
             findPositionLinks(features, mutableSetOf())
