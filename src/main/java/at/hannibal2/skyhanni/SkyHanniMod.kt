@@ -656,7 +656,7 @@ class SkyHanniMod {
         loadModule(GardenCropMilestoneDisplay)
         loadModule(GardenCustomKeybinds)
         loadModule(ChickenHeadTimer())
-        loadModule(FossilExcavator())
+        loadModule(FossilExcavator)
         loadModule(GardenOptimalSpeed())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
