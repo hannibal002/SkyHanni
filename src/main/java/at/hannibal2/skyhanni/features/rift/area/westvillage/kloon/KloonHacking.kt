@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -40,11 +39,9 @@ class KloonHacking {
     private var nearestTerminal: KloonTerminal? = null
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!RiftAPI.inRift()) return
-        if (event.repeatSeconds(1)) {
-            checkHelmet()
-        }
+        checkHelmet()
     }
 
     private fun checkHelmet() {
@@ -110,9 +107,9 @@ class KloonHacking {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTerminalInventory || !RiftAPI.inRift()) return
-        event.usePickblockInstead()
+        event.makePickblock()
     }
 
     @SubscribeEvent

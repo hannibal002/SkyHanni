@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.mining;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MiningEventConfig {
 
@@ -24,7 +25,7 @@ public class MiningEventConfig {
     @Expose
     @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the gui.")
     @ConfigEditorDropdown
-    public ShowType showType = ShowType.BOTH;
+    public ShowType showType = ShowType.ALL;
 
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compresses the event names so that they are shorter.")
@@ -38,9 +39,10 @@ public class MiningEventConfig {
     public boolean passedEvents = false;
 
     public enum ShowType {
-        BOTH("Both Mining Islands"),
+        ALL("All Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
         DWARVEN("Dwarven Mines Only"),
+        MINESHAFT("Mineshaft Only"),
         CURRENT("Current Island Only"),
         ;
 
@@ -57,5 +59,6 @@ public class MiningEventConfig {
     }
 
     @Expose
+    @ConfigLink(owner = MiningEventConfig.class, field = "enabled")
     public Position position = new Position(15, 70, false, true);
 }

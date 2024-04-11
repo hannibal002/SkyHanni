@@ -72,7 +72,7 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     @SubscribeEvent
-    fun onEntityJoinWorldEvent(event: EntityJoinWorldEvent) {
+    fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
         playerColor(event)
         val entity = event.entity as? EntityArmorStand ?: return
         analyzeArmorStand(entity)

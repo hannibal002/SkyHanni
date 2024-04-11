@@ -158,6 +158,7 @@ object SlayerAPI {
         -> SlayerType.SVEN
 
         "The End",
+        "Dragon's Nest",
         "Void Sepulture",
         "Zealot Bruiser Hideout",
         -> SlayerType.VOID

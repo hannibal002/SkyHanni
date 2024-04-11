@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
-import net.minecraft.event.HoverEvent
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
@@ -124,9 +123,7 @@ object ChatManager {
         }
         val key = IdentityCharacteristics(original)
         val chatEvent = LorenzChatEvent(message, original)
-        if (!isSoopyMessage(event.message)) {
-            chatEvent.postAndCatch()
-        }
+        chatEvent.postAndCatch()
 
         val blockReason = chatEvent.blockedReason.uppercase()
         if (blockReason != "") {
@@ -159,33 +156,6 @@ object ChatManager {
                 event.message, chatEvent.chatLineId
             )
         }
-    }
-
-    private fun isSoopyMessage(message: IChatComponent): Boolean {
-        for (sibling in message.siblings) {
-            if (isSoopyMessage(sibling)) return true
-        }
-
-        val style = message.chatStyle ?: return false
-        val hoverEvent = style.chatHoverEvent ?: return false
-        if (hoverEvent.action != HoverEvent.Action.SHOW_TEXT) return false
-        val text = hoverEvent.value?.formattedText ?: return false
-
-        val lines = text.split("\n")
-        if (lines.isEmpty()) return false
-
-        val last = lines.last()
-        if (last.startsWith("§f§lCOMMON")) return true
-        if (last.startsWith("§a§lUNCOMMON")) return true
-        if (last.startsWith("§9§lRARE")) return true
-        if (last.startsWith("§5§lEPIC")) return true
-        if (last.startsWith("§6§lLEGENDARY")) return true
-        if (last.startsWith("§d§lMYTHIC")) return true
-        if (last.startsWith("§c§lSPECIAL")) return true
-
-        // TODO confirm this format is correct
-        if (last.startsWith("§c§lVERY SPECIAL")) return true
-        return false
     }
 
     fun openChatFilterGUI(args: Array<String>) {

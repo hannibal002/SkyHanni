@@ -3,17 +3,16 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.SackStatus
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
@@ -72,7 +71,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
@@ -221,22 +220,14 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
 
         val sacksText = if (quest is FetchQuest && quest.state != QuestState.COLLECTED) {
-            val sackItem = SackAPI.fetchSackItem(quest.displayItem)
-            val sackStatus = sackItem.getStatus()
-
-            if (sackStatus == SackStatus.OUTDATED) {
-                " §7(§eSack data outdated§7)"
-            } else {
-                val amountInSacks = sackItem.amount
-                val needAmount = quest.needAmount
-
-                val color = if (amountInSacks >= needAmount) {
+            quest.displayItem.getAmountInSacksOrNull()?.let {
+                val color = if (it >= quest.needAmount) {
                     "§a"
                 } else {
                     "§c"
                 }
-                " §7($color${amountInSacks.addSeparators()} §7in sacks)"
-            }
+                " §7($color${it.addSeparators()} §7in sacks)"
+            } ?: " §7(§eSack data outdated/missing§7)"
         } else {
             ""
         }

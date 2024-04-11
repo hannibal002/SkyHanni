@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -66,11 +67,9 @@ class CurrentPetDisplay {
         if (!PetAPI.isPetMenu(event.inventoryName)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
-        for (line in lore) {
-            inventorySelectedPetPattern.matchMatcher(line) {
-                val newPet = group("pet")
-                PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
-            }
+        lore.matchFirst(inventorySelectedPetPattern) {
+            val newPet = group("pet")
+            PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
         }
     }
 

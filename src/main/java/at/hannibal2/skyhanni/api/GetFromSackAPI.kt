@@ -110,7 +110,7 @@ object GetFromSackAPI {
     }
 
     @SubscribeEvent
-    fun onTooltipRender(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val list = inventoryMap[event.slot.slotIndex] ?: return
         event.toolTip.let { tip ->
@@ -203,9 +203,9 @@ object GetFromSackAPI {
         val message = event.message
         fromSacksChatPattern.matchMatcher(message) {
             val diff = stack.amount - group("amount").toInt()
+            lastItemStack = null
             if (diff <= 0) return
             bazaarMessage(stack.itemName, diff, true)
-            lastItemStack = null
             return
         }
         missingChatPattern.matchMatcher(message) {
