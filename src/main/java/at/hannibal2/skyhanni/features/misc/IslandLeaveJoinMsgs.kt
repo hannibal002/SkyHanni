@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object IslandLeaveJoinMsgs {
     private val config get() = SkyHanniMod.feature.misc.leaveJoinMsgs
@@ -115,7 +116,7 @@ object IslandLeaveJoinMsgs {
         if (players.isEmpty()) return
 
         // rather arbitrary multiplier to fix totalPlayers sometimes having a couple more than players
-        if (players.size >= totalPlayers * 0.9 || players.size >= 37 && System.currentTimeMillis() - LorenzUtils.lastWorldSwitch > 2_000) {
+        if (players.size >= totalPlayers * 0.9 || players.size >= 37 && LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
             updatedSinceWorldSwitch = true
         }
 
