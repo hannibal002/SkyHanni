@@ -120,7 +120,7 @@ class JacobContestStatsSummary {
         val unsortedList = mutableListOf<String>()
         unsortedList.add("§e§l$cropName Contest Stats")
         unsortedList.add("§7Started §b$formattedStartTime §7into contest")
-        unsortedList.add("§7Participated for §b$timeParticipated")
+        unsortedList.add("§7Participating for §b$timeParticipated")
         unsortedList.add("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
         unsortedList.add("§7Blocks per Second: §c$blocksPerSecond")
         unsortedList.add("§7Position: $position")
