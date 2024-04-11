@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -79,6 +80,23 @@ object FossilExcavator {
         if (!isEnabled()) return
         if (!inInventory) return
 
+
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isEnabled()) return
+        if (!inInventory) return
+
+        val eventSlot = event.slot ?: return
+        if (eventSlot.slotIndex == slotToClick) {
+            slotToClick = null
+            correctPercentage = null
+        }
+
+        val correctItem = eventSlot.stack.name.removeColor() == "Dirt"
+        if (!correctItem) return
+
         val fossilLocations = mutableSetOf<Int>()
         val dirtLocations = mutableSetOf<Int>()
 
@@ -115,18 +133,6 @@ object FossilExcavator {
 
         coroutineScope.launch {
             FossilExcavatorSolver.findBestTile(fossilLocations, dirtLocations, percentage)
-        }
-    }
-
-    @SubscribeEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled()) return
-        if (!inInventory) return
-
-        val slot = event.slot ?: return
-        if (slot.slotIndex == slotToClick) {
-            slotToClick = null
-            correctPercentage = null
         }
     }
 
