@@ -156,12 +156,11 @@ class JacobContestStatsSummary {
                 val duration = startTime.passedSince()
                 val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
                 val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
-                val time = TimeUtils.formatDuration(duration.toLong(DurationUnit.MILLISECONDS) - 999)
-                val timeTest = startTime.passedSince().format()
+                val time = startTime.passedSince().format()
                 val position = if (percent == -1.0) "§eNo data" else "§fTop $medalColor${(percent * 100).round(1)}%"
 
                 ChatUtils.chat("§l$cropName Contest Stats")
-                ChatUtils.chat("§7Participated for §b$time: $timeTest")
+                ChatUtils.chat("§7Participated for §b$time")
                 ChatUtils.chat("§7Total Blocks Broken: §e${blocksBroken.addSeparators()}")
                 ChatUtils.chat("§7Average Blocks per Second: §c$blocksPerSecond")
                 ChatUtils.chat("§7Position: $position")
