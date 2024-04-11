@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class JacobContestStatsConfig {
     @ConfigEditorDraggableList
     public List<ContestStatsTextEntry> text = new ArrayList<>(Arrays.asList(
         ContestStatsTextEntry.TITLE,
-        ContestStatsTextEntry.TIME,
+        ContestStatsTextEntry.START_TIME,
         ContestStatsTextEntry.BLOCKS_BROKEN,
         ContestStatsTextEntry.BPS,
         ContestStatsTextEntry.POSITION,
@@ -37,7 +38,8 @@ public class JacobContestStatsConfig {
 
     public enum ContestStatsTextEntry {
         TITLE("§e§lSugar Cane Contest Stats"),
-        TIME("§7Started §b3s §7into contest"),
+        START_TIME("§7Started §b3s §7into contest"),
+        PARTICIPATED_TIME("§7Participated for §b15m 25s"),
         BLOCKS_BROKEN("§7Blocks Broken: §e14,781"),
         BPS("§7Blocks per Second: §c19.94"),
         POSITION("§7Position: Top §b0.1%"),
@@ -56,5 +58,6 @@ public class JacobContestStatsConfig {
     }
 
     @Expose
+    @ConfigLink(owner = JacobContestStatsConfig.class, field = "jacobContestSummary")
     public Position pos = new Position(0, 240, false, true);
 }

@@ -12,15 +12,18 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.DurationUnit
 
 class JacobContestStatsSummary {
     private val config get() = GardenAPI.config.jacobContestStats
     private var blocksBroken = 0
-    private var startTime = 0L
+    private var startTime = SimpleTimeMark.farPast()
     private var startTimeIntoContest: Long? = null
     private var percent = -1.0
     private var medalColor = ""
@@ -83,12 +86,17 @@ class JacobContestStatsSummary {
                 amount = group("amount").fixScoreAmount()
             }
         }
+        if (timeLeft == 0L && amount == 0.0) return
+
         val fixedStartTime = startTimeIntoContest
         if (fixedStartTime == null) {
             startTimeIntoContest = 1200 - timeLeft
             predictedScore = amount.toLong()
+        } else {
+            predictedScore = if (1200 - timeLeft - fixedStartTime > 5) {
+                ((amount / (1200 - timeLeft - fixedStartTime)) * (1200 - fixedStartTime)).toLong()
+            } else amount.toLong()
         }
-        else predictedScore = ((amount / (1200 - timeLeft - fixedStartTime)) * (1200 - fixedStartTime)).toLong()
         update()
     }
 
@@ -103,14 +111,16 @@ class JacobContestStatsSummary {
         val formattedStartTime = TimeUtils.formatDuration(((startTimeIntoContest ?: return) * 1000 - 999))
         contestStats.clear()
         val cropName = FarmingContestAPI.contestCrop?.cropName
-        val duration = System.currentTimeMillis() - startTime
-        val durationInSeconds = duration.toDouble() / 1000
+        val duration = startTime.passedSince()
+        val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
+        val timeParticipated = duration.format()
         val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
         val position = if (percent == -1.0) "§eNo data yet" else "Top $medalColor${(percent * 100).round(1)}%"
 
         val unsortedList = mutableListOf<String>()
         unsortedList.add("§e§l$cropName Contest Stats")
         unsortedList.add("§7Started §b$formattedStartTime §7into contest")
+        unsortedList.add("§7Participated for §b$timeParticipated")
         unsortedList.add("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
         unsortedList.add("§7Blocks per Second: §c$blocksPerSecond")
         unsortedList.add("§7Position: $position")
@@ -137,20 +147,21 @@ class JacobContestStatsSummary {
         when (event.phase) {
             FarmingContestPhase.START -> {
                 ChatUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
-                startTime = System.currentTimeMillis()
+                startTime = SimpleTimeMark.now()
                 startTimeIntoContest = null
             }
 
             FarmingContestPhase.STOP -> {
                 val cropName = event.crop.cropName
-                val duration = System.currentTimeMillis() - startTime
-                val durationInSeconds = duration.toDouble() / 1000
+                val duration = startTime.passedSince()
+                val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
                 val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
-                val time = TimeUtils.formatDuration(duration - 999)
+                val time = TimeUtils.formatDuration(duration.toLong(DurationUnit.MILLISECONDS) - 999)
+                val timeTest = startTime.passedSince().format()
                 val position = if (percent == -1.0) "§eNo data" else "§fTop $medalColor${(percent * 100).round(1)}%"
 
                 ChatUtils.chat("§l$cropName Contest Stats")
-                ChatUtils.chat("§7Participated for §b$time")
+                ChatUtils.chat("§7Participated for §b$time: $timeTest")
                 ChatUtils.chat("§7Total Blocks Broken: §e${blocksBroken.addSeparators()}")
                 ChatUtils.chat("§7Average Blocks per Second: §c$blocksPerSecond")
                 ChatUtils.chat("§7Position: $position")
@@ -158,7 +169,7 @@ class JacobContestStatsSummary {
 
             FarmingContestPhase.CHANGE -> {
                 ChatUtils.chat("You changed the crop during the contest, resetting the Blocks Per Second calculation..")
-                startTime = System.currentTimeMillis()
+                startTime = SimpleTimeMark.now()
                 startTimeIntoContest = null
             }
         }

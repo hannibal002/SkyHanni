@@ -192,6 +192,10 @@ public class GardenConfig {
     public boolean jacobContestTimes = true;
 
     @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
+    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
+
+    @Expose
     @ConfigOption(
         name = "Custom BPS",
         desc = "Use custom Blocks per Second value in some GUIs instead of the real one."
@@ -208,15 +212,6 @@ public class GardenConfig {
         minStep = 0.1f
     )
     public double jacobContestCustomBpsValue = 19.9;
-
-    @Expose
-    @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
-    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
-
-    @Expose
-    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
-    @ConfigEditorBoolean
-    public boolean forcefullyEnabledAlwaysFinnegan = false;
 
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
