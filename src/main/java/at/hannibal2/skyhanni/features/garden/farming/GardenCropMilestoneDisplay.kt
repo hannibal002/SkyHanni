@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -64,17 +63,17 @@ object GardenCropMilestoneDisplay {
         if (GardenAPI.hideExtraGuis()) return
 
         config.progressDisplayPos.renderStringsAndItems(
-            progressDisplay, posLabel = "Crop Milestone Progress", itemScale = NEUItems.itemFontSize
+            progressDisplay, posLabel = "Crop Milestone Progress"
         )
 
         if (config.mushroomPetPerk.enabled) {
             config.mushroomPetPerk.pos.renderStringsAndItems(
-                mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk", itemScale = NEUItems.itemFontSize
+                mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk"
             )
         }
 
         if (config.next.bestDisplay) {
-            config.next.displayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time", itemScale = NEUItems.itemFontSize)
+            config.next.displayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time")
         }
     }
 
