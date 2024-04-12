@@ -313,9 +313,6 @@ object ItemUtils {
         string = string.substring(2)
         val matcher = UtilsPatterns.readAmountAfterPattern.matcher(string)
         if (!matcher.matches()) {
-            println("")
-            println("input: '$input'")
-            println("string: '$string'")
             return null
         }
 
