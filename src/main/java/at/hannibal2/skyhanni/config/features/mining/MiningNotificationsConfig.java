@@ -41,6 +41,6 @@ public class MiningNotificationsConfig {
 
     @Expose
     @ConfigOption(name = "Cold Threshold", desc = "Change when the Cold notification gets triggered.")
-    @ConfigEditorSlider(minValue = 1.0F, maxValue = 100.0F, minStep = 1.0F)
+    @ConfigEditorSlider(minValue = 1, maxValue = 100, minStep = 1)
     public Property<Integer> coldThreshold = Property.of(50);
 }
