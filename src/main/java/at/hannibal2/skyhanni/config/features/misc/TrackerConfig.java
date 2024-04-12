@@ -78,7 +78,7 @@ public class TrackerConfig {
             "(This contains name, amount and price)")
         @ConfigEditorBoolean
         @FeatureToggle
-        public boolean chat = false;
+        public boolean chat = true;
 
         @Expose
         @ConfigOption(name = "Minimum Price", desc = "Items below this price will not show up in chat.")
