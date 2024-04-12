@@ -213,15 +213,11 @@ object FossilExcavator {
         }
         displayList.add("$CHARGES_REMAINING_STRING§a$chargesRemaining")
 
-        if (!isCompleted && !isNotPossible) {
-            displayList.add("§ePossible Fossil types:")
-        }
         if (possibleFossilTypes.isNotEmpty()) {
+            displayList.add("§ePossible Fossil types:")
             for (fossil in possibleFossilTypes) {
                 displayList.add("§7- ${fossil.displayName}")
             }
-        } else {
-            displayList.add("§7All fossil types.")
         }
 
         config.position.renderStrings(displayList, posLabel = "Fossil Excavator")
