@@ -20,9 +20,10 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
-import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
+import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
@@ -384,6 +385,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<String> kingsTalkedTo = new ArrayList<>();
+
+        @Expose
+        public FossilExcavatorProfitTracker.Data fossilExcavatorProfitTracker = new FossilExcavatorProfitTracker.Data();
     }
 
     @Expose

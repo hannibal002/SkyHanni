@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -38,7 +37,7 @@ object FossilExcavatorAPI {
     private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
     private var inLoot = false
-    private var loot = listOf<Pair<String, Int>>()
+    private val loot = mutableListOf<Pair<String, Int>>()
 
     var inInventory = false
     var inExcavatorMenu = false
@@ -72,6 +71,8 @@ object FossilExcavatorAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!IslandType.DWARVEN_MINES.isInIsland()) return
+
         val message = event.message
 
         if (startPattern.matches(message)) {
@@ -82,8 +83,8 @@ object FossilExcavatorAPI {
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
-            FossilExcavationEvent(loot).postAndCatch()
-            loot = emptyList()
+            FossilExcavationEvent(loot.toList()).postAndCatch()
+            loot.clear()
             inLoot = false
             return
         }
@@ -93,8 +94,6 @@ object FossilExcavatorAPI {
             val newLine = itemLine.replace("§r", "")
             ItemUtils.readItemAmount(newLine) ?: return
         } ?: return
-        loot = loot.editCopy {
-            add(pair)
-        }
+        loot.add(pair)
     }
 }

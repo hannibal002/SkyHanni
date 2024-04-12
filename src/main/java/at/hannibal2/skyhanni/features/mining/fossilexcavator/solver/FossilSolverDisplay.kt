@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object FossilSolverDisplay {
 
-    private val config get() = SkyHanniMod.feature.mining.fossilExcavator
+    private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
 
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
     private val chargesRemainingPattern by patternGroup.pattern(
