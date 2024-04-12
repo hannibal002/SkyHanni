@@ -18,6 +18,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ExcavatorProfitTracker {
@@ -104,9 +106,12 @@ class ExcavatorProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        // hide during an active excavation
-        if (FossilExcavatorAPI.inInventory && !FossilExcavatorAPI.inExcavatorMenu) {
-            return
+        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
+        if (inChest) {
+        // Only show in excavation menu
+            if (!FossilExcavatorAPI.inExcavatorMenu) {
+                return
+            }
         }
 
         tracker.renderDisplay(config.position)
