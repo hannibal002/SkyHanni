@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.guide
 
+import at.hannibal2.skyhanni.utils.CollectionUtils.tableStretchXPadding
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import net.minecraft.client.renderer.GlStateManager
 
 abstract class GuideScrollPage(
@@ -13,11 +15,14 @@ abstract class GuideScrollPage(
 
     private var renderable: Renderable? = null
 
-    fun update(content: List<List<Renderable?>>) {
+    private val scroll = ScrollValue()
+
+    fun update(content: List<List<Renderable>>) {
         renderable = Renderable.scrollTable(
             content = content,
             height = sizeY - paddingY * 2,
-            xPadding = Renderable.calculateStretchXPadding(content, sizeX - paddingX * 3),
+            scrollValue = scroll,
+            xPadding = content.tableStretchXPadding(sizeX - paddingX * 3),
             yPadding = 5,
             hasHeader = hasHeader,
             button = 0

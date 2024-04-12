@@ -7,99 +7,52 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.c
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.guide.GuideTablePage
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 
-class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) :
-    GuideTablePage(
-        sizeX, sizeY, paddingX, paddingY, footerSpacing
-    ) {
+class OverviewPage_old : FFGuideGUI.FFGuidePage() {
 
     private var equipmentFF = mutableMapOf<FFTypes, Double>()
     private var armorFF = mutableMapOf<FFTypes, Double>()
 
-    override fun onSwitch() {
-        val (content, footer) = adDrawPage(0, 0)
-        update(content, footer)
-    }
-
-    fun adDrawPage(mouseX: Int, mouseY: Int): Pair<List<List<Renderable>>, List<Renderable>> {
-        val content = mutableListOf<MutableList<Renderable>>()
-        val footer = mutableListOf<Renderable>()
+    override fun drawPage(mouseX: Int, mouseY: Int) {
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
-        content.addTable(
-            0,
-            GuiRenderUtils.getFarmingBar(
-                label = "§6Universal Farming Fortune",
-                tooltip = "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-                    "§eSee on the grass block page",
-                currentValue = FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0,
-                maxValue = 1277,
-                width = 90
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§6Universal Farming Fortune",
+            "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
+                "§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1277,
+            FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 5, 90, mouseX, mouseY
         )
 
         var line = if (FFTypes.ANITA.notSaved()) "§cAnita buff not saved\n§eVisit Anita to set it!"
         else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
-
-        content.addTable(
-            1,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Anita Buff",
-                tooltip = line,
-                currentValue = FFStats.baseFF[FFTypes.ANITA] ?: 0.0,
-                maxValue = 60,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Anita Buff", line, FFStats.baseFF[FFTypes.ANITA] ?: 0.0, 60, FFGuideGUI.guiLeft + 15,
+            FFGuideGUI.guiTop + 30, 90, mouseX, mouseY
         )
 
         line = if (FFTypes.FARMING_LVL.notSaved()) "§cFarming level not saved\n§eOpen /skills to set it!"
         else "§7§2Fortune for levelling your farming skill\n§2You get 4☘ per farming level"
-
-        content.addTable(
-            2,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Farming Level",
-                tooltip = line,
-                currentValue = FFStats.baseFF[FFTypes.FARMING_LVL] ?: 0.0,
-                maxValue = 240,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Farming Level", line, FFStats.baseFF[FFTypes.FARMING_LVL] ?: 0.0, 240, FFGuideGUI.guiLeft + 15,
+            FFGuideGUI.guiTop + 55, 90, mouseX, mouseY
         )
 
         line =
             if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
             else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier"
-
-        content.addTable(
-            3,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Community upgrades",
-                tooltip = line,
-                currentValue = FFStats.baseFF[FFTypes.COMMUNITY_SHOP] ?: 0.0,
-                maxValue = 40,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Community upgrades", line, FFStats.baseFF[FFTypes.COMMUNITY_SHOP] ?: 0.0,
+            40, FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 80, 90, mouseX, mouseY
         )
 
         line =
             if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
             else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked"
-
-        content.addTable(
-            4,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Garden Plots",
-                tooltip = line,
-                currentValue = FFStats.baseFF[FFTypes.PLOTS] ?: 0.0,
-                maxValue = 72,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Garden Plots", line, FFStats.baseFF[FFTypes.PLOTS] ?: 0.0, 72, FFGuideGUI.guiLeft + 15,
+            FFGuideGUI.guiTop + 105, 90, mouseX, mouseY
         )
 
         line = when (FFStats.cakeExpireTime) {
@@ -109,16 +62,9 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         if (FFStats.cakeExpireTime - System.currentTimeMillis() < 0 && FFStats.cakeExpireTime != -1L) {
             line = "§cYour cake buff has run out\nGo eat some cake!"
         }
-
-        content.addTable(
-            5,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Cake Buff",
-                tooltip = line,
-                currentValue = FFStats.baseFF[FFTypes.CAKE] ?: 0.0,
-                maxValue = 5,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Cake Buff", line, FFStats.baseFF[FFTypes.CAKE] ?: 0.0, 5, FFGuideGUI.guiLeft + 15,
+            FFGuideGUI.guiTop + 130, 90, mouseX, mouseY
         )
 
         val armorItem = when (currentArmor) {
@@ -155,16 +101,9 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                 else -> 78.75
             }
         }
-
-        content.addTable(
-            1,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Total $word Fortune",
-                tooltip = line,
-                currentValue = armorFF[FFTypes.TOTAL] ?: 0,
-                maxValue = value,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Total $word Fortune", line, armorFF[FFTypes.TOTAL] ?: 0, value,
+            FFGuideGUI.guiLeft + 135, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY
         )
 
         line = if (currentArmor == 0) "§7§2The base fortune from your armor\n§2Select a piece for more info"
@@ -176,16 +115,10 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             3 -> 35
             else -> if (FFStats.usingSpeedBoots) 60 else 30
         }
-
-        content.addTable(
-            2,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Base $word Fortune",
-                tooltip = line,
-                currentValue = armorFF[FFTypes.BASE] ?: 0,
-                maxValue = value + 55,
-                width = 90
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Base $word Fortune", line, armorFF[FFTypes.BASE] ?: 0,
+            value, FFGuideGUI.guiLeft + 135,
+            FFGuideGUI.guiTop + 55, 90, mouseX, mouseY
         )
 
         line = if (currentArmor == 0) "§7§2The fortune from your armor's ability\n§2Select a piece for more info"
@@ -203,15 +136,10 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             }
         }
 
-        content.addTable(
-            3,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2$word Ability",
-                tooltip = line,
-                currentValue = armorFF[FFTypes.ABILITY] ?: 0,
-                maxValue = value,
-                width = 90
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2$word Ability", line, armorFF[FFTypes.ABILITY] ?: 0,
+            value, FFGuideGUI.guiLeft + 135,
+            FFGuideGUI.guiTop + 80, 90, mouseX, mouseY
         )
 
         line = if (currentArmor == 0) "§7§2The fortune from your armor's reforge\n§2Select a piece for more info"
@@ -221,16 +149,10 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         } else if (currentArmor == 4) {
             if (FFStats.usingSpeedBoots) 25 else 30
         } else 30
-
-        content.addTable(
-            4,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2$word Reforge",
-                tooltip = line,
-                currentValue = armorFF[FFTypes.REFORGE] ?: 0,
-                maxValue = value,
-                width = 90
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2$word Reforge", line, armorFF[FFTypes.REFORGE] ?: 0,
+            value, FFGuideGUI.guiLeft + 135,
+            FFGuideGUI.guiTop + 105, 90, mouseX, mouseY
         )
 
         var currentPet = FFStats.rabbitFF
@@ -254,17 +176,11 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             else -> {}
         }
 
-        footer.add(
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Total Pet Fortune",
-                tooltip = "§7§2The total fortune from your pet and its item",
-                currentValue = currentPet[FFTypes.TOTAL] ?: 0,
-                maxValue = petMaxFF,
-                width = 70
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Total Pet Fortune", "§7§2The total fortune from your pet and its item",
+            currentPet[FFTypes.TOTAL] ?: 0, petMaxFF, FFGuideGUI.guiLeft + 105,
+            FFGuideGUI.guiTop + 155, 70, mouseX, mouseY
         )
-
-
 
         line = when (FFStats.currentPetItem) {
             "GREEN_BANDANA" -> "§7§2The fortune from your pet's item\n§2Grants 4☘ per garden level"
@@ -272,15 +188,9 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
             else -> "No fortune boosting pet item"
         }
-
-        footer.add(
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Pet Item",
-                tooltip = line,
-                currentValue = currentPet[FFTypes.PET_ITEM] ?: 0,
-                maxValue = 60,
-                width = 70,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2Pet Item", line, currentPet[FFTypes.PET_ITEM] ?: 0, 60, FFGuideGUI.guiLeft + 185,
+            FFGuideGUI.guiTop + 155, 70, mouseX, mouseY
         )
 
         word = if (currentEquipment == 0) "Equipment" else "Piece"
@@ -310,113 +220,50 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         line = if (currentEquipment == 0) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${equipmentItem.getItem().displayName}"
+        GuiRenderUtils.drawFarmingBar(
+            "§2Total $word Fortune", line, equipmentFF[FFTypes.TOTAL] ?: 0,
+            if (currentEquipment == 0) maxFortunePerPiece * 4 else maxFortunePerPiece,
 
-        content.addTable(
-            1,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2Total $word Fortune", tooltip = line, currentValue = equipmentFF[FFTypes.TOTAL] ?: 0,
-                maxValue = if (currentEquipment == 0) maxFortunePerPiece * 4 else maxFortunePerPiece, width = 90
-            )
+            FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 30, 90, mouseX, mouseY
         )
 
         line = if (currentEquipment == 0) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
         else "§7§2Total base fortune from your\n${equipmentItem.getItem().displayName}"
-
-        content.addTable(
-            2,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2$word Base Fortune",
-                tooltip = line,
-                currentValue = equipmentFF[FFTypes.BASE] ?: 0,
-                maxValue = if (currentEquipment == 0) maxEquipmentBaseFortune * 4 else maxEquipmentBaseFortune,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2$word Base Fortune", line, equipmentFF[FFTypes.BASE] ?: 0,
+            if (currentEquipment == 0) maxEquipmentBaseFortune * 4 else maxEquipmentBaseFortune,
+            FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 55, 90, mouseX, mouseY
         )
 
         line =
             if (currentEquipment == 0) "§7§2The fortune from all of your equipment's abilities\n§2Select a piece for more info"
             else "§7§2Total ability fortune from your\n${equipmentItem.getItem().displayName}"
-        content.addTable(
-            3,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2$word Ability",
-                tooltip = line,
-                currentValue = equipmentFF[FFTypes.ABILITY] ?: 0,
-                maxValue = if (currentEquipment == 0) maxEquipmentAbilityFortune * 4 else maxEquipmentAbilityFortune,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2$word Ability", line, equipmentFF[FFTypes.ABILITY] ?: 0,
+            if (currentEquipment == 0) maxEquipmentAbilityFortune * 4 else maxEquipmentAbilityFortune,
+            FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 80, 90, mouseX, mouseY
         )
 
         line =
             if (currentEquipment == 0) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
             else "§7§2Total reforge fortune from your\n${equipmentItem.getItem().displayName}"
-
-        content.addTable(
-            4,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2$word Reforge",
-                tooltip = line,
-                currentValue = equipmentFF[FFTypes.REFORGE] ?: 0,
-                maxValue = if (currentEquipment == 0) maxEquipmentReforgeFortune * 4 else maxEquipmentReforgeFortune,
-                width = 90,
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2$word Reforge", line, equipmentFF[FFTypes.REFORGE] ?: 0,
+            if (currentEquipment == 0) maxEquipmentReforgeFortune * 4 else maxEquipmentReforgeFortune,
+            FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 105, 90, mouseX, mouseY
         )
 
         line =
             if (currentEquipment == 0) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
             else "§7§2Total enchantment fortune from your\n${equipmentItem.getItem().displayName}"
-
-        content.addTable(
-            5,
-            Renderable.horizontalContainer(
-                FarmingItems.getPetsDisplay(),
-                4,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            )
+        GuiRenderUtils.drawFarmingBar(
+            "§2$word Enchantment", line, equipmentFF[FFTypes.GREEN_THUMB] ?: 0,
+            if (currentEquipment == 0) maxGreenThumbFortune * 4 else maxGreenThumbFortune,
+            FFGuideGUI.guiLeft + 255, FFGuideGUI.guiTop + 130, 90, mouseX, mouseY
         )
-
-        content.addTable(
-            5,
-            GuiRenderUtils.getFarmingBar(
-                label = "§2$word Enchantment",
-                tooltip = line,
-                currentValue = equipmentFF[FFTypes.GREEN_THUMB] ?: 0,
-                maxValue = if (currentEquipment == 0) maxGreenThumbFortune * 4 else maxGreenThumbFortune,
-                width = 90,
-            )
-        )
-
-        // Displays
-
-        content.addTable(
-            0,
-            Renderable.horizontalContainer(
-                FarmingItems.getArmorDisplay(),
-                4,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            )
-        )
-        content.addTable(
-            0,
-            Renderable.horizontalContainer(
-                FarmingItems.getEquipmentDisplay(),
-                4,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            )
-        )
-
-
-        return content to footer
     }
 
     private fun FFTypes.notSaved(): Boolean = FFStats.baseFF[this]?.let {
         it < 0.0
     } ?: true
-}
-
-private fun MutableList<MutableList<Renderable>>.addTable(row: Int, r: Renderable) {
-    this.getOrNull(row)?.add(r) ?: mutableListOf(r).let { this.add(row, it) }
 }

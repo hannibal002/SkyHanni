@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
@@ -26,6 +26,8 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
     companion object {
 
+        val pages = mutableMapOf<FortuneGuidePage, FFGuidePage>()
+
         var guiLeft = 0
         var guiTop = 0
 
@@ -46,17 +48,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
-        fun FarmingItems.getItem(): ItemStack {
-            val fortune = GardenAPI.storage?.fortune ?: return getFallbackItem(this)
-
-            val farmingItems = fortune.farmingItems
-            farmingItems[this]?.let { return it }
-
-            val fallbackItem = getFallbackItem(this)
-            farmingItems[this] = fallbackItem
-            return fallbackItem
-        }
-
         private val fallbackItems = mutableMapOf<FarmingItems, ItemStack>()
 
         fun getFallbackItem(item: FarmingItems) = fallbackItems.getOrPut(item) {
@@ -64,7 +55,12 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             ItemStack(Blocks.barrier).setStackDisplayName(name)
         }
 
-        fun isFallbackItem(item: ItemStack) = item.name!!.startsWith("§cNo saved ")
+        fun isFallbackItem(item: ItemStack) = item.name.startsWith("§cNo saved ")
+
+        fun open() {
+            CaptureFarmingGear.captureFarmingGear()
+            SkyHanniMod.screenToOpen = FFGuideGUI()
+        }
     }
 
     init {
@@ -79,21 +75,17 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             }
         }
 
-
         // New Code
         pageList = mapOf(
-            FortuneGuidePage.OVERVIEW to OverviewPage(),
+            FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
             FortuneGuidePage.CROP to CropPage(),
             FortuneGuidePage.UPGRADES to UpgradePage(sizeX, sizeY),
         )
-        verticalTabs = listOf(
-            vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {
-                currentPage = if (currentCrop == null) FortuneGuidePage.OVERVIEW else FortuneGuidePage.CROP
-            },
-            vTab(ItemStack(Items.map), Renderable.string("§eUpgrades")) {
-                currentPage = FortuneGuidePage.UPGRADES
-            }
-        )
+        verticalTabs = listOf(vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {
+            currentPage = if (currentCrop == null) FortuneGuidePage.OVERVIEW else FortuneGuidePage.CROP
+        }, vTab(ItemStack(Items.map), Renderable.string("§eUpgrades")) {
+            currentPage = FortuneGuidePage.UPGRADES
+        })
         horizontalTabs = buildList {
             add(hTab(ItemStack(Blocks.grass), Renderable.string("§eOverview")) {
                 currentCrop = null
@@ -138,122 +130,178 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         } else {
             GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
             if (currentCrop == null) {
-                GuiRenderUtils.renderItemAndTip(
+                /* GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.HELMET.getItem(), guiLeft + 142, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.HELMET.getItem(),
+                    guiLeft + 142,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentArmor == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.CHESTPLATE.getItem(),
+                    guiLeft + 162,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentArmor == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.LEGGINGS.getItem(), guiLeft + 182, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.LEGGINGS.getItem(),
+                    guiLeft + 182,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentArmor == 3) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.BOOTS.getItem(), guiLeft + 202, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.BOOTS.getItem(),
+                    guiLeft + 202,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentArmor == 4) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.NECKLACE.getItem(), guiLeft + 262, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.NECKLACE.getItem(),
+                    guiLeft + 262,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentEquipment == 1) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.CLOAK.getItem(), guiLeft + 282, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.CLOAK.getItem(),
+                    guiLeft + 282,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentEquipment == 2) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.BELT.getItem(), guiLeft + 302, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.BELT.getItem(),
+                    guiLeft + 302,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentEquipment == 3) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.BRACELET.getItem(), guiLeft + 322, guiTop + 5, mouseX, mouseY,
+                    FarmingItems.BRACELET.getItem(),
+                    guiLeft + 322,
+                    guiTop + 5,
+                    mouseX,
+                    mouseY,
                     if (currentEquipment == 4) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.ELEPHANT.getItem(), guiLeft + 142, guiTop + 130, mouseX, mouseY,
+                    FarmingItems.ELEPHANT.getItem(),
+                    guiLeft + 142,
+                    guiTop + 130,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.ELEPHANT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 162, guiTop + 130, mouseX, mouseY,
+                    FarmingItems.MOOSHROOM_COW.getItem(),
+                    guiLeft + 162,
+                    guiTop + 130,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.MOOSHROOM_COW) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.RABBIT.getItem(), guiLeft + 182, guiTop + 130, mouseX, mouseY,
+                    FarmingItems.RABBIT.getItem(),
+                    guiLeft + 182,
+                    guiTop + 130,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.RABBIT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.BEE.getItem(), guiLeft + 202, guiTop + 130, mouseX, mouseY,
+                    FarmingItems.BEE.getItem(),
+                    guiLeft + 202,
+                    guiTop + 130,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.BEE) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
-                )
+                ) */
             } else {
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.ELEPHANT.getItem(), guiLeft + 142, guiTop + 160, mouseX, mouseY,
+                    FarmingItems.ELEPHANT.getItem(),
+                    guiLeft + 142,
+                    guiTop + 160,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.ELEPHANT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.MOOSHROOM_COW.getItem(), guiLeft + 162, guiTop + 160, mouseX, mouseY,
+                    FarmingItems.MOOSHROOM_COW.getItem(),
+                    guiLeft + 162,
+                    guiTop + 160,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.MOOSHROOM_COW) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.RABBIT.getItem(), guiLeft + 182, guiTop + 160, mouseX, mouseY,
+                    FarmingItems.RABBIT.getItem(),
+                    guiLeft + 182,
+                    guiTop + 160,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.RABBIT) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
-                    FarmingItems.BEE.getItem(), guiLeft + 202, guiTop + 160, mouseX, mouseY,
+                    FarmingItems.BEE.getItem(),
+                    guiLeft + 202,
+                    guiTop + 160,
+                    mouseX,
+                    mouseY,
                     if (currentPet == FarmingItems.BEE) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 )
 
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.HELMET.getItem(), guiLeft + 162, guiTop + 80, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.HELMET.getItem(), guiLeft + 162, guiTop + 80, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 100, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 100, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.LEGGINGS.getItem(), guiLeft + 162, guiTop + 120, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.LEGGINGS.getItem(), guiLeft + 162, guiTop + 120, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.BOOTS.getItem(), guiLeft + 162, guiTop + 140, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.BOOTS.getItem(), guiLeft + 162, guiTop + 140, mouseX, mouseY
                 )
 
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.NECKLACE.getItem(), guiLeft + 182, guiTop + 80, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.NECKLACE.getItem(), guiLeft + 182, guiTop + 80, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.CLOAK.getItem(), guiLeft + 182, guiTop + 100, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.CLOAK.getItem(), guiLeft + 182, guiTop + 100, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.BELT.getItem(), guiLeft + 182, guiTop + 120, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.BELT.getItem(), guiLeft + 182, guiTop + 120, mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay,
-                    FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140, mouseX, mouseY
                 )
             }
         }
@@ -281,8 +329,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
     @Throws(IOException::class)
     fun mouseClickEvent() {
         var x = guiLeft + 15
-        var y = guiTop - 28
-        /* if (isMouseIn(x, y, 25, 28)) {
+        var y = guiTop - 28/* if (isMouseIn(x, y, 25, 28)) {
             // SoundUtils.playClickSound()
             if (currentCrop != null) {
                 currentCrop = null
@@ -457,9 +504,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, width, height)
 
     enum class FortuneGuidePage {
-        OVERVIEW,
-        CROP,
-        UPGRADES
+        OVERVIEW, CROP, UPGRADES
     }
 
     abstract class FFGuidePage : GuidePage() {

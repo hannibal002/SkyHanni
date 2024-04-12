@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NumberUtil.percentOf
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -18,7 +19,6 @@ import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.ceil
 import kotlin.math.min
-import kotlin.math.roundToInt
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -72,12 +72,7 @@ object GuiRenderUtils {
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
         drawStringCentered(
-            str,
-            Minecraft.getMinecraft().fontRendererObj,
-            x.toFloat(),
-            y.toFloat(),
-            true,
-            0xffffff
+            str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff
         )
     }
 
@@ -127,30 +122,33 @@ object GuiRenderUtils {
             if (tooltipY + tooltipHeight + 6 > screenHeight) tooltipY = screenHeight - tooltipHeight - 6
             // main background
             GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3,
-                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0
+                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0
             )
 
             // borders
             GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3 + 1,
-                tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor
+                tooltipX - 3, tooltipY - 3 + 1, tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor
 
             )
 
             GuiScreen.drawRect(
-                tooltipX + tooltipTextWidth + 2, tooltipY - 3 + 1,
-                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3 - 1, borderColor
+                tooltipX + tooltipTextWidth + 2,
+                tooltipY - 3 + 1,
+                tooltipX + tooltipTextWidth + 3,
+                tooltipY + tooltipHeight + 3 - 1,
+                borderColor
             )
 
             GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3,
-                tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor
+                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor
             )
 
             GuiScreen.drawRect(
-                tooltipX - 3, tooltipY + tooltipHeight + 2,
-                tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColor
+                tooltipX - 3,
+                tooltipY + tooltipHeight + 2,
+                tooltipX + tooltipTextWidth + 3,
+                tooltipY + tooltipHeight + 3,
+                borderColor
             )
             GlStateManager.translate(0f, 0f, -100f)
             GlStateManager.disableDepth()
@@ -181,11 +179,7 @@ object GuiRenderUtils {
         val width = barWidth * progress
         GuiScreen.drawRect(x + 1, y + 1, (x + width).toInt() + 1, y + 5, 0xFF00FF00.toInt())
         if (progress != 1f) GuiScreen.drawRect(
-            (x + width).toInt() + 1,
-            y + 1,
-            x + barWidth - 1,
-            y + 5,
-            0xFF013220.toInt()
+            (x + width).toInt() + 1, y + 1, x + barWidth - 1, y + 5, 0xFF013220.toInt()
         )
     }
 
@@ -231,25 +225,10 @@ object GuiRenderUtils {
         width: Int,
         mouseX: Int,
         mouseY: Int,
-        output: MutableList<String>,
         textScale: Float = .7f,
     ) {
-        val percent = currentValue.percentOf(maxValue)
         GlStateManager.translate(xPos.toFloat(), yPos.toFloat(), 0f)
-        Renderable.hoverTips(
-            Renderable.verticalList(
-                listOf(
-                    Renderable.string(label, scale = 0.7),
-                    Renderable.leftRightBox(
-                        Renderable.string("§2${DecimalFormat("0.##").format(currentValue.toDouble())} / ${DecimalFormat("0.##").format(maxValue)}☘", scale = 0.7),
-                        Renderable.string("§2${(percent * 100).round(1)}%", scale = 0.7),
-                        width
-                    ),
-                    Renderable.progressBar(percent, width = width)
-                )
-            ),
-            listOf(Renderable.string(tooltip))
-        ).render(mouseX, mouseY)
+        getFarmingBar(label, tooltip, currentValue, maxValue, width, textScale).render(mouseX, mouseY)
         GlStateManager.translate(-xPos.toFloat(), -yPos.toFloat(), 0f)
 
         /* var currentVal = currentValue.toDouble()
@@ -299,6 +278,39 @@ object GuiRenderUtils {
         } */
     }
 
+    fun getFarmingBar(
+        label: String,
+        tooltip: String,
+        currentValue: Number,
+        maxValue: Number,
+        width: Int,
+        textScale: Float = .7f,
+    ): Renderable {
+        val percent = currentValue.fractionOf(maxValue)
+        val scale = textScale.toDouble()
+        return Renderable.hoverTips(Renderable.verticalContainer(
+            listOf(
+                Renderable.string(label, scale = scale),
+                Renderable.fixedSizeLine(
+                    listOf(
+                        Renderable.string(
+                            "§2${DecimalFormat("0.##").format(currentValue.toDouble())} / ${
+                                DecimalFormat(
+                                    "0.##"
+                                ).format(maxValue)
+                            }☘", scale = scale, horizontalAlign = HorizontalAlignment.LEFT
+                        ),
+                        Renderable.string(
+                            "§2${(percent * 100).round(1)}%",
+                            scale = scale,
+                            horizontalAlign = HorizontalAlignment.RIGHT
+                        ),
+                    ), width
+                ), Renderable.progressBar(percent, width = width)
+            )
+        ), tooltip.split('\n').map { Renderable.string(it) })
+    }
+
     private fun barColorGradient(double: Double): Int {
         var newDouble = (double - .5) * 2
         if (newDouble < 0) newDouble = 0.0
@@ -312,8 +324,11 @@ object GuiRenderUtils {
 
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, colour: Int, inverseScale: Float) {
         GuiScreen.drawRect(
-            (left * inverseScale).toInt(), (top * inverseScale).toInt(),
-            (right * inverseScale).toInt(), (bottom * inverseScale).toInt(), colour
+            (left * inverseScale).toInt(),
+            (top * inverseScale).toInt(),
+            (right * inverseScale).toInt(),
+            (bottom * inverseScale).toInt(),
+            colour
         )
     }
 
@@ -358,15 +373,7 @@ object GuiRenderUtils {
 
         Utils.drawTexturedRect(x, y, w_2.toFloat(), height, 0f, w_2 / xSize, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
         Utils.drawTexturedRect(
-            x + w_2,
-            y,
-            w_2.toFloat(),
-            height,
-            1 - w_2 / xSize,
-            1f,
-            vMinEmpty,
-            vMaxEmpty,
-            GL11.GL_NEAREST
+            x + w_2, y, w_2.toFloat(), height, 1 - w_2 / xSize, 1f, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST
         )
 
         if (useChroma) {

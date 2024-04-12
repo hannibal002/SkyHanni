@@ -14,7 +14,6 @@ const val notSelectedColor = 0x50303030
 const val tabSpacing = 5
 const val tabShortSide = 25
 const val tabLongSide = 28
-const val tabPadding = 9f
 
 abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
 

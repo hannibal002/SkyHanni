@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -171,4 +172,26 @@ object CollectionUtils {
     @Suppress("UNCHECKED_CAST")
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
         takeIf { null !in this } as? List<T>
+
+    fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
+        if (this.isEmpty()) return xSpace
+        val xWidth = this.maxOf { it.sumOf { it.width } }
+        val xLength = this.maxOf { it.size }
+        val emptySpace = xSpace - xWidth
+        if (emptySpace < 0) {
+            //    throw IllegalArgumentException("Not enough space for content")
+        }
+        return emptySpace / (xLength - 1)
+    }
+
+    fun Collection<Collection<Renderable>>.tableStretchYPadding(ySpace: Int): Int {
+        if (this.isEmpty()) return ySpace
+        val yWidth = this.sumOf { it.maxOfOrNull { it.height } ?: 0 }
+        val yLength = this.size
+        val emptySpace = ySpace - yWidth
+        if (emptySpace < 0) {
+            //    throw IllegalArgumentException("Not enough space for content")
+        }
+        return emptySpace / (yLength - 1)
+    }
 }
