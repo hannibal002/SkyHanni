@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator
+package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
 data class FossilTile(val x: Int, val y: Int) {
 
