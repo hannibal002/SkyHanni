@@ -34,6 +34,11 @@ public class MiningConfig {
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
     @Expose
+    @ConfigOption(name = "Fossil Excavator", desc = "")
+    @Accordion
+    public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
+  
+    @Expose
     @ConfigOption(name = "Notifications", desc = "")
     @Accordion
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
