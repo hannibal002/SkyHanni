@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
@@ -59,7 +58,7 @@ object LorenzUtils {
      */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
-    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
+    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
@@ -132,11 +131,6 @@ object LorenzUtils {
 
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
-
-    @Deprecated("old code", ReplaceWith("d.round(round).addSeparators()"))
-    fun formatDouble(d: Double, round: Int = 1): String {
-        return d.round(round).addSeparators()
-    }
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

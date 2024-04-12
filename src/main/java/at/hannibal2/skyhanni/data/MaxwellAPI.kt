@@ -51,64 +51,64 @@ object MaxwellAPI {
 
     private var powers = mutableListOf<String>()
 
-    private val group = RepoPattern.group("data.maxwell")
-    private val chatPowerpattern by group.pattern(
+    private val patternGroup = RepoPattern.group("data.maxwell")
+    private val chatPowerpattern by patternGroup.pattern(
         "chat.power",
         "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!"
     )
-    private val inventoryPowerPattern by group.pattern(
+    private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
         "§7Selected Power: §a(?<power>.*)"
     )
-    private val inventoryMPPattern by group.pattern(
+    private val inventoryMPPattern by patternGroup.pattern(
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)"
     )
-    private val thaumaturgyGuiPattern by group.pattern(
+    private val thaumaturgyGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy",
         "Accessory Bag Thaumaturgy"
     )
-    private val thaumaturgyStartPattern by group.pattern(
+    private val thaumaturgyStartPattern by patternGroup.pattern(
         "gui.thaumaturgy.start",
         "§7Your tuning:"
     )
-    private val thaumaturgyDataPattern by group.pattern(
+    private val thaumaturgyDataPattern by patternGroup.pattern(
         "gui.thaumaturgy.data",
         "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)"
     )
-    private val thaumaturgyMagicalPowerPattern by group.pattern(
+    private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
         "§7Total: §6(?<mp>\\d+) Magical Power"
     )
-    private val statsTuningGuiPattern by group.pattern(
+    private val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
         "Stats Tuning"
     )
-    private val statsTuningDataPattern by group.pattern(
+    private val statsTuningDataPattern by patternGroup.pattern(
         "thaumaturgy.statstuning",
         "§7You have: .+ §7\\+ §(?<color>.)(?<amount>[^ ]+) (?<icon>.)"
     )
-    private val tuningAutoAssignedPattern by group.pattern(
+    private val tuningAutoAssignedPattern by patternGroup.pattern(
         "tuningpoints.chat.autoassigned",
         "§aYour §r§eTuning Points §r§awere auto-assigned as convenience!"
     )
-    private val yourBagsGuiPattern by group.pattern(
+    private val yourBagsGuiPattern by patternGroup.pattern(
         "gui.yourbags",
         "Your Bags"
     )
-    private val powerSelectedPattern by group.pattern(
+    private val powerSelectedPattern by patternGroup.pattern(
         "gui.selectedpower",
         "§aPower is selected!"
     )
-    private val noPowerSelectedPattern by group.pattern(
+    private val noPowerSelectedPattern by patternGroup.pattern(
         "gui.noselectedpower",
         "(?:§.)*Visit Maxwell in the Hub to learn"
     )
-    private val accessoryBagStack by group.pattern(
+    private val accessoryBagStack by patternGroup.pattern(
         "stack.accessorybag",
         "§.Accessory Bag"
     )
-    private val redstoneCollectionRequirementPattern by group.pattern(
+    private val redstoneCollectionRequirementPattern by patternGroup.pattern(
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\."
     )

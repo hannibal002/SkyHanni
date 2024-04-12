@@ -102,5 +102,5 @@ public class AdvancedPlayerListConfig {
             "§eThose are the folks that coded the mod for you for free :)"
     )
     @ConfigEditorBoolean
-    public boolean markSkyHanniContributors = false;
+    public boolean markSkyHanniDevs = true;
 }
