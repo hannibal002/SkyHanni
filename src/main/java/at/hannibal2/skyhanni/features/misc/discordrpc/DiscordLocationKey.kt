@@ -1,20 +1,13 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 class DiscordLocationKey {
 
     private val rpcGroup = RepoPattern.group("misc.discordrpc")
-    private val normalCataPattern by rpcGroup.pattern(
-        "catacombs",
-        "The Catacombs \\(F\\d\\)"
-    )
-    private val masterCataPattern by rpcGroup.pattern(
-        "mastercatacombs",
-        "The Catacombs \\(M\\d\\)"
-    )
 
     // normal keys follow a distinct pattern: lowercase the skyblock location and replace spaces with -
     private val normalRPC = setOf(
@@ -259,11 +252,13 @@ class DiscordLocationKey {
     private fun getAmbiguousKey(location: String): String {
         val island = LorenzUtils.skyBlockIsland
 
-        if (normalCataPattern.matcher(location).matches()) {
-            return "dungeon"
-        }
-        else if (masterCataPattern.matcher(location).matches()) {
-            return "master-mode"
+        DungeonAPI.dungeonFloor?.lowercase()?.let {
+            if (it.startsWith("m")) {
+                return "master-mode"
+            }
+            if (it.startsWith("f")) {
+                return "dungeon"
+            }
         }
 
         return when (location) {
