@@ -91,6 +91,8 @@ object FossilExcavatorAPI {
 
         val pair = itemPattern.matchMatcher(message) {
             val itemLine = group("item")
+            // TODO fix readItemAmount bug
+            if (itemLine.contains("§bGlacite Powder")) return
             ItemUtils.readItemAmount(itemLine) ?: return
         } ?: return
         loot.add(pair)
