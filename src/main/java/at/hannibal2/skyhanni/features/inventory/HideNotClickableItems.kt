@@ -223,7 +223,7 @@ class HideNotClickableItems {
             return false
         }
 
-        hideReason = "§cNo chisel or scrap!"
+        hideReason = "§cNot a chisel or scrap!"
         return true
     }
 
