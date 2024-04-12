@@ -20,11 +20,11 @@ public class ExcavatorProfitTrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show nearby",
-        desc = "Show the profit tracker while close to the excavation point."
+        name = "Track Glacite Powder",
+        desc = "Track Glacite Powder gained as well (no profit, but progress)"
     )
     @ConfigEditorBoolean
-    public boolean showNearvy = true;
+    public boolean trackGlacitePowder = true;
 
     @Expose
     @ConfigLink(owner = ExcavatorProfitTrackerConfig.class, field = "enabled")

@@ -7,13 +7,9 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -104,10 +100,7 @@ object FossilExcavatorAPI {
         }
 
         val pair = itemPattern.matchMatcher(message) {
-            val itemLine = group("item")
-            // TODO fix readItemAmount bug
-            if (itemLine.contains("§bGlacite Powder")) return
-            ItemUtils.readItemAmount(itemLine) ?: return
+            ItemUtils.readItemAmount(group("item"))
         } ?: return
         loot.add(pair)
     }
