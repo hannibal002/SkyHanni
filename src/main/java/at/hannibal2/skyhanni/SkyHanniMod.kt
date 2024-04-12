@@ -92,6 +92,7 @@ import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.combat.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.combat.mobs.MobHighlight
 import at.hannibal2.skyhanni.features.combat.mobs.SpawnTimers
+import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand
 import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
@@ -586,6 +587,7 @@ class SkyHanniMod {
         loadModule(WarpIsCommand())
         loadModule(ViewRecipeCommand)
         loadModule(PartyCommands)
+        loadModule(PartyChatCommands)
         loadModule(SummoningMobManager())
         loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
