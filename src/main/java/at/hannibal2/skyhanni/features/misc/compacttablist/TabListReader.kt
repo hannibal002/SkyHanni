@@ -46,6 +46,10 @@ object TabListReader {
         "upgrades",
         "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
     )
+    private val winterPowerUpsPattern by patternGroup.pattern(
+        "winterpowerups",
+        "Active Power Ups(?:§.)*(?:\\n(§.)*§7.+)*"
+    )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"
 
@@ -119,6 +123,12 @@ object TabListReader {
         dungeonBuffPattern.findMatcher(footer) {
             if (group().contains("No Buffs active.")) {
                 footer = this.replaceAll("Dungeon Buffs \n§r§7None Found")
+            }
+        }
+
+        winterPowerUpsPattern.findMatcher(footer) {
+            if (group().contains("No Power Ups active.")) {
+                footer = this.replaceAll("Active Power Ups \n§r§7None")
             }
         }
 
