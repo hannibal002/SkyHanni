@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -59,7 +60,7 @@ class BazaarApi {
             if (!LorenzUtils.inSkyBlock) return
             if (NEUItems.neuHasFocus()) return
             if (LorenzUtils.noTradeMode) return
-            if (LorenzUtils.inDungeons || LorenzUtils.inKuudraFight) return
+            if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
             ChatUtils.sendCommandToServer("bz ${displayName.removeColor()}")
             if (amount != -1) OSUtils.copyToClipboard(amount.toString())
             currentSearchedItem = displayName.removeColor()

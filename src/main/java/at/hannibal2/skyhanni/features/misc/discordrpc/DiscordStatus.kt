@@ -58,7 +58,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     NONE(null),
 
     LOCATION({
-        var location = LorenzUtils.skyBlockArea
+        var location = LorenzUtils.skyBlockArea?.removeColor() ?: "invalid"
         val island = LorenzUtils.skyBlockIsland
 
         if (location == "Your Island") location = "Private Island"

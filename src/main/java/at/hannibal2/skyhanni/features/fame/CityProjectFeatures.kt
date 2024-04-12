@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -38,12 +38,13 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class CityProjectFeatures {
 
     private var display = emptyList<List<Any>>()
     private var inInventory = false
-    private var lastReminderSend = 0L
+    private var lastReminderSend = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("fame.projects")
     private val contributeAgainPattern by patternGroup.pattern(
@@ -65,14 +66,7 @@ class CityProjectFeatures {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (event.repeatSeconds(1)) {
-            checkDailyReminder()
-        }
-    }
-
-    private fun checkDailyReminder() {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
@@ -81,9 +75,8 @@ class CityProjectFeatures {
 
         if (playerSpecific.nextCityProjectParticipationTime == 0L) return
         if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
-
-        if (lastReminderSend + 30_000 > System.currentTimeMillis()) return
-        lastReminderSend = System.currentTimeMillis()
+        if (lastReminderSend.passedSince() < 30.seconds) return
+        lastReminderSend = SimpleTimeMark.now()
 
         ChatUtils.clickableChat(
             "Daily City Project Reminder! (Click here to disable this reminder)",
@@ -123,15 +116,13 @@ class CityProjectFeatures {
                 val lore = item.getLore()
                 val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
                 if (completed) continue
-                for (line in lore) {
-                    contributeAgainPattern.matchMatcher(line) {
-                        val rawTime = group("time")
-                        if (rawTime.contains("Soon!")) return@matchMatcher
-                        val duration = TimeUtils.getDuration(rawTime)
-                        val endTime = now + duration
-                        if (endTime < nextTime) {
-                            nextTime = endTime
-                        }
+                lore.matchFirst(contributeAgainPattern) {
+                    val rawTime = group("time")
+                    if (!rawTime.contains("Soon!")) return@matchFirst
+                    val duration = TimeUtils.getDuration(rawTime)
+                    val endTime = now + duration
+                    if (endTime < nextTime) {
+                        nextTime = endTime
                     }
                 }
                 if (item.name != "§eContribute this component!") continue

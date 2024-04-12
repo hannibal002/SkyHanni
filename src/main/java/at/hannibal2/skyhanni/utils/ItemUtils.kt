@@ -76,25 +76,6 @@ object ItemUtils {
         return list
     }
 
-    fun getItemsInInventoryWithSlots(withCursorItem: Boolean = false): Map<ItemStack, Int> {
-        val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
-        val player = Minecraft.getMinecraft().thePlayer
-        if (player == null) {
-            ChatUtils.error("getItemsInInventoryWithSlots: player is null!")
-            return map
-        }
-        for (slot in player.openContainer.inventorySlots) {
-            if (slot.hasStack) {
-                map[slot.stack] = slot.slotNumber
-            }
-        }
-
-        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-            map[player.inventory.itemStack] = -1
-        }
-        return map
-    }
-
     fun hasAttributes(stack: ItemStack): Boolean {
         if (stack.hasTagCompound()) {
             val tagCompound = stack.tagCompound
@@ -305,10 +286,6 @@ object ItemUtils {
         set(value) {
             setStackDisplayName(value)
         }
-
-    @Deprecated("outdated", ReplaceWith("this.itemName"))
-    val ItemStack.nameWithEnchantment: String?
-        get() = itemName
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
