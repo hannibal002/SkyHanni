@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MiningNotificationsConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Toggles the Mining Notifications")
+    @ConfigOption(name = "Enabled", desc = "Toggles the Mining Notifications.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -35,12 +35,12 @@ public class MiningNotificationsConfig {
     ));
 
     @Expose
-    @ConfigOption(name = "Play Sound", desc = "Plays a ding when a notification is triggered")
+    @ConfigOption(name = "Play Sound", desc = "Plays a ding when a notification is triggered.")
     @ConfigEditorBoolean
     public boolean playSound = true;
 
     @Expose
-    @ConfigOption(name = "Cold Threshold", desc = "Change when the Cold notification gets triggered")
+    @ConfigOption(name = "Cold Threshold", desc = "Change when the Cold notification gets triggered.")
     @ConfigEditorSlider(minValue = 1.0F, maxValue = 100.0F, minStep = 1.0F)
     public Property<Integer> coldThreshold = Property.of(50);
 }
