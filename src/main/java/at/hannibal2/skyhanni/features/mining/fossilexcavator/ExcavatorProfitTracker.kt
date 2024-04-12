@@ -109,7 +109,6 @@ class ExcavatorProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockArea != "Fossil Research Center") return
         // hide during an active excavation
         if (FossilExcavatorAPI.inInventory && !FossilExcavatorAPI.inExcavatorMenu) {
             return
@@ -126,4 +125,5 @@ class ExcavatorProfitTracker {
     }
 
     fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
+        && LorenzUtils.skyBlockArea == "Fossil Research Center"
 }
