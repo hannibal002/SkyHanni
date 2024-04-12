@@ -24,5 +24,5 @@ public class FossilExcavatorSolverConfig {
 
     @Expose
     @ConfigLink(owner = FossilExcavatorSolverConfig.class, field = "enabled")
-    public Position position = new Position(-380, 150, false, true);
+    public Position position = new Position(183, 212, false, true);
 }
