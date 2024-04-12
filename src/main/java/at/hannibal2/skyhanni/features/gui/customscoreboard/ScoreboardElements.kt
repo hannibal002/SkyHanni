@@ -387,10 +387,10 @@ private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBitsDisplayPair(): List<ScoreboardElementType> {
     val bits = BitsAPI.bits.coerceAtLeast(0).formatNum()
-    val bitsToClaim = if (BitsAPI.bitsToClaim == -1) {
+    val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {
         "§cOpen Sbmenu§b"
     } else {
-        BitsAPI.bitsToClaim.coerceAtLeast(0).formatNum()
+        BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
     }
 
     return listOf(
@@ -487,7 +487,7 @@ private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
 private fun getLocationDisplayPair() = buildList {
-    add(HypixelData.skyBlockAreaWithSymbol to HorizontalAlignment.LEFT)
+    HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }
 
     ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
