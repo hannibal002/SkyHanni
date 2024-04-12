@@ -40,6 +40,11 @@ object FossilExcavatorAPI {
      */
     private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
+    /**
+     * REGEX-TEST: §cYou didn't find anything. Maybe next time!
+     */
+    private val emptyPattern by chatPatternGroup.pattern("empty", "§cYou didn't find anything. Maybe next time!")
+
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
 
@@ -78,6 +83,11 @@ object FossilExcavatorAPI {
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
 
         val message = event.message
+
+        if (emptyPattern.matches(message)) {
+            FossilExcavationEvent(emptyList()).postAndCatch()
+        }
+
 
         if (startPattern.matches(message)) {
             inLoot = true
