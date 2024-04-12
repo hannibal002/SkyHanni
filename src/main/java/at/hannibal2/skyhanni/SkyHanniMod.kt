@@ -264,6 +264,7 @@ import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityC
 import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.MineshaftWaypoints
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
@@ -831,6 +832,7 @@ class SkyHanniMod {
         loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
+        loadModule(MineshaftWaypoints())
 
         init()
 
