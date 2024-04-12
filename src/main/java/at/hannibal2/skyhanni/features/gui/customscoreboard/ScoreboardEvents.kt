@@ -509,7 +509,7 @@ private fun getMagmaBossLines() = getSbLines().filter { line ->
 }
 
 private fun getMagmaBossShowWhen(): Boolean {
-    return HypixelData.skyBlockArea?.let { SbPattern.magmaChamberPattern.matches(it) } ?: false
+    return SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 }
 
 private fun getHotDogLines(): List<String> {
