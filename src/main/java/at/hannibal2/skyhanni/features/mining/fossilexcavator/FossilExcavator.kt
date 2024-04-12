@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
@@ -93,12 +92,6 @@ object FossilExcavator {
         isCompleted = false
         inventoryItemNames = emptyList()
         possibleFossilTypes = emptySet()
-    }
-
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
-        if (!inInventory) return
     }
 
     @SubscribeEvent
