@@ -34,6 +34,11 @@ public class MiningConfig {
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
     @Expose
+    @ConfigOption(name = "Fossil Excavator", desc = "")
+    @Accordion
+    public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
+
+    @Expose
     @ConfigOption(name = "Mineshaft Waypoints", desc = "")
     @Accordion
     public MineshaftWaypointsConfig mineshaftWaypoints = new MineshaftWaypointsConfig();

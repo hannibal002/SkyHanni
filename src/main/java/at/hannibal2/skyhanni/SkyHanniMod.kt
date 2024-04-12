@@ -269,6 +269,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesI
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavator
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
@@ -433,7 +434,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.5",
+    version = "0.25.Beta.6",
 )
 class SkyHanniMod {
 
@@ -659,6 +660,7 @@ class SkyHanniMod {
         loadModule(GardenCropMilestoneDisplay)
         loadModule(GardenCustomKeybinds)
         loadModule(ChickenHeadTimer())
+        loadModule(FossilExcavator)
         loadModule(GardenOptimalSpeed())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
