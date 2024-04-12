@@ -12,8 +12,8 @@ public class FossilExcavatorConfig {
     public FossilExcavatorSolverConfig solver = new FossilExcavatorSolverConfig();
 
     @Expose
-    @ConfigOption(name = "Fossil Excavator Profit Tracker", desc = "")
+    @ConfigOption(name = "Excavator Profit Tracker", desc = "")
     @Accordion
-    public FossilExcavatorProfitTrackerConfig profitTracker = new FossilExcavatorProfitTrackerConfig();
+    public ExcavatorProfitTrackerConfig profitTracker = new ExcavatorProfitTrackerConfig();
 
 }

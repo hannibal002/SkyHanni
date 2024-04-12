@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class FossilExcavatorProfitTrackerConfig {
+public class ExcavatorProfitTrackerConfig {
 
     @Expose
     @ConfigOption(
@@ -27,6 +27,6 @@ public class FossilExcavatorProfitTrackerConfig {
     public boolean showNearvy = true;
 
     @Expose
-    @ConfigLink(owner = FossilExcavatorProfitTrackerConfig.class, field = "enabled")
+    @ConfigLink(owner = ExcavatorProfitTrackerConfig.class, field = "enabled")
     public Position position = new Position(20, 20, false, true);
 }

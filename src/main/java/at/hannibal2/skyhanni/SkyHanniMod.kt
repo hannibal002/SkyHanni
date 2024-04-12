@@ -268,8 +268,8 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesI
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
-import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.solver.FossilSolverDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
@@ -663,7 +663,7 @@ class SkyHanniMod {
         loadModule(GardenCustomKeybinds)
         loadModule(ChickenHeadTimer())
         loadModule(FossilSolverDisplay)
-        loadModule(FossilExcavatorProfitTracker())
+        loadModule(ExcavatorProfitTracker())
         loadModule(GardenOptimalSpeed())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())

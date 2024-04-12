@@ -3,12 +3,17 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -17,7 +22,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class FossilExcavatorProfitTracker {
+class ExcavatorProfitTracker {
 
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.profitTracker
 
@@ -52,17 +57,34 @@ class FossilExcavatorProfitTracker {
         var timesExcavated = 0L
     }
 
+    private val scrapItem = "SUSPICIOUS_SCRAP".asInternalName()
+
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lFossil Excavation Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this)
+        var profit = tracker.drawItems(data, { true }, this)
 
-        val pestsKilled = data.timesExcavated
+        val timesExcavated = data.timesExcavated
         addAsSingletonList(
             Renderable.hoverTips(
-                "§7Times excavated: §e${pestsKilled.addSeparators()}",
-                listOf("§7You excavated §e${pestsKilled.addSeparators()} §7times.")
+                "§7Times excavated: §e${timesExcavated.addSeparators()}",
+                listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times.")
             )
         )
+
+        // TODO use same price source as profit tracker
+        val scrapPrice = timesExcavated * scrapItem.getPrice()
+        profit -= scrapPrice
+        addAsSingletonList(
+            Renderable.hoverTips(
+                "${scrapItem.itemName}§7: §c${NumberUtil.format(scrapPrice)}",
+                listOf(
+                    "§7You paid ${NumberUtil.format(scrapPrice)} coins",
+                    "§7in total for all §e$timesExcavated §7${scrapItem.itemName}",
+                    "§7you have used."
+                )
+            )
+        )
+
         addAsSingletonList(tracker.addTotalProfit(profit, data.timesExcavated, "excarvation"))
 
         tracker.addPriceFromButton(this)
@@ -93,6 +115,14 @@ class FossilExcavatorProfitTracker {
 //         config.showNearvy
 
         tracker.renderDisplay(config.position)
+        tracker.firstUpdate()
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.DWARVEN_MINES) {
+            tracker.firstUpdate()
+        }
     }
 
     fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
