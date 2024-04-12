@@ -36,6 +36,10 @@ public class MiscConfig {
     @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
+    @Expose
+    @Category(name = "Hoppity", desc = "Features for the Hoppity event.")
+    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
