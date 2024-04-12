@@ -174,8 +174,8 @@ object GetFromSackAPI {
         val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
 
         val item = when {
-            sackListInternalNames.contains(itemString) -> itemString.asInternalName()
-            sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString) ?: run {
+            SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
+            SackAPI.sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",
                     "Query failed",
