@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -93,12 +92,8 @@ class ExcavatorProfitTracker {
     fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!isEnabled()) return
         for ((name, amount) in event.loot) {
-            println("")
-            println("name: '$name'")
-            println("amount: $amount")
             val internalName = NEUInternalName.fromItemNameOrNull(name) ?: continue
-            val itemStack = internalName.makePrimitiveStack(amount)
-            println("itemStack: '$itemStack'")
+            // TODO use primitive item stacks in tracker
             tracker.addItem(internalName, amount)
         }
         tracker.modify {
