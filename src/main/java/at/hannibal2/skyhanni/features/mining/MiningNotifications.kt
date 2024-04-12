@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class MiningNotifications {
 
@@ -58,6 +60,7 @@ class MiningNotifications {
 
     private var cold = 0
     private var hasSentCold = false
+    private var coldResetTimer = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -70,8 +73,9 @@ class MiningNotifications {
             goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
             coldReset.matches(message) -> {
-                hasSentCold = false
                 cold = 0
+                hasSentCold = false
+                coldResetTimer = SimpleTimeMark.now().plus(1.seconds)
             }
         }
     }
@@ -84,6 +88,7 @@ class MiningNotifications {
             group("cold").toInt().absoluteValue
         } ?: -1
         if (cold == -1) return
+        if (coldResetTimer.isInFuture()) return
         if (cold >= config.coldThreshold.get() && !hasSentCold) {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
