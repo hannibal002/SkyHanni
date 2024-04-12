@@ -246,7 +246,7 @@ class HideNotClickableItems {
             return false
         }
 
-        hideReason = "§cNo fossil!"
+        hideReason = "§cNot a fossil!"
         return true
     }
 
