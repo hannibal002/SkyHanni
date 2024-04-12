@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -40,10 +41,10 @@ object BitsAPI {
                 playerStorage?.currentFameRank = value.name
             }
         }
-    var bitsToClaim: Int
-        get() = profileStorage?.bitsToClaim ?: 0
+    var bitsAvailable: Int
+        get() = profileStorage?.bitsAvailable ?: 0
         private set(value) {
-            profileStorage?.bitsToClaim = value
+            profileStorage?.bitsAvailable = value
         }
 
     var cookieBuffTime: SimpleTimeMark?
@@ -147,11 +148,14 @@ object BitsAPI {
                 if (amount == bits) return
 
                 if (amount > bits) {
-                    bitsToClaim -= amount - bits
+                    bitsAvailable -= amount - bits
                     ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
+                    bits = amount
+                    sendBitsGainEvent()
+                } else {
+                    bits = amount
+                    sendBitsSpentEvent()
                 }
-                bits = amount
-                sendEvent()
             }
         }
     }
@@ -163,17 +167,17 @@ object BitsAPI {
 
         bitsFromFameRankUpChatPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
-            bitsToClaim += amount
-            sendEvent()
+            bitsAvailable += amount
+            sendBitsAvailableGainedEvent()
 
             return
         }
 
         boosterCookieAte.matchMatcher(message) {
-            bitsToClaim += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
+            bitsAvailable += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
             val cookieTime = cookieBuffTime
             cookieBuffTime = if (cookieTime == null) SimpleTimeMark.now() + 4.days else cookieTime + 4.days
-            sendEvent()
+            sendBitsAvailableGainedEvent()
 
             return
         }
@@ -190,7 +194,7 @@ object BitsAPI {
 
             // If the cookie stack is null, then the player should not have any bits to claim
             if (cookieStack == null) {
-                bitsToClaim = 0
+                bitsAvailable = 0
                 cookieBuffTime = SimpleTimeMark.farPast()
                 return
             }
@@ -198,9 +202,9 @@ object BitsAPI {
             val lore = cookieStack.getLore()
             lore.matchFirst(bitsAvailableMenuPattern) {
                 val amount = group("toClaim").formatInt()
-                if (bitsToClaim != amount) {
-                    bitsToClaim = amount
-                    sendEvent()
+                if (bitsAvailable != amount) {
+                    bitsAvailable = amount
+                    sendBitsAvailableGainedEvent()
                 }
             }
             lore.matchFirst(cookieDurationPattern) {
@@ -254,11 +258,10 @@ object BitsAPI {
             line@ for (line in bitsStack.getLore()) {
                 bitsAvailableMenuPattern.matchMatcher(line) {
                     val amount = group("toClaim").formatInt()
-                    if (amount != bitsToClaim) {
-                        bitsToClaim = amount
-                        sendEvent()
+                    if (amount != bitsAvailable) {
+                        bitsAvailable = amount
+                        sendBitsAvailableGainedEvent()
                     }
-
 
                     continue@line
                 }
@@ -279,11 +282,16 @@ object BitsAPI {
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
-    private fun sendEvent() {
-        BitsUpdateEvent(bits, bitsToClaim).postAndCatch()
-    }
+    private fun sendBitsGainEvent() = BitsUpdateEvent.BitsGain(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(35, "#profile.bits.bitsToClaim", "#profile.bits.bitsAvailable")
+    }
 
     class FameRankNotFoundException(rank: String) : Exception("FameRank not found: $rank")
 }
