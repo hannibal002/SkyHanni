@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
+package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -38,7 +38,8 @@ object FossilExcavator {
         "Fossil Excavation Progress: (?<progress>[\\d.]+%)"
     )
 
-    private val inExcavatorMenu get() = FossilExcavatorAPI.inExcavatorMenu
+    private var inInventory = false
+    private var inExcavatorMenu = false
 
     private var foundPercentage = false
     private var percentage: String? = null
@@ -63,6 +64,13 @@ object FossilExcavator {
     var possibleFossilTypes = setOf<FossilType>()
 
     @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!isEnabled()) return
+        if (event.inventoryName != "Fossil Excavator") return
+        inInventory = true
+    }
+
+    @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         clearData()
     }
@@ -73,6 +81,8 @@ object FossilExcavator {
     }
 
     private fun clearData() {
+        inInventory = false
+        inExcavatorMenu = false
         foundPercentage = false
         percentage = null
         chargesRemaining = 0
@@ -87,10 +97,12 @@ object FossilExcavator {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (!inInventory) return
         val slots = InventoryUtils.getItemsInOpenChest()
         val itemNames = slots.map { it.stack.displayName.removeColor() }
         if (itemNames != inventoryItemNames) {
             inventoryItemNames = itemNames
+            inExcavatorMenu = itemNames.any { it == "Start Excavator" }
             if (inExcavatorMenu) return
 
             updateData()
@@ -141,6 +153,7 @@ object FossilExcavator {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
+        if (!inInventory) return
         if (inExcavatorMenu) return
 
         event.makePickblock()
@@ -155,6 +168,7 @@ object FossilExcavator {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
+        if (!inInventory) return
         if (inExcavatorMenu) return
         if (slotToClick == null) return
 
@@ -168,6 +182,7 @@ object FossilExcavator {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
+        if (!inInventory) return
         if (!config.showPercentage) return
         if (slotToClick != event.slot.slotNumber) return
         if (inExcavatorMenu) return
@@ -181,6 +196,7 @@ object FossilExcavator {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!inInventory) return
 
         if (inExcavatorMenu) {
             // render here so they can move it around. As if you press key while doing the excavator you lose the scrap
@@ -193,9 +209,9 @@ object FossilExcavator {
         when {
             isNotPossible -> displayList.add(NOT_POSSIBLE_STRING)
             isCompleted -> displayList.add(SOLVED_STRING)
-            else -> displayList.add("${FOSSILS_REMAINING_STRING}§a$possibleFossilsRemaining")
+            else -> displayList.add("$FOSSILS_REMAINING_STRING§a$possibleFossilsRemaining")
         }
-        displayList.add("${CHARGES_REMAINING_STRING}§a$chargesRemaining")
+        displayList.add("$CHARGES_REMAINING_STRING§a$chargesRemaining")
 
         if (possibleFossilTypes.isNotEmpty()) {
             displayList.add("§ePossible Fossil types:")
@@ -210,9 +226,9 @@ object FossilExcavator {
     fun nextData(slotToClick: FossilTile, correctPercentage: Double, fossilsRemaining: Int) {
         val formattedPercentage = (correctPercentage * 100).round(1)
 
-        possibleFossilsRemaining = fossilsRemaining
-        FossilExcavator.slotToClick = slotToClick.toSlotIndex()
-        FossilExcavator.correctPercentage = "§2$formattedPercentage%"
+        this.possibleFossilsRemaining = fossilsRemaining
+        this.slotToClick = slotToClick.toSlotIndex()
+        this.correctPercentage = "§2$formattedPercentage%"
     }
 
     fun showError() {
@@ -223,5 +239,5 @@ object FossilExcavator {
         isCompleted = true
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled && FossilExcavatorAPI.inInventory
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
 }

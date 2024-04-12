@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
+package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 enum class FossilType(
     val displayName: String,

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
+package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 data class FossilShape(val tiles: List<FossilTile>) {
     fun width() = tiles.maxOf { it.x } - tiles.minOf { it.x }
