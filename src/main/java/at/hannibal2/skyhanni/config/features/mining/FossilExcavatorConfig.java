@@ -10,10 +10,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class FossilExcavatorConfig {
 
     @Expose
-    @ConfigOption(name = "Fossil Excavator Helper", desc = "Helps you find fossils in the fossil excavator.")
+    @ConfigOption(name = "Fossil Excavator Helper", desc = "Helps you find fossils in the fossil excavator. " +
+        "§eWill always solve if you have at least 18 clicks. Solves everything except Spine, Ugly and Helix in 16 clicks.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
+
+    @Expose
+    @ConfigOption(name = "Show Percentage", desc = "Shows percentage chance that next click will be a fossil. " +
+        "§eThis assumes there is a fossil hidden in the dirt.")
+    @ConfigEditorBoolean
+    public boolean showPercentage = true;
 
     @Expose
     @ConfigLink(owner = FossilExcavatorConfig.class, field = "enabled")

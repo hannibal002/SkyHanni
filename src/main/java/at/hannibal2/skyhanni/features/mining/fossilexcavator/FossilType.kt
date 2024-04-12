@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 enum class FossilType(
+    val displayName: String,
     val totalTiles: Int,
     val firstPercentage: String,
     val fossilShape: FossilShape,
     val possibleMutations: List<FossilMutation>
 ) {
     TUSK(
-        8, "12.5%",
+        "Tusk", 8, "12.5%",
         FossilShape(
             listOf(
                 FossilTile(0, 2),
@@ -23,7 +24,7 @@ enum class FossilType(
         FossilMutation.allValues
     ),
     WEBBED(
-        10, "10%",
+        "Webbed", 10, "10%",
         FossilShape(
             listOf(
                 FossilTile(0, 2),
@@ -44,7 +45,7 @@ enum class FossilType(
         )
     ),
     CLUB(
-        11, "9.1%",
+        "Club", 11, "9.1%",
         FossilShape(
             listOf(
                 FossilTile(0, 2),
@@ -68,7 +69,7 @@ enum class FossilType(
         )
     ),
     SPINE(
-        12, "8.3%",
+        "Spine", 12, "8.3%",
         FossilShape(
             listOf(
                 FossilTile(0, 2),
@@ -88,7 +89,7 @@ enum class FossilType(
         FossilMutation.onlyRotation
     ),
     CLAW(
-        13, "7.7%",
+        "Claw", 13, "7.7%",
         FossilShape(
             listOf(
                 FossilTile(0, 3),
@@ -109,7 +110,7 @@ enum class FossilType(
         FossilMutation.allValues
     ),
     FOOTPRINT(
-        13, "7.7%",
+        "Footprint", 13, "7.7%",
         FossilShape(
             listOf(
                 FossilTile(0, 2),
@@ -130,7 +131,7 @@ enum class FossilType(
         FossilMutation.onlyRotation
     ),
     HELIX(
-        14, "7.1%",
+        "Helix", 14, "7.1%",
         FossilShape(
             listOf(
                 FossilTile(0, 0),
@@ -152,7 +153,7 @@ enum class FossilType(
         FossilMutation.allValues
     ),
     UGLY(
-        16, "6.2%",
+        "Ugly", 16, "6.2%",
         FossilShape(
             listOf(
                 FossilTile(0, 1),

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,6 +44,8 @@ object FossilExcavator {
 
     private var foundPercentage = false
     private var percentage: String? = null
+
+    var maxCharges = 0
     private var chargesRemaining = 0
     private var possibleFossilsRemaining = 0
 
@@ -58,6 +60,9 @@ object FossilExcavator {
     private const val NOT_POSSIBLE_STRING = "§cNo possible fossils on board."
     private const val SOLVED_STRING = "§aFossil found, get all the loot you can."
     private const val FOSSILS_REMAINING_STRING = "§ePossible fossils remaining: "
+    private const val CHARGES_REMAINING_STRING = "§eCharges remaining: "
+
+    var possibleFossilTypes = setOf<FossilType>()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -87,6 +92,7 @@ object FossilExcavator {
         isNotPossible = false
         isCompleted = false
         inventoryItemNames = emptyList()
+        possibleFossilTypes = emptySet()
     }
 
     @SubscribeEvent
@@ -105,8 +111,7 @@ object FossilExcavator {
             inventoryItemNames = itemNames
             inExcavatorMenu = itemNames.any { it == "Start Excavator" }
             if (inExcavatorMenu) return
-            // todo remove on merge
-            ChatUtils.chat("Inventory update detected")
+
             updateData()
         }
     }
@@ -132,6 +137,7 @@ object FossilExcavator {
                 for (line in stack.getLore()) {
                     chargesRemainingPattern.matchMatcher(line.removeColor()) {
                         chargesRemaining = group("charges").toInt()
+                        if (maxCharges == 0) maxCharges = chargesRemaining
                         foundChargesRemaining = true
                     }
                 }
@@ -184,6 +190,7 @@ object FossilExcavator {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
+        if (!config.showPercentage) return
         if (slotToClick != event.slot.slotNumber) return
         if (inExcavatorMenu) return
         val correctPercentage = correctPercentage ?: return
@@ -204,13 +211,27 @@ object FossilExcavator {
             return
         }
 
-        val displayString = when {
-            isNotPossible -> NOT_POSSIBLE_STRING
-            isCompleted -> SOLVED_STRING
-            else -> "$FOSSILS_REMAINING_STRING§a$possibleFossilsRemaining"
+        val displayList = mutableListOf<String>()
+
+        when {
+            isNotPossible -> displayList.add(NOT_POSSIBLE_STRING)
+            isCompleted -> displayList.add(SOLVED_STRING)
+            else -> displayList.add("$FOSSILS_REMAINING_STRING§a$possibleFossilsRemaining")
+        }
+        displayList.add("$CHARGES_REMAINING_STRING§a$chargesRemaining")
+
+        if (!isCompleted && !isNotPossible) {
+            displayList.add("§ePossible Fossil types:")
+        }
+        if (possibleFossilTypes.isNotEmpty()) {
+            for (fossil in possibleFossilTypes) {
+                displayList.add("§7- ${fossil.displayName}")
+            }
+        } else {
+            displayList.add("§7All fossil types.")
         }
 
-        config.position.renderString(displayString, posLabel = "Fossil Excavator")
+        config.position.renderStrings(displayList, posLabel = "Fossil Excavator")
     }
 
     fun nextData(slotToClick: FossilTile, correctPercentage: Double, fossilsRemaining: Int) {
