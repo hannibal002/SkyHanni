@@ -12,6 +12,8 @@
     + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
 + Added Visitor's Logbook Stats. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1287)
     + Show all your visited/accepted/denied visitors stats in a display.
++ Added Stereo Harmony Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1324)
+    + Options to show/hide boosted crop and pest icons.
 
 #### Diana Features
 
@@ -23,6 +25,8 @@
 + Added Area Walls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1266)
     + Show walls between the main areas of the Crystal Hollows.
     + Option to show the walls also when inside the Nucleus.
++ Fossil Excavator Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1427)
+    + Shows where to next click for optimal chance of solving the fossil. If there is a fossil this will find it within 18 moves.
 
 #### Dungeon Features
 
@@ -49,6 +53,10 @@
 + SkyMart and Anita Medal prices are now perfectly aligned in the displays. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1376)
 + Clear plot sprays when Portable Washer is used. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1178)
 + Added option to show atmospheric filter display outside SB. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1131)
++ Improved visitor reward blocking. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1417)
+    + Added option to block accepting/refusing expensive/cheap copper.
+    + Added option to prevent blocking never accepted visitors.
+    + Reworked visitor blocking logic to make it more like not clickable items.
 
 #### Diana Improvements
 
@@ -76,6 +84,7 @@
 #### Inventory Improvements
 
 + Items that cannot be salvaged because you have donated them to the Museum are now greyed out in the Salvage menu. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1384)
++ Added support for Glacial Cave gemstones in Estimated Item Value. - Fix3dll (https://github.com/hannibal002/SkyHanni/pull/1416)
 
 #### Slayer Improvements
 
@@ -84,6 +93,7 @@
 #### Misc Improvements
 
 + Improved mod performance. - CalMWolfs, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1342)
++ Added option to toggle No Bits Warning sound. - Empa (https://github.com/hannibal002/SkyHanni/pull/1425)
 
 ### Fixes
 
@@ -124,10 +134,12 @@
 + Fixed Crystal Hollows Island size being 26 instead of 24 in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1389)
 + Fixed "unknown lines" error with an objective line in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1394)
 + Fixed Powder not being shown in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1414)
++ Fixed the skill tab list pattern sometimes not matching. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1419)
 
 #### Dungeon Fixes
 
 + Dungeon Copilot no longer tells you to enter the nonexistent boss room in The Catacombs - Entrance. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1374)
++ Fixed some area walls overlapping with blocks. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1418)
 
 #### Bingo Fixes
 
@@ -143,6 +155,10 @@
 + Fixes skill progress item scale being bigger than intended. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1413)
 + Fixed modid of SkyHanni classes being wrong, causing various issues, like the gfs queue not working - nea (https://github.com/hannibal002/SkyHanni/pull/1411)
 + Fixed some typos. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1408)
++ Fixed No Bits Warning triggering when spending bits. - Empa (https://github.com/hannibal002/SkyHanni/pull/1425)
++ Clear SkyBlock area on world change. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1421)
+    + This fixed the wrong area showing in some cases, such as when guesting on someone's Private Island.
++ Fixed a small issue that caused some features to not work as intended. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1402)
 
 ### Technical Details
 
@@ -196,6 +212,14 @@
 + Switch from LorenzUtils.inDungeons to DungeonAPI.inDungeon(). - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1378)
 + Bumped MoulConfig - nea (https://github.com/hannibal002/SkyHanni/pull/1411)
 + Deleted two empty files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1401)
++ Added BitsGain, BitsSpent and BitsAvailableGained to BitsUpdateEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/1425)
++ Renamed bitsToClaim to bitsAvailable. - Empa (https://github.com/hannibal002/SkyHanni/pull/1425)
++ Made `HypixelData.skyBlockArea[withSymbol]` and `LorenzUtils.skyBlockArea` nullable. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1421)
+    + This replaces the previous `"?"` magic value.
++ Fixed colors in debug messages. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1423)
++ Code cleanup. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1402)
++ Added function ChatUtils.chatAndOpenConfig(). -  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1396)
+    + Allows sending a chat message that will open a given config element in the config editor.
 
 ### Removed Features
 
