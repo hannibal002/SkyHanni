@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator
+package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
 enum class FossilMutation(val modification: (FossilShape) -> FossilShape) {
     ROTATE_0({ positions -> positions.rotate(0) }),
