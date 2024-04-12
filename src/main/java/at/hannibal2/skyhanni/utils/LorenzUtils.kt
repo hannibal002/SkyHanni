@@ -58,7 +58,7 @@ object LorenzUtils {
      */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
-    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
+    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
