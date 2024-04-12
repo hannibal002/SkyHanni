@@ -70,8 +70,8 @@ class MiningNotifications {
             goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
             coldReset.matches(message) -> {
-                cold = 0
                 hasSentCold = false
+                cold = 0
             }
         }
     }
@@ -82,7 +82,8 @@ class MiningNotifications {
         if (!LorenzUtils.inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)) return
         cold = ScoreboardData.sidebarLinesFormatted.matchFirst(ScoreboardPattern.coldPattern) {
             group("cold").toInt().absoluteValue
-        } ?: return
+        } ?: -1
+        if (cold == -1) return
         if (cold >= config.coldThreshold.get() && !hasSentCold) {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
