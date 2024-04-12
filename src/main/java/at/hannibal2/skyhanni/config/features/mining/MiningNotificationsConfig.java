@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.mining.MiningNotifications.NotificationList;
+import at.hannibal2.skyhanni.features.mining.MiningNotifications.MiningNotificationList;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -26,12 +26,12 @@ public class MiningNotificationsConfig {
             desc = "Drag text to change which events send a title."
     )
     @ConfigEditorDraggableList
-    public List<NotificationList> notifications = new ArrayList<>(Arrays.asList(
-            NotificationList.MINESHAFT_SPAWN,
-            NotificationList.SCRAP,
-            NotificationList.COLD,
-            NotificationList.GOLDEN_GOBLIN,
-            NotificationList.DIAMOND_GOBLIN
+    public List<MiningNotificationList> notifications = new ArrayList<>(Arrays.asList(
+            MiningNotificationList.MINESHAFT_SPAWN,
+            MiningNotificationList.SCRAP,
+            MiningNotificationList.COLD,
+            MiningNotificationList.GOLDEN_GOBLIN,
+            MiningNotificationList.DIAMOND_GOBLIN
     ));
 
     @Expose

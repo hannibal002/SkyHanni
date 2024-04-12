@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class MiningNotifications {
 
-    enum class NotificationList(val str: String, val notification: String) {
+    enum class MiningNotificationList(val str: String, val notification: String) {
         MINESHAFT_SPAWN("§bGlacite Mineshaft", "§bMineshaft"),
         SCRAP("§9Suspicious Scrap", "§9Suspicious Scrap"),
         GOLDEN_GOBLIN("§6Golden Goblin", "§6Golden Goblin"),
@@ -65,10 +65,10 @@ class MiningNotifications {
         if (!LorenzUtils.inMiningIsland()) return
         val message = event.message
         when {
-            mineshaftSpawn.matches(message) -> sendNotification(NotificationList.MINESHAFT_SPAWN)
-            scrapDrop.matches(message) -> sendNotification(NotificationList.SCRAP)
-            goldenGoblinSpawn.matches(message) -> sendNotification(NotificationList.GOLDEN_GOBLIN)
-            diamondGoblinSpawn.matches(message) -> sendNotification(NotificationList.DIAMOND_GOBLIN)
+            mineshaftSpawn.matches(message) -> sendNotification(MiningNotificationList.MINESHAFT_SPAWN)
+            scrapDrop.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
+            goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
+            diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
             coldReset.matches(message) -> {
                 cold = 0
                 hasSentCold = false
@@ -77,14 +77,14 @@ class MiningNotifications {
     }
 
     @SubscribeEvent
-    fun onScoreboard(event: ScoreboardChangeEvent) {
+    fun onScoreboardChange(event: ScoreboardChangeEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)) return
         if (!ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }) return
         cold = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.coldPattern, "cold").toInt().absoluteValue
         if ((cold >= config.coldThreshold.get()) && !hasSentCold) {
             hasSentCold = true
-            sendNotification(NotificationList.COLD)
+            sendNotification(MiningNotificationList.COLD)
         }
     }
 
@@ -101,7 +101,7 @@ class MiningNotifications {
         }
     }
 
-    private fun sendNotification(type: NotificationList) {
+    private fun sendNotification(type: MiningNotificationList) {
         if (!config.notifications.contains(type)) return
         LorenzUtils.sendTitle(type.notification, 1500.milliseconds)
         if (config.playSound) SoundUtils.playPlingSound()
