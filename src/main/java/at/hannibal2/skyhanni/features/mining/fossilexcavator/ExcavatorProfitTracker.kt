@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -110,12 +109,13 @@ class ExcavatorProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (GardenAPI.isCurrentlyFarming()) return
-        // TODO add distance check
-//         config.showNearvy
+        if (LorenzUtils.skyBlockArea != "Fossil Research Center") return
+        // hide during an active excavation
+        if (FossilExcavatorAPI.inInventory && !FossilExcavatorAPI.inExcavatorMenu) {
+            return
+        }
 
         tracker.renderDisplay(config.position)
-        tracker.firstUpdate()
     }
 
     @SubscribeEvent

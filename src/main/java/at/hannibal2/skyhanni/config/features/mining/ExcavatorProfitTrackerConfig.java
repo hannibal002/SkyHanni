@@ -12,7 +12,7 @@ public class ExcavatorProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Count all drops you gain while excavating fossils in the Crystal Cave."
+        desc = "Count all drops you gain while excavating fossils in the Glacial Cave."
     )
     @ConfigEditorBoolean
     @FeatureToggle

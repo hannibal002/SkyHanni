@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -293,9 +294,9 @@ object ItemUtils {
 
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
         // This workaround fixes 'Tubto Cacti I Book'
-        val input = if (originalInput.endsWith(" Book")) {
+        val input = (if (originalInput.endsWith(" Book")) {
             originalInput.replace(" Book", "")
-        } else originalInput
+        } else originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!

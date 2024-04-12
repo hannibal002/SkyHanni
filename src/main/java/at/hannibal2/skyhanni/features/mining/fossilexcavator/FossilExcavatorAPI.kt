@@ -91,8 +91,7 @@ object FossilExcavatorAPI {
 
         val pair = itemPattern.matchMatcher(message) {
             val itemLine = group("item")
-            val newLine = itemLine.replace("§r", "")
-            ItemUtils.readItemAmount(newLine) ?: return
+            ItemUtils.readItemAmount(itemLine) ?: return
         } ?: return
         loot.add(pair)
     }
