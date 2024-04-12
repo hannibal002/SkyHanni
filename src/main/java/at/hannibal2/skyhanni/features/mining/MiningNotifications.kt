@@ -61,8 +61,8 @@ class MiningNotifications {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.enabled) return
         if (!LorenzUtils.inMiningIsland()) return
+        if (!config.enabled) return
         val message = event.message
         when {
             mineshaftSpawn.matches(message) -> sendNotification(MiningNotificationList.MINESHAFT_SPAWN)
