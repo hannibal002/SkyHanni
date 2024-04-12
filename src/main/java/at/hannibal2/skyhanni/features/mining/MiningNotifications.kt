@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -80,9 +80,10 @@ class MiningNotifications {
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)) return
-        if (!ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }) return
-        cold = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.coldPattern, "cold").toInt().absoluteValue
-        if ((cold >= config.coldThreshold.get()) && !hasSentCold) {
+        cold = ScoreboardData.sidebarLinesFormatted.matchFirst(ScoreboardPattern.coldPattern) {
+            group("cold").toInt().absoluteValue
+        } ?: return
+        if (cold >= config.coldThreshold.get() && !hasSentCold) {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
         }
