@@ -657,6 +657,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
 + Visitor's Logbook Stats. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1287)
     + Show all your visited/accepted/denied visitors stats in a display.
++ Stereo Harmony Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1324)
+    + Options to show/hide boosted crop and pest icons.
 
 </details>
 <details open><summary>
@@ -757,6 +759,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Area Walls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1266)
     + Show walls between the main areas of the Crystal Hollows.
     + Option to show the walls also when inside the Nucleus.
++ Fossil Excavator Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1427)
+    + Shows where to next click for optimal chance of solving the fossil. If there is a fossil this will find it within 18 moves.
 
 </details>
 <details open><summary>

@@ -93,6 +93,11 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "No Bits Warning", desc = "")
+    @Accordion
+    public NoBitsWarningConfig noBitsWarning = new NoBitsWarningConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
@@ -130,12 +135,6 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colorMonthNames = false;
-
-    @Expose
-    @ConfigOption(name = "No Bits Warning", desc = "Alerts you when you have no bits available.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean noBitsWarning = true;
 
     @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")

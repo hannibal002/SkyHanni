@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -41,7 +42,7 @@ class ChestValue {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.inDungeons && !config.enableInDungeons) return
+        if (DungeonAPI.inDungeon() && !config.enableInDungeons) return
         if (InventoryUtils.openInventoryName() == "") return
 
         if (!config.showDuringEstimatedItemValue) {
