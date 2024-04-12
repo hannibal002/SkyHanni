@@ -11,7 +11,6 @@ enum class FossilMutation(val modification: (FossilShape) -> FossilShape) {
     FLIP_ROTATE_270({ positions -> positions.rotate(270).flipShape() });
 
     companion object {
-        val allValues = entries.toList()
         val onlyRotation = listOf(
             ROTATE_0,
             ROTATE_90,

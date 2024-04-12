@@ -21,7 +21,7 @@ enum class FossilType(
                 FossilTile(4, 2)
             )
         ),
-        FossilMutation.allValues
+        FossilMutation.entries
     ),
     WEBBED(
         "Webbed", 10, "10%",
@@ -107,7 +107,7 @@ enum class FossilType(
                 FossilTile(5, 1),
             )
         ),
-        FossilMutation.allValues
+        FossilMutation.entries
     ),
     FOOTPRINT(
         "Footprint", 13, "7.7%",
@@ -150,7 +150,7 @@ enum class FossilType(
                 FossilTile(3, 4),
             )
         ),
-        FossilMutation.allValues
+        FossilMutation.entries
     ),
     UGLY(
         "Ugly", 16, "6.2%",
