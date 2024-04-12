@@ -43,7 +43,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -120,7 +120,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
-            val year = item.getExtraAttributes()?.getInteger("new_years_cake")?.toString() ?: ""
+            val year = item.getNewYearCake()?.toString() ?: ""
             return "§b$year"
         }
 

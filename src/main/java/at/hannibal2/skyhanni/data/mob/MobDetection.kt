@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.mob.MobData.Companion.logger
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
@@ -36,8 +36,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MAX_RETRIES = 20 * 5
-
-private const val MOB_DETECTION_LOG_PREFIX = "MobDetection: "
 
 class MobDetection {
 
@@ -58,8 +56,6 @@ class MobDetection {
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
-
-    private val logger = LorenzLogger("mob/detection")
 
     init {
         MobFilter.bossMobNameFilter
