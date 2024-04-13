@@ -160,7 +160,7 @@ object ChocolateFactory {
 
         eggFoundPattern.matchMatcher(event.message) {
             val currentLocation = LocationUtils.playerLocation()
-            DelayedRun.runDelayed(5.seconds) {
+            DelayedRun.runDelayed(7.seconds) {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
                     onClick = { EggLocations.shareNearbyEggLocation(currentLocation) },
@@ -176,6 +176,7 @@ object ChocolateFactory {
             val z = group("z").formatInt()
             val eggLocation = LorenzVec(x, y, z)
             // todo add waypoint
+            event.isCanceled = true
             return
         }
     }
