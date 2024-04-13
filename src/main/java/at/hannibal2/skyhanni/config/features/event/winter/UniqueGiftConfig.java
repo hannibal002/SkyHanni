@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.config.features.event.winter;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class UniqueGiftConfig {
     @Expose
@@ -15,5 +16,6 @@ public class UniqueGiftConfig {
     public boolean enabled = true;
 
     @Expose
+    @ConfigLink(owner = UniqueGiftConfig.class, field = "enabled")
     public Position position = new Position(100, 100, false, true);
 }

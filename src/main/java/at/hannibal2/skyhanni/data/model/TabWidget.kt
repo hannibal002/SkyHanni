@@ -16,9 +16,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-// This group / prefix is not allowed to be used anywhere else (tab.widget is allowed as prefix)
+/** This group / prefix is not allowed to be used anywhere else (tab.widget is allowed as prefix) */
 private val repoGroup = RepoPattern.group("tab.widget.enum")
 
+/**
+ * This class defines various widgets within the tab list, specifically focusing on the reading of the values.
+ * Each enum value corresponds to a distinct widget in the tab list, ensuring no overlap between them.
+ * The general info widget is broken up into multiple smaller ones.
+ * The class facilitates access to the lines associated with each widget and triggers events when a widget undergoes changes or becomes invisible.
+ */
 enum class TabWidget(
     pattern0: String
 ) {
@@ -26,6 +32,8 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Players (?:§.)*\\(\\d+\\)"
     ),
+
+    /** This line holds no information, only here because every widget must be present */
     INFO(
         // language=RegExp
         "(?:§.)*Info"
@@ -262,6 +270,10 @@ enum class TabWidget(
         // language=RegExp
         "Pet Sitter:.*"
     ),
+    DUNGEON_HUB_PROGRESS(
+        // language=RegExp
+        "(?:§.)*Dungeons:"
+    ),
     DUNGEON_PUZZLE(
         // language=RegExp
         "(?:§.)*Puzzles: (?:§.)*\\((?<amount>\\d+)\\)"
@@ -278,6 +290,8 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Skills: (?:§.)*\\w+ \\d+: (?:§.)*[\\d.]+%"
     ),
+
+    /** This line holds no information, only here because every widget must be present */
     DUNGEON_ACCOUNT_INFO_LINE(
         // language=RegExp
         "(?:§.)*Account Info"
@@ -289,21 +303,27 @@ enum class TabWidget(
 
     ;
 
+    /** The pattern for the first line of the widget*/
     val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
 
+    /** The current active information from tab list.
+     *
+     * When the widget isn't visible it will be empty
+     * */
     var lines: List<String> = emptyList()
         private set
 
     /** Both are inclusive */
     var boundary = -1 to -1
 
+    /** Is this widget currently visible in the tab list */
     var isActive: Boolean = false
         private set
 
-    fun isEventForThis(event: TabWidgetUpdate) = event.widget == this
-
+    /** Internal value for the checking to set [isActive] */
     private var gotChecked = false
 
+    /** A [matchMatcher] for the first line using the pattern from the widget*/
     inline fun <T> matchMatcherFirstLine(consumer: Matcher.() -> T) =
         if (isActive)
             pattern.matchMatcher(lines.first(), consumer)
@@ -322,6 +342,7 @@ enum class TabWidget(
         TabWidgetUpdate.Clear(this).postAndCatch()
     }
 
+    /** Update the state of the widget, posts the clear if [isActive] == true && [gotChecked] == false */
     private fun updateIsActive() {
         if (isActive == gotChecked) return
         isActive = gotChecked
@@ -332,8 +353,10 @@ enum class TabWidget(
 
     companion object {
 
+        /** The index for the start of each Widget (inclusive) */
         private val separatorIndexes = mutableListOf<Pair<Int, TabWidget?>>()
 
+        /** Patterns that where loaded from a future version*/
         private var extraPatterns: List<Pattern> = emptyList()
 
         init {

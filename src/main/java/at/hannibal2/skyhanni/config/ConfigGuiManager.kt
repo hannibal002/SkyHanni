@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.moulconfig.gui.MoulConfigEditor
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 
 object ConfigGuiManager {
 

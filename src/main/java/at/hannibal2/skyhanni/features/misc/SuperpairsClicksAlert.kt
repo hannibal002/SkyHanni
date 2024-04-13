@@ -38,7 +38,7 @@ class SuperpairsClicksAlert {
     }
 
     @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.superpairsClicksAlert) return
         if (roundsNeeded == -1) return
         if (!targetInventoryNames.any { event.inventoryName.contains(it) }) return
