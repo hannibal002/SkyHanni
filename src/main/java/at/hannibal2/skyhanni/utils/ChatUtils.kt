@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
@@ -12,6 +13,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
@@ -194,7 +196,7 @@ object ChatUtils {
         message: String,
         hover: List<String>,
         command: String? = null,
-        runCommand: Boolean = true
+        runCommand: Boolean = true,
     ): ChatComponentText {
         val text = ChatComponentText(message)
         text.chatStyle.chatHoverEvent =
@@ -225,7 +227,7 @@ object ChatUtils {
         hover: String = "§eOpen $url",
         autoOpen: Boolean = false,
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val text = ChatComponentText(msgPrefix + message)
@@ -246,7 +248,7 @@ object ChatUtils {
     fun multiComponentMessage(
         components: List<ChatComponentText>,
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val baseMessage = ChatComponentText(msgPrefix)
@@ -297,4 +299,13 @@ object ChatUtils {
 
     fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
         MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
+
+    fun chatAndOpenConfig(message: String, property: KMutableProperty0<*>) {
+        clickableChat(
+            message,
+            onClick = {
+                property.jumpToEditor()
+            }
+        )
+    }
 }
