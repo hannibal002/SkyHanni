@@ -54,9 +54,9 @@ class NonGodPotEffectDisplay {
 
         INVISIBILITY("§8Invisibility I"), // when wearing sorrow armor
 
-        REV("§cZombie Brain Mixin", true, "§cZombie Brain Mixin I"),
-        TARA("§6Spider Egg Mixin", true, "§6Spider Egg Mixin I"),
-        SVEN("§bWolf Fur Mixin", true, "§bWolf Fur Mixin I"),
+        REV("§cZombie Brain Mixin", true),
+        TARA("§6Spider Egg Mixin", true),
+        SVEN("§bWolf Fur Mixin", true),
         VOID("§6Ender Portal Fumes", true),
         BLAZE("§fGabagoey", true),
         GLOWING_MUSH("§2Glowing Mush Mixin", true),
@@ -196,7 +196,7 @@ class NonGodPotEffectDisplay {
         for (stack in event.inventoryItems.values) {
             val name = stack.name
             for (effect in NonGodPotEffect.entries) {
-                if (name != effect.inventoryItemName) continue
+                if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
                     if (line.contains("Remaining") &&
                         line != "§7Time Remaining: §aCompleted!" &&
