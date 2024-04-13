@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.mining.fossilexcavator
+package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
-object FossilExcavatorSolver {
+object FossilSolver {
     /*
     to be used when they have less than 18 clicks
      - solves 361/404 in at most 16 clicks
@@ -34,7 +34,7 @@ object FossilExcavatorSolver {
     private var currentlySolving = false
 
     private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> {
-        return if (FossilExcavator.maxCharges < 18) {
+        return if (FossilSolverDisplay.maxCharges < 18) {
             riskyStartingSequence
         } else {
             safeStartingSequence
@@ -62,13 +62,13 @@ object FossilExcavatorSolver {
         if (needsMoveSequence) {
             val movesTaken = invalidPositions.size
             if (movesTaken >= getCurrentSequence().size) {
-                FossilExcavator.showError()
+                FossilSolverDisplay.showError()
                 currentlySolving = false
                 return
             }
 
             val nextMove = getCurrentSequence().elementAt(movesTaken)
-            FossilExcavator.nextData(nextMove.first, nextMove.second, nextMove.third)
+            FossilSolverDisplay.nextData(nextMove.first, nextMove.second, nextMove.third)
             currentlySolving = false
             return
         }
@@ -78,7 +78,7 @@ object FossilExcavatorSolver {
 
         val possibleFossilTypes = if (percentage == null) FossilType.entries else {
             val possibleFossils = FossilType.getByPercentage(percentage)
-            FossilExcavator.possibleFossilTypes = possibleFossils.toSet()
+            FossilSolverDisplay.possibleFossilTypes = possibleFossils.toSet()
             possibleFossils
         }
 
@@ -106,12 +106,12 @@ object FossilExcavatorSolver {
 
         val bestPosition = possibleClickPositions.maxByOrNull { it.value } ?: run {
             if (fossilLocations.isNotEmpty()) {
-                FossilExcavator.showCompleted()
+                FossilSolverDisplay.showCompleted()
                 currentlySolving = false
                 return
             }
 
-            FossilExcavator.showError()
+            FossilSolverDisplay.showError()
             currentlySolving = false
             return
         }
@@ -119,7 +119,7 @@ object FossilExcavatorSolver {
         val nextMove = bestPosition.key
         val correctPercentage = bestPosition.value / totalPossibleTiles
         currentlySolving = false
-        FossilExcavator.nextData(nextMove, correctPercentage, totalPossibleTiles.toInt())
+        FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles.toInt())
     }
 
     private fun isValidFossilPosition(
