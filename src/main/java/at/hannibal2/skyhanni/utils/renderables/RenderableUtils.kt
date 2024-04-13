@@ -29,7 +29,7 @@ internal object RenderableUtils {
     fun calculateTableYOffsets(content: List<List<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
         listOf(0) + (content.takeIf { it.isNotEmpty() }?.map { row ->
-            buffer += row.maxOf { it?.height ?: 0 } + yPadding
+            buffer += (row.maxOfOrNull { it?.height ?: 0 } ?: 0) + yPadding
             buffer
         } ?: listOf(yPadding))
     }

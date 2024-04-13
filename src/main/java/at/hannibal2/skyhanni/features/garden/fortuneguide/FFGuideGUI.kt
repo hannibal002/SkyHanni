@@ -90,25 +90,25 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             add(hTab(ItemStack(Blocks.grass), Renderable.string("§eOverview")) {
                 currentCrop = null
 
-                // Double Click Logic
+
                 if (it.isSelected()) {
-                    verticalTabs.first { it != lastVerticalTabWrapper.tab }.fakeClick()
+                    verticalTabs.first { it != lastVerticalTabWrapper.tab }.fakeClick() // Double Click Logic
+                } else {
+                    lastVerticalTabWrapper.tab?.fakeClick() // First Click Logic
                 }
             })
             for (crop in CropType.entries) {
                 add(hTab(crop.icon, Renderable.string("§e${crop.cropName}")) {
 
                     currentCrop = crop
-                    for (item in FarmingItems.entries) {
-                        if (item.name == crop.name) {
-                            FFStats.getCropStats(crop, item.getItem())
-                            FortuneUpgrades.getCropSpecific(item.getItem())
-                        }
-                    }
+                    val item = crop.farmingItem
+                    FFStats.getCropStats(crop, item.getItemOrNull())
+                    FortuneUpgrades.getCropSpecific(item.getItemOrNull())
 
-                    // Double Click Logic
                     if (it.isSelected()) {
-                        verticalTabs.first { it != lastVerticalTabWrapper.tab }.fakeClick()
+                        verticalTabs.first { it != lastVerticalTabWrapper.tab }.fakeClick() // Double Click Logic
+                    } else {
+                        lastVerticalTabWrapper.tab?.fakeClick() // First Click Logic
                     }
                 })
             }

@@ -559,6 +559,23 @@ interface Renderable {
             }
         }
 
+        fun fixedSizeCollum(
+            content: Renderable,
+            height: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = render.width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+            override fun render(posX: Int, posY: Int) {
+                render.renderYAligned(0, 0, height)
+            }
+        }
+
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,

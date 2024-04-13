@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneStats
+import at.hannibal2.skyhanni.utils.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -18,7 +19,7 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
 ) {
 
     override fun onEnter() {
-        val toolLines = toolLines().chunked(2).map { Renderable.verticalContainer(it, 2) }
+        val toolLines = toolLines().split().map { Renderable.verticalContainer(it, 2) }
         update(
             listOf(
                 header(),
@@ -28,7 +29,7 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
                     toolLines[1],
                 )
             ),
-            FarmingItems.getPetsDisplay()
+            emptyList()
         )
     }
 
@@ -63,21 +64,28 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
     private fun toolLines(): List<Renderable> =
         FFStats.cropPage.filter { it.key !in headers }.map { it.getFarmingBar() }
 
-    private fun equipDisplay(): Renderable = Renderable.verticalContainer(
-        listOf(
-            FFGuideGUI.currentCrop?.farmingItem?.getDisplay() ?: Renderable.placeholder(0, 0),
-            Renderable.horizontalContainer(
+    private fun equipDisplay(): Renderable =
+        Renderable.fixedSizeCollum(
+            Renderable.verticalContainer(
                 listOf(
-                    Renderable.verticalContainer(FarmingItems.getArmorDisplay(), 2),
-                    Renderable.verticalContainer(FarmingItems.getEquipmentDisplay(), 2)
+                    FFGuideGUI.currentCrop?.farmingItem?.getDisplay() ?: Renderable.placeholder(0, 0),
+                    Renderable.horizontalContainer(
+                        listOf(
+                            Renderable.verticalContainer(FarmingItems.getArmorDisplay(), 2),
+                            Renderable.verticalContainer(FarmingItems.getEquipmentDisplay(), 2)
+                        ),
+                        2,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                    ),
+                    Renderable.horizontalContainer(FarmingItems.getPetsDisplay(), 2)
                 ),
-                2
-            )
-        ),
-        2,
-        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-        verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
-    )
+                2,
+                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+            ),
+            144,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+        )
 
     fun unsued(mouseX: Int, mouseY: Int) {
         for (item in FarmingItems.entries) {

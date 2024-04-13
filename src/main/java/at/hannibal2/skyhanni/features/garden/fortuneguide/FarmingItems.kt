@@ -31,8 +31,9 @@ enum class FarmingItems {
 
     var selectedState = false
 
-    fun getItem() =
-        ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.get(this) ?: FFGuideGUI.getFallbackItem(this)
+    fun getItem() = getItemOrNull() ?: FFGuideGUI.getFallbackItem(this)
+
+    fun getItemOrNull() = ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.get(this)
 
     fun getDisplay() = object : Renderable {
 

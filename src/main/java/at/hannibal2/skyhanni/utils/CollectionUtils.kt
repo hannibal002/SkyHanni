@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.math.ceil
 
 object CollectionUtils {
 
@@ -194,5 +195,15 @@ object CollectionUtils {
             //    throw IllegalArgumentException("Not enough space for content")
         }
         return emptySpace / (yLength - 1)
+    }
+
+    /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
+    fun <T> Collection<T>.split(subs: Int = 2): List<List<T>> {
+        if (this.isEmpty()) return listOf(emptyList())
+        val list = this.chunked(ceil(this.size.toDouble() / subs.toDouble()).toInt()).toMutableList()
+        while (list.size < subs) {
+            list.add(emptyList())
+        }
+        return list
     }
 }
