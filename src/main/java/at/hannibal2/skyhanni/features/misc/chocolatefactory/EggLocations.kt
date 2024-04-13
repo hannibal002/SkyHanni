@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -32,12 +33,11 @@ object EggLocations {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!config.showAllWaypoints) return
-
-        val eggsLocations = getCurrentIslandEggLocations() ?: return
+        if (!LorenzUtils.inSkyBlock) return
+        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
 
         if (config.showAllWaypoints) {
-            for ((index, eggLocation) in eggsLocations.withIndex()) {
+            for ((index, eggLocation) in islandEggsLocations.withIndex()) {
                 event.drawWaypointFilled(
                     eggLocation,
                     LorenzColor.GREEN.toColor(),
@@ -47,5 +47,17 @@ object EggLocations {
                 event.drawDynamicText(eggLocation.add(y = 1), "§aEgg $index", 1.5)
             }
         }
+    }
+
+    fun shareNearbyEggLocation(playerLocation: LorenzVec) {
+        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
+
+        val x = closestEgg.x.toInt()
+        val y = closestEgg.y.toInt()
+        val z = closestEgg.z.toInt()
+
+        val message = "[SkyHanni] Chocolate egg located at x: $x, y: $y, z: $z"
+        ChatUtils.sendCommandToServer("ac $message")
     }
 }

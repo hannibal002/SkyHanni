@@ -159,14 +159,21 @@ object ChatUtils {
      * Sends a message to the user that they can click and run an action
      * @param message The message to be sent
      * @param onClick The runnable to be executed when the message is clicked
+     * @param expireAt When the click action should expire, default never
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
      *
      * @see CHAT_PREFIX
      */
-    fun clickableChat(message: String, onClick: () -> Any, prefix: Boolean = true, prefixColor: String = "§e") {
+    fun clickableChat(
+        message: String,
+        onClick: () -> Any,
+        expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
+        prefix: Boolean = true,
+        prefixColor: String = "§e"
+    ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        ChatClickActionManager.oneTimeClick(msgPrefix + message, onClick)
+        ChatClickActionManager.oneTimeClick(msgPrefix + message, onClick, expireAt)
     }
 
     /**
