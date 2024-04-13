@@ -179,7 +179,7 @@ object CollectionUtils {
     fun MutableList<Renderable>.addString(
         text: String,
         horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     ) {
         add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
