@@ -18,61 +18,60 @@ class UpgradePage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7)
     paddingY,
     hasHeader = true,
 ) {
-    override fun onSwitch() {
-        update(
-            content = buildList {
-                add(listOf("Upgrade", "", "Item", "FF", "Cost/FF", "Total").map {
-                    Renderable.string(
-                        it,
-                        0.9,
-                        horizontalAlign = HorizontalAlignment.CENTER
+    override fun onEnter() = update(
+        content = buildList {
+            add(listOf("Upgrade", "", "Item", "FF", "Cost/FF", "Total").map {
+                Renderable.string(
+                    it,
+                    0.9,
+                    horizontalAlign = HorizontalAlignment.CENTER
+                )
+            })
+            val upgradeList =
+                if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
+            addAll(upgradeList.map { upgrade ->
+                buildList {
+                    add(
+                        Renderable.wrappedString(
+                            upgrade.description,
+                            136,
+                            0.75,
+                            verticalAlign = VerticalAlignment.CENTER
+                        )
                     )
-                })
-                val upgradeList =
-                    if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
-                addAll(upgradeList.map { upgrade ->
-                    buildList {
-                        add(
-                            Renderable.wrappedString(
-                                upgrade.description,
-                                136,
-                                0.75,
-                                verticalAlign = VerticalAlignment.CENTER
-                            )
+                    add(
+                        Renderable.itemStackWithTip(
+                            upgrade.requiredItem.getItemStack(),
+                            8.0 / 9.0,
+                            verticalAlign = VerticalAlignment.CENTER
                         )
-                        add(
-                            Renderable.itemStackWithTip(
-                                upgrade.requiredItem.getItemStack(),
-                                4.0 / 3.0,
-                                verticalAlign = VerticalAlignment.CENTER
-                            )
-                        ) // TODO fix tooltip + use NeuInternalNames
-                        add(Renderable.wrappedString(upgrade.requiredItem.getItemStack().itemName.let { if (upgrade.itemQuantity == 1) it else "$it §fx${upgrade.itemQuantity}" }
-                            ?: "", 70, 0.75, verticalAlign = VerticalAlignment.CENTER)) // TODO wtf
-                        add(
-                            Renderable.string(
-                                "§a${DecimalFormat("0.##").format(upgrade.fortuneIncrease)}",
-                                horizontalAlign = HorizontalAlignment.CENTER,
-                                verticalAlign = VerticalAlignment.CENTER
-                            )
-                        ) // TODO cleaner formating
-                        add(
-                            Renderable.string(
-                                "§6" + upgrade.costPerFF?.let { NumberUtil.format(it) },
-                                horizontalAlign = HorizontalAlignment.CENTER,
-                                verticalAlign = VerticalAlignment.CENTER
-                            )
+                    ) // TODO fix tooltip + use NeuInternalNames
+                    add(Renderable.wrappedString(upgrade.requiredItem.getItemStack().itemName.let { if (upgrade.itemQuantity == 1) it else "$it §fx${upgrade.itemQuantity}" }
+                        ?: "", 70, 0.75, verticalAlign = VerticalAlignment.CENTER)) // TODO wtf
+                    add(
+                        Renderable.string(
+                            "§a${DecimalFormat("0.##").format(upgrade.fortuneIncrease)}",
+                            horizontalAlign = HorizontalAlignment.CENTER,
+                            verticalAlign = VerticalAlignment.CENTER
                         )
-                        add(
-                            Renderable.string(
-                                "§6" + upgrade.cost?.let { NumberUtil.format(it) },
-                                horizontalAlign = HorizontalAlignment.CENTER,
-                                verticalAlign = VerticalAlignment.CENTER
-                            )
+                    ) // TODO cleaner formating
+                    add(
+                        Renderable.string(
+                            "§6" + upgrade.costPerFF?.let { NumberUtil.format(it) },
+                            horizontalAlign = HorizontalAlignment.CENTER,
+                            verticalAlign = VerticalAlignment.CENTER
                         )
-                    }
-                })
-            }
-        )
-    }
+                    )
+                    add(
+                        Renderable.string(
+                            "§6" + upgrade.cost?.let { NumberUtil.format(it) },
+                            horizontalAlign = HorizontalAlignment.CENTER,
+                            verticalAlign = VerticalAlignment.CENTER
+                        )
+                    )
+                }
+            })
+        }
+    )
 }
+

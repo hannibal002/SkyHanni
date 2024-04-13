@@ -3,11 +3,9 @@ package at.hannibal2.skyhanni.utils.guide
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
-import org.lwjgl.input.Mouse
 
 const val selectedColor = 0x50000000
 const val notSelectedColor = 0x50303030
@@ -24,7 +22,8 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
     lateinit var verticalTabs: List<GuideTab>
     protected var currentPage: pageEnum = defaultScreen
         set(value) {
-            pageList[value]?.onSwitch()
+            pageList[field]?.onLeave()
+            pageList[value]?.onEnter()
             field = value
         }
 
@@ -73,15 +72,15 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
         GlStateManager.translate(-offset.first, -offset.second, 0f)
     }
 
-    override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
+    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         try {
-            super.drawScreen(unusedX, unusedY, partialTicks)
+            super.drawScreen(mouseX, mouseY, partialTicks)
             drawDefaultBackground()
             val guiLeft = (width - sizeX) / 2
             val guiTop = (height - sizeY) / 2
 
-            val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-            val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+            /*             val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+                        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1 */
 
             val relativeMouseX = mouseX - guiLeft
             val relativeMouseY = mouseY - guiTop

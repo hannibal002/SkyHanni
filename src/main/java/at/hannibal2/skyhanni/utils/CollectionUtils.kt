@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -175,9 +176,9 @@ object CollectionUtils {
 
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
         if (this.isEmpty()) return xSpace
-        val xWidth = this.maxOf { it.sumOf { it.width } }
-        val xLength = this.maxOf { it.size }
-        val emptySpace = xSpace - xWidth
+        val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
+        val xLength = off.size - 1
+        val emptySpace = xSpace - off.last()
         if (emptySpace < 0) {
             //    throw IllegalArgumentException("Not enough space for content")
         }
@@ -186,9 +187,9 @@ object CollectionUtils {
 
     fun Collection<Collection<Renderable>>.tableStretchYPadding(ySpace: Int): Int {
         if (this.isEmpty()) return ySpace
-        val yWidth = this.sumOf { it.maxOfOrNull { it.height } ?: 0 }
-        val yLength = this.size
-        val emptySpace = ySpace - yWidth
+        val off = RenderableUtils.calculateTableYOffsets(this as List<List<Renderable?>>, 0)
+        val yLength = off.size - 1
+        val emptySpace = ySpace - off.last()
         if (emptySpace < 0) {
             //    throw IllegalArgumentException("Not enough space for content")
         }

@@ -4,17 +4,14 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.tableStretchXPadding
 import at.hannibal2.skyhanni.utils.CollectionUtils.tableStretchYPadding
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.renderer.GlStateManager
 
 abstract class GuideTablePage(
     val sizeX: Int,
     val sizeY: Int,
-    val paddingX: Int = 0,
-    val paddingY: Int = 0,
+    paddingX: Int = 0,
+    paddingY: Int = 0,
     val footerSpacing: Int = 2
-) : GuidePage() {
-
-    private var renderable: Renderable? = null
+) : GuideRenderablePage(paddingX, paddingY) {
 
     fun update(
         content: List<List<Renderable>>,
@@ -32,13 +29,5 @@ abstract class GuideTablePage(
                     Renderable.horizontalContainer(footer, footerSpacing, horizontalAlign = HorizontalAlignment.CENTER)
                 ), spacing = ySpace
             )
-    }
-
-    override fun drawPage(mouseX: Int, mouseY: Int) {
-        GlStateManager.translate(paddingX.toFloat(), paddingY.toFloat(), 0f)
-        Renderable.withMousePosition(mouseX, mouseY) {
-            renderable?.render(paddingX, paddingY)
-        }
-        GlStateManager.translate(-paddingX.toFloat(), -paddingY.toFloat(), 0f)
     }
 }

@@ -38,7 +38,7 @@ enum class FarmingItems {
 
         val content = Renderable.clickable(
             Renderable.itemStackWithTip(
-                getItem(), 1.0, -1, -1
+                getItem(), 1.0, 0, 0, false
             ),
             onClick = {},
             condition = { !selectedState })

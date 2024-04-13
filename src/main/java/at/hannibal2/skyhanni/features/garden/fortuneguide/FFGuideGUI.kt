@@ -117,13 +117,10 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         verticalTabs.firstOrNull()?.fakeClick()
     }
 
-    override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
-        super.drawScreen(unusedX, unusedY, partialTicks)
+    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        super.drawScreen(mouseX, mouseY, partialTicks)
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
-
-        mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
 
         if (this.currentPage == FortuneGuidePage.UPGRADES) {
             //
@@ -279,29 +276,37 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
                 )
 
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.HELMET.getItem(), guiLeft + 162, guiTop + 80, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.HELMET.getItem(), guiLeft + 162, guiTop + 80,
+                    mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 100, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.CHESTPLATE.getItem(), guiLeft + 162, guiTop + 100,
+                    mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.LEGGINGS.getItem(), guiLeft + 162, guiTop + 120, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.LEGGINGS.getItem(), guiLeft + 162, guiTop + 120,
+                    mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.BOOTS.getItem(), guiLeft + 162, guiTop + 140, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.BOOTS.getItem(), guiLeft + 162, guiTop + 140,
+                    mouseX, mouseY
                 )
 
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.NECKLACE.getItem(), guiLeft + 182, guiTop + 80, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.NECKLACE.getItem(), guiLeft + 182, guiTop + 80,
+                    mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.CLOAK.getItem(), guiLeft + 182, guiTop + 100, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.CLOAK.getItem(), guiLeft + 182, guiTop + 100,
+                    mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.BELT.getItem(), guiLeft + 182, guiTop + 120, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.BELT.getItem(), guiLeft + 182, guiTop + 120,
+                    mouseX, mouseY
                 )
                 GuiRenderUtils.renderItemAndTip(
-                    tooltipToDisplay, FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140, mouseX, mouseY
+                    tooltipToDisplay, FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140,
+                    mouseX, mouseY
                 )
             }
         }
@@ -508,6 +513,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
     }
 
     abstract class FFGuidePage : GuidePage() {
-        override fun onSwitch() {}
+        override fun onEnter() {}
+        override fun onLeave() {}
     }
 }

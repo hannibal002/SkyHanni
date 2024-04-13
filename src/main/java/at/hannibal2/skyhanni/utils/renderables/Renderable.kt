@@ -273,6 +273,7 @@ interface Renderable {
             scale: Double = NEUItems.itemFontSize,
             xSpacing: Int = 2,
             ySpacing: Int = 0,
+            rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) =
@@ -282,6 +283,7 @@ interface Renderable {
                     scale,
                     xSpacing,
                     ySpacing,
+                    rescaleSkulls,
                     horizontalAlign = horizontalAlign,
                     verticalAlign = verticalAlign
                 ),
@@ -293,17 +295,18 @@ interface Renderable {
             item: ItemStack,
             scale: Double = NEUItems.itemFontSize,
             xSpacing: Int = 2,
-            ySpacing: Int = 0,
+            ySpacing: Int = 1,
+            rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
         ) = object : Renderable {
-            override val width = (15.5 * scale + 1.5).toInt() + xSpacing
-            override val height = (15.5 * scale + 1.5).toInt() + ySpacing
+            override val width = (15.5 * scale + 0.5).toInt() + xSpacing
+            override val height = (15.5 * scale + 0.5).toInt() + ySpacing
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale)
+                item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
 
@@ -342,7 +345,7 @@ interface Renderable {
             scale: Double = 1.0,
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
         ) = object : Renderable {
 
             val list by lazy {
@@ -353,9 +356,9 @@ interface Renderable {
 
             override val width by lazy {
                 if (list.size == 1) {
-                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / scale).toInt() + 1
+                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1
                 } else {
-                    (width / scale).toInt() + 1
+                    width
                 }
             }
 
@@ -417,8 +420,8 @@ interface Renderable {
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
-                            xOffsets[index + 1] - xOffsets[index] - xPadding,
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - yPadding
+                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY
                         )
                         GlStateManager.popMatrix()
                     }
@@ -679,6 +682,7 @@ interface Renderable {
             button: Int? = null,
             xPadding: Int = 1,
             yPadding: Int = 0,
+            useEmptySpace: Boolean = false,
             hasHeader: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
@@ -693,6 +697,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             private val virtualHeight = yOffsets.last() - yPadding
+
+            val emptySpaceX = if (useEmptySpace) 0 else xPadding
+            val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
             private val end get() = scroll.asInt() + height - yPadding - 1
 
@@ -716,8 +723,8 @@ interface Renderable {
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
                             posY + renderY,
-                            xOffsets[index + 1] - xOffsets[index],
-                            yOffsets[1]
+                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
+                            yOffsets[1] - emptySpaceY
                         )
                         GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
@@ -735,8 +742,8 @@ interface Renderable {
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
                             posY + renderY,
-                            xOffsets[index + 1] - xOffsets[index],
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY
                         )
                         GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }

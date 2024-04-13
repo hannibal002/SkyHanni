@@ -22,7 +22,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
     private var equipmentFF = mutableMapOf<FFTypes, Double>()
     private var armorFF = mutableMapOf<FFTypes, Double>()
 
-    override fun onSwitch() {
+    override fun onEnter() {
         val (content, footer) = adDrawPage(0, 0)
         update(content, footer)
     }
