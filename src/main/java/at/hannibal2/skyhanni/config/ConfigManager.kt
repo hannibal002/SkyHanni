@@ -216,9 +216,11 @@ class ConfigManager {
             }
             val configLink = field.getAnnotation(ConfigLink::class.java)
             if (configLink == null) {
-                val abc = "${field.declaringClass.name}.${field.name}"
-                val def = abc.replace("at.hannibal2.skyhanni.config.", "")
-                println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $def")
+                if (LorenzUtils.isInDevEnvironment()) {
+                    var name = "${field.declaringClass.name}.${field.name}"
+                    name = name.replace("at.hannibal2.skyhanni.config.", "")
+                    println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
+                }
                 continue
             }
             val position = field.get(obj) as Position
