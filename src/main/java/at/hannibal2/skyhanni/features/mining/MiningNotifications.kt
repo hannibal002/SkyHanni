@@ -81,8 +81,8 @@ class MiningNotifications {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        if (!config.enabled) return
         if (!LorenzUtils.inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)) return
+        if (!config.enabled) return
         val newCold = event.newList.matchFirst(ScoreboardPattern.coldPattern) {
             group("cold").toInt().absoluteValue
         } ?: 0
