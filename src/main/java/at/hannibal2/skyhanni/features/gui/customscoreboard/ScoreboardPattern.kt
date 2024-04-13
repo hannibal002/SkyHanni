@@ -331,7 +331,7 @@ object ScoreboardPattern {
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern(
         "wtfarethoselines",
-        "^§eMine 10 Rubies$"
+        "^(§eMine 10 Rubies|§eKill 100 Automatons)$"
     )
     val darkAuctionCurrentItemPattern by miscSb.pattern(
         "darkauction.currentitem",
@@ -405,15 +405,15 @@ object ScoreboardPattern {
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
-        "^\\s*Mithril Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
+        "^\\s*Mithril(?: Powder)?: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
     )
     val gemstonePowderPattern by tablistGroup.pattern(
         "gemstonepowder",
-        "^\\s*Gemstone Powder: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
+        "^\\s*Gemstone(?: Powder)?: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
     )
     val glacitePowderPattern by tablistGroup.pattern(
         "glacitepowder",
-        "^\\s*Glacite Powder: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
+        "^\\s*Glacite(?: Powder)?: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",

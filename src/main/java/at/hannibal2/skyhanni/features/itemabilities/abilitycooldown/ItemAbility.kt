@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import kotlin.math.floor
 
 enum class ItemAbility(
@@ -102,11 +104,11 @@ enum class ItemAbility(
             duration /= 100
             var d = duration.toDouble()
             d /= 10.0
-            LorenzUtils.formatDouble(d)
+            d.round(1).addSeparators()
         } else {
             duration /= 1000
             duration++
-            LorenzUtils.formatInteger(duration)
+            duration.addSeparators()
         }
     }
 
@@ -126,7 +128,7 @@ enum class ItemAbility(
 
         private fun ItemAbility.getMageCooldownReduction(): Double? {
             if (ignoreMageCooldownReduction) return null
-            if (!LorenzUtils.inDungeons) return null
+            if (!DungeonAPI.inDungeon()) return null
             if (DungeonAPI.playerClass != DungeonAPI.DungeonClass.MAGE) return null
 
             var abilityCooldownMultiplier = 1.0

@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
+import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
@@ -70,7 +71,7 @@ public class ProfileSpecificStorage {
         public String currentArrow = null;
 
         @Expose
-        public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
+        public Map<NEUInternalName, Integer> arrowAmount = new HashMap<>();
     }
 
     @Expose
@@ -81,7 +82,7 @@ public class ProfileSpecificStorage {
         public int bits = -1;
 
         @Expose
-        public int bitsToClaim = -1;
+        public int bitsAvailable = -1;
 
         @Expose
         public Long boosterCookieExpiryTime = null;
@@ -292,6 +293,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public PestProfitTracker.Data pestProfitTracker = new PestProfitTracker.Data();
+
+        @Expose
+        public VinylType activeVinyl = null;
     }
 
     @Expose

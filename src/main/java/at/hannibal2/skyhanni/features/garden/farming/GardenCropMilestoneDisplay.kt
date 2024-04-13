@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
@@ -162,11 +163,11 @@ object GardenCropMilestoneDisplay {
         }
 
         lineMap[2] = if (crop.isMaxed()) {
-            val haveFormat = LorenzUtils.formatInteger(counter)
+            val haveFormat = counter.addSeparators()
             Collections.singletonList("§7Counter: §e$haveFormat")
         } else {
-            val haveFormat = LorenzUtils.formatInteger(have)
-            val needFormat = LorenzUtils.formatInteger(need)
+            val haveFormat = have.addSeparators()
+            val needFormat = need.addSeparators()
             Collections.singletonList("§e$haveFormat§8/§e$needFormat")
         }
 
@@ -194,9 +195,9 @@ object GardenCropMilestoneDisplay {
                 }
             }
 
-            val format = LorenzUtils.formatInteger(farmingFortuneSpeed * 60)
+            val format = (farmingFortuneSpeed * 60).addSeparators()
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
-            val formatBps = LorenzUtils.formatDouble(speed, config.blocksBrokenPrecision)
+            val formatBps = speed.round(config.blocksBrokenPrecision).addSeparators()
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$formatBps")
         }
 
@@ -266,8 +267,8 @@ object GardenCropMilestoneDisplay {
         val have = counter - cropsForCurrentTier
         val need = cropsForNextTier - cropsForCurrentTier
 
-        val haveFormat = LorenzUtils.formatInteger(have)
-        val needFormat = LorenzUtils.formatInteger(need)
+        val haveFormat = have.addSeparators()
+        val needFormat = need.addSeparators()
 
         val missing = need - have
 

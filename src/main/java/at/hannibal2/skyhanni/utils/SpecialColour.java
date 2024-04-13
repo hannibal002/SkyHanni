@@ -33,6 +33,7 @@ public class SpecialColour {
 
     public static long startTime = -1;
 
+    @Deprecated // use String.toChromaColor()
     public static int specialToChromaRGB(String special) {
         if (startTime < 0) startTime = System.currentTimeMillis();
 
