@@ -527,7 +527,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
             override fun render(posX: Int, posY: Int) {
-                render.renderXAligned(0, 0, width)
+                render.renderXAligned(posX, posY, width)
             }
         }
 
@@ -572,7 +572,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
             override fun render(posX: Int, posY: Int) {
-                render.renderYAligned(0, 0, height)
+                render.renderYAligned(posX, posY, height)
             }
         }
 
@@ -723,7 +723,7 @@ interface Renderable {
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
                 if (hasHeader) yOffsets[1] else 0,
-                virtualHeight - height,
+                virtualHeight - height + if (hasHeader) yOffsets[1] else 0,
                 velocity,
                 button
             )
