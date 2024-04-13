@@ -69,7 +69,7 @@ public class ProfileSpecificStorage {
         public String currentArrow = null;
 
         @Expose
-        public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
+        public Map<NEUInternalName, Integer> arrowAmount = new HashMap<>();
     }
 
     @Expose

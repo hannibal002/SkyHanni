@@ -118,7 +118,7 @@ class ConfigManager {
                     }
 
                     override fun read(reader: JsonReader): LorenzRarity {
-                        return LorenzRarity.valueOf(reader.nextString().uppercase())
+                        return LorenzRarity.valueOf(reader.nextString().uppercase().replace(" ", "_"))
                     }
                 }.nullSafe())
                 .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
