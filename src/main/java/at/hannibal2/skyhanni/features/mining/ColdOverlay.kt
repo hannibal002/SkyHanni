@@ -1,13 +1,9 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.MiningAPI.getCold
+import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -15,16 +11,12 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
-import kotlin.math.absoluteValue
 
 
 class ColdOverlay {
 
-    private val areaPattern by RepoPattern.pattern("mining.coldoverlay.area", "Glacite Tunnels")
-
-    fun getCold(): Int? = ScoreboardData.sidebarLinesFormatted.matchFirst(ScoreboardPattern.coldPattern) {
-        return group("cold").toInt().absoluteValue
-    }
+    private val config get() = SkyHanniMod.feature.mining.coldOverlay
+    private fun isEnabled() = config.enabled && inGlaciteArea()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -56,10 +48,4 @@ class ColdOverlay {
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
     }
-
-
-    private fun isEnabled() = config.enabled && areaPattern.matches(HypixelData.skyBlockArea)
-
-    private val config get() = SkyHanniMod.feature.mining.coldOverlay
-
 }
