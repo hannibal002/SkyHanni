@@ -12,11 +12,9 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
-
 class ColdOverlay {
 
     private val config get() = SkyHanniMod.feature.mining.coldOverlay
-    private fun isEnabled() = config.enabled && inGlaciteArea()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -48,4 +46,6 @@ class ColdOverlay {
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
     }
+
+    private fun isEnabled() = inGlaciteArea() && config.enabled
 }

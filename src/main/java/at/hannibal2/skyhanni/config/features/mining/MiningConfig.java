@@ -37,12 +37,12 @@ public class MiningConfig {
     @ConfigOption(name = "Cold Overlay", desc = "")
     @Accordion
     public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
-  
+
     @Expose
     @ConfigOption(name = "Fossil Excavator", desc = "")
     @Accordion
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
-  
+
     @Expose
     @ConfigOption(name = "Notifications", desc = "")
     @Accordion
