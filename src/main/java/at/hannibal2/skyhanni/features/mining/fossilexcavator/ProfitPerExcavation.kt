@@ -23,7 +23,9 @@ class ProfitPerExcavation {
         val map = mutableMapOf<String, Double>()
         loot.forEach { (name, amount) ->
             NEUInternalName.fromItemNameOrNull(name)?.let {
-                val profit = amount * it.getPrice()
+                val pricePer = it.getPrice()
+                if (pricePer == -1.0) return@forEach
+                val profit = amount * pricePer
                 val text = "Found $name §8${amount.addSeparators()}x §7(§6${NumberUtil.format(profit)}§7)"
                 map[text] = profit
                 totalProfit += profit
