@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -16,11 +17,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object ChocolateFactory {
 
@@ -43,14 +47,23 @@ object ChocolateFactory {
         "upgradetier",
         ".*\\s(?<tier>[IVXL]+)"
     )
+    private val barnAmountPattern by patternGroup.pattern(
+        "barnamount",
+        "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits"
+    )
 
     private var inChocolateFactory = false
     private var currentChocolate = 0L
 
+    private var barnFull = false
+    private var lastBarnFullWarning = SimpleTimeMark.farPast()
+
     private val slotsToHighlight: MutableSet<Int> = mutableSetOf()
     private val otherUpgradeSlots = setOf(
-        28, 34, 39, 40, 41
+        28, 34, 38, 39, 41, 42
     )
+
+    private var bestUpgrade: Int? = null
 
     // todo update slot highlight and chocolate here as well
     @SubscribeEvent
@@ -78,6 +91,9 @@ object ChocolateFactory {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inChocolateFactory) return
 
+        bestUpgrade = null
+        var bestUpgradeRatio = 0.0
+
         val chocolateItem = InventoryUtils.getItemsInOpenChest().find { it.slotIndex == 13 }?.stack ?: return
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             currentChocolate = group("chocolate").formatLong()
@@ -85,11 +101,30 @@ object ChocolateFactory {
 
         slotsToHighlight.clear()
         for ((slotIndex, item) in event.inventoryItems) {
-            val nextLine = item.getLore().nextAfter({ it == "§7Cost" }) ?: continue
-            chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
-                val amount = group("chocolate").formatLong()
-                if (amount < currentChocolate) {
-                    slotsToHighlight.add(slotIndex)
+            val upgradeCost = item.getLore().getUpgradeCost() ?: continue
+
+            if (slotIndex == 34) {
+                item.getLore().matchFirst(barnAmountPattern) {
+                    val rabbits = group("rabbits").formatInt()
+                    val max = group("max").formatInt()
+                    barnFull = max - rabbits <= 5
+
+                    if (barnFull && lastBarnFullWarning.passedSince() > 30.seconds) {
+                        ChatUtils.chat("§cYour barn is almost full! §7(${rabbits}/${max}). §cUpgrade it so they don't get crushed")
+                        SoundUtils.playBeepSound()
+                        lastBarnFullWarning = SimpleTimeMark.now()
+                    }
+                }
+            }
+            if (upgradeCost < currentChocolate) {
+                slotsToHighlight.add(slotIndex)
+
+                if ((slotIndex) in 29..33) {
+                    val upgradeRatio = upgradeCost.toDouble() / (slotIndex - 28)
+                    if (upgradeRatio < bestUpgradeRatio || bestUpgradeRatio == 0.0) {
+                        bestUpgrade = slotIndex
+                        bestUpgradeRatio = upgradeRatio
+                    }
                 }
             }
         }
@@ -108,9 +143,10 @@ object ChocolateFactory {
             rabbitAmountPattern.matchMatcher(itemName) {
                 val rabbitTip = when (val rabbitAmount = group("amount").formatInt()) {
                     in (0..9) -> "$rabbitAmount"
-                    // todo confirm it changes at 74
                     in (10..74) -> "§a$rabbitAmount"
+                    in (75..124) -> "§9$rabbitAmount"
                     // todo get more data for colours
+                    // next on (manager is §5)
                     else -> "§c$rabbitAmount"
                 }
 
@@ -122,6 +158,7 @@ object ChocolateFactory {
                 event.stackTip = group("tier").romanToDecimal().toString()
             }
         }
+
         if (slotNumber == 53) {
             item.getLore().matchFirst(unclaimedRewardsPattern) {
                 event.stackTip = "§c!!!"
@@ -145,8 +182,25 @@ object ChocolateFactory {
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex in slotsToHighlight) {
-                slot highlight LorenzColor.GREEN.addOpacity(100)
+                if (slot.slotIndex == bestUpgrade) {
+                    slot highlight LorenzColor.GREEN.addOpacity(200)
+                } else {
+                    slot highlight LorenzColor.GREEN.addOpacity(75)
+                }
+            }
+            if (slot.slotIndex == 34 && barnFull) {
+                slot highlight LorenzColor.RED
             }
         }
     }
+
+    private fun List<String>.getUpgradeCost(): Int? {
+        val nextLine = this.nextAfter({ it == "§7Cost" }) ?: return null
+        chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
+            return group("chocolate").formatInt()
+        }
+        return null
+    }
+
+    // todo when getting a new rabbit in chat send a message saying what the current and max rabbit count is
 }
