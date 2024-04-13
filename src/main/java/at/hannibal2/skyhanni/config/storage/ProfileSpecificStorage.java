@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.storage;
 
+import at.hannibal2.skyhanni.api.HotmAPI;
 import at.hannibal2.skyhanni.api.SkillAPI;
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
@@ -386,16 +387,16 @@ public class ProfileSpecificStorage {
         public HotmTree hotmTree = new HotmTree();
 
         @Expose
-        public long mithrilPowder;
+        public Map<HotmAPI.Powder, PowderStorage> powder = new HashMap<>();
 
-        @Expose
-        public long availableMithrilPowder;
+        public static class PowderStorage {
 
-        @Expose
-        public long gemstonePowder;
+            @Expose
+            public Long available;
 
-        @Expose
-        public long availableGemstonePowder;
+            @Expose
+            public Long total;
+        }
 
         @Expose
         public int tokens;
