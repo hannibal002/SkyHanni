@@ -182,8 +182,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    private var lastPer = ""
-
     fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
         val profitFormat = profit.toInt().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
@@ -191,11 +189,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         val tips = if (totalAmount > 0) {
             val profitPerCatch = profit / totalAmount
             val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
-            val element = "§7Profit per $action: $profitPrefix${profitPerCatch.toInt().addSeparators()}"
-            if (lastPer != element) {
-                lastPer = element
-                ChatUtils.debug(lastPer)
-            }
             listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
         } else emptyList()
 
