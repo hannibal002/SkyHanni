@@ -20,13 +20,15 @@ class UpgradePage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7)
 ) {
     override fun onEnter() = update(
         content = buildList {
-            add(listOf("Upgrade", "", "Item", "FF", "Cost/FF", "Total").map {
-                Renderable.string(
-                    it,
-                    0.9,
-                    horizontalAlign = HorizontalAlignment.CENTER
-                )
-            })
+            add(
+                listOf("Upgrade", "", "Item", "FF", "Cost/FF", "Total").map {
+                    Renderable.string(
+                        it,
+                        0.9,
+                        horizontalAlign = HorizontalAlignment.CENTER
+                    )
+                }
+            )
             val upgradeList =
                 if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
             addAll(upgradeList.map { upgrade ->
@@ -45,9 +47,15 @@ class UpgradePage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7)
                             8.0 / 9.0,
                             verticalAlign = VerticalAlignment.CENTER
                         )
-                    ) // TODO fix tooltip + use NeuInternalNames
-                    add(Renderable.wrappedString(upgrade.requiredItem.getItemStack().itemName.let { if (upgrade.itemQuantity == 1) it else "$it §fx${upgrade.itemQuantity}" }
-                        ?: "", 70, 0.75, verticalAlign = VerticalAlignment.CENTER)) // TODO wtf
+                    )
+                    add(
+                        Renderable.wrappedString(
+                            upgrade.requiredItem.itemName.let { if (upgrade.itemQuantity == 1) it else "$it §fx${upgrade.itemQuantity}" }, // TODO wtf
+                            70,
+                            0.75,
+                            verticalAlign = VerticalAlignment.CENTER
+                        )
+                    )
                     add(
                         Renderable.string(
                             "§a${DecimalFormat("0.##").format(upgrade.fortuneIncrease)}",

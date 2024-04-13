@@ -33,7 +33,7 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
         )
     }
 
-    val headers = setOf(FortuneStats.BASE, FortuneStats.CROP_TOTAL, FortuneStats.CROP_UPGRADE)
+    private val headers = setOf(FortuneStats.BASE, FortuneStats.CROP_TOTAL, FortuneStats.CROP_UPGRADE)
 
     private fun header(): List<Renderable> = buildList {
         add((FortuneStats.BASE to FFStats.cropPage[FortuneStats.BASE]!!).getFarmingBar())
@@ -51,10 +51,7 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
         add((FortuneStats.CROP_UPGRADE to FFStats.cropPage[FortuneStats.CROP_UPGRADE]!!).getFarmingBar())
     }
 
-    private fun Map.Entry<FortuneStats, Pair<Double, Double>>.getFarmingBar() = GuiRenderUtils.getFarmingBar(
-        key.label, key.tooltip, value.first, value.second,
-        90
-    )
+    private fun Map.Entry<FortuneStats, Pair<Double, Double>>.getFarmingBar() = (key to value).getFarmingBar()
 
     private fun Pair<FortuneStats, Pair<Double, Double>>.getFarmingBar() = GuiRenderUtils.getFarmingBar(
         first.label, first.tooltip, second.first, second.second,
@@ -86,45 +83,4 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
         )
-
-    fun unsued(mouseX: Int, mouseY: Int) {
-        for (item in FarmingItems.entries) {
-            if (item.name == FFGuideGUI.currentCrop?.name) {
-                GuiRenderUtils.renderItemAndTip(
-                    FFGuideGUI.tooltipToDisplay,
-                    item.getItem(),
-                    FFGuideGUI.guiLeft + 172,
-                    FFGuideGUI.guiTop + 60,
-                    mouseX,
-                    mouseY
-                )
-            }
-        }
-
-        var x: Int
-        var y = FFGuideGUI.guiTop - 20
-        var i = 0
-        FFStats.cropPage.forEach { (key, value) ->
-            if (key == FortuneStats.CROP_TOTAL) {
-                val newLine =
-                    key.label.replace("Crop", FFGuideGUI.currentCrop?.name?.replace("_", " ")?.firstLetterUppercase()!!)
-                GuiRenderUtils.drawFarmingBar(
-                    newLine, key.tooltip, value.first, value.second, FFGuideGUI.guiLeft + 135,
-                    FFGuideGUI.guiTop + 5, 90, mouseX, mouseY
-                )
-            } else {
-                if (i % 2 == 0) {
-                    x = FFGuideGUI.guiLeft + 15
-                    y += 25
-                } else {
-                    x = FFGuideGUI.guiLeft + 255
-                }
-                i++
-                GuiRenderUtils.drawFarmingBar(
-                    key.label, key.tooltip, value.first, value.second, x, y,
-                    90, mouseX, mouseY
-                )
-            }
-        }
-    }
 }

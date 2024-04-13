@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.c
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -63,7 +62,7 @@ object FortuneUpgrades {
     // todo fix NEU price data not being loaded if run too early
     private fun MutableList<FortuneUpgrade>.populateAndSort(style: Int) {
         this.map { upgrade ->
-            val cost = (upgrade.requiredItem_old.asInternalName().getPrice() * upgrade.itemQuantity).toInt()
+            val cost = (upgrade.requiredItem.getPrice() * upgrade.itemQuantity).toInt()
             upgrade.cost = cost
             upgrade.costPerFF = (cost / upgrade.fortuneIncrease).toInt()
         }

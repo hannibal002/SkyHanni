@@ -23,11 +23,11 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
     private var armorFF = mutableMapOf<FFTypes, Double>()
 
     override fun onEnter() {
-        val (content, footer) = adDrawPage(0, 0)
+        val (content, footer) = getPage()
         update(content, footer)
     }
 
-    fun adDrawPage(mouseX: Int, mouseY: Int): Pair<List<List<Renderable>>, List<Renderable>> {
+    fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
         val content = mutableListOf<MutableList<Renderable>>()
         val footer = mutableListOf<Renderable>()
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())

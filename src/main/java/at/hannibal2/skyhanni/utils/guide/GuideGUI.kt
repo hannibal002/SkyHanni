@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.guide
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -99,16 +98,15 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
             ).renderXYAligned(0, 0, sizeX, sizeY)
 
             val page = pageList[currentPage]
-            if (page !is FFGuideGUI.FFGuidePage) { // TODO remove
-                page?.drawPage(relativeMouseX, relativeMouseY)
-            }
+            page?.drawPage(relativeMouseX, relativeMouseY)
+
             GlStateManager.translate(-guiLeft.toFloat(), -guiTop.toFloat(), 0f)
-            if (page is FFGuideGUI.FFGuidePage) {
-                page.drawPage(mouseX, mouseY)
-            }
         }
 
+        GlStateManager.popMatrix()
+
     } catch (e: Exception) {
+        GlStateManager.popMatrix()
         ErrorManager.logErrorWithData(
             e, "Something broke in GuideGUI",
             "Guide" to this.javaClass.typeName,
