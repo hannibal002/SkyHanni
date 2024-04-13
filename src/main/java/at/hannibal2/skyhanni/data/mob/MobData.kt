@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -37,6 +38,8 @@ class MobData {
         const val DISPLAY_NPC_DETECTION_RANGE = 24.0 // 24.0
 
         var externRemoveOfRetryAmount = 0
+
+        val logger = LorenzLogger("mob/detection")
     }
 
     internal enum class Result {

@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.mixins.transformers.AccessorEventBus
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
@@ -25,7 +27,7 @@ abstract class LorenzEvent : Event() {
                 return 0
             }
         }
-        val isInGuardedEventHandler get() = eventHandlerDepth > 0
+        val isInGuardedEventHandler get() = eventHandlerDepth > 0 || LorenzUtils.isInDevEnvironment()
     }
 
     fun postAndCatchAndBlock(

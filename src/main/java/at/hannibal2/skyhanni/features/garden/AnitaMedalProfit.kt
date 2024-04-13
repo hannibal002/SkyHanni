@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -14,20 +13,21 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.fillTable
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
 
     private val config get() = GardenAPI.config.anitaShop
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
 
     companion object {
 
@@ -70,9 +70,9 @@ class AnitaMedalProfit {
             }
         }
 
-        val newList = mutableListOf<List<Any>>()
-        newList.addAsSingletonList("§eMedal Profit")
-        newList.fillTable(table)
+        val newList = mutableListOf<Renderable>()
+        newList.add(Renderable.string("§eMedal Profit"))
+        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
 
@@ -108,7 +108,16 @@ class AnitaMedalProfit {
             "§7Material cost: §6${NumberUtil.format(fullCost)} ",
             "§7Final profit: §6${profitFormat} ",
         )
-        table.add(DisplayTableEntry(itemName, "$color$profitFormat", profit, internalName, hover, highlightsOnHoverSlots = listOf(slot)))
+        table.add(
+            DisplayTableEntry(
+                itemName,
+                "$color$profitFormat",
+                profit,
+                internalName,
+                hover,
+                highlightsOnHoverSlots = listOf(slot)
+            )
+        )
     }
 
     private fun getItemName(item: ItemStack): String? {
@@ -167,10 +176,9 @@ class AnitaMedalProfit {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
-            config.medalProfitPos.renderStringsAndItems(
+            config.medalProfitPos.renderRenderables(
                 display,
                 extraSpace = 5,
-                itemScale = 1.7,
                 posLabel = "Anita Medal Profit"
             )
         }

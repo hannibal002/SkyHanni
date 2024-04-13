@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,10 +34,10 @@ object TestCopyRngMeterValues {
         for (item in event.inventoryItems.values) {
             for (line in item.getLore()) {
                 slayerPattern.matchMatcher(line) {
-                    map[item.getInternalName()] = group("xp").formatNumber()
+                    map[item.getInternalName()] = group("xp").formatLong()
                 }
                 dungeonPattern.matchMatcher(line) {
-                    map[item.getInternalName()] = group("xp").formatNumber()
+                    map[item.getInternalName()] = group("xp").formatLong()
                 }
             }
         }

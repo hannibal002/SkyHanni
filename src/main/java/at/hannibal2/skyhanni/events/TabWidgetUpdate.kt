@@ -13,4 +13,6 @@ open class TabWidgetUpdate(
     class Clear(
         widget: TabWidget,
     ) : TabWidgetUpdate(widget)
+
+    fun isEventFor(widgetType: TabWidget) = widget == widgetType
 }
