@@ -161,7 +161,7 @@ object GardenAPI {
     fun MutableList<Any>.addCropIcon(
         crop: CropType,
         scale: Double = NEUItems.itemFontSize,
-        highlight: Boolean = false
+        highlight: Boolean = false,
     ) =
         addItemIcon(crop.icon.copy(), highlight, scale = scale)
 
