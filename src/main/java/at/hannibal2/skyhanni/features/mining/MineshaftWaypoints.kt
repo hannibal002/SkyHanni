@@ -54,7 +54,7 @@ class MineshaftWaypoints {
     @SubscribeEvent
     fun onJoinMineshaft(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
-        val coordinates = LocationUtils.playerLocation().round(0)
+        val coordinates = LocationUtils.playerLocation().round(0).add(y = -1)
         waypoints.add(Triple(coordinates, MineshaftWaypointType.ENTRANCE, false))
     }
 
@@ -72,7 +72,7 @@ class MineshaftWaypoints {
             if (config.delete && isCollected) return@forEach
             if (config.drawText) {
                 val text = type.waypointText
-                event.drawDynamicText(location.add(0, 1, 0), text, 1.0)
+                event.drawDynamicText(location.add(y = 1), text, 1.0)
             }
             event.drawWaypointFilled(location, type.color, seeThroughBlocks = true)
         }
