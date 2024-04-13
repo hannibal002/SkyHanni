@@ -183,6 +183,17 @@ data class LorenzVec(
     fun rotateXZ(theta: Double) = LorenzVec(x * cos(theta) + z * sin(theta), y, -x * sin(theta) + z * cos(theta))
     fun rotateYZ(theta: Double) = LorenzVec(x, y * cos(theta) - z * sin(theta), y * sin(theta) + z * cos(theta))
 
+
+    fun distanceToLine(startPos: LorenzVec, endPos: LorenzVec): Double {
+        val a = startPos.subtract(this)
+        val b = LorenzVec(
+            a.y * endPos.z - a.z * endPos.y,
+            -(a.x * endPos.z - a.z * endPos.x),
+            a.x * endPos.y - a.y * endPos.x
+        )
+        return b.length() / endPos.length()
+    }
+
     companion object {
 
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
@@ -231,3 +242,5 @@ fun Array<Double>.toLorenzVec(): LorenzVec {
 fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
 
 fun AxisAlignedBB.expand(vec: LorenzVec) = this.expand(vec.x, vec.y, vec.z)
+
+fun AxisAlignedBB.expand(amount: Double) = this.expand(amount, amount, amount)

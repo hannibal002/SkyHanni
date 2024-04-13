@@ -4,21 +4,43 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.clampTo
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.expand
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EggLocations {
 
     private val config get() = SkyHanniMod.feature.misc.chocolateFactory
-    // todo need to know when it is the hoppity event
+
+    private val locatorItem = "EGGLOCATOR".asInternalName()
+
+    private var lastParticlePosition: LorenzVec? = null
+    private val validParticleLocations = mutableListOf<LorenzVec>()
+
+    // todo remove later
+    private var firstPos = LorenzVec()
+    private var secondPos = LorenzVec()
+    private val possibleEggLocations = mutableListOf<LorenzVec>()
 
     private var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
+    private var ticksSinceLastParticleFound = -1
+
+    // todo need to know when it is the hoppity event
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -34,15 +56,25 @@ object EggLocations {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        event.draw3DLine(firstPos, secondPos, LorenzColor.RED.toColor(), 2, false)
+
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+//         val worldBoundingBox = getWorldBoundingBox(islandEggsLocations)
+//
+//         val boundingBox = AxisAlignedBB(
+//             firstPos.x, firstPos.y, firstPos.z,
+//             secondPos.x, secondPos.y, secondPos.z
+//         ).expand(5.0).clampTo(worldBoundingBox)
+//
+//         event.drawFilledBoundingBox_nea(boundingBox, LorenzColor.RED.toColor(), 0.5f)
 
         if (config.showAllWaypoints) {
-            for ((index, eggLocation) in islandEggsLocations.withIndex()) {
+            for ((index, eggLocation) in possibleEggLocations.withIndex()) {
                 event.drawWaypointFilled(
                     eggLocation,
                     LorenzColor.GREEN.toColor(),
                     seeThroughBlocks = true,
-                    beacon = true
                 )
                 event.drawDynamicText(eggLocation.add(y = 1), "§aEgg $index", 1.5)
             }
@@ -60,4 +92,103 @@ object EggLocations {
         val message = "[SkyHanni] Chocolate egg located at x: $x, y: $y, z: $z"
         ChatUtils.sendCommandToServer("ac $message")
     }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        validParticleLocations.clear()
+        ticksSinceLastParticleFound = -1
+        possibleEggLocations.clear()
+        firstPos = LorenzVec()
+        secondPos = LorenzVec()
+    }
+
+    @SubscribeEvent
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
+        // todo need to know when it is the hoppity event
+        if (!LorenzUtils.inSkyBlock) return
+        if (!event.isVillagerParticle() && !event.isEnchantmentParticle()) return
+
+        val lastParticlePosition = lastParticlePosition ?: run {
+            this.lastParticlePosition = event.location
+            return
+        }
+        if (lastParticlePosition == event.location) {
+            validParticleLocations.add(event.location)
+            ticksSinceLastParticleFound = 0
+        }
+        this.lastParticlePosition = null
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (validParticleLocations.isEmpty()) return
+        ticksSinceLastParticleFound++
+
+        if (ticksSinceLastParticleFound < 6) return
+
+        calculateEggPosition()
+
+        ticksSinceLastParticleFound = 0
+        validParticleLocations.clear()
+    }
+
+    private fun calculateEggPosition() {
+        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val listSize = validParticleLocations.size
+        if (listSize < 5) return
+
+        val secondPoint = validParticleLocations.removeLast()
+        val firstPoint = validParticleLocations.removeLast()
+
+        val xDiff = secondPoint.x - firstPoint.x
+        val yDiff = secondPoint.y - firstPoint.y
+        val zDiff = secondPoint.z - firstPoint.z
+
+
+        firstPos = firstPoint.roundLocationToBlock()
+
+        secondPos = LorenzVec(
+            secondPoint.x + xDiff * 1000,
+            secondPoint.y + yDiff * 1000,
+            secondPoint.z + zDiff * 1000
+        ).roundLocationToBlock()
+
+        val worldBoundingBox = getWorldBoundingBox(islandEggsLocations)
+
+        val boundingBox = AxisAlignedBB(
+            firstPos.x, firstPos.y, firstPos.z,
+            secondPos.x, secondPos.y, secondPos.z
+        ).expand(5.0).clampTo(worldBoundingBox)
+
+        possibleEggLocations.clear()
+        val a = islandEggsLocations.filter { boundingBox.isInside(it) }
+
+        possibleEggLocations.addAll(a.sortedBy { it.distanceToLine(firstPos, secondPos) })
+
+        // todo more stuff
+    }
+
+    private fun getWorldBoundingBox(islandEggs: List<LorenzVec>): AxisAlignedBB {
+        var minX = 10000.0
+        var minY = 10000.0
+        var minZ = 10000.0
+        var maxX = -10000.0
+        var maxY = -10000.0
+        var maxZ = -10000.0
+        for (eggLocation in islandEggs) {
+            if (eggLocation.x < minX) minX = eggLocation.x
+            if (eggLocation.y < minY) minY = eggLocation.y
+            if (eggLocation.z < minZ) minZ = eggLocation.z
+            if (eggLocation.x > maxX) maxX = eggLocation.x
+            if (eggLocation.y > maxY) maxY = eggLocation.y
+            if (eggLocation.z > maxZ) maxZ = eggLocation.z
+        }
+        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ).expand(10.0)
+    }
+
+    private fun ReceiveParticleEvent.isVillagerParticle() =
+        type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
+
+    private fun ReceiveParticleEvent.isEnchantmentParticle() =
+        type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 }

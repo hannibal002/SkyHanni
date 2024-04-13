@@ -176,7 +176,8 @@ object ChocolateFactory {
             val z = group("z").formatInt()
             val eggLocation = LorenzVec(x, y, z)
             // todo add waypoint
-            event.isCanceled = true
+            // todo dont hide own message
+//             event.blockedReason = "shared_egg"
             return
         }
     }

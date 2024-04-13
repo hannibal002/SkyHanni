@@ -21,10 +21,10 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     public boolean useMiddleClick = true;
 
-    // todo remove probably
+    // todo remove probably or make false or something
     @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby.")
     @ConfigEditorBoolean
-    public boolean showAllWaypoints = false;
+    public boolean showAllWaypoints = true;
 
 }
