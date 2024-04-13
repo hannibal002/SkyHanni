@@ -15,6 +15,8 @@ object MiningAPI {
     private val group = RepoPattern.group("data.miningapi")
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels")
 
+    private var oldCold = 0
+
 
     fun inGlaciteArea() = glaciteAreaPattern.matches(HypixelData.skyBlockArea) || IslandType.MINESHAFT.isInIsland()
 
@@ -24,20 +26,13 @@ object MiningAPI {
 
     @SubscribeEvent
     fun onScoreboardChangeEvent(event: ScoreboardChangeEvent) {
-        val newCold = event.newList.matchFirst(ScoreboardPattern.coldPattern) {
-            group("cold").toInt().absoluteValue
-        }
+        val newCold = getCold() ?: return
 
-        val oldCold = event.oldList.matchFirst(ScoreboardPattern.coldPattern) {
-            group("cold").toInt().absoluteValue
-        }
+        if (newCold - oldCold != 0) {
+            ColdUpdateEvent(newCold).postAndCatch()
 
-        if (newCold != null && oldCold != null) {
-            if (newCold - oldCold != 0) {
-                ColdUpdateEvent(newCold).postAndCatch()
-            }
+            oldCold = newCold
         }
     }
-
 
 }
