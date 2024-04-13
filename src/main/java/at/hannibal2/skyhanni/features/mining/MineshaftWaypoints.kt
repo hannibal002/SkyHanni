@@ -130,7 +130,7 @@ class MineshaftWaypoints {
             val position = entity.position.toLorenzVec()
             val message = "[SkyHanni] ${type.waypointText.removeColor()} Corpse ${position.toCleanString()}"
             waypoints.add(Triple(position, type, true))
-            if (config.sendChat) ChatUtils.sendCommandToServer("pc $message")
+            if (config.sendChat && !isVecInList(position)) ChatUtils.sendCommandToServer("pc $message")
             ChatUtils.debug("found corpse at $position}")
         }
     }
