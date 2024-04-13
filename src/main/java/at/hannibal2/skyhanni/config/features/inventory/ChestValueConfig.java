@@ -135,6 +135,6 @@ public class ChestValueConfig {
     public int hideBelow = 100_000;
 
     @Expose
-    @ConfigLink(owner = SackDisplayConfig.class, field = "enabled")
+    @ConfigLink(owner = ChestValueConfig.class, field = "enabled")
     public Position position = new Position(107, 141, false, true);
 }
