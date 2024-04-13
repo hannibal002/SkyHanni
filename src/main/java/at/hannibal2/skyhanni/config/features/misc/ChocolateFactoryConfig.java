@@ -16,4 +16,15 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     public boolean highlightUpgrades = true;
 
+    @Expose
+    @ConfigOption(name = "Use Middle Click", desc = "Click on slots with middle click to speed up interactions.")
+    @ConfigEditorBoolean
+    public boolean useMiddleClick = true;
+
+    // todo remove probably
+    @Expose
+    @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby.")
+    @ConfigEditorBoolean
+    public boolean showAllWaypoints = false;
+
 }

@@ -170,7 +170,8 @@ object ChocolateFactory {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inChocolateFactory) return
         val slot = event.slot ?: return
-        if (slot.slotNumber == 40) return
+        if (!config.useMiddleClick) return
+        if (slot.slotNumber == 39) return
 
         event.makePickblock()
     }
