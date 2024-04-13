@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils.guide
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -44,13 +46,11 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
         var tab: GuideTab?
     }
 
-    private fun renderHorizontalTabs(mouseX: Int, mouseY: Int) {
+    private fun renderHorizontalTabs() {
         var offset = Pair(tabSpacing.toFloat() * 3f, -tabLongSide.toFloat())
         GlStateManager.translate(offset.first, offset.second, 0f)
         for (tab in horizontalTabs) {
-            Renderable.withMousePosition(mouseX, mouseY) {
-                tab.render(offset.first.toInt(), offset.second.toInt())
-            }
+            tab.render(offset.first.toInt(), offset.second.toInt())
             val xShift = (tabShortSide + tabSpacing).toFloat()
             offset = offset.first + xShift to offset.second
             GlStateManager.translate(xShift, 0f, 0f)
@@ -58,13 +58,11 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
         GlStateManager.translate(-offset.first, -offset.second, 0f)
     }
 
-    private fun renderVerticalTabs(mouseX: Int, mouseY: Int) {
+    private fun renderVerticalTabs() {
         var offset = Pair(-tabLongSide.toFloat(), tabSpacing.toFloat() * 3f)
         GlStateManager.translate(offset.first, offset.second, 0f)
         for (tab in verticalTabs) {
-            Renderable.withMousePosition(mouseX, mouseY) {
-                tab.render(offset.first.toInt(), offset.second.toInt())
-            }
+            tab.render(offset.first.toInt(), offset.second.toInt())
             val yShift = (tabShortSide + tabSpacing).toFloat()
             offset = offset.first to offset.second + yShift
             GlStateManager.translate(0f, yShift, 0f)
@@ -72,25 +70,33 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
         GlStateManager.translate(-offset.first, -offset.second, 0f)
     }
 
-    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        try {
-            super.drawScreen(mouseX, mouseY, partialTicks)
-            drawDefaultBackground()
-            val guiLeft = (width - sizeX) / 2
-            val guiTop = (height - sizeY) / 2
+    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) = try {
+        super.drawScreen(mouseX, mouseY, partialTicks)
+        drawDefaultBackground()
+        val guiLeft = (width - sizeX) / 2
+        val guiTop = (height - sizeY) / 2
 
-            /*             val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-                        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1 */
+        /*
+        val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
+        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+         */
 
-            val relativeMouseX = mouseX - guiLeft
-            val relativeMouseY = mouseY - guiTop
+        val relativeMouseX = mouseX - guiLeft
+        val relativeMouseY = mouseY - guiTop
 
-            GlStateManager.pushMatrix()
-            GlStateManager.translate(guiLeft.toFloat(), guiTop.toFloat(), 0f)
-            drawRect(0, 0, sizeX, sizeY, 0x50000000)
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(guiLeft.toFloat(), guiTop.toFloat(), 0f)
+        drawRect(0, 0, sizeX, sizeY, 0x50000000)
 
-            renderHorizontalTabs(relativeMouseX, relativeMouseY)
-            renderVerticalTabs(relativeMouseX, relativeMouseY)
+        Renderable.withMousePosition(relativeMouseX, relativeMouseY) {
+            renderHorizontalTabs()
+            renderVerticalTabs()
+
+            Renderable.string(
+                "§7SkyHanni ",
+                horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
+                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+            ).renderXYAligned(0, 0, sizeX, sizeY)
 
             val page = pageList[currentPage]
             if (page !is FFGuideGUI.FFGuidePage) { // TODO remove
@@ -100,10 +106,14 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
             if (page is FFGuideGUI.FFGuidePage) {
                 page.drawPage(mouseX, mouseY)
             }
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Something broke in GuideGUI",
-            )
         }
+
+    } catch (e: Exception) {
+        ErrorManager.logErrorWithData(
+            e, "Something broke in GuideGUI",
+            "Guide" to this.javaClass.typeName,
+            "Page" to currentPage.name
+        )
     }
 }
+

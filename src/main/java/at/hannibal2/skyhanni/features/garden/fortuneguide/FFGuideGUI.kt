@@ -125,7 +125,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         if (this.currentPage == FortuneGuidePage.UPGRADES) {
             //
         } else {
-            GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
+            //GuiRenderUtils.drawStringCentered("§7SkyHanni", guiLeft + 325, guiTop + 170)
             if (currentCrop == null) {
                 /* GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,

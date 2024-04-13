@@ -12,9 +12,7 @@ abstract class GuideRenderablePage(
 
     final override fun drawPage(mouseX: Int, mouseY: Int) {
         GlStateManager.translate(paddingX.toFloat(), paddingY.toFloat(), 0f)
-        Renderable.withMousePosition(mouseX, mouseY) {
-            renderable?.render(paddingX, paddingY)
-        }
+        renderable?.render(paddingX, paddingY)
         GlStateManager.translate(-paddingX.toFloat(), -paddingY.toFloat(), 0f)
     }
 
