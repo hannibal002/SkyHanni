@@ -46,7 +46,6 @@ object PartyChatCommands {
         }
     }
 
-
     fun isTrustedUser(name: String): Boolean {
         val friend = FriendAPI.getAllFriends().find { it.name == name }
         return when (useConfig().defaultRequiredTrustLevel) {
