@@ -27,6 +27,14 @@ public class ExcavatorProfitTrackerConfig {
     public boolean trackGlacitePowder = true;
 
     @Expose
+    @ConfigOption(
+        name = "Track Fossil Dust",
+        desc = "Track Fossil Dust and use it for profit calculation."
+    )
+    @ConfigEditorBoolean
+    public boolean showFossilDust = true;
+
+    @Expose
     @ConfigLink(owner = ExcavatorProfitTrackerConfig.class, field = "enabled")
     public Position position = new Position(-380, 150, false, true);
 }
