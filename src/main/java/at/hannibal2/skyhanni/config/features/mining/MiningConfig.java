@@ -34,6 +34,11 @@ public class MiningConfig {
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
     @Expose
+    @ConfigOption(name = "Cold Overlay", desc = "")
+    @Accordion
+    public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
