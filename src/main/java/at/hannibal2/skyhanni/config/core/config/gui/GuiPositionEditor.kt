@@ -93,6 +93,12 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}§7, scale: §e${pos.scale.round(2)}"
         GuiRenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
         GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
+        if (pos.canJumpToConfigOptions())
+            GuiRenderUtils.drawStringCentered(
+                "§aRight-Click to open associated config options",
+                getScaledWidth() / 2,
+                38
+            )
     }
 
     private fun renderRectangles(): Int {
@@ -142,7 +148,6 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
         super.mouseClicked(originalX, priginalY, mouseButton)
 
-        if (mouseButton != 0) return
 
         val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
         val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
@@ -152,19 +157,20 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
             val elementHeight = position.getDummySize().y
             val x = position.getAbsX()
             val y = position.getAbsY()
-            if (!position.clicked &&
-                GuiRenderUtils.isPointInRect(
-
-                    mouseX,
-                    mouseY,
-                    x - border,
-                    y - border,
-                    elementWidth + border * 2,
-                    elementHeight + border * 2
-
-                )
-
-            ) {
+            val isHovered = GuiRenderUtils.isPointInRect(
+                mouseX,
+                mouseY,
+                x - border,
+                y - border,
+                elementWidth + border * 2,
+                elementHeight + border * 2
+            )
+            if (!isHovered) continue
+            if (mouseButton == 1) {
+                position.jumpToConfigOptions()
+                break
+            }
+            if (!position.clicked && mouseButton == 0) {
                 clickedPos = i
                 position.clicked = true
                 grabbedX = mouseX

@@ -91,7 +91,7 @@ class DungeonCopilot {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
@@ -130,9 +130,7 @@ class DungeonCopilot {
         changeNextStep("")
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && config.enabled
-    }
+    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
