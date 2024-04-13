@@ -22,7 +22,7 @@ class ColdOverlay {
     private val areaPattern by RepoPattern.pattern("mining.coldoverlay.area", "Glacite Tunnels")
 
     fun getCold(): Int? = ScoreboardData.sidebarLinesFormatted.matchFirst(ScoreboardPattern.coldPattern) {
-        return group("cold").replace("-", "").toInt()
+        return group("cold").toInt().absoluteValue
     }
 
     @SubscribeEvent
