@@ -29,7 +29,17 @@ public class MineshaftWaypointsConfig {
     public boolean receiveChat = true;
 
     @Expose
-    @ConfigOption(name = "Delete on collect", desc = "Deletes the waypoint after collecting a corpse.")
+    @ConfigOption(name = "Draw Text", desc = "Draws text near the waypoints.")
+    @ConfigEditorBoolean
+    public boolean drawText = false;
+
+    @Expose
+    @ConfigOption(name = "Hide collected", desc = "Hides waypoints for collected corpses.")
     @ConfigEditorBoolean
     public boolean delete = true;
+
+    @Expose
+    @ConfigOption(name = "Hide Message", desc = "Hides waypoint messages from the party chat.")
+    @ConfigEditorBoolean
+    public boolean hideMessage = false;
 }
