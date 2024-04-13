@@ -78,7 +78,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         // New Code
         pageList = mapOf(
             FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
-            FortuneGuidePage.CROP to CropPage(),
+            FortuneGuidePage.CROP to CropPage(sizeX, sizeY),
             FortuneGuidePage.UPGRADES to UpgradePage(sizeX, sizeY),
         )
         verticalTabs = listOf(vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {
@@ -238,7 +238,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
                     if (currentPet == FarmingItems.BEE) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
                 ) */
             } else {
-                GuiRenderUtils.renderItemAndTip(
+                /* GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay,
                     FarmingItems.ELEPHANT.getItem(),
                     guiLeft + 142,
@@ -307,7 +307,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
                 GuiRenderUtils.renderItemAndTip(
                     tooltipToDisplay, FarmingItems.BRACELET.getItem(), guiLeft + 182, guiTop + 140,
                     mouseX, mouseY
-                )
+                ) */
             }
         }
 
