@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.items
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedWardrobePrice {
 
-    private val config get() = EstimatedItemValue.config
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
 
     @SubscribeEvent

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class RiftInventoryValueConfig {
@@ -50,5 +51,6 @@ public class RiftInventoryValueConfig {
     }
 
     @Expose
+    @ConfigLink(owner = RiftInventoryValueConfig.class, field = "enabled")
     public Position position = new Position(126, 156, false, true);
 }

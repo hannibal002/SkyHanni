@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -70,7 +70,7 @@ object CropMoneyDisplay {
         if (!isEnabled()) return
 
         if (!GardenAPI.hideExtraGuis()) {
-            config.pos.renderStringsAndItems(display, posLabel = "Garden Crop Money Per Hour")
+            config.pos.renderStringsAndItems(display, posLabel = "Garden Money Per Hour")
         }
     }
 
@@ -80,7 +80,7 @@ object CropMoneyDisplay {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(5)) return
 
