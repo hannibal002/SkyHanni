@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ExcavatorProfitTracker {
 
-    private val config get() = SkyHanniMod.feature.mining.fossilExcavator.profitTracker
+    private val config get() = SkyHanniMod.feature.mining.fossilExcavator2.profitTracker
 
     private val tracker = SkyHanniItemTracker(
         "Fossil Excavation Profit Tracker",
