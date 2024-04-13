@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBoarderPacket
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.network.play.server.S44PacketWorldBorder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -28,5 +27,5 @@ class DungeonShadowAssassinNotification {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inDungeons && config.shadowAssassinJumpNotifier
+    private fun isEnabled() = DungeonAPI.inDungeon() && config.shadowAssassinJumpNotifier
 }

@@ -54,7 +54,7 @@ import java.util.Locale
 
 object EstimatedItemValueCalculator {
 
-    private val config get() = EstimatedItemValue.config
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
         ::addReforgeStone,

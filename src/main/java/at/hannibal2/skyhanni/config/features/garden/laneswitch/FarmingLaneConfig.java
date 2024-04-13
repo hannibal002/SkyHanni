@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FarmingLaneConfig {
@@ -27,6 +28,7 @@ public class FarmingLaneConfig {
     public boolean distanceDisplay = false;
 
     @Expose
+    @ConfigLink(owner = FarmingLaneConfig.class, field = "distanceDisplay")
     public Position distanceDisplayPosition = new Position(0, 200, false, true);
 
     @Expose

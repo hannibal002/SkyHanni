@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GreatSpookConfig {
@@ -21,6 +22,7 @@ public class GreatSpookConfig {
     public boolean primalFearNotification = false;
 
     @Expose
+    @ConfigLink(owner = GreatSpookConfig.class, field = "primalFearTimer")
     public Position positionTimer = new Position(20, 20, false, true);
 
     @Expose
@@ -30,6 +32,7 @@ public class GreatSpookConfig {
     public boolean fearStatDisplay = false;
 
     @Expose
+    @ConfigLink(owner = GreatSpookConfig.class, field = "fearStatDisplay")
     public Position positionFear = new Position(30, 30, false, true);
 
     @Expose
@@ -39,6 +42,7 @@ public class GreatSpookConfig {
     public boolean greatSpookTimeLeft = false;
 
     @Expose
+    @ConfigLink(owner = GreatSpookConfig.class, field = "greatSpookTimeLeft")
     public Position positionTimeLeft = new Position(40, 40, false, true);
 
 }

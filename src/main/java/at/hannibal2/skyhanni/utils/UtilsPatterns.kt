@@ -49,7 +49,7 @@ object UtilsPatterns {
     )
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",
-        "(?: *§8(\\+§\\w)?(?<amount>[\\d.km,]+)(x )?)?(?<name>.*)"
+        "(?: +§8(?:\\+§.)?(?<amount>[\\d.,]+[km]?)x? )?(?<name>.*)"
     )
     val readAmountAfterPattern by patternGroup.pattern(
         "item.amount.behind",
