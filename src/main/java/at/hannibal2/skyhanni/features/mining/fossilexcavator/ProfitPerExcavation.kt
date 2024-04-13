@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -20,8 +19,6 @@ class ProfitPerExcavation {
         if (!config.profitPerExcavation) return
         val loot = event.loot
 
-        val scrapItem = "SUSPICIOUS_SCRAP".asInternalName()
-
         var totalProfit = 0.0
         val map = mutableMapOf<String, Double>()
         loot.forEach { (name, amount) ->
@@ -32,6 +29,8 @@ class ProfitPerExcavation {
                 totalProfit += profit
             }
         }
+
+        val scrapItem = FossilExcavatorAPI.scrapItem
 
         val scrapPrice = scrapItem.getPrice()
         map["${scrapItem.itemName}: §c-${NumberUtil.format(scrapPrice)}"] = -scrapPrice
