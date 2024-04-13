@@ -20,15 +20,15 @@ object MiningAPI {
 
     fun inGlaciteArea() = glaciteAreaPattern.matches(HypixelData.skyBlockArea) || IslandType.MINESHAFT.isInIsland()
 
-    fun getCold(): Int? = ScoreboardData.sidebarLinesFormatted.matchFirst(ScoreboardPattern.coldPattern) {
-        return group("cold").toInt().absoluteValue
-    }
+    fun getCold() = oldCold
 
     @SubscribeEvent
     fun onScoreboardChangeEvent(event: ScoreboardChangeEvent) {
-        val newCold = getCold() ?: return
+        val newCold = event.newList.matchFirst(ScoreboardPattern.coldPattern) {
+            group("cold").toInt().absoluteValue
+        } ?: return
 
-        if (newCold - oldCold != 0) {
+        if (newCold != oldCold) {
             ColdUpdateEvent(newCold).postAndCatch()
 
             oldCold = newCold
