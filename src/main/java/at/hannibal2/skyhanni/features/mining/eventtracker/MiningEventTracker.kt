@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -89,8 +89,7 @@ class MiningEventTracker {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!event.repeatSeconds(1)) return
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())) return
         if (!canRequestAt.isInPast()) return
