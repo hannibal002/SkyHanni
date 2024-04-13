@@ -112,8 +112,8 @@ class HypixelData {
         var profileName = ""
         var joinedWorld = SimpleTimeMark.farPast()
 
-        var skyBlockArea = "?"
-        var skyBlockAreaWithSymbol = "?"
+        var skyBlockArea: String? = null
+        var skyBlockAreaWithSymbol: String? = null
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -229,6 +229,8 @@ class HypixelData {
         locraw.forEach { locraw[it.key] = "" }
         joinedWorld = SimpleTimeMark.now()
         serverId = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent
@@ -239,6 +241,8 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         locrawData = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent

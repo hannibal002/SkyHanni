@@ -197,7 +197,7 @@ object GardenCropMilestoneDisplay {
 
             val format = (farmingFortuneSpeed * 60).addSeparators()
             lineMap[4] = Collections.singletonList("§7Crops/Minute§8: §e$format")
-            val formatBps = LorenzUtils.formatDouble(speed, config.blocksBrokenPrecision)
+            val formatBps = speed.round(config.blocksBrokenPrecision).addSeparators()
             lineMap[5] = Collections.singletonList("§7Blocks/Second§8: §e$formatBps")
         }
 
