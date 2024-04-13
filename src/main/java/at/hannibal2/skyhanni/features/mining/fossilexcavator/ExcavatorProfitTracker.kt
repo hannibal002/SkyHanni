@@ -80,7 +80,7 @@ class ExcavatorProfitTracker {
             addGlacitePowder(data)
         }
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.timesExcavated, "excarvation"))
+        addAsSingletonList(tracker.addTotalProfit(profit, data.timesExcavated, "excavation"))
 
         tracker.addPriceFromButton(this)
     }
