@@ -21,10 +21,18 @@ public class ExcavatorProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Track Glacite Powder",
-        desc = "Track Glacite Powder gained as well (no profit, but progress)"
+        desc = "Track Glacite Powder gained as well (no profit, but progress)."
     )
     @ConfigEditorBoolean
     public boolean trackGlacitePowder = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Track Fossil Dust",
+        desc = "Track Fossil Dust and use it for profit calculation."
+    )
+    @ConfigEditorBoolean
+    public boolean showFossilDust = true;
 
     @Expose
     @ConfigLink(owner = ExcavatorProfitTrackerConfig.class, field = "enabled")

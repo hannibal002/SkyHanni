@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -35,6 +36,8 @@ class ExcavatorProfitTracker {
     class Data : ItemTrackerData() {
         override fun resetItems() {
             timesExcavated = 0
+            glacitePowderGained = 0
+            fossilDustGained = 0
         }
 
         override fun getDescription(timesGained: Long): List<String> {
@@ -74,15 +77,40 @@ class ExcavatorProfitTracker {
             )
         )
 
-        // TODO use same price source as profit tracker
         profit = addScrap(timesExcavated, profit)
+        if (config.showFossilDust) {
+            profit = addFossilDust(data.fossilDustGained, profit)
+        }
         if (config.trackGlacitePowder) {
             addGlacitePowder(data)
         }
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.timesExcavated, "excarvation"))
+        addAsSingletonList(tracker.addTotalProfit(profit, data.timesExcavated, "excavation"))
 
         tracker.addPriceFromButton(this)
+    }
+
+    private fun MutableList<List<Any>>.addFossilDust(
+        fossilDustGained: Long,
+        profit: Double,
+    ): Double {
+        if (fossilDustGained <= 0) return profit
+        // TODO use same price source as profit tracker
+        val pricePer = scrapItem.getPrice() / 500
+        val fossilDustPrice = pricePer * fossilDustGained
+        addAsSingletonList(
+            Renderable.hoverTips(
+                "§7${NumberUtil.format(fossilDustGained)}x §fFossil Dust§7: §6${NumberUtil.format(fossilDustPrice)}",
+                listOf(
+                    "§7You gained §6${NumberUtil.format(fossilDustPrice)} coins §7in total",
+                    "§7for all §e$fossilDustGained §fFossil Dust",
+                    "§7you have collected.",
+                    "",
+                    "§7Price Per Fossil Dust: §6${NumberUtil.format(pricePer)}"
+                )
+            )
+        )
+        return profit + fossilDustPrice
     }
 
     private fun MutableList<List<Any>>.addGlacitePowder(data: Data) {
@@ -104,13 +132,15 @@ class ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (timesExcavated <= 0) return profit
+        // TODO use same price source as profit tracker
         val scrapPrice = timesExcavated * scrapItem.getPrice()
+        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
         addAsSingletonList(
             Renderable.hoverTips(
-                "${scrapItem.itemName}§7: §c${NumberUtil.format(scrapPrice)}",
+                "${scrapItem.itemName} §7price: §c-${NumberUtil.format(scrapPrice)}",
                 listOf(
-                    "§7You paid ${NumberUtil.format(scrapPrice)} coins",
-                    "§7in total for all §e$timesExcavated §7${scrapItem.itemName}",
+                    "§7You paid §c${NumberUtil.format(scrapPrice)} coins §7in total",
+                    "§7for all §e$timesExcavated $name",
                     "§7you have used."
                 )
             )
@@ -139,10 +169,10 @@ class ExcavatorProfitTracker {
             return
         }
         if (name == "§fFossil Dust") {
-            // TODO calculate profit and show
-            ChatUtils.debug("fossilDustGained: +$amount")
-            tracker.modify {
-                it.fossilDustGained += amount
+            if (config.showFossilDust) {
+                tracker.modify {
+                    it.fossilDustGained += amount
+                }
             }
             return
         }
