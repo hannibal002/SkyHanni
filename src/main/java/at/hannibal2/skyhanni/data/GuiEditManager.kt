@@ -66,9 +66,9 @@ class GuiEditManager {
 
     companion object {
 
-        val currentPositions = mutableMapOf<String, Position>()
+        var currentPositions = mutableMapOf<String, Position>()
         private var latestPositions = mapOf<String, Position>()
-        private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+        private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
         private var lastMovedGui: String? = null
 
         @JvmStatic
