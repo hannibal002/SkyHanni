@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -84,10 +83,11 @@ class MiningNotifications {
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)) return
-        cold = ScoreboardData.sidebarLinesFormatted.matchFirst(ScoreboardPattern.coldPattern) {
+        val newCold = event.newList.matchFirst(ScoreboardPattern.coldPattern) {
             group("cold").toInt().absoluteValue
-        } ?: -1
-        if (cold == -1) return
+        } ?: 0
+        if (cold == newCold) return
+        cold = newCold
         if (coldResetTimer.isInFuture()) return
         if (cold >= config.coldThreshold.get() && !hasSentCold) {
             hasSentCold = true
