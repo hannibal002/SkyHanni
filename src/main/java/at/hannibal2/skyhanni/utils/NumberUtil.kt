@@ -164,6 +164,8 @@ object NumberUtil {
         } else romanSymbols[l] + (this - l).toRoman()
     }
 
+    fun Number.toStringWithPlus() = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()
+
     private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int) = if (lastNumber > decimal) {
         lastDecimal - decimal
     } else {
