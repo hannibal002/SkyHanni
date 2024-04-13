@@ -70,7 +70,7 @@ public class ProfileSpecificStorage {
         public String currentArrow = null;
 
         @Expose
-        public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
+        public Map<NEUInternalName, Integer> arrowAmount = new HashMap<>();
     }
 
     @Expose
@@ -81,7 +81,7 @@ public class ProfileSpecificStorage {
         public int bits = -1;
 
         @Expose
-        public int bitsToClaim = -1;
+        public int bitsAvailable = -1;
 
         @Expose
         public Long boosterCookieExpiryTime = null;
