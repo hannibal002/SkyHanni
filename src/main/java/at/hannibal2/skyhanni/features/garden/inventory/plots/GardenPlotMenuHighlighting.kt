@@ -20,7 +20,7 @@ class GardenPlotMenuHighlighting {
     private var highlightedPlots = mutableMapOf<GardenPlotAPI.Plot, PlotStatusType>()
 
     @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
