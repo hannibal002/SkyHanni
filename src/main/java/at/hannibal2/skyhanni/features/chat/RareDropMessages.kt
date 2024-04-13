@@ -11,11 +11,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RareDropMessages {
 
+    private val chatGroup = RepoPattern.group("pet.chatdrop")
+
     /**
      * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      */
-    private val petDroppedPattern by RepoPattern.pattern(
+    private val petDroppedPattern by chatGroup.pattern(
         "pet.petdroppedmessage",
         "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> .*)"
     )
@@ -23,7 +25,7 @@ class RareDropMessages {
     /**
      * REGEX-TEST: §5§lGREAT CATCH! §r§bYou found a §r§7[Lvl 1] §r§aGuardian§r§b.
      */
-    private val petFishedPattern by RepoPattern.pattern(
+    private val petFishedPattern by chatGroup.pattern(
         "pet.petfishedmessage",
         "(?<start>(?:§.)*GREAT CATCH! (?:§.)*You found a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
     )
@@ -31,7 +33,7 @@ class RareDropMessages {
     /**
      * REGEX-TEST: §aYou claimed a §5Tarantula Pet§a! §r§aYou can manage your Pets in the §r§fPets Menu§r§a in your §r§fSkyBlock Menu§r§a.
      */
-    private val petClaimedPattern by RepoPattern.pattern(
+    private val petClaimedPattern by chatGroup.pattern(
         "pet.petclaimedmessage",
         "(?<start>(?:§.)*You claimed a )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
     )
@@ -39,9 +41,9 @@ class RareDropMessages {
     /**
      * REGEX-TEST: §b[MVP§r§c+§r§b] Empa_§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
      */
-    private val petObtainedPattern by RepoPattern.pattern(
+    private val petObtainedPattern by chatGroup.pattern(
         "pet.petobtainedmessage",
-        "(?<start>(?:§.)*(?:\\[.*])? ?(?:§.)?[a-zA-Z0-9_]{2,16}(?:§.)* (?:§.)*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
+        "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
     )
 
     private val patterns = listOf(
