@@ -137,7 +137,7 @@ class ExcavatorProfitTracker {
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
         addAsSingletonList(
             Renderable.hoverTips(
-                "${scrapItem.itemName}§7: §c-${NumberUtil.format(scrapPrice)}",
+                "${scrapItem.itemName} §7price: §c-${NumberUtil.format(scrapPrice)}",
                 listOf(
                     "§7You paid §c${NumberUtil.format(scrapPrice)} coins §7in total",
                     "§7for all §e$timesExcavated $name",
