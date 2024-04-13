@@ -117,7 +117,6 @@ class KingTalismanHelper {
         val currentKing = getCurrentKing()
         val kingsTalkedTo = storage.kingsTalkedTo
         if (currentKing !in kingsTalkedTo) {
-            ChatUtils.debug("Found new king!")
             kingsTalkedTo.add(currentKing)
             update(kingsTalkedTo)
             display = allKingsDisplay
