@@ -5,10 +5,11 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI.isFishingRod
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -20,33 +21,20 @@ class OdgerWaypoint {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
     private val location = LorenzVec(-373, 207, -808)
 
-    private var hasLavaRodInHand = false
-    private var trophyFishInInv = false
+    private var trophyFishInInventory = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-
-        if (event.isMod(10)) {
-            hasLavaRodInHand = isLavaFishingRod()
-
-            trophyFishInInv = InventoryUtils.getItemsInOwnInventory().map { it.getLore() }
-                .any { it.isNotEmpty() && it.last().endsWith("TROPHY FISH") }
-        }
-    }
-
-    private fun isLavaFishingRod(): Boolean {
-        val heldItem = InventoryUtils.getItemInHand() ?: return false
-        if (!heldItem.isFishingRod()) return false
-
-        return heldItem.getLore().any { it.contains("Lava Rod") }
+        if (!isEnabled() || !event.isMod(10)) return
+        trophyFishInInventory = InventoryUtils.getItemsInOwnInventory()
+                .any { it.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH }
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (hasLavaRodInHand) return
-        if (!trophyFishInInv) return
+        if (FishingAPI.holdingLavaRod) return
+        if (!trophyFishInInventory) return
 
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Odger", 1.5)

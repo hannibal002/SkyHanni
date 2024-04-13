@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -24,9 +25,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object FossilExcavator {
+object FossilSolverDisplay {
 
-    private val config get() = SkyHanniMod.feature.mining.fossilExcavator
+    private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
 
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
     private val chargesRemainingPattern by patternGroup.pattern(
@@ -134,7 +135,7 @@ object FossilExcavator {
         }
 
         coroutineScope.launch {
-            FossilExcavatorSolver.findBestTile(fossilLocations, dirtLocations, percentage)
+            FossilSolver.findBestTile(fossilLocations, dirtLocations, percentage)
         }
     }
 
@@ -184,7 +185,7 @@ object FossilExcavator {
 
         if (inExcavatorMenu) {
             // render here so they can move it around. As if you press key while doing the excavator you lose the scrap
-            config.position.renderString("§eExcavator solver gui", posLabel = "Fossil Excavator")
+            config.position.renderString("§eExcavator solver gui", posLabel = "Fossil Excavator Solver")
             return
         }
 
@@ -204,15 +205,20 @@ object FossilExcavator {
             }
         }
 
-        config.position.renderStrings(displayList, posLabel = "Fossil Excavator")
+        config.position.renderStrings(displayList, posLabel = "Fossil Excavator Solver")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(36, "mining.fossilExcavator", "mining.fossilExcavator.solver")
     }
 
     fun nextData(slotToClick: FossilTile, correctPercentage: Double, fossilsRemaining: Int) {
         val formattedPercentage = (correctPercentage * 100).round(1)
 
         possibleFossilsRemaining = fossilsRemaining
-        FossilExcavator.slotToClick = slotToClick.toSlotIndex()
-        FossilExcavator.correctPercentage = "§2$formattedPercentage%"
+        FossilSolverDisplay.slotToClick = slotToClick.toSlotIndex()
+        FossilSolverDisplay.correctPercentage = "§2$formattedPercentage%"
     }
 
     fun showError() {
