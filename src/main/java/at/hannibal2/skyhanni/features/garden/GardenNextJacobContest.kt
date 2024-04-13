@@ -392,7 +392,7 @@ object GardenNextJacobContest {
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            list.addCropIcon(crop, highlight = (crop == boostedCrop))
+            list.addCropIcon(crop, 1.0, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
         if (!activeContest) {

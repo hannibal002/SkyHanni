@@ -10,8 +10,8 @@ public class ColdOverlayConfig {
 
     @Expose
     @ConfigOption(
-        name = "Toggle Cold Overlay",
-        desc = "Toggle the cold overlay in Glacite Tunnels."
+        name = "Enabled",
+        desc = "Show the cold overlay in Glacite Tunnels."
     )
     @ConfigEditorBoolean
     @FeatureToggle
