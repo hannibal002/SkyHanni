@@ -28,8 +28,8 @@ object CombatUtils {
 
     private fun getSkillInfo(xpInformation: XPInformation.SkillInfo?): Float {
         return try {
-            val a = xpInformation as? IMixinXPInformation
-            a!!.getTotalXp(null).toFloat()
+            val a = xpInformation as? MixinXPInformation
+            a!!.getTotalXp().toFloat()
         } catch (e: Exception) {
             val xpInfo = xpInformation ?: return -1f
             xpInfo.totalXp
