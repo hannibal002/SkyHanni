@@ -24,9 +24,9 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
-    @ConfigOption(name = "Deep Caverns Parkour", desc = "")
+    @ConfigOption(name = "Deep Caverns Guide", desc = "")
     @Accordion
-    public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
+    public DeepCavernsGuideConfig deepCavernsGuide = new DeepCavernsGuideConfig();
 
     @Expose
     @ConfigOption(name = "Area Walls", desc = "")
