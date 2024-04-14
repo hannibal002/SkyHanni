@@ -35,8 +35,7 @@ public class MiningConfig {
 
     // TODO rename to fossilExcavator
     @Expose
-    @ConfigOption(name = "Fossil Excavator", desc = "")
-    @Accordion
+    @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features")
     public FossilExcavatorConfig fossilExcavator2 = new FossilExcavatorConfig();
 
     @Expose
