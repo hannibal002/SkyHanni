@@ -53,7 +53,7 @@ enum class HotmData(
         45,
         { currentLevel -> (currentLevel + 2.0).pow(3.07) },
         { level -> mapOf(HotmReward.EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES to 5.0 + level) }),
-    CRYSTALLIZED("" + "Crystallized", 30, { currentLevel -> (currentLevel + 2.0).pow(3.4) }, { level ->
+    CRYSTALLIZED("Crystallized", 30, { currentLevel -> (currentLevel + 2.0).pow(3.4) }, { level ->
         mapOf(
             HotmReward.MINING_SPEED to 20.0 + ((level - 1.0) * 6.0),
             HotmReward.MINING_FORTUNE to 20.0 + ((level - 1.0) * 5.0)
@@ -169,7 +169,7 @@ enum class HotmData(
         "Dust Collector",
         20,
         { currentLevel -> (currentLevel + 1.0).pow(4) },
-        { level -> mapOf(HotmReward.FOSSILE_DUST to 1.0 * level) }),
+        { level -> mapOf(HotmReward.FOSSIL_DUST to 1.0 * level) }),
     WARM_HEARTED("Warm Hearted",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.1)) },
@@ -182,7 +182,7 @@ enum class HotmData(
     NO_STONE_UNTURNED("No Stone Unturned",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.05)) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.5 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) }),
 
     SUB_ZERO_MINING("SubZero Mining",
         100,
@@ -191,7 +191,7 @@ enum class HotmData(
     SURVEYOR("Surveyor",
         20,
         { currentLevel -> (currentLevel + 1.0).pow(4) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.75 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.75 * level) }),
     EAGER_ADVENTURER("Eager Adventurer",
         100,
         { currentLevel -> floor((currentLevel + 1.0).pow(2.3)) },
@@ -200,18 +200,18 @@ enum class HotmData(
     DEAD_MANS_CHEST("Dead Man's Chest",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.2)) },
-        { level -> mapOf(HotmReward.UNKOWN to 1.0 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 1.0 * level) }),
 
     GIFTS_FROM_THE_DEPARTED("Gifts from the Departed",
         100,
         { currentLevel -> floor((currentLevel + 1.0).pow(2.45)) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.2 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.2 * level) }),
 
     EXCAVATOR(
         "Excavator",
         50,
         { currentLevel -> (currentLevel + 1.0).pow(3) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.5 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) }),
     RAGS_TO_RICHES("Rags to Riches",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.05)) },
@@ -291,18 +291,18 @@ enum class HotmData(
         )
 
         private val heartItemPattern by repoGroup.pattern(
-            "invetory.heart", "§5Heart of the Mountain"
+            "inventory.heart", "§5Heart of the Mountain"
         )
         private val resetItemPattern by repoGroup.pattern(
-            "invetory.reset", "§cReset Heart of the Mountain"
+            "inventory.reset", "§cReset Heart of the Mountain"
         )
 
         private val heartTokensPattern by repoGroup.pattern(
-            "invetory.heart.token", "§7Token of the Mountain: §5(?<token>\\d+)"
+            "inventory.heart.token", "§7Token of the Mountain: §5(?<token>\\d+)"
         )
 
         private val resetTokensPattern by repoGroup.pattern(
-            "invetory.reset.token", "\\s+§8- §5(?<token>\\d+) Token of the Mountain"
+            "inventory.reset.token", "\\s+§8- §5(?<token>\\d+) Token of the Mountain"
         )
 
         var inInventory = false
@@ -470,5 +470,5 @@ enum class HotmData(
 private val repoGroup = RepoPattern.group("mining.hotm")
 
 enum class HotmReward {
-    MINING_SPEED, MINING_FORTUNE, MINING_WISDOM, FORGE_TIME_DECREASE, TITANIUM_CHANCE, DAILY_POWDER, MORE_BASE_MITHRIL_POWER, MORE_BASE_GEMSTONE_POWER, MORE_MITHRIL_POWER, MORE_GEMSTONE_POWER, COMBAT_STAT_BOOST, CHANCE_OF_TREASURE_CHEST, LOCKS_OF_TREASURE_CHEST, EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES, AVERAGE_BLOCK_BREAKS, CHANCE_EXTRA_XP_ORBS, MINING_SPEED_BOOST, ABILITY_DURATION, ABILITY_RADIUS, ABILITY_COOLDOWN, FOSSILE_DUST, UNKOWN, COLD_RESISTANCE
+    MINING_SPEED, MINING_FORTUNE, MINING_WISDOM, FORGE_TIME_DECREASE, TITANIUM_CHANCE, DAILY_POWDER, MORE_BASE_MITHRIL_POWER, MORE_BASE_GEMSTONE_POWER, MORE_MITHRIL_POWER, MORE_GEMSTONE_POWER, COMBAT_STAT_BOOST, CHANCE_OF_TREASURE_CHEST, LOCKS_OF_TREASURE_CHEST, EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES, AVERAGE_BLOCK_BREAKS, CHANCE_EXTRA_XP_ORBS, MINING_SPEED_BOOST, ABILITY_DURATION, ABILITY_RADIUS, ABILITY_COOLDOWN, FOSSIL_DUST, UNKNOWN, COLD_RESISTANCE
 }
