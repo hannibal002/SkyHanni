@@ -18,6 +18,7 @@ import kotlin.math.round
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+
 data class LorenzVec(
     val x: Double,
     val y: Double,
@@ -56,6 +57,13 @@ data class LorenzVec(
         return (dx * dx + dz * dz)
     }
 
+    operator fun plus(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
+    operator fun minus(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
+    operator fun times(other: LorenzVec) = LorenzVec(x * other.x, y * other.y, z * other.z)
+    operator fun times(other: Double) = LorenzVec(x * other, y * other, z * other)
+    operator fun div(other: LorenzVec) = LorenzVec(x / other.x, y / other.y, z / other.z)
+    operator fun div(other: Double) = LorenzVec(x / other, y / other, z / other)
+
     fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec =
         LorenzVec(this.x + x, this.y + y, this.z + z)
 
@@ -73,7 +81,7 @@ data class LorenzVec(
     fun multiply(v: LorenzVec) = LorenzVec(x multiplyZeroSave v.x, y multiplyZeroSave v.y, z multiplyZeroSave v.z)
 
     fun dotProduct(other: LorenzVec): Double =
-        x multiplyZeroSave other.x + y multiplyZeroSave other.y + z multiplyZeroSave other.z
+        (x multiplyZeroSave other.x) + (y multiplyZeroSave other.y) + (z multiplyZeroSave other.z)
 
     fun angleAsCos(other: LorenzVec) = this.normalize().dotProduct(other.normalize())
 
@@ -111,7 +119,8 @@ data class LorenzVec(
 
     fun toCleanString(): String = "$x $y $z"
 
-    fun length(): Double = sqrt(x * x + y * y + z * z)
+    fun lengthSquared(): Double = x * x + y * y + z * z
+    fun length(): Double = sqrt(this.lengthSquared())
 
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
@@ -183,15 +192,22 @@ data class LorenzVec(
     fun rotateXZ(theta: Double) = LorenzVec(x * cos(theta) + z * sin(theta), y, -x * sin(theta) + z * cos(theta))
     fun rotateYZ(theta: Double) = LorenzVec(x, y * cos(theta) - z * sin(theta), y * sin(theta) + z * cos(theta))
 
+    fun nearestPointOnLine(startPos: LorenzVec, endPos: LorenzVec): LorenzVec {
+        var d = endPos - startPos
+        val w = this - startPos
+
+        val dp = d.lengthSquared()
+        var dt = 0.0
+
+        if (dp != dt) dt = (w.dotProduct(d) / dp).coerceIn(0.0, 1.0)
+
+        d *= dt
+        d += startPos
+        return d
+    }
 
     fun distanceToLine(startPos: LorenzVec, endPos: LorenzVec): Double {
-        val a = startPos.subtract(this)
-        val b = LorenzVec(
-            a.y * endPos.z - a.z * endPos.y,
-            -(a.x * endPos.z - a.z * endPos.x),
-            a.x * endPos.y - a.y * endPos.x
-        )
-        return b.length() / endPos.length()
+        return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
 
     companion object {

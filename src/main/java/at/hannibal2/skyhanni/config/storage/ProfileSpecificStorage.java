@@ -55,7 +55,7 @@ public class ProfileSpecificStorage {
         public int currentRabbits = 0;
 
         @Expose
-        public int maxRabbits = 0;
+        public int maxRabbits = -1;
     }
 
     @Expose

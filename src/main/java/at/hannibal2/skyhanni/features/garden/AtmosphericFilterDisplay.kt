@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.Season
+import at.hannibal2.skyhanni.utils.SkyblockSeason
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AtmosphericFilterDisplay {
@@ -19,7 +19,7 @@ class AtmosphericFilterDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!GardenAPI.inGarden() && !config.outsideGarden) return
-        display = drawDisplay(Season.getCurrentSeason() ?: return)
+        display = drawDisplay(SkyblockSeason.getCurrentSeason() ?: return)
     }
 
     @SubscribeEvent
@@ -32,7 +32,7 @@ class AtmosphericFilterDisplay {
         }
     }
 
-    private fun drawDisplay(season: Season): String = buildString {
+    private fun drawDisplay(season: SkyblockSeason): String = buildString {
         if (!config.onlyBuff) {
             append(season.getSeason(config.abbreviateSeason))
             append("§7: ")

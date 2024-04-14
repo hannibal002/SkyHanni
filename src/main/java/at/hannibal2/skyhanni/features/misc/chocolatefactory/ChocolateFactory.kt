@@ -64,11 +64,11 @@ object ChocolateFactory {
     )
     private val eggFoundPattern by patternGroup.pattern(
         "egg.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a.*"
+        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg.*"
     )
     private val sharedEggPattern by patternGroup.pattern(
         "egg.shared",
-        ".*\\[SkyHanni] Chocolate egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)"
+        ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)"
     )
 
     private var inChocolateFactory = false
@@ -78,9 +78,20 @@ object ChocolateFactory {
     private var lastBarnFullWarning = SimpleTimeMark.farPast()
 
     private val slotsToHighlight: MutableSet<Int> = mutableSetOf()
-    private val otherUpgradeSlots = setOf(
+
+    // todo repo for all
+    private var rabbitSlots = setOf(
+        29, 30, 31, 32, 33
+    )
+    private var otherUpgradeSlots = setOf(
         28, 34, 38, 39, 41, 42
     )
+    private var noPickblockSlots = setOf(
+        39
+    )
+    private var barnIndex = 34
+    private var infoIndex = 13
+    private var milestoneIndex = 53
 
     private var bestUpgrade: Int? = null
 
@@ -116,7 +127,7 @@ object ChocolateFactory {
         bestUpgrade = null
         var bestUpgradeRatio = 0.0
 
-        val chocolateItem = InventoryUtils.getItemsInOpenChest().find { it.slotIndex == 13 }?.stack ?: return
+        val chocolateItem = InventoryUtils.getItemsInOpenChest().find { it.slotIndex == infoIndex }?.stack ?: return
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             currentChocolate = group("chocolate").formatLong()
         }
@@ -125,7 +136,7 @@ object ChocolateFactory {
         for ((slotIndex, item) in event.inventoryItems) {
             val upgradeCost = item.getLore().getUpgradeCost() ?: continue
 
-            if (slotIndex == 34) {
+            if (slotIndex == barnIndex) {
                 item.getLore().matchFirst(barnAmountPattern) {
                     profileStorage.currentRabbits = group("rabbits").formatInt()
                     profileStorage.maxRabbits = group("max").formatInt()
@@ -136,7 +147,8 @@ object ChocolateFactory {
             if (upgradeCost < currentChocolate) {
                 slotsToHighlight.add(slotIndex)
 
-                if ((slotIndex) in 29..33) {
+                if ((slotIndex) in rabbitSlots) {
+                    // todo need to calculate with repo in case they change it
                     val upgradeRatio = upgradeCost.toDouble() / (slotIndex - 28)
                     if (upgradeRatio < bestUpgradeRatio || bestUpgradeRatio == 0.0) {
                         bestUpgrade = slotIndex
@@ -160,10 +172,12 @@ object ChocolateFactory {
 
         eggFoundPattern.matchMatcher(event.message) {
             val currentLocation = LocationUtils.playerLocation()
+            EggLocations.eggFound()
+            // todo fix timing
             DelayedRun.runDelayed(7.seconds) {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
-                    onClick = { EggLocations.shareNearbyEggLocation(currentLocation) },
+                    onClick = { EggLocations.shareNearbyEggLocation(currentLocation, group("meal")) },
                     SimpleTimeMark.now() + 30.seconds
                 )
             }
@@ -185,13 +199,23 @@ object ChocolateFactory {
     private fun trySendBarnFullMessage() {
         val profileStorage = profileStorage ?: return
 
-        barnFull = profileStorage.maxRabbits - profileStorage.currentRabbits <= 5
+        barnFull = profileStorage.maxRabbits - profileStorage.currentRabbits <= config.barnCapacityThreshold
         if (!barnFull) return
 
         if (lastBarnFullWarning.passedSince() < 30.seconds) return
-        ChatUtils.chat(
+
+        if (profileStorage.maxRabbits == -1) {
+            ChatUtils.clickableChat(
+                "Open your chocolate factory to see your barn's capacity status!",
+                "cf"
+            )
+            return
+        }
+
+        ChatUtils.clickableChat(
             "§cYour barn is almost full! " +
-                "§7(${profileStorage.currentRabbits}/${profileStorage.maxRabbits}). §cUpgrade it so they don't get crushed"
+                "§7(${profileStorage.currentRabbits}/${profileStorage.maxRabbits}). §cUpgrade it so they don't get crushed",
+            "cf"
         )
         SoundUtils.playBeepSound()
         lastBarnFullWarning = SimpleTimeMark.now()
@@ -207,14 +231,15 @@ object ChocolateFactory {
         val itemName = item.name.removeColor()
         val slotNumber = event.slot.slotNumber
 
-        if (slotNumber in 29..33) {
+        if (slotNumber in rabbitSlots) {
             rabbitAmountPattern.matchMatcher(itemName) {
                 val rabbitTip = when (val rabbitAmount = group("amount").formatInt()) {
                     in (0..9) -> "$rabbitAmount"
                     in (10..74) -> "§a$rabbitAmount"
                     in (75..124) -> "§9$rabbitAmount"
-                    // todo get more data for colours
-                    // next on (manager is §5)
+                    in (125..174) -> "§5$rabbitAmount"
+                    in (175..199) -> "§6$rabbitAmount"
+                    200 -> "§d$rabbitAmount"
                     else -> "§c$rabbitAmount"
                 }
 
@@ -227,7 +252,7 @@ object ChocolateFactory {
             }
         }
 
-        if (slotNumber == 53) {
+        if (slotNumber == milestoneIndex) {
             item.getLore().matchFirst(unclaimedRewardsPattern) {
                 event.stackTip = "§c!!!"
             }
@@ -240,7 +265,7 @@ object ChocolateFactory {
         if (!inChocolateFactory) return
         val slot = event.slot ?: return
         if (!config.useMiddleClick) return
-        if (slot.slotNumber == 39) return
+        if (slot.slotNumber in noPickblockSlots) return
 
         event.makePickblock()
     }
@@ -259,7 +284,7 @@ object ChocolateFactory {
                     slot highlight LorenzColor.GREEN.addOpacity(75)
                 }
             }
-            if (slot.slotIndex == 34 && barnFull) {
+            if (slot.slotIndex == barnIndex && barnFull) {
                 slot highlight LorenzColor.RED
             }
         }
