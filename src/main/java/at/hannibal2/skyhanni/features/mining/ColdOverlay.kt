@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
+import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
-import kotlin.time.Duration.Companion.seconds
 
 class ColdOverlay {
 
@@ -26,9 +25,7 @@ class ColdOverlay {
         if (!isEnabled()) return
         val alpha = getColdAlpha()
         if (alpha == 0f) return
-        println(alpha)
 
-        GL11.glDepthMask(false)
         val mc = Minecraft.getMinecraft()
         val textureLocation = ResourceLocation("skyhanni", "cold_overlay.png")
         mc.textureManager.bindTexture(textureLocation)
@@ -40,6 +37,7 @@ class ColdOverlay {
         GlStateManager.pushMatrix()
         GlStateManager.pushAttrib()
 
+        GL11.glDepthMask(false)
         GlStateManager.color(1f, 1f, 1f, alpha)
 
         Utils.drawTexturedRect(
@@ -49,7 +47,7 @@ class ColdOverlay {
             screenHeight.toFloat(),
             GL11.GL_NEAREST
         )
-        GL11.glDepthMask(false)
+        GL11.glDepthMask(true)
 
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
@@ -67,5 +65,5 @@ class ColdOverlay {
         cold = event.cold
     }
 
-    private fun isEnabled() = (inGlaciteArea() || MiningAPI.lastColdUpdate.passedSince() < 5.seconds) && config.enabled
+    private fun isEnabled() = inColdIsland() && config.enabled
 }

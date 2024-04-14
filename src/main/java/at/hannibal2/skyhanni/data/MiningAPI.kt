@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -26,14 +25,17 @@ object MiningAPI {
 
     private var cold = 0
     var lastColdUpdate = SimpleTimeMark.farPast()
+    var lastColdReset = SimpleTimeMark.farPast()
 
 
-    fun inGlaciteArea() = glaciteAreaPattern.matches(HypixelData.skyBlockArea) || IslandType.MINESHAFT.isInIsland()
+    fun inGlaciteArea() = glaciteAreaPattern.matches(HypixelData.skyBlockArea) || inColdIsland()
+
+    fun inColdIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
     fun getCold() = cold
 
     @SubscribeEvent
-    fun onScoreboardChangeEvent(event: ScoreboardChangeEvent) {
+    fun onScoreboardChange(event: ScoreboardChangeEvent) {
         val newCold = event.newList.matchFirst(ScoreboardPattern.coldPattern) {
             group("cold").toInt().absoluteValue
         } ?: return
@@ -45,19 +47,22 @@ object MiningAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!inColdIsland()) return
         if (coldReset.matches(event.message)) {
             updateCold(0)
+            lastColdReset = SimpleTimeMark.now()
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        updateCold(0)
+        if (cold != 0) updateCold(0)
         lastColdUpdate = SimpleTimeMark.farPast()
+        lastColdReset = SimpleTimeMark.farPast()
     }
 
     private fun updateCold(newCold: Int) {
+        // hypixel sends cold data once in scoreboard even after resetting it
         if (cold == 0 && lastColdUpdate.passedSince() < 1.seconds) return
         lastColdUpdate = SimpleTimeMark.now()
         ColdUpdateEvent(newCold).postAndCatch()
