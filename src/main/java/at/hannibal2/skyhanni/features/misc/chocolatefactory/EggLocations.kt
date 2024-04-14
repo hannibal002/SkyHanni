@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.clampTo
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -91,7 +92,7 @@ object EggLocations {
         resetData()
     }
 
-    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: String) {
+    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: CakeMealTime) {
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
 
@@ -99,7 +100,7 @@ object EggLocations {
         val y = closestEgg.y.toInt()
         val z = closestEgg.z.toInt()
 
-        val message = "[SkyHanni] $meal Chocolate Egg located at x: $x, y: $y, z: $z"
+        val message = "[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z"
         ChatUtils.sendCommandToServer("ac $message")
     }
 
@@ -164,13 +165,12 @@ object EggLocations {
         possibleEggLocations.clear()
         // todo allow more leeway for further points later
         val a = islandEggsLocations.filter {
-            it.distanceToLine(firstPos, secondPos) < 200.0
+            boundingBox.isInside(it) && it.distanceToLine(firstPos, secondPos) < 200.0
         }
 
         possibleEggLocations.addAll(a.sortedBy {
             it.distanceToLine(firstPos, secondPos)
-        }
-        )
+        })
 
         drawLocations = true
     }
@@ -200,8 +200,7 @@ object EggLocations {
         type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.waypointsEnabled
-    // todo eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-//         && SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
+        && ChocolateFactory.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
     private fun hasLocatorInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }

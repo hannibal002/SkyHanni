@@ -3,12 +3,16 @@ package at.hannibal2.skyhanni.features.misc.chocolatefactory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -23,12 +27,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -62,6 +69,10 @@ object ChocolateFactory {
         "rabbit.found",
         "§d§lNEW RABBIT! §6\\+\\d Chocolate §7and §6\\+0.\\d+x Chocolate §7per second!"
     )
+    private val rabbitDuplicatePattern by patternGroup.pattern(
+        "rabbit.duplicate",
+        "§7§lDUPLICATE RABBIT! §6\\+[\\d,]+ Chocolate"
+    )
     private val eggFoundPattern by patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg.*"
@@ -69,6 +80,18 @@ object ChocolateFactory {
     private val sharedEggPattern by patternGroup.pattern(
         "egg.shared",
         ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)"
+    )
+    private val eggSpawnedPattern by patternGroup.pattern(
+        "egg.spawned",
+        "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?<meal>\\w+) Egg §r§dhas appeared!"
+    )
+    private val eggAlreadyCollectedPattern by patternGroup.pattern(
+        "egg.alreadycollected",
+        "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!"
+    )
+    private val noEggsLeftPattern by patternGroup.pattern(
+        "egg.noneleft",
+        "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!"
     )
 
     private var inChocolateFactory = false
@@ -95,12 +118,12 @@ object ChocolateFactory {
 
     private var bestUpgrade: Int? = null
 
-    // todo update slot highlight and chocolate here as well
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
+        updateInventoryItems(event.inventoryItems)
     }
 
     @SubscribeEvent
@@ -118,10 +141,7 @@ object ChocolateFactory {
         slotsToHighlight.clear()
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!inChocolateFactory) return
+    private fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
         val profileStorage = profileStorage ?: return
 
         bestUpgrade = null
@@ -131,9 +151,8 @@ object ChocolateFactory {
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             currentChocolate = group("chocolate").formatLong()
         }
-
         slotsToHighlight.clear()
-        for ((slotIndex, item) in event.inventoryItems) {
+        for ((slotIndex, item) in inventory) {
             val upgradeCost = item.getLore().getUpgradeCost() ?: continue
 
             if (slotIndex == barnIndex) {
@@ -160,6 +179,14 @@ object ChocolateFactory {
     }
 
     @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!inChocolateFactory) return
+
+        updateInventoryItems(event.inventoryItems)
+    }
+
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -173,11 +200,18 @@ object ChocolateFactory {
         eggFoundPattern.matchMatcher(event.message) {
             val currentLocation = LocationUtils.playerLocation()
             EggLocations.eggFound()
-            // todo fix timing
-            DelayedRun.runDelayed(7.seconds) {
+            val meal = CakeMealTime.getMealByName(group("meal")) ?: run {
+                ErrorManager.skyHanniError(
+                    "Unknown meal: ${group("meal")}",
+                    "message" to event.message
+                )
+            }
+            meal.markClaimed()
+
+            DelayedRun.runDelayed(3.seconds) {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
-                    onClick = { EggLocations.shareNearbyEggLocation(currentLocation, group("meal")) },
+                    onClick = { EggLocations.shareNearbyEggLocation(currentLocation, meal) },
                     SimpleTimeMark.now() + 30.seconds
                 )
             }
@@ -189,10 +223,30 @@ object ChocolateFactory {
             val y = group("y").formatInt()
             val z = group("z").formatInt()
             val eggLocation = LorenzVec(x, y, z)
+            val meal = CakeMealTime.getMealByName(group("meal")) ?: run {
+                ErrorManager.skyHanniError(
+                    "Unknown meal: ${group("meal")}",
+                    "message" to event.message
+                )
+            }
+
             // todo add waypoint
             // todo dont hide own message
 //             event.blockedReason = "shared_egg"
             return
+        }
+        noEggsLeftPattern.matchMatcher(event.message) {
+            CakeMealTime.allFound()
+            return
+        }
+        eggAlreadyCollectedPattern.matchMatcher(event.message) {
+            val meal = CakeMealTime.getMealByName(group("meal")) ?: run {
+                ErrorManager.skyHanniError(
+                    "Unknown meal: ${group("meal")}",
+                    "message" to event.message
+                )
+            }
+            meal.markClaimed()
         }
     }
 
@@ -290,6 +344,31 @@ object ChocolateFactory {
         }
     }
 
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        CakeMealTime.checkClaimed()
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.showClaimedEggs) return
+        if (ReminderUtils.isBusy()) return
+        if (!isHoppityEvent()) return
+
+        val displayList = mutableListOf<String>()
+        displayList.add("§bUnfound Eggs:")
+
+        for (meal in CakeMealTime.entries) {
+            if (!meal.claimed) {
+                displayList.add("§7 - ${meal.formattedName()}")
+            }
+        }
+        if (displayList.size == 1) return
+
+        config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
+    }
+
     private fun List<String>.getUpgradeCost(): Long? {
         val nextLine = this.nextAfter({ it == "§7Cost" }) ?: return null
         chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
@@ -297,4 +376,6 @@ object ChocolateFactory {
         }
         return null
     }
+
+    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
 }
