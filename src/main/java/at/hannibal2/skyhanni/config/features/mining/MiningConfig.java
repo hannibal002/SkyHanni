@@ -39,6 +39,11 @@ public class MiningConfig {
     public FossilExcavatorConfig fossilExcavator2 = new FossilExcavatorConfig();
 
     @Expose
+    @ConfigOption(name = "Corpse LOS", desc = "")
+    @Accordion
+    public CorpseLOSConfig corpseLOS = new CorpseLOSConfig();
+
+    @Expose
     @ConfigOption(name = "Notifications", desc = "")
     @Accordion
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
