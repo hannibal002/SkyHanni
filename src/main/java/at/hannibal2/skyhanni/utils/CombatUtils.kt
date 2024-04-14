@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData
-import at.hannibal2.skyhanni.mixins.transformers.IMixinXPInformation
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 
