@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object ChocolateFactoryGui {
+object ChocolateFactoryInventory {
 
     private val config get() = ChocolateFactoryApi.config
 
@@ -37,7 +37,7 @@ object ChocolateFactoryGui {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!ChocolateFactoryApi.isEnabled()) return
         if (!ChocolateFactoryApi.inChocolateFactory) return
-        if (!config.showStackSizes) return
+        if (!config.highlightUpgrades) return
 
         val item = event.stack ?: return
         val itemName = item.name

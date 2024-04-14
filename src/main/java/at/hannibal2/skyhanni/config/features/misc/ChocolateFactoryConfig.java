@@ -1,20 +1,18 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ChocolateFactoryConfig {
 
     @Expose
-    @ConfigOption(name = "Hoppity Egg Locations", desc = "")
+    @ConfigOption(name = "Hoppity Egg ", desc = "")
     @Accordion
-    public HoppityEggLocationsConfig hoppityEggLocations = new HoppityEggLocationsConfig();
+    public HoppityEggsConfig hoppityEggs = new HoppityEggsConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all Hoppity features.")
@@ -43,20 +41,10 @@ public class ChocolateFactoryConfig {
     public boolean rabbitWarning = true;
 
     @Expose
-    @ConfigOption(name = "Show Claimed Eggs", desc = "Show which eggs have been found in the last SkyBlock day.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showClaimedEggs = false;
-
-    @Expose
     @ConfigOption(
         name = "Barn Capacity Threshold",
         desc = "How close to your barn capacity threshold should you be warned about needing to upgrade it."
     )
     @ConfigEditorSlider(minValue = 3, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
-
-    @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "showClaimedEggs")
-    public Position position = new Position(33, 72, false, true);
 }

@@ -58,8 +58,6 @@ data class LorenzVec(
     }
 
     operator fun plus(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
-    operator fun plus(other: Double) = LorenzVec(x + other, y + other, z + other)
-    operator fun plus(other: Int) = LorenzVec(x + other, y + other, z + other)
 
     operator fun minus(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
 
@@ -70,11 +68,9 @@ data class LorenzVec(
     operator fun div(other: LorenzVec) = LorenzVec(x / other.x, y / other.y, z / other.z)
     operator fun div(other: Double) = LorenzVec(x / other, y / other, z / other)
 
-    @Deprecated("Use operator fun plus instead", ReplaceWith("this + LorenzVec(x, y, z)"))
     fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec =
         LorenzVec(this.x + x, this.y + y, this.z + z)
 
-    @Deprecated("Use operator fun plus instead", ReplaceWith("this + LorenzVec(x, y, z)"))
     fun add(x: Int = 0, y: Int = 0, z: Int = 0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"

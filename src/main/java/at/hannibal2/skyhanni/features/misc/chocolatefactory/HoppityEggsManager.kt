@@ -16,7 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class HoppityEggsManager {
 
-    val config get() = ChocolateFactoryApi.config
+    private val config get() = ChocolateFactoryApi.config.hoppityEggs
 
     private val eggFoundPattern by ChocolateFactoryApi.patternGroup.pattern(
         "egg.found",

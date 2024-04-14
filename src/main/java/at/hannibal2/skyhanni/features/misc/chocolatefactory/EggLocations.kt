@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EggLocations {
 
-    private val config get() = ChocolateFactoryApi.config.hoppityEggLocations
+    private val config get() = ChocolateFactoryApi.config.hoppityEggs
 
     private val locatorItem = "EGGLOCATOR".asInternalName()
 
