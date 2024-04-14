@@ -46,7 +46,7 @@ class MiningNotifications {
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!"
     )
-    private val coldReset by patternGroup.pattern(
+    val coldReset by patternGroup.pattern(
         "cold.reset",
         "§cThe warmth of the campfire reduced your §r§b❄ Cold §r§cto 0!"
     )

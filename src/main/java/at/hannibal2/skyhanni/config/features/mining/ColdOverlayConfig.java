@@ -23,9 +23,21 @@ public class ColdOverlayConfig {
         desc = "The threshold at which the cold overlay will be shown."
     )
     @ConfigEditorSlider(
-        minValue = 0,
-        maxValue = 100,
-        minStep = 1
+        minValue = 0f,
+        maxValue = 100f,
+        minStep = 1f
     )
-    public int coldThreshold = 50;
+    public float coldThreshold = 0f;
+
+    @Expose
+    @ConfigOption(
+        name = "Max Opacity",
+        desc = "The maximum opacity the overlay will reach."
+    )
+    @ConfigEditorSlider(
+        minValue = 0f,
+        maxValue = 100f,
+        minStep = 0.1f
+    )
+    public float maxAlpha = 100f;
 }
