@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -26,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -33,10 +36,12 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object ChocolateFactory {
@@ -93,6 +98,10 @@ object ChocolateFactory {
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!"
     )
+    private val clickMeRabbitPattern by patternGroup.pattern(
+        "rabbit.clickme",
+        "§e§lCLICK ME!"
+    )
 
     private var inChocolateFactory = false
     private var currentChocolate = 0L
@@ -102,28 +111,24 @@ object ChocolateFactory {
 
     private val slotsToHighlight: MutableSet<Int> = mutableSetOf()
 
-    // todo repo for all
-    private var rabbitSlots = setOf(
-        29, 30, 31, 32, 33
-    )
-    private var otherUpgradeSlots = setOf(
-        28, 34, 38, 39, 41, 42
-    )
-    private var noPickblockSlots = setOf(
-        39
-    )
+    private var rabbitSlots = mapOf<Int, Int>()
+    private var otherUpgradeSlots = setOf<Int>()
+    private var noPickblockSlots = setOf<Int>()
     private var barnIndex = 34
     private var infoIndex = 13
     private var milestoneIndex = 53
 
     private var bestUpgrade: Int? = null
+    private var bestRabbitUpgrade: String? = null
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
-        updateInventoryItems(event.inventoryItems)
+        DelayedRun.runDelayed(50.milliseconds) {
+            updateInventoryItems(event.inventoryItems)
+        }
     }
 
     @SubscribeEvent
@@ -139,13 +144,16 @@ object ChocolateFactory {
     private fun clearData() {
         inChocolateFactory = false
         slotsToHighlight.clear()
+        bestUpgrade = null
+        bestRabbitUpgrade = null
     }
 
     private fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
         val profileStorage = profileStorage ?: return
 
         bestUpgrade = null
-        var bestUpgradeRatio = 0.0
+        var bestAffordableUpgradeRatio = 0.0
+        var bestPossibleUpgradeRatio = 0.0
 
         val chocolateItem = InventoryUtils.getItemsInOpenChest().find { it.slotIndex == infoIndex }?.stack ?: return
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
@@ -153,6 +161,11 @@ object ChocolateFactory {
         }
         slotsToHighlight.clear()
         for ((slotIndex, item) in inventory) {
+            if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
+                println("tried to play sound")
+                SoundUtils.playBeepSound()
+            }
+
             val upgradeCost = item.getLore().getUpgradeCost() ?: continue
 
             if (slotIndex == barnIndex) {
@@ -163,16 +176,23 @@ object ChocolateFactory {
                     trySendBarnFullMessage()
                 }
             }
-            if (upgradeCost < currentChocolate) {
-                slotsToHighlight.add(slotIndex)
 
-                if ((slotIndex) in rabbitSlots) {
-                    // todo need to calculate with repo in case they change it
-                    val upgradeRatio = upgradeCost.toDouble() / (slotIndex - 28)
-                    if (upgradeRatio < bestUpgradeRatio || bestUpgradeRatio == 0.0) {
-                        bestUpgrade = slotIndex
-                        bestUpgradeRatio = upgradeRatio
-                    }
+            val canAfford = upgradeCost <= currentChocolate
+            if (canAfford) {
+                slotsToHighlight.add(slotIndex)
+            }
+
+            if ((slotIndex) in rabbitSlots) {
+                val chocolateIncrease = rabbitSlots[slotIndex] ?: 0
+                val upgradeRatio = upgradeCost.toDouble() / chocolateIncrease
+
+                if (canAfford && upgradeRatio < bestAffordableUpgradeRatio || bestAffordableUpgradeRatio == 0.0) {
+                    bestUpgrade = slotIndex
+                    bestAffordableUpgradeRatio = upgradeRatio
+                }
+                if (upgradeRatio < bestPossibleUpgradeRatio || bestPossibleUpgradeRatio == 0.0) {
+                    bestPossibleUpgradeRatio = upgradeRatio
+                    bestRabbitUpgrade = item.name
                 }
             }
         }
@@ -276,6 +296,19 @@ object ChocolateFactory {
     }
 
     @SubscribeEvent
+    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!inChocolateFactory) return
+        if (!config.showStackSizes) return
+
+        val item = event.stack ?: return
+        val itemName = item.name
+        if (itemName != bestRabbitUpgrade) return
+
+        event.drawSlotText(event.x + 18, event.y, "§6✦", .8f)
+    }
+
+    @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!inChocolateFactory) return
@@ -375,6 +408,15 @@ object ChocolateFactory {
             return group("chocolate").formatLong()
         }
         return null
+    }
+
+    fun loadRepoData(data: HoppityEggLocationsJson) {
+        rabbitSlots = data.rabbitSlots
+        otherUpgradeSlots = data.otherUpgradeSlots
+        noPickblockSlots = data.noPickblockSlots
+        barnIndex = data.barnIndex
+        infoIndex = data.infoIndex
+        milestoneIndex = data.milestoneIndex
     }
 
     fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING

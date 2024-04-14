@@ -32,6 +32,11 @@ public class ChocolateFactoryConfig {
     public boolean useMiddleClick = true;
 
     @Expose
+    @ConfigOption(name = "Rabbit Warning", desc = "Warn when the rabbit that needs to be clicked appears.")
+    @ConfigEditorBoolean
+    public boolean rabbitWarning = true;
+
+    @Expose
     @ConfigOption(name = "Show Claimed Eggs", desc = "Show which eggs have been found in the last SkyBlock day.")
     @ConfigEditorBoolean
     @FeatureToggle

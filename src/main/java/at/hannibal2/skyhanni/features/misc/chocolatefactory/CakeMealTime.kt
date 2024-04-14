@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
-import at.hannibal2.skyhanni.utils.ChatUtils
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 
 enum class CakeMealTime(
@@ -35,7 +34,6 @@ enum class CakeMealTime(
                 if (currentSbHour >= it.resetsAt && it.lastResetDay != currentSbDay) {
                     it.claimed = false
                     it.lastResetDay = currentSbDay
-                    ChatUtils.chat("reset ${it.formattedName()}")
                 }
             }
         }

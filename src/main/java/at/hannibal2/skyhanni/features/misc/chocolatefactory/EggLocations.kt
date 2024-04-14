@@ -48,6 +48,7 @@ object EggLocations {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
         eggLocations = data.eggLocations
+        ChocolateFactory.loadRepoData(data)
     }
 
     @SubscribeEvent
