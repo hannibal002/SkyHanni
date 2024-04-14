@@ -95,5 +95,8 @@ object LocationUtils {
     fun AxisAlignedBB.getCenter() = this.getEdgeLengths().multiply(0.5).add(this.minBox())
 
     fun AxisAlignedBB.getTopCenter() = this.getCenter().add(y = (maxY - minY) / 2)
+
+//     fun lookDirection() = Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec()
+    fun lookDirection() = Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec()
 }
 

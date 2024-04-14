@@ -16,18 +16,15 @@ class GardenYawAndPitch {
 
     private val config get() = GardenAPI.config.yawPitchDisplay
     private var lastChange = SimpleTimeMark.farPast()
-    private var lastYaw = 0f
-    private var lastPitch = 0f
+
+    companion object {
+        var lastYaw = 0f
+        var lastPitch = 0f
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.onHypixel) return
-        if (!isEnabled()) return
-        if (GardenAPI.hideExtraGuis()) return
-        if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
-
         val player = Minecraft.getMinecraft().thePlayer
-
         var yaw = player.rotationYaw % 360
         if (yaw < 0) yaw += 360
         if (yaw > 180) yaw -= 360
@@ -38,6 +35,11 @@ class GardenYawAndPitch {
         }
         lastYaw = yaw
         lastPitch = pitch
+
+        if (!LorenzUtils.onHypixel) return
+        if (!isEnabled()) return
+        if (GardenAPI.hideExtraGuis()) return
+        if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
         if (!config.showAlways && lastChange.passedSince() > config.timeout.seconds) return
 

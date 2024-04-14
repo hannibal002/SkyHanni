@@ -175,6 +175,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotBorders
 import at.hannibal2.skyhanni.features.garden.GardenWarpCommands
 import at.hannibal2.skyhanni.features.garden.GardenYawAndPitch
+import at.hannibal2.skyhanni.features.garden.GardenYawAndPitchWaypoint
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.ToolTooltipTweaks
 import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay
@@ -711,6 +712,7 @@ class SkyHanniMod {
         loadModule(JacobContestTimeNeeded())
         loadModule(JacobContestStatsSummary())
         loadModule(GardenYawAndPitch())
+        loadModule(GardenYawAndPitchWaypoint)
         loadModule(MovementSpeedDisplay())
         loadModule(ChumBucketHider())
         loadModule(InquisitorWaypointShare)
