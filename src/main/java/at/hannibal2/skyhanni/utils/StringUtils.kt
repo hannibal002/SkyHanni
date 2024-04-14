@@ -308,4 +308,10 @@ object StringUtils {
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun String.insert(pos: Int, chars: CharSequence): String =
+        this.substring(0, pos) + chars + this.substring(pos)
+
+    fun String.insert(pos: Int, char: Char): String =
+        this.substring(0, pos) + char + this.substring(pos)
 }

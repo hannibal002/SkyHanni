@@ -60,6 +60,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
+import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -488,6 +489,10 @@ object Commands {
             "shaddfoundburrowlocationsfromclipboard",
             "Add all ever found burrow locations from clipboard"
         ) { AllBurrowsList.addFromClipboard() }
+        registerCommand(
+            "shgraph",
+            "Enables the graph editor"
+        ) { GraphEditor.commandIn() }
     }
 
     private fun internalCommands() {
