@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Pseudo
-@Mixin(SkillInfo.class)
+@Mixin(targets = "io.github.moulberry.notenoughupdates.util.XPInformation.SkillInfo")
 public interface MixinXPInformation {
 
     @Accessor(value = "totalXp", remap = false)
