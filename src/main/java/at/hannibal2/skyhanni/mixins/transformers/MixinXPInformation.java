@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Pseudo
 @Mixin(SkillInfo.class)
-public class MixinXPInformation extends XPInformation {
+public class MixinXPInformation extends XPInformation.SkillInfo {
 
     @Shadow
     public double totalXp;
