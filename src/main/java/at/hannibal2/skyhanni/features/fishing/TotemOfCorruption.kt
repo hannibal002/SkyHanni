@@ -103,7 +103,10 @@ class TotemOfCorruption {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.showOverlay.onToggle { display = emptyList() }
+        config.showOverlay.onToggle {
+            display = emptyList()
+            totems = emptyList()
+        }
     }
 
     private fun getTimeRemaining(totem: EntityArmorStand): Duration? =
