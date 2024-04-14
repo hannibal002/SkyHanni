@@ -6,16 +6,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Pseudo
 @Mixin(SkillInfo.class)
-public class MixinXPInformation extends XPInformation.SkillInfo {
+public interface MixinXPInformation {
 
-    @Shadow
-    public double totalXp;
+    @Accessor(value = "totalXp", remap = false)
+    double getTotalXp();
 
-    @Unique
-    public double getTotalXp() {
-        return this.totalXp;
-    }
 }
