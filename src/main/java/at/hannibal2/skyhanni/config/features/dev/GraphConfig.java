@@ -52,13 +52,13 @@ public class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Save Key", desc = "Saves the current graph to the clipboard.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_C)
-    public int saveKey = Keyboard.KEY_C;
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_O)
+    public int saveKey = Keyboard.KEY_O;
 
     @Expose
     @ConfigOption(name = "Load Key", desc = "Loades a graph from clipboard, if valid.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_V)
-    public int loadKey = Keyboard.KEY_V;
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_I)
+    public int loadKey = Keyboard.KEY_I;
 
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
     public Position infoDisplay = new Position(20, 20);
