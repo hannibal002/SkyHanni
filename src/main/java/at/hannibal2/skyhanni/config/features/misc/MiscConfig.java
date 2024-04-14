@@ -29,6 +29,10 @@ public class MiscConfig {
     public CommandsConfig commands = new CommandsConfig();
 
     @Expose
+    @Category(name = "Party Commands", desc = "Enable or disable party commands.")
+    public PartyCommandsConfig partyCommands = new PartyCommandsConfig();
+
+    @Expose
     @Category(name = "Minions", desc = "The minions on your private island.")
     public MinionsConfig minions = new MinionsConfig();
 

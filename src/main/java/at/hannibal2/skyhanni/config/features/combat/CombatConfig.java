@@ -20,6 +20,11 @@ public class CombatConfig {
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
+    @ConfigOption(name = "Quiver", desc = "")
+    @Accordion
+    public QuiverConfig quiverConfig = new QuiverConfig();
+
+    @Expose
     @ConfigOption(name = "Summonings", desc = "")
     @Accordion
     public SummoningsConfig summonings = new SummoningsConfig();

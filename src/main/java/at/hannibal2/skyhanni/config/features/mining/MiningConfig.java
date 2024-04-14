@@ -33,10 +33,16 @@ public class MiningConfig {
     @Accordion
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
+    // TODO rename to fossilExcavator
     @Expose
     @ConfigOption(name = "Fossil Excavator", desc = "")
     @Accordion
-    public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
+    public FossilExcavatorConfig fossilExcavator2 = new FossilExcavatorConfig();
+
+    @Expose
+    @ConfigOption(name = "Notifications", desc = "")
+    @Accordion
+    public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
