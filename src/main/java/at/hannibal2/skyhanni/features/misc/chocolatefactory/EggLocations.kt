@@ -1,13 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -28,7 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object EggLocations {
 
-    private val config get() = SkyHanniMod.feature.misc.chocolateFactory
+    private val config get() = ChocolateFactoryApi.config.hoppityEggLocations
 
     private val locatorItem = "EGGLOCATOR".asInternalName()
 
@@ -40,16 +36,7 @@ object EggLocations {
     private var secondPos = LorenzVec()
     private val possibleEggLocations = mutableListOf<LorenzVec>()
 
-    private var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
     private var ticksSinceLastParticleFound = -1
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
-
-        eggLocations = data.eggLocations
-        ChocolateFactory.loadRepoData(data)
-    }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -63,10 +50,6 @@ object EggLocations {
         firstPos = LorenzVec()
         secondPos = LorenzVec()
         drawLocations = false
-    }
-
-    private fun getCurrentIslandEggLocations(): List<LorenzVec>? {
-        return eggLocations[LorenzUtils.skyBlockIsland]
     }
 
     @SubscribeEvent
@@ -86,7 +69,7 @@ object EggLocations {
             }
         }
 
-        // if no locator draw all waypoints
+        // todo if no locator draw all waypoints
     }
 
     fun eggFound() {
@@ -94,7 +77,7 @@ object EggLocations {
     }
 
     fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: CakeMealTime) {
-        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = ChocolateFactoryApi.getCurrentIslandEggLocations() ?: return
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
 
         val x = closestEgg.x.toInt()
@@ -137,7 +120,7 @@ object EggLocations {
     }
 
     private fun calculateEggPosition() {
-        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = ChocolateFactoryApi.getCurrentIslandEggLocations() ?: return
         val listSize = validParticleLocations.size
         if (listSize < 5) return
 
@@ -164,6 +147,7 @@ object EggLocations {
         ).expand(5.0).clampTo(worldBoundingBox)
 
         possibleEggLocations.clear()
+
         // todo allow more leeway for further points later
         val a = islandEggsLocations.filter {
             boundingBox.isInside(it) && it.distanceToLine(firstPos, secondPos) < 200.0
@@ -201,7 +185,7 @@ object EggLocations {
         type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.waypointsEnabled
-        && ChocolateFactory.isHoppityEvent()
+        && ChocolateFactoryApi.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
     private fun hasLocatorInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }

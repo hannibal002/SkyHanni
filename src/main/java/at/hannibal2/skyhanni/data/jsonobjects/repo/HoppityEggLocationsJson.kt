@@ -12,4 +12,5 @@ data class HoppityEggLocationsJson(
     @Expose val barnIndex: Int,
     @Expose val infoIndex: Int,
     @Expose val milestoneIndex: Int,
+    @Expose val maxRabbits: Int,
 )

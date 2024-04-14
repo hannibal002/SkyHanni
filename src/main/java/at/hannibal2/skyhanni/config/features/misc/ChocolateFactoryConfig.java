@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -11,10 +12,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ChocolateFactoryConfig {
 
     @Expose
-    @ConfigOption(name = "HoppityWaypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
+    @ConfigOption(name = "Hoppity Egg Locations", desc = "")
+    @Accordion
+    public HoppityEggLocationsConfig hoppityEggLocations = new HoppityEggLocationsConfig();
+
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all Hoppity features.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean waypointsEnabled = true;
+    public boolean enabled = true;
 
     @Expose
     @ConfigOption(name = "Show Stack Sizes", desc = "Shows addition info as many items in the chocolate menu as the stack size.")
@@ -49,12 +55,6 @@ public class ChocolateFactoryConfig {
     )
     @ConfigEditorSlider(minValue = 3, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
-
-    // todo remove probably or make false or something
-    @Expose
-    @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby.")
-    @ConfigEditorBoolean
-    public boolean showAllWaypoints = true;
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "showClaimedEggs")

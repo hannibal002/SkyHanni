@@ -317,8 +317,11 @@ import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactory
+import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryGui
 import at.hannibal2.skyhanni.features.misc.chocolatefactory.EggLocations
+import at.hannibal2.skyhanni.features.misc.chocolatefactory.HoppityEggsManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
@@ -544,6 +547,7 @@ class SkyHanniMod {
         loadModule(NEUItems)
         loadModule(PestAPI)
         loadModule(FossilExcavatorAPI)
+        loadModule(ChocolateFactoryApi)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -599,7 +603,9 @@ class SkyHanniMod {
         loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
-        loadModule(ChocolateFactory)
+        loadModule(ChocolateFactoryBarnManager)
+        loadModule(ChocolateFactoryGui)
+        loadModule(HoppityEggsManager())
         loadModule(EggLocations)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
