@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.SkyblockSeason
@@ -41,7 +42,23 @@ object ChocolateFactoryApi {
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
     private val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
-        "(?<chocolate>[\\d,]+) Chocolate"
+        "(?<amount>[\\d,]+) Chocolate"
+    )
+    private val chocolatePerSecondPattern by patternGroup.pattern(
+        "chocolate.persecond",
+        "§6(?<amount>[\\d.,]+) §8per second"
+    )
+    private val chocolateAllTime by patternGroup.pattern(
+        "chocolate.alltime",
+        "§7All-time Chocolate: §6(?<amount>[\\d,]+)"
+    )
+    private val chocolateThisPrestigePattern by patternGroup.pattern(
+        "chocolate.thisprestige",
+        "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)"
+    )
+    private val chocolateMultiplierPattern by patternGroup.pattern(
+        "chocolate.multiplier",
+        "§7Total Multiplier: §6(?<amount>[\\d.]+)x"
     )
     private val barnAmountPattern by patternGroup.pattern(
         "barn.amount",
@@ -60,15 +77,21 @@ object ChocolateFactoryApi {
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
-    var noPickblockSlots = setOf<Int>()
+    private var noPickblockSlots = setOf<Int>()
     var barnIndex = 34
-    var infoIndex = 13
+    private var infoIndex = 13
+    private var productionInfoIndex = 45
+    private var prestigeIndex = 28
     var milestoneIndex = 53
     var maxRabbits = 395
 
     var inChocolateFactory = false
 
     var currentChocolate = 0L
+    var allTimeChocolate = 0L
+    var chocolatePerSecond = 0.0
+    var chocolateThisPrestige = 0L
+    var chocolateMultiplier = 1.0
 
     val upgradeableSlots: MutableSet<Int> = mutableSetOf()
     var bestUpgrade: Int? = null
@@ -95,21 +118,20 @@ object ChocolateFactoryApi {
 
     private fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
         val profileStorage = profileStorage ?: return
-        val chocolateItem = InventoryUtils.getItemsInOpenChest().find { it.slotIndex == infoIndex }?.stack ?: return
 
-        chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
-            currentChocolate = group("chocolate").formatLong()
-        }
+        val infoItem = InventoryUtils.getItemAtSlotIndex(infoIndex) ?: return
+        val prestigeItem = InventoryUtils.getItemAtSlotIndex(prestigeIndex) ?: return
+        val productionInfoItem = InventoryUtils.getItemAtSlotIndex(productionInfoIndex) ?: return
+
+        processInfoItems(infoItem, prestigeItem, productionInfoItem)
 
         bestUpgrade = null
         upgradeableSlots.clear()
-
         var bestAffordableUpgradeRatio = Double.MAX_VALUE
         var bestPossibleUpgradeRatio = Double.MAX_VALUE
 
         for ((slotIndex, item) in inventory) {
             if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
-                // todo new file
                 println("tried to play sound")
                 SoundUtils.playBeepSound()
             }
@@ -144,6 +166,27 @@ object ChocolateFactoryApi {
         }
     }
 
+    private fun processInfoItems(chocolateItem: ItemStack, prestigeItem: ItemStack, productionItem: ItemStack) {
+        chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
+            currentChocolate = group("amount").formatLong()
+        }
+        for (line in chocolateItem.getLore()) {
+            chocolatePerSecondPattern.matchMatcher(line) {
+                chocolatePerSecond = group("amount").formatDouble()
+            }
+            chocolateAllTime.matchMatcher(line) {
+                allTimeChocolate = group("amount").formatLong()
+            }
+        }
+        prestigeItem.getLore().matchFirst(chocolateThisPrestigePattern) {
+            chocolateThisPrestige = group("amount").formatLong()
+        }
+        productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
+            chocolateMultiplier = group("amount").formatDouble()
+        }
+        println("Chocolate: $currentChocolate, Per Second: $chocolatePerSecond, All Time: $allTimeChocolate, This Prestige: $chocolateThisPrestige, Multiplier: $chocolateMultiplier")
+    }
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         clearData()
@@ -169,6 +212,9 @@ object ChocolateFactoryApi {
         noPickblockSlots = data.noPickblockSlots
         barnIndex = data.barnIndex
         infoIndex = data.infoIndex
+        // todo add back
+//         productionInfoIndex = data.productionInfoIndex
+//         prestigeIndex = data.prestigeIndex
         milestoneIndex = data.milestoneIndex
         maxRabbits = data.maxRabbits
     }
@@ -196,7 +242,7 @@ object ChocolateFactoryApi {
     private fun List<String>.getUpgradeCost(): Long? {
         val nextLine = this.nextAfter({ it == "§7Cost" }) ?: return null
         chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
-            return group("chocolate").formatLong()
+            return group("amount").formatLong()
         }
         return null
     }

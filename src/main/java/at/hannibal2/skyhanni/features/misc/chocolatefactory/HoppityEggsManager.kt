@@ -18,7 +18,6 @@ class HoppityEggsManager {
 
     val config get() = ChocolateFactoryApi.config
 
-
     private val eggFoundPattern by ChocolateFactoryApi.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg.*"
