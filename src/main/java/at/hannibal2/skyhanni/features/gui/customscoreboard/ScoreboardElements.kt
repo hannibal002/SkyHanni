@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig.ArrowAmountDisplay
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.HypixelData.Companion.getMaxPlayersForCurrentServer
@@ -663,47 +665,52 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes: List<Triple<String, String, String>> = listOf(
+    val powderTypes = listOf(
         Triple(
-            "Mithril", "§2", getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.mithrilPowderPattern,
-                "mithrilpowder"
-            ).formatNum()
+            "Mithril",
+            "§2",
+            Pair(HotmAPI.Powder.MITHRIL.getCurrent().formatNum(), HotmAPI.Powder.MITHRIL.getTotal().formatNum())
         ),
         Triple(
-            "Gemstone", "§d", getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.gemstonePowderPattern,
-                "gemstonepowder"
-            ).formatNum()
+            "Gemstone",
+            "§d",
+            Pair(HotmAPI.Powder.GEMSTONE.getCurrent().formatNum(), HotmAPI.Powder.GEMSTONE.getTotal().formatNum())
         ),
         Triple(
-            "Glacite", "§b", getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.glacitePowderPattern,
-                "glacitepowder"
-            ).formatNum()
+            "Glacite",
+            "§b",
+            Pair(HotmAPI.Powder.GLACITE.getCurrent().formatNum(), HotmAPI.Powder.GLACITE.getTotal().formatNum())
         )
     )
 
-    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third == "0" }) {
-        add("<hidden>" to HorizontalAlignment.LEFT)
-    } else {
-        add("§9§lPowder" to HorizontalAlignment.LEFT)
+    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third.first == "0" && it.third.second == "0" }) {
+        return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    }
 
-        if (displayConfig.displayNumbersFirst) {
-            for ((type, color, value) in powderTypes) {
-                if (value != "0") {
-                    add(" §7- $color$value $type" to HorizontalAlignment.LEFT)
+    add("§9§lPowder" to HorizontalAlignment.LEFT)
+
+    val displayNumbersFirst = displayConfig.displayNumbersFirst
+
+    for ((type, color, value) in powderTypes) {
+        val (current, total) = value
+
+        when (displayConfig.powderDisplay) {
+            PowderDisplay.AVAILABLE -> {
+                if (current != "0") {
+                    add(" §7- ${if (displayNumbersFirst) "$color$current $type" else "§f$type: $color$current"}" to HorizontalAlignment.LEFT)
                 }
             }
-        } else {
-            for ((type, color, value) in powderTypes) {
-                if (value != "0") {
-                    add(" §7- §f$type: $color$value" to HorizontalAlignment.LEFT)
+            PowderDisplay.TOTAL -> {
+                if (total != "0") {
+                    add(" §7- ${if (displayNumbersFirst) "$color$total $type" else "§f$type: $color$total"}" to HorizontalAlignment.LEFT)
                 }
             }
+            PowderDisplay.BOTH -> {
+                if (current != "0" && total != "0") {
+                    add(" §7- ${if (displayNumbersFirst) "$color$current/$total $type" else "§f$type: $color$current/$total"}" to HorizontalAlignment.LEFT)
+                }
+            }
+            null -> {}
         }
     }
 }
