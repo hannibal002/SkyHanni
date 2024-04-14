@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData
+import at.hannibal2.skyhanni.mixins.transformers.IMixinXPInformation
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 
@@ -24,6 +25,16 @@ object CombatUtils {
     var killGainHour = -1
     private var gainTimer = 0
     var _isKilling = false
+
+    private fun getSkillInfo(xpInformation: XPInformation.SkillInfo?): Float {
+        return try {
+            val a = xpInformation as? IMixinXPInformation
+            a!!.getTotalXp(null).toFloat()
+        } catch (e: Exception) {
+            val xpInfo = xpInformation ?: return -1f
+            xpInfo.totalXp
+        }
+    }
 
     /**
      * Taken from NotEnoughUpdates
