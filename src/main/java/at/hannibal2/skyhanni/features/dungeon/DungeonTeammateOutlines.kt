@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.FontRenderer
@@ -22,7 +21,7 @@ class DungeonTeammateOutlines {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.inDungeons && config.highlightTeammates
+    private fun isEnabled() = DungeonAPI.inDungeon() && config.highlightTeammates
 
     private fun getEntityOutlineColor(entity: Entity): Int? {
         if (entity !is EntityOtherPlayerMP || entity.team == null) return null

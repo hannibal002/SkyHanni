@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.devConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.displayConfig
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -372,10 +372,10 @@ private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBitsDisplayPair(): List<ScoreboardElementType> {
     val bits = BitsAPI.bits.coerceAtLeast(0).formatNum()
-    val bitsToClaim = if (BitsAPI.bitsToClaim == -1) {
+    val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {
         "§cOpen Sbmenu§b"
     } else {
-        BitsAPI.bitsToClaim.coerceAtLeast(0).formatNum()
+        BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
     }
 
     return listOf(
@@ -483,7 +483,7 @@ private fun getIslandDisplayPair() =
     listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
 private fun getLocationDisplayPair() = buildList {
-    add(HypixelData.skyBlockAreaWithSymbol to HorizontalAlignment.LEFT)
+    HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }
 
     ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
@@ -524,14 +524,10 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
-    val lobbyCode = HypixelData.serverId ?: "<hidden>"
-    return listOf(
-        if (lobbyCode == "<hidden>") {
-            "<hidden>"
-        } else {
-            "§8$lobbyCode"
-        } to HorizontalAlignment.LEFT
-    )
+    val lobbyCode = HypixelData.serverId
+    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
+    val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: "<hidden>"
+    return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
 }
 
 private fun getPowerDisplayPair() = listOf(
@@ -754,7 +750,7 @@ private fun getPartyDisplayPair() =
         listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
     }
 
-private fun getPartyShowWhen() = if (inDungeons) {
+private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     false // Hidden bc the scoreboard lines already exist
 } else {
     if (partyConfig.showPartyEverywhere) {

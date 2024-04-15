@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
@@ -22,7 +23,11 @@ object DelayedRun {
         tasks.removeIf { (runnable, time) ->
             val inPast = time.isInPast()
             if (inPast) {
-                runnable()
+                try {
+                    runnable()
+                } catch (e: Exception) {
+                    ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing")
+                }
             }
             inPast
         }

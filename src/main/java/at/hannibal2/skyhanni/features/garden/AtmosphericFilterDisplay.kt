@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.Season
+import at.hannibal2.skyhanni.utils.SkyblockSeason
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AtmosphericFilterDisplay {
@@ -15,24 +16,23 @@ class AtmosphericFilterDisplay {
     private var display = ""
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!GardenAPI.inGarden() && !config.everywhere) return
-        if (!event.repeatSeconds(1)) return
-        display = drawDisplay(Season.getCurrentSeason() ?: return)
+        if (!GardenAPI.inGarden() && !config.outsideGarden) return
+        display = drawDisplay(SkyblockSeason.getCurrentSeason() ?: return)
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!GardenAPI.inGarden() && config.everywhere) {
-            config.positionOutside.renderString(display, posLabel = "Atmospheric Filter Perk Display")
-        } else if (GardenAPI.inGarden()) {
+        if (GardenAPI.inGarden()) {
             config.position.renderString(display, posLabel = "Atmospheric Filter Perk Display")
+        } else {
+            config.positionOutside.renderString(display, posLabel = "Atmospheric Filter Perk Display")
         }
     }
 
-    private fun drawDisplay(season: Season): String = buildString {
+    private fun drawDisplay(season: SkyblockSeason): String = buildString {
         if (!config.onlyBuff) {
             append(season.getSeason(config.abbreviateSeason))
             append("§7: ")
@@ -40,5 +40,8 @@ class AtmosphericFilterDisplay {
         append(season.getPerk(config.abbreviatePerk))
     }
 
-    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = LorenzUtils.onHypixel && config.enabled && (
+        (OutsideSbFeature.ATMOSPHERIC_FILTER.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.outsideGarden))
+        )
 }

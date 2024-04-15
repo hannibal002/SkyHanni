@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class QuickModMenuSwitchConfig {
@@ -25,5 +26,6 @@ public class QuickModMenuSwitchConfig {
     public boolean insidePlayerInventory = false;
 
     @Expose
+    @ConfigLink(owner = QuickModMenuSwitchConfig.class, field = "enabled")
     public Position pos = new Position(-178, 143, false, true);
 }
