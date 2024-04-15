@@ -55,12 +55,15 @@ public class DevConfig {
     @Expose
     public WaypointsConfig waypoint = new WaypointsConfig();
 
+    // Does not have a config element!
     @Expose
     public Position debugPos = new Position(10, 10, false, true);
 
+    // Does not have a config element!
     @Expose
     public Position debugLocationPos = new Position(1, 160, false, true);
 
+    // Does not have a config element!
     @Expose
     public Position debugItemPos = new Position(90, 70);
 

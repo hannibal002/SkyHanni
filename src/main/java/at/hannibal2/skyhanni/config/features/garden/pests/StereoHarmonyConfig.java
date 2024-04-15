@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
@@ -49,5 +50,6 @@ public class StereoHarmonyConfig {
     public boolean hideWhenNone = false;
 
     @Expose
+    @ConfigLink(owner = StereoHarmonyConfig.class, field = "displayEnabled")
     public Position position = new Position(205, 55, 1f);
 }

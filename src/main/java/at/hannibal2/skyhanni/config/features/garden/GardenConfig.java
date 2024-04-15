@@ -217,6 +217,7 @@ public class GardenConfig {
     @FeatureToggle
     public boolean jacobContestSummary = true;
 
+    // Does not have a config element!
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 
