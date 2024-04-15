@@ -24,9 +24,9 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
-    @ConfigOption(name = "Deep Caverns Parkour", desc = "")
+    @ConfigOption(name = "Deep Caverns Guide", desc = "")
     @Accordion
-    public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
+    public DeepCavernsGuideConfig deepCavernsGuide = new DeepCavernsGuideConfig();
 
     @Expose
     @ConfigOption(name = "Area Walls", desc = "")
@@ -36,7 +36,7 @@ public class MiningConfig {
     // TODO rename to fossilExcavator
     @Expose
     @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features")
-    public FossilExcavatorConfig fossilExcavator2 = new FossilExcavatorConfig();
+    public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
 
     @Expose
     @ConfigOption(name = "Corpse LOS", desc = "")

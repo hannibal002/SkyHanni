@@ -214,7 +214,7 @@ class HideNotClickableItems {
         showGreenLine = true
 
         val internalName = stack.getInternalNameOrNull() ?: return true
-        if (internalName == "SUSPICIOUS_SCRAP".asInternalName()) {
+        if (internalName == FossilExcavatorAPI.scrapItem) {
             return false
         }
 
