@@ -27,5 +27,17 @@ public class ColdOverlayConfig {
         maxValue = 100,
         minStep = 1
     )
-    public int coldThreshold = 50;
+    public int coldThreshold = 25;
+
+    @Expose
+    @ConfigOption(
+        name = "Max Alpha",
+        desc = "The maximum alpha value the overlay will reach."
+    )
+    @ConfigEditorSlider(
+        minValue = 0f,
+        maxValue = 100f,
+        minStep = 0.1f
+    )
+    public float maxAlpha = 100f;
 }

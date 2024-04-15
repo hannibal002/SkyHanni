@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MiningAPI.getCold
-import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
+import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
+import at.hannibal2.skyhanni.data.MiningAPI.lastColdReset
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -46,15 +46,10 @@ class MiningNotifications {
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!"
     )
-    private val coldReset by patternGroup.pattern(
-        "cold.reset",
-        "§cThe warmth of the campfire reduced your §r§b❄ Cold §r§cto 0!"
-    )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
 
     private var hasSentCold = false
-    private var coldResetTimer = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -66,19 +61,15 @@ class MiningNotifications {
             scrapDrop.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
             goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
-            coldReset.matches(message) -> {
-                hasSentCold = false
-                coldResetTimer = SimpleTimeMark.now().plus(1.seconds)
-            }
         }
     }
 
     @SubscribeEvent
     fun onColdUpdate(event: ColdUpdateEvent) {
-        if (!inGlaciteArea()) return
+        if (!inColdIsland()) return
         if (!config.enabled) return
+        if (lastColdReset.passedSince() < 1.seconds) return
 
-        if (coldResetTimer.isInFuture()) return
         if (event.cold >= config.coldThreshold.get() && !hasSentCold) {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
