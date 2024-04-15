@@ -14,18 +14,18 @@ public class ReforgeHelperConfig {
     public Position posCurrent = new Position(280, 45, true, true);
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enables the reforge helper")
+    @ConfigOption(name = "Enable", desc = "Enables the reforge helper.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enable = true;
 
     @Expose
-    @ConfigOption(name = "Reforge Stones Hex Only", desc = "Displays reforge stones only when in Hex")
+    @ConfigOption(name = "Reforge Stones Hex Only", desc = "Displays reforge stones only when in Hex.")
     @ConfigEditorBoolean
     public boolean reforgeStonesOnlyHex = true;
 
     @Expose
-    @ConfigOption(name = "Hide chat", desc = "Hides the vanilla chat messages from reforging")
+    @ConfigOption(name = "Hide chat", desc = "Hides the vanilla chat messages from reforging.")
     @ConfigEditorBoolean
     public boolean hideChat = false;
 }
