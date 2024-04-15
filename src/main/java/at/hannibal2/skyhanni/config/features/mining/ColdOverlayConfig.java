@@ -27,7 +27,7 @@ public class ColdOverlayConfig {
         maxValue = 100,
         minStep = 1
     )
-    public int coldThreshold = 0;
+    public int coldThreshold = 25;
 
     @Expose
     @ConfigOption(
