@@ -14,9 +14,13 @@ object ChocolateFactoryBarnManager {
     private val config get() = ChocolateFactoryApi.config
     private val profileStorage get() = ChocolateFactoryApi.profileStorage
 
-    private val rabbitFoundPattern by ChocolateFactoryApi.patternGroup.pattern(
-        "rabbit.found",
+    private val newRabbitPattern by ChocolateFactoryApi.patternGroup.pattern(
+        "rabbit.new",
         "§d§lNEW RABBIT! §6\\+\\d Chocolate §7and §6\\+0.\\d+x Chocolate §7per second!"
+    )
+    private val rabbitDuplicatePattern by ChocolateFactoryApi.patternGroup.pattern(
+        "rabbit.duplicate",
+        "§7§lDUPLICATE RABBIT! §6\\+[\\d,]+ Chocolate"
     )
 
     var barnFull = false
@@ -26,7 +30,7 @@ object ChocolateFactoryBarnManager {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        rabbitFoundPattern.matchMatcher(event.message) {
+        newRabbitPattern.matchMatcher(event.message) {
             val profileStorage = profileStorage ?: return
             profileStorage.currentRabbits += 1
             trySendBarnFullMessage()

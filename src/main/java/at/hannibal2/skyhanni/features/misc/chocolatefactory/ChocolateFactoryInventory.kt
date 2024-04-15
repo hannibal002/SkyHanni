@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
@@ -101,5 +102,16 @@ object ChocolateFactoryInventory {
                 event.stackTip = "§c!!!"
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
+        val slot = event.slot ?: return
+        if (!config.useMiddleClick) return
+        if (slot.slotNumber in ChocolateFactoryApi.noPickblockSlots) return
+
+        event.makePickblock()
     }
 }

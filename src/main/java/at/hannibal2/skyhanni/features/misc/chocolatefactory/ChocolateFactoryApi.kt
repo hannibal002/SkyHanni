@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFact
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -64,10 +63,6 @@ object ChocolateFactoryApi {
         "barn.amount",
         "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits"
     )
-    private val rabbitDuplicatePattern by patternGroup.pattern(
-        "rabbit.duplicate",
-        "§7§lDUPLICATE RABBIT! §6\\+[\\d,]+ Chocolate"
-    )
     private val clickMeRabbitPattern by patternGroup.pattern(
         "rabbit.clickme",
         "§e§lCLICK ME!"
@@ -77,7 +72,7 @@ object ChocolateFactoryApi {
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
-    private var noPickblockSlots = setOf<Int>()
+    var noPickblockSlots = setOf<Int>()
     var barnIndex = 34
     private var infoIndex = 13
     private var productionInfoIndex = 45
@@ -220,17 +215,6 @@ object ChocolateFactoryApi {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         CakeMealTime.checkClaimed()
-    }
-
-    @SubscribeEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!inChocolateFactory) return
-        val slot = event.slot ?: return
-        if (!config.useMiddleClick) return
-        if (slot.slotNumber in noPickblockSlots) return
-
-        event.makePickblock()
     }
 
     fun getCurrentIslandEggLocations(): List<LorenzVec>? {
