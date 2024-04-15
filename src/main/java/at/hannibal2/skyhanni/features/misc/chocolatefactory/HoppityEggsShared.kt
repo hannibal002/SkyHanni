@@ -24,7 +24,6 @@ object HoppityEggsShared {
         if (!isEnabled()) return
 
         sharedEggPattern.matchMatcher(event.message.removeColor()) {
-            println()
             val x = group("x").formatInt()
             val y = group("y").formatInt()
             val z = group("z").formatInt()
