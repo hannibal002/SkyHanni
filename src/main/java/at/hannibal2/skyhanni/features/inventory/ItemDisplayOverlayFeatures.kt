@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.GLACITE_POWDER
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -79,10 +78,6 @@ object ItemDisplayOverlayFeatures {
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
-    )
-    private val glacitePowderPattern by patternGroup.pattern(
-        "glacitepowder",
-        "Glacite Powder x(?<amount>.*)"
     )
 
     @SubscribeEvent
@@ -188,13 +183,6 @@ object ItemDisplayOverlayFeatures {
                     val text = name.split(" ").last()
                     return "" + text.romanToDecimalIfNecessary()
                 }
-            }
-        }
-
-        if (GLACITE_POWDER.isSelected() && InventoryUtils.openInventoryName() == "Fossil Excavator") {
-            glacitePowderPattern.matchMatcher(itemName) {
-                val powder = group("amount").formatLong()
-                return "§b${NumberUtil.format(powder)}"
             }
         }
 

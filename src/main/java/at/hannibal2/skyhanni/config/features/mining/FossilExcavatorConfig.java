@@ -27,4 +27,13 @@ public class FossilExcavatorConfig {
     @FeatureToggle
     public boolean profitPerExcavation = false;
 
+    @Expose
+    @ConfigOption(
+        name = "Glacial Powder Stack",
+        desc = "Added Glacial Powder as stack size in the Fossil Excavator."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean glacialPowerStack = false;
+
 }
