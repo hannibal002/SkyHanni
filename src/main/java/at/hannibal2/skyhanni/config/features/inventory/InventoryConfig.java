@@ -119,7 +119,8 @@ public class InventoryConfig {
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
         EDITION_NUMBER("§bEdition Number", 16),
-        BINGO_GOAL_RANK("§bBingo Goal Rank"),
+        BINGO_GOAL_RANK("§bBingo Goal Rank", 17),
+        GLACITE_POWDER("§bGlacite Powder"),
         ;
 
         private final String str;
