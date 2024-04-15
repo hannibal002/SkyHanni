@@ -149,7 +149,7 @@ object SackAPI {
                         when (rarity) {
                             "Rough" -> {
                                 gem.rough = stored
-                                gem.stored += stored
+                                gem.stored += (stored * 1)
                                 gem.roughPrice = internalName.sackPrice(stored)
                                 gem.price += gem.roughPrice
                                 if (savingSacks) setSackItem(internalName, stored)
@@ -157,7 +157,7 @@ object SackAPI {
 
                             "Flawed" -> {
                                 gem.flawed = stored
-                                gem.stored += stored
+                                gem.stored += (stored * 80)
                                 gem.flawedPrice = internalName.sackPrice(stored)
                                 gem.price += gem.flawedPrice
                                 if (savingSacks) setSackItem(internalName, stored)
@@ -165,7 +165,7 @@ object SackAPI {
 
                             "Fine" -> {
                                 gem.fine = stored
-                                gem.stored += stored
+                                gem.stored += (stored * 80 * 80)
                                 gem.finePrice = internalName.sackPrice(stored)
                                 gem.price += gem.finePrice
                                 if (savingSacks) setSackItem(internalName, stored)
