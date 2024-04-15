@@ -210,7 +210,7 @@ object ChocolateFactoryApi {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        EggMealType.checkClaimed()
+        HoppityEggType.checkClaimed()
     }
 
     private fun List<String>.getUpgradeCost(): Long? {

@@ -30,7 +30,7 @@ object HoppityEggsShared {
             val z = group("z").formatInt()
             val eggLocation = LorenzVec(x, y, z)
 
-            val meal = EggMealType.getMealByName(group("meal")) ?: run {
+            val meal = HoppityEggType.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message
@@ -45,7 +45,7 @@ object HoppityEggsShared {
         }
     }
 
-    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: EggMealType) {
+    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: HoppityEggType) {
         if (!isEnabled()) return
         val islandEggsLocations = HoppityEggsLocations.getCurrentIslandEggLocations() ?: return
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return

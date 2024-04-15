@@ -36,7 +36,7 @@ object HoppityEggsManager {
         "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!"
     )
 
-    private var lastMeal: EggMealType? = null
+    private var lastMeal: HoppityEggType? = null
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -50,7 +50,7 @@ object HoppityEggsManager {
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggsLocations.eggFound()
 
-            val meal = EggMealType.getMealByName(group("meal")) ?: run {
+            val meal = HoppityEggType.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message
@@ -61,12 +61,12 @@ object HoppityEggsManager {
         }
 
         noEggsLeftPattern.matchMatcher(event.message) {
-            EggMealType.allFound()
+            HoppityEggType.allFound()
             return
         }
 
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
-            val meal = EggMealType.getMealByName(group("meal")) ?: run {
+            val meal = HoppityEggType.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message
@@ -100,7 +100,7 @@ object HoppityEggsManager {
         val displayList = mutableListOf<String>()
         displayList.add("§bUnfound Eggs:")
 
-        for (meal in EggMealType.entries) {
+        for (meal in HoppityEggType.entries) {
             if (!meal.isClaimed()) {
                 displayList.add("§7 - ${meal.formattedName()}")
             }

@@ -39,7 +39,7 @@ object HoppityEggsLocations {
     private var ticksSinceLastParticleFound = -1
 
     var sharedEggLocation: LorenzVec? = null
-    var currentEggType: EggMealType? = null
+    var currentEggType: HoppityEggType? = null
 
     var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
 
@@ -91,7 +91,7 @@ object HoppityEggsLocations {
 
         if (!config.showAllWaypoints) return
         if (hasLocatorInInventory()) return
-        if (!EggMealType.eggsRemaining()) return
+        if (!HoppityEggType.eggsRemaining()) return
 
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
         for (eggLocation in islandEggsLocations) {

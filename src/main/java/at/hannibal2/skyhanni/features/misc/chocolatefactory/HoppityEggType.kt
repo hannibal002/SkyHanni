@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 
-enum class EggMealType(
+enum class HoppityEggType(
     val mealName: String,
     val resetsAt: Int,
     private val mealColour: String,
