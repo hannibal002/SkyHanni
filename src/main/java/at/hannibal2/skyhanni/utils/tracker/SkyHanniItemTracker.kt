@@ -31,8 +31,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
 
-    private var lastClickDelay = 0L
-
     fun addCoins(coins: Int) {
         addItem(SKYBLOCK_COIN, coins)
     }
@@ -131,19 +129,16 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
             val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore,
                 onClick = {
-                    if (System.currentTimeMillis() > lastClickDelay + 150) {
-                        if (KeyboardManager.isModifierKeyDown()) {
-                            data.items.remove(internalName)
-                            ChatUtils.chat("Removed $cleanName §efrom $name.")
-                            lastClickDelay = System.currentTimeMillis() + 500
-                        } else {
-                            modify {
-                                it.items[internalName]?.hidden = !hidden
-                            }
-                            lastClickDelay = System.currentTimeMillis()
+                    if (KeyboardManager.isModifierKeyDown()) {
+                        data.items.remove(internalName)
+                        ChatUtils.chat("Removed $cleanName §efrom $name.")
+                    } else {
+                        modify {
+                            it.items[internalName]?.hidden = !hidden
                         }
-                        update()
                     }
+                    update()
+
                 }
             ) else Renderable.string(displayName)
 

@@ -767,6 +767,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Track Fossil Dust and use it for profit calculation.
 + Mining Notifications. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1429)
     + Mining events, including Mineshaft spawning, Suspicious Scrap drops, and Cold going above a threshold.
++ Profit Per Excavation. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1439)
+    + Show profit/loss in chat after each excavation.
+    + Also include breakdown information on hover.
 
 </details>
 <details open><summary>
@@ -1063,6 +1066,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + party chat commands. - !nea (https://github.com/hannibal002/SkyHanni/pull/1433)
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
++ Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
 
 </details>
 <details open><summary>
