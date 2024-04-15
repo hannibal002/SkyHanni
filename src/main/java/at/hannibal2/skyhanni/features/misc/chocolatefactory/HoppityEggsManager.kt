@@ -23,10 +23,6 @@ object HoppityEggsManager {
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg.*"
     )
-    private val sharedEggPattern by ChocolateFactoryApi.patternGroup.pattern(
-        "egg.shared",
-        ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)"
-    )
     private val noEggsLeftPattern by ChocolateFactoryApi.patternGroup.pattern(
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!"
@@ -40,7 +36,7 @@ object HoppityEggsManager {
         "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!"
     )
 
-    private var lastMeal: EggMealTime? = null
+    private var lastMeal: EggMealType? = null
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -54,7 +50,7 @@ object HoppityEggsManager {
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggsLocations.eggFound()
 
-            val meal = EggMealTime.getMealByName(group("meal")) ?: run {
+            val meal = EggMealType.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message
@@ -64,29 +60,13 @@ object HoppityEggsManager {
             lastMeal = meal
         }
 
-
-        // todo later
-//         sharedEggPattern.matchMatcher(event.message.removeColor()) {
-//             val x = group("x").formatInt()
-//             val y = group("y").formatInt()
-//             val z = group("z").formatInt()
-//             val eggLocation = LorenzVec(x, y, z)
-//             val meal = CakeMealTime.getMealByName(group("meal")) ?: run {
-//                 ErrorManager.skyHanniError(
-//                     "Unknown meal: ${group("meal")}",
-//                     "message" to event.message
-//                 )
-//             }
-//             return
-//         }
-
         noEggsLeftPattern.matchMatcher(event.message) {
-            EggMealTime.allFound()
+            EggMealType.allFound()
             return
         }
 
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
-            val meal = EggMealTime.getMealByName(group("meal")) ?: run {
+            val meal = EggMealType.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message
@@ -99,11 +79,12 @@ object HoppityEggsManager {
     fun shareWaypointPrompt() {
         val currentLocation = LocationUtils.playerLocation()
         val meal = lastMeal ?: return
+        lastMeal = null
 
         DelayedRun.runDelayed(1.seconds) {
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
-                onClick = { HoppityEggsLocations.shareNearbyEggLocation(currentLocation, meal) },
+                onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal) },
                 SimpleTimeMark.now() + 30.seconds
             )
         }
@@ -119,8 +100,8 @@ object HoppityEggsManager {
         val displayList = mutableListOf<String>()
         displayList.add("§bUnfound Eggs:")
 
-        for (meal in EggMealTime.entries) {
-            if (!meal.claimed) {
+        for (meal in EggMealType.entries) {
+            if (!meal.isClaimed()) {
                 displayList.add("§7 - ${meal.formattedName()}")
             }
         }

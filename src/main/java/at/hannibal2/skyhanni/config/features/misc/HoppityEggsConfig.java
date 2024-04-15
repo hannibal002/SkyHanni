@@ -13,7 +13,12 @@ public class HoppityEggsConfig {
     @ConfigOption(name = "Hoppity Waypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean waypointsEnabled = true;
+    public boolean waypoints = true;
+
+    @Expose
+    @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby.")
+    @ConfigEditorBoolean
+    public boolean showAllWaypoints = false;
 
     @Expose
     @ConfigOption(name = "Show Claimed Eggs", desc = "Displays which eggs have been found in the last SkyBlock day.")
@@ -22,9 +27,10 @@ public class HoppityEggsConfig {
     public boolean showClaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby.")
+    @ConfigOption(name = "Shared Hoppity Waypoints", desc = "Enable being able to share and receive egg waypoints in your lobby.")
     @ConfigEditorBoolean
-    public boolean showAllWaypoints = false;
+    @FeatureToggle
+    public boolean sharedWaypoints = true;
 
     @Expose
     @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")

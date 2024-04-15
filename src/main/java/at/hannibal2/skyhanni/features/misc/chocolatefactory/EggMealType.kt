@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 
-enum class EggMealTime(
+enum class EggMealType(
     val mealName: String,
     val resetsAt: Int,
     private val mealColour: String,
     var lastResetDay: Int = -1,
-    var claimed: Boolean = false
+    private var claimed: Boolean = false
 ) {
     BREAKFAST("Breakfast", 7, "§a"),
     LUNCH("Lunch", 14, "§9"),
@@ -18,6 +18,7 @@ enum class EggMealTime(
         claimed = true
     }
 
+    fun isClaimed() = claimed
     fun formattedName() = "$mealColour$mealName"
 
     companion object {
@@ -34,6 +35,10 @@ enum class EggMealTime(
                 if (currentSbHour >= it.resetsAt && it.lastResetDay != currentSbDay) {
                     it.claimed = false
                     it.lastResetDay = currentSbDay
+                    if (HoppityEggsLocations.currentEggType == it) {
+                        HoppityEggsLocations.currentEggType = null
+                        HoppityEggsLocations.sharedEggLocation = null
+                    }
                 }
             }
         }

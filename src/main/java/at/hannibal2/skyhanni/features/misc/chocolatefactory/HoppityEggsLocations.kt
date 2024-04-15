@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.clampTo
@@ -38,6 +38,11 @@ object HoppityEggsLocations {
 
     private var ticksSinceLastParticleFound = -1
 
+    var sharedEggLocation: LorenzVec? = null
+    var currentEggType: EggMealType? = null
+
+    var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         resetData()
@@ -50,6 +55,8 @@ object HoppityEggsLocations {
         firstPos = LorenzVec()
         secondPos = LorenzVec()
         drawLocations = false
+        sharedEggLocation = null
+        currentEggType = null
     }
 
     @SubscribeEvent
@@ -70,11 +77,23 @@ object HoppityEggsLocations {
             }
             return
         }
+
+        val sharedEggLocation = sharedEggLocation
+        if (sharedEggLocation != null) {
+            event.drawWaypointFilled(
+                sharedEggLocation,
+                LorenzColor.GREEN.toColor(),
+                seeThroughBlocks = true,
+            )
+            event.drawDynamicText(sharedEggLocation.add(y = 1), "§aShared Egg", 1.5)
+            return
+        }
+
         if (!config.showAllWaypoints) return
         if (hasLocatorInInventory()) return
-        if (!EggMealTime.eggsRemaining()) return
+        if (!EggMealType.eggsRemaining()) return
 
-        val islandEggsLocations = ChocolateFactoryApi.getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
         for (eggLocation in islandEggsLocations) {
             event.drawWaypointFilled(
                 eggLocation,
@@ -87,18 +106,6 @@ object HoppityEggsLocations {
 
     fun eggFound() {
         resetData()
-    }
-
-    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: EggMealTime) {
-        val islandEggsLocations = ChocolateFactoryApi.getCurrentIslandEggLocations() ?: return
-        val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
-
-        val x = closestEgg.x.toInt()
-        val y = closestEgg.y.toInt()
-        val z = closestEgg.z.toInt()
-
-        val message = "[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z"
-        ChatUtils.sendCommandToServer("ac $message")
     }
 
     @SubscribeEvent
@@ -133,7 +140,7 @@ object HoppityEggsLocations {
     }
 
     private fun calculateEggPosition() {
-        val islandEggsLocations = ChocolateFactoryApi.getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
         val listSize = validParticleLocations.size
         if (listSize < 5) return
 
@@ -192,13 +199,21 @@ object HoppityEggsLocations {
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ).expand(10.0)
     }
 
+    fun getCurrentIslandEggLocations(): List<LorenzVec>? {
+        return eggLocations[LorenzUtils.skyBlockIsland]
+    }
+
+    fun isValidEggLocation(location: LorenzVec): Boolean {
+        return getCurrentIslandEggLocations()?.any { it.distance(location) < 5.0 } ?: false
+    }
+
     private fun ReceiveParticleEvent.isVillagerParticle() =
         type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
 
     private fun ReceiveParticleEvent.isEnchantmentParticle() =
         type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.waypointsEnabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints
         && ChocolateFactoryApi.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem

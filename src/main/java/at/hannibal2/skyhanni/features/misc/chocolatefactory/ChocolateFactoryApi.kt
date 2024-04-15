@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.chocolatefactory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -18,7 +17,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -67,8 +65,6 @@ object ChocolateFactoryApi {
         "rabbit.clickme",
         "§e§lCLICK ME!"
     )
-
-    private var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
@@ -199,7 +195,7 @@ object ChocolateFactoryApi {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
-        eggLocations = data.eggLocations
+        HoppityEggsLocations.eggLocations = data.eggLocations
 
         rabbitSlots = data.rabbitSlots
         otherUpgradeSlots = data.otherUpgradeSlots
@@ -214,11 +210,7 @@ object ChocolateFactoryApi {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        EggMealTime.checkClaimed()
-    }
-
-    fun getCurrentIslandEggLocations(): List<LorenzVec>? {
-        return eggLocations[LorenzUtils.skyBlockIsland]
+        EggMealType.checkClaimed()
     }
 
     private fun List<String>.getUpgradeCost(): Long? {
