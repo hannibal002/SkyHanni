@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GlacialPowerFeatures {
+class GlacialPowderFeatures {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
