@@ -2,10 +2,21 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object HotmAPI {
+
+    private val repoGroup = RepoPattern.group("data.hotmapi")
+
+    private val hotmGuiPattern by repoGroup.pattern(
+        "gui.name",
+        "Heart of the Mountain"
+    )
+
+    fun inHotmGui() = hotmGuiPattern.matches(InventoryUtils.openInventoryName())
 
     fun copyCurrentTree() = HotmData.storage?.deepCopy()
 
@@ -20,11 +31,11 @@ object HotmAPI {
 
         val lowName = name.lowercase().firstLetterUppercase()
 
-        val heartPattern by RepoPattern.pattern(
+        val heartPattern by repoGroup.pattern(
             "inventory.${name.lowercase()}.heart",
             "§7$lowName Powder: §a§.(?<powder>[\\d,]+)"
         )
-        val resetPattern by RepoPattern.pattern(
+        val resetPattern by repoGroup.pattern(
             "inventory.${name.lowercase()}.reset",
             "\\s+§8- §.(?<powder>[\\d,]+) $lowName Powder"
         )
