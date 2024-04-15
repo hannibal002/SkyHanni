@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -24,9 +25,9 @@ import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DeepCavernsParkour {
+class DeepCavernsGuide {
 
-    private val config get() = SkyHanniMod.feature.mining.deepCavernsParkour
+    private val config get() = SkyHanniMod.feature.mining.deepCavernsGuide
 
     private var parkourHelper: ParkourHelper? = null
     private var show = false
@@ -36,12 +37,12 @@ class DeepCavernsParkour {
         val neuItem = "MAP".asInternalName().getItemStack()
         Utils.createItemStack(
             neuItem.item,
-            "§bDeep Caverns Parkour",
+            "§bDeep Caverns Guide",
             "§8(From SkyHanni)",
             "",
             "§7Manually enable the ",
-            "§7Parkour to the bottom",
-            "§7of Deep Caverns."
+            "§7guide to the bottom",
+            "§7of the Deep Caverns."
         )
     }
 
@@ -94,7 +95,7 @@ class DeepCavernsParkour {
             if (it.displayName != "§aObsidian Sanctuary") {
                 if (!show) {
                     start()
-                    ChatUtils.chat("Automatically enabling Deep Caverns Parkour, helping you find the way to the bottom of Deep Caverns and the path to Rhys.")
+                    ChatUtils.chat("Automatically enabling Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys.")
                 }
             }
         }
@@ -120,16 +121,16 @@ class DeepCavernsParkour {
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (show) return
-        if (event.inventory is ContainerLocalMenu && showStartIcon && event.slotNumber == 40) {
+        if (event.inventory is ContainerLocalMenu && showStartIcon && event.slotNumber == 49) {
             event.replaceWith(startIcon)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (showStartIcon && event.slotId == 40) {
+        if (showStartIcon && event.slotId == 49) {
             event.isCanceled = true
-            ChatUtils.chat("Manually enabled Deep Caverns Parkour.")
+            ChatUtils.chat("Manually enabled Deep Caverns Guide.")
             start()
         }
     }
@@ -143,4 +144,9 @@ class DeepCavernsParkour {
     }
 
     fun isEnabled() = IslandType.DEEP_CAVERNS.isInIsland() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(38, "mining.deepCavernsParkour", "mining.deepCavernsGuide")
+    }
 }

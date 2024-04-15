@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -293,9 +294,9 @@ object ItemUtils {
 
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
         // This workaround fixes 'Tubto Cacti I Book'
-        val input = if (originalInput.endsWith(" Book")) {
+        val input = (if (originalInput.endsWith(" Book")) {
             originalInput.replace(" Book", "")
-        } else originalInput
+        } else originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
@@ -313,9 +314,6 @@ object ItemUtils {
         string = string.substring(2)
         val matcher = UtilsPatterns.readAmountAfterPattern.matcher(string)
         if (!matcher.matches()) {
-            println("")
-            println("input: '$input'")
-            println("string: '$string'")
             return null
         }
 
@@ -382,6 +380,9 @@ object ItemUtils {
         // show enchanted book name
         if (name.endsWith("Enchanted Book")) {
             return itemStack.getLore()[0]
+        }
+        if (name.endsWith("Enchanted Book Bundle")) {
+            return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
         }
 
         // hide pet level
