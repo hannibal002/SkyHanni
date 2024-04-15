@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -14,7 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class HoppityEggsManager {
+object HoppityEggsManager {
 
     private val config get() = ChocolateFactoryApi.config.hoppityEggs
 
@@ -39,30 +40,31 @@ class HoppityEggsManager {
         "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!"
     )
 
+    private var lastMeal: EggMealTime? = null
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        lastMeal = null
+    }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         eggFoundPattern.matchMatcher(event.message) {
-            val currentLocation = LocationUtils.playerLocation()
-            EggLocations.eggFound()
-            val meal = CakeMealTime.getMealByName(group("meal")) ?: run {
+            HoppityEggsLocations.eggFound()
+
+            val meal = EggMealTime.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message
                 )
             }
             meal.markClaimed()
-
-            DelayedRun.runDelayed(3.seconds) {
-                ChatUtils.clickableChat(
-                    "Click here to share the location of this chocolate egg with the server!",
-                    onClick = { EggLocations.shareNearbyEggLocation(currentLocation, meal) },
-                    SimpleTimeMark.now() + 30.seconds
-                )
-            }
-            return
+            lastMeal = meal
         }
+
+
         // todo later
 //         sharedEggPattern.matchMatcher(event.message.removeColor()) {
 //             val x = group("x").formatInt()
@@ -77,18 +79,33 @@ class HoppityEggsManager {
 //             }
 //             return
 //         }
+
         noEggsLeftPattern.matchMatcher(event.message) {
-            CakeMealTime.allFound()
+            EggMealTime.allFound()
             return
         }
+
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
-            val meal = CakeMealTime.getMealByName(group("meal")) ?: run {
+            val meal = EggMealTime.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",
                     "message" to event.message
                 )
             }
             meal.markClaimed()
+        }
+    }
+
+    fun shareWaypointPrompt() {
+        val currentLocation = LocationUtils.playerLocation()
+        val meal = lastMeal ?: return
+
+        DelayedRun.runDelayed(1.seconds) {
+            ChatUtils.clickableChat(
+                "Click here to share the location of this chocolate egg with the server!",
+                onClick = { HoppityEggsLocations.shareNearbyEggLocation(currentLocation, meal) },
+                SimpleTimeMark.now() + 30.seconds
+            )
         }
     }
 
@@ -102,7 +119,7 @@ class HoppityEggsManager {
         val displayList = mutableListOf<String>()
         displayList.add("§bUnfound Eggs:")
 
-        for (meal in CakeMealTime.entries) {
+        for (meal in EggMealTime.entries) {
             if (!meal.claimed) {
                 displayList.add("§7 - ${meal.formattedName()}")
             }

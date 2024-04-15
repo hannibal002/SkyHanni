@@ -22,7 +22,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object EggLocations {
+object HoppityEggsLocations {
 
     private val config get() = ChocolateFactoryApi.config.hoppityEggs
 
@@ -60,23 +60,36 @@ object EggLocations {
 
         if (drawLocations) {
             for ((index, eggLocation) in possibleEggLocations.withIndex()) {
+                val eggLabel = "§aGuess #${index + 1}"
                 event.drawWaypointFilled(
                     eggLocation,
                     LorenzColor.GREEN.toColor(),
                     seeThroughBlocks = true,
                 )
-                event.drawDynamicText(eggLocation.add(y = 1), "§aEgg $index", 1.5)
+                event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
             }
+            return
         }
+        if (!config.showAllWaypoints) return
+        if (hasLocatorInInventory()) return
+        if (!EggMealTime.eggsRemaining()) return
 
-        // todo if no locator draw all waypoints
+        val islandEggsLocations = ChocolateFactoryApi.getCurrentIslandEggLocations() ?: return
+        for (eggLocation in islandEggsLocations) {
+            event.drawWaypointFilled(
+                eggLocation,
+                LorenzColor.GREEN.toColor(),
+                seeThroughBlocks = true,
+            )
+            event.drawDynamicText(eggLocation.add(y = 1), "§aEgg", 1.5)
+        }
     }
 
     fun eggFound() {
         resetData()
     }
 
-    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: CakeMealTime) {
+    fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: EggMealTime) {
         val islandEggsLocations = ChocolateFactoryApi.getCurrentIslandEggLocations() ?: return
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
 
@@ -149,6 +162,7 @@ object EggLocations {
         possibleEggLocations.clear()
 
         // todo allow more leeway for further points later
+        // need to test while is hoppity event. Works well enough for now
         val a = islandEggsLocations.filter {
             boundingBox.isInside(it) && it.distanceToLine(firstPos, secondPos) < 200.0
         }

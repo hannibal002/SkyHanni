@@ -21,11 +21,10 @@ public class HoppityEggsConfig {
     @FeatureToggle
     public boolean showClaimedEggs = false;
 
-    // todo remove probably or make false or something
     @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby.")
     @ConfigEditorBoolean
-    public boolean showAllWaypoints = true;
+    public boolean showAllWaypoints = false;
 
     @Expose
     @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")

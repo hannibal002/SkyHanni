@@ -34,6 +34,11 @@ object ChocolateFactoryBarnManager {
             val profileStorage = profileStorage ?: return
             profileStorage.currentRabbits += 1
             trySendBarnFullMessage()
+            HoppityEggsManager.shareWaypointPrompt()
+        }
+
+        rabbitDuplicatePattern.matchMatcher(event.message) {
+            HoppityEggsManager.shareWaypointPrompt()
         }
     }
 

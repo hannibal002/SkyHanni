@@ -214,7 +214,7 @@ object ChocolateFactoryApi {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        CakeMealTime.checkClaimed()
+        EggMealTime.checkClaimed()
     }
 
     fun getCurrentIslandEggLocations(): List<LorenzVec>? {

@@ -321,7 +321,7 @@ import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryInventory
 import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryStats
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.EggLocations
+import at.hannibal2.skyhanni.features.misc.chocolatefactory.HoppityEggsLocations
 import at.hannibal2.skyhanni.features.misc.chocolatefactory.HoppityEggsManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
@@ -606,8 +606,8 @@ class SkyHanniMod {
         loadModule(MobHighlight())
         loadModule(ChocolateFactoryBarnManager)
         loadModule(ChocolateFactoryInventory)
-        loadModule(HoppityEggsManager())
-        loadModule(EggLocations)
+        loadModule(HoppityEggsManager)
+        loadModule(HoppityEggsLocations)
         loadModule(ChocolateFactoryStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())

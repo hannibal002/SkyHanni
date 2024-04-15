@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.chocolatefactory
 
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 
-enum class CakeMealTime(
+enum class EggMealTime(
     val mealName: String,
     val resetsAt: Int,
     private val mealColour: String,
@@ -36,6 +36,10 @@ enum class CakeMealTime(
                     it.lastResetDay = currentSbDay
                 }
             }
+        }
+
+        fun eggsRemaining(): Boolean {
+            return entries.any { !it.claimed }
         }
     }
 }
