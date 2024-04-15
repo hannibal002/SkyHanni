@@ -27,8 +27,7 @@ object MiningAPI {
     var lastColdUpdate = SimpleTimeMark.farPast()
     var lastColdReset = SimpleTimeMark.farPast()
 
-
-    fun inGlaciteArea() = glaciteAreaPattern.matches(HypixelData.skyBlockArea) || inColdIsland()
+    fun inGlaciteArea() = glaciteAreaPattern.matches(HypixelData.skyBlockArea) || IslandType.MINESHAFT.isInIsland()
 
     fun inColdIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
@@ -62,7 +61,7 @@ object MiningAPI {
     }
 
     private fun updateCold(newCold: Int) {
-        // hypixel sends cold data once in scoreboard even after resetting it
+        // Hypixel sends cold data once in scoreboard even after resetting it
         if (cold == 0 && lastColdUpdate.passedSince() < 1.seconds) return
         lastColdUpdate = SimpleTimeMark.now()
         ColdUpdateEvent(newCold).postAndCatch()
