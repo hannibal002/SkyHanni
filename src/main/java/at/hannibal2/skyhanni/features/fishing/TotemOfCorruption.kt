@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.Out
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -107,6 +108,12 @@ class TotemOfCorruption {
             display = emptyList()
             totems = emptyList()
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        display = emptyList()
+        totems = emptyList()
     }
 
     private fun getTimeRemaining(totem: EntityArmorStand): Duration? =
