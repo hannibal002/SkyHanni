@@ -16,7 +16,7 @@ public class HoppityEggsConfig {
     public boolean waypointsEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Show Claimed Eggs", desc = "Show a display that says which eggs have been found in the last SkyBlock day.")
+    @ConfigOption(name = "Show Claimed Eggs", desc = "Displays which eggs have been found in the last SkyBlock day.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
