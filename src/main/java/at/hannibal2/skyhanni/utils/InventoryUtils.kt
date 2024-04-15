@@ -100,5 +100,9 @@ object InventoryUtils {
         }
     }
 
+    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? {
+        return getItemsInOpenChest().find { it.slotIndex == slotIndex }?.stack
+    }
+
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 }

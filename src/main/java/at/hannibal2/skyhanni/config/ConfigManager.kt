@@ -118,7 +118,7 @@ class ConfigManager {
                     }
 
                     override fun read(reader: JsonReader): LorenzRarity {
-                        return LorenzRarity.valueOf(reader.nextString().uppercase())
+                        return LorenzRarity.valueOf(reader.nextString().uppercase().replace(" ", "_"))
                     }
                 }.nullSafe())
                 .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
@@ -214,7 +214,15 @@ class ConfigManager {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
-            val configLink = field.getAnnotation(ConfigLink::class.java) ?: continue
+            val configLink = field.getAnnotation(ConfigLink::class.java)
+            if (configLink == null) {
+                if (LorenzUtils.isInDevEnvironment()) {
+                    var name = "${field.declaringClass.name}.${field.name}"
+                    name = name.replace("at.hannibal2.skyhanni.config.", "")
+                    println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
+                }
+                continue
+            }
             val position = field.get(obj) as Position
             position.setLink(configLink)
         }
