@@ -81,17 +81,24 @@ interface Renderable {
             text: String,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
+            highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
-        ): Renderable = link(string(text), onClick, bypassChecks, condition)
+        ): Renderable =
+            link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
 
         fun link(
             renderable: Renderable,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
+            highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
         ): Renderable {
             return clickable(
-                hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
+                hoverable(
+                    underlined(renderable), renderable, bypassChecks,
+                    condition = condition,
+                    highlightsOnHoverSlots = highlightsOnHoverSlots
+                ),
                 onClick,
                 0,
                 bypassChecks,
@@ -117,7 +124,7 @@ interface Renderable {
             text: Any,
             tips: List<Any>,
             bypassChecks: Boolean = false,
-            click: List<Pair<Int, () -> Unit>>,
+            click: Map<Int, () -> Unit>,
             onHover: () -> Unit = {},
         ): Renderable {
             return multiClickable(
@@ -151,7 +158,7 @@ interface Renderable {
 
         fun multiClickable(
             render: Renderable,
-            click: List<Pair<Int, () -> Unit>>,
+            click: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
         ) = object : Renderable {
@@ -277,6 +284,7 @@ interface Renderable {
             unhovered: Renderable,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
+            highlightsOnHoverSlots: List<Int> = emptyList(),
         ) = object : Renderable {
             override val width: Int
                 get() = max(hovered.width, unhovered.width)
@@ -287,11 +295,14 @@ interface Renderable {
             var isHovered = false
 
             override fun render(posX: Int, posY: Int) {
+                val pair = Pair(posX, posY)
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     hovered.render(posX, posY)
+                    HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
                 } else {
                     unhovered.render(posX, posY)
+                    HighlightOnHoverSlot.currentSlots.remove(pair)
                     false
                 }
             }

@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class GetFromSackConfig {
 
     @Expose
-    @ConfigOption(name = "Queued GfS", desc = "If §e/gfs §7or §e/getfromsacks §7is used it queues up the commands so all items are guarantied to be received.")
+    @ConfigOption(name = "Queued GfS", desc = "If §e/gfs §7or §e/getfromsacks §7is used it queues up the commands so all items are guaranteed to be received.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean queuedGFS = true;

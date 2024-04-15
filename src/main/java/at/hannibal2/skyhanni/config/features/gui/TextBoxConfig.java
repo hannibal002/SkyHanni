@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
@@ -27,5 +28,6 @@ public class TextBoxConfig {
     public Property<String> text = Property.of("&aYour Text Here\\n&bYour new line here");
 
     @Expose
+    @ConfigLink(owner = TextBoxConfig.class, field = "enabled")
     public Position position = new Position(10, 80, false, true);
 }

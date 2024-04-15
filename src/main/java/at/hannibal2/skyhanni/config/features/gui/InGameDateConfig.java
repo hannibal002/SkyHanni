@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class InGameDateConfig {
@@ -20,6 +21,7 @@ public class InGameDateConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigLink(owner = InGameDateConfig.class, field = "enabled")
     public Position position = new Position(10, 10, false, true);
 
     @Expose

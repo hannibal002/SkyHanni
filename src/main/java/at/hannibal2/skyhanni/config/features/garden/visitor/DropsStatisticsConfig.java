@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -132,5 +133,6 @@ public class DropsStatisticsConfig {
     public boolean onlyOnBarn = true;
 
     @Expose
+    @ConfigLink(owner = DropsStatisticsConfig.class, field = "enabled")
     public Position pos = new Position(5, 20, false, true);
 }
