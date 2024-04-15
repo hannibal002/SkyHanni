@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -185,12 +186,7 @@ object GardenNextJacobContest {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
-
-        val backItem = event.inventoryItems[48] ?: return
-        if (backItem.name != "§aGo Back") return
-        val lore = backItem.getLore()
-        if (lore.size != 1) return
-        if (lore[0] != "§7To Calendar and Events") return
+        if (!monthPattern.matches(event.inventoryName)) return
 
         inCalendar = true
 
