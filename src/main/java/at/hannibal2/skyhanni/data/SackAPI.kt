@@ -390,6 +390,7 @@ data class SackItem(
     fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }
 
+// TODO repo
 private val gemstoneMap = mapOf(
     "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
     "Amber Gemstones" to "ROUGH_AMBER_GEM".asInternalName(),
