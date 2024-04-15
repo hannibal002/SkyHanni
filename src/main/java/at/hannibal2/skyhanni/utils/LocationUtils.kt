@@ -95,5 +95,15 @@ object LocationUtils {
     fun AxisAlignedBB.getCenter() = this.getEdgeLengths().multiply(0.5).add(this.minBox())
 
     fun AxisAlignedBB.getTopCenter() = this.getCenter().add(y = (maxY - minY) / 2)
+
+    fun AxisAlignedBB.clampTo(other: AxisAlignedBB): AxisAlignedBB {
+        val minX = max(this.minX, other.minX)
+        val minY = max(this.minY, other.minY)
+        val minZ = max(this.minZ, other.minZ)
+        val maxX = min(this.maxX, other.maxX)
+        val maxY = min(this.maxY, other.maxY)
+        val maxZ = min(this.maxZ, other.maxZ)
+        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+    }
 }
 
