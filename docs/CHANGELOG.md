@@ -33,6 +33,9 @@
     + Track Fossil Dust and use it for profit calculation.
 + Added Mining Notifications. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1429)
     + Mining events, including Mineshaft spawning, Suspicious Scrap drops, and Cold going above a threshold.
++ Added Profit Per Excavation. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1439)
+    + Show profit/loss in chat after each excavation.
+    + Also include breakdown information on hover.
 
 #### Dungeon Features
 
@@ -50,6 +53,7 @@
 
 + Added Quiver Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
     + Only shows the type of arrow when wearing a Skeleton Master Chestplate.
++ Added an option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
 
 #### Chat Features
 
@@ -75,6 +79,7 @@
     + Added option to block accepting/refusing expensive/cheap copper.
     + Added option to prevent blocking never accepted visitors.
     + Reworked visitor blocking logic to make it more like not clickable items.
++ Only warn that crop fortune is missing in tab list while actively farming. - Empa (https://github.com/hannibal002/SkyHanni/pull/1451)
 
 #### Diana Improvements
 
@@ -93,6 +98,9 @@
 + Added queue to Scoreboard Events in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1420)
 + New Images for Discord Rich Presence. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/1422)
     + Updated important areas to have new images.
++ Added Fortunate Freezing Bonus to Mining Events in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1453)
++ Added line breaks functionality for Custom Scoreboard Title/Footer. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1373)
++ Added Dungeon Room ID to Lobby Code. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1428)
 
 #### Commands Improvements
 
@@ -102,12 +110,17 @@
 
 + Added right click support for many garden GUI elements. - hannibal2 + nea (https://github.com/hannibal002/SkyHanni/pull/1395)
 + Added config links to most features. - jani (https://github.com/hannibal002/SkyHanni/pull/1404)
++ Added all missing config links, or added a comment if no related GUI element exists. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1412)
 
 #### Inventory Improvements
 
 + Items that cannot be salvaged because you have donated them to the Museum are now greyed out in the Salvage menu. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1384)
 + Added support for Glacial Cave gemstones in Estimated Item Value. - Fix3dll (https://github.com/hannibal002/SkyHanni/pull/1416)
 + Added Fossil Excavator and Research Center to Hide Non-Clickable Items feature. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1430)
++ Sack Display update. - hannibal2 + Thunderblade73 + CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1381)
+    + Sorting for gemstone sack and rune sack.
+    + Now has options for horizontal alignment.
+    + Highlight the item in inventory while hovering over the item name in the display.
 
 #### Slayer Improvements
 
@@ -120,6 +133,11 @@
 #### Combat Improvements
 
 + Added customizable amount at which to get a Low Quiver Notification / Quiver Reminder. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
+
+#### Mining Improvements
+
++ Renamed Deep Caverns parkour to Deep Caverns Guide. - seraid (https://github.com/hannibal002/SkyHanni/pull/1443)
++ Make Fossil Excavator a category rather than accordion. - walker (https://github.com/hannibal002/SkyHanni/pull/1441)
 
 #### Misc Improvements
 
@@ -169,6 +187,7 @@
 + Fixed Powder not being shown in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1414)
 + Fixed the skill tab list pattern sometimes not matching. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1419)
 + Fixed multiple mining v3 Unknown Lines errors in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1420)
++ Fixed Fame rank-up not updating the rank. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1450)
 
 #### Dungeon Fixes
 
@@ -193,6 +212,12 @@
 + Clear SkyBlock area on world change. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1421)
     + This fixed the wrong area showing in some cases, such as when guesting on someone's Private Island.
 + Fixed a small issue that caused some features to not work as intended. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1402)
++ Fixed Bazaar copy not working and showing null instead. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1452)
++ Fixed Totem of Corruption Overlay not getting cleared on disable. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1449)
++ Fixed detecting being in calendar when you aren't. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1445)
++ Fixed delayed run crashes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1445)
++ Fixed error from console filter on Minecraft shutdown. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1445)
++ Fixed skill issue. - nopo (https://github.com/hannibal002/SkyHanni/pull/1446)
 
 ### Technical Details
 
@@ -263,6 +288,16 @@
 + Made a generic gson builder containing common type adapters. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1308)
     + Moved specific gson types (Elite api data and Hypixel api data) to their own gsons.
 + Elitebot api now uses CropType and PestType instead of strings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1308)
++ Added Renderable.multiClickable. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1407)
++ Added isKeyClicked. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1405)
+    + This cleans up the Renderable.clickable.
++ Adding Hypixel mod API. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1426)
++ Added expiry time parameter to ClickableAction. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1445)
++ Added some LorenzVec and LocationUtils functions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1445)
++ Deprecated all old LorenzVec math functions and made new operator functions for them. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1445)
++ Changed neu version in dev env. - nopo (https://github.com/hannibal002/SkyHanni/pull/1446)
++ Changed config name. - seraid (https://github.com/hannibal002/SkyHanni/pull/1443)
++ Fixed internalizing config moves introducing a self reference inside the JSON tree. - !nea (https://github.com/hannibal002/SkyHanni/pull/1447)
 
 ### Removed Features
 
