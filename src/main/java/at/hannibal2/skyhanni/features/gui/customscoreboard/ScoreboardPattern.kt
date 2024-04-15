@@ -231,6 +231,10 @@ object ScoreboardPattern {
         "mineshaft.notstarted",
         "(?:§.)*Not started.*"
     )
+    val fortunateFreezingBonusPattern by miningSb.pattern(
+        "fortunatefreezing.bonus",
+        "Event Bonus: §6\\+\\d+☘"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")

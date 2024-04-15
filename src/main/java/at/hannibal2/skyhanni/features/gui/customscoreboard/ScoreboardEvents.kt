@@ -488,6 +488,11 @@ private fun getMiningEventsLines() = buildList {
         add(getSbLines().first { SbPattern.yourGoblinKillsPattern.matches(it) })
         add(getSbLines().first { SbPattern.remainingGoblinPattern.matches(it) })
     }
+
+    // Fortunate Freezing
+    if (getSbLines().any { SbPattern.fortunateFreezingBonusPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fortunateFreezingBonusPattern.matches(it) })
+    }
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
