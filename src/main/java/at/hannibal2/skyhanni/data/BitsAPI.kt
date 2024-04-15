@@ -67,8 +67,13 @@ object BitsAPI {
     private val bitsChatGroup = bitsDataGroup.group("chat")
 
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
-        "famerankup",
+        "rankup.bits",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
+    )
+
+    private val fameRankUpPattern by bitsChatGroup.pattern(
+        "rankup.rank",
+        "[§\\w\\s]+FAME RANK UP (?:§.)+(?<rank>.*)"
     )
 
     private val boosterCookieAte by bitsChatGroup.pattern(
@@ -169,6 +174,21 @@ object BitsAPI {
             val amount = group("amount").formatInt()
             bitsAvailable += amount
             sendBitsAvailableGainedEvent()
+
+            return
+        }
+
+        fameRankUpPattern.matchMatcher(message) {
+            val rank = group("rank")
+
+            currentFameRank = getFameRankByNameOrNull(rank)
+                ?: return ErrorManager.logErrorWithData(
+                    FameRankNotFoundException(rank),
+                    "FameRank $rank not found",
+                    "Rank" to rank,
+                    "Message" to message,
+                    "FameRanks" to FameRanks.fameRanks
+                )
 
             return
         }
