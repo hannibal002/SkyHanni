@@ -24,8 +24,7 @@ class BazaarCancelledBuyOrderClipboard {
      */
     private val lastAmountPattern by patternGroup.pattern(
         "lastamount",
-        "§6§7from §a(?<amount>.*)§7x §7missing item" +
-            "s\\."
+        "§6§7from §a(?<amount>.*)§7x §7missing items\\."
     )
     private val cancelledMessagePattern by patternGroup.pattern(
         "cancelledmessage",
