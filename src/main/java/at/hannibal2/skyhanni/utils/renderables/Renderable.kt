@@ -83,7 +83,8 @@ interface Renderable {
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
-        ): Renderable = link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
+        ): Renderable =
+            link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
 
         fun link(
             renderable: Renderable,
@@ -123,7 +124,7 @@ interface Renderable {
             text: Any,
             tips: List<Any>,
             bypassChecks: Boolean = false,
-            click: List<Pair<Int, () -> Unit>>,
+            click: Map<Int, () -> Unit>,
             onHover: () -> Unit = {},
         ): Renderable {
             return multiClickable(
@@ -157,7 +158,7 @@ interface Renderable {
 
         fun multiClickable(
             render: Renderable,
-            click: List<Pair<Int, () -> Unit>>,
+            click: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
         ) = object : Renderable {
@@ -295,13 +296,13 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val pair = Pair(posX, posY)
-                    isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                        hovered.render(posX, posY)
-                        HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                        true
-                    } else {
-                        unhovered.render(posX, posY)
-                        HighlightOnHoverSlot.currentSlots.remove(pair)
+                isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    hovered.render(posX, posY)
+                    HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
+                    true
+                } else {
+                    unhovered.render(posX, posY)
+                    HighlightOnHoverSlot.currentSlots.remove(pair)
                     false
                 }
             }
