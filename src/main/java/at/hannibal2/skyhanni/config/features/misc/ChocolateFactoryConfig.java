@@ -18,7 +18,7 @@ import java.util.List;
 public class ChocolateFactoryConfig {
 
     @Expose
-    @ConfigOption(name = "Hoppity Egg ", desc = "")
+    @ConfigOption(name = "Hoppity Egg", desc = "")
     @Accordion
     public HoppityEggsConfig hoppityEggs = new HoppityEggsConfig();
 
