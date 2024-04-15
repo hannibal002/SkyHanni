@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
+import at.hannibal2.skyhanni.data.model.graphFromJson
 import at.hannibal2.skyhanni.data.model.toJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -23,6 +26,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -45,7 +49,15 @@ object GraphEditor {
     private var inTextMode = false
         set(value) {
             field = value
-            if (value) textBox.makeActive() else textBox.disable()
+            if (value) {
+                activeNode?.name?.let {
+                    textBox.textBox = it
+                }
+                textBox.makeActive()
+            } else {
+                textBox.clear()
+                textBox.disable()
+            }
         }
 
     private val textBox = TextInput()
@@ -80,6 +92,7 @@ object GraphEditor {
                     add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
                     add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
                     add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
+                    add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
                     if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
                 }
                 if (!inTextMode && activeNode != null) {
@@ -177,8 +190,36 @@ object GraphEditor {
             return
         }
         if (config.saveKey.isKeyClicked()) {
+            if (nodes.isEmpty()) {
+                ChatUtils.chat("Copied nothing since the graph is empty")
+                return
+            }
             OSUtils.copyToClipboard(compileGraph().toJson())
+            ChatUtils.chat("Copied Graph to Clipboard")
             return
+        }
+        if (config.loadKey.isKeyClicked()) {
+            runBlocking {
+                OSUtils.readFromClipboard()?.let {
+                    try {
+                        graphFromJson(it)
+                    } catch (e: Exception) {
+                        ErrorManager.logErrorWithData(
+                            e,
+                            "Import of graph failed",
+                            "json" to it,
+                            ignoreErrorCache = true
+                        )
+                        null
+                    }
+                }?.let { import(it) }
+            }
+            return
+        }
+        if (config.clearKey.isKeyClicked()) {
+            OSUtils.copyToClipboard(compileGraph().toJson())
+            ChatUtils.chat("Copied Graph to Clipboard and cleared the graph")
+            clear()
         }
         if (config.placeKey.isKeyClicked()) {
             addNode()
@@ -248,7 +289,7 @@ object GraphEditor {
         if (node1 != null && node2 != null && node1 != node2) edge.add(GraphingEdge(node1, node2)) else false
 
     /** Has a side effect on the graphing graph, since it runs [prune] on the graphing graph*/
-    private fun compileGraph(): List<GraphNode> {
+    private fun compileGraph(): Graph {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name) }
@@ -259,10 +300,10 @@ object GraphEditor {
             }.sortedBy { it.second }
         }
         nodes.forEachIndexed { index, it -> it.neighbours = neighbours[index].toMap() }
-        return nodes
+        return Graph(nodes)
     }
 
-    fun import(graph: List<GraphNode>) {
+    fun import(graph: Graph) {
         clear()
         nodes.addAll(graph.map { GraphingNode(it.id, it.position, it.name) })
         val translation = graph.mapIndexed { index, it -> it to nodes[index] }.toMap()

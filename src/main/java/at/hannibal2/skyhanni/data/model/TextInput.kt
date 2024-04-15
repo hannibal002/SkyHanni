@@ -26,6 +26,9 @@ class TextInput {
     fun makeActive() = Companion.activate(this)
     fun disable() = Companion.disable()
     fun handle() = Companion.handleTextInput()
+    fun clear() {
+        textBox = ""
+    }
 
     companion object {
         private var activeInstance: TextInput? = null

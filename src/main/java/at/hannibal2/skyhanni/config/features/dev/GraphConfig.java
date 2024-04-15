@@ -60,6 +60,11 @@ public class GraphConfig {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_I)
     public int loadKey = Keyboard.KEY_I;
 
+    @Expose
+    @ConfigOption(name = "Clear Key", desc = "Clears the graph. Also saves the graph to the clipboard")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_P)
+    public int clearKey = Keyboard.KEY_P;
+
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
     public Position infoDisplay = new Position(20, 20);
 }
