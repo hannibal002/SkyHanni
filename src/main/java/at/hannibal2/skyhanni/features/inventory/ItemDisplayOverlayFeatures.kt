@@ -80,8 +80,8 @@ object ItemDisplayOverlayFeatures {
         "bingogoalrank",
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
     )
-    private val glacialPowderPattern by patternGroup.pattern(
-        "glacialpowder",
+    private val glacitePowderPattern by patternGroup.pattern(
+        "glacitepowder",
         "Glacite Powder x(?<amount>.*)"
     )
 
@@ -192,7 +192,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (GLACITE_POWDER.isSelected() && InventoryUtils.openInventoryName() == "Fossil Excavator") {
-            glacialPowderPattern.matchMatcher(itemName) {
+            glacitePowderPattern.matchMatcher(itemName) {
                 val powder = group("amount").formatLong()
                 return "§b${NumberUtil.format(powder)}"
             }
