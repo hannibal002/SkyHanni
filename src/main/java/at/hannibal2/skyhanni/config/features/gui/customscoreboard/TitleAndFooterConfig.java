@@ -12,6 +12,7 @@ public class TitleAndFooterConfig {
     @Expose
     @ConfigOption(name = "Title and Footer Alignment", desc = "Align the title and footer in the scoreboard.")
     @ConfigEditorDropdown
+    // TODO rename to "horizontalAlignment" or "alignment"
     public RenderUtils.HorizontalAlignment alignTitleAndFooter = RenderUtils.HorizontalAlignment.CENTER;
 
     @Expose
