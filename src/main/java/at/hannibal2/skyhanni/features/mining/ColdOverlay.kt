@@ -38,6 +38,7 @@ class ColdOverlay {
         GlStateManager.pushAttrib()
 
         GL11.glDepthMask(false)
+        GlStateManager.translate(0f, 0f, -500f)
         GlStateManager.color(1f, 1f, 1f, alpha)
 
         Utils.drawTexturedRect(
