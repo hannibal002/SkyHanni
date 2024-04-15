@@ -399,6 +399,10 @@ private val gemstoneMap = mapOf(
     "Jasper Gemstones" to "ROUGH_JASPER_GEM".asInternalName(),
     "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
     "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
+    "Onyx Gemstones" to "ROUGH_ONYX_GEM".asInternalName(),
+    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".asInternalName(),
+    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".asInternalName(),
+    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".asInternalName(),
 )
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks
