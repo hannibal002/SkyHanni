@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -28,7 +29,6 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
-import org.lwjgl.input.Mouse
 import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
@@ -131,16 +131,12 @@ interface Renderable {
             override val horizontalAlign = render.horizontalAlign
             override val verticalAlign = render.verticalAlign
 
-            private var wasDown = false
-
             override fun render(posX: Int, posY: Int) {
-                val isDown = Mouse.isButtonDown(button)
-                if (isDown > wasDown && isHovered(posX, posY) && condition() &&
-                    shouldAllowLink(true, bypassChecks)
+                if (isHovered(posX, posY) && condition() &&
+                    shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
                 ) {
                     onClick()
                 }
-                wasDown = isDown
                 render.render(posX, posY)
             }
         }
@@ -429,7 +425,7 @@ interface Renderable {
                 percent.toInt()
             }
 
-            private var color = if (texture == null) {
+            private val color = if (texture == null) {
                 ColorUtils.blendRGB(startColor, endColor, percent)
             } else {
                 startColor
