@@ -269,6 +269,7 @@ import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.HotmFeatures
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MiningNotifications
+import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
@@ -847,6 +848,7 @@ class SkyHanniMod {
         loadModule(NoBitsWarning())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(PowderPerHotmPerk())
 
         init()
 

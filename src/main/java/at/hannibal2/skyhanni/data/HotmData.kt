@@ -23,7 +23,7 @@ import kotlin.math.floor
 import kotlin.math.pow
 
 enum class HotmData(
-    guiName: String,
+    val guiName: String,
     val maxLevel: Int,
     val costFun: ((Int) -> (Double?)),
     val rewardFun: ((Int) -> (Map<HotmReward, Double>)),
@@ -114,7 +114,8 @@ enum class HotmData(
             HotmReward.MINING_SPEED to 50.0, HotmReward.MINING_FORTUNE to 50.0
         )
     }),
-    SKY_MALL("Sky Mall", 1, { null }, { emptyMap() }), PRECISION_MINING("Precision Mining",
+    SKY_MALL("Sky Mall", 1, { null }, { emptyMap() }),
+    PRECISION_MINING("Precision Mining",
         1,
         { null },
         { mapOf(HotmReward.MINING_SPEED_BOOST to 30.0) }),
@@ -260,6 +261,8 @@ enum class HotmData(
 
     fun getReward() = rewardFun(activeLevel)
 
+    fun calculateTotalCost(desiredLevel: Int) = (0 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
+
     companion object {
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
@@ -328,6 +331,8 @@ enum class HotmData(
                 it.resetPattern
             }
         }
+
+        fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
 
         private fun resetTree() = entries.forEach {
             it.activeLevel = 0
