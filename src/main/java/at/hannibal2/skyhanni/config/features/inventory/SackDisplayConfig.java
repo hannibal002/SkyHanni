@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -34,6 +35,11 @@ public class SackDisplayConfig {
         "§eUnformatted: §72,240/2,200")
     @ConfigEditorDropdown
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
+
+    @Expose
+    @ConfigOption(name = "Alignment", desc = "Channge the alignment for numbers and money.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
 
     public enum NumberFormatEntry implements HasLegacyId {
         DEFAULT("Default", 0),

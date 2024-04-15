@@ -217,6 +217,7 @@ object LorenzUtils {
         }
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
         getName: (T) -> String,
@@ -226,6 +227,7 @@ object LorenzUtils {
         add(buildSelector<T>(prefix, getName, isCurrent, onChange))
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
@@ -248,6 +250,7 @@ object LorenzUtils {
         }
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun MutableList<List<Any>>.addButton(
         prefix: String,
         getName: String,
