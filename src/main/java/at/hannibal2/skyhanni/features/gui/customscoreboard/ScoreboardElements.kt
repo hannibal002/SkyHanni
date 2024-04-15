@@ -524,14 +524,10 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
-    val lobbyCode = HypixelData.serverId ?: "<hidden>"
-    return listOf(
-        if (lobbyCode == "<hidden>") {
-            "<hidden>"
-        } else {
-            "§8$lobbyCode"
-        } to HorizontalAlignment.LEFT
-    )
+    val lobbyCode = HypixelData.serverId
+    val roomId = DungeonAPI.getRoomID().let { if (it == null) "" else "§8$it" }
+    val lobbyDisplay = if (lobbyCode == null) "<hidden>" else "§8$lobbyCode $roomId"
+    return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
 }
 
 private fun getPowerDisplayPair() = listOf(
