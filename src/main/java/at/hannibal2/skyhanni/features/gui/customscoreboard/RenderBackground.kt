@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.alignmentConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.backgroundConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColour
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -79,6 +80,19 @@ class RenderBackground {
                     SpecialColour.specialToChromaRGB(backgroundConfig.color),
                     backgroundConfig.roundedCornerSmoothness
                 )
+                if (backgroundConfig.outline) {
+                    RenderUtils.drawRoundRectOutline(
+                        x - border,
+                        y - border,
+                        elementWidth + border * 3,
+                        elementHeight + border * 2,
+                        backgroundConfig.outlineColorTop.toChromaColor().rgb,
+                        backgroundConfig.outlineColorBottom.toChromaColor().rgb,
+                        backgroundConfig.outlineThickness,
+                        backgroundConfig.roundedCornerSmoothness,
+                        backgroundConfig.outlineBlur
+                    )
+                }
             }
         }
         GL11.glDepthMask(true)
