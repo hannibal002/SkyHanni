@@ -54,10 +54,15 @@ object ChocolateFactoryBarnManager {
 
         ChatUtils.clickableChat(
             "§cYour barn is almost full! " +
-                "§7(${profileStorage.currentRabbits}/${profileStorage.maxRabbits}). §cUpgrade it so they don't get crushed",
+                "§7(${barnStatus()}). §cUpgrade it so they don't get crushed",
             "cf"
         )
         SoundUtils.playBeepSound()
         lastBarnFullWarning = SimpleTimeMark.now()
+    }
+
+    fun barnStatus(): String {
+        val profileStorage = profileStorage ?: return "Unknown"
+        return "${profileStorage.currentRabbits}/${profileStorage.maxRabbits} Rabbits"
     }
 }

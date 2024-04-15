@@ -1,11 +1,19 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStatsType;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ChocolateFactoryConfig {
 
@@ -19,6 +27,33 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
+
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Stats", desc = "Show general info about your chocolate factory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean statsDisplay = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Stats List",
+        desc = "Drag text to change what displays and which order it displays in."
+    )
+    @ConfigEditorDraggableList
+    public List<ChocolateFactoryStatsType> statsDisplayList = new ArrayList<>(Arrays.asList(
+        ChocolateFactoryStatsType.HEADER,
+        ChocolateFactoryStatsType.CURRENT,
+        ChocolateFactoryStatsType.THIS_PRESTIGE,
+        ChocolateFactoryStatsType.ALL_TIME,
+        ChocolateFactoryStatsType.EMPTY,
+        ChocolateFactoryStatsType.PER_SECOND,
+        ChocolateFactoryStatsType.PER_MINUTE,
+        ChocolateFactoryStatsType.PER_HOUR,
+        ChocolateFactoryStatsType.PER_DAY,
+        ChocolateFactoryStatsType.EMPTY_2,
+        ChocolateFactoryStatsType.MULTIPLIER,
+        ChocolateFactoryStatsType.BARN
+    ));
 
     @Expose
     @ConfigOption(name = "Show Stack Sizes", desc = "Shows addition info as many items in the chocolate menu as the stack size.")
@@ -47,4 +82,8 @@ public class ChocolateFactoryConfig {
     )
     @ConfigEditorSlider(minValue = 3, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
+    public Position position = new Position(183, 160, false, true);
 }

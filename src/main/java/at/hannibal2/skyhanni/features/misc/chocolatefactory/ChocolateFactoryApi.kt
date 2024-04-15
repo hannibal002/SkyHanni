@@ -48,7 +48,7 @@ object ChocolateFactoryApi {
         "chocolate.persecond",
         "§6(?<amount>[\\d.,]+) §8per second"
     )
-    private val chocolateAllTime by patternGroup.pattern(
+    private val chocolateAllTimePattern by patternGroup.pattern(
         "chocolate.alltime",
         "§7All-time Chocolate: §6(?<amount>[\\d,]+)"
     )
@@ -87,8 +87,8 @@ object ChocolateFactoryApi {
 
     var inChocolateFactory = false
 
-    var currentChocolate = 0L
-    var allTimeChocolate = 0L
+    var chocolateCurrent = 0L
+    var chocolateAllTime = 0L
     var chocolatePerSecond = 0.0
     var chocolateThisPrestige = 0L
     var chocolateMultiplier = 1.0
@@ -132,7 +132,6 @@ object ChocolateFactoryApi {
 
         for ((slotIndex, item) in inventory) {
             if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
-                println("tried to play sound")
                 SoundUtils.playBeepSound()
             }
 
@@ -147,7 +146,7 @@ object ChocolateFactoryApi {
                 }
             }
 
-            val canAfford = upgradeCost <= currentChocolate
+            val canAfford = upgradeCost <= chocolateCurrent
             if (canAfford) upgradeableSlots.add(slotIndex)
 
             if (slotIndex in rabbitSlots) {
@@ -168,14 +167,14 @@ object ChocolateFactoryApi {
 
     private fun processInfoItems(chocolateItem: ItemStack, prestigeItem: ItemStack, productionItem: ItemStack) {
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
-            currentChocolate = group("amount").formatLong()
+            chocolateCurrent = group("amount").formatLong()
         }
         for (line in chocolateItem.getLore()) {
             chocolatePerSecondPattern.matchMatcher(line) {
                 chocolatePerSecond = group("amount").formatDouble()
             }
-            chocolateAllTime.matchMatcher(line) {
-                allTimeChocolate = group("amount").formatLong()
+            this.chocolateAllTimePattern.matchMatcher(line) {
+                chocolateAllTime = group("amount").formatLong()
             }
         }
         prestigeItem.getLore().matchFirst(chocolateThisPrestigePattern) {
@@ -184,7 +183,7 @@ object ChocolateFactoryApi {
         productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
             chocolateMultiplier = group("amount").formatDouble()
         }
-        println("Chocolate: $currentChocolate, Per Second: $chocolatePerSecond, All Time: $allTimeChocolate, This Prestige: $chocolateThisPrestige, Multiplier: $chocolateMultiplier")
+        ChocolateFactoryStats.updateDisplay()
     }
 
     @SubscribeEvent
@@ -212,9 +211,8 @@ object ChocolateFactoryApi {
         noPickblockSlots = data.noPickblockSlots
         barnIndex = data.barnIndex
         infoIndex = data.infoIndex
-        // todo add back
-//         productionInfoIndex = data.productionInfoIndex
-//         prestigeIndex = data.prestigeIndex
+        productionInfoIndex = data.productionInfoIndex
+        prestigeIndex = data.prestigeIndex
         milestoneIndex = data.milestoneIndex
         maxRabbits = data.maxRabbits
     }
