@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -210,7 +211,7 @@ class ConfigManager {
         slog.add(ic)
         for (field in obj.javaClass.fields) {
             field.isAccessible = true
-            if (field.type != Position::class.java) {
+            if (field.type != Position::class.java && field.type != PositionList::class.java) {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
@@ -223,8 +224,13 @@ class ConfigManager {
                 }
                 continue
             }
-            val position = field.get(obj) as Position
-            position.setLink(configLink)
+            if (field.type == Position::class.java) {
+                val position = field.get(obj) as Position
+                position.setLink(configLink)
+            } else if (field.type == PositionList::class.java) {
+                val list = field.get(obj) as PositionList
+                list.setLink(configLink)
+            }
         }
     }
 

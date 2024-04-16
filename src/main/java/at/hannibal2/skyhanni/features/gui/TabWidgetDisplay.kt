@@ -47,6 +47,7 @@ enum class TabWidgetDisplay(val configName: String?, vararg val widgets: TabWidg
         @SubscribeEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
+            if (config?.displayPositions == null) return
             config.display.forEach { widget ->
                 widget.position.renderStrings(
                     widget.widgets.flatMap { it.lines }, posLabel = "Diplay Widget: ${widget.name}"
