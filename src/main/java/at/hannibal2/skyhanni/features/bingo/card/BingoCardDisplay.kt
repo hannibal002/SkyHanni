@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -26,7 +25,6 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.milliseconds
 
 class BingoCardDisplay {
 
@@ -100,8 +98,6 @@ class BingoCardDisplay {
         }
         return newList
     }
-
-    private var lastClick = SimpleTimeMark.farPast()
 
     private fun MutableList<Renderable>.addCommunityGoals() {
         add(Renderable.string("§6Community Goals:"))
@@ -197,9 +193,6 @@ class BingoCardDisplay {
                         add("§eClick to $clickName this goal as highlight!")
                     },
                     onClick = {
-                        if (lastClick.passedSince() < 300.milliseconds) return@clickAndHover
-                        lastClick = SimpleTimeMark.now()
-
                         it.highlight = !currentlyHighlighted
                         it.displayName
                         update()

@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object FossilSolverDisplay {
 
-    private val config get() = SkyHanniMod.feature.mining.fossilExcavator2.solver
+    private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
 
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
     private val chargesRemainingPattern by patternGroup.pattern(
@@ -211,6 +211,7 @@ object FossilSolverDisplay {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(36, "mining.fossilExcavator", "mining.fossilExcavator2.solver")
+        event.move(37, "mining.fossilExcavator2", "mining.fossilExcavator")
     }
 
     fun nextData(slotToClick: FossilTile, correctPercentage: Double, fossilsRemaining: Int) {
