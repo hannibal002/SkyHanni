@@ -6,6 +6,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PartyCommandsConfig {
 
     @Expose
@@ -41,4 +44,6 @@ public class PartyCommandsConfig {
         }
     }
 
+    @Expose
+    public List<String> blacklistedUsers = new ArrayList<>();
 }
