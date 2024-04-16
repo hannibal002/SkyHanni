@@ -16,17 +16,17 @@ public class PartyCommandsConfig {
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "Party Transfer", desc = "Automatically transfer the party to people who type §b!ptme")
-    public boolean transferCommand = false;
+    public boolean transferCommand = true;
 
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "Party Warp", desc = "Automatically warp the party if someone types §b!warp")
-    public boolean warpCommand = false;
+    public boolean warpCommand = true;
 
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "Party All Invite", desc = "Automatically turn on allinvite if someone types §b!allinv")
-    public boolean allInviteCommand = false;
+    public boolean allInviteCommand = true;
 
     public enum TrustedUser {
         BEST_FRIENDS("Best Friends"),
