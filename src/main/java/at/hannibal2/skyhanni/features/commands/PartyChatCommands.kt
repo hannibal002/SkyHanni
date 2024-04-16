@@ -94,12 +94,20 @@ object PartyChatCommands {
         }
         when (val firstArg = input[0]) {
             "add" -> {
+                if (input.size != 2) {
+                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
+                    return
+                }
                 if (input[1] in useConfig().blacklistedUsers) {
                     ChatUtils.userError("${input[1]} is already ignored!")
                 } else blacklistModify(input[1])
                 return
             }
             "remove" -> {
+                if (input.size != 2) {
+                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
+                    return
+                }
                 if (input[1] !in useConfig().blacklistedUsers) {
                     ChatUtils.userError("${input[1]} isn't ignored!")
                 } else blacklistModify(input[1])
