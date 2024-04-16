@@ -4,13 +4,16 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ReforgeHelperConfig {
 
     @Expose
+    @ConfigLink(owner = ReforgeHelperConfig.class, field = "enable")
     public Position posList = new Position(-200, 85, true, true);
     @Expose
+    @ConfigLink(owner = ReforgeHelperConfig.class, field = "enable")
     public Position posCurrent = new Position(280, 45, true, true);
 
     @Expose
