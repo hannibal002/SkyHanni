@@ -29,11 +29,11 @@ public class FossilExcavatorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Glacial Powder Stack",
-        desc = "Added Glacial Powder as stack size in the Fossil Excavator."
+        name = "Glacite Powder Stack",
+        desc = "Show Glacite Powder as stack size in the Fossil Excavator."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean glacialPowerStack = false;
+    public boolean glacitePowderStack = false;
 
 }
