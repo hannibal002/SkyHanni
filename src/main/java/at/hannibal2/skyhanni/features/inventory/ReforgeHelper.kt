@@ -40,20 +40,22 @@ class ReforgeHelper {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.reforge
 
-    private val reforgeMenu by RepoPattern.pattern(
-        "menu.reforge",
+    private val repoGroup = RepoPattern.group("reforge")
+
+    private val reforgeMenu by repoGroup.pattern(
+        "menu.blacksmith",
         "Reforge Item"
     )
-    private val reforgeHexMenu by RepoPattern.pattern(
-        "menu.reforge.hex",
+    private val reforgeHexMenu by repoGroup.pattern(
+        "menu.hex",
         "The Hex ➜ Reforges"
     )
-    private val reforgeChatMessage by RepoPattern.pattern(
-        "chat.reforge.message",
+    private val reforgeChatMessage by repoGroup.pattern(
+        "chat.success",
         "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!"
     )
-    private val reforgeChatFail by RepoPattern.pattern(
-        "chat.reforge.fail",
+    private val reforgeChatFail by repoGroup.pattern(
+        "chat.fail",
         "§cWait a moment before reforging again!|§cWhoa! Slow down there!"
     )
 
