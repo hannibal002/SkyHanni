@@ -263,7 +263,7 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
-        if (!TabWidget.PROFILE.isEventForThis(event)) return
+        if (!event.isEventFor(TabWidget.PROFILE)) return
 
         TabWidget.PROFILE.matchMatcherFirstLine() {
             var newProfile = group("profile").lowercase()
@@ -393,7 +393,7 @@ class HypixelData {
                 // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
                 val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
                 foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
-                islandType = getIslandType(newIsland, guesting)
+                islandType = getIslandType(foundIsland, guesting)
             }
 
             else -> ErrorManager.skyHanniError("Unmanaged Event for Island check")

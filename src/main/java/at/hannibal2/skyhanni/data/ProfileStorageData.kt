@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -49,13 +48,13 @@ object ProfileStorageData {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabWidgetUpdate.Clear) {
-        if (!TabWidget.PROFILE.isEventForThis(event)) return
+        if (!event.isEventFor(TabWidget.PROFILE)) return
         noTabListTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
-        if (!TabWidget.PROFILE.isEventForThis(event)) return
+        if (!event.isEventFor(TabWidget.PROFILE)) return
         noTabListTime = SimpleTimeMark.farPast()
     }
 
