@@ -19,7 +19,7 @@ object PartyChatCommands {
     )
 
     private fun useConfig() = SkyHanniMod.feature.misc.partyCommands
-    val allPartyCommands = listOf(
+    private val allPartyCommands = listOf(
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
             { useConfig().transferCommand },
@@ -36,9 +36,17 @@ object PartyChatCommands {
                 ChatUtils.sendCommandToServer("party warp")
             }
         ),
+        PartyChatCommand(
+            listOf("allinv", "allinvite"),
+            { useConfig().allInviteCommand },
+            requiresPartyLead = true,
+            executable = {
+                ChatUtils.sendCommandToServer("party settings allinvite")
+            }
+        ),
     )
 
-    val indexedPartyChatCommands = buildMap {
+    private val indexedPartyChatCommands = buildMap {
         for (command in allPartyCommands) {
             for (name in command.names) {
                 put(name.lowercase(), command)
@@ -46,7 +54,7 @@ object PartyChatCommands {
         }
     }
 
-    fun isTrustedUser(name: String): Boolean {
+    private fun isTrustedUser(name: String): Boolean {
         val friend = FriendAPI.getAllFriends().find { it.name == name }
         return when (useConfig().defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
