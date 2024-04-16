@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
@@ -49,12 +51,12 @@ object TabListReader {
 
     val renderColumns = mutableListOf<RenderColumn>()
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
 
-        var tabLines = event.tabList
+    private fun updateTablistData(tablist: List<String>? = null) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled.get()) return
+
+        var tabLines = tablist ?: TabListData.getTabList()
 
         if (tabLines.size < 80) return
 
@@ -73,6 +75,11 @@ object TabListReader {
         val renderColumn = RenderColumn()
         renderColumns.add(renderColumn)
         combineColumnsToRender(columns, renderColumn)
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        updateTablistData(event.tabList)
     }
 
     private fun parseColumns(original: List<String>): MutableList<TabColumn> {
@@ -242,6 +249,13 @@ object TabListReader {
                     }
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.enabled) {
+            updateTablistData()
         }
     }
 }

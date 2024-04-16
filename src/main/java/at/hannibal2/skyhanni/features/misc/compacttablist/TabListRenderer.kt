@@ -31,7 +31,7 @@ object TabListRenderer {
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.type != RenderGameOverlayEvent.ElementType.PLAYER_LIST) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         event.isCanceled = true
 
         if (config.toggleTab) return
@@ -45,7 +45,7 @@ object TabListRenderer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
