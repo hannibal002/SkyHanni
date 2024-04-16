@@ -310,14 +310,16 @@ enum class ScoreboardElement(
     }
 }
 
-private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-    listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-} else {
-    listOf(
-        displayConfig.titleAndFooter.customTitle.get().toString()
-            .replace("&", "§") to displayConfig.titleAndFooter.alignTitleAndFooter
-    )
-}
+private fun getTitleDisplayPair(): List<ScoreboardElementType> =
+    if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
+        listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+    } else {
+        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
+            .replace("&", "§")
+            .split("\\n")
+            .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+        ).flatten()
+    }
 
 private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
@@ -525,14 +527,10 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
-    val lobbyCode = HypixelData.serverId ?: "<hidden>"
-    return listOf(
-        if (lobbyCode == "<hidden>") {
-            "<hidden>"
-        } else {
-            "§8$lobbyCode"
-        } to HorizontalAlignment.LEFT
-    )
+    val lobbyCode = HypixelData.serverId
+    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
+    val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: "<hidden>"
+    return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
 }
 
 private fun getPowerDisplayPair() = listOf(
@@ -769,10 +767,13 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     }
 }
 
-private fun getFooterDisplayPair() = listOf(
-    displayConfig.titleAndFooter.customFooter.get().toString()
-        .replace("&", "§") to displayConfig.titleAndFooter.alignTitleAndFooter
-)
+private fun getFooterDisplayPair(): List<ScoreboardElementType> =
+    listOf(displayConfig.titleAndFooter.customFooter.get().toString()
+        .replace("&", "§")
+        .split("\\n")
+        .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+    ).flatten()
+
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
