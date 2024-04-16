@@ -30,7 +30,7 @@ object CombatUtils {
         return try {
             val a = xpInformation as? MixinXPInformation
             a!!.getTotalXp().toFloat()
-        } catch (e: Exception) {
+        } catch (e: Error) {
             val xpInfo = xpInformation ?: return -1f
             xpInfo.totalXp
         }
