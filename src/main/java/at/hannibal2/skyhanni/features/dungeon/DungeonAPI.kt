@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -57,7 +59,7 @@ object DungeonAPI {
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
     )
 
-    fun inDungeon() = dungeonFloor != null
+    fun inDungeon() = IslandType.CATACOMBS.isInIsland()
 
     fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
 
@@ -242,7 +244,7 @@ object DungeonAPI {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
-        if (!LorenzUtils.inDungeons) {
+        if (!inDungeon()) {
             event.addIrrelevant("not in dungeons")
             return
         }

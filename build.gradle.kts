@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.4"
+version = "0.25.Beta.7.1"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -104,7 +104,7 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -115,7 +115,7 @@ dependencies {
     implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }

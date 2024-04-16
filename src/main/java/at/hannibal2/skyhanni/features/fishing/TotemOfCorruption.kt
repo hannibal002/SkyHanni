@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -35,16 +35,16 @@ class TotemOfCorruption {
     private var display = emptyList<String>()
     private var totems: List<Totem> = emptyList()
 
-    private val group = RepoPattern.group("fishing.totemofcorruption")
-    private val totemNamePattern by group.pattern(
+    private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
+    private val totemNamePattern by patternGroup.pattern(
         "totemname",
         "§5§lTotem of Corruption"
     )
-    private val timeRemainingPattern by group.pattern(
+    private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining",
         "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s"
     )
-    private val ownerPattern by group.pattern(
+    private val ownerPattern by patternGroup.pattern(
         "owner",
         "§7Owner: §e(?<owner>.+)"
     )
@@ -56,7 +56,7 @@ class TotemOfCorruption {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(2)) return
         if (!isOverlayEnabled()) return
 
@@ -148,7 +148,7 @@ class TotemOfCorruption {
     private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 
-class Totem(
+private class Totem(
     val location: LorenzVec,
     val timeRemaining: Duration,
     val ownerName: String,

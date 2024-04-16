@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFrom
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -61,6 +64,12 @@ object SackAPI {
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
+
+    var sackListInternalNames = emptySet<String>()
+        private set
+
+    var sackListNames = emptySet<String>()
+        private set
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -233,6 +242,21 @@ object SackAPI {
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }
+    }
+
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
+        val uniqueSackItems = mutableSetOf<NEUInternalName>()
+
+        sacksData.values.forEach { sackInfo ->
+            sackInfo.contents.forEach { content ->
+                uniqueSackItems.add(content)
+            }
+        }
+
+        sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
+        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.uppercase() }.toSet()
     }
 
     private fun updateSacks(changes: SackChangeEvent) {

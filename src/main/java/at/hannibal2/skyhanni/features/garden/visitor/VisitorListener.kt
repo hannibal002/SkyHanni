@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorStatus
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.INFO_SLOT
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -24,8 +26,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
@@ -37,11 +41,15 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 class VisitorListener {
+    private val offersAcceptedPattern by RepoPattern.pattern(
+        "garden.visitor.offersaccepted",
+        "§7Offers Accepted: §a(?<offersAccepted>\\d+)"
+    )
 
     private val config get() = VisitorAPI.config
 
-    private var lastClickedNpc = 0
     private val logger = LorenzLogger("garden/visitors/listener")
+
 
     companion object {
         private val VISITOR_INFO_ITEM_SLOT = 13
@@ -75,6 +83,7 @@ class VisitorListener {
         if (!hasVisitorInfo) return
 
         val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
+
         if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
             VisitorAPI.getVisitors().forEach {
                 val name = it.visitorName
@@ -94,11 +103,11 @@ class VisitorListener {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
-        val npcItem = event.inventoryItems[VISITOR_INFO_ITEM_SLOT] ?: return
+        val npcItem = event.inventoryItems[INFO_SLOT] ?: return
         val lore = npcItem.getLore()
         if (!VisitorAPI.isVisitorInfo(lore)) return
 
-        val offerItem = event.inventoryItems[VISITOR_ACCEPT_ITEM_SLOT] ?: return
+        val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
         if (offerItem.name != "§aAccept Offer") return
 
         VisitorAPI.inInventory = true
@@ -112,6 +121,7 @@ class VisitorListener {
 
         val visitor = VisitorAPI.getOrCreateVisitor(name) ?: return
 
+        visitor.offersAccepted = offersAcceptedPattern.matchMatcher(lore[3]) { group("offersAccepted").toInt() }
         visitor.entityId = lastClickedNpc
         visitor.offer = visitorOffer
         VisitorOpenEvent(visitor).postAndCatch()
@@ -151,10 +161,9 @@ class VisitorListener {
                     event.isCanceled = true
                     ChatUtils.chat("§cBlocked refusing visitor ${visitor.visitorName} §7(${it.displayName}§7)")
                     if (config.rewardWarning.bypassKey == Keyboard.KEY_NONE) {
-                        ChatUtils.clickableChat(
+                        ChatUtils.chatAndOpenConfig(
                             "§eIf you want to deny this visitor, set a keybind in §e/sh bypass",
-                            "sh bypass",
-                            false
+                            GardenAPI.config.visitors.rewardWarning::bypassKey
                         )
                     }
                     Minecraft.getMinecraft().thePlayer.closeScreen()
@@ -162,7 +171,7 @@ class VisitorListener {
                 }
             }
 
-            VisitorAPI.changeStatus(visitor, VisitorStatus.REFUSED, "refused")
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")
             // fallback if tab list is disabled
             DelayedRun.runDelayed(10.seconds) {
                 VisitorAPI.removeVisitor(visitor.visitorName)
@@ -172,7 +181,7 @@ class VisitorListener {
         if (event.slotId == VISITOR_ACCEPT_ITEM_SLOT && event.slot?.stack?.getLore()
                 ?.any { it == "§eClick to give!" } == true
         ) {
-            VisitorAPI.changeStatus(visitor, VisitorStatus.ACCEPTED, "accepted")
+            VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }
     }
