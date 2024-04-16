@@ -28,6 +28,7 @@ public class OptimalSpeedConfig {
     public boolean signEnabled = true;
 
     @Expose
+    @ConfigLink(owner = OptimalSpeedConfig.class, field = "signEnabled")
     public Position signPosition = new Position(20, -195, false, true);
 
     @Expose

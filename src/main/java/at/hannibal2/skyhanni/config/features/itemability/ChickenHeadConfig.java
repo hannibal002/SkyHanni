@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ChickenHeadConfig {
@@ -15,6 +16,7 @@ public class ChickenHeadConfig {
     public boolean displayTimer = false;
 
     @Expose
+    @ConfigLink(owner = ChickenHeadConfig.class, field = "displayTimer")
     public Position position = new Position(-372, 73, false, true);
 
     @Expose

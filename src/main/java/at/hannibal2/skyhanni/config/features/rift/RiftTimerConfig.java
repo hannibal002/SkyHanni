@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
@@ -26,6 +27,7 @@ public class RiftTimerConfig {
     public Property<Boolean> percentage = Property.of(true);
 
     @Expose
+    @ConfigLink(owner = RiftTimerConfig.class, field = "enabled")
     public Position timerPosition = new Position(10, 10, false, true);
 
 }
