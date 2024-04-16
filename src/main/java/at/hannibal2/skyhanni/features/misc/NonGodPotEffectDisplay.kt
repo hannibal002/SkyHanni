@@ -71,6 +71,8 @@ class NonGodPotEffectDisplay {
         PEST_REPELLENT_MAX("§6Pest Repellent II"),
 
         CURSE_OF_GREED("§4Curse of Greed I"),
+
+        COLD_RESISTANCE_4("§bCold Resistance IV"),
         ;
     }
 

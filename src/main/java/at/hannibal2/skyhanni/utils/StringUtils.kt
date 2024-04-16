@@ -106,6 +106,13 @@ object StringUtils {
         return null
     }
 
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.find()) consumer(it) }
+        }
+        return null
+    }
+
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
         return if (split.size > 1) {

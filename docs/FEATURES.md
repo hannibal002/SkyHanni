@@ -761,6 +761,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to show the walls also when inside the Nucleus.
 + Fossil Excavator Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1427)
     + Shows where to next click for optimal chance of solving the fossil. If there is a fossil this will find it within 18 moves.
++ Excavation Profit Tracker. - hannibal2 + Empa (https://github.com/hannibal002/SkyHanni/pull/1432)
+    + Count all drops you gain while excavating in the Fossil Research Center.
+    + Track Glacite Powder gained as well (no profit, but progress).
+    + Track Fossil Dust and use it for profit calculation.
++ Mining Notifications. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1429)
+    + Mining events, including Mineshaft spawning, Suspicious Scrap drops, and Cold going above a threshold.
++ Profit Per Excavation. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1439)
+    + Show profit/loss in chat after each excavation.
+    + Also include breakdown information on hover.
 
 </details>
 <details open><summary>
@@ -1051,6 +1060,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
     + Simply right-click a HUD element in the HUD editor to jump to its associated options.
     + Does not yet work on every GUI element. Wait for the missing elements in the following betas.
++ Quiver Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
+    + Only shows the type of arrow when wearing a Skeleton Master Chestplate.
++ Low Quiver Reminder at the end of Dungeon/Kuudra run. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
++ party chat commands. - !nea (https://github.com/hannibal002/SkyHanni/pull/1433)
+    + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
+    + Added `!pw` (and aliases) as a command that allows others to request a warp.
++ Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
 
 </details>
 <details open><summary>
