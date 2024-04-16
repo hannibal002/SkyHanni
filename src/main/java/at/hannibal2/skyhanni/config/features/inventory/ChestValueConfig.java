@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ChestValueConfig {
@@ -133,7 +134,7 @@ public class ChestValueConfig {
     )
     public int hideBelow = 100_000;
 
-
     @Expose
+    @ConfigLink(owner = ChestValueConfig.class, field = "enabled")
     public Position position = new Position(107, 141, false, true);
 }

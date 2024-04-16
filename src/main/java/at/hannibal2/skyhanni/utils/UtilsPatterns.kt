@@ -53,7 +53,7 @@ object UtilsPatterns {
     )
     val readAmountAfterPattern by patternGroup.pattern(
         "item.amount.behind",
-        "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?"
+        "(?<name>(?:§.)*(?:[^§] ?)+)(?:§8x(?<amount>[\\d,]+))?"
     )
 
     val timeAmountPattern by patternGroup.pattern(
