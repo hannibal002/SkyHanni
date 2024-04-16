@@ -32,7 +32,7 @@ void main() {
 
     vec2 newCenterPos = vec2((centerPos.x * xScale) + (xTranslation * scaleFactor), newCenterPosY - (yTranslation * scaleFactor));
 
-    float distance = roundedRectSDF(gl_FragCoord.xy - newCenterPos, newHalfSize, radius);
+    float distance = roundedRectSDF(gl_FragCoord.xy - newCenterPos, newHalfSize, max(radius, borderThickness));
 
     // In testing, keeping the upper bound at 1.0 and letting the lower be changable seemed the most sensible for nice results
     float smoothed = 1.0 - smoothstep(borderBlur, 1.0, abs(distance / borderThickness));
