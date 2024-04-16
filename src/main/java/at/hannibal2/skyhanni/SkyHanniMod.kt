@@ -122,6 +122,13 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsLocations
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -318,13 +325,6 @@ import at.hannibal2.skyhanni.features.misc.SuperpairsClicksAlert
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryApi
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryBarnManager
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryInventory
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.ChocolateFactoryStats
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.HoppityEggsLocations
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.HoppityEggsManager
-import at.hannibal2.skyhanni.features.misc.chocolatefactory.HoppityEggsShared
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -13,7 +13,6 @@ object ChocolateFactoryStats {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryApi.isEnabled()) return
         if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!config.statsDisplay) return
 

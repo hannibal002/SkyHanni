@@ -55,6 +55,10 @@ object UtilsPatterns {
         "item.amount.behind",
         "(?<name>(?:§.)*(?:[^§] ?)+)(?:§8x(?<amount>[\\d,]+))?"
     )
+    val costLinePattern by patternGroup.pattern(
+        "item.cost.line",
+        "§7Cost"
+    )
 
     val timeAmountPattern by patternGroup.pattern(
         "time.amount",

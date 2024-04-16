@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
@@ -36,7 +35,6 @@ object ChocolateFactoryInventory {
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        if (!ChocolateFactoryApi.isEnabled()) return
         if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
@@ -49,7 +47,6 @@ object ChocolateFactoryInventory {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!ChocolateFactoryApi.isEnabled()) return
         if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
@@ -64,12 +61,14 @@ object ChocolateFactoryInventory {
             if (slot.slotIndex == ChocolateFactoryApi.barnIndex && ChocolateFactoryBarnManager.barnFull) {
                 slot highlight LorenzColor.RED
             }
+            if (slot.slotIndex == ChocolateFactoryApi.clickRabbitSlot) {
+                slot highlight LorenzColor.RED
+            }
         }
     }
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!ChocolateFactoryApi.isEnabled()) return
         if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!config.showStackSizes) return
 
@@ -106,7 +105,6 @@ object ChocolateFactoryInventory {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!ChocolateFactoryApi.inChocolateFactory) return
         val slot = event.slot ?: return
         if (!config.useMiddleClick) return

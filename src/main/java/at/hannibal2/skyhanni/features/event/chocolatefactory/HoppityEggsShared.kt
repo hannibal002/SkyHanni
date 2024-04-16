@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager

@@ -1,8 +1,9 @@
-package at.hannibal2.skyhanni.features.misc.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,7 +11,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -77,6 +78,7 @@ object HoppityEggsManager {
     }
 
     fun shareWaypointPrompt() {
+        if (!config.sharedWaypoints) return
         val currentLocation = LocationUtils.playerLocation()
         val meal = lastMeal ?: return
         lastMeal = null
@@ -108,5 +110,10 @@ object HoppityEggsManager {
         if (displayList.size == 1) return
 
         config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
+    }
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        HoppityEggType.checkClaimed()
     }
 }

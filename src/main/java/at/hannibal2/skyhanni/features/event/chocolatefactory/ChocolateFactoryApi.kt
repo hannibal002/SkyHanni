@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.ChocolateFactoryConfig
@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -26,14 +25,14 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 
 object ChocolateFactoryApi {
 
-    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.misc.chocolateFactory
+    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.event.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
@@ -87,10 +86,11 @@ object ChocolateFactoryApi {
     val upgradeableSlots: MutableSet<Int> = mutableSetOf()
     var bestUpgrade: Int? = null
     var bestRabbitUpgrade: String? = null
+    var clickRabbitSlot: Int? = null
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
@@ -101,7 +101,6 @@ object ChocolateFactoryApi {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!inChocolateFactory) return
 
         updateInventoryItems(event.inventoryItems)
@@ -120,16 +119,19 @@ object ChocolateFactoryApi {
         upgradeableSlots.clear()
         var bestAffordableUpgradeRatio = Double.MAX_VALUE
         var bestPossibleUpgradeRatio = Double.MAX_VALUE
+        clickRabbitSlot = null
 
         for ((slotIndex, item) in inventory) {
             if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
                 SoundUtils.playBeepSound()
+                clickRabbitSlot = slotIndex
             }
 
-            val upgradeCost = item.getLore().getUpgradeCost() ?: continue
+            val lore = item.getLore()
+            val upgradeCost = lore.getUpgradeCost() ?: continue
 
             if (slotIndex == barnIndex) {
-                item.getLore().matchFirst(barnAmountPattern) {
+                lore.matchFirst(barnAmountPattern) {
                     profileStorage.currentRabbits = group("rabbits").formatInt()
                     profileStorage.maxRabbits = group("max").formatInt()
 
@@ -164,7 +166,7 @@ object ChocolateFactoryApi {
             chocolatePerSecondPattern.matchMatcher(line) {
                 chocolatePerSecond = group("amount").formatDouble()
             }
-            this.chocolateAllTimePattern.matchMatcher(line) {
+            chocolateAllTimePattern.matchMatcher(line) {
                 chocolateAllTime = group("amount").formatLong()
             }
         }
@@ -174,6 +176,7 @@ object ChocolateFactoryApi {
         productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
             chocolateMultiplier = group("amount").formatDouble()
         }
+        if (!config.statsDisplay) return
         ChocolateFactoryStats.updateDisplay()
     }
 
@@ -208,13 +211,8 @@ object ChocolateFactoryApi {
         maxRabbits = data.maxRabbits
     }
 
-    @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        HoppityEggType.checkClaimed()
-    }
-
     private fun List<String>.getUpgradeCost(): Long? {
-        val nextLine = this.nextAfter({ it == "§7Cost" }) ?: return null
+        val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             return group("amount").formatLong()
         }

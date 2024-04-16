@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig;
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
 import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig;
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig;
+import at.hannibal2.skyhanni.config.features.misc.ChocolateFactoryConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -22,6 +23,10 @@ public class EventConfig {
     @Category(name = "Winter", desc = "Winter Season on Jerry's Island")
     @Expose
     public WinterConfig winter = new WinterConfig();
+
+    @Expose
+    @Category(name = "Hoppity", desc = "Features for the Hoppity event and the chocolate factory.")
+    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @ConfigOption(name = "City Project", desc = "")
     @Accordion

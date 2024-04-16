@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -115,14 +115,14 @@ object HoppityEggsLocations {
         if (!event.isVillagerParticle() && !event.isEnchantmentParticle()) return
 
         val lastParticlePosition = lastParticlePosition ?: run {
-            this.lastParticlePosition = event.location
+            lastParticlePosition = event.location
             return
         }
         if (lastParticlePosition == event.location) {
             validParticleLocations.add(event.location)
             ticksSinceLastParticleFound = 0
         }
-        this.lastParticlePosition = null
+        HoppityEggsLocations.lastParticlePosition = null
     }
 
     @SubscribeEvent
@@ -170,11 +170,11 @@ object HoppityEggsLocations {
 
         // todo allow more leeway for further points later
         // need to test while is hoppity event. Works well enough for now
-        val a = islandEggsLocations.filter {
+        val filteredLocations = islandEggsLocations.filter {
             boundingBox.isInside(it) && it.distanceToLine(firstPos, secondPos) < 200.0
         }
 
-        possibleEggLocations.addAll(a.sortedBy {
+        possibleEggLocations.addAll(filteredLocations.sortedBy {
             it.distanceToLine(firstPos, secondPos)
         })
 
