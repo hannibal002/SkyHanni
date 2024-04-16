@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
@@ -220,6 +221,10 @@ public class MiscConfig {
     public boolean showTimeInLimbo = true;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "showTimeInLimbo")
+    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
+
+    @Expose
     @ConfigOption(
         name = "Lesser Orb of Healing Hider",
         desc = "Hides the Lesser Orb of Healing.")
@@ -234,13 +239,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     public boolean lockMouseLookChatMessage = true;
 
-    @Expose
-    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
-
+    // Does not have a config element!
     @Expose
     public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
+    @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose

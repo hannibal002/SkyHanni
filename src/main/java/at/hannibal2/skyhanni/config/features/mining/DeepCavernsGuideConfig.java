@@ -8,10 +8,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
-public class DeepCavernsParkourConfig {
+public class DeepCavernsGuideConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows a parkour to the bottom of Deep Caverns and to Rhys.")
+    @ConfigOption(name = "Enabled", desc = "Shows a guide to the bottom of the Deep Caverns and to Rhys.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -27,12 +27,12 @@ public class DeepCavernsParkourConfig {
     public Property<Boolean> rainbowColor = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+    @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the guide waypoints.")
     @ConfigEditorColour
     public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
-    @Expose
-    @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
-    @ConfigEditorBoolean
-    public boolean highlightAllLines = false;
+//     @Expose
+//     @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
+//     @ConfigEditorBoolean
+//     public boolean highlightAllLines = false;
 }
