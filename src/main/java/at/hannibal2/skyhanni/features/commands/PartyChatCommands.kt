@@ -98,7 +98,7 @@ object PartyChatCommands {
                     ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
                     return
                 }
-                if (input[1] in useConfig().blacklistedUsers) {
+                if (isBlockedUser(input[1])) {
                     ChatUtils.userError("${input[1]} is already ignored!")
                 } else blacklistModify(input[1])
                 return
@@ -108,7 +108,7 @@ object PartyChatCommands {
                     ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
                     return
                 }
-                if (input[1] !in useConfig().blacklistedUsers) {
+                if (!isBlockedUser(input[1])) {
                     ChatUtils.userError("${input[1]} isn't ignored!")
                 } else blacklistModify(input[1])
                 return
@@ -168,7 +168,7 @@ object PartyChatCommands {
             ChatUtils.chat("Your ignored players list is empty!")
             return
         } else {
-            if (player in blacklist) {
+            if (isBlockedUser(player)) {
                 ChatUtils.chat("$player §ais §eignored.")
             } else {
                 ChatUtils.chat("$player §cisn't §eignored.")
