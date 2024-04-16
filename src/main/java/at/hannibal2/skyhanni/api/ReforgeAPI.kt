@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigManager.Companion.registerTypeAdapter
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -10,6 +13,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import com.google.gson.Gson
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -128,10 +135,38 @@ object ReforgeAPI {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val reforgeStoneData = event.readConstant<Map<String, NeuReforgeJson>>("reforgestones").values
-        val reforgeData = event.readConstant<Map<String, NeuReforgeJson>>("reforges").values
+        val reforgeStoneData = event.readConstant<Map<String, NeuReforgeJson>>("reforgestones", reforgeGson).values
+        val reforgeData = event.readConstant<Map<String, NeuReforgeJson>>("reforges", reforgeGson).values
         reforgeList = (reforgeStoneData + reforgeData).map(::mapReforge)
     }
+
+    private val reforgeGson: Gson = ConfigManager.createBaseGsonBuilder()
+        .registerTypeAdapter(SkyblockStat::class.java, object : TypeAdapter<SkyblockStat>() {
+            override fun write(out: JsonWriter, value: SkyblockStat) {
+                out.value(value.name.lowercase()) // F you guy who made the stats lowercase
+            }
+
+            override fun read(reader: JsonReader): SkyblockStat {
+                return SkyblockStat.valueOf(reader.nextString().uppercase())
+            }
+        }.nullSafe())
+        .registerTypeAdapter<SkyblockStatList>({ out, value ->
+            out.beginObject()
+            value.forEach {
+                out.name(it.key.name.lowercase()).value(it.value)
+            }
+            out.endObject()
+        }, { reader ->
+            reader.beginObject()
+            val list = SkyblockStatList()
+            while (reader.hasNext()) {
+                val name = reader.nextName()
+                val value = reader.nextDouble()
+                list[SkyblockStat.valueOf(name.uppercase())] = value
+            }
+            reader.endObject()
+            list
+        }).create()
 
     private fun mapReforge(it: NeuReforgeJson): Reforge {
         val type = it.itemType
