@@ -199,13 +199,11 @@ object HoppityEggsLocations {
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ).expand(10.0)
     }
 
-    fun getCurrentIslandEggLocations(): List<LorenzVec>? {
-        return eggLocations[LorenzUtils.skyBlockIsland]
-    }
+    fun getCurrentIslandEggLocations(): List<LorenzVec>? =
+        eggLocations[LorenzUtils.skyBlockIsland]
 
-    fun isValidEggLocation(location: LorenzVec): Boolean {
-        return getCurrentIslandEggLocations()?.any { it.distance(location) < 5.0 } ?: false
-    }
+    fun isValidEggLocation(location: LorenzVec): Boolean =
+        getCurrentIslandEggLocations()?.any { it.distance(location) < 5.0 } ?: false
 
     private fun ReceiveParticleEvent.isVillagerParticle() =
         type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1

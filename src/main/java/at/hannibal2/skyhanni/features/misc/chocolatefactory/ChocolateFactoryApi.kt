@@ -94,7 +94,7 @@ object ChocolateFactoryApi {
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
-        DelayedRun.runDelayed(50.milliseconds) {
+        DelayedRun.runNextTick {
             updateInventoryItems(event.inventoryItems)
         }
     }

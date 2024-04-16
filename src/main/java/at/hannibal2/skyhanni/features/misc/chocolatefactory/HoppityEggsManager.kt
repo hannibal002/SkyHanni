@@ -85,7 +85,7 @@ object HoppityEggsManager {
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
                 onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal) },
-                SimpleTimeMark.now() + 30.seconds
+                30.seconds.fromNow()
             )
         }
     }
