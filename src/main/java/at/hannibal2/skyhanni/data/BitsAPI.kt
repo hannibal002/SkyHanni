@@ -225,6 +225,12 @@ object BitsAPI {
                 if (bitsAvailable != amount) {
                     bitsAvailable = amount
                     sendBitsAvailableGainedEvent()
+
+                    val difference = bits - bitsAvailable
+                    if (difference > 0) {
+                        ChatUtils.debug("You have gained §3${difference} Bits §7according to the menu!")
+                        bits += difference
+                    }
                 }
             }
             lore.matchFirst(cookieDurationPattern) {

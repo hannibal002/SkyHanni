@@ -118,8 +118,7 @@ object GardenVisitorFeatures {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
-            val pair = ItemUtils.readItemAmount(line)
-            if (pair == null) {
+            val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Could not read Shopping List in Visitor Inventory", "ItemUtils.readItemAmount returns null",
                     "line" to line,
@@ -129,7 +128,6 @@ object GardenVisitorFeatures {
                 )
                 continue
             }
-            val (itemName, amount) = pair
             val internalName = NEUInternalName.fromItemName(itemName)
             visitor.shoppingList[internalName] = amount
         }
