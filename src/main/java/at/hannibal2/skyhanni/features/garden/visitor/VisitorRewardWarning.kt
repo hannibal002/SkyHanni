@@ -47,13 +47,13 @@ class VisitorRewardWarning {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
-        val slot = event.slot ?: return
+        val stack = event.slot?.stack ?: return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = slot.stack.name == "§cRefuse Offer"
-        val isAcceptSlot = slot.stack.name == "§aAccept Offer"
+        val isRefuseSlot = stack.name == "§cRefuse Offer"
+        val isAcceptSlot = stack.name == "§aAccept Offer"
 
         if (blockReason != null && !config.bypassKey.isKeyHeld() &&
             ((blockReason.blockRefusing && isRefuseSlot) || !blockReason.blockRefusing && isAcceptSlot)) {
@@ -66,7 +66,7 @@ class VisitorRewardWarning {
             return
         }
         if (isAcceptSlot) {
-            if (slot.stack?.name != "§eClick to give!") return
+            if (stack.name != "§eClick to give!") return
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }
