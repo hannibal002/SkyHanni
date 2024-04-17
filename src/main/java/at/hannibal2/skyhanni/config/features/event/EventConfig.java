@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig;
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
 import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig;
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig;
-import at.hannibal2.skyhanni.config.features.misc.ChocolateFactoryConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
