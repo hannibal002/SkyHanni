@@ -72,7 +72,7 @@ object MobUtils {
             )
         }.values
         if (possibleEntities.isEmpty()) return null
-        return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }.drop(1) // drop to remove player
+        return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }
     }
 
     val EntityLivingBase.mob get() = MobData.entityToMob[this]
