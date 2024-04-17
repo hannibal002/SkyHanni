@@ -235,8 +235,11 @@ enum class HotmData(
 
     private val guiNamePattern by repoGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
 
-    var activeLevel: Int
+    val rawLevel: Int
         get() = storage?.perks?.get(this.name)?.level ?: 0
+
+    var activeLevel: Int
+        get() = storage?.perks?.get(this.name)?.level?.plus(if (HotmAPI.isBlueEggActive) 1 else 0) ?: 0
         private set(value) {
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
         }
@@ -272,7 +275,7 @@ enum class HotmData(
         )
 
         private val levelPattern by repoGroup.pattern(
-            "perk.level", "§7Level (?<level>\\d+).*"
+            "perk.level", "§Level (?<level>\\d+).*"
         )
 
         private val notUnlockedPattern by repoGroup.pattern(
