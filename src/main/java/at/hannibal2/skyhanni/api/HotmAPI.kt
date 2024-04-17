@@ -14,7 +14,7 @@ object HotmAPI {
     enum class Powder() {
         MITHRIL,
         GEMSTONE,
-        GLACITE
+        GLACITE,
 
         ;
 
@@ -34,6 +34,7 @@ object HotmAPI {
         fun getStorage() = ProfileStorageData.profileSpecific?.mining?.powder?.get(this)
 
         fun getCurrent() = getStorage()?.available ?: 0L
+
         fun setCurrent(value: Long) {
             getStorage()?.available = value
         }
