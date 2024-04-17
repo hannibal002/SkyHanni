@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -35,7 +36,7 @@ enum class HotmData(
         { level -> mapOf(HotmReward.MINING_SPEED to level * 20.0) }),
     MINING_FORTUNE("Mining Fortune",
         50,
-        { currentLevel -> (currentLevel + 1.0).pow(3.5) },
+        { currentLevel -> (currentLevel + 2.0).pow(3.05) },
         { level -> mapOf(HotmReward.MINING_FORTUNE to level * 5.0) }),
     QUICK_FORGE("Quick Forge",
         20,
@@ -236,8 +237,11 @@ enum class HotmData(
 
     private val guiNamePattern by repoGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
 
-    var activeLevel: Int
+    val rawLevel: Int
         get() = storage?.perks?.get(this.name)?.level ?: 0
+
+    var activeLevel: Int
+        get() = storage?.perks?.get(this.name)?.level?.plus(if (HotmAPI.isBlueEggActive) 1 else 0) ?: 0
         private set(value) {
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
         }
@@ -257,7 +261,7 @@ enum class HotmData(
     var slot: Slot? = null
         private set
 
-    fun getLevelUpCost() = costFun(activeLevel)
+    fun getLevelUpCost() = costFun(rawLevel)
 
     fun getReward() = rewardFun(activeLevel)
 
@@ -275,7 +279,7 @@ enum class HotmData(
         )
 
         private val levelPattern by repoGroup.pattern(
-            "perk.level", "§7Level (?<level>\\d+).*"
+            "perk.level", "§(?<color>.)Level (?<level>\\d+).*"
         )
 
         private val notUnlockedPattern by repoGroup.pattern(
@@ -362,8 +366,8 @@ enum class HotmData(
             entry.isUnlocked = true
 
             entry.activeLevel = levelPattern.matchMatcher(lore.first()) {
-                group("level").toInt()
-            } ?: 0
+                group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
+            } ?: entry.maxLevel
 
             if (entry.activeLevel > entry.maxLevel) {
                 throw IllegalStateException("Hotm Perk '${entry.name}' over max level")
