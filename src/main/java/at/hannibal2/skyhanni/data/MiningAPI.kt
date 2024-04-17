@@ -56,8 +56,7 @@ object MiningAPI {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (cold != 0) updateCold(0)
-        lastColdUpdate = SimpleTimeMark.farPast()
-        lastColdReset = SimpleTimeMark.farPast()
+        lastColdReset = SimpleTimeMark.now()
     }
 
     private fun updateCold(newCold: Int) {
