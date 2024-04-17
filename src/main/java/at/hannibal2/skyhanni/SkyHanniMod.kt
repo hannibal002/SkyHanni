@@ -119,6 +119,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonShadowAssassinNotification
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
+import at.hannibal2.skyhanni.features.dungeon.DungeonsRaceGuide
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
@@ -501,6 +502,7 @@ class SkyHanniMod {
         loadModule(ItemAddManager())
         loadModule(BingoCardReader())
         loadModule(DeepCavernsGuide())
+        loadModule(DungeonsRaceGuide())
         loadModule(GardenBestCropTime())
         loadModule(ActionBarData)
         loadModule(TrackerManager)
