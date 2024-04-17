@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
@@ -32,10 +31,6 @@ object CustomScoreboardUtils {
         } ?: "§e❤ "
 
         else -> "§e"
-    }
-
-    fun getTablistFooter(): String {
-        return TabListData.getFooter().removeResets()
     }
 
     internal fun Number.formatNum(): String = when (displayConfig.numberFormat) {

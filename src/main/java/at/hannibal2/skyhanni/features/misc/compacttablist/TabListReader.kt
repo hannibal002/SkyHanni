@@ -57,7 +57,6 @@ object TabListReader {
 
     val renderColumns = mutableListOf<RenderColumn>()
 
-
     private fun updateTablistData(tablist: List<String>? = null) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled.get()) return
@@ -197,60 +196,58 @@ object TabListReader {
         var firstColumnCopy = firstColumn
         var lastTitle: String? = null
 
-        for (column in columns) {
-            for (section in column.sections) {
-                var sectionSize = section.size()
+        for (section in columns.flatMap { it.sections }) {
+            var sectionSize = section.size()
 
-                var needsTitle = false
-                if (lastTitle != section.columnValue.columnTitle) {
-                    needsTitle = true
-                    sectionSize++
+            var needsTitle = false
+            if (lastTitle != section.columnValue.columnTitle) {
+                needsTitle = true
+                sectionSize++
+            }
+
+            var currentCount = firstColumnCopy.size()
+
+            if (sectionSize >= TabListRenderer.MAX_LINES / 2) {
+                if (currentCount >= TabListRenderer.MAX_LINES) {
+                    renderColumns.add(RenderColumn().also { firstColumnCopy = it })
+                    currentCount = 1
+                } else {
+                    if (firstColumnCopy.size() > 0) {
+                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
+                    }
                 }
 
-                var currentCount = firstColumnCopy.size()
+                if (needsTitle) {
+                    lastTitle = section.columnValue.columnTitle
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
+                    currentCount++
+                }
 
-                if (sectionSize >= TabListRenderer.MAX_LINES / 2) {
+                for (line in section.lines) {
                     if (currentCount >= TabListRenderer.MAX_LINES) {
                         renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                         currentCount = 1
-                    } else {
-                        if (firstColumnCopy.size() > 0) {
-                            firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
-                        }
                     }
 
-                    if (needsTitle) {
-                        lastTitle = section.columnValue.columnTitle
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
-                        currentCount++
-                    }
-
-                    for (line in section.lines) {
-                        if (currentCount >= TabListRenderer.MAX_LINES) {
-                            renderColumns.add(RenderColumn().also { firstColumnCopy = it })
-                            currentCount = 1
-                        }
-
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
-                        currentCount++
-                    }
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
+                    currentCount++
+                }
+            } else {
+                if (currentCount + sectionSize > TabListRenderer.MAX_LINES) {
+                    renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                 } else {
-                    if (currentCount + sectionSize > TabListRenderer.MAX_LINES) {
-                        renderColumns.add(RenderColumn().also { firstColumnCopy = it })
-                    } else {
-                        if (firstColumnCopy.size() > 0) {
-                            firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
-                        }
+                    if (firstColumnCopy.size() > 0) {
+                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
                     }
+                }
 
-                    if (needsTitle) {
-                        lastTitle = section.columnValue.columnTitle
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
-                    }
+                if (needsTitle) {
+                    lastTitle = section.columnValue.columnTitle
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
+                }
 
-                    for (line in section.lines) {
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
-                    }
+                for (line in section.lines) {
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
                 }
             }
         }
