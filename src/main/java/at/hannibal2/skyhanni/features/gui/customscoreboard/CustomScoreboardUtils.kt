@@ -35,9 +35,7 @@ object CustomScoreboardUtils {
     }
 
     fun getTablistFooter(): String {
-        val tabList = TabListData.getPlayerTabOverlay()
-        if (tabList.footer_skyhanni == null) return ""
-        return tabList.footer_skyhanni.formattedText.replace("§r", "")
+        return TabListData.getFooter().removeResets()
     }
 
     internal fun Number.formatNum(): String = when (displayConfig.numberFormat) {

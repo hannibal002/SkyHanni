@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
@@ -45,6 +47,10 @@ object TabListReader {
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
         "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
+    )
+    private val winterPowerUpsPattern by patternGroup.pattern(
+        "winterpowerups",
+        "Active Power Ups(?:§.)*(?:\\n(§.)*§7.+)*"
     )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"
@@ -103,53 +109,51 @@ object TabListReader {
     }
 
     private fun parseFooterAsColumn(): TabColumn? {
-        val tabList = TabListData.getPlayerTabOverlay()
+        var footer = TabListData.getFooter().removeSFormattingCode()
+        if (footer.isEmpty()) return null
 
-        if (tabList.footer_skyhanni == null) {
-            return null
+        footer = godPotPattern.findMatcher(footer) {
+            activeEffectPattern.matcher(footer)
+                .replaceAll("Active Effects:\n§cGod Potion§r: ${group("timer")}")
+        } ?: run {
+            effectCountPattern.findMatcher(footer) {
+                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + group("effectCount"))
+            } ?: activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e0")
         }
 
-        val column = TabColumn("§2§lOther")
-
-        var footer = tabList.footer_skyhanni.formattedText.removeSFormattingCode()
-
-        var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
-        if (matcher.find()) {
-            footer = activeEffectPattern.matcher(footer)
-                .replaceAll("Active Effects:\n§cGod Potion§r: ${matcher.group("timer")}")
-        } else {
-            matcher = effectCountPattern.matcher(tabList.footer_skyhanni.unformattedText)
-            footer = if (matcher.find()) {
-                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + matcher.group("effectCount"))
-            } else {
-                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e0")
+        cookiePattern.findMatcher(footer) {
+            if (group().contains("Not active!")) {
+                footer = this.replaceAll("Cookie Buff \n§r§7Not Active")
             }
         }
 
-        matcher = cookiePattern.matcher(footer)
-        if (matcher.find() && matcher.group().contains("Not active!")) {
-            footer = matcher.replaceAll("Cookie Buff \n§r§7Not Active")
+        dungeonBuffPattern.findMatcher(footer) {
+            if (group().contains("No Buffs active.")) {
+                footer = this.replaceAll("Dungeon Buffs \n§r§7None Found")
+            }
         }
 
-        matcher = dungeonBuffPattern.matcher(footer)
-        if (matcher.find() && matcher.group().contains("No Buffs active.")) {
-            footer = matcher.replaceAll("Dungeon Buffs \n§r§7None Found")
+        winterPowerUpsPattern.findMatcher(footer) {
+            if (group().contains("No Power Ups active.")) {
+                footer = this.replaceAll("Active Power Ups \n§r§7None")
+            }
         }
+
+        val column = TabColumn("§2§lOther")
 
         for (line in footer.split("\n")) {
             if (line.contains(hypixelAdvertisingString)) continue
 
             var newLine = line
-            matcher = upgradesPattern.matcher(newLine.removeResets())
 
-            if (matcher.matches()) {
-                var firstPart = matcher.group("firstPart").trimWhiteSpaceAndResets()
+            upgradesPattern.matchMatcher(newLine.removeResets()) {
+                var firstPart = group("firstPart").trimWhiteSpaceAndResets()
                 if (!firstPart.contains("§l")) {
                     firstPart = " $firstPart"
                 }
                 column.addLine(firstPart)
 
-                newLine = matcher.group("secondPart")
+                newLine = group("secondPart")
             }
 
             newLine = newLine.trimWhiteSpaceAndResets()
@@ -205,8 +209,8 @@ object TabListReader {
 
                 var currentCount = firstColumnCopy.size()
 
-                if (sectionSize >= TabListRenderer.maxLines / 2) {
-                    if (currentCount >= TabListRenderer.maxLines) {
+                if (sectionSize >= TabListRenderer.MAX_LINES / 2) {
+                    if (currentCount >= TabListRenderer.MAX_LINES) {
                         renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                         currentCount = 1
                     } else {
@@ -222,7 +226,7 @@ object TabListReader {
                     }
 
                     for (line in section.lines) {
-                        if (currentCount >= TabListRenderer.maxLines) {
+                        if (currentCount >= TabListRenderer.MAX_LINES) {
                             renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                             currentCount = 1
                         }
@@ -231,7 +235,7 @@ object TabListReader {
                         currentCount++
                     }
                 } else {
-                    if (currentCount + sectionSize > TabListRenderer.maxLines) {
+                    if (currentCount + sectionSize > TabListRenderer.MAX_LINES) {
                         renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                     } else {
                         if (firstColumnCopy.size() > 0) {
