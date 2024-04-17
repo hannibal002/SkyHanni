@@ -5,13 +5,14 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class DebugMobConfig {
 
     @Expose
     @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all Mobs.")
     @ConfigEditorBoolean
-    public boolean enable = true;
+    public Property<Boolean> enabled = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection.")

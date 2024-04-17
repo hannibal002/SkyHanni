@@ -6,16 +6,19 @@ import at.hannibal2.skyhanni.data.mob.MobData.Companion.logger
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,15 +32,14 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
-import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MAX_RETRIES = 20 * 5
 
 class MobDetection {
+
+    private val config get() = SkyHanniMod.feature.dev.mobDebug
 
     /* Unsupported "Mobs"
         Nicked Players
@@ -52,10 +54,6 @@ class MobDetection {
         Wai
         Zee
      */
-
-    private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
-
-    private var shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     init {
         MobFilter.bossMobNameFilter
@@ -79,10 +77,8 @@ class MobDetection {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (shouldClear.get()) { // Needs to work outside skyblock since it needs clearing when leaving skyblock and joining limbo
-            mobDetectionReset()
-            shouldClear.set(false)
-        }
+        if (!config.enabled.get()) return
+
         if (!LorenzUtils.inSkyBlock) return
         if (event.isMod(2)) return
 
@@ -98,16 +94,8 @@ class MobDetection {
         MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
             .filter { it !is EntityArmorStand })
 
-        if (forceReset) {
-            MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
-        }
-
         (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
         (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
-
-        if (forceReset) {
-            mobDetectionReset() // Ensure that all mobs are cleared 100%
-        }
     }
 
     /** Splits the entity into player, displayNPC and other */
@@ -311,11 +299,6 @@ class MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S37PacketStatistics -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-            {
-                shouldClear.set(true)
-                allEntitiesViaPacketId.clear()
-            }
         }
     }
 
@@ -333,25 +316,46 @@ class MobDetection {
     }
 
     @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        shouldClear.set(true)
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        clearMobs()
     }
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mob Detection")
-        if (forceReset) {
+        if (!config.enabled.get()) {
             event.addData("Mob Detection is manually disabled!")
         } else {
             event.addIrrelevant {
                 add("normal enabled")
-                add("Active Mobs: ${MobData.currentMobs.size}")
+                add("Active Players: ${MobData.players.size}")
+                add("Active players: ${MobData.players.map { "${it.name} - ${System.identityHashCode(it)}" }}")
+                add("Active Mobs: ${MobData.players.size + MobData.displayNPCs.size + MobData.summoningMobs.size + MobData.skyblockMobs.size + MobData.special.size}")
+                add("Active Mobs: ${MobData.currentMobs.map { "${it.name} - ${System.identityHashCode(it)}" }}")
                 val inDistanceMobs = MobData.retries.count { it.value.outsideRange() }
                 add("Searching for Mobs: ${MobData.retries.size - inDistanceMobs}")
                 add("Mobs over Max Search Count: ${MobData.retries.count { it.value.times > MAX_RETRIES }}")
                 add("Mobs outside of Range: $inDistanceMobs")
+                add("")
+                MobData.players.forEach {
+                    add("a")
+                    add("Player: ${it.name} - ${System.identityHashCode(it)}")
+                }
             }
         }
     }
 
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.enabled) {
+            clearMobs()
+        }
+    }
+
+    private fun clearMobs() {
+        mobDetectionReset()
+        MobData.previousEntityLiving.clear()
+        MobData.currentEntityLiving.clear()
+        allEntitiesViaPacketId.clear()
+    }
 }
