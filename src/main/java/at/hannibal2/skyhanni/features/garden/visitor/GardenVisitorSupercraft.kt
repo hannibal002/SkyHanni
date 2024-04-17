@@ -1,14 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -48,29 +44,12 @@ class GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
+    // needs to run later than onVisitorOpen at GardenVisitorFeatures
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
-        val offerItem = visitor.offer?.offerItem ?: return
-
-        val lore = offerItem.getLore()
-        for (line in lore) {
-            if (line == "§7Items Required:") continue
-            if (line.isEmpty()) break
-
-            val pair = ItemUtils.readItemAmount(line)
-            if (pair == null) {
-                ErrorManager.logErrorStateWithData(
-                    "Could not read Shopping List in Visitor Inventory", "ItemUtils.readItemAmount returns null",
-                    "line" to line,
-                    "offerItem" to offerItem,
-                    "lore" to lore,
-                    "visitor" to visitor
-                )
-                continue
-            }
-            val (itemName, amount) = pair
-            val internalName = NEUInternalName.fromItemName(itemName)
+        visitor.offer?.offerItem ?: return
+        for ((internalName, amount) in visitor.shoppingList) {
             if (isSupercraftEnabled) getSupercraftForSacks(internalName, amount)
         }
     }
