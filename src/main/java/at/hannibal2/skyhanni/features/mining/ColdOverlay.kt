@@ -19,8 +19,9 @@ import kotlin.time.Duration.Companion.seconds
 class ColdOverlay {
 
     private val config get() = SkyHanniMod.feature.mining.coldOverlay
-    var cold = 0
-    var lastCold = 0
+
+    private var cold = 0
+    private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -59,12 +60,11 @@ class ColdOverlay {
 
     @SubscribeEvent
     fun onColdUpdate(event: ColdUpdateEvent) {
-        val duration = if (event.cold == 0) 2.seconds else 0.seconds
+        val duration = if (event.cold == 0) 1.seconds else 0.seconds
         DelayedRun.runDelayed(duration) {
             lastCold = cold
             cold = event.cold
             lastColdUpdate = SimpleTimeMark.now()
-
         }
     }
 
