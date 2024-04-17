@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -439,7 +439,7 @@ object RenderUtils {
         string: String?,
         offsetX: Int = 0,
         offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment
+        alignmentEnum: HorizontalAlignment,
     ): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
@@ -482,7 +482,7 @@ object RenderUtils {
     fun Position.renderStringsAlignedWidth(
         list: List<Pair<String, HorizontalAlignment>>,
         extraSpace: Int = 0,
-        posLabel: String
+        posLabel: String,
     ) {
         if (list.isEmpty()) return
 
@@ -528,7 +528,7 @@ object RenderUtils {
     fun Position.renderStringsAndItems(
         list: List<List<Any?>>,
         extraSpace: Int = 0,
-        itemScale: Double = 1.0,
+        itemScale: Double = NEUItems.itemFontSize,
         posLabel: String,
     ) {
         if (list.isEmpty()) return
@@ -556,13 +556,20 @@ object RenderUtils {
      * Accepts a single line to print.
      * This  line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderSingleLineWithItems(list: List<Any?>, itemScale: Double = 1.0, posLabel: String) {
+    fun Position.renderSingleLineWithItems(
+        list: List<Any?>,
+        posLabel: String,
+    ) {
         if (list.isEmpty()) return
-        val longestX = renderLine(list, 0, itemScale)
-        GuiEditManager.add(this, posLabel, longestX, 10)
+        renderRenderables(
+            listOf(
+                Renderable.horizontalContainer(
+                    list.mapNotNull { Renderable.fromAny(it) }
+                )), posLabel = posLabel)
+        // TODO Future write that better
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         GlStateManager.translate(0f, offsetY.toFloat(), 0F)
@@ -580,13 +587,17 @@ object RenderUtils {
         return offsetX
     }
 
-    fun MutableList<Any>.addItemIcon(item: ItemStack, highlight: Boolean = false) {
+    fun MutableList<Any>.addItemIcon(
+        item: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize,
+    ) {
         try {
             if (highlight) {
                 // Hack to add enchant glint, like Hypixel does it
                 item.addEnchantment(Enchantment.protection, 0)
             }
-            add(item)
+            add(Renderable.itemStack(item, scale))
         } catch (e: NullPointerException) {
             ErrorManager.logErrorWithData(
                 e, "Add item icon to renderable list",
@@ -739,9 +750,11 @@ object RenderUtils {
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
 
-                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 =
+                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 =
+                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -800,9 +813,11 @@ object RenderUtils {
                 val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
                 val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 =
+                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 =
+                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -1172,7 +1187,7 @@ object RenderUtils {
             middlePoint: LorenzVec,
             sidePoint1: LorenzVec,
             sidePoint2: LorenzVec,
-            c: Color
+            c: Color,
         ) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
             worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
@@ -1186,7 +1201,7 @@ object RenderUtils {
         companion object {
             inline fun draw3D(
                 partialTicks: Float = 0F,
-                crossinline quads: QuadDrawer.() -> Unit
+                crossinline quads: QuadDrawer.() -> Unit,
             ) {
 
                 GlStateManager.enableBlend()
@@ -1441,5 +1456,12 @@ object RenderUtils {
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
+    }
+
+    // TODO move off of neu function
+    fun drawTexturedRect(x: Float, y: Float) {
+        with(ScaledResolution(Minecraft.getMinecraft())) {
+            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
+        }
     }
 }

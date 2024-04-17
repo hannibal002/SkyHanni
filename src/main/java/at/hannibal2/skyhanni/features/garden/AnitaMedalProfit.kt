@@ -72,7 +72,7 @@ class AnitaMedalProfit {
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eMedal Profit"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 1.7))
+        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
 

@@ -328,7 +328,11 @@ object GriffinBurrowHelper {
 
         if (!isEnabled()) {
             if (currentMayor != Mayor.DIANA) {
-                ChatUtils.clickableChat("§cSelect Diana as mayor overwrite!", "sh assume mayor")
+                ChatUtils.chatAndOpenConfig(
+                    "§cSelect Diana as mayor overwrite!",
+                    SkyHanniMod.feature.dev.debug::assumeMayor
+                )
+
             } else {
                 ChatUtils.userError("Have an Ancestral Spade in the inventory!")
             }
