@@ -327,14 +327,12 @@ class MobDetection {
             event.addData("Mob Detection is manually disabled!")
         } else {
             event.addIrrelevant {
-                event.addIrrelevant {
-                    add("normal enabled")
-                    add("Active Mobs: ${MobData.currentMobs.size}")
-                    val inDistanceMobs = MobData.retries.count { it.value.outsideRange() }
-                    add("Searching for Mobs: ${MobData.retries.size - inDistanceMobs}")
-                    add("Mobs over Max Search Count: ${MobData.retries.count { it.value.times > MAX_RETRIES }}")
-                    add("Mobs outside of Range: $inDistanceMobs")
-                }
+                add("normal enabled")
+                add("Active Mobs: ${MobData.currentMobs.size}")
+                val inDistanceMobs = MobData.retries.count { it.value.outsideRange() }
+                add("Searching for Mobs: ${MobData.retries.size - inDistanceMobs}")
+                add("Mobs over Max Search Count: ${MobData.retries.count { it.value.times > MAX_RETRIES }}")
+                add("Mobs outside of Range: $inDistanceMobs")
             }
         }
     }
