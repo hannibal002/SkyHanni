@@ -18,11 +18,11 @@ object PartyChatCommands {
         val executable: (PartyChatEvent) -> Unit,
     )
 
-    private fun config() = SkyHanniMod.feature.misc.partyCommands
+    private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val allPartyCommands = listOf(
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
-            { config().transferCommand },
+            { config.transferCommand },
             requiresPartyLead = true,
             executable = {
                 ChatUtils.sendCommandToServer("party transfer ${it.author}")
@@ -30,7 +30,7 @@ object PartyChatCommands {
         ),
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
-            { config().warpCommand },
+            { config.warpCommand },
             requiresPartyLead = true,
             executable = {
                 ChatUtils.sendCommandToServer("party warp")
@@ -48,7 +48,7 @@ object PartyChatCommands {
 
     private fun isTrustedUser(name: String): Boolean {
         val friend = FriendAPI.getAllFriends().find { it.name == name }
-        return when (config().defaultRequiredTrustLevel) {
+        return when (config.defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
             PartyCommandsConfig.TrustedUser.ANYONE -> true
@@ -57,7 +57,7 @@ object PartyChatCommands {
     }
 
     private fun isBlockedUser(name: String): Boolean {
-        val blacklist = config().blacklistedUsers
+        val blacklist = config.blacklistedUsers
         return name in blacklist
     }
 
@@ -77,11 +77,12 @@ object PartyChatCommands {
             return
         }
         if (isBlockedUser(event.author)) {
-            ChatUtils.chat("§cIgnoring chat command from ${event.author}. Unblock them using *unblacklist command here*.")
+            if (config.showIgnoredReminder) ChatUtils.clickableChat("§cIgnoring chat command from ${event.author}. Unignore them using /shignore remove <player> or click here!",
+                { blacklistModify(event.author) })
             return
         }
         if (!isTrustedUser(event.author)) {
-            ChatUtils.chat("§cIgnoring chat command from ${event.author}. Change your party chat command settings or /friend (best) them.")
+            if (config.showIgnoredReminder) ChatUtils.chat("§cIgnoring chat command from ${event.author}. Change your party chat command settings or /friend (best) them.")
             return
         }
         command.executable(event)
@@ -122,7 +123,7 @@ object PartyChatCommands {
             "clear" -> {
                 ChatUtils.clickableChat("Are you sure you want to do this? Click here to confirm.",
                     {
-                        config().blacklistedUsers.clear()
+                        config.blacklistedUsers.clear()
                         ChatUtils.chat("Cleared your ignored players list!")
                     })
                 return
@@ -135,19 +136,19 @@ object PartyChatCommands {
     }
 
     private fun blacklistModify(player: String) {
-        if (player !in config().blacklistedUsers) {
+        if (player !in config.blacklistedUsers) {
             ChatUtils.chat("§cNow ignoring §b$player§e!")
-            config().blacklistedUsers.add(player)
+            config.blacklistedUsers.add(player)
             return
         } else {
             ChatUtils.chat("§aStopped ignoring §b$player§e!")
-            config().blacklistedUsers.remove(player)
+            config.blacklistedUsers.remove(player)
             return
         }
     }
 
     private fun blacklistView(player: String? = null) {
-        val blacklist = config().blacklistedUsers
+        val blacklist = config.blacklistedUsers
         if (player == null) {
             if (blacklist.size > 0) {
                 var message = "Ignored player list:"
