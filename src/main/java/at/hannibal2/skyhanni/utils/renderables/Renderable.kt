@@ -146,8 +146,6 @@ interface Renderable {
             override val horizontalAlign = render.horizontalAlign
             override val verticalAlign = render.verticalAlign
 
-            private var wasDown = false
-
             override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() &&
                     shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
@@ -176,7 +174,6 @@ interface Renderable {
                     if ((button - 100).isKeyClicked())
                         onClick()
                 }
-                wasDown = isDown
                 render.render(posX, posY)
             }
         }
