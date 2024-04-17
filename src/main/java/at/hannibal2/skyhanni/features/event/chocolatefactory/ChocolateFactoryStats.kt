@@ -25,20 +25,25 @@ object ChocolateFactoryStats {
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
+        val leaderboardPosition = ChocolateFactoryApi.leaderboardPosition
 
         newList.add("§6§lChocolate Factory Stats")
 
-        newList.add("§eCurrent Chocolate: §7${ChocolateFactoryApi.chocolateCurrent.addSeparators()}")
-        newList.add("§eThis Prestige: §7${ChocolateFactoryApi.chocolateThisPrestige.addSeparators()}")
-        newList.add("§eAll-time: §7${ChocolateFactoryApi.chocolateAllTime.addSeparators()}")
+        newList.add("§eCurrent Chocolate: §6${ChocolateFactoryApi.chocolateCurrent.addSeparators()}")
+        newList.add("§eThis Prestige: §6${ChocolateFactoryApi.chocolateThisPrestige.addSeparators()}")
+        newList.add("§eAll-time: §6${ChocolateFactoryApi.chocolateAllTime.addSeparators()}")
 
-        newList.add("§ePer Second: §7${perSecond.addSeparators()}")
-        newList.add("§ePer Minute: §7${perMinute.addSeparators()}")
-        newList.add("§ePer Hour: §7${perHour.addSeparators()}")
-        newList.add("§ePer Day: §7${perDay.addSeparators()}")
+        newList.add("§ePer Second: §6${perSecond.addSeparators()}")
+        newList.add("§ePer Minute: §6${perMinute.addSeparators()}")
+        newList.add("§ePer Hour: §6${perHour.addSeparators()}")
+        newList.add("§ePer Day: §6${perDay.addSeparators()}")
 
-        newList.add("§eChocolate Multiplier: §7${ChocolateFactoryApi.chocolateMultiplier}")
-        newList.add("§eBarn: §7${ChocolateFactoryBarnManager.barnStatus()}")
+        newList.add("§eChocolate Multiplier: §6${ChocolateFactoryApi.chocolateMultiplier}")
+        newList.add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
+
+        if (leaderboardPosition != null) {
+            newList.add("§ePosition: §7#§b${leaderboardPosition.addSeparators()}")
+        }
 
         newList.add("")
         newList.add("")
@@ -58,15 +63,16 @@ object ChocolateFactoryStats {
 
     enum class ChocolateFactoryStatsType(val display: String) {
         HEADER("§6§lChocolate Factory Stats"),
-        CURRENT("§eCurrent Chocolate: §75,272,230"),
-        THIS_PRESTIGE("§eThis Prestige: §7483,023,853"),
-        ALL_TIME("§eAll-time: §7641,119,115"),
-        PER_SECOND("§ePer Second: §73,780.72"),
-        PER_MINUTE("§ePer Minute: §7226,843.2"),
-        PER_HOUR("§ePer Hour: §713,610,592"),
-        PER_DAY("§ePer Day: §7326,654,208"),
-        MULTIPLIER("§eChocolate Multiplier: §71.77"),
-        BARN("§eBarn: §7171/190 Rabbits"),
+        CURRENT("§eCurrent Chocolate: §65,272,230"),
+        THIS_PRESTIGE("§eThis Prestige: §6483,023,853"),
+        ALL_TIME("§eAll-time: §6641,119,115"),
+        PER_SECOND("§ePer Second: §63,780.72"),
+        PER_MINUTE("§ePer Minute: §6226,843.2"),
+        PER_HOUR("§ePer Hour: §613,610,592"),
+        PER_DAY("§ePer Day: §6326,654,208"),
+        MULTIPLIER("§eChocolate Multiplier: §61.77"),
+        BARN("§eBarn: §6171/190 Rabbits"),
+        LEADERBOARD_POS("§ePosition: §7#§b103"),
         EMPTY(""),
         EMPTY_2(""),
         EMPTY_3(""),

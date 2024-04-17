@@ -64,6 +64,10 @@ object ChocolateFactoryApi {
         "rabbit.clickme",
         "§e§lCLICK ME!"
     )
+    private val leaderboardPlacePattern by patternGroup.pattern(
+        "leaderboard.place",
+        "§7You are §8#§b(?<position>[\\d,]+)"
+    )
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
@@ -73,6 +77,7 @@ object ChocolateFactoryApi {
     private var productionInfoIndex = 45
     private var prestigeIndex = 28
     var milestoneIndex = 53
+    private var leaderboardIndex = 51
     var maxRabbits = 395
 
     var inChocolateFactory = false
@@ -82,6 +87,7 @@ object ChocolateFactoryApi {
     var chocolatePerSecond = 0.0
     var chocolateThisPrestige = 0L
     var chocolateMultiplier = 1.0
+    var leaderboardPosition: Int? = null
 
     val upgradeableSlots: MutableSet<Int> = mutableSetOf()
     var bestUpgrade: Int? = null
@@ -112,8 +118,9 @@ object ChocolateFactoryApi {
         val infoItem = InventoryUtils.getItemAtSlotIndex(infoIndex) ?: return
         val prestigeItem = InventoryUtils.getItemAtSlotIndex(prestigeIndex) ?: return
         val productionInfoItem = InventoryUtils.getItemAtSlotIndex(productionInfoIndex) ?: return
+        val leaderboardItem = InventoryUtils.getItemAtSlotIndex(leaderboardIndex) ?: return
 
-        processInfoItems(infoItem, prestigeItem, productionInfoItem)
+        processInfoItems(infoItem, prestigeItem, productionInfoItem, leaderboardItem)
 
         bestUpgrade = null
         upgradeableSlots.clear()
@@ -158,7 +165,12 @@ object ChocolateFactoryApi {
         }
     }
 
-    private fun processInfoItems(chocolateItem: ItemStack, prestigeItem: ItemStack, productionItem: ItemStack) {
+    private fun processInfoItems(
+        chocolateItem: ItemStack,
+        prestigeItem: ItemStack,
+        productionItem: ItemStack,
+        leaderboardItem: ItemStack
+    ) {
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             chocolateCurrent = group("amount").formatLong()
         }
@@ -175,6 +187,9 @@ object ChocolateFactoryApi {
         }
         productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
             chocolateMultiplier = group("amount").formatDouble()
+        }
+        leaderboardItem.getLore().matchFirst(leaderboardPlacePattern) {
+            leaderboardPosition = group("position").formatInt()
         }
         if (!config.statsDisplay) return
         ChocolateFactoryStats.updateDisplay()
@@ -208,6 +223,7 @@ object ChocolateFactoryApi {
         productionInfoIndex = data.productionInfoIndex
         prestigeIndex = data.prestigeIndex
         milestoneIndex = data.milestoneIndex
+        leaderboardIndex = data.leaderboardIndex
         maxRabbits = data.maxRabbits
     }
 

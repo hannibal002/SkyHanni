@@ -52,7 +52,8 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStatsType.PER_DAY,
         ChocolateFactoryStatsType.EMPTY_2,
         ChocolateFactoryStatsType.MULTIPLIER,
-        ChocolateFactoryStatsType.BARN
+        ChocolateFactoryStatsType.BARN,
+        ChocolateFactoryStatsType.LEADERBOARD_POS
     ));
 
     @Expose
