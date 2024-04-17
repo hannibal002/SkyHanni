@@ -44,13 +44,7 @@ class ColdOverlay {
         GlStateManager.translate(0f, 0f, -500f)
         GlStateManager.color(1f, 1f, 1f, alpha)
 
-        Utils.drawTexturedRect(
-            0f,
-            0f,
-            screenWidth.toFloat(),
-            screenHeight.toFloat(),
-            GL11.GL_NEAREST
-        )
+        Utils.drawTexturedRect(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat(), GL11.GL_NEAREST)
         GL11.glDepthMask(true)
 
         GlStateManager.popMatrix()
