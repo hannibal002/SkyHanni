@@ -25,7 +25,7 @@ object ChocolateFactoryStats {
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
-        val leaderboardPosition = ChocolateFactoryApi.leaderboardPosition
+        val position = ChocolateFactoryApi.leaderboardPosition?.addSeparators() ?: "???"
 
         newList.add("§6§lChocolate Factory Stats")
 
@@ -41,12 +41,7 @@ object ChocolateFactoryStats {
         newList.add("§eChocolate Multiplier: §6${ChocolateFactoryApi.chocolateMultiplier}")
         newList.add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
-        if (leaderboardPosition != null) {
-            newList.add("§ePosition: §7#§b${leaderboardPosition.addSeparators()}")
-        } else {
-            newList.add("§ePosition: §7#§b???")
-
-        }
+        newList.add("§ePosition: §7#§b$position")
 
         newList.add("")
         newList.add("")
