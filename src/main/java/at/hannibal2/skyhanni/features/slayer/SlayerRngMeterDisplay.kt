@@ -97,7 +97,7 @@ class SlayerRngMeterDisplay {
             if (diff > 0) {
                 storage.gainPerBoss = diff
             } else {
-                storage.itemGoal = ""
+                storage.currentMeter = 0
                 blockChat = false
                 val from = old.addSeparators()
                 val to = storage.goalNeeded.addSeparators()
