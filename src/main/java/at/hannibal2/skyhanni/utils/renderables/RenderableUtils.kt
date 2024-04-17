@@ -64,5 +64,4 @@ internal object RenderableUtils {
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
     }
-
 }

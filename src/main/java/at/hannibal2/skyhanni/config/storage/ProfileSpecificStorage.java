@@ -20,9 +20,10 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
-import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
+import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
@@ -69,7 +70,7 @@ public class ProfileSpecificStorage {
         public String currentArrow = null;
 
         @Expose
-        public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
+        public Map<NEUInternalName, Integer> arrowAmount = new HashMap<>();
     }
 
     @Expose
@@ -233,6 +234,9 @@ public class ProfileSpecificStorage {
         public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
 
         @Expose
+        public int scoreboardPests = 0;
+
+        @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
 
         @Expose
@@ -384,6 +388,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<String> kingsTalkedTo = new ArrayList<>();
+
+        @Expose
+        public ExcavatorProfitTracker.Data fossilExcavatorProfitTracker = new ExcavatorProfitTracker.Data();
     }
 
     @Expose

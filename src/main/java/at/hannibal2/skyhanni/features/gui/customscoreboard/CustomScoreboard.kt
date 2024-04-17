@@ -177,6 +177,7 @@ class CustomScoreboard {
         val prefix = "gui.customScoreboard"
         val displayConfigPrefix = "$prefix.displayConfig"
         val displayPrefix = "$prefix.display"
+
         event.move(28, "$prefix.displayConfig.showAllActiveEvents", "$prefix.displayConfig.eventsConfig.showAllActiveEvents")
         event.transform(30, "$prefix.displayConfig.eventsConfig.eventEntries") { element ->
             val array = element.asJsonArray
@@ -204,5 +205,11 @@ class CustomScoreboard {
         event.move(31, "$displayConfigPrefix.eventsConfig", "$displayPrefix.events")
         event.move(31, "$prefix.mayorConfig", "$displayPrefix.mayor")
         event.move(31, "$prefix.partyConfig", "$displayPrefix.party")
+
+        event.transform(37, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array
+        }
     }
 }

@@ -40,7 +40,7 @@ object UtilsPatterns {
 
     val enchantmentNamePattern by patternGroup.pattern(
         "item.neuitems.enchantmentname",
-        "^(?<format>(?:§.)+)(?<name>[^§]+) (?<level>[IVXL]+)$"
+        "^(?<format>(?:§.)*)(?<name>[^§]+) (?<level>[IVXL]+)(?: Book)?$"
     )
 
     val potionPattern by patternGroup.pattern(
@@ -53,7 +53,7 @@ object UtilsPatterns {
     )
     val readAmountAfterPattern by patternGroup.pattern(
         "item.amount.behind",
-        "(?<name>(?:['\\w-]+ ?)+)(?:§8x(?<amount>[\\d,]+))?"
+        "(?<name>(?:§.)*(?:[^§] ?)+)(?:§8x(?<amount>[\\d,]+))?"
     )
 
     val timeAmountPattern by patternGroup.pattern(
@@ -86,6 +86,6 @@ object UtilsPatterns {
 
     val tabListProfilePattern by patternGroup.pattern(
         "tablist.profile",
-        "(?:§.)+Profile: §r§a(?<profile>\\S+).*"
+        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*"
     )
 }

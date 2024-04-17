@@ -1,29 +1,39 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FossilExcavatorConfig {
 
     @Expose
-    @ConfigOption(name = "Fossil Excavator Helper", desc = "Helps you find fossils in the fossil excavator. " +
-        "§eWill always solve if you have at least 18 clicks. Solves everything except Spine, Ugly and Helix in 16 clicks.")
+    @ConfigOption(name = "Fossil Excavator Solver", desc = "")
+    @Accordion
+    public FossilExcavatorSolverConfig solver = new FossilExcavatorSolverConfig();
+
+    @Expose
+    @ConfigOption(name = "Excavator Profit Tracker", desc = "")
+    @Accordion
+    public ExcavatorProfitTrackerConfig profitTracker = new ExcavatorProfitTrackerConfig();
+
+    @Expose
+    @ConfigOption(
+        name = "Profit Per",
+        desc = "Show profit/loss in chat after each excavation. Also include breakdown information on hover."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean profitPerExcavation = false;
 
     @Expose
-    @ConfigOption(name = "Show Percentage", desc = "Shows percentage chance that next click will be a fossil. " +
-        "§eThis assumes there is a fossil hidden in the dirt.")
+    @ConfigOption(
+        name = "Glacite Powder Stack",
+        desc = "Show Glacite Powder as stack size in the Fossil Excavator."
+    )
     @ConfigEditorBoolean
-    public boolean showPercentage = true;
-
-    @Expose
-    @ConfigLink(owner = FossilExcavatorConfig.class, field = "enabled")
-    public Position position = new Position(183, 212, false, true);
+    @FeatureToggle
+    public boolean glacitePowderStack = false;
 
 }

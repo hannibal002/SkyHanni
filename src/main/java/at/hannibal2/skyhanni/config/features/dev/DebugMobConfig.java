@@ -44,7 +44,7 @@ public class DebugMobConfig {
         public boolean logEvents = false;
 
         @Expose
-        @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently in front of your view (only SkyblockMob).")
+        @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently in front of your view.")
         @ConfigEditorBoolean
         public boolean showRayHit = false;
 
