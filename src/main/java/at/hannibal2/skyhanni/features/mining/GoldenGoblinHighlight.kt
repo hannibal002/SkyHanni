@@ -20,7 +20,7 @@ class GoldenGoblinHighlight {
 
     private fun isEnabled() = LorenzUtils.inMiningIsland() && config
 
-    private val timeOut = 10.0.seconds
+    private val timeOut = 10.seconds
 
     private var lastChatMessage = SimpleTimeMark.farPast()
     private var lastGoblinSpawn = SimpleTimeMark.farPast()
