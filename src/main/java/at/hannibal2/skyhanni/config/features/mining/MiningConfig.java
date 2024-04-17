@@ -33,7 +33,6 @@ public class MiningConfig {
     @Accordion
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
-    // TODO rename to fossilExcavator
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
     @Accordion

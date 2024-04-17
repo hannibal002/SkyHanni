@@ -6,10 +6,9 @@ import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,19 +23,15 @@ class ColdOverlay {
     private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
+    private val textureLocation by lazy { ResourceLocation("skyhanni", "cold_overlay.png") }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val alpha = getColdAlpha()
         if (alpha == 0f) return
 
-        val mc = Minecraft.getMinecraft()
-        val textureLocation = ResourceLocation("skyhanni", "cold_overlay.png")
-        mc.textureManager.bindTexture(textureLocation)
-
-        val scaledResolution = ScaledResolution(mc)
-        val screenWidth = scaledResolution.scaledWidth
-        val screenHeight = scaledResolution.scaledHeight
+        Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
         GlStateManager.pushMatrix()
         GlStateManager.pushAttrib()
@@ -45,7 +40,7 @@ class ColdOverlay {
         GlStateManager.translate(0f, 0f, -500f)
         GlStateManager.color(1f, 1f, 1f, alpha)
 
-        Utils.drawTexturedRect(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat(), GL11.GL_NEAREST)
+        RenderUtils.drawTexturedRect(0f, 0f)
         GL11.glDepthMask(true)
 
         GlStateManager.popMatrix()
