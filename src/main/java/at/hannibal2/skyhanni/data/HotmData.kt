@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -259,7 +260,7 @@ enum class HotmData(
     var slot: Slot? = null
         private set
 
-    fun getLevelUpCost() = costFun(activeLevel)
+    fun getLevelUpCost() = costFun(rawLevel)
 
     fun getReward() = rewardFun(activeLevel)
 
@@ -275,7 +276,7 @@ enum class HotmData(
         )
 
         private val levelPattern by repoGroup.pattern(
-            "perk.level", "§Level (?<level>\\d+).*"
+            "perk.level", "§(?<color>.)Level (?<level>\\d+).*"
         )
 
         private val notUnlockedPattern by repoGroup.pattern(
@@ -360,9 +361,8 @@ enum class HotmData(
             entry.isUnlocked = true
 
             entry.activeLevel = levelPattern.matchMatcher(lore.first()) {
-                val level = group("level").toInt()
-                if (group("color") == "b") level - 1 else level
-            } ?: 0
+                group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
+            } ?: entry.maxLevel
 
             if (entry.activeLevel > entry.maxLevel) {
                 throw IllegalStateException("Hotm Perk '${entry.name}' over max level")
