@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -20,7 +20,7 @@ class BazaarCancelledBuyOrderClipboard {
     private val patternGroup = RepoPattern.group("bazaar.cancelledorder")
 
     /**
-     * REGEX-TEST: §6§7from §a59§7x §7missing items.
+     * REGEX-TEST: §6§7from §a50§7x §7missing items.
      */
     private val lastAmountPattern by patternGroup.pattern(
         "lastamount",
@@ -34,10 +34,10 @@ class BazaarCancelledBuyOrderClipboard {
     private var latestAmount: Int? = null
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-
-        val stack = event.itemStack
+        if (event.inventoryName != "Order options") return
+        val stack = event.inventoryItems[11] ?: return
         if (!stack.name.contains("Cancel Order")) return
 
         stack.getLore().matchFirst(lastAmountPattern) {
@@ -49,12 +49,12 @@ class BazaarCancelledBuyOrderClipboard {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
-            group("coins")
+            group("coins").formatInt().addSeparators()
         } ?: return
 
         val latestAmount = latestAmount ?: error("latest amount is null")
         event.blockedReason = "bazaar cancelled buy order clipboard"
-        ChatUtils.chat("Bazaar buy order cancelled. ${latestAmount.addSeparators()} saved to clipboard. ($coins coins)")
+        ChatUtils.chat(" 1111 11 Bazaar buy order cancelled. ${latestAmount.addSeparators()} saved to clipboard. ($coins coins)")
         OSUtils.copyToClipboard(latestAmount.toString())
         this.latestAmount = null
     }
