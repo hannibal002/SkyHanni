@@ -54,7 +54,7 @@ class BazaarCancelledBuyOrderClipboard {
 
         val latestAmount = latestAmount ?: error("latest amount is null")
         event.blockedReason = "bazaar cancelled buy order clipboard"
-        ChatUtils.chat(" 1111 11 Bazaar buy order cancelled. ${latestAmount.addSeparators()} saved to clipboard. ($coins coins)")
+        ChatUtils.chat("Bazaar buy order cancelled. ${latestAmount.addSeparators()} saved to clipboard. ($coins coins)")
         OSUtils.copyToClipboard(latestAmount.toString())
         this.latestAmount = null
     }
