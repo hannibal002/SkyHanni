@@ -26,7 +26,7 @@ class TrophyFishMessages {
     )
 
     @SubscribeEvent
-    fun onStatusBar(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         var displayName = ""
         var displayRarity = ""

@@ -55,7 +55,7 @@ class ItemAbilityCooldown {
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
 
     @SubscribeEvent
-    fun onSoundEvent(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         when {
             // Hyperion
             event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {

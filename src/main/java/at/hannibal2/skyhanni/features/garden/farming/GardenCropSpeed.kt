@@ -40,6 +40,7 @@ object GardenCropSpeed {
     var latestPumpkinDicer = 0.0
 
     init {
+        // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
                 if (GardenAPI.mushroomCowPet) {
@@ -173,11 +174,7 @@ object GardenCropSpeed {
         secondsStopped = 0
     }
 
-    fun finneganPerkActive(): Boolean {
-        val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
-        val perkActive = Perk.FARMING_SIMULATOR.isActive
-        return forcefullyEnabledAlwaysFinnegan || perkActive
-    }
+    fun finneganPerkActive() = Perk.FARMING_SIMULATOR.isActive
 
     fun isEnabled() = GardenAPI.inGarden()
 

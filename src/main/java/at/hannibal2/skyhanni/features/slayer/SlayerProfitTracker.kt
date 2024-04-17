@@ -167,12 +167,12 @@ object SlayerProfitTracker {
         return internalName in allowedList
     }
 
-    private fun drawDisplay(itemLog: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<List<Any>> {
         val tracker = getTracker() ?: return@buildList
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
 
-        var profit = tracker.drawItems(itemLog, { true }, this)
-        val slayerSpawnCost = itemLog.slayerSpawnCost
+        var profit = tracker.drawItems(data, { true }, this)
+        val slayerSpawnCost = data.slayerSpawnCost
         if (slayerSpawnCost != 0L) {
             val mobKillCoinsFormat = NumberUtil.format(slayerSpawnCost)
             addAsSingletonList(
@@ -184,7 +184,7 @@ object SlayerProfitTracker {
             profit += slayerSpawnCost
         }
 
-        val slayerCompletedCount = itemLog.slayerCompletedCount
+        val slayerCompletedCount = data.slayerCompletedCount
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Bosses killed: §e${slayerCompletedCount.addSeparators()}",
@@ -192,7 +192,7 @@ object SlayerProfitTracker {
             )
         )
 
-        addAsSingletonList(tracker.addTotalProfit(profit, itemLog.slayerCompletedCount, "boss"))
+        addAsSingletonList(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
 
         tracker.addPriceFromButton(this)
     }

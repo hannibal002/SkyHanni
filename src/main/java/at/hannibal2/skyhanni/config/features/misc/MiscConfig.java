@@ -4,15 +4,17 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,10 @@ public class MiscConfig {
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
     public CommandsConfig commands = new CommandsConfig();
+
+    @Expose
+    @Category(name = "Party Commands", desc = "Enable or disable party commands.")
+    public PartyCommandsConfig partyCommands = new PartyCommandsConfig();
 
     @Expose
     @Category(name = "Minions", desc = "The minions on your private island.")
@@ -90,6 +96,11 @@ public class MiscConfig {
     @ConfigOption(name = "Pet Candy Display", desc = "")
     @Accordion
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "No Bits Warning", desc = "")
+    @Accordion
+    public NoBitsWarningConfig noBitsWarning = new NoBitsWarningConfig();
 
     @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
@@ -161,6 +172,7 @@ public class MiscConfig {
     public boolean playerMovementSpeed = false;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
@@ -209,6 +221,10 @@ public class MiscConfig {
     public boolean showTimeInLimbo = true;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "showTimeInLimbo")
+    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
+
+    @Expose
     @ConfigOption(
         name = "Lesser Orb of Healing Hider",
         desc = "Hides the Lesser Orb of Healing.")
@@ -223,13 +239,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     public boolean lockMouseLookChatMessage = true;
 
-    @Expose
-    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
-
+    // Does not have a config element!
     @Expose
     public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
+    @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose

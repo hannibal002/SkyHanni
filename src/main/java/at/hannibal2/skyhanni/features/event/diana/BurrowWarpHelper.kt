@@ -44,7 +44,7 @@ class BurrowWarpHelper {
     }
 
     @SubscribeEvent
-    fun onStatusBar(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.message == "§cYou haven't unlocked this fast travel destination!") {

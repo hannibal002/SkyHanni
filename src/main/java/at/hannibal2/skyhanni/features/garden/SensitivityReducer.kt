@@ -77,7 +77,7 @@ object SensitivityReducer {
     }
 
     @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.reducingFactor.afterChange {
             reloadSensitivity()
         }
@@ -169,7 +169,7 @@ object SensitivityReducer {
     }
 
     @SubscribeEvent
-    fun onLogin(event: HypixelJoinEvent) {
+    fun onHypixelJoin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
         val expectedLoweredSensitivity = doTheMath(gameSettings.mouseSensitivity, true)
         if (abs(storage.savedMouseloweredSensitivity - expectedLoweredSensitivity) <= 0.0001) {

@@ -37,7 +37,7 @@ class CropSpeedMeter {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (!event.isMod(30)) return
+        if (!event.isMod(15)) return
 
         updateDisplay()
     }

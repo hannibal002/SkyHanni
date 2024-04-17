@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -53,13 +53,11 @@ object AuctionsHighlighter {
                 continue
             }
             if (config.highlightAuctionsUnderbid) {
-                for (line in lore) {
-                    buyItNowPattern.matchMatcher(line) {
-                        val coins = group("coins").formatLong()
-                        stack.getInternalNameOrNull()?.getPriceOrNull()?.let {
-                            if (coins > it) {
-                                slot highlight LorenzColor.GOLD
-                            }
+                lore.matchFirst(buyItNowPattern) {
+                    val coins = group("coins").formatLong()
+                    stack.getInternalNameOrNull()?.getPriceOrNull()?.let {
+                        if (coins > it) {
+                            slot highlight LorenzColor.GOLD
                         }
                     }
                 }

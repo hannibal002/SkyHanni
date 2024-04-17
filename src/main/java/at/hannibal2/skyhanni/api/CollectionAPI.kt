@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -51,13 +51,11 @@ object CollectionAPI {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
             val stack = event.inventoryItems[4] ?: return
-            loop@ for (line in stack.getLore()) {
-                singleCounterPattern.matchMatcher(line) {
-                    val counter = group("amount").formatLong()
-                    val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                    val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
-                    collectionValue[internalName] = counter
-                }
+            stack.getLore().matchFirst(singleCounterPattern) {
+                val counter = group("amount").formatLong()
+                val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
+                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
+                collectionValue[internalName] = counter
             }
             CollectionUpdateEvent().postAndCatch()
         }
@@ -77,11 +75,9 @@ object CollectionAPI {
                 }
 
                 val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
-                loop@ for (line in lore) {
-                    counterPattern.matchMatcher(line) {
-                        val counter = group("amount").formatLong()
-                        collectionValue[internalName] = counter
-                    }
+                lore.matchFirst(counterPattern) {
+                    val counter = group("amount").formatLong()
+                    collectionValue[internalName] = counter
                 }
             }
             CollectionUpdateEvent().postAndCatch()

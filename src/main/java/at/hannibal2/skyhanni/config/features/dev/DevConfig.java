@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.config.features.dev;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class DevConfig {
@@ -45,11 +45,6 @@ public class DevConfig {
     public boolean worldEdit = false;
 
     @Expose
-    @ConfigOption(name = "Bow Sound distance", desc = "The distance in blocks where the sound of shooting a bow will be used for the QuiverAPI.")
-    @ConfigEditorSlider(minValue = 0, maxValue = 50, minStep = 1)
-    public int bowSoundDistance = 5;
-
-    @Expose
     @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard." +
         "\nCustom Scoreboard debug option")
     @ConfigEditorBoolean
@@ -60,14 +55,24 @@ public class DevConfig {
     @Expose
     public WaypointsConfig waypoint = new WaypointsConfig();
 
+    // Does not have a config element!
     @Expose
     public Position debugPos = new Position(10, 10, false, true);
 
+    // Does not have a config element!
     @Expose
     public Position debugLocationPos = new Position(1, 160, false, true);
+
+    // Does not have a config element!
+    @Expose
+    public Position debugItemPos = new Position(90, 70);
 
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
+
+    @Expose
+    @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
+    public DebugMobConfig mobDebug = new DebugMobConfig();
 
 }

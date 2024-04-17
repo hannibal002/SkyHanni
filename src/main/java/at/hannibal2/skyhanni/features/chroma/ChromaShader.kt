@@ -21,7 +21,7 @@ abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, f
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
             var ticks =
-                (MinecraftData.totalTicks / 2) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+                (MinecraftData.totalTicks) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
 
             ticks = when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -16,22 +17,19 @@ class BlazeSlayerFirePitsWarning {
 
     private val config get() = SkyHanniMod.feature.slayer.blazes
 
-    companion object {
+    private var lastFirePitsWarning = SimpleTimeMark.farPast()
 
-        private var lastFirePitsWarning = 0L
-
-        fun fireFirePits() {
-            LorenzUtils.sendTitle("§cFire Pits!", 2.seconds)
-        }
+    private fun fireFirePits() {
+        LorenzUtils.sendTitle("§cFire Pits!", 2.seconds)
+        lastFirePitsWarning = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (!event.isMod(10)) return
 
-        val difference = System.currentTimeMillis() - lastFirePitsWarning
-
-        if (difference in 1..2_000 && event.isMod(10) && config.firePitsWarning) {
+        if (lastFirePitsWarning.passedSince() < 2.seconds) {
             SoundUtils.createSound("random.orb", 0.8f).playSound()
         }
     }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,7 +22,7 @@ class PlayerChatModifier {
     }
 
     @SubscribeEvent
-    fun onChatReceive(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         val foundCommands = mutableListOf<IChatComponent>()
         val message = event.chatComponent
 
@@ -68,7 +69,7 @@ class PlayerChatModifier {
             string = string.replace("§[7ab6]((?:\\w+){2,16}) (§.)", "§b$1 $2")
 
             // TODO remove workaround
-            if (!DungeonMilestonesDisplay.isMilestoneMessage(input)) {
+            if (!DungeonMilestonesDisplay.milestonePattern.matches(input)) {
                 // all players same color in chat
                 string = string.replace("§r§7: ", "§r§f: ")
             }

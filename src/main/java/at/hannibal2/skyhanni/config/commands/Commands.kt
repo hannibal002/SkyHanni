@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -79,10 +80,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
-import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
@@ -246,6 +244,10 @@ object Commands {
             "shresetdianaprofittracker",
             "Resets the Diana Profit Tracker"
         ) { DianaProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetpestprofittracker",
+            "Resets the Pest Profit Tracker"
+        ) { PestProfitTracker.resetCommand(it) }
         registerCommand(
             "shresetmythologicalcreatureracker",
             "Resets the Mythological Creature Tracker"
@@ -517,30 +519,33 @@ object Commands {
         } else {
             title = "All SkyHanni commands"
         }
-        val base = ChatComponentText(" \n§7$title:\n")
+
+        val components = mutableListOf<ChatComponentText>()
+        components.add(ChatComponentText(" \n§7$title:\n"))
+
         for (command in commands) {
             if (!filter(command.name) && !filter(command.description)) continue
             val category = command.category
             val name = command.name
             val color = category.color
-            val text = ChatComponentText("$color/$name")
-            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/$name")
 
             val hoverText = buildList {
                 add("§e/$name")
-                add(" §7${command.description}")
+                if (command.description.isNotEmpty()) {
+                    add(" §7${command.description}")
+                }
                 add("")
                 add("$color${category.categoryName}")
                 add("  §7${category.description}")
             }
 
-            text.chatStyle.chatHoverEvent =
-                HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hoverText.joinToString("\n")))
-            base.appendSibling(text)
-            base.appendSibling(ChatComponentText("§7, "))
+            val commandInfo = ChatUtils.createHoverableChat("$color/$name", hoverText, "/$name", false)
+
+            components.add(commandInfo)
+            components.add(ChatComponentText("§7, "))
         }
-        base.appendSibling(ChatComponentText("\n "))
-        Minecraft.getMinecraft().thePlayer.addChatMessage(base)
+        components.add(ChatComponentText("\n "))
+        ChatUtils.multiComponentMessage(components)
     }
 
     @JvmStatic
@@ -548,8 +553,7 @@ object Commands {
         if (!LorenzUtils.inSkyBlock) {
             ChatUtils.userError("Join SkyBlock to open the fortune guide!")
         } else {
-            CaptureFarmingGear.captureFarmingGear()
-            SkyHanniMod.screenToOpen = FFGuideGUI()
+            FFGuideGUI.open()
         }
     }
 

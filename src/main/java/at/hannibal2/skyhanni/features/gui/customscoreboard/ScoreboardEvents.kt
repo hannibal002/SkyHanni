@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -10,11 +11,11 @@ import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
@@ -154,6 +155,12 @@ enum class ScoreboardEvents(
         ::getEffigiesShowWhen,
         "Effigies: §c⧯§c⧯⧯§7⧯§c⧯§c⧯"
     ),
+    QUEUE(
+        ::getQueueLines,
+        ::getQueueShowWhen,
+        "Queued: Glacite Mineshafts\n" +
+            "Position: §b#45 §fSince: §a00:00"
+    ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
         ::getActiveEventShowWhen,
@@ -260,9 +267,7 @@ private fun getDungeonsLines() = listOf(
     getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
 }
 
-private fun getDungeonsShowWhen(): Boolean {
-    return IslandType.CATACOMBS.isInIsland() || inDungeons
-}
+private fun getDungeonsShowWhen(): Boolean = DungeonAPI.inDungeon()
 
 private fun getKuudraLines() = listOf(
     SbPattern.autoClosingPattern,
@@ -395,7 +400,8 @@ private fun getSpookyLines() = buildList {
     getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }?.let { add(it) } // Time
     add("§7Your Candy: ")
     add(
-        CustomScoreboardUtils.getTablistFooter()
+        TabListData.getFooter()
+            .removeResets()
             .split("\n")
             .firstOrNull { it.startsWith("§7Your Candy:") }
             ?.removePrefix("§7Your Candy:") ?: "§cCandy not found"
@@ -484,6 +490,11 @@ private fun getMiningEventsLines() = buildList {
         add(getSbLines().first { SbPattern.yourGoblinKillsPattern.matches(it) })
         add(getSbLines().first { SbPattern.remainingGoblinPattern.matches(it) })
     }
+
+    // Fortunate Freezing
+    if (getSbLines().any { SbPattern.fortunateFreezingBonusPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fortunateFreezingBonusPattern.matches(it) })
+    }
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
@@ -538,6 +549,15 @@ private fun getEffigiesLines(): List<String> {
 
 private fun getEffigiesShowWhen(): Boolean {
     return RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())
+}
+
+private fun getQueueLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
+}
+
+private fun getQueueShowWhen(): Boolean {
+    return SbPattern.queuePattern.anyMatches(getSbLines())
 }
 
 private fun getRedstoneLines(): List<String> {
