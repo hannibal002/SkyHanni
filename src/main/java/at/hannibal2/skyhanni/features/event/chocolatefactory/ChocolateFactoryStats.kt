@@ -43,6 +43,9 @@ object ChocolateFactoryStats {
 
         if (leaderboardPosition != null) {
             newList.add("§ePosition: §7#§b${leaderboardPosition.addSeparators()}")
+        } else {
+            newList.add("§ePosition: §7#§b???")
+
         }
 
         newList.add("")
