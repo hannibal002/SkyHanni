@@ -32,6 +32,7 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -299,6 +300,10 @@ class MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
+            is S37PacketStatistics -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
+            {
+                clearMobs()
+            }
         }
     }
 
@@ -315,6 +320,7 @@ class MobDetection {
         allEntitiesViaPacketId.add(id)
     }
 
+    // Thunderblade said cant do this instead of other event
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         clearMobs()
@@ -329,6 +335,7 @@ class MobDetection {
             event.addIrrelevant {
                 add("normal enabled")
                 add("Active Mobs: ${MobData.currentMobs.size}")
+                add("Active players: ${MobData.players.map { "${it.name} - ${System.identityHashCode(it)}" }}")
                 val inDistanceMobs = MobData.retries.count { it.value.outsideRange() }
                 add("Searching for Mobs: ${MobData.retries.size - inDistanceMobs}")
                 add("Mobs over Max Search Count: ${MobData.retries.count { it.value.times > MAX_RETRIES }}")
@@ -348,6 +355,10 @@ class MobDetection {
         mobDetectionReset()
         MobData.previousEntityLiving.clear()
         MobData.currentEntityLiving.clear()
+        MobData.retries.clear()
+        MobData.entityToMob.clear()
+        entityUpdatePackets.clear()
+        entitiesThatRequireUpdate.clear()
         allEntitiesViaPacketId.clear()
     }
 }
