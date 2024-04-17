@@ -47,6 +47,7 @@ class ColdOverlay {
         GlStateManager.popAttrib()
     }
 
+    // TODO fix small bug with high cold and low threshold having the same opacity than high cold and a b it smaller threshold
     private fun getColdAlpha(): Float {
         val coldInterp = NumberUtil.interpolate(cold.toFloat(), lastCold.toFloat(), lastColdUpdate.toMillis())
         val coldPercentage = (coldInterp - config.coldThreshold) / (100 - config.coldThreshold)
