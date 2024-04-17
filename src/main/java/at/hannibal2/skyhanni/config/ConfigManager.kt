@@ -202,21 +202,58 @@ class ConfigManager {
         }
     }
 
+    // Some position elements dont need config links as they dont have a config option.
+    private val ignoredMissingConfigLinks = listOf(
+        // commands
+        "features.garden.GardenConfig.cropSpeedMeterPos",
+        "features.misc.MiscConfig.collectionCounterPos",
+        "features.misc.MiscConfig.lockedMouseDisplay",
+
+        // debug features
+        "features.dev.DebugConfig.trackSoundPosition",
+        "features.dev.DevConfig.debugPos",
+        "features.dev.DevConfig.debugLocationPos",
+        "features.dev.DevConfig.debugItemPos",
+    )
+
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
         if (obj == null) return
         if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
         val ic = IdentityCharacteristics(obj)
         if (ic in slog) return
         slog.add(ic)
+        var missingConfigLink = false
         for (field in obj.javaClass.fields) {
             field.isAccessible = true
             if (field.type != Position::class.java) {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
-            val configLink = field.getAnnotation(ConfigLink::class.java) ?: continue
+            val configLink = field.getAnnotation(ConfigLink::class.java)
+            if (configLink == null) {
+                if (LorenzUtils.isInDevEnvironment()) {
+                    var name = "${field.declaringClass.name}.${field.name}"
+                    name = name.replace("at.hannibal2.skyhanni.config.", "")
+                    if (name !in ignoredMissingConfigLinks) {
+                        println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
+                        missingConfigLink = true
+                    }
+                }
+                continue
+            }
             val position = field.get(obj) as Position
             position.setLink(configLink)
+        }
+        if (missingConfigLink) {
+            println("")
+            println("This crash is here to remind you to fix the missing @ConfigLink annotation over your new config position config element.")
+            println("")
+            println("Steps to fix:")
+            println("1. Search for `WEE WOO WEE WOO` in the console output.")
+            println("2. Either add the Config Link.")
+            println("3. Or add the name to ignoredMissingConfigLinks.")
+            println("")
+            LorenzUtils.shutdownMinecraft("Missing Config Link")
         }
     }
 

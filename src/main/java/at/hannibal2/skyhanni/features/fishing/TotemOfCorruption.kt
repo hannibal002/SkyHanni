@@ -2,11 +2,14 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -99,6 +102,20 @@ class TotemOfCorruption {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.showOverlay.onToggle {
+            display = emptyList()
+            totems = emptyList()
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        display = emptyList()
+        totems = emptyList()
+    }
+
     private fun getTimeRemaining(totem: EntityArmorStand): Duration? =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(totem.getLorenzVec(), 2.0)
             .firstNotNullOfOrNull { entity ->
@@ -143,7 +160,7 @@ class TotemOfCorruption {
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }
 
-    private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay
+    private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay.get()
     private fun isHideParticlesEnabled() = LorenzUtils.inSkyBlock && config.hideParticles
     private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
