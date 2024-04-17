@@ -528,6 +528,10 @@ private fun getRiftLines() = buildList {
     if (RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())) {
         add(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
     }
+
+    if (SbPattern.riftAveikxPattern.anyMatches(getSbLines())) {
+        addAll(getSbLines().filter { SbPattern.riftAveikxPattern.matches(it) })
+    }
 }
 
 private fun getEssenceLines(): List<String> {
