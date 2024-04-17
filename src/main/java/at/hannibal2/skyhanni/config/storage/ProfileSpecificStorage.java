@@ -234,6 +234,9 @@ public class ProfileSpecificStorage {
         public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
 
         @Expose
+        public int scoreboardPests = 0;
+
+        @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
 
         @Expose

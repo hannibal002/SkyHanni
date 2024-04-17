@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class MiningNotifications {
+object MiningNotifications {
 
     enum class MiningNotificationList(val str: String, val notification: String) {
         MINESHAFT_SPAWN("§bGlacite Mineshaft", "§bMineshaft"),
@@ -38,11 +38,11 @@ class MiningNotifications {
         "scrapdrop",
         "§6§lEXCAVATOR! §r§fYou found a §r§9Suspicious Scrap§r§f!"
     )
-    private val goldenGoblinSpawn by patternGroup.pattern(
+    val goldenGoblinSpawn by patternGroup.pattern(
         "goblin.goldspawn",
         "§6A Golden Goblin has spawned!"
     )
-    private val diamondGoblinSpawn by patternGroup.pattern(
+    val diamondGoblinSpawn by patternGroup.pattern(
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!"
     )

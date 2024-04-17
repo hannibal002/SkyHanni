@@ -65,4 +65,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean privateIslandNoPickaxeAbility = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlights golden goblins you have spawned in green.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightYourGoldenGoblin = true;
 }
