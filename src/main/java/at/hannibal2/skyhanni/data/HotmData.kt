@@ -36,7 +36,7 @@ enum class HotmData(
         { level -> mapOf(HotmReward.MINING_SPEED to level * 20.0) }),
     MINING_FORTUNE("Mining Fortune",
         50,
-        { currentLevel -> (currentLevel + 1.0).pow(3.5) },
+        { currentLevel -> (currentLevel + 2.0).pow(3.05) },
         { level -> mapOf(HotmReward.MINING_FORTUNE to level * 5.0) }),
     QUICK_FORGE("Quick Forge",
         20,
