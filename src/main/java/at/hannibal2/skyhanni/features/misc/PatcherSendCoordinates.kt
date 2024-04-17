@@ -88,6 +88,6 @@ class PatcherSendCoordinates {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(39, "misc.patcherSendCoordWaypoint", "misc.patchercoordswaypointconfig.enabled")
+        event.move(39, "misc.patcherSendCoordWaypoint", "misc.patcherCoordsWaypoint.enabled")
     }
 }
