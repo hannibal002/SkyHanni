@@ -83,8 +83,6 @@ object PestProfitTracker {
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
-            val isPetDrop = group("dropType") == "PET"
-            val rarity = group("rarity")
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
             tracker.addItem(internalName, 1)
@@ -136,7 +134,9 @@ object PestProfitTracker {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.GARDEN) tracker.firstUpdate()
+        if (event.newIsland == IslandType.GARDEN) {
+            tracker.firstUpdate()
+        }
     }
 
     fun resetCommand(args: Array<String>) {

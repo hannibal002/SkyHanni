@@ -154,6 +154,12 @@ enum class ScoreboardEvents(
         ::getEffigiesShowWhen,
         "Effigies: §c⧯§c⧯⧯§7⧯§c⧯§c⧯"
     ),
+    QUEUE(
+        ::getQueueLines,
+        ::getQueueShowWhen,
+        "Queued: Glacite Mineshafts\n" +
+            "Position: §b#45 §fSince: §a00:00"
+    ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
         ::getActiveEventShowWhen,
@@ -482,6 +488,11 @@ private fun getMiningEventsLines() = buildList {
         add(getSbLines().first { SbPattern.yourGoblinKillsPattern.matches(it) })
         add(getSbLines().first { SbPattern.remainingGoblinPattern.matches(it) })
     }
+
+    // Fortunate Freezing
+    if (getSbLines().any { SbPattern.fortunateFreezingBonusPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fortunateFreezingBonusPattern.matches(it) })
+    }
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
@@ -536,6 +547,15 @@ private fun getEffigiesLines(): List<String> {
 
 private fun getEffigiesShowWhen(): Boolean {
     return RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())
+}
+
+private fun getQueueLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
+}
+
+private fun getQueueShowWhen(): Boolean {
+    return SbPattern.queuePattern.anyMatches(getSbLines())
 }
 
 private fun getRedstoneLines(): List<String> {
