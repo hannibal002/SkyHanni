@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -264,6 +265,7 @@ import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
+import at.hannibal2.skyhanni.features.mining.ColdOverlay
 import at.hannibal2.skyhanni.features.mining.DeepCavernsGuide
 import at.hannibal2.skyhanni.features.mining.GoldenGoblinHighlight
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
@@ -546,6 +548,7 @@ class SkyHanniMod {
         loadModule(LorenzUtils)
         loadModule(NEUItems)
         loadModule(PestAPI)
+        loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
 
         // features
@@ -851,6 +854,7 @@ class SkyHanniMod {
         loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning())
+        loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
 
