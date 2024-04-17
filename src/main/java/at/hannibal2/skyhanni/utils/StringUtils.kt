@@ -20,7 +20,7 @@ object StringUtils {
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
     private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
-    private val asciiPattern = "[^${Char(0)}-${Char(255)}]".toPattern()
+private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
