@@ -360,7 +360,8 @@ enum class HotmData(
             entry.isUnlocked = true
 
             entry.activeLevel = levelPattern.matchMatcher(lore.first()) {
-                group("level").toInt()
+                val level = group("level").toInt()
+                if (group("color") == "b") level - 1 else level
             } ?: 0
 
             if (entry.activeLevel > entry.maxLevel) {
