@@ -26,6 +26,9 @@ class PatcherSendCoordinates {
     private val patcherBeacon = mutableListOf<PatcherBeacon>()
     private val logger = LorenzLogger("misc/patchercoords")
 
+    /**
+     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4
+     */
     private val coordinatePattern by RepoPattern.pattern(
         "misc.patchercoords.coords",
         "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>.*)"
