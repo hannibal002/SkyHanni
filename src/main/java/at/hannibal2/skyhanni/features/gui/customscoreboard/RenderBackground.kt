@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Comp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SpecialColour
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -37,14 +36,17 @@ class RenderBackground {
             alignmentConfig.alignRight
             || alignmentConfig.alignCenterVertically
         ) {
+            var newX = if (alignmentConfig.alignRight) scaledWidth - elementWidth - (border * 2) else x
+            val newY = if (alignmentConfig.alignCenterVertically) scaledHeight / 2 - elementHeight / 2 else y
+
+            if (backgroundConfig.outline) {
+                newX -= backgroundConfig.outlineThickness / 2
+            }
+
             position.set(
                 Position(
-                    if (alignmentConfig.alignRight)
-                        scaledWidth - elementWidth - (border * 2)
-                    else x,
-                    if (alignmentConfig.alignCenterVertically)
-                        scaledHeight / 2 - elementHeight / 2
-                    else y,
+                    newX,
+                    newY,
                     position.getScale(),
                     position.isCenter
                 )
@@ -77,7 +79,7 @@ class RenderBackground {
                     y - border,
                     elementWidth + border * 3,
                     elementHeight + border * 2,
-                    SpecialColour.specialToChromaRGB(backgroundConfig.color),
+                    backgroundConfig.color.toChromaColor().rgb,
                     backgroundConfig.roundedCornerSmoothness
                 )
                 if (backgroundConfig.outline) {
