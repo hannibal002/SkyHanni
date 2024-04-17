@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Comp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCold
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern

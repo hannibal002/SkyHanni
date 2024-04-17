@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
@@ -8,7 +9,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsToClaim
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCold
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
@@ -90,7 +90,7 @@ enum class ChunkedStats(
             "§b${getCold()} ❄"
         },
         {
-            !(hideEmptyLines && getCold() == "0") && ScoreboardElement.COLD.showWhen()
+            !(hideEmptyLines && getCold() == 0) && ScoreboardElement.COLD.showWhen()
         },
         "§bCold"
     ),
