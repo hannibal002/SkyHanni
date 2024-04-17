@@ -327,19 +327,13 @@ class MobDetection {
             event.addData("Mob Detection is manually disabled!")
         } else {
             event.addIrrelevant {
-                add("normal enabled")
-                add("Active Players: ${MobData.players.size}")
-                add("Active players: ${MobData.players.map { "${it.name} - ${System.identityHashCode(it)}" }}")
-                add("Active Mobs: ${MobData.players.size + MobData.displayNPCs.size + MobData.summoningMobs.size + MobData.skyblockMobs.size + MobData.special.size}")
-                add("Active Mobs: ${MobData.currentMobs.map { "${it.name} - ${System.identityHashCode(it)}" }}")
-                val inDistanceMobs = MobData.retries.count { it.value.outsideRange() }
-                add("Searching for Mobs: ${MobData.retries.size - inDistanceMobs}")
-                add("Mobs over Max Search Count: ${MobData.retries.count { it.value.times > MAX_RETRIES }}")
-                add("Mobs outside of Range: $inDistanceMobs")
-                add("")
-                MobData.players.forEach {
-                    add("a")
-                    add("Player: ${it.name} - ${System.identityHashCode(it)}")
+                event.addIrrelevant {
+                    add("normal enabled")
+                    add("Active Mobs: ${MobData.currentMobs.size}")
+                    val inDistanceMobs = MobData.retries.count { it.value.outsideRange() }
+                    add("Searching for Mobs: ${MobData.retries.size - inDistanceMobs}")
+                    add("Mobs over Max Search Count: ${MobData.retries.count { it.value.times > MAX_RETRIES }}")
+                    add("Mobs outside of Range: $inDistanceMobs")
                 }
             }
         }
