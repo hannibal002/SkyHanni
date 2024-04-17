@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
@@ -40,7 +40,7 @@ val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
 private fun getVisitingName(): String {
-    val tabData = getTabList()
+    val tabData = TabListData.getTabList()
     val ownerRegex = Regex(".*Owner: (\\w+).*")
     for (line in tabData) {
         val colorlessLine = line.removeColor()
@@ -146,7 +146,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     PROFILE({
         val player = LorenzUtils.getPlayerName()
 
-        val tabData = getTabList()
+        val tabData = TabListData.getTabList()
         val levelRegex = Regex("""\[(\d{1,3})] $player""")
         var sbLevel = ""
 // SkyBlock Level: [999] on Lemon

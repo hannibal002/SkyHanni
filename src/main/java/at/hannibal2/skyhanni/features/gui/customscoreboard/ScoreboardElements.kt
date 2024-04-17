@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServe
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -449,11 +450,11 @@ private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
-    val cold = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.coldPattern, "cold")
+    val cold = -getCold()
 
     return listOf(
         when {
-            informationFilteringConfig.hideEmptyLines && cold == "0" -> "<hidden>"
+            informationFilteringConfig.hideEmptyLines && cold == 0 -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
             else -> "Cold: §b$cold❄"
         } to HorizontalAlignment.LEFT
