@@ -33,7 +33,7 @@ class GoldenGoblinHighlight {
             !MiningNotifications.diamondGoblinSpawn.matches(event.message)
         ) return
         lastChatMessage = SimpleTimeMark.now()
-        handel()
+        handle()
     }
 
     @SubscribeEvent
@@ -42,10 +42,10 @@ class GoldenGoblinHighlight {
         if (!goblinPattern.matches(event.mob.name)) return
         lastGoblin = event.mob
         lastGoblinSpawn = SimpleTimeMark.now()
-        handel()
+        handle()
     }
 
-    private fun handel() {
+    private fun handle() {
         if (lastChatMessage.passedSince() > timeOut || lastGoblinSpawn.passedSince() > timeOut) return
         lastChatMessage = SimpleTimeMark.farPast()
         lastGoblinSpawn = SimpleTimeMark.farPast()
