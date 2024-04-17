@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
@@ -399,7 +400,8 @@ private fun getSpookyLines() = buildList {
     getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }?.let { add(it) } // Time
     add("§7Your Candy: ")
     add(
-        CustomScoreboardUtils.getTablistFooter()
+        TabListData.getFooter()
+            .removeResets()
             .split("\n")
             .firstOrNull { it.startsWith("§7Your Candy:") }
             ?.removePrefix("§7Your Candy:") ?: "§cCandy not found"
