@@ -11,6 +11,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyChatCommands {
 
+    private val config get() = SkyHanniMod.feature.misc.partyCommands
+
     data class PartyChatCommand(
         val names: List<String>,
         val isEnabled: () -> Boolean,
@@ -18,11 +20,10 @@ object PartyChatCommands {
         val executable: (PartyChatEvent) -> Unit,
     )
 
-    private fun useConfig() = SkyHanniMod.feature.misc.partyCommands
     private val allPartyCommands = listOf(
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
-            { useConfig().transferCommand },
+            { config.transferCommand },
             requiresPartyLead = true,
             executable = {
                 ChatUtils.sendCommandToServer("party transfer ${it.author}")
@@ -30,7 +31,7 @@ object PartyChatCommands {
         ),
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
-            { useConfig().warpCommand },
+            { config.warpCommand },
             requiresPartyLead = true,
             executable = {
                 ChatUtils.sendCommandToServer("party warp")
@@ -38,7 +39,7 @@ object PartyChatCommands {
         ),
         PartyChatCommand(
             listOf("allinv", "allinvite"),
-            { useConfig().allInviteCommand },
+            { config.allInviteCommand },
             requiresPartyLead = true,
             executable = {
                 ChatUtils.sendCommandToServer("party settings allinvite")
@@ -56,7 +57,7 @@ object PartyChatCommands {
 
     private fun isTrustedUser(name: String): Boolean {
         val friend = FriendAPI.getAllFriends().find { it.name == name }
-        return when (useConfig().defaultRequiredTrustLevel) {
+        return when (config.defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
             PartyCommandsConfig.TrustedUser.ANYONE -> true
