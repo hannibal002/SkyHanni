@@ -93,4 +93,13 @@ enum class PestType(
         "PEST_SLUG_MONSTER".asInternalName(),
         CropType.MUSHROOM,
     ),
+    ;
+
+    companion object {
+        fun getByNameOrNull(name: String): PestType? {
+            return PestType.entries.firstOrNull { it.displayName.lowercase() == name }
+        }
+
+        fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")
+    }
 }
