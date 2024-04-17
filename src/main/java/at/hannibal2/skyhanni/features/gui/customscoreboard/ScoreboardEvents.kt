@@ -138,21 +138,15 @@ enum class ScoreboardEvents(
             "§7Damage Soaked:\n" +
             "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
     ),
-    HOT_DOG_CONTEST(
-        ::getHotDogLines,
-        ::getHotDogShowWhen,
-        "§6Hot Dog Contest\n" +
-            "Eaten: §c0/50"
+    RIFT(
+        ::getRiftLines,
+        { IslandType.THE_RIFT.isInIsland() },
+        "§7(All Rift Lines)"
     ),
     ESSENCE(
         ::getEssenceLines,
         ::getEssenceShowWhen,
         "Dragon Essence: §d1,285"
-    ),
-    EFFIGIES(
-        ::getEffigiesLines,
-        ::getEffigiesShowWhen,
-        "Effigies: §c⧯§c⧯⧯§7⧯§c⧯§c⧯"
     ),
     QUEUE(
         ::getQueueLines,
@@ -214,9 +208,8 @@ enum class ScoreboardEvents(
             MINING_EVENTS,
             DAMAGE,
             MAGMA_BOSS,
-            HOT_DOG_CONTEST,
+            RIFT,
             ESSENCE,
-            EFFIGIES,
             ACTIVE_TABLIST_EVENTS
         )
     }
@@ -518,14 +511,16 @@ private fun getMagmaBossShowWhen(): Boolean {
     return SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 }
 
-private fun getHotDogLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) }) +
-        (getSbLines().first { SbPattern.timeLeftPattern.matches(it) }) +
-        (getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
-}
+private fun getRiftLines() = buildList {
+    if (SbPattern.riftHotdogTitlePattern.anyMatches(getSbLines())) {
+        add(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) })
+        add(getSbLines().first { SbPattern.timeLeftPattern.matches(it) })
+        add(getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
+    }
 
-private fun getHotDogShowWhen(): Boolean {
-    return SbPattern.riftHotdogTitlePattern.anyMatches(getSbLines())
+    if (RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())) {
+        add(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
+    }
 }
 
 private fun getEssenceLines(): List<String> {
@@ -534,14 +529,6 @@ private fun getEssenceLines(): List<String> {
 
 private fun getEssenceShowWhen(): Boolean {
     return SbPattern.essencePattern.anyMatches(getSbLines())
-}
-
-private fun getEffigiesLines(): List<String> {
-    return listOf(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
-}
-
-private fun getEffigiesShowWhen(): Boolean {
-    return RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())
 }
 
 private fun getQueueLines(): List<String> {

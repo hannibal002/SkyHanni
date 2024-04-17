@@ -178,11 +178,6 @@ class CustomScoreboard {
         val displayPrefix = "$prefix.display"
 
         event.move(28, "$prefix.displayConfig.showAllActiveEvents", "$prefix.displayConfig.eventsConfig.showAllActiveEvents")
-        event.transform(30, "$prefix.displayConfig.eventsConfig.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.HOT_DOG_CONTEST.name))
-            array
-        }
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
         event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
@@ -208,6 +203,11 @@ class CustomScoreboard {
         event.transform(37, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
             array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array
+        }
+        event.transform(39, "$prefix.displayConfig.eventsConfig.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
             array
         }
     }
