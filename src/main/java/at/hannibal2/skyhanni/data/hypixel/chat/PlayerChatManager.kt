@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
@@ -36,8 +37,33 @@ class PlayerChatManager {
         "§9Party §8> (?<author>[^:]*): §r(?<message>.*)"
     )
 
+    /**
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is holding §r§8[§6Heroic Aspect of the Void§8]
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is holding §r§8[§7[Lvl 2] §dSpider§8]
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is friends with a §r§8[§7[Lvl 200] §8[§6103§8§4✦§8] §6Golden Dragon§8]
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is wearing §r§8[§5Glistening Implosion Belt§8]
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is friends with a §r§8[§7[Lvl 100] §dEnderman§8]
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 has §r§8[§6Heroic Aspect of the Void§8]
+     * REGEX-TEST: §8[§5396§8] §7☢ §r§b[MVP§c+§b] hannibal2§f§7 is holding §r§8[§6Buzzing InfiniVacuum™ Hooverius§8]
+     */
+    private val itemShowPattern by patternGroup.pattern(
+        "party",
+        "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§f§7 (?<action>is (?:holding|friends with a|wearing)|has) §r(?<itemName>.*)"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        itemShowPattern.matchMatcher(event.message) {
+            val levelColor = groupOrNull("levelColor")
+            val level = groupOrNull("level")?.formatInt()
+            val author = group("author")
+            val action = group("action")
+            val itemName = group("itemName")
+
+            // for consistency
+            val message = "§7$action §r$itemName"
+            PlayerShowItemChatEvent(levelColor, level, author, message, action, itemName).postChat(event)
+        }
         globalPattern.matchMatcher(event.message) {
             val author = group("author")
             val message = LorenzUtils.stripVanillaMessage(group("message"))
