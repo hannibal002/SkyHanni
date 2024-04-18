@@ -15,9 +15,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.expand
 import net.minecraft.item.ItemStack
-import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -182,24 +180,6 @@ object HoppityEggsLocations {
         possibleEggLocations.addAll(sortedEggs)
 
         drawLocations = true
-    }
-
-    private fun getWorldBoundingBox(islandEggs: List<LorenzVec>): AxisAlignedBB {
-        var minX = 10000.0
-        var minY = 10000.0
-        var minZ = 10000.0
-        var maxX = -10000.0
-        var maxY = -10000.0
-        var maxZ = -10000.0
-        for (eggLocation in islandEggs) {
-            if (eggLocation.x < minX) minX = eggLocation.x
-            if (eggLocation.y < minY) minY = eggLocation.y
-            if (eggLocation.z < minZ) minZ = eggLocation.z
-            if (eggLocation.x > maxX) maxX = eggLocation.x
-            if (eggLocation.y > maxY) maxY = eggLocation.y
-            if (eggLocation.z > maxZ) maxZ = eggLocation.z
-        }
-        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ).expand(10.0)
     }
 
     fun getCurrentIslandEggLocations(): List<LorenzVec>? =
