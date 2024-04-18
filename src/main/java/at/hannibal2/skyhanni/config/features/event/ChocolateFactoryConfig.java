@@ -23,7 +23,7 @@ public class ChocolateFactoryConfig {
     public HoppityEggsConfig hoppityEggs = new HoppityEggsConfig();
 
     @Expose
-    @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all Hoppity features.")
+    @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all chocolate factory features.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

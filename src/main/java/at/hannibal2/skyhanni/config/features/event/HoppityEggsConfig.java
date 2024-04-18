@@ -16,7 +16,8 @@ public class HoppityEggsConfig {
     public boolean waypoints = true;
 
     @Expose
-    @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby.")
+    @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +
+        "Only works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
     public boolean showAllWaypoints = false;
 

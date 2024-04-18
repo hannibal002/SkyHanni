@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -58,7 +59,6 @@ object HoppityEggsLocations {
         drawLocations = false
         sharedEggLocation = null
         currentEggType = null
-        eggLocationWeights.clear()
     }
 
     @SubscribeEvent
@@ -81,7 +81,7 @@ object HoppityEggsLocations {
         }
 
         val sharedEggLocation = sharedEggLocation
-        if (sharedEggLocation != null) {
+        if (sharedEggLocation != null && config.sharedWaypoints) {
             event.drawWaypointFilled(
                 sharedEggLocation,
                 LorenzColor.GREEN.toColor(),
@@ -171,7 +171,7 @@ object HoppityEggsLocations {
 
         eggLocationWeights.clear()
         eggLocationWeights.addAll(sortedEggs.map {
-            it.getEggLocationWeight(firstPos, secondPos)
+            it.getEggLocationWeight(firstPos, secondPos).round(3)
         }.take(5))
 
         val filteredEggs = sortedEggs.filter {
