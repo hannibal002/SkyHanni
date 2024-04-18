@@ -127,6 +127,7 @@ object StringUtils {
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
         } else {
@@ -333,10 +334,12 @@ object StringUtils {
         if (size > 1) {
             return null
         }
-        if (original.formattedText == newText) return null
+
+        if (LorenzUtils.stripVanillaMessage(original.formattedText) == newText) return null
         println("replaceIfNeeded!")
         println("original: ${original.formattedText}")
         println("newText: $newText")
+        println(" ")
 
         val text = ChatComponentText(newText)
         if (size == 1) {

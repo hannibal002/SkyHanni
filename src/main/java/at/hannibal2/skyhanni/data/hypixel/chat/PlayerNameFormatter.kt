@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -35,7 +36,17 @@ class PlayerNameFormatter {
         val name = format(levelColor, level, author)
         val newMessage = "$name$chatColor: $message"
 
-        println("newMessage: '$newMessage'")
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+    }
+
+    @SubscribeEvent
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
+        val direction = event.direction
+        val message = event.message
+        val author = event.author
+        val name = format(null, null, author)
+        val newMessage = "§d$direction §f$name§7: §f$message"
+
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
 
