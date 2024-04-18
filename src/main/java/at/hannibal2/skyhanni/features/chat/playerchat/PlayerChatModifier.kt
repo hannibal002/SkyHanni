@@ -15,7 +15,6 @@ class PlayerChatModifier {
     init {
         patterns.add("§[ab6]\\[(?:VIP|MVP)(?:§.|\\+)*] {1,2}(?:§[7ab6])?(\\w{2,16})".toRegex()) // ranked player with prefix everywhere
         patterns.add("§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
-//         patterns.add("(?:§7 )?§7(\\w{2,16})§7§r".toRegex()) // nons user chat
     }
 
     @SubscribeEvent
@@ -34,10 +33,6 @@ class PlayerChatModifier {
             }
             string = string.replace("§[7ab6]((?:\\w+){2,16})'s", "§b$1's")
             string = string.replace("§[7ab6]((?:\\w+){2,16}) (§.)", "§b$1 $2")
-        }
-
-        if (config.chatFilter && string.contains("§r§f: ") && PlayerChatFilter.shouldChatFilter(string)) {
-            string = string.replace("§r§f: ", "§r§7: ")
         }
 
         string = MarkedPlayerManager.replaceInChat(string)

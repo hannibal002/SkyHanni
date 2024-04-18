@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -37,7 +38,10 @@ class PlayerNameFormatter {
         val level = event.level
         val message = event.message
         val author = event.author
-        val chatColor = if (config.sameChatColor) "§f" else event.chatColor
+
+        val shouldFilter = config.chatFilter && PlayerChatFilter.shouldChatFilter(message)
+        val chatColor = if (shouldFilter) "§7" else if (config.sameChatColor) "§f" else event.chatColor
+
         val name = format(levelColor, level, author)
         val newMessage = "$name$chatColor: $message"
 
