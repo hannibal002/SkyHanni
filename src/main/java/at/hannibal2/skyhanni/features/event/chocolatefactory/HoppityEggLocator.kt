@@ -22,7 +22,7 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-object HoppityEggsLocations {
+object HoppityEggLocator {
 
     private val config get() = ChocolateFactoryAPI.config.hoppityEggs
 
@@ -124,7 +124,7 @@ object HoppityEggsLocations {
             validParticleLocations.add(event.location)
             ticksSinceLastParticleFound = 0
         }
-        HoppityEggsLocations.lastParticlePosition = null
+        HoppityEggLocator.lastParticlePosition = null
     }
 
     @SubscribeEvent
@@ -144,26 +144,25 @@ object HoppityEggsLocations {
     private fun calculateEggPosition() {
         if (lastGuessMade.passedSince() < 1.seconds) return
         lastGuessMade = SimpleTimeMark.now()
+        possibleEggLocations.clear()
+
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
         val listSize = validParticleLocations.size
+
         if (listSize < 5) return
 
         val secondPoint = validParticleLocations.removeLast()
-        val firstPoint = validParticleLocations.removeLast()
+        val firstPos = validParticleLocations.removeLast()
 
-        val xDiff = secondPoint.x - firstPoint.x
-        val yDiff = secondPoint.y - firstPoint.y
-        val zDiff = secondPoint.z - firstPoint.z
-
-        firstPos = firstPoint
+        val xDiff = secondPoint.x - firstPos.x
+        val yDiff = secondPoint.y - firstPos.y
+        val zDiff = secondPoint.z - firstPos.z
 
         secondPos = LorenzVec(
             secondPoint.x + xDiff * 1000,
             secondPoint.y + yDiff * 1000,
             secondPoint.z + zDiff * 1000
         )
-
-        possibleEggLocations.clear()
 
         val sortedEggs = islandEggsLocations.sortedBy {
             it.getEggLocationWeight(firstPos, secondPos)

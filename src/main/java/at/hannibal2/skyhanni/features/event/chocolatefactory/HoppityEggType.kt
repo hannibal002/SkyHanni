@@ -17,6 +17,7 @@ enum class HoppityEggType(
     fun markClaimed() {
         claimed = true
     }
+
     fun markSpawned() {
         claimed = false
     }
@@ -38,9 +39,9 @@ enum class HoppityEggType(
                 if (currentSbHour >= it.resetsAt && it.lastResetDay != currentSbDay) {
                     it.markSpawned()
                     it.lastResetDay = currentSbDay
-                    if (HoppityEggsLocations.currentEggType == it) {
-                        HoppityEggsLocations.currentEggType = null
-                        HoppityEggsLocations.sharedEggLocation = null
+                    if (HoppityEggLocator.currentEggType == it) {
+                        HoppityEggLocator.currentEggType = null
+                        HoppityEggLocator.sharedEggLocation = null
                     }
                 }
             }

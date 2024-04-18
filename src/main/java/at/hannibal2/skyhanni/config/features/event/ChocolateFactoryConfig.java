@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.event;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStatsType;
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -18,7 +18,7 @@ import java.util.List;
 public class ChocolateFactoryConfig {
 
     @Expose
-    @ConfigOption(name = "Hoppity Egg", desc = "")
+    @ConfigOption(name = "Hoppity Eggs", desc = "")
     @Accordion
     public HoppityEggsConfig hoppityEggs = new HoppityEggsConfig();
 
@@ -37,23 +37,23 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(
         name = "Stats List",
-        desc = "Drag text to change what displays and which order it displays in."
+        desc = "Drag text to change what displays in the chocolate factory stats list and what order the text appears in."
     )
     @ConfigEditorDraggableList
-    public List<ChocolateFactoryStatsType> statsDisplayList = new ArrayList<>(Arrays.asList(
-        ChocolateFactoryStatsType.HEADER,
-        ChocolateFactoryStatsType.CURRENT,
-        ChocolateFactoryStatsType.THIS_PRESTIGE,
-        ChocolateFactoryStatsType.ALL_TIME,
-        ChocolateFactoryStatsType.EMPTY,
-        ChocolateFactoryStatsType.PER_SECOND,
-        ChocolateFactoryStatsType.PER_MINUTE,
-        ChocolateFactoryStatsType.PER_HOUR,
-        ChocolateFactoryStatsType.PER_DAY,
-        ChocolateFactoryStatsType.EMPTY_2,
-        ChocolateFactoryStatsType.MULTIPLIER,
-        ChocolateFactoryStatsType.BARN,
-        ChocolateFactoryStatsType.LEADERBOARD_POS
+    public List<ChocolateFactoryStat> statsDisplayList = new ArrayList<>(Arrays.asList(
+        ChocolateFactoryStat.HEADER,
+        ChocolateFactoryStat.CURRENT,
+        ChocolateFactoryStat.THIS_PRESTIGE,
+        ChocolateFactoryStat.ALL_TIME,
+        ChocolateFactoryStat.EMPTY,
+        ChocolateFactoryStat.PER_SECOND,
+        ChocolateFactoryStat.PER_MINUTE,
+        ChocolateFactoryStat.PER_HOUR,
+        ChocolateFactoryStat.PER_DAY,
+        ChocolateFactoryStat.EMPTY_2,
+        ChocolateFactoryStat.MULTIPLIER,
+        ChocolateFactoryStat.BARN,
+        ChocolateFactoryStat.LEADERBOARD_POS
     ));
 
     @Expose

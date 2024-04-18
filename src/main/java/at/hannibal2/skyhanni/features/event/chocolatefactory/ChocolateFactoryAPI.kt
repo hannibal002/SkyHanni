@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -60,6 +61,10 @@ object ChocolateFactoryAPI {
         "barn.amount",
         "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits"
     )
+    private val prestigeLevelPattern by patternGroup.pattern(
+        "prestige.level",
+        "'§6Chocolate Factory (?<prestige>[IVX]+)"
+    )
     private val clickMeRabbitPattern by patternGroup.pattern(
         "rabbit.clickme",
         "§e§lCLICK ME!"
@@ -82,6 +87,7 @@ object ChocolateFactoryAPI {
 
     var inChocolateFactory = false
 
+    var currentPrestige = 0
     var chocolateCurrent = 0L
     var chocolateAllTime = 0L
     var chocolatePerSecond = 0.0
@@ -182,6 +188,9 @@ object ChocolateFactoryAPI {
                 chocolateAllTime = group("amount").formatLong()
             }
         }
+        prestigeLevelPattern.matchMatcher(prestigeItem.name) {
+            currentPrestige = group("prestige").romanToDecimal()
+        }
         prestigeItem.getLore().matchFirst(chocolateThisPrestigePattern) {
             chocolateThisPrestige = group("amount").formatLong()
         }
@@ -213,7 +222,7 @@ object ChocolateFactoryAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
-        HoppityEggsLocations.eggLocations = data.eggLocations
+        HoppityEggLocator.eggLocations = data.eggLocations
 
         rabbitSlots = data.rabbitSlots
         otherUpgradeSlots = data.otherUpgradeSlots
@@ -229,10 +238,9 @@ object ChocolateFactoryAPI {
 
     private fun List<String>.getUpgradeCost(): Long? {
         val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
-        chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
-            return group("amount").formatLong()
+        return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
+            group("amount").formatLong()
         }
-        return null
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
