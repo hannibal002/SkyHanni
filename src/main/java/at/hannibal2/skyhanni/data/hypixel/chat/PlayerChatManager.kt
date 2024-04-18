@@ -158,7 +158,6 @@ class PlayerChatManager {
 
             // for consistency
             val message = "§7$action §r$itemName"
-            // TODO
             PlayerShowItemChatEvent(levelColor, level, author, message, action, itemName, chatComponent).postChat(event)
         }
 

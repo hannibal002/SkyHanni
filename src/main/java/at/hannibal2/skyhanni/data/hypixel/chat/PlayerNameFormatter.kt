@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
@@ -82,6 +83,18 @@ class PlayerNameFormatter {
         val author = event.author
         val name = nameFormat(author)
         val newMessage = "§9Party §8> $name§f: $message"
+
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+    }
+
+    @SubscribeEvent
+    fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
+        if (!isEnabled()) return
+        val author = event.author
+        val action = event.action
+        val itemName = event.itemName
+        val name = nameFormat(author)
+        val newMessage = "$name §7$action §r$itemName"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
