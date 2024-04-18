@@ -36,7 +36,7 @@ class PlayerNameFormatter {
         val level = event.level
         val message = event.message
         val author = event.author
-        val chatColor = event.chatColor
+        val chatColor = if (config.sameChatColor) "§f" else event.chatColor
         val name = format(levelColor, level, author)
         val newMessage = "$name$chatColor: $message"
 
