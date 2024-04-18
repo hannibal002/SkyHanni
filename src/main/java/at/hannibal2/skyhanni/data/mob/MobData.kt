@@ -43,7 +43,10 @@ class MobData {
     }
 
     internal enum class Result {
-        Found, NotYetFound, Illegal, SomethingWentWrong
+        Found,
+        NotYetFound,
+        Illegal,
+        SomethingWentWrong
     }
 
     internal class MobResult(val result: Result, val mob: Mob?) {

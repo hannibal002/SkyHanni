@@ -135,11 +135,12 @@ object FarmingFortuneDisplay {
     }
 
     private fun update() {
-        display = if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
-            drawMissingFortuneDisplay(false)
-        } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-            drawMissingFortuneDisplay(true)
-        } else drawDisplay()
+        display =
+            if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
+                drawMissingFortuneDisplay(false)
+            } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
+                drawMissingFortuneDisplay(true)
+            } else drawDisplay()
     }
 
     private fun drawDisplay() = buildList {
@@ -157,11 +158,13 @@ object FarmingFortuneDisplay {
             }
         } else getCurrentFarmingFortune()
 
-        list.add(Renderable.string(
-            "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                farmingFortune.round(0).addSeparators()
-            } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
-        ))
+        list.add(
+            Renderable.string(
+                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
+                    farmingFortune.round(0).addSeparators()
+                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
+            )
+        )
         add(Renderable.horizontalContainer(list))
 
         val ffReduction = getPestFFReduction()
@@ -212,7 +215,7 @@ object FarmingFortuneDisplay {
             if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
                 "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
-                "and showing the Farming Fortune stat.",
+                    "and showing the Farming Fortune stat.",
                 command = "widget"
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()

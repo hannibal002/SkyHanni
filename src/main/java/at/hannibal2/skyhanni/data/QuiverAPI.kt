@@ -264,7 +264,8 @@ object QuiverAPI {
     private fun checkChestplate() {
         val wasWearing = wearingSkeletonMasterChestplate
         wearingSkeletonMasterChestplate = InventoryUtils.getChestplate()?.getInternalName()?.equals(
-            SKELETON_MASTER_CHESTPLATE) ?: false
+            SKELETON_MASTER_CHESTPLATE
+        ) ?: false
         if (wasWearing != wearingSkeletonMasterChestplate) {
             QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
         }

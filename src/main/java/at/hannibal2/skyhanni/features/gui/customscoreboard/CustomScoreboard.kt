@@ -178,7 +178,11 @@ class CustomScoreboard {
         val displayConfigPrefix = "$prefix.displayConfig"
         val displayPrefix = "$prefix.display"
 
-        event.move(28, "$prefix.displayConfig.showAllActiveEvents", "$prefix.displayConfig.eventsConfig.showAllActiveEvents")
+        event.move(
+            28,
+            "$prefix.displayConfig.showAllActiveEvents",
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+        )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
         event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
@@ -191,7 +195,11 @@ class CustomScoreboard {
         event.move(31, "$displayConfigPrefix.showMaxIslandPlayers", "$displayPrefix.showMaxIslandPlayers")
         event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
         event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
-        event.move(31, "$displayConfigPrefix.cacheScoreboardOnIslandSwitch", "$displayPrefix.cacheScoreboardOnIslandSwitch")
+        event.move(
+            31,
+            "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
+            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+        )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
         event.move(31, "$displayConfigPrefix.titleAndFooter", "$displayPrefix.titleAndFooter")
@@ -223,7 +231,6 @@ class CustomScoreboard {
 
             newArray
         }
-
 
     }
 }

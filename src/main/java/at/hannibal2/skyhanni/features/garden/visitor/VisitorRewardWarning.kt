@@ -40,7 +40,8 @@ class VisitorRewardWarning {
     }
 
     private fun renderColor(backgroundStack: ItemStack?, outlineStack: ItemStack?, outlineColor: LorenzColor) {
-        if (!config.bypassKey.isKeyHeld()) backgroundStack?.background = LorenzColor.DARK_GRAY.addOpacity(config.opacity).rgb
+        if (!config.bypassKey.isKeyHeld()) backgroundStack?.background =
+            LorenzColor.DARK_GRAY.addOpacity(config.opacity).rgb
         if (config.optionOutline) outlineStack?.borderLine = outlineColor.addOpacity(200).rgb
     }
 
@@ -57,7 +58,8 @@ class VisitorRewardWarning {
         val isAcceptSlot = stack.name == "§aAccept Offer"
 
         if (blockReason != null && !config.bypassKey.isKeyHeld() &&
-            ((blockReason.blockRefusing && isRefuseSlot) || !blockReason.blockRefusing && isAcceptSlot)) {
+            ((blockReason.blockRefusing && isRefuseSlot) || !blockReason.blockRefusing && isAcceptSlot)
+        ) {
             event.isCanceled = true
             return
         }
@@ -83,7 +85,7 @@ class VisitorRewardWarning {
         val isRefuseSlot = event.itemStack.name == "§cRefuse Offer"
         val isAcceptSlot = event.itemStack.name == "§aAccept Offer"
 
-        val blockReason = visitor.blockReason?: return
+        val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return
         if (!blockReason.blockRefusing && !isAcceptSlot) return
 

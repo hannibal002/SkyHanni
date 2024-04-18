@@ -177,8 +177,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
         if (quests.any {
                 it.state == QuestState.READY_TO_COLLECT ||
-                it.state == QuestState.NOT_ACCEPTED ||
-                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
+                    it.state == QuestState.NOT_ACCEPTED ||
+                    (it is RescueMissionQuest && it.state == QuestState.ACCEPTED)
+            }) {
             val location = when (reputationHelper.factionType) {
                 FactionType.BARBARIAN -> townBoardBarbarian
                 FactionType.MAGE -> townBoardMage

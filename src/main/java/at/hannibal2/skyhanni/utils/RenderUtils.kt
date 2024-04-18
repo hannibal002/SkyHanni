@@ -51,7 +51,11 @@ object RenderUtils {
         }
     }
 
-    enum class VerticalAlignment { TOP, CENTER, BOTTOM }
+    enum class VerticalAlignment {
+        TOP,
+        CENTER,
+        BOTTOM
+    }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
