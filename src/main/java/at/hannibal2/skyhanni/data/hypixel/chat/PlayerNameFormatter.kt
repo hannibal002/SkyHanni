@@ -97,7 +97,9 @@ class PlayerNameFormatter {
         val author = event.author
         val action = event.action
         val itemName = event.itemName
-        val name = nameFormat(author)
+        val levelColor = event.levelColor
+        val level = event.level
+        val name = nameFormat(author, levelColor = levelColor, level = level)
         val newMessage = "$name §7$action §r$itemName"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
@@ -114,8 +116,7 @@ class PlayerNameFormatter {
 
         var emblemFormat = ""
         emblemPattern.matchMatcher(author) {
-            val emblem = group("emblem")
-            emblemFormat = "$emblem §r"
+            emblemFormat = group("emblem")
             cleanAuthor = group("author")
         }
 
@@ -162,7 +163,7 @@ class PlayerNameFormatter {
         if (author.contains("ADMIN")) return author
         if (config.ignoreYouTube && author.contains("YOUTUBE")) return author
 
-        val result = if (config.useLevelColorForName) {
+        val result = if (config.useLevelColorForName && levelColor != null) {
             levelColor + author.cleanPlayerName()
         } else author.cleanPlayerName(displayName = true)
 
