@@ -7,13 +7,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryStats {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = ChocolateFactoryAPI.config
 
     private var displayList = listOf<String>()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.statsDisplay) return
 
         config.position.renderStrings(displayList, posLabel = "Chocolate Factory Stats")
@@ -21,24 +21,24 @@ object ChocolateFactoryStats {
 
     fun updateDisplay() {
         val newList = mutableListOf<String>()
-        val perSecond = ChocolateFactoryApi.chocolatePerSecond
+        val perSecond = ChocolateFactoryAPI.chocolatePerSecond
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
-        val position = ChocolateFactoryApi.leaderboardPosition?.addSeparators() ?: "???"
+        val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
 
         newList.add("§6§lChocolate Factory Stats")
 
-        newList.add("§eCurrent Chocolate: §6${ChocolateFactoryApi.chocolateCurrent.addSeparators()}")
-        newList.add("§eThis Prestige: §6${ChocolateFactoryApi.chocolateThisPrestige.addSeparators()}")
-        newList.add("§eAll-time: §6${ChocolateFactoryApi.chocolateAllTime.addSeparators()}")
+        newList.add("§eCurrent Chocolate: §6${ChocolateFactoryAPI.chocolateCurrent.addSeparators()}")
+        newList.add("§eThis Prestige: §6${ChocolateFactoryAPI.chocolateThisPrestige.addSeparators()}")
+        newList.add("§eAll-time: §6${ChocolateFactoryAPI.chocolateAllTime.addSeparators()}")
 
         newList.add("§ePer Second: §6${perSecond.addSeparators()}")
         newList.add("§ePer Minute: §6${perMinute.addSeparators()}")
         newList.add("§ePer Hour: §6${perHour.addSeparators()}")
         newList.add("§ePer Day: §6${perDay.addSeparators()}")
 
-        newList.add("§eChocolate Multiplier: §6${ChocolateFactoryApi.chocolateMultiplier}")
+        newList.add("§eChocolate Multiplier: §6${ChocolateFactoryAPI.chocolateMultiplier}")
         newList.add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
         newList.add("§ePosition: §7#§b$position")

@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggsLocations {
 
-    private val config get() = ChocolateFactoryApi.config.hoppityEggs
+    private val config get() = ChocolateFactoryAPI.config.hoppityEggs
 
     private val locatorItem = "EGGLOCATOR".asInternalName()
 
@@ -206,7 +206,7 @@ object HoppityEggsLocations {
         type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints
-        && ChocolateFactoryApi.isHoppityEvent()
+        && ChocolateFactoryAPI.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
     private fun hasLocatorInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }

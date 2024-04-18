@@ -18,50 +18,50 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryInventory {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = ChocolateFactoryAPI.config
 
-    private val rabbitAmountPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.amount",
         "Rabbit \\S+ - \\[(?<amount>\\d+)].*"
     )
-    private val upgradeTierPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val upgradeTierPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "upgradetier",
         ".*\\s(?<tier>[IVXLC]+)"
     )
-    private val unclaimedRewardsPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val unclaimedRewardsPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "unclaimedrewards",
         "§7§aYou have \\d+ unclaimed rewards?!"
     )
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
         val item = event.stack ?: return
         val itemName = item.name
-        if (itemName != ChocolateFactoryApi.bestRabbitUpgrade) return
+        if (itemName != ChocolateFactoryAPI.bestRabbitUpgrade) return
 
         event.drawSlotText(event.x + 18, event.y, "§6✦", .8f)
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.slotIndex in ChocolateFactoryApi.upgradeableSlots) {
-                if (slot.slotIndex == ChocolateFactoryApi.bestUpgrade) {
+            if (slot.slotIndex in ChocolateFactoryAPI.upgradeableSlots) {
+                if (slot.slotIndex == ChocolateFactoryAPI.bestUpgrade) {
                     slot highlight LorenzColor.GREEN.addOpacity(200)
                 } else {
                     slot highlight LorenzColor.GREEN.addOpacity(75)
                 }
             }
-            if (slot.slotIndex == ChocolateFactoryApi.barnIndex && ChocolateFactoryBarnManager.barnFull) {
+            if (slot.slotIndex == ChocolateFactoryAPI.barnIndex && ChocolateFactoryBarnManager.barnFull) {
                 slot highlight LorenzColor.RED
             }
-            if (slot.slotIndex == ChocolateFactoryApi.clickRabbitSlot) {
+            if (slot.slotIndex == ChocolateFactoryAPI.clickRabbitSlot) {
                 slot highlight LorenzColor.RED
             }
         }
@@ -69,14 +69,14 @@ object ChocolateFactoryInventory {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.showStackSizes) return
 
         val item = event.stack
         val itemName = item.name.removeColor()
         val slotNumber = event.slot.slotNumber
 
-        if (slotNumber in ChocolateFactoryApi.rabbitSlots) {
+        if (slotNumber in ChocolateFactoryAPI.rabbitSlots) {
             rabbitAmountPattern.matchMatcher(itemName) {
                 val rabbitTip = when (val rabbitAmount = group("amount").formatInt()) {
                     in (0..9) -> "$rabbitAmount"
@@ -91,12 +91,12 @@ object ChocolateFactoryInventory {
                 event.stackTip = rabbitTip
             }
         }
-        if (slotNumber in ChocolateFactoryApi.otherUpgradeSlots) {
+        if (slotNumber in ChocolateFactoryAPI.otherUpgradeSlots) {
             upgradeTierPattern.matchMatcher(itemName) {
                 event.stackTip = group("tier").romanToDecimal().toString()
             }
         }
-        if (slotNumber == ChocolateFactoryApi.milestoneIndex) {
+        if (slotNumber == ChocolateFactoryAPI.milestoneIndex) {
             item.getLore().matchFirst(unclaimedRewardsPattern) {
                 event.stackTip = "§c!!!"
             }
@@ -105,10 +105,10 @@ object ChocolateFactoryInventory {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
         val slot = event.slot ?: return
         if (!config.useMiddleClick) return
-        if (slot.slotNumber in ChocolateFactoryApi.noPickblockSlots) return
+        if (slot.slotNumber in ChocolateFactoryAPI.noPickblockSlots) return
 
         event.makePickblock()
     }

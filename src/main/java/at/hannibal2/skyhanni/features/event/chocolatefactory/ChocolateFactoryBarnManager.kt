@@ -11,14 +11,14 @@ import kotlin.time.Duration.Companion.seconds
 
 object ChocolateFactoryBarnManager {
 
-    private val config get() = ChocolateFactoryApi.config
-    private val profileStorage get() = ChocolateFactoryApi.profileStorage
+    private val config get() = ChocolateFactoryAPI.config
+    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
-    private val newRabbitPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val newRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.new",
         "§d§lNEW RABBIT! §6\\+\\d Chocolate §7and §6\\+0.\\d+x Chocolate §7per second!"
     )
-    private val rabbitDuplicatePattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val rabbitDuplicatePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.duplicate",
         "§7§lDUPLICATE RABBIT! §6\\+[\\d,]+ Chocolate"
     )
@@ -43,12 +43,12 @@ object ChocolateFactoryBarnManager {
     }
 
     fun trySendBarnFullMessage() {
-        if (!ChocolateFactoryApi.isEnabled()) return
+        if (!ChocolateFactoryAPI.isEnabled()) return
         val profileStorage = profileStorage ?: return
 
         val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
         barnFull =
-            remainingSpace <= config.barnCapacityThreshold && profileStorage.maxRabbits < ChocolateFactoryApi.maxRabbits
+            remainingSpace <= config.barnCapacityThreshold && profileStorage.maxRabbits < ChocolateFactoryAPI.maxRabbits
         if (!barnFull) return
 
         if (lastBarnFullWarning.passedSince() < 30.seconds) return

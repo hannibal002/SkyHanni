@@ -123,7 +123,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
@@ -558,7 +558,7 @@ class SkyHanniMod {
         loadModule(PestAPI)
         loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
-        loadModule(ChocolateFactoryApi)
+        loadModule(ChocolateFactoryAPI)
 
         // features
         loadModule(BazaarOrderHelper())

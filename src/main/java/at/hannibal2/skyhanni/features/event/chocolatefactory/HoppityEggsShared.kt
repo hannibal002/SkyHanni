@@ -12,9 +12,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityEggsShared {
 
-    private val config get() = ChocolateFactoryApi.config.hoppityEggs
+    private val config get() = ChocolateFactoryAPI.config.hoppityEggs
 
-    private val sharedEggPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val sharedEggPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.shared",
         ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)"
     )
