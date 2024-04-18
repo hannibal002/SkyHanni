@@ -85,6 +85,16 @@ public class ChocolateFactoryConfig {
     public int barnCapacityThreshold = 6;
 
     @Expose
+    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityCollectionStats = true;
+
+    @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
     public Position position = new Position(183, 160, false, true);
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
+    public Position hoppityStatsPosition = new Position(183, 160, false, true);
 }
