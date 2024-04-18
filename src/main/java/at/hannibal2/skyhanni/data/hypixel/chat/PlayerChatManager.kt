@@ -89,10 +89,11 @@ class PlayerChatManager {
     /**
      * REGEX-TEST: §c[Tiffany] §b[MVP§c+§b] hannibal2
      * REGEX-TEST: §b[MVP§c+§b] hannibal2
+     * REGEX-TEST: §6§l℻ §r§f[Gamer] §b[MVP§f+§b] SchrankLP§f§r
      */
     private val privateIslandRankPattern by patternGroup.pattern(
-        "privateislandgroup",
-        "(?<privateIslandGroup>§.\\[\\w+]) (?<author>.*)"
+        "privateislandrank",
+        ".*(?<privateIslandRank>§.\\[\\w+]).*"
     )
 
     @SubscribeEvent
@@ -152,8 +153,9 @@ class PlayerChatManager {
         var privateIslandRank: String? = null
         if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
             privateIslandRankPattern.matchMatcher(author) {
-                privateIslandRank = group("privateIslandGroup")
-                author = group("author")
+                val rank = group("privateIslandRank")
+                privateIslandRank = rank
+                author = author.replace(rank, "")
             }
         }
 
