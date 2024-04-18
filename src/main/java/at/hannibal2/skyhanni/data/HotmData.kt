@@ -28,6 +28,7 @@ enum class HotmData(
     val maxLevel: Int,
     val costFun: ((Int) -> (Double?)),
     val rewardFun: ((Int) -> (Map<HotmReward, Double>)),
+    var totalCostMaxLevel: Int = 0,
 ) {
 
     MINING_SPEED("Mining Speed",
@@ -329,7 +330,10 @@ enum class HotmData(
         var heartItem: Slot? = null
 
         init {
-            entries.forEach { it.guiNamePattern }
+            entries.forEach {
+                it.guiNamePattern
+                it.totalCostMaxLevel = it.calculateTotalCost(it.maxLevel)
+            }
             HotmAPI.Powder.entries.forEach {
                 it.heartPattern
                 it.resetPattern
