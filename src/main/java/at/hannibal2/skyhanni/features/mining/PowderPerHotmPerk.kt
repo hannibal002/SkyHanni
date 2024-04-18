@@ -16,7 +16,6 @@ class PowderPerHotmPerk {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
-        if (!HotmData.inInventory) return
 
         val itemName = event.itemStack.displayName
         val perkEnum = HotmData.getPerkByNameOrNull(itemName.removeColor()) ?: return
@@ -62,5 +61,5 @@ class PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() = config.powderSpent && LorenzUtils.inSkyBlock
+    private fun isEnabled() = config.powderSpent && LorenzUtils.inSkyBlock && HotmData.inInventory
 }
