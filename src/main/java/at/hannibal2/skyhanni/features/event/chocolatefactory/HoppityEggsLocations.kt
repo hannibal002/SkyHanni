@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -36,6 +37,7 @@ object HoppityEggsLocations {
 
     private var ticksSinceLastParticleFound = -1
     private var lastGuessMade = SimpleTimeMark.farPast()
+    private val eggLocationWeights = mutableListOf<Double>()
 
     var sharedEggLocation: LorenzVec? = null
     var currentEggType: HoppityEggType? = null
@@ -56,6 +58,7 @@ object HoppityEggsLocations {
         drawLocations = false
         sharedEggLocation = null
         currentEggType = null
+        eggLocationWeights.clear()
     }
 
     @SubscribeEvent
@@ -152,32 +155,40 @@ object HoppityEggsLocations {
         val yDiff = secondPoint.y - firstPoint.y
         val zDiff = secondPoint.z - firstPoint.z
 
-        firstPos = firstPoint.roundLocationToBlock()
+        firstPos = firstPoint
 
         secondPos = LorenzVec(
             secondPoint.x + xDiff * 1000,
             secondPoint.y + yDiff * 1000,
             secondPoint.z + zDiff * 1000
-        ).roundLocationToBlock()
+        )
 
         possibleEggLocations.clear()
 
-        val sortedEggs = islandEggsLocations.filter {
-            it.getEggLocationWeight(firstPos, secondPos) < 1
-        }.sortedBy {
+        val sortedEggs = islandEggsLocations.sortedBy {
             it.getEggLocationWeight(firstPos, secondPos)
         }
 
-        val maxLineDistance = sortedEggs.sortedByDescending {
+        eggLocationWeights.clear()
+        eggLocationWeights.addAll(sortedEggs.map {
+            it.getEggLocationWeight(firstPos, secondPos)
+        }.take(5))
+
+        val filteredEggs = sortedEggs.filter {
+            it.getEggLocationWeight(firstPos, secondPos) < 1
+        }
+
+        val maxLineDistance = filteredEggs.sortedByDescending {
             it.nearestPointOnLine(firstPos, secondPos).distance(firstPos)
         }
+
         if (maxLineDistance.isEmpty()) {
             LorenzUtils.sendTitle("§cNo eggs found, try getting closer", 2.seconds)
             return
         }
         secondPos = maxLineDistance.first().nearestPointOnLine(firstPos, secondPos)
 
-        possibleEggLocations.addAll(sortedEggs)
+        possibleEggLocations.addAll(filteredEggs)
 
         drawLocations = true
     }
@@ -203,8 +214,28 @@ object HoppityEggsLocations {
     private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
         val distToLine = this.distanceToLine(firstPoint, secondPoint)
         val distToStart = this.distance(firstPoint)
-        val distMultiplier = distToStart * 2 / 100 + 3
+        val distMultiplier = distToStart * 2 / 100 + 5
         val disMultiplierSquared = distMultiplier * distMultiplier
         return distToLine / disMultiplierSquared
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Hoppity Eggs Locations")
+
+        if (!isEnabled()) {
+            event.addIrrelevant("not in skyblock or waypoints are disabled")
+            return
+        }
+
+        event.addData {
+            add("First Pos: $firstPos")
+            add("Second Pos: $secondPos")
+            add("Possible Egg Locations: ${possibleEggLocations.size}")
+            add("Egg Location Weights: $eggLocationWeights")
+            add("Draw Locations: $drawLocations")
+            add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
+            add("Current Egg Type: ${currentEggType ?: "None"}")
+        }
     }
 }
