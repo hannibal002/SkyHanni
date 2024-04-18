@@ -53,13 +53,12 @@ class PlayerNameFormatter {
     }
 
     @SubscribeEvent
-    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
+    fun onPartyChat(event: PartyChatEvent) {
         if (!isEnabled()) return
-        val direction = event.direction
         val message = event.message
         val author = event.author
         val name = nameFormat(author)
-        val newMessage = "§d$direction §f$name§7: §f$message"
+        val newMessage = "§9Party §8> $name§f: $message"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
@@ -77,12 +76,13 @@ class PlayerNameFormatter {
     }
 
     @SubscribeEvent
-    fun onPartyChat(event: PartyChatEvent) {
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
+        val direction = event.direction
         val message = event.message
         val author = event.author
         val name = nameFormat(author)
-        val newMessage = "§9Party §8> $name§f: $message"
+        val newMessage = "§d$direction §f$name§7: §f$message"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
