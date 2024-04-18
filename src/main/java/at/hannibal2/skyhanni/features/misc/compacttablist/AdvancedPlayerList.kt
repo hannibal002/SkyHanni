@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -42,7 +43,7 @@ object AdvancedPlayerList {
 
     fun newSorting(original: List<String>): List<String> {
         if (LorenzUtils.inKuudraFight) return original
-        if (LorenzUtils.inDungeons) return original
+        if (DungeonAPI.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
         val newList = mutableListOf<String>()
@@ -184,7 +185,7 @@ object AdvancedPlayerList {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
         }
-        if (config.markSkyHanniContributors && data.name in contributors) {
+        if (config.markSkyHanniDevs && data.name in contributors) {
             suffix += "§c:O"
         }
 

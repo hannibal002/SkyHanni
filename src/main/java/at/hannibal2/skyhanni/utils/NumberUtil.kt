@@ -170,11 +170,11 @@ object NumberUtil {
         lastDecimal + decimal
     }
 
-    val pattern = "^[0-9]*$".toPattern()
-    val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
+    private val numberPattern = "^[0-9]*$".toPattern()
+    private val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
     fun String.isInt(): Boolean {
-        return isNotEmpty() && pattern.matcher(this).matches()
+        return isNotEmpty() && numberPattern.matcher(this).matches()
     }
 
     fun String.isFormatNumber(): Boolean {

@@ -30,3 +30,4 @@ ij_java_packages_to_use_import_on_demand =
 ij_kotlin_name_count_to_use_star_import = 999
 ij_kotlin_name_count_to_use_star_import_for_members = 999
 ij_kotlin_packages_to_use_import_on_demand =
+ij_kotlin_enum_constants_wrap = split_into_lines
