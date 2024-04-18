@@ -6,6 +6,7 @@ class PlayerAllChatEvent(
     val levelColor: String?,
     val level: Int?,
     val privateIslandRank: String? = null,
+    val isAGuest: Boolean,
     author: String,
     val chatColor: String?,
     message: String,

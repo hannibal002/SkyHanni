@@ -32,10 +32,11 @@ class PlayerNameFormatter {
      * REGEX-TEST: §7☢ §r§b[MVP§d+§b] hannibal2
      * REGEX-TEST: §7☢ §r§bhannibal2
      * REGEX-TEST: §7☢ §rhannibal2
+     * REGEX-TEST: §7☢ §b[MVP§c+§b] hannibal2
      */
     private val emblemPattern by patternGroup.pattern(
         "emblem",
-        "(?<emblem>(§.)*.) §r(?<author>.*)"
+        "(?<emblem>(?:§.){1,2}.) (?<author>.*)"
     )
 
     @SubscribeEvent
@@ -46,11 +47,12 @@ class PlayerNameFormatter {
         val message = event.message
         val author = event.author
         val privateIslandRank = event.privateIslandRank
+        val isAGuest = event.isAGuest
 
         val shouldFilter = config.chatFilter && PlayerChatFilter.shouldChatFilter(message)
         val chatColor = if (shouldFilter) "§7" else if (config.sameChatColor) "§f" else event.chatColor
 
-        val name = nameFormat(author, levelColor, level, privateIslandRank = privateIslandRank)
+        val name = nameFormat(author, levelColor, level, privateIslandRank = privateIslandRank, isAGuest = isAGuest)
         val newMessage = "$name$chatColor: $message"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
@@ -111,19 +113,21 @@ class PlayerNameFormatter {
         level: Int? = null,
         guildRank: String? = null,
         privateIslandRank: String? = null,
+        isAGuest: Boolean = false
     ): String {
         var cleanAuthor = cleanAuthor(author)
 
         var emblemFormat = ""
         emblemPattern.matchMatcher(author) {
             emblemFormat = group("emblem")
-            cleanAuthor = group("author")
+            cleanAuthor = LorenzUtils.stripVanillaMessage(group("author"))
         }
 
         val name = formatAuthor(cleanAuthor, levelColor)
         val levelFormat = formatLevel(levelColor, level)
         val guildRankFormat = guildRank ?: ""
         val privateIslandRankFormat = privateIslandRank ?: ""
+        val privateIslandGuestFormat = if (isAGuest) "§a[✌]" else ""
 
         val cleanName = cleanAuthor.cleanPlayerName()
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
@@ -143,6 +147,7 @@ class PlayerNameFormatter {
         map[PlayerMessagesConfig.MessagePart.EMPTY_CHAR] = " "
         map[PlayerMessagesConfig.MessagePart.GUILD_RANK] = guildRankFormat
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
+        map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_GUEST] = privateIslandGuestFormat
 
         return config.partsOrder.map { map[it] }.joinToString(" ").replace("  ", " ").trim()
     }

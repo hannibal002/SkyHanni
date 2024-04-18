@@ -21,6 +21,7 @@ public class PlayerMessagesConfig {
     public List<MessagePart> partsOrder = new ArrayList<>(Arrays.asList(
         MessagePart.SKYBLOCK_LEVEL,
         MessagePart.PRIVATE_ISLAND_RANK,
+        MessagePart.PRIVATE_ISLAND_GUEST,
         MessagePart.PLAYER_NAME,
         MessagePart.GUILD_RANK,
         MessagePart.EMBLEM
@@ -29,9 +30,10 @@ public class PlayerMessagesConfig {
     public enum MessagePart {
         SKYBLOCK_LEVEL("SkyBlock Level"),
         EMBLEM("Emblem"),
-        PLAYER_NAME("Player Name"),
+        PLAYER_NAME("§bPlayer Name"),
         GUILD_RANK("Guild Rank"),
         PRIVATE_ISLAND_RANK("Private Island Rank"),
+        PRIVATE_ISLAND_GUEST("Private Island Guest"),
         CRIMSON_FACTION("Crimson Faction"),
         MODE_IRONMAN("Ironman Mode"),
         BINGO_LEVEL("Bingo Level"),

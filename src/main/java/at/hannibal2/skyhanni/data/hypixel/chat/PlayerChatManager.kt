@@ -96,6 +96,17 @@ class PlayerChatManager {
         ".*(?<privateIslandRank>§.\\[\\w+]).*"
     )
 
+    /**
+     * REGEX-TEST: §8[§r§5396§r§8] §r§7☢ §r§a[✌] §b[MVP§c+§b] hannibal2§f: hey
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2
+     * REGEX-TEST: §6§l℻ §r§f[Gamer] §b[MVP§f+§b] SchrankLP§f§r
+     * REGEX-TEST: §7☢ §r§a[✌] §b[MVP§c+§b] hannibal2
+     */
+    private val prrivateIslandGuestPattern by patternGroup.pattern(
+        "privateislandguest",
+        ".*(?<guest>§r§a\\[✌]).*"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val chatComponent = event.chatComponent
@@ -151,11 +162,17 @@ class PlayerChatManager {
         }
 
         var privateIslandRank: String? = null
+        var isAGuest = false
         if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
             privateIslandRankPattern.matchMatcher(author) {
                 val rank = group("privateIslandRank")
                 privateIslandRank = rank
                 author = author.replace(rank, "")
+            }
+            prrivateIslandGuestPattern.matchMatcher(author) {
+                val guest = group("guest")
+                isAGuest = true
+                author = author.replace(guest, "")
             }
         }
 
@@ -166,6 +183,7 @@ class PlayerChatManager {
             levelColor = levelColor,
             level = level,
             privateIslandRank = privateIslandRank,
+            isAGuest = isAGuest,
             author = author,
             chatColor = chatColor,
             message = message,
