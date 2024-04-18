@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.features.chat.playerchat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatModifier {
@@ -36,12 +34,6 @@ class PlayerChatModifier {
             }
             string = string.replace("§[7ab6]((?:\\w+){2,16})'s", "§b$1's")
             string = string.replace("§[7ab6]((?:\\w+){2,16}) (§.)", "§b$1 $2")
-
-            // TODO remove workaround
-            if (!DungeonMilestonesDisplay.milestonePattern.matches(input)) {
-                // all players same color in chat
-                string = string.replace("§r§7: ", "§r§f: ")
-            }
         }
 
         if (config.chatFilter && string.contains("§r§f: ") && PlayerChatFilter.shouldChatFilter(string)) {

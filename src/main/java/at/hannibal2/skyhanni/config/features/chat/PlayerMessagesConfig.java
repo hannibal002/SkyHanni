@@ -62,4 +62,10 @@ public class PlayerMessagesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean chatFilter = false;
+
+    @Expose
+    @ConfigOption(name = "Same Chat Color", desc = "All players, also those with ranks, have the same, white chat color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean sameChatColor = true;
 }

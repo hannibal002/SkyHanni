@@ -73,7 +73,7 @@ class PlayerNameFormatter {
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
             val faction = it.faction.icon
             val ironman = if (it.ironman) "§7♲" else ""
-            val bingo = it.bingoLevel?.let { level ->  BingoAPI.getBingoIcon(level) } ?: ""
+            val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level) } ?: ""
             listOf(faction, ironman, bingo)
         } ?: listOf("", "", "")
 
@@ -113,5 +113,5 @@ class PlayerNameFormatter {
         return author.cleanPlayerName(displayName = true)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && (config.playerRankHider || config.chatFilter)
+    fun isEnabled() = LorenzUtils.inSkyBlock && (config.playerRankHider || config.chatFilter || config.sameChatColor)
 }
