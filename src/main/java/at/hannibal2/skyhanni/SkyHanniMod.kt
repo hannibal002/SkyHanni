@@ -853,7 +853,7 @@ class SkyHanniMod {
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)
-        loadModule(NoBitsWarning())
+        loadModule(NoBitsWarning)
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
