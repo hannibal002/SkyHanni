@@ -15,7 +15,7 @@ object NoBitsWarning {
 
     private val config get() = SkyHanniMod.feature.misc.bits
 
-    fun displayBitsGainChatMessage(bits: Int) {
+    fun sendBitsGainChatMessage(bits: Int) {
         if (!isChatMessageEnabled()) return
         if (bits < config.threshold) return
         ChatUtils.chat("You have gained §b${bits.addSeparators()} §eBits.")

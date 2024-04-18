@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.features.misc.NoBitsWarning.displayBitsGainChatMessage
+import at.hannibal2.skyhanni.features.misc.NoBitsWarning.sendBitsGainChatMessage
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -154,7 +154,7 @@ object BitsAPI {
 
                 if (amount > bits) {
                     bitsAvailable -= amount - bits
-                    displayBitsGainChatMessage(amount - bits)
+                    sendBitsGainChatMessage(amount - bits)
                     bits = amount
                     sendBitsGainEvent()
                 } else {
@@ -228,7 +228,7 @@ object BitsAPI {
 
                     val difference = bits - bitsAvailable
                     if (difference > 0) {
-                        displayBitsGainChatMessage(difference)
+                        sendBitsGainChatMessage(difference)
                         bits += difference
                     }
                 }
