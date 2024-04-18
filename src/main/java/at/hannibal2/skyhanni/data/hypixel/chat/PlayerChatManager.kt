@@ -56,10 +56,11 @@ class PlayerChatManager {
     /**
      * REGEX-TEST: §dFrom §r§b[MVP§r§3+§r§b] Eisengolem§r§7: §r§7Baum
      * REGEX-TEST: §dTo §r§b[MVP§r§3+§r§b] Eisengolem§r§7: §r§7hey
+     * REGEX-TEST: §dTo §r§b[MVP§r§5+§r§b] Alea1337§r§7: §r§d§lBoop!
      */
     private val privateMessagePattern by patternGroup.pattern(
         "party",
-        "§d(?<direction>From|To) §r(?<author>[^:]*)§7: §r§7(?<message>.*)"
+        "§d(?<direction>From|To) §r(?<author>[^:]*)§7: §r(?<message>.*)"
     )
 
     /**
