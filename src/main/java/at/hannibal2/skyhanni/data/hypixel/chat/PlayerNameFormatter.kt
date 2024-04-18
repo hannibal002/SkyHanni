@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
+import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
@@ -56,6 +57,18 @@ class PlayerNameFormatter {
         val author = event.author
         val name = format(null, null, author)
         val newMessage = "§d$direction §f$name§7: §f$message"
+
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+    }
+
+    @SubscribeEvent
+    fun onGuildChat(event: GuildChatEvent) {
+        if (!isEnabled()) return
+        val message = event.message
+        val author = event.author
+        val guildRank = event.guildRank ?: ""
+        val name = format(null, null, author)
+        val newMessage = "§2Guild > $name$guildRank§f: $message"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }

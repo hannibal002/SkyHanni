@@ -49,10 +49,11 @@ class PlayerChatManager {
      * REGEX-TEST: §2Guild > §b§l⚛ §b[MVP§f+§b] Dankbarkeit§f: §rx: -190, y: 5, z: -163
      * REGEX-TEST: §2Guild > §6⚔ §6[MVP§3++§6] RealBacklight§f: §r!warp
      * REGEX-TEST: §2Guild > §b[MVP§3+§b] Eisengolem§f: §r!pt
+     * REGEX-TEST: §2Guild > §b[MVP§d+§b] zunoff §e[VET]§f: §rwas löuft
      */
     private val guildPattern by patternGroup.pattern(
         "guild",
-        "§2Guild > (?<author>[^:]*): (?<message>.*)"
+        "§2Guild > (?<author>§.+?)(?<guildRank> §e\\[\\w*])?§f: §r(?<message>.*)"
     )
 
     /**
@@ -84,16 +85,21 @@ class PlayerChatManager {
         val chatComponent = event.chatComponent
         globalPattern.matchMatcher(event.message) {
             val author = group("author")
-            val message = LorenzUtils.stripVanillaMessage(group("message"))
-            if (author.contains("[NPC]")) {
-                NpcChatEvent(author, message.removePrefix("§f"), chatComponent).postChat(event)
-            } else {
-                val chatColor = group("chatColor")
-                val levelColor = groupOrNull("levelColor")
-                val level = groupOrNull("level")?.formatInt()
-                PlayerAllChatEvent(levelColor, level, author, chatColor, message, chatComponent).postChat(event)
+            // TODO move into regex
+            val isGuild = author.startsWith("§2Guild >")
+            val isParty = author.startsWith("§9Party")
+            if (!isGuild && !isParty) {
+                val message = LorenzUtils.stripVanillaMessage(group("message"))
+                if (author.contains("[NPC]")) {
+                    NpcChatEvent(author, message.removePrefix("§f"), chatComponent).postChat(event)
+                } else {
+                    val chatColor = group("chatColor")
+                    val levelColor = groupOrNull("levelColor")
+                    val level = groupOrNull("level")?.formatInt()
+                    PlayerAllChatEvent(levelColor, level, author, chatColor, message, chatComponent).postChat(event)
+                }
+                return
             }
-            return
         }
         partyPattern.matchMatcher(event.message) {
             val author = group("author")
@@ -104,7 +110,8 @@ class PlayerChatManager {
         guildPattern.matchMatcher(event.message) {
             val author = group("author")
             val message = group("message")
-            GuildChatEvent(author, message, chatComponent).postChat(event)
+            val guildRank = groupOrNull("guildRank")
+            GuildChatEvent(author, message, guildRank, chatComponent).postChat(event)
             return
         }
         privateMessagePattern.matchMatcher(event.message) {
