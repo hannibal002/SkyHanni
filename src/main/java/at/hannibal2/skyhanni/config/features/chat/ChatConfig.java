@@ -31,11 +31,6 @@ public class ChatConfig {
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
 
     @Expose
-    @ConfigOption(name = "Player Chat Symbols", desc = "")
-    @Accordion
-    public ChatSymbols chatSymbols = new ChatSymbols();
-
-    @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     public List<DungeonMessageTypes> dungeonFilteredMessageTypes = new ArrayList<>();

@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data.hypixel.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
+import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -61,10 +63,20 @@ class PlayerNameFormatter {
             cleanAuthor = group("author")
         }
 
-        val authorFormat = formatAuthor(cleanAuthor)
+        val name = formatAuthor(cleanAuthor)
         val levelFormat = formatLevel(levelColor, level)
+
+        val cleanName = cleanAuthor.cleanPlayerName()
+        val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
+            val faction = it.faction.icon
+            val ironman = if (it.ironman) "§7♲" else ""
+            val bingo = it.bingoLevel?.let { level ->  BingoAPI.getBingoIcon(level) } ?: ""
+            listOf(faction, ironman, bingo)
+        } ?: listOf("", "", "")
+
         // TODO add chat format order options
-        return "$levelFormat$emblemFormat$authorFormat"
+//         return "$levelFormat$emblemFormat$name"
+        return "$levelFormat$emblemFormat$name$faction$ironman$bingo"
     }
 
     private fun formatLevel(rawColor: String?, rawLevel: Int?): String {
