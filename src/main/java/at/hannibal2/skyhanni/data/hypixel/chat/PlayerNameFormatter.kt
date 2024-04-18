@@ -30,6 +30,7 @@ class PlayerNameFormatter {
 
     @SubscribeEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent) {
+        if (!isEnabled()) return
         val levelColor = event.levelColor
         val level = event.level
         val message = event.message
@@ -43,6 +44,7 @@ class PlayerNameFormatter {
 
     @SubscribeEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
+        if (!isEnabled()) return
         val direction = event.direction
         val message = event.message
         val author = event.author
@@ -97,4 +99,6 @@ class PlayerNameFormatter {
 
         return author.cleanPlayerName(displayName = true)
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && (config.playerRankHider || config.chatFilter)
 }

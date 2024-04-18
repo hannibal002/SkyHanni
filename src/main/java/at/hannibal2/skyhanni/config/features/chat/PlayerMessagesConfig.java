@@ -16,7 +16,6 @@ public class PlayerMessagesConfig {
     @Expose
     @ConfigOption(name = "Ignore YouTube", desc = "Do not remove the rank for YouTubers")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean ignoreYouTube = false;
 
     @Expose
