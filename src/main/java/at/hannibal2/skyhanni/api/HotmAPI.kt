@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -22,8 +21,6 @@ object HotmAPI {
         "gui.name",
         "Heart of the Mountain"
     )
-
-    fun inHotmGui() = hotmGuiPattern.matches(InventoryUtils.openInventoryName())
 
     fun copyCurrentTree() = HotmData.storage?.deepCopy()
 

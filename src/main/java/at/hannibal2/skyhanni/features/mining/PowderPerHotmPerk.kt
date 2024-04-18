@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,7 +16,7 @@ class PowderPerHotmPerk {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
-        if (!HotmAPI.inHotmGui()) return
+        if (!HotmData.inInventory) return
 
         val itemName = event.itemStack.displayName
         val perkEnum = HotmData.getPerkByNameOrNull(itemName.removeColor()) ?: return
