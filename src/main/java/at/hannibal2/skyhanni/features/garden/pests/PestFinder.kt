@@ -54,10 +54,11 @@ class PestFinder {
             val plotName = plot.name
             val isInaccurate = plot.isPestCountInaccurate
             val pestsName = StringUtils.pluralize(pests, "pest")
+            val name = "§e" + if (isInaccurate) "1+?" else {
+                pests
+            } + " §c$pestsName §7in §b$plotName"
             val renderable = Renderable.clickAndHover(
-                "§e" + if (isInaccurate) "1+?" else {
-                    pests
-                } + " §c$pestsName §7in §b$plotName",
+                name,
                 listOf(
                     "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
@@ -124,11 +125,8 @@ class PestFinder {
             val isInaccurate = plot.isPestCountInaccurate
             val location = playerLocation.copy(x = middle.x, z = middle.z)
             event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-            event.drawDynamicText(
-                location, "§e" + if (isInaccurate) "?" else {
-                    pests
-                } + " §c$pestsName §7in §b$plotName", 1.5
-            )
+            val text = "§e" + (if (isInaccurate) "?" else pests) + " §c$pestsName §7in §b$plotName"
+            event.drawDynamicText(location, text, 1.5)
         }
     }
 

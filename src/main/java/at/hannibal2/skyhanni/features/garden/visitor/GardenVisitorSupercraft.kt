@@ -56,11 +56,13 @@ class GardenVisitorSupercraft {
 
     fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
         val ingredients = NEUItems.getRecipes(internalName)
-            .first { !it.ingredients.first().internalItemId.contains("PEST") }.ingredients
+            // TODO describe what this line does
+            .first { !it.ingredients.first().internalItemId.contains("PEST") }
+            .ingredients
         val ingredientReqs = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
-            ingredientReqs[ingredient.internalItemId] =
-                ingredientReqs.getOrDefault(ingredient.internalItemId, 0) + ingredient.count.toInt()
+            val key = ingredient.internalItemId
+            ingredientReqs[key] = ingredientReqs.getOrDefault(key, 0) + ingredient.count.toInt()
         }
         hasIngredients = true
         for ((key, value) in ingredientReqs) {

@@ -152,8 +152,9 @@ object LimboTimeTracker {
             var firstMessage =
                 "§fYour current PB is §e${limboPB.seconds}§f, granting you §a$luckString✴ SkyHanni User Luck§f!"
             val secondMessage = "§fYou have §e${playtime.seconds} §fof playtime!"
-            if ((userLuck == Float.POSITIVE_INFINITY) || (userLuck == Float.NEGATIVE_INFINITY)) firstMessage =
-                "$firstMessage §Zwhat"
+            if (userLuck == Float.POSITIVE_INFINITY || userLuck == Float.NEGATIVE_INFINITY) {
+                firstMessage = "$firstMessage §Zwhat"
+            }
             ChatUtils.chat(firstMessage)
             ChatUtils.chat(secondMessage)
         }

@@ -57,9 +57,8 @@ class VisitorRewardWarning {
         val isRefuseSlot = stack.name == "§cRefuse Offer"
         val isAcceptSlot = stack.name == "§aAccept Offer"
 
-        if (blockReason != null && !config.bypassKey.isKeyHeld() &&
-            ((blockReason.blockRefusing && isRefuseSlot) || !blockReason.blockRefusing && isAcceptSlot)
-        ) {
+        val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
+        if (!config.bypassKey.isKeyHeld() && shouldBlock) {
             event.isCanceled = true
             return
         }
