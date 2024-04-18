@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
-class PartyChatEvent(
+class NpcChatEvent(
     author: String,
     message: String,
     blockedReason: String? = null,

@@ -60,9 +60,9 @@ object PartyChatCommands {
 
     @SubscribeEvent
     fun onPartyCommand(event: PartyChatEvent) {
-        if (event.text.firstOrNull() !in commandBeginChars)
+        if (event.message.firstOrNull() !in commandBeginChars)
             return
-        val commandLabel = event.text.substring(1).substringBefore(' ')
+        val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         if (event.author == LorenzUtils.getPlayerName()) {
             return

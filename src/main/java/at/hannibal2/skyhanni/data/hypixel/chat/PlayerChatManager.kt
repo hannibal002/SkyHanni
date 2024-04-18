@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -31,19 +32,29 @@ class PlayerChatManager {
             val levelColor = groupOrNull("levelColor")
             val level = groupOrNull("level")?.formatInt()
             val author = group("author")
-            val message = group("message")
-            val playerChatEvent = PlayerChatEvent(levelColor, level, author, message)
-            playerChatEvent.postAndCatch()
-            playerChatEvent.blockedReason?.let {
-                event.blockedReason = it
+            val message = LorenzUtils.stripVanillaMessage(group("message"))
+            if (author.contains("[NPC]")) {
+                NpcChatEvent(author, message.removePrefix("§f")).postChat(event)
+                NpcChatEvent(author, message.removePrefix("§f")).postChat(event)
+            } else {
+                PlayerAllChatEvent(levelColor, level, author, message).postChat(event)
             }
             return
         }
         partyPattern.matchMatcher(event.message) {
             val author = group("author")
-            val message = group("author")
-            PartyChatEvent(author, message, event).postAndCatch()
+            val message = group("message")
+            PartyChatEvent(author, message).postChat(event)
             return
+        }
+    }
+
+    private fun AbstractChatEvent.postChat(event: LorenzChatEvent) {
+        if (postAndCatch()) {
+            event.cancel()
+        }
+        blockedReason?.let {
+            event.blockedReason = it
         }
     }
 }
