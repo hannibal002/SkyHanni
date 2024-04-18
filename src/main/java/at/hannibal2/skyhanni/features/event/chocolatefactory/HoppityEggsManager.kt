@@ -18,21 +18,21 @@ import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggsManager {
 
-    private val config get() = ChocolateFactoryApi.config.hoppityEggs
+    private val config get() = ChocolateFactoryAPI.config.hoppityEggs
 
-    private val eggFoundPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg.*"
     )
-    private val noEggsLeftPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!"
     )
-    private val eggSpawnedPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val eggSpawnedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.spawned",
         "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?<meal>\\w+) Egg §r§dhas appeared!"
     )
-    private val eggAlreadyCollectedPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val eggAlreadyCollectedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.alreadycollected",
         "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!"
     )
@@ -107,7 +107,7 @@ object HoppityEggsManager {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showClaimedEggs) return
         if (ReminderUtils.isBusy()) return
-        if (!ChocolateFactoryApi.isHoppityEvent()) return
+        if (!ChocolateFactoryAPI.isHoppityEvent()) return
 
         val displayList = mutableListOf<String>()
         displayList.add("§bUnfound Eggs:")

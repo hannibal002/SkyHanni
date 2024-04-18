@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object ChocolateFactoryApi {
+object ChocolateFactoryAPI {
 
     val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.event.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
