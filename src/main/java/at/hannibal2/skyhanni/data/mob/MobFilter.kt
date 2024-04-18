@@ -99,7 +99,8 @@ object MobFilter {
         Healing,
         Boomer,
         Golden,
-        Stealth;
+        Stealth,
+        ;
 
         companion object {
 

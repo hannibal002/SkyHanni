@@ -42,6 +42,6 @@ abstract class PacketEvent : LorenzEvent() {
 
     enum class Direction {
         INBOUND,
-        OUTBOUND
+        OUTBOUND,
     }
 }

@@ -12,5 +12,5 @@ enum class FFTypes {
     COMMUNITY_SHOP,
     PLOTS,
     CAKE,
-    PET_ITEM
+    PET_ITEM,
 }

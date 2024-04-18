@@ -96,7 +96,7 @@ object ErrorManager {
             ignoreErrorCache,
             noStackTrace,
             *extraData,
-            betaOnly = betaOnly
+            betaOnly = betaOnly,
         )
     }
 

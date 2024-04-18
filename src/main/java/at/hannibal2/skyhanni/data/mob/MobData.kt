@@ -46,7 +46,7 @@ class MobData {
         Found,
         NotYetFound,
         Illegal,
-        SomethingWentWrong
+        SomethingWentWrong,
     }
 
     internal class MobResult(val result: Result, val mob: Mob?) {
@@ -74,7 +74,7 @@ class MobData {
     internal class RetryEntityInstancing(
         var entity: EntityLivingBase,
         var times: Int,
-        val roughType: MobType
+        val roughType: MobType,
     ) {
         override fun hashCode() = entity.entityId
         override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()
