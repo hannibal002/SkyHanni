@@ -103,6 +103,11 @@ public class MiscConfig {
     public NoBitsWarningConfig noBitsWarning = new NoBitsWarningConfig();
 
     @Expose
+    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
+    @Accordion
+    public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
@@ -186,13 +191,6 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean restorePieceOfWizardPortalLore = true;
-
-    @Expose
-    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coordinates sent by Patcher.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean patcherSendCoordWaypoint = false;
-
 
     @Expose
     @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")

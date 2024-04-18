@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.REFUSE_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorBlockReason
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -17,8 +18,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
-
 
 class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
@@ -48,14 +47,14 @@ class VisitorRewardWarning {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
-        val slot = event.slot ?: return
+        val stack = event.slot?.stack ?: return
         if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = slot.stack.name == "§cRefuse Offer"
-        val isAcceptSlot = slot.stack.name == "§aAccept Offer"
+        val isRefuseSlot = stack.name == "§cRefuse Offer"
+        val isAcceptSlot = stack.name == "§aAccept Offer"
 
         if (blockReason != null && !config.bypassKey.isKeyHeld() &&
             ((blockReason.blockRefusing && isRefuseSlot) || !blockReason.blockRefusing && isAcceptSlot)) {
@@ -68,7 +67,7 @@ class VisitorRewardWarning {
             return
         }
         if (isAcceptSlot) {
-            if (slot.stack?.name != "§eClick to give!") return
+            if (stack.name != "§eClick to give!") return
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }
@@ -107,7 +106,7 @@ class VisitorRewardWarning {
                 if (blockReason == VisitorBlockReason.CHEAP_COPPER || blockReason == VisitorBlockReason.EXPENSIVE_COPPER)
                     "${blockReason.description} §7(§6$pricePerCopper §7per)" else blockReason.description
             )
-            blockedToolTip.add("  §7(Bypass by holding ${Keyboard.getKeyName(config.bypassKey)})")
+            blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
 
             visitor.blockedLore = blockedToolTip
         }
