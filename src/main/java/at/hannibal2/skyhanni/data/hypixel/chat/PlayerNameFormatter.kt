@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -110,7 +111,9 @@ class PlayerNameFormatter {
         if (author.contains("ADMIN")) return author
         if (config.ignoreYouTube && author.contains("YOUTUBER")) return author
 
-        return author.cleanPlayerName(displayName = true)
+        val result = author.cleanPlayerName(displayName = true)
+
+        return MarkedPlayerManager.replaceInChat(result)
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && (config.playerRankHider || config.chatFilter || config.sameChatColor)

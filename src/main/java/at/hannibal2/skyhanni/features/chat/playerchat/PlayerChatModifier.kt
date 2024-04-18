@@ -40,12 +40,7 @@ class PlayerChatModifier {
             string = string.replace("§r§f: ", "§r§7: ")
         }
 
-        if (MarkedPlayerManager.config.highlightInChat) {
-            val color = MarkedPlayerManager.config.chatColor.getChatColor()
-            for (markedPlayer in MarkedPlayerManager.playerNamesToMark) {
-                string = string.replace(markedPlayer, "$color$markedPlayer§r")
-            }
-        }
+        string = MarkedPlayerManager.replaceInChat(string)
 
         return string
     }
