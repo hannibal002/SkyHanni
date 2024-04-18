@@ -105,11 +105,12 @@ object AdvancedPlayerList {
                         playerData.nameSuffix = ""
                     }
                 } catch (e: NumberFormatException) {
-                    ErrorManager.logErrorWithData(e, "Advanced Player List failed to parse user name",
+                    ErrorManager.logErrorWithData(
+                        e, "Advanced Player List failed to parse user name",
                         "line" to line,
                         "i" to i,
                         "original" to original,
-                        )
+                    )
                 }
             }
         }

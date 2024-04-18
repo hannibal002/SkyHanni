@@ -50,7 +50,6 @@ class VisitorListener {
 
     private val logger = LorenzLogger("garden/visitors/listener")
 
-
     companion object {
         private val VISITOR_INFO_ITEM_SLOT = 13
         private val VISITOR_ACCEPT_ITEM_SLOT = 29

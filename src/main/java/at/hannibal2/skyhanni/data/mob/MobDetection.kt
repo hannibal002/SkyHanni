@@ -168,7 +168,9 @@ class MobDetection {
 
     /** For mobs that have default health of the entity */
     private enum class EntityPacketType {
-        SPIRIT_BAT, VILLAGER, CREEPER_VAIL
+        SPIRIT_BAT,
+        VILLAGER,
+        CREEPER_VAIL,
     }
 
     /** Handles some mobs that have default health of the entity, specially using the [EntityHealthUpdateEvent] */
