@@ -5,6 +5,7 @@ import net.minecraft.util.IChatComponent
 class PlayerAllChatEvent(
     val levelColor: String?,
     val level: Int?,
+    val privateIslandRank: String? = null,
     author: String,
     val chatColor: String?,
     message: String,

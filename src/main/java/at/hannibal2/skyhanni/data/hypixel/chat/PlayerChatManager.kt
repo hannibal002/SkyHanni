@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -80,11 +82,20 @@ class PlayerChatManager {
         "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§f§7 (?<action>is (?:holding|friends with a|wearing)|has) §r(?<itemName>.*)"
     )
 
+    /**
+     * REGEX-TEST: §c[Tiffany] §b[MVP§c+§b] hannibal2
+     * REGEX-TEST: §b[MVP§c+§b] hannibal2
+     */
+    private val privateIslandRankPattern by patternGroup.pattern(
+        "privateislandgroup",
+        "(?<privateIslandGroup>§.\\[\\w+]) (?<author>.*)"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val chatComponent = event.chatComponent
         globalPattern.matchMatcher(event.message) {
-            val author = group("author")
+            var author = group("author")
             // TODO move into regex
             val isGuild = author.startsWith("§2Guild >")
             val isParty = author.startsWith("§9Party")
@@ -93,10 +104,27 @@ class PlayerChatManager {
                 if (author.contains("[NPC]")) {
                     NpcChatEvent(author, message.removePrefix("§f"), chatComponent).postChat(event)
                 } else {
+
+                    var privateIslandRank: String? = null
+                    if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
+                        privateIslandRankPattern.matchMatcher(author) {
+                            privateIslandRank = group("privateIslandGroup")
+                            author = group("author")
+                        }
+                    }
+
                     val chatColor = group("chatColor")
                     val levelColor = groupOrNull("levelColor")
                     val level = groupOrNull("level")?.formatInt()
-                    PlayerAllChatEvent(levelColor, level, author, chatColor, message, chatComponent).postChat(event)
+                    PlayerAllChatEvent(
+                        levelColor = levelColor,
+                        level = level,
+                        privateIslandRank = privateIslandRank,
+                        author = author,
+                        chatColor = chatColor,
+                        message = message,
+                        chatComponent = chatComponent,
+                    ).postChat(event)
                 }
                 return
             }

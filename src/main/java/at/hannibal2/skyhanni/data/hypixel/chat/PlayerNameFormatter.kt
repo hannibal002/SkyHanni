@@ -39,11 +39,12 @@ class PlayerNameFormatter {
         val level = event.level
         val message = event.message
         val author = event.author
+        val privateIslandRank = event.privateIslandRank
 
         val shouldFilter = config.chatFilter && PlayerChatFilter.shouldChatFilter(message)
         val chatColor = if (shouldFilter) "§7" else if (config.sameChatColor) "§f" else event.chatColor
 
-        val name = nameFormat(author, levelColor, level)
+        val name = nameFormat(author, levelColor, level, privateIslandRank = privateIslandRank)
         val newMessage = "$name$chatColor: $message"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
@@ -73,10 +74,16 @@ class PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
 
-    private fun nameFormat(author: String, levelColor: String? = null, level: Int? = null, guildRank: String? = null): String {
+    private fun nameFormat(
+        author: String,
+        levelColor: String? = null,
+        level: Int? = null,
+        guildRank: String? = null,
+        privateIslandRank: String? = null,
+    ): String {
         var cleanAuthor = cleanAuthor(author)
-        var emblemFormat = ""
 
+        var emblemFormat = ""
         emblemPattern.matchMatcher(author) {
             val emblem = group("emblem")
             // TODO add emblem hider
@@ -87,6 +94,7 @@ class PlayerNameFormatter {
         val name = formatAuthor(cleanAuthor)
         val levelFormat = formatLevel(levelColor, level)
         val guildRankFormat = guildRank ?: ""
+        val privateIslandRankFormat = privateIslandRank ?: ""
 
         val cleanName = cleanAuthor.cleanPlayerName()
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
@@ -95,7 +103,6 @@ class PlayerNameFormatter {
             val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level) } ?: ""
             listOf(faction, ironman, bingo)
         } ?: listOf("", "", "")
-
 
         val map = mutableMapOf<PlayerMessagesConfig.ChatPart, String>()
         map[PlayerMessagesConfig.ChatPart.SKYBLOCK_LEVEL] = levelFormat
@@ -106,6 +113,7 @@ class PlayerNameFormatter {
         map[PlayerMessagesConfig.ChatPart.BINGO_LEVEL] = bingo
         map[PlayerMessagesConfig.ChatPart.EMPTY_CHAR] = " "
         map[PlayerMessagesConfig.ChatPart.GUILD_RANK] = guildRankFormat
+        map[PlayerMessagesConfig.ChatPart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
 
         val result = StringBuilder()
         for (part in config.messageOrder) {

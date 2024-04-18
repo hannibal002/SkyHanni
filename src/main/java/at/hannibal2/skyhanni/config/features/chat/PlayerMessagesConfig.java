@@ -20,6 +20,7 @@ public class PlayerMessagesConfig {
     @ConfigEditorDraggableList
     public List<ChatPart> messageOrder = new ArrayList<>(Arrays.asList(
         ChatPart.SKYBLOCK_LEVEL,
+        ChatPart.PRIVATE_ISLAND_RANK,
         ChatPart.NAME,
         ChatPart.GUILD_RANK,
         ChatPart.EMBLEM
@@ -30,6 +31,7 @@ public class PlayerMessagesConfig {
         EMBLEM("Emblem"),
         NAME("Name"),
         GUILD_RANK("Guild Rank"),
+        PRIVATE_ISLAND_RANK("Private Island Rank"),
         CRIMSON_FACTION("Crimson Faction"),
         MODE_IRONMAN("Ironman Mode"),
         BINGO_LEVEL("Bingo Level"),
