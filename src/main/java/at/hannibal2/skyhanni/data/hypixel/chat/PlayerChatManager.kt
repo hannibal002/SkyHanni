@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Matcher
 
 class PlayerChatManager {
 
@@ -95,39 +96,7 @@ class PlayerChatManager {
     fun onChat(event: LorenzChatEvent) {
         val chatComponent = event.chatComponent
         globalPattern.matchMatcher(event.message) {
-            var author = group("author")
-            // TODO move into regex
-            val isGuild = author.startsWith("§2Guild >")
-            val isParty = author.startsWith("§9Party")
-            if (!isGuild && !isParty) {
-                val message = LorenzUtils.stripVanillaMessage(group("message"))
-                if (author.contains("[NPC]")) {
-                    NpcChatEvent(author, message.removePrefix("§f"), chatComponent).postChat(event)
-                } else {
-
-                    var privateIslandRank: String? = null
-                    if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
-                        privateIslandRankPattern.matchMatcher(author) {
-                            privateIslandRank = group("privateIslandGroup")
-                            author = group("author")
-                        }
-                    }
-
-                    val chatColor = group("chatColor")
-                    val levelColor = groupOrNull("levelColor")
-                    val level = groupOrNull("level")?.formatInt()
-                    PlayerAllChatEvent(
-                        levelColor = levelColor,
-                        level = level,
-                        privateIslandRank = privateIslandRank,
-                        author = author,
-                        chatColor = chatColor,
-                        message = message,
-                        chatComponent = chatComponent,
-                    ).postChat(event)
-                }
-                return
-            }
+            if (isGlobalChat(event)) return
         }
         partyPattern.matchMatcher(event.message) {
             val author = group("author")
@@ -162,6 +131,42 @@ class PlayerChatManager {
         }
 
         sendSystemMessage(event)
+    }
+
+    private fun Matcher.isGlobalChat(event: LorenzChatEvent): Boolean {
+        var author = group("author")
+        // TODO move into regex
+        val isGuild = author.startsWith("§2Guild >")
+        val isParty = author.startsWith("§9Party")
+        if (isGuild || isParty) return false
+
+        val message = LorenzUtils.stripVanillaMessage(group("message"))
+        if (author.contains("[NPC]")) {
+            NpcChatEvent(author, message.removePrefix("§f"), event.chatComponent).postChat(event)
+            return true
+        }
+
+        var privateIslandRank: String? = null
+        if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
+            privateIslandRankPattern.matchMatcher(author) {
+                privateIslandRank = group("privateIslandGroup")
+                author = group("author")
+            }
+        }
+
+        val chatColor = group("chatColor")
+        val levelColor = groupOrNull("levelColor")
+        val level = groupOrNull("level")?.formatInt()
+        PlayerAllChatEvent(
+            levelColor = levelColor,
+            level = level,
+            privateIslandRank = privateIslandRank,
+            author = author,
+            chatColor = chatColor,
+            message = message,
+            chatComponent = event.chatComponent,
+        ).postChat(event)
+        return true
     }
 
     private fun sendSystemMessage(event: LorenzChatEvent) {
