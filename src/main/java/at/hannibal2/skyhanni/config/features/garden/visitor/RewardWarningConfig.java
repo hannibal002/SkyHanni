@@ -60,7 +60,7 @@ public class RewardWarningConfig {
     @ConfigOption(
         name = "Coins Per Copper",
         desc = "The price to use for the below options.\n" +
-               "Requires one of the below options to be on."
+            "Requires one of the below options to be on."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 50_000, minStep = 250)
     public int coinsPerCopperPrice = 6_000;

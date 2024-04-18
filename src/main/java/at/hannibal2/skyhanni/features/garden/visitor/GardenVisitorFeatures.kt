@@ -355,7 +355,7 @@ object GardenVisitorFeatures {
         }
 
         readingShoppingList = true
-        val finalList = toolTip.map { it.removePrefix("§5§o")}.toMutableList()
+        val finalList = toolTip.map { it.removePrefix("§5§o") }.toMutableList()
         var offset = 0
         for ((i, formattedLine) in finalList.toMutableList().withIndex()) {
             val index = i + offset
