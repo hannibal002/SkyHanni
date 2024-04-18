@@ -206,7 +206,7 @@ class CustomScoreboard {
             array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
             array
         }
-        event.transform(39, "$displayPrefix.events.eventEntries") { element ->
+        event.transform(40, "$displayPrefix.events.eventEntries") { element ->
             val jsonArray = element.asJsonArray
             val newArray = JsonArray()
 
