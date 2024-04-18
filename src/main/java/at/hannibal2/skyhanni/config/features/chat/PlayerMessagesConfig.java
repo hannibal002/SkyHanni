@@ -14,19 +14,19 @@ public class PlayerMessagesConfig {
 
     @Expose
     @ConfigOption(
-        name = "Message Order",
-        desc = "Drag text to change the the message order for chat messages."
+        name = "Part Order",
+        desc = "Drag text to change the chat message format order for chat messages."
     )
     @ConfigEditorDraggableList
-    public List<ChatPart> messageOrder = new ArrayList<>(Arrays.asList(
-        ChatPart.SKYBLOCK_LEVEL,
-        ChatPart.PRIVATE_ISLAND_RANK,
-        ChatPart.NAME,
-        ChatPart.GUILD_RANK,
-        ChatPart.EMBLEM
+    public List<MessagePart> partsOrder = new ArrayList<>(Arrays.asList(
+        MessagePart.SKYBLOCK_LEVEL,
+        MessagePart.PRIVATE_ISLAND_RANK,
+        MessagePart.NAME,
+        MessagePart.GUILD_RANK,
+        MessagePart.EMBLEM
     ));
 
-    public enum ChatPart {
+    public enum MessagePart {
         SKYBLOCK_LEVEL("SkyBlock Level"),
         EMBLEM("Emblem"),
         NAME("Name"),
@@ -40,7 +40,7 @@ public class PlayerMessagesConfig {
 
         private final String str;
 
-        ChatPart(String str) {
+        MessagePart(String str) {
             this.str = str;
         }
 
@@ -49,6 +49,16 @@ public class PlayerMessagesConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Hide Level Brackets", desc = "Hide the gray brackets in front of and behind the level numbers.")
+    @ConfigEditorBoolean
+    public boolean hideLevelBrackets = false;
+
+    @Expose
+    @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
+    @ConfigEditorBoolean
+    public boolean useLevelColorForName = false;
 
     @Expose
     @ConfigOption(name = "Player Rank Hider", desc = "Hide player ranks in all chat messages.")

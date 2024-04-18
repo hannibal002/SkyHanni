@@ -115,12 +115,11 @@ class PlayerNameFormatter {
         var emblemFormat = ""
         emblemPattern.matchMatcher(author) {
             val emblem = group("emblem")
-            // TODO add emblem hider
             emblemFormat = "$emblem §r"
             cleanAuthor = group("author")
         }
 
-        val name = formatAuthor(cleanAuthor)
+        val name = formatAuthor(cleanAuthor, levelColor)
         val levelFormat = formatLevel(levelColor, level)
         val guildRankFormat = guildRank ?: ""
         val privateIslandRankFormat = privateIslandRank ?: ""
@@ -133,25 +132,25 @@ class PlayerNameFormatter {
             listOf(faction, ironman, bingo)
         } ?: listOf("", "", "")
 
-        val map = mutableMapOf<PlayerMessagesConfig.ChatPart, String>()
-        map[PlayerMessagesConfig.ChatPart.SKYBLOCK_LEVEL] = levelFormat
-        map[PlayerMessagesConfig.ChatPart.EMBLEM] = emblemFormat
-        map[PlayerMessagesConfig.ChatPart.NAME] = name
-        map[PlayerMessagesConfig.ChatPart.CRIMSON_FACTION] = faction
-        map[PlayerMessagesConfig.ChatPart.MODE_IRONMAN] = ironman
-        map[PlayerMessagesConfig.ChatPart.BINGO_LEVEL] = bingo
-        map[PlayerMessagesConfig.ChatPart.EMPTY_CHAR] = " "
-        map[PlayerMessagesConfig.ChatPart.GUILD_RANK] = guildRankFormat
-        map[PlayerMessagesConfig.ChatPart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
+        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, String>()
+        map[PlayerMessagesConfig.MessagePart.SKYBLOCK_LEVEL] = levelFormat
+        map[PlayerMessagesConfig.MessagePart.EMBLEM] = emblemFormat
+        map[PlayerMessagesConfig.MessagePart.NAME] = name
+        map[PlayerMessagesConfig.MessagePart.CRIMSON_FACTION] = faction
+        map[PlayerMessagesConfig.MessagePart.MODE_IRONMAN] = ironman
+        map[PlayerMessagesConfig.MessagePart.BINGO_LEVEL] = bingo
+        map[PlayerMessagesConfig.MessagePart.EMPTY_CHAR] = " "
+        map[PlayerMessagesConfig.MessagePart.GUILD_RANK] = guildRankFormat
+        map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
 
-        return config.messageOrder.map { map[it] }.joinToString(" ")
+        return config.partsOrder.map { map[it] }.joinToString(" ").replace("  ", " ").trim()
     }
 
     private fun formatLevel(rawColor: String?, rawLevel: Int?): String {
         val color = rawColor ?: return ""
         val level = rawLevel ?: error("level is null, color is not null")
-        // TODO add level formatting options
-        return "§8[§r$color$level§r§8] §r"
+        val levelData = "$color$level"
+        return if (config.hideLevelBrackets) levelData else "§8[${levelData}§8]"
     }
 
     private fun cleanAuthor(author: String): String {
@@ -159,11 +158,13 @@ class PlayerNameFormatter {
         return text.removeSuffix("§f")
     }
 
-    private fun formatAuthor(author: String): String {
+    private fun formatAuthor(author: String, levelColor: String?): String {
         if (author.contains("ADMIN")) return author
         if (config.ignoreYouTube && author.contains("YOUTUBE")) return author
 
-        val result = author.cleanPlayerName(displayName = true)
+        val result = if (config.useLevelColorForName) {
+            levelColor + author.cleanPlayerName()
+        } else author.cleanPlayerName(displayName = true)
 
         return MarkedPlayerManager.replaceInChat(result)
     }
