@@ -93,7 +93,7 @@ object HoppityEggsManager {
         val meal = lastMeal ?: return
         lastMeal = null
 
-        DelayedRun.runDelayed(1.seconds) {
+        DelayedRun.runNextTick {
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
                 onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal) },
