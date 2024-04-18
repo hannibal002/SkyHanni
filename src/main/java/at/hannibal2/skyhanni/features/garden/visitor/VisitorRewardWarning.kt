@@ -48,6 +48,7 @@ class VisitorRewardWarning {
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         val stack = event.slot?.stack ?: return
+        if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
