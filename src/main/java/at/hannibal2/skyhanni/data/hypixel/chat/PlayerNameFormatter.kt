@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
@@ -76,9 +77,21 @@ class PlayerNameFormatter {
             listOf(faction, ironman, bingo)
         } ?: listOf("", "", "")
 
-        // TODO add chat format order options
-//         return "$levelFormat$emblemFormat$name"
-        return "$levelFormat$emblemFormat$name$faction$ironman$bingo"
+        val map = mutableMapOf<PlayerMessagesConfig.ChatPart, String>()
+        map[PlayerMessagesConfig.ChatPart.SKYBLOCK_LEVEL] = levelFormat
+        map[PlayerMessagesConfig.ChatPart.EMBLEM] = emblemFormat
+        map[PlayerMessagesConfig.ChatPart.NAME] = name
+        map[PlayerMessagesConfig.ChatPart.CRIMSON_FACTION] = faction
+        map[PlayerMessagesConfig.ChatPart.MODE_IRONMAN] = ironman
+        map[PlayerMessagesConfig.ChatPart.BINGO_LEVEL] = bingo
+        map[PlayerMessagesConfig.ChatPart.EMPTY_CHAR] = " "
+
+        val result = StringBuilder()
+        for (part in config.messageOrder) {
+            result.append(map[part])
+        }
+        return result.toString()
+
     }
 
     private fun formatLevel(rawColor: String?, rawLevel: Int?): String {
