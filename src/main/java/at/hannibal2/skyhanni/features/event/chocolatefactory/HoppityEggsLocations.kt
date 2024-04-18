@@ -233,6 +233,7 @@ object HoppityEggsLocations {
             add("Second Pos: $secondPos")
             add("Possible Egg Locations: ${possibleEggLocations.size}")
             add("Egg Location Weights: $eggLocationWeights")
+            add("Last Time Checked: ${lastGuessMade.passedSince().inWholeSeconds}s ago")
             add("Draw Locations: $drawLocations")
             add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
             add("Current Egg Type: ${currentEggType ?: "None"}")
