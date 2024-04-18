@@ -349,8 +349,7 @@ private fun getWinterLines() = buildList {
     getSbLines().firstOrNull { SbPattern.winterCubeDmgPattern.matches(it) }?.let { add(it) }
 }
 
-private fun getWinterShowWhen(): Boolean =
-    getSbLines().any {
+private fun getWinterShowWhen(): Boolean = getSbLines().any {
         ScoreboardPattern.winterEventStartPattern.matches(it)
             || (ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
             || ScoreboardPattern.winterWavePattern.matches(it)
