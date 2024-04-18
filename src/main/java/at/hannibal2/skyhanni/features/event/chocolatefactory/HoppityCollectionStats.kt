@@ -19,9 +19,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HoppityCollectionStats {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = ChocolateFactoryAPI.config
 
-    private val patternGroup = ChocolateFactoryApi.patternGroup.group("collection")
+    private val patternGroup = ChocolateFactoryAPI.patternGroup.group("collection")
     private val pagePattern by patternGroup.pattern(
         "page.current",
         "\\((?<page>\\d+)/(?<maxPage>\\d+)\\) Hoppity's Collection"
