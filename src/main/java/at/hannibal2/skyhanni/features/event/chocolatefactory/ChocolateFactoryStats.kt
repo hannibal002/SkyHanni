@@ -20,46 +20,42 @@ object ChocolateFactoryStats {
     }
 
     fun updateDisplay() {
-        val newList = mutableListOf<String>()
         val perSecond = ChocolateFactoryAPI.chocolatePerSecond
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
         val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
 
-        newList.add("§6§lChocolate Factory Stats")
+        displayList = formatList(buildList {
+            add("§6§lChocolate Factory Stats")
 
-        newList.add("§eCurrent Chocolate: §6${ChocolateFactoryAPI.chocolateCurrent.addSeparators()}")
-        newList.add("§eThis Prestige: §6${ChocolateFactoryAPI.chocolateThisPrestige.addSeparators()}")
-        newList.add("§eAll-time: §6${ChocolateFactoryAPI.chocolateAllTime.addSeparators()}")
+            add("§eCurrent Chocolate: §6${ChocolateFactoryAPI.chocolateCurrent.addSeparators()}")
+            add("§eThis Prestige: §6${ChocolateFactoryAPI.chocolateThisPrestige.addSeparators()}")
+            add("§eAll-time: §6${ChocolateFactoryAPI.chocolateAllTime.addSeparators()}")
 
-        newList.add("§ePer Second: §6${perSecond.addSeparators()}")
-        newList.add("§ePer Minute: §6${perMinute.addSeparators()}")
-        newList.add("§ePer Hour: §6${perHour.addSeparators()}")
-        newList.add("§ePer Day: §6${perDay.addSeparators()}")
+            add("§ePer Second: §6${perSecond.addSeparators()}")
+            add("§ePer Minute: §6${perMinute.addSeparators()}")
+            add("§ePer Hour: §6${perHour.addSeparators()}")
+            add("§ePer Day: §6${perDay.addSeparators()}")
 
-        newList.add("§eChocolate Multiplier: §6${ChocolateFactoryAPI.chocolateMultiplier}")
-        newList.add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
+            add("§eChocolate Multiplier: §6${ChocolateFactoryAPI.chocolateMultiplier}")
+            add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
-        newList.add("§ePosition: §7#§b$position")
+            add("§ePosition: §7#§b$position")
 
-        newList.add("")
-        newList.add("")
-        newList.add("")
-
-        displayList = formatList(newList)
+            add("")
+            add("")
+            add("")
+        })
     }
 
-    private fun formatList(list: MutableList<String>): List<String> {
-        val newList = mutableListOf<String>()
-        for (index in config.statsDisplayList) {
-            newList.add(list[index.ordinal])
-        }
-
-        return newList
+    private fun formatList(list: List<String>): List<String> {
+        return config.statsDisplayList
+            .filter { ChocolateFactoryAPI.currentPrestige != 1 || it != ChocolateFactoryStat.THIS_PRESTIGE }
+            .map { list[it.ordinal] }
     }
 
-    enum class ChocolateFactoryStatsType(val display: String) {
+    enum class ChocolateFactoryStat(private val display: String) {
         HEADER("§6§lChocolate Factory Stats"),
         CURRENT("§eCurrent Chocolate: §65,272,230"),
         THIS_PRESTIGE("§eThis Prestige: §6483,023,853"),
