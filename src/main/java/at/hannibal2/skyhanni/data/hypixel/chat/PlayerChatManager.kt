@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
@@ -121,6 +122,18 @@ class PlayerChatManager {
             val message = group("message")
             PrivateMessageChatEvent(direction, author, message).postChat(event)
             return
+        }
+
+        sendSystemMessage(event)
+    }
+
+    private fun sendSystemMessage(event: LorenzChatEvent) {
+        val systemEvent = SystemMessageEvent(event.message)
+        if (systemEvent.postAndCatch()) {
+            event.cancel()
+        }
+        systemEvent.blockedReason?.let {
+            event.blockedReason = it
         }
     }
 
