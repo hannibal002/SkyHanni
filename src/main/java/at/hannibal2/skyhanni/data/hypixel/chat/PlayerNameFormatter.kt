@@ -28,7 +28,7 @@ class PlayerNameFormatter {
      */
     private val emblemPattern by patternGroup.pattern(
         "emblem",
-        "(?<emblem>§..) §r(?<author>.*)"
+        "(?<emblem>(§.)*.) §r(?<author>.*)"
     )
 
     @SubscribeEvent
