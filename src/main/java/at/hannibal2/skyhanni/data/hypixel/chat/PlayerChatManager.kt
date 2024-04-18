@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatManager {
@@ -80,6 +81,7 @@ class PlayerChatManager {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        val chatComponent = event.chatComponent
         itemShowPattern.matchMatcher(event.message) {
             val levelColor = groupOrNull("levelColor")
             val level = groupOrNull("level")?.formatInt()
@@ -89,38 +91,37 @@ class PlayerChatManager {
 
             // for consistency
             val message = "§7$action §r$itemName"
-            PlayerShowItemChatEvent(levelColor, level, author, message, action, itemName).postChat(event)
+            PlayerShowItemChatEvent(levelColor, level, author, message, action, itemName, chatComponent).postChat(event)
         }
         globalPattern.matchMatcher(event.message) {
             val author = group("author")
             val message = LorenzUtils.stripVanillaMessage(group("message"))
             if (author.contains("[NPC]")) {
-                NpcChatEvent(author, message.removePrefix("§f")).postChat(event)
-                NpcChatEvent(author, message.removePrefix("§f")).postChat(event)
+                NpcChatEvent(author, message.removePrefix("§f"), chatComponent).postChat(event)
             } else {
                 val levelColor = groupOrNull("levelColor")
                 val level = groupOrNull("level")?.formatInt()
-                PlayerAllChatEvent(levelColor, level, author, message).postChat(event)
+                PlayerAllChatEvent(levelColor, level, author, message, chatComponent).postChat(event)
             }
             return
         }
         partyPattern.matchMatcher(event.message) {
             val author = group("author")
             val message = group("message")
-            PartyChatEvent(author, message).postChat(event)
+            PartyChatEvent(author, message, chatComponent).postChat(event)
             return
         }
         guildPattern.matchMatcher(event.message) {
             val author = group("author")
             val message = group("message")
-            GuildChatEvent(author, message).postChat(event)
+            GuildChatEvent(author, message, chatComponent).postChat(event)
             return
         }
         privateMessagePattern.matchMatcher(event.message) {
             val direction = group("direction")
             val author = group("author")
             val message = group("message")
-            PrivateMessageChatEvent(direction, author, message).postChat(event)
+            PrivateMessageChatEvent(direction, author, message, chatComponent).postChat(event)
             return
         }
 
@@ -128,21 +129,28 @@ class PlayerChatManager {
     }
 
     private fun sendSystemMessage(event: LorenzChatEvent) {
-        val systemEvent = SystemMessageEvent(event.message)
-        if (systemEvent.postAndCatch()) {
-            event.cancel()
-        }
-        systemEvent.blockedReason?.let {
-            event.blockedReason = it
+        with(SystemMessageEvent(event.message, event.chatComponent)) {
+            val cancelled = postAndCatch()
+            event.handleChat(cancelled, blockedReason, chatComponent)
         }
     }
 
     private fun AbstractChatEvent.postChat(event: LorenzChatEvent) {
-        if (postAndCatch()) {
-            event.cancel()
+        val cancelled = postAndCatch()
+        event.handleChat(cancelled, blockedReason, chatComponent)
+    }
+
+    private fun LorenzChatEvent.handleChat(
+        cancelled: Boolean,
+        blockedReason: String?,
+        chatComponent: IChatComponent,
+    ) {
+        if (cancelled) {
+            this.cancel()
         }
         blockedReason?.let {
-            event.blockedReason = it
+            this.blockedReason = it
         }
+        this.chatComponent = chatComponent
     }
 }

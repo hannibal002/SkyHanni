@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.data.hypixel.chat.event
 
+import net.minecraft.util.IChatComponent
+
 class PlayerAllChatEvent(
     val levelColor: String?,
     val level: Int?,
     author: String,
     message: String,
+    chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(author, message, blockedReason)
+) : AbstractChatEvent(author, message, chatComponent, blockedReason)
