@@ -69,7 +69,6 @@ class PlayerNameFormatter {
     }
 
     private fun formatAuthor(author: String): String {
-        if (!config.playerRankHider) return author
         if (author.contains("ADMIN")) return author
         if (config.ignoreYouTube && author.contains("YOUTUBER")) return author
 
