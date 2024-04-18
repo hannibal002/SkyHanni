@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
@@ -50,6 +51,15 @@ class PlayerChatManager {
     private val guildPattern by patternGroup.pattern(
         "party",
         "§2Guild > (?<author>[^:]*): (?<message>.*)"
+    )
+
+    /**
+     * REGEX-TEST: §dFrom §r§b[MVP§r§3+§r§b] Eisengolem§r§7: §r§7Baum
+     * REGEX-TEST: §dTo §r§b[MVP§r§3+§r§b] Eisengolem§r§7: §r§7hey
+     */
+    private val privateMessagePattern by patternGroup.pattern(
+        "party",
+        "§d(?<direction>From|To) §r(?<author>[^:]*)§7: §r§7(?<message>.*)"
     )
 
     /**
@@ -102,6 +112,13 @@ class PlayerChatManager {
             val author = group("author")
             val message = group("message")
             GuildChatEvent(author, message).postChat(event)
+            return
+        }
+        privateMessagePattern.matchMatcher(event.message) {
+            val direction = group("direction")
+            val author = group("author")
+            val message = group("message")
+            PrivateMessageChatEvent(direction, author, message).postChat(event)
             return
         }
     }
