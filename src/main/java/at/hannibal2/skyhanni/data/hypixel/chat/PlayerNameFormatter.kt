@@ -113,7 +113,7 @@ class PlayerNameFormatter {
 
     private fun formatAuthor(author: String): String {
         if (author.contains("ADMIN")) return author
-        if (config.ignoreYouTube && author.contains("YOUTUBER")) return author
+        if (config.ignoreYouTube && author.contains("YOUTUBE")) return author
 
         val result = author.cleanPlayerName(displayName = true)
 

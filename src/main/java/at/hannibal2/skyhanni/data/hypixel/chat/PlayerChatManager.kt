@@ -46,9 +46,9 @@ class PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: §9Party §8> §b§l⚛ §b[MVP§f+§b] Dankbarkeit§f: §rx: -190, y: 5, z: -163
-     * REGEX-TEST: §9Party §8> §6⚔ §6[MVP§3++§6] RealBacklight§f: §r!warp
-     * REGEX-TEST: §9Party §8> §b[MVP§3+§b] Eisengolem§f: §r!pt
+     * REGEX-TEST: §2Guild > §b§l⚛ §b[MVP§f+§b] Dankbarkeit§f: §rx: -190, y: 5, z: -163
+     * REGEX-TEST: §2Guild > §6⚔ §6[MVP§3++§6] RealBacklight§f: §r!warp
+     * REGEX-TEST: §2Guild > §b[MVP§3+§b] Eisengolem§f: §r!pt
      */
     private val guildPattern by patternGroup.pattern(
         "guild",
