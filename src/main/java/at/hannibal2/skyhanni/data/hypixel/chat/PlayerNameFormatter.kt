@@ -18,6 +18,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+/**
+ * Listening to the player chat events, and applying custom chat options to them.
+ * E.g. part order, rank hider, etc
+ */
 class PlayerNameFormatter {
     private val config get() = SkyHanniMod.feature.chat.playerMessage
 

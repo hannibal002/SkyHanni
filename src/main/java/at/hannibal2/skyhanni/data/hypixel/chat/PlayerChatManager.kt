@@ -20,6 +20,9 @@ import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
+/**
+ * Reading normal chat events, and splitting them up into many different player chat events, with all avaliable extra information
+ */
 class PlayerChatManager {
 
     private val patternGroup = RepoPattern.group("data.chat.player")
