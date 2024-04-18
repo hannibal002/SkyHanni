@@ -82,17 +82,6 @@ class PlayerChatManager {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val chatComponent = event.chatComponent
-        itemShowPattern.matchMatcher(event.message) {
-            val levelColor = groupOrNull("levelColor")
-            val level = groupOrNull("level")?.formatInt()
-            val author = group("author")
-            val action = group("action")
-            val itemName = group("itemName")
-
-            // for consistency
-            val message = "§7$action §r$itemName"
-            PlayerShowItemChatEvent(levelColor, level, author, message, action, itemName, chatComponent).postChat(event)
-        }
         globalPattern.matchMatcher(event.message) {
             val author = group("author")
             val message = LorenzUtils.stripVanillaMessage(group("message"))
@@ -123,6 +112,17 @@ class PlayerChatManager {
             val message = group("message")
             PrivateMessageChatEvent(direction, author, message, chatComponent).postChat(event)
             return
+        }
+        itemShowPattern.matchMatcher(event.message) {
+            val levelColor = groupOrNull("levelColor")
+            val level = groupOrNull("level")?.formatInt()
+            val author = group("author")
+            val action = group("action")
+            val itemName = group("itemName")
+
+            // for consistency
+            val message = "§7$action §r$itemName"
+            PlayerShowItemChatEvent(levelColor, level, author, message, action, itemName, chatComponent).postChat(event)
         }
 
         sendSystemMessage(event)
