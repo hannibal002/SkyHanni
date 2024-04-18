@@ -174,7 +174,7 @@ object HoppityEggsLocations {
             it.nearestPointOnLine(firstPos, secondPos).distance(firstPos)
         }
         if (maxLineDistance.isEmpty()) {
-            LorenzUtils.sendTitle("§cNo egg found", 1.seconds)
+            LorenzUtils.sendTitle("§cNo eggs found, try getting closer", 2.seconds)
             return
         }
         secondPos = maxLineDistance.first().nearestPointOnLine(firstPos, secondPos)
