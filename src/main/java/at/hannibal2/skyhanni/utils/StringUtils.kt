@@ -336,6 +336,7 @@ object StringUtils {
         }
 
         if (LorenzUtils.stripVanillaMessage(original.formattedText) == newText) return null
+        // TODO remove debug
         println("replaceIfNeeded!")
         println("original: ${original.formattedText}")
         println("newText: $newText")
