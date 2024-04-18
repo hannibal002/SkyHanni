@@ -87,7 +87,7 @@ class EasterEggWaypoints {
     }
 
     // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next egg event
-    
+
     /*
         Title:
         §e§lHYPIXEL
@@ -113,5 +113,6 @@ class EasterEggWaypoints {
         val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Easter Eggs") }
         return a && b && c
     }
+
     private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
 }

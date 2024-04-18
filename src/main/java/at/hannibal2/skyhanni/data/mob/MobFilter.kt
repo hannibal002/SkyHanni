@@ -91,7 +91,16 @@ object MobFilter {
     const val MINION_MOB_PREFIX = "Minion Mob "
 
     enum class DungeonAttribute {
-        Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
+        Flaming,
+        Stormy,
+        Speedy,
+        Fortified,
+        Healthy,
+        Healing,
+        Boomer,
+        Golden,
+        Stealth,
+        ;
 
         companion object {
 
