@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.hypixel.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
@@ -74,6 +75,17 @@ class PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
 
+    @SubscribeEvent
+    fun onPartyChat(event: PartyChatEvent) {
+        if (!isEnabled()) return
+        val message = event.message
+        val author = event.author
+        val name = nameFormat(author)
+        val newMessage = "§9Party §8> $name§f: $message"
+
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+    }
+
     private fun nameFormat(
         author: String,
         levelColor: String? = null,
@@ -115,12 +127,7 @@ class PlayerNameFormatter {
         map[PlayerMessagesConfig.ChatPart.GUILD_RANK] = guildRankFormat
         map[PlayerMessagesConfig.ChatPart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
 
-        val result = StringBuilder()
-        for (part in config.messageOrder) {
-            result.append(map[part])
-        }
-        return result.toString()
-
+        return config.messageOrder.map { map[it] }.joinToString(" ")
     }
 
     private fun formatLevel(rawColor: String?, rawLevel: Int?): String {
