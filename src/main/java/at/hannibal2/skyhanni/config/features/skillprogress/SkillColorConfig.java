@@ -14,7 +14,7 @@ public class SkillColorConfig {
     public Property<Boolean> matchBarColor = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Enable Display Color", desc = "Change the text color in the display based on percentage completed")
+    @ConfigOption(name = "Enable Display Color", desc = "Change the text color in the display based on percentage completed.")
     @ConfigEditorBoolean
     public boolean enabledDisplayColor = false;
 
