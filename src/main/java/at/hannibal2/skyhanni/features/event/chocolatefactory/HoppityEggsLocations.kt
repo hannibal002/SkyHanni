@@ -8,19 +8,19 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LocationUtils.clampTo
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.expand
 import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggsLocations {
 
@@ -37,6 +37,7 @@ object HoppityEggsLocations {
     private val possibleEggLocations = mutableListOf<LorenzVec>()
 
     private var ticksSinceLastParticleFound = -1
+    private var lastGuessMade = SimpleTimeMark.farPast()
 
     var sharedEggLocation: LorenzVec? = null
     var currentEggType: HoppityEggType? = null
@@ -140,6 +141,8 @@ object HoppityEggsLocations {
     }
 
     private fun calculateEggPosition() {
+        if (lastGuessMade.passedSince() < 1.seconds) return
+        lastGuessMade = SimpleTimeMark.now()
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
         val listSize = validParticleLocations.size
         if (listSize < 5) return
@@ -159,24 +162,24 @@ object HoppityEggsLocations {
             secondPoint.z + zDiff * 1000
         ).roundLocationToBlock()
 
-        val worldBoundingBox = getWorldBoundingBox(islandEggsLocations)
-
-        val boundingBox = AxisAlignedBB(
-            firstPos.x, firstPos.y, firstPos.z,
-            secondPos.x, secondPos.y, secondPos.z
-        ).expand(5.0).clampTo(worldBoundingBox)
-
         possibleEggLocations.clear()
 
-        // todo allow more leeway for further points later
-        // need to test while is hoppity event. Works well enough for now
-        val filteredLocations = islandEggsLocations.filter {
-            boundingBox.isInside(it) && it.distanceToLine(firstPos, secondPos) < 200.0
+        val sortedEggs = islandEggsLocations.filter {
+            it.getEggLocationWeight(firstPos, secondPos) < 1
+        }.sortedBy {
+            it.getEggLocationWeight(firstPos, secondPos)
         }
 
-        possibleEggLocations.addAll(filteredLocations.sortedBy {
-            it.distanceToLine(firstPos, secondPos)
-        })
+        val maxLineDistance = sortedEggs.sortedByDescending {
+            it.nearestPointOnLine(firstPos, secondPos).distance(firstPos)
+        }
+        if (maxLineDistance.isEmpty()) {
+            LorenzUtils.sendTitle("§cNo egg found", 1.seconds)
+            return
+        }
+        secondPos = maxLineDistance.first().nearestPointOnLine(firstPos, secondPos)
+
+        possibleEggLocations.addAll(sortedEggs)
 
         drawLocations = true
     }
@@ -216,4 +219,12 @@ object HoppityEggsLocations {
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
     private fun hasLocatorInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }
+
+    private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
+        val distToLine = this.distanceToLine(firstPoint, secondPoint)
+        val distToStart = this.distance(firstPoint)
+        val distMultiplier = distToStart * 2 / 100 + 3
+        val disMultiplierSquared = distMultiplier * distMultiplier
+        return distToLine / disMultiplierSquared
+    }
 }
