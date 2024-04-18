@@ -21,6 +21,7 @@ public class PlayerMessagesConfig {
     public List<ChatPart> messageOrder = new ArrayList<>(Arrays.asList(
         ChatPart.SKYBLOCK_LEVEL,
         ChatPart.NAME,
+        ChatPart.GUILD_RANK,
         ChatPart.EMBLEM
     ));
 
@@ -28,6 +29,7 @@ public class PlayerMessagesConfig {
         SKYBLOCK_LEVEL("SkyBlock Level"),
         EMBLEM("Emblem"),
         NAME("Name"),
+        GUILD_RANK("Guild Rank"),
         CRIMSON_FACTION("Crimson Faction"),
         MODE_IRONMAN("Ironman Mode"),
         BINGO_LEVEL("Bingo Level"),
