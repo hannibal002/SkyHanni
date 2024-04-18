@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.hypixel.chat
+package at.hannibal2.skyhanni.data.hypixel.chat.event
 
 class PartyChatEvent(
     author: String,

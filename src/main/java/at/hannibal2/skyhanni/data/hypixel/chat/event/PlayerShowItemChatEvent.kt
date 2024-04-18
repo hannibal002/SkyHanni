@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.data.hypixel.chat.event
 
-import at.hannibal2.skyhanni.data.hypixel.chat.AbstractChatEvent
-
 class PlayerShowItemChatEvent(
     val levelColor: String?,
     val level: Int?,
