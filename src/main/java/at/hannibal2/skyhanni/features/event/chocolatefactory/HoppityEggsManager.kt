@@ -75,6 +75,16 @@ object HoppityEggsManager {
             }
             meal.markClaimed()
         }
+
+        eggSpawnedPattern.matchMatcher(event.message) {
+            val meal = HoppityEggType.getMealByName(group("meal")) ?: run {
+                ErrorManager.skyHanniError(
+                    "Unknown meal: ${group("meal")}",
+                    "message" to event.message
+                )
+            }
+            meal.markSpawned()
+        }
     }
 
     fun shareWaypointPrompt() {

@@ -17,6 +17,9 @@ enum class HoppityEggType(
     fun markClaimed() {
         claimed = true
     }
+    fun markSpawned() {
+        claimed = false
+    }
 
     fun isClaimed() = claimed
     fun formattedName() = "$mealColour$mealName"
@@ -33,7 +36,7 @@ enum class HoppityEggType(
 
             entries.forEach {
                 if (currentSbHour >= it.resetsAt && it.lastResetDay != currentSbDay) {
-                    it.claimed = false
+                    it.markSpawned()
                     it.lastResetDay = currentSbDay
                     if (HoppityEggsLocations.currentEggType == it) {
                         HoppityEggsLocations.currentEggType = null
