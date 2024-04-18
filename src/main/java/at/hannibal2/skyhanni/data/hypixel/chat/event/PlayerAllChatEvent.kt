@@ -6,6 +6,7 @@ class PlayerAllChatEvent(
     val levelColor: String?,
     val level: Int?,
     author: String,
+    val chatColor: String?,
     message: String,
     chatComponent: IChatComponent,
     blockedReason: String? = null,

@@ -14,6 +14,12 @@ public class PlayerMessagesConfig {
     public boolean playerRankHider = false;
 
     @Expose
+    @ConfigOption(name = "Ignore YouTube", desc = "Do not remove the rank for YouTubers")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ignoreYouTube = false;
+
+    @Expose
     @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -32,7 +32,7 @@ class PlayerChatManager {
      */
     private val globalPattern by patternGroup.pattern(
         "global",
-        "(?:§8\\[§r(?<levelColor>§.)(?<level>\\d+)§r§8] §r)?(?<author>§.+)(?:§f|§7§r§7): (?<message>.*)"
+        "(?:§8\\[§r(?<levelColor>§.)(?<level>\\d+)§r§8] §r)?(?<author>§.+)(?<chatColor>§f|§7§r§7): (?<message>.*)"
     )
 
     /**
@@ -51,7 +51,7 @@ class PlayerChatManager {
      * REGEX-TEST: §9Party §8> §b[MVP§3+§b] Eisengolem§f: §r!pt
      */
     private val guildPattern by patternGroup.pattern(
-        "party",
+        "guild",
         "§2Guild > (?<author>[^:]*): (?<message>.*)"
     )
 
@@ -61,7 +61,7 @@ class PlayerChatManager {
      * REGEX-TEST: §dTo §r§b[MVP§r§5+§r§b] Alea1337§r§7: §r§d§lBoop!
      */
     private val privateMessagePattern by patternGroup.pattern(
-        "party",
+        "privatemessage",
         "§d(?<direction>From|To) §r(?<author>[^:]*)§7: §r(?<message>.*)"
     )
 
@@ -75,7 +75,7 @@ class PlayerChatManager {
      * REGEX-TEST: §8[§5396§8] §7☢ §r§b[MVP§c+§b] hannibal2§f§7 is holding §r§8[§6Buzzing InfiniVacuum™ Hooverius§8]
      */
     private val itemShowPattern by patternGroup.pattern(
-        "party",
+        "itemshow",
         "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§f§7 (?<action>is (?:holding|friends with a|wearing)|has) §r(?<itemName>.*)"
     )
 
@@ -88,9 +88,10 @@ class PlayerChatManager {
             if (author.contains("[NPC]")) {
                 NpcChatEvent(author, message.removePrefix("§f"), chatComponent).postChat(event)
             } else {
+                val chatColor = group("chatColor")
                 val levelColor = groupOrNull("levelColor")
                 val level = groupOrNull("level")?.formatInt()
-                PlayerAllChatEvent(levelColor, level, author, message, chatComponent).postChat(event)
+                PlayerAllChatEvent(levelColor, level, author, chatColor, message, chatComponent).postChat(event)
             }
             return
         }

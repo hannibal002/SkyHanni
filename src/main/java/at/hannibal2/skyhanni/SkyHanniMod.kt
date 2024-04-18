@@ -54,6 +54,8 @@ import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager
+import at.hannibal2.skyhanni.data.hypixel.chat.PlayerNameFormatter
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -458,6 +460,8 @@ class SkyHanniMod {
         // data
         loadModule(this)
         loadModule(ChatManager)
+        loadModule(PlayerChatManager())
+        loadModule(PlayerNameFormatter())
         loadModule(HypixelData())
         loadModule(LocationFixData)
         loadModule(DungeonAPI)
