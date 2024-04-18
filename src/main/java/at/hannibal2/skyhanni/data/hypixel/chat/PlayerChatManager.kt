@@ -39,14 +39,14 @@ class PlayerChatManager {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         globalPattern.matchMatcher(event.message) {
-            val levelColor = groupOrNull("levelColor")
-            val level = groupOrNull("level")?.formatInt()
             val author = group("author")
             val message = LorenzUtils.stripVanillaMessage(group("message"))
             if (author.contains("[NPC]")) {
                 NpcChatEvent(author, message.removePrefix("§f")).postChat(event)
                 NpcChatEvent(author, message.removePrefix("§f")).postChat(event)
             } else {
+                val levelColor = groupOrNull("levelColor")
+                val level = groupOrNull("level")?.formatInt()
                 PlayerAllChatEvent(levelColor, level, author, message).postChat(event)
             }
             return
