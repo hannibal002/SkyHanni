@@ -135,7 +135,7 @@ class PlayerNameFormatter {
         val map = mutableMapOf<PlayerMessagesConfig.MessagePart, String>()
         map[PlayerMessagesConfig.MessagePart.SKYBLOCK_LEVEL] = levelFormat
         map[PlayerMessagesConfig.MessagePart.EMBLEM] = emblemFormat
-        map[PlayerMessagesConfig.MessagePart.NAME] = name
+        map[PlayerMessagesConfig.MessagePart.PLAYER_NAME] = name
         map[PlayerMessagesConfig.MessagePart.CRIMSON_FACTION] = faction
         map[PlayerMessagesConfig.MessagePart.MODE_IRONMAN] = ironman
         map[PlayerMessagesConfig.MessagePart.BINGO_LEVEL] = bingo

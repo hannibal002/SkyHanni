@@ -95,7 +95,6 @@ public class AdvancedPlayerListConfig {
     @ConfigEditorBoolean
     public boolean markSpecialPersons = false;
 
-
     @Expose
     @ConfigOption(
         name = "Mark SkyHanni Devs",

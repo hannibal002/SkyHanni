@@ -21,7 +21,7 @@ public class PlayerMessagesConfig {
     public List<MessagePart> partsOrder = new ArrayList<>(Arrays.asList(
         MessagePart.SKYBLOCK_LEVEL,
         MessagePart.PRIVATE_ISLAND_RANK,
-        MessagePart.NAME,
+        MessagePart.PLAYER_NAME,
         MessagePart.GUILD_RANK,
         MessagePart.EMBLEM
     ));
@@ -29,7 +29,7 @@ public class PlayerMessagesConfig {
     public enum MessagePart {
         SKYBLOCK_LEVEL("SkyBlock Level"),
         EMBLEM("Emblem"),
-        NAME("Name"),
+        PLAYER_NAME("Player Name"),
         GUILD_RANK("Guild Rank"),
         PRIVATE_ISLAND_RANK("Private Island Rank"),
         CRIMSON_FACTION("Crimson Faction"),
@@ -67,7 +67,7 @@ public class PlayerMessagesConfig {
     public boolean playerRankHider = false;
 
     @Expose
-    @ConfigOption(name = "Ignore YouTube", desc = "Do not remove the rank for YouTubers")
+    @ConfigOption(name = "Ignore YouTube", desc = "Do not remove the rank for YouTubers in chat.")
     @ConfigEditorBoolean
     public boolean ignoreYouTube = false;
 
@@ -78,7 +78,7 @@ public class PlayerMessagesConfig {
     public boolean chatFilter = false;
 
     @Expose
-    @ConfigOption(name = "Same Chat Color", desc = "All players, also those with ranks, have the same, white chat color.")
+    @ConfigOption(name = "Same Chat Color", desc = "All players, also those with ranks, write with the same, white chat color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sameChatColor = true;
