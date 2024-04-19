@@ -481,7 +481,7 @@ enum class HotmData(
 
                 if (difference > 0) {
                     type.gain(difference)
-                    ChatUtils.chat("Gained §.$difference ${type.lowName} Powder")
+                    ChatUtils.debug("Gained §.$difference ${type.lowName} Powder")
                 }
             }
         }
