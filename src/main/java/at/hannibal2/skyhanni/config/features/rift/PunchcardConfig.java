@@ -5,13 +5,14 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class PunchcardConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Highlights unpunched players in the Rift.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Color", desc = "Color used for highlighting.")
