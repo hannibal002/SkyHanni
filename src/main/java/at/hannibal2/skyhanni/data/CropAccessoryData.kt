@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -28,7 +28,6 @@ class CropAccessoryData {
     )
 
     private var loadedAccessoryThisProfile = false
-    private var ticks = 0
     private var accessoryInBag: CropAccessory? = null
     private var accessoryInInventory = CropAccessory.NONE
 
@@ -84,8 +83,7 @@ class CropAccessoryData {
 
     // Handle inventory detection
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!event.repeatSeconds(1)) return
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         accessoryInInventory = bestCropAccessory(InventoryUtils.getItemsInOwnInventory())
         if (accessoryInInventory == CropAccessory.NONE) return

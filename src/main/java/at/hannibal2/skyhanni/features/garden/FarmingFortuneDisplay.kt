@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -159,7 +159,7 @@ object FarmingFortuneDisplay {
 
         list.add(Renderable.string(
             "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                LorenzUtils.formatDouble(farmingFortune, 0)
+                farmingFortune.round(0).addSeparators()
             } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
         ))
         add(Renderable.horizontalContainer(list))
@@ -218,7 +218,7 @@ object FarmingFortuneDisplay {
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-            if (lastCropFortuneMissingError.passedSince() < 1.minutes) return
+            if (lastCropFortuneMissingError.passedSince() < 1.minutes || !GardenAPI.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
                 "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing latest Crop Fortune.",

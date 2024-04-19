@@ -48,9 +48,10 @@ class OwnInventoryData {
         if (packet is S2FPacketSetSlot) {
             val windowId = packet.func_149175_c()
             if (windowId == 0) {
+                val slot = packet.func_149173_d()
                 val item = packet.func_149174_e() ?: return
                 DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item).postAndCatch()
+                    OwnInventoryItemUpdateEvent(item, slot).postAndCatch()
                 }
             }
         }

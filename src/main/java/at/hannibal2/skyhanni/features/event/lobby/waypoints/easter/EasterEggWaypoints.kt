@@ -75,10 +75,7 @@ class EasterEggWaypoints {
                 event.drawWaypointFilled(eggEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(eggEntrance.waypoint, "§e" + eggEntrance.eggEntranceName, 1.5)
             }
-            return
         }
-
-        if (LorenzUtils.skyBlockArea == "?") return
     }
 
     private fun EasterEgg.shouldShow(): Boolean {

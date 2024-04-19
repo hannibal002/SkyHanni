@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -123,7 +124,7 @@ object EntityUtils {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
-        if (!boss && !LorenzUtils.inDungeons) {
+        if (!boss && !DungeonAPI.inDungeon()) {
             // Corrupted
             if (maxHealth == health * 3 * derpyMultiplier) return true
             // Runic
