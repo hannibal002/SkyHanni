@@ -32,13 +32,14 @@ object CorpseLOS {
     private val config get() = SkyHanniMod.feature.mining.corpseLOS
 
     /**
-     * REGEX-TEST: §9Party §8> §bMVP§0+§b nobaboy§f: §rx: -164, y: 8, z: -154 | (Lapis Corpse)
+     * I have no clue what to do for the regex anymore, I'm slowly losing it
+     * REGEX-TEST: §9Party §8> §b[MVP§0+]§b nobaboy§f: §rx: -164, y: 8, z: -154 | (Lapis Corpse)
      * REGEX-TEST: Guild > §r§6♣ §b[MVP§0+§b] nobaboy§f: x: 141, y: 14, z: -131
      * REGEX-TEST: §8[§r§6407§r§8] §r§6♣ §b[MVP§0+§b] nobaboy§f: x: -9, y: 135, z: 20 | (Tungsten Corpse)
      */
     private val corpseCoordsWaypoint by RepoPattern.pattern(
         "corpse.waypoints",
-        "^(?:[^ ]+ > )?(?<playerName>.+)§f: (§r)?x: (?<x>-?\\d+),? y: (?<y>-?\\d+),? z: (?<z>-?\\d+)"
+        "^(?:.+?[^x:y0-9] )?(?<playerName>.+)§f: (?:§r)?x: (?<x>-?\\d+),? y: (?<y>-?\\d+),? z: (?<z>-?\\d+)(?:.+)?"
     )
 
     private val detectedArmorStands: MutableList<Corpse> = mutableListOf()
@@ -56,48 +57,45 @@ object CorpseLOS {
 
     private fun findCorpse() {
         Minecraft.getMinecraft().theWorld ?: return
-        for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
-            // 3 block distance because for some reason location didn't match when it should a couple of times
-            if (detectedArmorStands.any { it.coords.distance(entity.getLorenzVec()) <= 3}) continue
-            if (entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible) {
-                for (offset in -1..3) { // Offset for search, feels a bit too borderline but best I can do to deal with glass/ice
-                    val canSee = entity.getLorenzVec().add(y = offset).canBeSeen()
-                    if (canSee) {
-                        val helmetDisplayName = StringUtils.stripControlCodes(entity.getCurrentArmor(3).displayName)
-                        val corpseType = CorpseType.entries.firstOrNull { it.helmetName == helmetDisplayName }
-                        corpseType?.let {
-                            detectedArmorStands.add(Corpse(type = it, coords = entity.getLorenzVec(), shared = false))
-                            sendCorpseAlert(it)
+        EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()
+            .filterNot { corpse ->
+                detectedArmorStands.any { it.coords.distance(corpse.getLorenzVec()) <= 3 }
+            }
+            .filter { entity ->
+                entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
+            }
+            .forEach { entity ->
+                val helmetDisplayName = StringUtils.stripControlCodes(entity.getCurrentArmor(3).displayName)
+                val corpseType = CorpseType.entries.firstOrNull { it.helmetName == helmetDisplayName }
+                corpseType?.let { type ->
+                    for (offset in -1..3) {
+                        val canSee = entity.getLorenzVec().add(y = offset).canBeSeen()
+                        if (canSee) {
+                            detectedArmorStands.add(Corpse(type = type, coords = entity.getLorenzVec(), shared = false))
+                            ChatUtils.chat("Located a ${type.name.firstLetterUppercase()} Corpse and marked its location with a waypoint.")
+                            break
                         }
-                        break // Break the inner loop if the corpse is detected from any offset
                     }
                 }
             }
-        }
-    }
-
-    private fun sendCorpseAlert(type: CorpseType) {
-        val message = "Located a ${type.name.firstLetterUppercase()} Corpse and marked its location with a waypoint."
-        ChatUtils.chat(message)
     }
 
     private fun shareCoords() {
-        for (corpse in detectedArmorStands) {
-            if (parsedLocations.any { corpse.coords.distance(it) <= 5}) corpse.shared = true
-            if (corpse.shared) continue
+        detectedArmorStands.filterNot { it.shared }
+            .filterNot { corpse ->
+                parsedLocations.any { corpse.coords.distance(it) <= 5 }
+            }
+            .filter { it.coords.distanceToPlayer() <= 5 }
+            .forEach { corpse ->
+                val location = corpse.coords
+                val x = location.x.toInt()
+                val y = location.y.toInt()
+                val z = location.z.toInt()
+                val type = corpse.type.name.firstLetterUppercase()
 
-            val distToPlayer = corpse.coords.distanceToPlayer()
-            if (distToPlayer > 5) continue
-
-            val corpseLocation = corpse.coords
-            val x = corpseLocation.x.toInt()
-            val y = corpseLocation.y.toInt()
-            val z = corpseLocation.z.toInt()
-            val type = corpse.type.name.firstLetterUppercase()
-
-            ChatUtils.sendCommandToServer("pc x: $x, y: $y, z: $z | ($type Corpse)")
-            corpse.shared = true
-        }
+                ChatUtils.sendCommandToServer("pc x: $x, y: $y, z: $z | ($type Corpse)")
+                corpse.shared = true
+            }
     }
 
     @SubscribeEvent
@@ -123,11 +121,11 @@ object CorpseLOS {
         if (!isEnabled()) return
         if (detectedArmorStands.isEmpty()) return
 
-        for (corpse in detectedArmorStands) {
-            val location = corpse.coords.add(y = 1)
-            event.drawWaypointFilled(location, corpse.type.color.toColor())
-            event.drawDynamicText(location, "§e${corpse.type.name.firstLetterUppercase()} Corpse", 1.0)
-        }
+        detectedArmorStands.forEach {
+                val location = it.coords.add(y = 1)
+                event.drawWaypointFilled(location, it.type.color.toColor())
+                event.drawDynamicText(location, "§e${it.type.name.firstLetterUppercase()} Corpse", 1.0)
+            }
     }
 
     @SubscribeEvent
@@ -137,15 +135,15 @@ object CorpseLOS {
 
         corpseCoordsWaypoint.matchMatcher(message) {
             val name = group("playerName").cleanPlayerName()
-            if (name == Minecraft.getMinecraft().thePlayer.name) return
+            if (Minecraft.getMinecraft().thePlayer.name in name) return
 
             val x = group("x").trim().toInt()
             val y = group("y").trim().toInt()
             val z = group("z").trim().toInt()
             val location = LorenzVec(x, y, z)
 
-            // Return if someone had already sent that corpse's location
-            if (parsedLocations.any { it.distance(location) <= 5}) return
+            // Return if someone had already sent a location nearby
+            if (parsedLocations.any { it.distance(location) <= 5 }) return
             parsedLocations.add(location)
         }
     }
