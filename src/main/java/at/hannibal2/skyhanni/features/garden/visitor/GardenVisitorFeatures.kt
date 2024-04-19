@@ -462,6 +462,7 @@ object GardenVisitorFeatures {
             event.blockedReason = "new_visitor_arrived"
         }
 
+        // TODO use NpcChatEvent
         if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
         }
