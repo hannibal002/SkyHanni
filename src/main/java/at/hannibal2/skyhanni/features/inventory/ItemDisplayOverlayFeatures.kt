@@ -83,10 +83,10 @@ object ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        event.stackTip = getStackTip(event.stack)
+        event.stackTip = getStackTip(event.stack) ?: return
     }
 
-    private fun getStackTip(item: ItemStack): String {
+    private fun getStackTip(item: ItemStack): String? {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
@@ -259,7 +259,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        return ""
+        return null
     }
 
     private fun isOwnVacuum(lore: List<String>) =

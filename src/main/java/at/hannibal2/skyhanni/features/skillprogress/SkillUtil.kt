@@ -8,9 +8,6 @@ import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
 import at.hannibal2.skyhanni.api.SkillAPI.skillColorConfig
 import at.hannibal2.skyhanni.utils.Quad
 import com.google.common.base.Splitter
-import com.google.gson.JsonArray
-import io.github.moulberry.notenoughupdates.util.Constants
-import io.github.moulberry.notenoughupdates.util.Utils
 
 object SkillUtil {
 
@@ -126,17 +123,9 @@ object SkillUtil {
         return level
     }
 
-    fun calculateLevelXp(levelingArray: JsonArray, level: Int): Double {
-        var totalXp = 0.0
-        for (i in 0 until level + 1) {
-            val xp = levelingArray[i].asDouble
-            totalXp += xp
-        }
-        return totalXp
+    fun calculateLevelXp(level: Int): Double {
+        return SkillAPI.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
     }
-
-    fun levelArray(): JsonArray =
-        Utils.getElement(Constants.LEVELING, "leveling_xp").asJsonArray
 
     fun getColorForPercentage(percentage: Int): String {
         val segments = skillColorConfig.displayPercentageColorString.split(";")

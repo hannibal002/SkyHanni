@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
@@ -110,14 +111,18 @@ public class SkillProgressConfig {
     public SkillETADisplayConfig skillETADisplayConfig = new SkillETADisplayConfig();
 
     @Expose
+    @ConfigLink(owner = SkillProgressConfig.class, field = "enabled")
     public Position displayPosition = new Position(384, -105, false, true);
 
     @Expose
+    @ConfigLink(owner = SkillProgressBarConfig.class, field = "enabled")
     public Position barPosition = new Position(384, -87, false, true);
 
     @Expose
+    @ConfigLink(owner = AllSkillDisplayConfig.class, field = "enabled")
     public Position allSkillPosition = new Position(5, 209, false, true);
 
     @Expose
+    @ConfigLink(owner = SkillETADisplayConfig.class, field = "enabled")
     public Position etaPosition = new Position(5, 155, false, true);
 }

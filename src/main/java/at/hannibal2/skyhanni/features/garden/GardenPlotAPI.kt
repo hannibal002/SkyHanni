@@ -34,6 +34,7 @@ object GardenPlotAPI {
         "name",
         "§.Plot §7- §b(?<name>.*)"
     )
+
     /**
      * REGEX-TEST: §aThe Barn
      */
@@ -41,6 +42,7 @@ object GardenPlotAPI {
         "barnname",
         "§.(?<name>The Barn)"
     )
+
     /**
      * REGEX-TEST: §7Cleanup: §b0% Completed
      */
@@ -48,6 +50,7 @@ object GardenPlotAPI {
         "uncleaned",
         "§7Cleanup: .* (?:§.)*Completed"
     )
+
     /**
      * REGEX-TEST: §aUnlocked Garden §r§aPlot §r§7- §r§b10§r§a!
      */
@@ -55,6 +58,7 @@ object GardenPlotAPI {
         "chat.unlock",
         "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
     )
+
     /**
      * REGEX-TEST: §aPlot §r§7- §r§b10 §r§ais now clean!
      */
@@ -116,7 +120,20 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false, false, true, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) {
+        PlotData(
+            id,
+            "$id",
+            0,
+            null,
+            null,
+            false,
+            false,
+            false,
+            true,
+            false,
+        )
+    }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -190,7 +207,7 @@ object GardenPlotAPI {
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
-    fun closestCenterPlot(location: LorenzVec) = plots.find {it.box.isInside(location)}?.middle
+    fun closestCenterPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }?.middle
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) ChatUtils.sendCommandToServer("tptoplot barn")

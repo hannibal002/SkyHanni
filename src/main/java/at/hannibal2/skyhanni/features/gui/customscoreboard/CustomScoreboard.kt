@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -176,12 +177,12 @@ class CustomScoreboard {
         val prefix = "gui.customScoreboard"
         val displayConfigPrefix = "$prefix.displayConfig"
         val displayPrefix = "$prefix.display"
-        event.move(28, "$prefix.displayConfig.showAllActiveEvents", "$prefix.displayConfig.eventsConfig.showAllActiveEvents")
-        event.transform(30, "$prefix.displayConfig.eventsConfig.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.HOT_DOG_CONTEST.name))
-            array
-        }
+
+        event.move(
+            28,
+            "$prefix.displayConfig.showAllActiveEvents",
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+        )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
         event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
@@ -194,7 +195,11 @@ class CustomScoreboard {
         event.move(31, "$displayConfigPrefix.showMaxIslandPlayers", "$displayPrefix.showMaxIslandPlayers")
         event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
         event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
-        event.move(31, "$displayConfigPrefix.cacheScoreboardOnIslandSwitch", "$displayPrefix.cacheScoreboardOnIslandSwitch")
+        event.move(
+            31,
+            "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
+            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+        )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
         event.move(31, "$displayConfigPrefix.titleAndFooter", "$displayPrefix.titleAndFooter")
@@ -203,5 +208,29 @@ class CustomScoreboard {
         event.move(31, "$displayConfigPrefix.eventsConfig", "$displayPrefix.events")
         event.move(31, "$prefix.mayorConfig", "$displayPrefix.mayor")
         event.move(31, "$prefix.partyConfig", "$displayPrefix.party")
+
+        event.transform(37, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array
+        }
+        event.transform(40, "$displayPrefix.events.eventEntries") { element ->
+            val jsonArray = element.asJsonArray
+            val newArray = JsonArray()
+
+            for (jsonElement in jsonArray) {
+                val stringValue = jsonElement.asString
+                if (stringValue !in listOf("HOT_DOG_CONTEST", "EFFIGIES")) {
+                    newArray.add(jsonElement)
+                }
+            }
+
+            if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
+                newArray.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
+            }
+
+            newArray
+        }
+
     }
 }

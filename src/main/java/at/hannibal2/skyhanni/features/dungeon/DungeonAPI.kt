@@ -58,6 +58,10 @@ object DungeonAPI {
         "complete",
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
     )
+    private val dungeonRoomPattern by patternGroup.pattern(
+        "room",
+        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)"
+    )
 
     fun inDungeon() = IslandType.CATACOMBS.isInIsland()
 
@@ -102,7 +106,11 @@ object DungeonAPI {
         return DungeonFloor.valueOf(floor.replace("M", "F"))
     }
 
-    fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
+    fun getRoomID(): String? {
+        return ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
+            group("roomId")
+        }
+    }
 
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
