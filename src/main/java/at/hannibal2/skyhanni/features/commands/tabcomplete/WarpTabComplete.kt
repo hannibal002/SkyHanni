@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object WarpTabComplete {
 
-    private val config get() = SkyHanniMod.feature.commands.tabComplete
+    private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
     private var warps = listOf<String>()
 
     @SubscribeEvent

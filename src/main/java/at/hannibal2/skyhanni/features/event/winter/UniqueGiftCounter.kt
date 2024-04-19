@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -34,13 +34,10 @@ object UniqueGiftCounter {
 
         val storage = storage ?: return
 
-        for (line in item.getLore()) {
-            giftedAmountPattern.matchMatcher(line) {
-                val amount = group("amount").formatNumber().toInt()
-                storage.amountGifted = amount
-                update()
-                return
-            }
+        item.getLore().matchFirst(giftedAmountPattern) {
+            val amount = group("amount").formatInt()
+            storage.amountGifted = amount
+            update()
         }
     }
 

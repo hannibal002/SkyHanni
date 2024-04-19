@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 
+// TODO split into two classes: TranslatorCommand and GoogleTransaltor. only communicates via getTranslationFromEnglish and getTranslationToEnglish
 class Translator {
 
     private val messageContentRegex = Regex(".*: (.*)")
@@ -30,6 +31,7 @@ class Translator {
         if (!isEnabled()) return
 
         val message = event.message
+        // TODO use PlayerAllChatEvent and other player chat events
         if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
@@ -43,7 +45,7 @@ class Translator {
         style.setChatClickEvent(
             ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
-                "/shsendtranslation ${messageContentRegex.find(message)!!.groupValues[1]}"
+                "/shtranslate ${messageContentRegex.find(message)!!.groupValues[1]}"
             )
         )
         style.setChatHoverEvent(
@@ -82,10 +84,8 @@ class Translator {
 
         private fun getTranslationToEnglish(message: String): String {
             val url =
-                "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=" + URLEncoder.encode(
-                    message,
-                    "UTF-8"
-                )
+                "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=" +
+                    URLEncoder.encode(message, "UTF-8")
 
             var messageToSend = ""
             val layer1 = getJSONResponse(url).asJsonArray
@@ -114,10 +114,8 @@ class Translator {
 
         private fun getTranslationFromEnglish(message: String, lang: String): String {
             val url =
-                "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=$lang&dt=t&q=" + URLEncoder.encode(
-                    message,
-                    "UTF-8"
-                )
+                "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=$lang&dt=t&q=" +
+                    URLEncoder.encode(message, "UTF-8")
 
             val layer1 = getJSONResponse(url).asJsonArray
             if (layer1.size() < 1) return "Error!"
@@ -137,11 +135,7 @@ class Translator {
         }
 
         fun toEnglish(args: Array<String>) {
-            if (!isEnabled()) return
-            var message = ""
-            for (i in args) {
-                message = "$message$i "
-            }
+            val message = args.joinToString(" ")
 
             coroutineScope.launch {
                 val translation = getTranslationToEnglish(message)
@@ -151,20 +145,16 @@ class Translator {
         }
 
         fun fromEnglish(args: Array<String>) {
-            if (!isEnabled()) return
             if (args.size < 2 || args[0].length != 2) { // args[0] is the language code
                 ChatUtils.userError("Usage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
                 return
             }
             val language = args[0]
-            var message = ""
-            for (i in 1..<args.size) {
-                message = "$message${args[i]} "
-            }
+            val message = args.drop(1).joinToString(" ")
 
             coroutineScope.launch {
                 val translation = getTranslationFromEnglish(message, language)
-                ChatUtils.chat("Copied translation to clipboard: $translation")
+                ChatUtils.chat("Copied translation to clipboard: §f$translation")
                 OSUtils.copyToClipboard(translation)
             }
         }

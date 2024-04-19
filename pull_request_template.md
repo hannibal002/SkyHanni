@@ -1,10 +1,18 @@
+<!-- remove all unused parts -->
+
 ## Dependencies
 - pr_number_or_link_here
 
 ## What
 Describe what this pull request does, including technical details, screenshots, links to discord, etc.
 
-<!-- remove unused parts below -->
+<details>
+<summary>Images</summary>
+
+<!-- drop images here -->
+
+</details>
+
 ## Changelog New Features
 + Cool new feature. - your_name_here
     * extra info

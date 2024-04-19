@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
@@ -231,7 +232,7 @@ open class VisualWordGui : GuiScreen() {
             }
 
             if (modifiedWords.size < 1) {
-                modifiedWords = SkyHanniMod.feature.storage.modifiedWords
+                modifiedWords = ModifyVisualWords.modifiedWords
             }
 
             if (toRemove != null) {
@@ -444,7 +445,7 @@ open class VisualWordGui : GuiScreen() {
                 currentText = ""
                 currentIndex = modifiedWords.size - 1
                 saveChanges()
-                pageScroll = -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100)
+                pageScroll = -(modifiedWords.size * 30 - 100)
                 scrollScreen()
             }
             currentlyEditing = !currentlyEditing
@@ -465,7 +466,7 @@ open class VisualWordGui : GuiScreen() {
         if (!currentlyEditing) {
             if (keyCode == Keyboard.KEY_DOWN || keyCode == Keyboard.KEY_S) {
                 if (KeyboardManager.isModifierKeyDown()) {
-                    pageScroll = -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100)
+                    pageScroll = -(modifiedWords.size * 30 - 100)
                 } else {
                     pageScroll -= 30
                 }
@@ -486,15 +487,10 @@ open class VisualWordGui : GuiScreen() {
 
         if (keyCode == Keyboard.KEY_BACK) {
             if (currentText.isNotEmpty()) {
-                currentText = if (KeyboardManager.isModifierKeyDown()) {
-                    ""
-                } else if (KeyboardManager.isShiftKeyDown()) {
-                    val lastSpaceIndex = currentText.lastIndexOf(' ')
-                    if (lastSpaceIndex >= 0) {
-                        currentText.substring(0, lastSpaceIndex)
-                    } else {
-                        ""
-                    }
+                currentText = if (KeyboardManager.isDeleteLineDown()) ""
+                else if (KeyboardManager.isDeleteWordDown()) {
+                    val lastSpaceIndex = currentText.trimEnd().removeSuffix(" ").lastIndexOf(' ')
+                    if (lastSpaceIndex >= 0) currentText.substring(0, lastSpaceIndex + 1) else ""
                 } else {
                     currentText.substring(0, currentText.length - 1)
                 }
@@ -553,14 +549,15 @@ open class VisualWordGui : GuiScreen() {
             pageScroll = 0
         }
 
-        pageScroll = MathHelper.clamp_int(pageScroll, -(SkyHanniMod.feature.storage.modifiedWords.size * 30 - 100), 0)
+        pageScroll = MathHelper.clamp_int(pageScroll, -(modifiedWords.size * 30 - 100), 0)
         lastMouseScroll = 0
     }
 
     private fun saveChanges() {
         ModifyVisualWords.modifiedWords = modifiedWords
         ModifyVisualWords.textCache.clear()
-        SkyHanniMod.feature.storage.modifiedWords = modifiedWords
+        SkyHanniMod.visualWordsData.modifiedWords = modifiedWords
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }
 
     private fun tryImportFromSBE() {

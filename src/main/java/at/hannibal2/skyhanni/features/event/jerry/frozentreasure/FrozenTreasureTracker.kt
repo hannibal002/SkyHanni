@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.fixedRateTimer
 
 object FrozenTreasureTracker {
 
@@ -44,11 +44,6 @@ object FrozenTreasureTracker {
 
     init {
         FrozenTreasure.entries.forEach { it.chatPattern }
-
-        fixedRateTimer(name = "skyhanni-frozen-treasure-tracker", period = 1000) {
-            if (!onJerryWorkshop()) return@fixedRateTimer
-            calculateIcePerHour()
-        }
     }
 
     class Data : TrackerData() {
@@ -77,12 +72,14 @@ object FrozenTreasureTracker {
         tracker.update()
     }
 
-    private fun calculateIcePerHour() {
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!onJerryWorkshop()) return
+
         val difference = estimatedIce - lastEstimatedIce
         lastEstimatedIce = estimatedIce
 
         if (difference == estimatedIce) return
-
 
         if (difference == 0L) {
             if (icePerSecond.isEmpty()) return

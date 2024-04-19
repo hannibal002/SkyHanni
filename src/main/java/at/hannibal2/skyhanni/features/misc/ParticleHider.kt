@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.projectile.EntitySmallFireball
 import net.minecraft.util.EnumParticleTypes
@@ -13,10 +12,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ParticleHider {
 
-    private fun inM7Boss() = LorenzUtils.inDungeons && DungeonAPI.dungeonFloor == "M7" && DungeonAPI.inBossRoom
+    private fun inM7Boss() = DungeonAPI.inDungeon() && DungeonAPI.dungeonFloor == "M7" && DungeonAPI.inBossRoom
 
     @SubscribeEvent
-    fun onHypExplosions(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         val distanceToPlayer = event.distanceToPlayer
         if (SkyHanniMod.feature.misc.particleHiders.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
             event.isCanceled = true

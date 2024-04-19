@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.config.features.garden.pests;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class PestFinderConfig {
@@ -14,7 +15,7 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Display",
-        desc = "Show a display with all know pest locations."
+        desc = "Show a display with all known pest locations."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -23,7 +24,7 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Show Plot in World",
-        desc = "Mark infected plot names and world border in the world."
+        desc = "Mark infested plot names and world border in the world."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -47,10 +48,16 @@ public class PestFinderConfig {
     public int showBorderForSeconds = 1;
 
     @Expose
+    @ConfigLink(owner = PestFinderConfig.class, field = "showDisplay")
     public Position position = new Position(-350, 200, 1.3f);
 
     @Expose
     @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int teleportHotkey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Always Teleport", desc = "Allow teleporting with the Teleport Hotkey even when you're already in an infested plot.")
+    @ConfigEditorBoolean
+    public boolean alwaysTp = false;
 }

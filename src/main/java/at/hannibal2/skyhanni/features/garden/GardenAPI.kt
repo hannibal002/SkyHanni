@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
@@ -87,7 +88,7 @@ object GardenAPI {
     }
 
     @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
     }
@@ -95,7 +96,7 @@ object GardenAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inGarden()) return
-        if (event.isMod(10)) {
+        if (event.isMod(10, 1)) {
             inBarn = barnArea.isPlayerInside()
 
             // We ignore random hypixel moments
@@ -143,6 +144,13 @@ object GardenAPI {
 
     fun inGarden() = IslandType.GARDEN.isInIsland()
 
+    fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && hasFarmingToolInHand()
+
+    fun hasFarmingToolInHand() = InventoryUtils.getItemInHand()?.let {
+        val crop = it.getCropType()
+        getToolInHand(it, crop) != null
+    } ?: false
+
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
@@ -150,8 +158,13 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    fun MutableList<Any>.addCropIcon(crop: CropType, highlight: Boolean = false) =
-        addItemIcon(crop.icon.copy(), highlight)
+    @Deprecated("use renderable list instead", ReplaceWith(""))
+    fun MutableList<Any>.addCropIcon(
+        crop: CropType,
+        scale: Double = NEUItems.itemFontSize,
+        highlight: Boolean = false,
+    ) =
+        addItemIcon(crop.icon.copy(), highlight, scale = scale)
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
         SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
@@ -176,7 +189,7 @@ object GardenAPI {
     private var lastLocation: LorenzVec? = null
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
+    fun onBlockClick(event: BlockClickEvent) {
         if (!inGarden()) return
 
         val blockState = event.getBlockState
@@ -189,7 +202,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {

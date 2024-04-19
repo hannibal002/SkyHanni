@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.event.bingo;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class BingoCardConfig {
     @Expose
@@ -42,6 +43,7 @@ public class BingoCardConfig {
     public boolean bingoSplashGuide = true;
 
     @Expose
+    @ConfigLink(owner = BingoCardConfig.class, field = "enabled")
     public Position bingoCardPos = new Position(10, 10, false, true);
 
     @Expose

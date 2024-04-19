@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -19,6 +23,51 @@ import java.io.IOException
 
 open class FFGuideGUI : GuiScreen() {
     companion object {
+
+        private var firefoxTrials = 0
+
+        fun open() {
+            if (LorenzUtils.isAprilFoolsDay) {
+                when (firefoxTrials) {
+                    0 -> {
+                        ChatUtils.chat("Are you looking for the FF browser?", prefix = false)
+                    }
+
+                    1 -> {
+                        ChatUtils.chat("Quickly, download Firefox! NOW!", prefix = false)
+                        OSUtils.openBrowser("https://www.mozilla.org/en-US/firefox/new/")
+                    }
+
+                    2 -> {
+                        ChatUtils.chat("Have you tried Firefix from Mozilla already?", prefix = false)
+                    }
+
+                    10 -> {
+                        ChatUtils.chat("Firefox is simply the best!", prefix = false)
+                    }
+
+                    20 -> {
+                        ChatUtils.chat(
+                            "What do you mean with \"farming fortune\"? This is a web browser!",
+                            prefix = false
+                        )
+                    }
+
+                    30 -> {
+                        ChatUtils.chat("What are you still doing here? get Firefox!", prefix = false)
+                    }
+
+                    else -> {
+                        CaptureFarmingGear.captureFarmingGear()
+                        SkyHanniMod.screenToOpen = FFGuideGUI()
+                    }
+                }
+                firefoxTrials++
+            } else {
+                CaptureFarmingGear.captureFarmingGear()
+                SkyHanniMod.screenToOpen = FFGuideGUI()
+            }
+        }
 
         val pages = mutableMapOf<FortuneGuidePage, FFGuidePage>()
 

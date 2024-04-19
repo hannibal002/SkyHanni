@@ -11,15 +11,20 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
@@ -28,6 +33,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -46,7 +52,7 @@ class HideNotClickableItems {
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
     private var hideReason = ""
-    private var reverseColor = false
+    private var showGreenLine = false
 
     private var lastClickTime = 0L
     private var bypassUntil = 0L
@@ -96,19 +102,14 @@ class HideNotClickableItems {
         val chest = guiChest.inventorySlots as ContainerChest
         val chestName = chest.getInventoryName()
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-
-            if (slot.slotNumber == slot.slotIndex) continue
-            if (slot.stack == null) continue
-
-            if (hide(chestName, slot.stack)) {
+        for ((_, stack) in chest.getLowerItems()) {
+            if (hide(chestName, stack)) {
                 val opacity = config.opacity
                 val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
-                slot.stack.background = color.rgb
-            } else if (reverseColor && config.itemsGreenLine) {
+                stack.background = color.rgb
+            } else if (showGreenLine && config.itemsGreenLine) {
                 val color = LorenzColor.GREEN.addOpacity(200)
-                slot.stack.borderLine = color.rgb
+                stack.borderLine = color.rgb
             }
         }
     }
@@ -179,7 +180,7 @@ class HideNotClickableItems {
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
         hideReason = ""
-        reverseColor = false
+        showGreenLine = false
 
         return when {
             hideNpcSell(stack) -> true
@@ -200,16 +201,59 @@ class HideNotClickableItems {
             hideComposter(chestName, stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
             hideRiftTransferChest(chestName, stack) -> true
-            else -> {
-                false
-            }
+            hideFossilExcavator(stack) -> true
+            hideResearchCenter(chestName, stack) -> true
+
+            else -> false
         }
+    }
+
+    private fun hideFossilExcavator(stack: ItemStack): Boolean {
+        if (!FossilExcavatorAPI.inExcavatorMenu) return false
+
+        showGreenLine = true
+
+        val internalName = stack.getInternalNameOrNull() ?: return true
+        if (internalName == FossilExcavatorAPI.scrapItem) {
+            return false
+        }
+
+        val category = stack.getItemCategoryOrNull() ?: return true
+        if (category == ItemCategory.CHISEL) {
+            return false
+        }
+
+        hideReason = "§cNot a chisel or scrap!"
+        return true
+    }
+
+    private fun hideResearchCenter(chestName: String, stack: ItemStack): Boolean {
+        if (chestName != "Research Center") return false
+
+        showGreenLine = true
+
+        val internalName = stack.getInternalNameOrNull() ?: return false
+
+        // TODO add more special named fossils (hypixel why)
+        val list = listOf(
+            "HELIX".asInternalName(),
+        )
+
+        if (internalName in list) {
+            return false
+        }
+        if (internalName.endsWith("_FOSSIL")) {
+            return false
+        }
+
+        hideReason = "§cNot a fossil!"
+        return true
     }
 
     private fun hideRiftTransferChest(chestName: String, stack: ItemStack): Boolean {
         if (chestName != "Rift Transfer Chest") return false
 
-        reverseColor = true
+        showGreenLine = true
         val riftTransferable = stack.isRiftTransferable() ?: return true
         if (riftTransferable) {
             return false
@@ -227,9 +271,9 @@ class HideNotClickableItems {
 
     private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
         if (!RiftAPI.inRift()) return false
-        if (chestName != "Motes Grubber") return false
+        if (chestName != "Motes Grubber" && !ShiftClickNPCSell.inInventory) return false
 
-        reverseColor = true
+        showGreenLine = true
 
         if (stack.motesNpcPrice() != null) return false
 
@@ -240,7 +284,7 @@ class HideNotClickableItems {
     private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
         if (!ComposterOverlay.inInventory) return false
 
-        reverseColor = true
+        showGreenLine = true
 
         val internalName = stack.getInternalName()
         if (internalName == ComposterOverlay.currentOrganicMatterItem) {
@@ -271,13 +315,13 @@ class HideNotClickableItems {
         )
         for (type in list) {
             if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
-                reverseColor = true
+                showGreenLine = true
                 return false
             }
         }
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
-            hideReason = "The SkyBlock Menu cannot be put into the potion bag!"
+            hideReason = "The SkyBlock Menu cannot be put into your equipment!"
             return true
         }
 
@@ -288,7 +332,7 @@ class HideNotClickableItems {
     private fun hideAttributeFusion(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("Attribute Fusion")) return false
 
-        reverseColor = true
+        showGreenLine = true
 
         if (ItemUtils.hasAttributes(stack)) return false
 
@@ -315,7 +359,7 @@ class HideNotClickableItems {
             return true
         }
 
-        reverseColor = true
+        showGreenLine = true
         if (stack.cleanName().endsWith(" Potion") || stack.cleanName() == "Water Bottle") return false
 
         hideReason = "This item is not a potion!"
@@ -330,7 +374,7 @@ class HideNotClickableItems {
             return true
         }
 
-        reverseColor = true
+        showGreenLine = true
         if (stack.getLore().any { it.removeColor() == "Fishing Bait" }) {
             return false
         }
@@ -343,7 +387,7 @@ class HideNotClickableItems {
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
         val name = stack.cleanName()
-        reverseColor = true
+        showGreenLine = true
         if (ItemUtils.isSack(stack)) return false
 
 
@@ -355,7 +399,7 @@ class HideNotClickableItems {
         if (!chestName.startsWith("Accessory Bag") && !chestName.startsWith("Accessory Bag (")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
-        reverseColor = true
+        showGreenLine = true
         if (stack.getLore().any { it.contains("ACCESSORY") || it.contains("HATCESSORY") }) return false
 
         hideReason = "This item is not an accessory!"
@@ -433,9 +477,10 @@ class HideNotClickableItems {
     }
 
     private fun hideNpcSell(stack: ItemStack): Boolean {
+        if (RiftAPI.inRift()) return false
         if (!ShiftClickNPCSell.inInventory) return false
         if (VisitorAPI.inInventory) return false
-        reverseColor = true
+        showGreenLine = true
 
         var name = stack.cleanName()
         val size = stack.stackSize
@@ -483,17 +528,23 @@ class HideNotClickableItems {
 
     private fun hideSalvage(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.equalsOneOf("Salvage Item", "Salvage Items")) return false
-        reverseColor = true
+        showGreenLine = true
 
         if (ItemUtils.isRecombobulated(stack)) {
             hideReason = "This item should not be salvaged! (Recombobulated)"
             return true
         }
+        // TODO replace with rarity check
         for (line in stack.getLore()) {
             if (line.contains("LEGENDARY DUNGEON")) {
                 hideReason = "This item should not be salvaged! (Legendary)"
                 return true
             }
+        }
+
+        if (stack.isMuseumDonated()) {
+            hideReason = "This item cannot be salvaged! (Donated to Museum)"
+            return true
         }
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -518,7 +569,7 @@ class HideNotClickableItems {
         val auctionHouseInventory =
             chestName == "Co-op Auction House" || chestName == "Auction House" || chestName == "Create BIN Auction" || chestName == "Create Auction"
         if (!bazaarInventory && !auctionHouseInventory) return false
-        reverseColor = true
+        showGreenLine = true
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
             if (bazaarInventory) hideReason = "The SkyBlock Menu is not a Bazaar Product!"

@@ -4,24 +4,41 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 object VisitorAPI {
 
     private var visitors = mapOf<String, Visitor>()
     var inInventory = false
+    var lastClickedNpc = 0
     val config get() = GardenAPI.config.visitors
     private val logger = LorenzLogger("garden/visitors/api")
+
+    const val INFO_SLOT = 13
+    const val ACCEPT_SLOT = 29
+    const val REFUSE_SLOT = 33
+
+    val patternGroup = RepoPattern.group("garden.visitor.api")
+    val visitorCountPattern by patternGroup.pattern(
+        "visitor.count",
+        "§b§lVisitors: §r§f\\((?<info>.*)\\)"
+    )
+    private val visitorNamePattern by patternGroup.pattern(
+        "visitor.name",
+        " (?:§.)+(?<name>§.[^§]+).*"
+    )
 
     fun getVisitorsMap() = visitors
     fun getVisitors() = visitors.values
@@ -109,14 +126,16 @@ object VisitorAPI {
         var entityId: Int = -1,
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
-        var inSacks: Boolean = false,
         val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
-
+        var offersAccepted: Int? = null
+        var pricePerCopper: Int? = null
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
+        var blockedLore = listOf<String>()
+        var blockReason: VisitorBlockReason? = null
 
         fun getEntity() = EntityUtils.getEntityByID(entityId)
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
@@ -142,35 +161,54 @@ object VisitorAPI {
     }
 
     fun visitorsInTabList(tabList: List<String>): MutableList<String> {
+        var visitorCount = 0
         var found = false
-        val visitorsInTab = mutableListOf<String>()
-        for (line in tabList) {
-            if (line.startsWith("§b§lVisitors:")) {
-                found = true
-                continue
-            }
-            if (!found) continue
+        var visitorsRemaining = 0
 
-            if (line.isEmpty() || line.contains("Account Info") || line.contains("Next Visitor")) {
+        val visitorsInTab = mutableListOf<String>()
+        loop@ for (line in tabList) {
+            visitorCountPattern.matchMatcher(line) {
+                found = true
+                val countInfo = group("info")
+                if (countInfo.isInt()) {
+                    visitorCount = countInfo.toInt()
+                } else if (countInfo == "§r§c§lQueue Full!§r§f") visitorCount = 5
+
+                visitorsRemaining = visitorCount
+                continue@loop
+            }
+
+            if (!found) continue
+            if (visitorsRemaining <= 0) {
                 found = false
                 continue
             }
-            val name = fromHypixelName(line)
 
-            // Hide hypixel watchdog entries
-            if (name.contains("§c") && !name.contains("Spaceman") && !name.contains("Grandma Wolf")) {
-                logger.log("Ignore wrong red name: '$name'")
-                continue
+            visitorNamePattern.matchMatcher(line) {
+                visitorsInTab.add(group("name").trim())
             }
 
-            // hide own player name
-            if (name.contains(LorenzUtils.getPlayerName())) {
-                logger.log("Ignore wrong own name: '$name'")
-                continue
-            }
-
-            visitorsInTab.add(name)
+            visitorsRemaining--
         }
         return visitorsInTab
+    }
+
+    fun Visitor.blockReason(): VisitorBlockReason? = with(config.rewardWarning) {
+        val pricePerCopper = pricePerCopper ?: error("pricePerCopper is null")
+        return when {
+            preventRefusing && hasReward() != null -> VisitorBlockReason.RARE_REWARD
+            preventRefusingNew && offersAccepted == 0 -> VisitorBlockReason.NEVER_ACCEPTED
+            preventRefusingCopper && pricePerCopper <= coinsPerCopperPrice -> VisitorBlockReason.CHEAP_COPPER
+            preventAcceptingCopper && pricePerCopper > coinsPerCopperPrice -> VisitorBlockReason.EXPENSIVE_COPPER
+
+            else -> null
+        }
+    }
+
+    enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) {
+        NEVER_ACCEPTED("§cNever accepted", true),
+        RARE_REWARD("§aRare visitor reward found", true),
+        CHEAP_COPPER("§aCheap copper", true),
+        EXPENSIVE_COPPER("§cExpensive copper", false)
     }
 }

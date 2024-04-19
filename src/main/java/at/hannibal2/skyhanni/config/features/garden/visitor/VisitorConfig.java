@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.config.features.garden.visitor;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class VisitorConfig {
@@ -78,19 +78,13 @@ public class VisitorConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Colored Name", desc = "Show the visitor name in the color of the rarity.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean coloredName = true;
-
-    @Expose
     @ConfigOption(name = "Hypixel Message", desc = "Hide the chat message from Hypixel that a new visitor has arrived at your garden.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hypixelArrivedMessage = true;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth, Jacob and Spaceman)")
+    @ConfigOption(name = "Hide Chat", desc = "Hide chat messages from the visitors in the garden. (Except Beth and Spaceman)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideChat = true;

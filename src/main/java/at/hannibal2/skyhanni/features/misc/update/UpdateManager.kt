@@ -7,17 +7,21 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import io.github.moulberry.moulconfig.processor.MoulConfigProcessor
+import com.google.gson.JsonElement
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import io.github.moulberry.notenoughupdates.util.ApiUtil
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateSource
 import moe.nea.libautoupdate.UpdateTarget
+import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.CompletableFuture
+import javax.net.ssl.HttpsURLConnection
 
 object UpdateManager {
 
@@ -52,10 +56,6 @@ object UpdateManager {
             checkUpdate()
     }
 
-    fun getCurrentVersion(): String {
-        return SkyHanniMod.version
-    }
-
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
@@ -63,7 +63,7 @@ object UpdateManager {
     }
 
     fun isCurrentlyBeta(): Boolean {
-        return getCurrentVersion().contains("beta", ignoreCase = true)
+        return SkyHanniMod.version.contains("beta", ignoreCase = true)
     }
 
     private val config get() = SkyHanniMod.feature.about
@@ -129,12 +129,34 @@ object UpdateManager {
     private val context = UpdateContext(
         UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
-        CurrentVersion.ofTag(SkyHanniMod.version),
+        object : CurrentVersion {
+            val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)
+            override fun display(): String {
+                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
+                    return "Force Outdated"
+                return normalDelegate.display()
+            }
+
+            override fun isOlderThan(element: JsonElement): Boolean {
+                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
+                    return true
+                return normalDelegate.isOlderThan(element)
+            }
+
+            override fun toString(): String {
+                return "ForceOutdateDelegate($normalDelegate)"
+            }
+        },
         SkyHanniMod.MODID,
     )
 
     init {
         context.cleanup()
+        UpdateUtils.patchConnection {
+            if (it is HttpsURLConnection) {
+                ApiUtil.patchHttpsRequest(it)
+            }
+        }
     }
 
     enum class UpdateState {

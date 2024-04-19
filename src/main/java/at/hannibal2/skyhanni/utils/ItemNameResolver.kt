@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
@@ -22,16 +23,44 @@ object ItemNameResolver {
         resolveEnchantmentByName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it) }
         }
+        if (itemName.endsWith("gemstone", ignoreCase = true)) {
+            val split = lowercase.split(" ")
+            if (split.size == 3) {
+                val gemstoneQuery = "${
+                    when (split[1]) {
+                        "jade", "peridot", "citrine" -> '☘'
+                        "amethyst" -> '❈'
+                        "ruby" -> '❤'
+                        "amber" -> '⸕'
+                        "opal" -> '❂'
+                        "topaz" -> '✧'
+                        "onyx" -> '☠'
+                        "sapphire" -> '✎'
+                        "aquamarine" -> 'α'
+                        "jasper" -> '❁'
+                        else -> ' '
+                    }
+                }_${split.joinToString("_")}".allLettersFirstUppercase()
+                ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, true)?.let {
+                    return itemNameCache.getOrPut(lowercase) { it.asInternalName() }
+                }
+            }
+        }
 
-        val internalName = ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
+        val internalName = when (itemName) {
+            "SUPERBOOM TNT" -> "SUPERBOOM_TNT".asInternalName()
+            else -> {
+                ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
 
-            // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-            // TODO remove workaround when this is fixed in neu
-            val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
-            rawInternalName.asInternalName()
-        } ?: run {
-            getInternalNameOrNullIgnoreCase(itemName)
-        } ?: return null
+                    // This fixes a NEU bug with §9Hay Bale (cosmetic item)
+                    // TODO remove workaround when this is fixed in neu
+                    val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
+                    rawInternalName.asInternalName()
+                } ?: run {
+                    getInternalNameOrNullIgnoreCase(itemName)
+                } ?: return null
+            }
+        }
 
         itemNameCache[lowercase] = internalName
         return internalName

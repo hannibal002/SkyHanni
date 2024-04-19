@@ -17,9 +17,7 @@ class ShyCruxWarnings {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!RiftAPI.inRift() || !config.shyWarning) return
-        if (event.isMod(2)) {
-            checkForShy()
-        }
+        checkForShy()
     }
 
     private fun checkForShy() {

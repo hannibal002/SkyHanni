@@ -53,13 +53,14 @@ format like "- #821" to illustrate the dependency.
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
-    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy)
+  - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-  - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.data.jsonobjects`
+- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+    - Config files should still be made in Java.
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
@@ -70,7 +71,7 @@ format like "- #821" to illustrate the dependency.
 - Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
-- Try to avoid using kotlin's `!!` (catch if not null) feature.
+- Try to avoid using Kotlin's `!!` (catch if not null) feature.
     - Replace it with `?:` (if null return this).
     - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
@@ -81,6 +82,8 @@ format like "- #821" to illustrate the dependency.
 for more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
+- Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
+  the main thread.
 
 ## Software Used in SkyHanni
 
@@ -154,33 +157,17 @@ at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
-## Additional Useful Developement Tools
+## Additional Useful Development Tools
 
 ### DevAuth
 
 [DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
-debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar, put it into the
-`mods` folder, and start the Minecraft launcher manually.
+debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
 
 - The library is already downloaded by Gradle.
-- Create the config folder (Windows only). For other OSes, use the guide from DJtheRedstoner.
-    - Navigate to `C:\Users\<your username>`
-    - Create a new folder `.devauth`
-    - Navigate to `C:\Users\<your username>\.devauth`
-    - Create a new file `config.toml`
-    - Paste this text into the file: (Don't change anything.)
-
-```
-defaultEnabled = true
-
-defaultAccount = "main"
-
-[accounts.main]
-type = "microsoft"
-```
-
+- SkyHanni will automatically set up DevAuth.
 - Start Minecraft inside IntelliJ normally.
-    - Click on the link in the console and verify with a Mojang account.
+    - Click on the link in the console and verify with a Microsoft account.
     - The verification process will reappear every few days (after the session token expires).
 
 ### Hot Swap

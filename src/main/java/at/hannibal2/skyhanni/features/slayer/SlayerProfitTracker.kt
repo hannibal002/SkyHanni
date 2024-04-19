@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -18,8 +19,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonObject
@@ -34,6 +38,14 @@ object SlayerProfitTracker {
     private var itemLogCategory = ""
     private var baseSlayerType = ""
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
+
+    /**
+     * REGEX-TEST: §7Took 1.9k coins from your bank for auto-slayer...
+     */
+    private val autoSlayerBankPattern by RepoPattern.pattern(
+        "slayer.autoslayer.bank.chat",
+        "§7Took (?<coins>.+) coins from your bank for auto-slayer\\.\\.\\."
+    )
 
     class Data : ItemTrackerData() {
 
@@ -71,9 +83,10 @@ object SlayerProfitTracker {
 
     private val ItemTrackerData.TrackedItem.timesDropped get() = timesGained
 
-    private fun addSlayerCosts(price: Int) {
+    private fun addSlayerCosts(price: Double) {
+        require(price < 0) { "slayer costs can not be positve" }
         getTracker()?.modify {
-            it.slayerSpawnCost += price
+            it.slayerSpawnCost += price.toInt()
         }
     }
 
@@ -92,7 +105,15 @@ object SlayerProfitTracker {
             getTracker()?.addCoins(coins.toInt())
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            addSlayerCosts(coins.toInt())
+            addSlayerCosts(coins)
+        }
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+        autoSlayerBankPattern.matchMatcher(event.message) {
+            addSlayerCosts(-group("coins").formatDouble())
         }
     }
 
@@ -108,7 +129,7 @@ object SlayerProfitTracker {
         if (itemLogCategory == "") return null
 
         return trackers.getOrPut(itemLogCategory) {
-            val getStorage: (Storage.ProfileSpecific) -> Data = {
+            val getStorage: (ProfileSpecificStorage) -> Data = {
                 it.slayerProfitData.getOrPut(
                     itemLogCategory
                 ) { Data() }
@@ -146,12 +167,12 @@ object SlayerProfitTracker {
         return internalName in allowedList
     }
 
-    private fun drawDisplay(itemLog: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<List<Any>> {
         val tracker = getTracker() ?: return@buildList
         addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
 
-        var profit = tracker.drawItems(itemLog, { true }, this)
-        val slayerSpawnCost = itemLog.slayerSpawnCost
+        var profit = tracker.drawItems(data, { true }, this)
+        val slayerSpawnCost = data.slayerSpawnCost
         if (slayerSpawnCost != 0L) {
             val mobKillCoinsFormat = NumberUtil.format(slayerSpawnCost)
             addAsSingletonList(
@@ -163,7 +184,7 @@ object SlayerProfitTracker {
             profit += slayerSpawnCost
         }
 
-        val slayerCompletedCount = itemLog.slayerCompletedCount
+        val slayerCompletedCount = data.slayerCompletedCount
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Bosses killed: §e${slayerCompletedCount.addSeparators()}",
@@ -171,7 +192,7 @@ object SlayerProfitTracker {
             )
         )
 
-        addAsSingletonList(tracker.addTotalProfit(profit, itemLog.slayerCompletedCount, "boss"))
+        addAsSingletonList(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
 
         tracker.addPriceFromButton(this)
     }

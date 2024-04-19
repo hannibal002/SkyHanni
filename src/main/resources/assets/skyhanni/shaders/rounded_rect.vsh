@@ -1,6 +1,6 @@
-#version 130
+#version 120
 
-out vec4 color;
+varying vec4 color;
 
 void main() {
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;

@@ -10,9 +10,10 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorListJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,12 +23,15 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
 object AdvancedPlayerList {
 
-    private val config get() = SkyHanniMod.feature.misc.compactTabList.advancedPlayerList
+    val tabPlayerData = mutableMapOf<String, PlayerData>()
+
+    private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",
@@ -42,7 +46,7 @@ object AdvancedPlayerList {
 
     fun newSorting(original: List<String>): List<String> {
         if (LorenzUtils.inKuudraFight) return original
-        if (LorenzUtils.inDungeons) return original
+        if (DungeonAPI.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
         val newList = mutableListOf<String>()
@@ -56,57 +60,33 @@ object AdvancedPlayerList {
             i++
             if (i == 1) continue
             if (line.isEmpty() || line.contains("Server Info")) break
+            if (line == "               §r§3§lInfo") break
             if (line.contains("§r§a§lPlayers")) {
                 extraTitles++
                 continue
             }
-            levelPattern.matchMatcher(line) {
+            val playerData: PlayerData? = levelPattern.matchMatcher(line) {
                 val levelText = group("level")
                 val removeColor = levelText.removeColor()
                 try {
-                    val playerData = PlayerData(removeColor.toInt())
-                    currentData[line] = playerData
-
-                    var index = 0
-                    val fullName = group("name")
-                    if (fullName.contains("[")) index++
-                    val name = fullName.split(" ")
-                    val coloredName = name[index]
-                    if (index == 1) {
-                        playerData.coloredName = name[0] + " " + coloredName
-                    } else {
-                        playerData.coloredName = coloredName
-                    }
-                    playerData.name = coloredName.removeColor()
-                    playerData.levelText = levelText
-                    index++
-                    if (name.size > index) {
-                        var nameSuffix = name.drop(index).joinToString(" ")
-                        if (nameSuffix.contains("♲")) {
-                            playerData.ironman = true
-                        } else {
-                            playerData.bingoLevel = BingoAPI.getRank(line)
-                        }
-                        if (IslandType.CRIMSON_ISLE.isInIsland()) {
-                            playerData.faction = if (line.contains("§c⚒")) {
-                                nameSuffix = nameSuffix.replace("§c⚒", "")
-                                CrimsonIsleFaction.BARBARIAN
-                            } else if (line.contains("§5ቾ")) {
-                                nameSuffix = nameSuffix.replace("§5ቾ", "")
-                                CrimsonIsleFaction.MAGE
-                            } else {
-                                CrimsonIsleFaction.NONE
-                            }
-                        }
-                        playerData.nameSuffix = nameSuffix
-                    } else {
-                        playerData.nameSuffix = ""
-                    }
+                    val sbLevel = removeColor.toInt()
+                    readPlayerData(sbLevel, levelText, line)
                 } catch (e: NumberFormatException) {
-                    val message = "Special user (youtube or admin?): '$line'"
-                    ChatUtils.debug(message)
-                    println(message)
+                    ErrorManager.logErrorWithData(
+                        e, "Advanced Player List failed to parse user name",
+                        "line" to line,
+                        "i" to i,
+                        "original" to original,
+                    )
+                    null
                 }
+            }
+            playerData?.let {
+                val name = it.name
+                if (name != "?") {
+                    tabPlayerData[name] = it
+                }
+                currentData[line] = it
             }
         }
         playerDatas = currentData
@@ -151,6 +131,50 @@ object AdvancedPlayerList {
         return newList
     }
 
+    private fun Matcher.readPlayerData(
+        sbLevel: Int,
+        levelText: String,
+        line: String,
+    ): PlayerData {
+        val playerData = PlayerData(sbLevel)
+        var index = 0
+        val fullName = group("name")
+        if (fullName.contains("[")) index++
+        val name = fullName.split(" ")
+        val coloredName = name[index]
+        if (index == 1) {
+            playerData.coloredName = name[0] + " " + coloredName
+        } else {
+            playerData.coloredName = coloredName
+        }
+        playerData.name = coloredName.removeColor()
+        playerData.levelText = levelText
+        index++
+        if (name.size > index) {
+            var nameSuffix = name.drop(index).joinToString(" ")
+            if (nameSuffix.contains("♲")) {
+                playerData.ironman = true
+            } else {
+                playerData.bingoLevel = BingoAPI.getRank(line)
+            }
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
+                playerData.faction = if (line.contains("§c⚒")) {
+                    nameSuffix = nameSuffix.replace("§c⚒", "")
+                    CrimsonIsleFaction.BARBARIAN
+                } else if (line.contains("§5ቾ")) {
+                    nameSuffix = nameSuffix.replace("§5ቾ", "")
+                    CrimsonIsleFaction.MAGE
+                } else {
+                    CrimsonIsleFaction.NONE
+                }
+            }
+            playerData.nameSuffix = nameSuffix
+        } else {
+            playerData.nameSuffix = ""
+        }
+        return playerData
+    }
+
     fun ignoreCustomTabList(): Boolean {
         val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
         return denyKeyPressed || !SkyHanniDebugsAndTests.globalRender
@@ -164,6 +188,7 @@ object AdvancedPlayerList {
     }
 
     private fun createCustomName(data: PlayerData): String {
+
         val playerName = if (config.useLevelColorForName) {
             val c = data.levelText[3]
             "§$c" + data.name
@@ -174,14 +199,14 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let { getBingoIcon(it) } ?: ""
+            if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(it) } ?: ""
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
             val score = socialScore(data.name)
             suffix += " " + getSocialScoreIcon(score)
         }
-        if (config.markSkyHanniContributors && data.name in contributors) {
+        if (config.markSkyHanniDevs && data.name in contributors) {
             suffix += "§c:O"
         }
 
@@ -217,21 +242,12 @@ object AdvancedPlayerList {
     private fun getSocialScoreIcon(score: Int) = when (score) {
 //        10 -> "§c§lME"
         10 -> ""
-        8 -> "${SkyHanniMod.feature.markedPlayers.chatColor.getChatColor()}§lMARKED"
+        8 -> "${MarkedPlayerManager.config.chatColor.getChatColor()}§lMARKED"
         5 -> "§9§lP"
         4 -> "§d§lF"
         3 -> "§2§lG"
 
         else -> ""
-    }
-
-    private fun getBingoIcon(rank: Int): String {
-        val rankIcon = BingoAPI.getIcon(rank) ?: ""
-        return if (config.showBingoRankNumber && rank != -1) {
-            "$rankIcon $rank"
-        } else {
-            rankIcon
-        }
     }
 
     class PlayerData(val sbLevel: Int) {

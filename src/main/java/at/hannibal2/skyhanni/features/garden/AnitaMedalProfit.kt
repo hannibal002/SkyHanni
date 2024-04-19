@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -18,15 +18,16 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
 
     private val config get() = GardenAPI.config.anitaShop
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
 
     companion object {
 
@@ -55,10 +56,10 @@ class AnitaMedalProfit {
 
         inInventory = true
 
-        val table = mutableMapOf<Pair<String, String>, Pair<Double, NEUInternalName>>()
-        for ((_, item) in event.inventoryItems) {
+        val table = mutableListOf<DisplayTableEntry>()
+        for ((slot, item) in event.inventoryItems) {
             try {
-                readItem(item, table)
+                readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
                     e, "Error in AnitaMedalProfit while reading item '${item.itemName}'",
@@ -69,13 +70,13 @@ class AnitaMedalProfit {
             }
         }
 
-        val newList = mutableListOf<List<Any>>()
-        newList.addAsSingletonList("§eMedal Profit")
-        LorenzUtils.fillTable(newList, table)
+        val newList = mutableListOf<Renderable>()
+        newList.add(Renderable.string("§eMedal Profit"))
+        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
 
-    private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
+    private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item) ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
@@ -96,9 +97,27 @@ class AnitaMedalProfit {
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost
-        val format = NumberUtil.format(profit)
+        val profitFormat = NumberUtil.format(profit)
         val color = if (profit > 0) "§6" else "§c"
-        table[Pair(itemName, "$color$format")] = Pair(profit, internalName)
+
+        val hover = listOf(
+            itemName,
+            "",
+            "§7Item price: §6${NumberUtil.format(itemPrice)} ",
+            // TODO add more exact material cost breakdown
+            "§7Material cost: §6${NumberUtil.format(fullCost)} ",
+            "§7Final profit: §6${profitFormat} ",
+        )
+        table.add(
+            DisplayTableEntry(
+                itemName,
+                "$color$profitFormat",
+                profit,
+                internalName,
+                hover,
+                highlightsOnHoverSlots = listOf(slot)
+            )
+        )
     }
 
     private fun getItemName(item: ItemStack): String? {
@@ -157,10 +176,9 @@ class AnitaMedalProfit {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
-            config.medalProfitPos.renderStringsAndItems(
+            config.medalProfitPos.renderRenderables(
                 display,
                 extraSpace = 5,
-                itemScale = 1.7,
                 posLabel = "Anita Medal Profit"
             )
         }

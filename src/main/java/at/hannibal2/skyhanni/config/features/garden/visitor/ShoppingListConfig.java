@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden.visitor;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ShoppingListConfig {
     @Expose
@@ -16,6 +17,7 @@ public class ShoppingListConfig {
 
     @Expose
     // TODO renmae "postion"
+    @ConfigLink(owner = ShoppingListConfig.class, field = "display")
     public Position pos = new Position(180, 170, false, true);
 
     @Expose
@@ -45,6 +47,12 @@ public class ShoppingListConfig {
         "§eOnly updates on sack change messages.")
     @ConfigEditorBoolean
     public boolean showSackCount = true;
+
+    @Expose
+    @ConfigOption(name = "Show Super Craft", desc = "Show super craft button if there are enough materials to make in the sack.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showSuperCraft = false;
 
     @Expose
     @ConfigOption(name = "Item Preview", desc = "Show the base type for the required items next to new visitors. §cNote that some visitors may require any crop.")

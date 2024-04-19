@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -74,25 +75,6 @@ object ItemUtils {
             list.add(player.inventory.itemStack)
         }
         return list
-    }
-
-    fun getItemsInInventoryWithSlots(withCursorItem: Boolean = false): Map<ItemStack, Int> {
-        val map: LinkedHashMap<ItemStack, Int> = LinkedHashMap()
-        val player = Minecraft.getMinecraft().thePlayer
-        if (player == null) {
-            ChatUtils.error("getItemsInInventoryWithSlots: player is null!")
-            return map
-        }
-        for (slot in player.openContainer.inventorySlots) {
-            if (slot.hasStack) {
-                map[slot.stack] = slot.slotNumber
-            }
-        }
-
-        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-            map[player.inventory.itemStack] = -1
-        }
-        return map
     }
 
     fun hasAttributes(stack: ItemStack): Boolean {
@@ -306,19 +288,15 @@ object ItemUtils {
             setStackDisplayName(value)
         }
 
-    @Deprecated("outdated", ReplaceWith("this.itemName"))
-    val ItemStack.nameWithEnchantment: String?
-        get() = itemName
-
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
         // This workaround fixes 'Tubto Cacti I Book'
-        val input = if (originalInput.endsWith(" Book")) {
+        val input = (if (originalInput.endsWith(" Book")) {
             originalInput.replace(" Book", "")
-        } else originalInput
+        } else originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
@@ -336,9 +314,6 @@ object ItemUtils {
         string = string.substring(2)
         val matcher = UtilsPatterns.readAmountAfterPattern.matcher(string)
         if (!matcher.matches()) {
-            println("")
-            println("input: '$input'")
-            println("string: '$string'")
             return null
         }
 
@@ -395,6 +370,9 @@ object ItemUtils {
         if (this == NEUInternalName.NONE) {
             error("NEUInternalName.NONE has no name!")
         }
+        if (NEUItems.ignoreItemsFilter.match(this.asString())) {
+            return "§cBugged Item"
+        }
 
         val itemStack = getItemStackOrNull()
         val name = itemStack?.name ?: error("Could not find item name for $this")
@@ -402,6 +380,9 @@ object ItemUtils {
         // show enchanted book name
         if (name.endsWith("Enchanted Book")) {
             return itemStack.getLore()[0]
+        }
+        if (name.endsWith("Enchanted Book Bundle")) {
+            return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
         }
 
         // hide pet level
