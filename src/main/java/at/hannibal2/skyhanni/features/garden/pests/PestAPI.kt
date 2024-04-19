@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -31,12 +33,18 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 object PestAPI {
 
     val config get() = GardenAPI.config.pests
+    val storage get() = GardenAPI.storage
 
-    var scoreboardPests = 0
+    var scoreboardPests: Int
+        get() = storage?.scoreboardPests ?: 0
+        set(value) {
+            storage?.scoreboardPests = value
+        }
 
     var lastPestKillTime = SimpleTimeMark.farPast()
 
@@ -108,6 +116,9 @@ object PestAPI {
         "§cThere are not any Pests on your Garden right now! Keep farming!"
     )
 
+    var gardenJoinTime = SimpleTimeMark.farPast()
+    var firstScoreboardCheck = false
+
     private fun fixPests(loop: Int = 2) {
         val accurateAmount = getPlotsWithAccuratePests().sumOf { it.pests }
         val inaccurateAmount = getPlotsWithInaccuratePests().size
@@ -117,10 +128,10 @@ object PestAPI {
                 plot.isPestCountInaccurate = false
             }
         } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
-            val plot = getPlotsWithInaccuratePests().firstOrNull()
-            plot?.pests = scoreboardPests - accurateAmount
-            plot?.isPestCountInaccurate = false
-        } else if (accurateAmount + inaccurateAmount > scoreboardPests) {
+            val plot = getPlotsWithInaccuratePests().firstOrNull() ?: return
+            plot.pests = scoreboardPests - accurateAmount
+            plot.isPestCountInaccurate = false
+        } else if (accurateAmount + inaccurateAmount > scoreboardPests) { // when logic fails and we reach impossible pest counts
             sendPestError(true)
             getInfestedPlots().forEach {
                 it.pests = 0
@@ -132,6 +143,7 @@ object PestAPI {
     }
 
     private fun updatePests() {
+        if (!firstScoreboardCheck) return
         fixPests()
         PestUpdateEvent().postAndCatch()
     }
@@ -154,6 +166,7 @@ object PestAPI {
                 plot.isPestCountInaccurate = false
             }
         }
+        if (!event.unknownAmount) scoreboardPests += event.amountPests
         updatePests()
     }
 
@@ -177,14 +190,10 @@ object PestAPI {
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        var previousLine = ""
         for (line in event.tabList) {
             infectedPlotsTablistPattern.matchMatcher(line) {
-                if (previousLine == line) return
-                val plotList = mutableListOf<Int>()
-                group("plots").removeColor().split(", ").toMutableList().forEach {
-                    plotList.add(it.toInt())
-                }
+                val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
+                if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
 
                 GardenPlotAPI.plots.forEach {
                     if (plotList.contains(it.id)) {
@@ -196,7 +205,6 @@ object PestAPI {
                         it.isPestCountInaccurate = false
                     }
                 }
-                previousLine = line
                 updatePests()
             }
         }
@@ -205,47 +213,8 @@ object PestAPI {
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
         if (!GardenAPI.inGarden()) return
-
-        for (line in event.newList) {
-            // gets the total amount of pests in the garden
-            pestsInScoreboardPattern.matchMatcher(line) {
-                val newPests = group("pests").formatInt()
-                if (newPests != scoreboardPests) {
-                    scoreboardPests = newPests
-                    updatePests()
-                }
-            }
-
-            // gets if there are no pests remaining in the garden
-            noPestsInScoreboardPattern.matchMatcher(line) {
-                if (scoreboardPests != 0) {
-                    resetAllPests()
-                }
-            }
-
-            // gets the amount of pests in the current plot
-            pestsInPlotScoreboardPattern.matchMatcher(line) {
-                val plotName = group("plot")
-                val pestsInPlot = group("pests").toInt()
-                val plot = GardenPlotAPI.getPlotByName(plotName)
-                if (pestsInPlot != plot?.pests || plot.isPestCountInaccurate) {
-                    plot?.pests = pestsInPlot
-                    plot?.isPestCountInaccurate = false
-                    updatePests()
-                }
-            }
-
-            // gets if there are no pests remaining in the current plot
-            noPestsInPlotScoreboardPattern.matchMatcher(line) {
-                val plotName = group("plot")
-                val plot = GardenPlotAPI.getPlotByName(plotName)
-                if (plot?.pests != 0 || plot.isPestCountInaccurate) {
-                    GardenPlotAPI.getPlotByName(plotName)?.pests = 0
-                    GardenPlotAPI.getPlotByName(plotName)?.isPestCountInaccurate = false
-                    updatePests()
-                }
-            }
-        }
+        if (!firstScoreboardCheck) return
+        checkScoreboardLines(event.newList)
     }
 
     @SubscribeEvent
@@ -261,8 +230,20 @@ object PestAPI {
     }
 
     @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (!firstScoreboardCheck && gardenJoinTime.passedSince() > 5.seconds) {
+            checkScoreboardLines(ScoreboardData.sidebarLinesFormatted)
+            firstScoreboardCheck = true
+            updatePests()
+        }
+    }
+
+    @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastPestKillTime = SimpleTimeMark.farPast()
+        gardenJoinTime = SimpleTimeMark.now()
+        firstScoreboardCheck = false
     }
 
     private fun getPlotsWithAccuratePests() = GardenPlotAPI.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
@@ -309,6 +290,50 @@ object PestAPI {
             "plots" to getInfestedPlots().map { "id: ${it.id} pests: ${it.pests} isInaccurate: ${it.isPestCountInaccurate}" },
             noStackTrace = true, betaOnly = betaOnly
         )
+    }
+
+    private fun checkScoreboardLines(list: List<String>) {
+        for (line in list) {
+            // gets if there are no pests remaining in the garden
+            noPestsInScoreboardPattern.matchMatcher(line) {
+                if (scoreboardPests != 0 || getInfestedPlots().isNotEmpty()) {
+                    resetAllPests()
+                }
+                return
+            }
+
+            // gets the total amount of pests in the garden
+            pestsInScoreboardPattern.matchMatcher(line) {
+                val newPests = group("pests").formatInt()
+                if (newPests != scoreboardPests) {
+                    scoreboardPests = newPests
+                    updatePests()
+                }
+            }
+
+            // gets the amount of pests in the current plot
+            pestsInPlotScoreboardPattern.matchMatcher(line) {
+                val plotName = group("plot")
+                val pestsInPlot = group("pests").toInt()
+                val plot = GardenPlotAPI.getPlotByName(plotName) ?: return
+                if (pestsInPlot != plot.pests || plot.isPestCountInaccurate) {
+                    plot.pests = pestsInPlot
+                    plot.isPestCountInaccurate = false
+                    updatePests()
+                }
+            }
+
+            // gets if there are no pests remaining in the current plot
+            noPestsInPlotScoreboardPattern.matchMatcher(line) {
+                val plotName = group("plot")
+                val plot = GardenPlotAPI.getPlotByName(plotName) ?: return
+                if (plot.pests != 0 || plot.isPestCountInaccurate) {
+                    plot.pests = 0
+                    plot.isPestCountInaccurate = false
+                    updatePests()
+                }
+            }
+        }
     }
 
     @SubscribeEvent

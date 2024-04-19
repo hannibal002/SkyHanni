@@ -40,7 +40,7 @@ class BingoCardReader {
     )
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.enabled) return
         if (event.inventoryName != "Bingo Card") return
 

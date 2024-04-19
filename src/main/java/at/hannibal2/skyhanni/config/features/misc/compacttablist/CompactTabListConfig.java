@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.config.features.misc.compacttablist;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CompactTabListConfig {
     @Expose
@@ -13,7 +14,7 @@ public class CompactTabListConfig {
     //made tablist one word here so both searches will pick it up
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(

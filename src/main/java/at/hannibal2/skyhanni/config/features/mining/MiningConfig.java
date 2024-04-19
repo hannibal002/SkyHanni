@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MiningConfig {
 
@@ -24,14 +24,28 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
-    @ConfigOption(name = "Deep Caverns Parkour", desc = "")
+    @ConfigOption(name = "Deep Caverns Guide", desc = "")
     @Accordion
-    public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
+    public DeepCavernsGuideConfig deepCavernsGuide = new DeepCavernsGuideConfig();
 
     @Expose
     @ConfigOption(name = "Area Walls", desc = "")
     @Accordion
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
+
+    @Expose
+    @ConfigOption(name = "Cold Overlay", desc = "")
+    @Accordion
+    public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
+
+    @Expose
+    @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features")
+    public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
+
+    @Expose
+    @ConfigOption(name = "Notifications", desc = "")
+    @Accordion
+    public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
@@ -50,4 +64,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean privateIslandNoPickaxeAbility = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlights golden goblins you have spawned in green.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightYourGoldenGoblin = true;
 }

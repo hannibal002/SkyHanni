@@ -31,6 +31,7 @@ class Translator {
         if (!isEnabled()) return
 
         val message = event.message
+        // TODO use PlayerAllChatEvent and other player chat events
         if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }

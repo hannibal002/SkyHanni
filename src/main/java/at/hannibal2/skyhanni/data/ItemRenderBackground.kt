@@ -2,47 +2,42 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.RenderRealOverlayEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 class ItemRenderBackground {
 
     companion object {
 
-        private val backgroundColor = mutableMapOf<ItemStack, Int>()
-        private val backgroundTime = mutableMapOf<ItemStack, Long>()
-        private val borderLineColor = mutableMapOf<ItemStack, Int>()
-        private val borderTime = mutableMapOf<ItemStack, Long>()
+        private val backgroundColour = TimeLimitedCache<ItemStack, Int>(60.milliseconds)
+        private val borderLineColour = TimeLimitedCache<ItemStack, Int>(60.milliseconds)
 
         var ItemStack.background: Int
             get() {
-                if (System.currentTimeMillis() > backgroundTime.getOrDefault(this, 0) + 60) return -1
-                return backgroundColor.getOrDefault(this, -1)
+                return backgroundColour.getOrNull(this) ?: -1
             }
             set(value) {
-                backgroundColor[this] = value
-                backgroundTime[this] = System.currentTimeMillis()
+                backgroundColour.put(this, value)
             }
 
         var ItemStack.borderLine: Int
             get() {
-                if (System.currentTimeMillis() > borderTime.getOrDefault(this, 0) + 60) return -1
-                return borderLineColor.getOrDefault(this, -1)
+                return borderLineColour.getOrNull(this) ?: -1
             }
             set(value) {
-                borderLineColor[this] = value
-                borderTime[this] = System.currentTimeMillis()
+                borderLineColour.put(this, value)
             }
     }
 
     @SubscribeEvent
-    fun renderOverlayLol(event: RenderRealOverlayEvent) {
-        val stack = event.stack
+    fun onRenderRealOverlay(event: RenderRealOverlayEvent) {
+        val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock) return
-        if (stack == null) return
 
         val backgroundColor = stack.background
         if (backgroundColor != -1) {
