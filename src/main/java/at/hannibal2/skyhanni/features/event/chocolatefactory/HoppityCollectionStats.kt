@@ -165,7 +165,7 @@ class HoppityCollectionStats {
         val duplicates: Int
     )
 
-    // todo in future make the amount and multiplier work with mythic rabbits
+    // todo in future make the amount and multiplier work with mythic rabbits (can't until I have some)
     private enum class RabbitCollectionRarity(
         val displayName: String,
         val chocolatePerSecond: Int,

@@ -81,7 +81,6 @@ object HoppityEggsManager {
 
     fun shareWaypointPrompt() {
         if (!config.sharedWaypoints) return
-        val currentLocation = LocationUtils.playerLocation()
         val meal = lastMeal ?: return
         lastMeal = null
 
