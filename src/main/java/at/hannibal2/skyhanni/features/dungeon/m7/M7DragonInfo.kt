@@ -85,17 +85,17 @@ enum class M7DragonLocation(
     FLAME(
         AxisAlignedBB(82.0, 15.0, 88.0, 53.0, 22.0, 59.0),
         AxisAlignedBB(70.0, 8.0, 47.0, 102.0, 28.0, 77.0),
-        LorenzVec(85.0, 14.0, 56.0),
+        LorenzVec(83.0, 15.0, 56.0),
     ),
     APEX(
         AxisAlignedBB(24.0, 15.0, 30.0, 91.0, 22.0, 97.0),
         AxisAlignedBB(7.0, 8.0, 80.0, 37.0, 28.0, 110.0),
-        LorenzVec(27.0, 14.0, 94.0)
+        LorenzVec(26.0, 15.0, 92.0)
     ),
     ICE(
         AxisAlignedBB(82.0, 15.0, 88.0, 91.0, 22.0, 97.0),
         AxisAlignedBB(71.5, 16.0, 82.5, 96.5, 26.0, 107.5),
-        LorenzVec(84.0, 14.0, 94.0)
+        LorenzVec(83.0, 14.0, 94.0)
     ),
     SOUL(
         AxisAlignedBB(53.0, 15.0, 59.0, 122.0, 22.0, 128.0),
