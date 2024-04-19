@@ -167,11 +167,9 @@ object GetFromSackAPI {
         }
 
         var amountString = args.last()
+        amountString = Calculator.calculate(amountString).toString()
 
-        if (!amountString.isInt()) {
-            amountString =  Calculator.calculate(amountString).toString()
-            if(!amountString.isInt()) return CommandResult.WRONG_AMOUNT to null
-        }
+        if (!amountString.isInt()) return CommandResult.WRONG_AMOUNT to null
 
         val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
 
