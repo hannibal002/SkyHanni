@@ -247,7 +247,6 @@ object ChocolateFactoryAPI {
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
         }
-        return null
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
