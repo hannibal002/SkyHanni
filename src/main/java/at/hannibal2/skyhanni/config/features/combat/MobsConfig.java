@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.combat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MobsConfig {
     @Expose
@@ -29,6 +29,12 @@ public class MobsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean zealotBruiserHighlighter = false;
+
+    @Expose
+    @ConfigOption(name = "Zealot with Chest", desc = "Highlight Zealots holding a Chest in a different color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean chestZealotHighlighter = false;
 
     @Expose
     @ConfigOption(

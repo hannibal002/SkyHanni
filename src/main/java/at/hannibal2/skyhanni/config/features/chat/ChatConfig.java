@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -22,18 +22,15 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
+    // TODO move into own sub category
     public FilterTypesConfig filterType = new FilterTypesConfig();
 
 
     @Expose
     @ConfigOption(name = "Player Messages", desc = "")
     @Accordion
+    // TODO move into own sub category
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
-
-    @Expose
-    @ConfigOption(name = "Player Chat Symbols", desc = "")
-    @Accordion
-    public ChatSymbols chatSymbols = new ChatSymbols();
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
@@ -111,8 +108,8 @@ public class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Translator",
-        desc = "Click on a message to translate it into English. " +
-            "Use §e/shcopytranslation§7 to get the translation from English. " +
+        desc = "Click on a message to translate it to English. " +
+            "Use §e/shcopytranslation§7 to translate from English. " +
             "§cTranslation is not guaranteed to be 100% accurate."
     )
     @ConfigEditorBoolean

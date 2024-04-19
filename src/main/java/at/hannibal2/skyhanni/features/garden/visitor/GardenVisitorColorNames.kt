@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -24,8 +23,6 @@ object GardenVisitorColorNames {
     }
 
     fun getColoredName(name: String): String {
-        if (!GardenAPI.config.visitors.coloredName) return name
-
         val cleanName = name.removeColor()
         val color = visitorColours[cleanName] ?: return name
         return color + cleanName

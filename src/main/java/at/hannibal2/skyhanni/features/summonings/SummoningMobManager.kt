@@ -180,7 +180,9 @@ class SummoningMobManager {
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
 
-        event.isCanceled = entity in summoningMobNametags
+        if (entity in summoningMobNametags) {
+            event.cancel()
+        }
     }
 
     @SubscribeEvent

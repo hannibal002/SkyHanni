@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.minion
 
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -30,9 +30,8 @@ class MinionCollectLogic {
         return map
     }
 
-    // hypixel opens a new inventory after clicking on an item in minion inventory, InventoryCloseEvent isn't usable here
     @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         closeMinion()
     }
 

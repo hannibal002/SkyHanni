@@ -18,6 +18,10 @@ object ScoreboardPattern {
         "heat",
         "^Heat: (?<heat>.*)$"
     ) // this line is weird (either text or number), ill leave it as is; it even has different colors?
+    val coldPattern by mainSb.pattern(
+        "cold",
+        "^(?:§.)*Cold: §.(?<cold>-?\\d+)❄$"
+    )
     val copperPattern by mainSb.pattern(
         "copper",
         "^(§.)*Copper: (§.)*(?<copper>[\\d,]+).*$"
@@ -79,7 +83,7 @@ object ScoreboardPattern {
     )
     val instanceShutdownPattern by multiUseSb.pattern(
         "instanceshutdown",
-        "(§.)*Instance Shutdown: (§.)*(?<time>(\\w+[ydhms] ?)+)$"
+        "(§.)*Instance Shutdown In: (§.)*(?<time>(\\w+[ydhms] ?)+)$"
     )
     val timeLeftPattern by multiUseSb.pattern(
         "timeleft",
@@ -110,7 +114,7 @@ object ScoreboardPattern {
     )
     val floor3GuardiansPattern by dungeonSb.pattern(
         "floor3guardians",
-        "^§. - §.(Healthy|Reinforced|Laser|Chaos)§a ([\\w,.]?)+§c❤$"
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c❤)?"
     )
 
     // kuudra
@@ -140,11 +144,11 @@ object ScoreboardPattern {
     )
     val cleanUpPattern by farmingSb.pattern(
         "cleanup",
-        "^\\s*(§.)*Cleanup(§.)*: (§.)*[\\d,.]+%$"
+        "^\\s*(§.)*Cleanup(§.)*: (§.)*[\\d,.]*%?$"
     )
     val pastingPattern by farmingSb.pattern(
         "pasting",
-        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,.]+%$"
+        "^\\s*§f(Barn )?Pasting§7: (§.)*[\\d,.]+%?$"
     )
     val peltsPattern by farmingSb.pattern(
         "pelts",
@@ -167,7 +171,7 @@ object ScoreboardPattern {
     private val miningSb = scoreboardGroup.group("mining")
     val powderPattern by miningSb.pattern(
         "powder",
-        "(§.)*᠅ §f(Gemstone|Mithril)( Powder)?(§.)*:?.*$"
+        "(§.)*᠅ §.(Gemstone|Mithril|Glacite)( Powder)?(§.)*:?.*$"
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",
@@ -223,6 +227,14 @@ object ScoreboardPattern {
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$"
     )
+    val mineshaftNotStartedPattern by miningSb.pattern(
+        "mineshaft.notstarted",
+        "(?:§.)*Not started.*"
+    )
+    val fortunateFreezingBonusPattern by miningSb.pattern(
+        "fortunatefreezing.bonus",
+        "Event Bonus: §6\\+\\d+☘"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
@@ -248,7 +260,7 @@ object ScoreboardPattern {
     )
     val reformingPattern by combatSb.pattern(
         "magmareforming",
-        "^§cThe boss is reforming!$"
+        "^§cThe boss is (?:re)?forming!$"
     )
     val bossHealthPattern by combatSb.pattern(
         "magmabosshealth",
@@ -279,11 +291,11 @@ object ScoreboardPattern {
     private val miscSb = scoreboardGroup.group("misc")
     val essencePattern by miscSb.pattern(
         "essence",
-        "^\\s*(.*)?Essence: §.(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$"
+        "^\\s*.*Essence: §.(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$"
     )
     val brokenRedstonePattern by miscSb.pattern(
         "brokenredstone",
-        "\\s*e: §e§b\\d{1,3}%$"
+        "\\s*(?:(?:§.)*⚡ (§.)*Redston|e: (?:§.)*\\d+%)\\s*"
     )
     val redstonePattern by miscSb.pattern(
         "redstone",
@@ -307,7 +319,7 @@ object ScoreboardPattern {
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
-        "^(§.)*Points: (§.)*[\\w.]+( §7\\(§.*§7\\))?$"
+        "^(§.)*Points: (§.)*[\\w.]+ ?(§7\\(§.*§7\\))?\$"
     )
     val dojoTimePattern by miscSb.pattern(
         "dojotime",
@@ -316,6 +328,14 @@ object ScoreboardPattern {
     val objectivePattern by miscSb.pattern(
         "objective",
         "^(§.)*(Objective|Quest).*"
+    )
+    val queuePattern by miscSb.pattern(
+        "queued",
+        "Queued:.*"
+    )
+    val queuePositionPattern by miscSb.pattern(
+        "queueposition",
+        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
@@ -327,7 +347,7 @@ object ScoreboardPattern {
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern(
         "wtfarethoselines",
-        "^§eMine 10 Rubies$"
+        "^(§eMine 10 Rubies|§eKill 100 Automatons)$"
     )
     val darkAuctionCurrentItemPattern by miscSb.pattern(
         "darkauction.currentitem",
@@ -379,7 +399,18 @@ object ScoreboardPattern {
         "dimension",
         "^\\s*§fRift Dimension$"
     )
-
+    val riftHotdogTitlePattern by riftSb.pattern(
+        "hotdogtitle",
+        "^§6Hot Dog Contest$"
+    )
+    val riftHotdogEatenPattern by riftSb.pattern(
+        "hotdogeaten",
+        "^Eaten: §.\\d+\\/\\d+$"
+    )
+    val riftAveikxPattern by riftSb.pattern(
+        "aveikx",
+        "Time spent sitting|with Ävaeìkx: .*"
+    )
 
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
@@ -393,11 +424,15 @@ object ScoreboardPattern {
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
-        "^\\s*Mithril Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
+        "^\\s*Mithril(?: Powder)?: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
     )
     val gemstonePowderPattern by tablistGroup.pattern(
         "gemstonepowder",
-        "^\\s*Gemstone Powder: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
+        "^\\s*Gemstone(?: Powder)?: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
+    )
+    val glacitePowderPattern by tablistGroup.pattern(
+        "glacitepowder",
+        "^\\s*Glacite(?: Powder)?: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",
