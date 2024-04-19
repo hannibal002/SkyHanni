@@ -14,6 +14,9 @@ object HoppityEggsShared {
 
     private val config get() = ChocolateFactoryAPI.config.hoppityEggs
 
+    /**
+     * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453
+     */
     private val sharedEggPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.shared",
         ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)"
@@ -24,9 +27,7 @@ object HoppityEggsShared {
         if (!isEnabled()) return
 
         sharedEggPattern.matchMatcher(event.message.removeColor()) {
-            val x = group("x").formatInt()
-            val y = group("y").formatInt()
-            val z = group("z").formatInt()
+            val (x, y, z) = listOf(group("x"), group("y"), group("z")).map { it.formatInt() }
             val eggLocation = LorenzVec(x, y, z)
 
             val meal = getEggType(event)

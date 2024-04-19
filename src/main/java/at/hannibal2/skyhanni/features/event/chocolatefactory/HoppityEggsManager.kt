@@ -101,8 +101,8 @@ object HoppityEggsManager {
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
 
         val displayList = HoppityEggType.entries
-            .filter { it.isClaimed() }
-            .map { "§7 - ${it.formattedName()}" }
+            .filter { !it.isClaimed() }
+            .map { "§7 - ${it.formattedName}" }
             .toMutableList()
         displayList.add(0, "§bUnfound Eggs:")
         if (displayList.size == 1) return

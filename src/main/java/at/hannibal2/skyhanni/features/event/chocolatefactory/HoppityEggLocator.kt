@@ -34,11 +34,11 @@ object HoppityEggLocator {
     private var drawLocations = false
     private var firstPos = LorenzVec()
     private var secondPos = LorenzVec()
-    private val possibleEggLocations = mutableListOf<LorenzVec>()
+    private var possibleEggLocations = listOf<LorenzVec>()
 
     private var ticksSinceLastParticleFound = -1
     private var lastGuessMade = SimpleTimeMark.farPast()
-    private val eggLocationWeights = mutableListOf<Double>()
+    private var eggLocationWeights = listOf<Double>()
 
     var sharedEggLocation: LorenzVec? = null
     var currentEggType: HoppityEggType? = null
@@ -53,7 +53,7 @@ object HoppityEggLocator {
     private fun resetData() {
         validParticleLocations.clear()
         ticksSinceLastParticleFound = -1
-        possibleEggLocations.clear()
+        possibleEggLocations = emptyList()
         firstPos = LorenzVec()
         secondPos = LorenzVec()
         drawLocations = false
@@ -144,7 +144,7 @@ object HoppityEggLocator {
     private fun calculateEggPosition() {
         if (lastGuessMade.passedSince() < 1.seconds) return
         lastGuessMade = SimpleTimeMark.now()
-        possibleEggLocations.clear()
+        possibleEggLocations = emptyList()
 
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
         val listSize = validParticleLocations.size
@@ -152,7 +152,7 @@ object HoppityEggLocator {
         if (listSize < 5) return
 
         val secondPoint = validParticleLocations.removeLast()
-        val firstPos = validParticleLocations.removeLast()
+        firstPos = validParticleLocations.removeLast()
 
         val xDiff = secondPoint.x - firstPos.x
         val yDiff = secondPoint.y - firstPos.y
@@ -164,18 +164,17 @@ object HoppityEggLocator {
             secondPoint.z + zDiff * 1000
         )
 
-        val sortedEggs = islandEggsLocations.sortedBy {
-            it.getEggLocationWeight(firstPos, secondPos)
-        }
+        val sortedEggs = islandEggsLocations.map {
+            it to it.getEggLocationWeight(firstPos, secondPos)
+        }.sortedBy { it.second }
 
-        eggLocationWeights.clear()
-        eggLocationWeights.addAll(sortedEggs.map {
-            it.getEggLocationWeight(firstPos, secondPos).round(3)
-        }.take(5))
+        eggLocationWeights = sortedEggs.map {
+            it.second.round(3)
+        }.take(5)
 
         val filteredEggs = sortedEggs.filter {
-            it.getEggLocationWeight(firstPos, secondPos) < 1
-        }
+            it.second < 1
+        }.map { it.first }
 
         val maxLineDistance = filteredEggs.sortedByDescending {
             it.nearestPointOnLine(firstPos, secondPos).distance(firstPos)
@@ -187,7 +186,7 @@ object HoppityEggLocator {
         }
         secondPos = maxLineDistance.first().nearestPointOnLine(firstPos, secondPos)
 
-        possibleEggLocations.addAll(filteredEggs)
+        possibleEggLocations = filteredEggs
 
         drawLocations = true
     }
