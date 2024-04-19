@@ -412,7 +412,6 @@ object ScoreboardPattern {
         "Time spent sitting|with Ävaeìkx: .*"
     )
 
-
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
     val gemsPattern by tablistGroup.pattern(

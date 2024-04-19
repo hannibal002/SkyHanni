@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggsManager {
@@ -49,14 +51,8 @@ object HoppityEggsManager {
         if (!LorenzUtils.inSkyBlock) return
 
         eggFoundPattern.matchMatcher(event.message) {
-            HoppityEggsLocations.eggFound()
-
-            val meal = HoppityEggType.getMealByName(group("meal")) ?: run {
-                ErrorManager.skyHanniError(
-                    "Unknown meal: ${group("meal")}",
-                    "message" to event.message
-                )
-            }
+            HoppityEggLocator.eggFound()
+            val meal = getEggType(event)
             meal.markClaimed()
             lastMeal = meal
         }
@@ -67,25 +63,21 @@ object HoppityEggsManager {
         }
 
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
-            val meal = HoppityEggType.getMealByName(group("meal")) ?: run {
-                ErrorManager.skyHanniError(
-                    "Unknown meal: ${group("meal")}",
-                    "message" to event.message
-                )
-            }
-            meal.markClaimed()
+            getEggType(event).markClaimed()
         }
 
         eggSpawnedPattern.matchMatcher(event.message) {
-            val meal = HoppityEggType.getMealByName(group("meal")) ?: run {
-                ErrorManager.skyHanniError(
-                    "Unknown meal: ${group("meal")}",
-                    "message" to event.message
-                )
-            }
-            meal.markSpawned()
+            getEggType(event).markSpawned()
         }
     }
+
+    internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
+        HoppityEggType.getMealByName(group("meal")) ?: run {
+            ErrorManager.skyHanniError(
+                "Unknown meal: ${group("meal")}",
+                "message" to event.message
+            )
+        }
 
     fun shareWaypointPrompt() {
         if (!config.sharedWaypoints) return
@@ -93,13 +85,18 @@ object HoppityEggsManager {
         val meal = lastMeal ?: return
         lastMeal = null
 
+        val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
                 onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal) },
-                30.seconds.fromNow()
+                expireAt = 30.seconds.fromNow()
             )
         }
+    }
+
+    private val hasLocatorInInventory = RecalculatingValue(1.seconds) {
+        HoppityEggLocator.hasLocatorInInventory()
     }
 
     @SubscribeEvent
@@ -108,15 +105,13 @@ object HoppityEggsManager {
         if (!config.showClaimedEggs) return
         if (ReminderUtils.isBusy()) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
+        if (!hasLocatorInInventory.getValue()) return
 
-        val displayList = mutableListOf<String>()
-        displayList.add("§bUnfound Eggs:")
-
-        for (meal in HoppityEggType.entries) {
-            if (!meal.isClaimed()) {
-                displayList.add("§7 - ${meal.formattedName()}")
-            }
-        }
+        val displayList = HoppityEggType.entries
+            .filter { !it.isClaimed() }
+            .map { "§7 - ${it.formattedName}" }
+            .toMutableList()
+        displayList.add(0, "§bUnfound Eggs:")
         if (displayList.size == 1) return
 
         config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")

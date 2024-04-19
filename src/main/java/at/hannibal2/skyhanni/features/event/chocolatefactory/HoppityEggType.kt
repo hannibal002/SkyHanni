@@ -17,12 +17,13 @@ enum class HoppityEggType(
     fun markClaimed() {
         claimed = true
     }
+
     fun markSpawned() {
         claimed = false
     }
 
     fun isClaimed() = claimed
-    fun formattedName() = "$mealColour$mealName"
+    val formattedName by lazy { "$mealColour$mealName" }
 
     companion object {
         fun allFound() = entries.forEach { it.markClaimed() }
@@ -34,14 +35,13 @@ enum class HoppityEggType(
             val currentSbDay = currentSbTime.day
             val currentSbHour = currentSbTime.hour
 
-            entries.forEach {
-                if (currentSbHour >= it.resetsAt && it.lastResetDay != currentSbDay) {
-                    it.markSpawned()
-                    it.lastResetDay = currentSbDay
-                    if (HoppityEggsLocations.currentEggType == it) {
-                        HoppityEggsLocations.currentEggType = null
-                        HoppityEggsLocations.sharedEggLocation = null
-                    }
+            for (eggType in entries) {
+                if (currentSbHour < eggType.resetsAt || eggType.lastResetDay == currentSbDay) continue
+                eggType.markSpawned()
+                eggType.lastResetDay = currentSbDay
+                if (HoppityEggLocator.currentEggType == eggType) {
+                    HoppityEggLocator.currentEggType = null
+                    HoppityEggLocator.sharedEggLocation = null
                 }
             }
         }
