@@ -2,35 +2,27 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.RenderRealOverlayEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 
 class ItemRenderBackground {
 
     companion object {
 
-        private val backgroundColour = TimeLimitedCache<ItemStack, Int>(60.milliseconds)
-        private val borderLineColour = TimeLimitedCache<ItemStack, Int>(60.milliseconds)
-
         var ItemStack.background: Int
-            get() {
-                return backgroundColour.getOrNull(this) ?: -1
-            }
+            get() = cachedData.itemBackground
             set(value) {
-                backgroundColour.put(this, value)
+                cachedData.itemBackground = value
             }
 
         var ItemStack.borderLine: Int
-            get() {
-                return borderLineColour.getOrNull(this) ?: -1
-            }
+            get() = cachedData.itemBorderLine
             set(value) {
-                borderLineColour.put(this, value)
+                cachedData.itemBorderLine = value
             }
     }
 

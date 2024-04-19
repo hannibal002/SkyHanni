@@ -27,4 +27,8 @@ data class CachedItemData(
     var lastInternalName: NEUInternalName? = null,
 
     var lastInternalNameFetchTime: Long = 0L, // Still can't use SimpleTimeMark here
+
+    var itemBackground: Int = -1,
+
+    var itemBorderLine: Int = -1
 )
