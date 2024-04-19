@@ -20,11 +20,13 @@ object StringUtils {
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
     private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
     fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
+    fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
@@ -125,6 +127,7 @@ object StringUtils {
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
         } else {
@@ -321,4 +324,53 @@ object StringUtils {
 
     fun String.insert(pos: Int, char: Char): String =
         this.substring(0, pos) + char + this.substring(pos)
+
+    fun replaceIfNeeded(
+        original: IChatComponent,
+        newText: String,
+    ): ChatComponentText? {
+        val foundCommands = mutableListOf<IChatComponent>()
+
+        addComponent(foundCommands, original)
+        for (sibling in original.siblings) {
+            addComponent(foundCommands, sibling)
+        }
+
+        val size = foundCommands.size
+        if (size > 1) {
+            return null
+        }
+
+        if (LorenzUtils.stripVanillaMessage(original.formattedText) == newText) return null
+
+        val text = ChatComponentText(newText)
+        if (size == 1) {
+            val chatStyle = foundCommands[0].chatStyle
+            text.chatStyle.chatClickEvent = chatStyle.chatClickEvent
+            text.chatStyle.chatHoverEvent = chatStyle.chatHoverEvent
+        }
+
+        return text
+    }
+
+    private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
+        val clickEvent = message.chatStyle.chatClickEvent
+        if (clickEvent != null) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+                return
+            }
+            foundCommands.add(message)
+        }
+    }
+
+    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
+        var text = this
+        while (true) {
+            val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
+            if (newText == text) {
+                return text
+            }
+            text = newText
+        }
+    }
 }
