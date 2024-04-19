@@ -117,7 +117,7 @@ class PlayerNameFormatter {
         level: Int? = null,
         guildRank: String? = null,
         privateIslandRank: String? = null,
-        isAGuest: Boolean = false
+        isAGuest: Boolean = false,
     ): String {
         var cleanAuthor = cleanAuthor(author)
 
@@ -171,15 +171,18 @@ class PlayerNameFormatter {
         if (author.contains("ADMIN")) return author
         if (config.ignoreYouTube && author.contains("YOUTUBE")) return author
 
-        val result = if (config.useLevelColorForName && levelColor != null) {
-            levelColor + author.cleanPlayerName()
-        } else author.cleanPlayerName(displayName = true)
+        var result = author.cleanPlayerName(displayName = true)
+        levelColor?.let {
+            if (config.useLevelColorForName) {
+                val cleanPlayerName = author.cleanPlayerName()
+                result = result.replace(cleanPlayerName, it + cleanPlayerName)
+            }
+        }
 
         return MarkedPlayerManager.replaceInChat(result)
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && (config.playerRankHider || config.chatFilter || config.sameChatColor)
-
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
