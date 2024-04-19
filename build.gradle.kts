@@ -116,7 +116,7 @@ fun RunConfig.setBaseConfig() {
     )
     this.workingDir = runDir
     if (System.getenv("repo_action") != "true") {
-        this.jvmArgs.add("-Ddevauth.configdir=${rootProject.file(".devauth").absolutePath}")
+        this.jvmArgs.add("-Ddevauth.configDir=${rootProject.file(".devauth").absolutePath}")
     }
     this.env.putAll(parseEnvFile(file(".env")))
 }
@@ -213,7 +213,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.0")
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
