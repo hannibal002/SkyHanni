@@ -8,12 +8,17 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -418,6 +423,22 @@ enum class HotmData(
                 }
             }
             return true
+        }
+
+        @SubscribeEvent
+        fun onScoreboardUpdate(event: ScoreboardChangeEvent) {
+            if (!LorenzUtils.inSkyBlock) return
+
+            event.newList.matchFirst(ScoreboardPattern.powderPattern) {
+                val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
+                val amount = group("amount").formatLong()
+                val difference = amount - type.getCurrent()
+
+                if (difference > 0) {
+                    type.gain(difference)
+                    ChatUtils.chat("Gained §.$difference ${type.lowName} Powder")
+                }
+            }
         }
 
         @SubscribeEvent
