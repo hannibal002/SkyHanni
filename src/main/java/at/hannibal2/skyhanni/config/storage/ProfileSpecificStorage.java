@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI;
+import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
@@ -21,7 +21,9 @@ import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane;
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
+import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
@@ -47,6 +49,17 @@ public class ProfileSpecificStorage {
     public String currentPet = "";
 
     @Expose
+    public ChocolateFactoryStorage chocolateFactory = new ChocolateFactoryStorage();
+
+    public static class ChocolateFactoryStorage {
+        @Expose
+        public int currentRabbits = 0;
+
+        @Expose
+        public int maxRabbits = -1;
+    }
+
+    @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
 
     public static class MaxwellPowerStorage {
@@ -68,7 +81,7 @@ public class ProfileSpecificStorage {
         public String currentArrow = null;
 
         @Expose
-        public Map<NEUInternalName, Float> arrowAmount = new HashMap<>();
+        public Map<NEUInternalName, Integer> arrowAmount = new HashMap<>();
     }
 
     @Expose
@@ -79,7 +92,7 @@ public class ProfileSpecificStorage {
         public int bits = -1;
 
         @Expose
-        public int bitsToClaim = -1;
+        public int bitsAvailable = -1;
 
         @Expose
         public Long boosterCookieExpiryTime = null;
@@ -232,6 +245,9 @@ public class ProfileSpecificStorage {
         public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
 
         @Expose
+        public int scoreboardPests = 0;
+
+        @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
 
         @Expose
@@ -290,6 +306,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public PestProfitTracker.Data pestProfitTracker = new PestProfitTracker.Data();
+
+        @Expose
+        public VinylType activeVinyl = null;
     }
 
     @Expose
@@ -380,6 +399,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<String> kingsTalkedTo = new ArrayList<>();
+
+        @Expose
+        public ExcavatorProfitTracker.Data fossilExcavatorProfitTracker = new ExcavatorProfitTracker.Data();
     }
 
     @Expose
@@ -409,7 +431,7 @@ public class ProfileSpecificStorage {
     public static class DungeonStorage {
 
         @Expose
-        public Map<DungeonAPI.DungeonFloor, Integer> bosses = new HashMap<>();
+        public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
         public List<DungeonStorage.DungeonRunInfo> runs = Stream.generate(DungeonStorage.DungeonRunInfo::new)

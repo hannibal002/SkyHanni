@@ -90,12 +90,14 @@ object ErrorManager {
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
     ) {
-        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
-    }
-
-    @Deprecated("Use data as well", ReplaceWith("ErrorManager.logErrorWithData(throwable, message)"))
-    fun logError(throwable: Throwable, message: String) {
-        logError(throwable, message, ignoreErrorCache = false, noStackTrace = false)
+        logError(
+            IllegalStateException(internalMessage),
+            userMessage,
+            ignoreErrorCache,
+            noStackTrace,
+            *extraData,
+            betaOnly = betaOnly,
+        )
     }
 
     fun logErrorWithData(

@@ -46,7 +46,7 @@ class MobDebug {
     fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
             lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)
-                ?.firstOrNull { it.canBeSeen() && (config.showInvisible || it.isInvisible()) }
+                ?.firstOrNull { it.canBeSeen() && (!config.showInvisible || !it.isInvisible()) }
         }
 
         if (config.skyblockMob.isHighlight()) {
@@ -86,12 +86,10 @@ class MobDebug {
     @SubscribeEvent
     fun onMobEvent(event: MobEvent) {
         if (!config.logEvents) return
-        LorenzDebug.log(
-            "Mob ${if (event is MobEvent.Spawn) "Spawn" else "Despawn"}: ${
-                getMobInfo(event.mob).joinToString(
-                    ", "
-                )
-            }"
-        )
+        val text = "Mob ${if (event is MobEvent.Spawn) "Spawn" else "Despawn"}: ${
+            getMobInfo(event.mob).joinToString(", ")
+        }"
+        MobData.logger.log(text)
+        LorenzDebug.log(text)
     }
 }

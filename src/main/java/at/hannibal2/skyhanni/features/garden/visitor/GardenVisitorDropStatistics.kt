@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -107,33 +107,33 @@ object GardenVisitorDropStatistics {
         val storage = GardenAPI.storage?.visitorDrops ?: return
 
         copperPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.copper += amount
             saveAndUpdate()
         }
         farmingExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber()
+            val amount = group("amount").formatInt()
             storage.farmingExp += amount
             saveAndUpdate()
         }
         gardenExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
             storage.gardenExp += amount
             saveAndUpdate()
         }
         bitsPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.bits += amount
             saveAndUpdate()
         }
         mithrilPowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.mithrilPowder += amount
             saveAndUpdate()
         }
         gemstonePowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.gemstonePowder += amount
             saveAndUpdate()
         }
@@ -307,5 +307,9 @@ object GardenVisitorDropStatistics {
 }
 
 enum class VisitorRarity {
-    UNCOMMON, RARE, LEGENDARY, MYTHIC, SPECIAL,
+    UNCOMMON,
+    RARE,
+    LEGENDARY,
+    MYTHIC,
+    SPECIAL,
 }

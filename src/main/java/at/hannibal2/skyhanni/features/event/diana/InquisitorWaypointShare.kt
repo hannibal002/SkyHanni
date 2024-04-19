@@ -4,15 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.hasGroup
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -34,12 +35,13 @@ object InquisitorWaypointShare {
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
 
     private val patternGroup = RepoPattern.group("diana.waypoints")
+
     /**
      * REGEX-TEST: §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: 6.7
      */
     private val partyOnlyCoordsPattern by patternGroup.pattern(
         "party.onlycoords",
-        "§9Party §8> (?<playerName>.+)§f: §rx: (?<x>[^ ]+),? y: (?<y>[^ ]+),? z: (?<z>[^ ]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+),? y: (?<y>[^ ]+),? z: (?<z>[^ ]+)"
     )
 
     //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
@@ -48,11 +50,11 @@ object InquisitorWaypointShare {
      */
     private val partyInquisitorCheckerPattern by patternGroup.pattern(
         "party.inquisitorchecker",
-        "§9Party §8> (?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
     )
     private val diedPattern by patternGroup.pattern(
         "died",
-        "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!"
+        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
     )
 
     private var time = 0L
@@ -82,15 +84,14 @@ object InquisitorWaypointShare {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
             inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
         }
-        if (event.repeatSeconds(1)) {
-            waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
-        }
+
+        waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
     }
 
     @SubscribeEvent
@@ -258,6 +259,7 @@ object InquisitorWaypointShare {
             }
         }
         diedPattern.matchMatcher(message) {
+            if (block()) return
             val rawName = group("playerName")
             val name = rawName.cleanPlayerName()
             val displayName = rawName.cleanPlayerName(displayName = true)
@@ -267,7 +269,10 @@ object InquisitorWaypointShare {
         }
     }
 
+    private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
+
     private fun Matcher.detectFromChat(): Boolean {
+        if (block()) return false
         val rawName = group("playerName")
         val x = group("x").trim().toDoubleOrNull() ?: return false
         val y = group("y").trim().toDoubleOrNull() ?: return false

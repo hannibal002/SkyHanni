@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -141,7 +141,7 @@ object PowderTracker {
             reward.chatPattern.matchMatcher(msg) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
-                    var amount = group("amount").formatNumber()
+                    var amount = group("amount").formatLong()
                     if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder)
                         amount *= 2
                     it.rewards[reward] = count + amount

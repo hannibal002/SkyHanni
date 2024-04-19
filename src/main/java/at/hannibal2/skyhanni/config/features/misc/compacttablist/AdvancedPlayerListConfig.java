@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.misc.compacttablist;
 
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class AdvancedPlayerListConfig {
 
@@ -102,5 +102,5 @@ public class AdvancedPlayerListConfig {
             "§eThose are the folks that coded the mod for you for free :)"
     )
     @ConfigEditorBoolean
-    public boolean markSkyHanniContributors = false;
+    public boolean markSkyHanniDevs = true;
 }

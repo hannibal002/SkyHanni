@@ -58,7 +58,7 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || LorenzUtils.isInDevEnviromen()
+    val localLoading: Boolean get() = config.forceLocal.get() || LorenzUtils.isInDevEnvironment()
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.

@@ -14,7 +14,8 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.g
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -63,7 +64,7 @@ object FortuneUpgrades {
     // todo fix NEU price data not being loaded if run too early
     private fun MutableList<FortuneUpgrade>.populateAndSort(style: Int) {
         this.map { upgrade ->
-            val cost = (NEUItems.getPrice(upgrade.requiredItem) * (upgrade.itemQuantity)).toInt()
+            val cost = (upgrade.requiredItem.asInternalName().getPrice() * upgrade.itemQuantity).toInt()
             upgrade.cost = cost
             upgrade.costPerFF = (cost / upgrade.fortuneIncrease).toInt()
         }
