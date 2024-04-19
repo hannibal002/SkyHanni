@@ -49,6 +49,17 @@ public class ProfileSpecificStorage {
     public String currentPet = "";
 
     @Expose
+    public ChocolateFactoryStorage chocolateFactory = new ChocolateFactoryStorage();
+
+    public static class ChocolateFactoryStorage {
+        @Expose
+        public int currentRabbits = 0;
+
+        @Expose
+        public int maxRabbits = -1;
+    }
+
+    @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
 
     public static class MaxwellPowerStorage {

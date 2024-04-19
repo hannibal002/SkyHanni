@@ -123,6 +123,13 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -550,6 +557,7 @@ class SkyHanniMod {
         loadModule(PestAPI)
         loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
+        loadModule(ChocolateFactoryAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -605,6 +613,12 @@ class SkyHanniMod {
         loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
+        loadModule(ChocolateFactoryBarnManager)
+        loadModule(ChocolateFactoryInventory)
+        loadModule(HoppityEggsManager)
+        loadModule(HoppityEggLocator)
+        loadModule(HoppityEggsShared)
+        loadModule(ChocolateFactoryStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
         loadModule(SlayerMiniBossFeatures())
