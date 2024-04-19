@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -58,6 +60,10 @@ object DungeonAPI {
         "complete",
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
     )
+    private val dungeonRoomPattern by patternGroup.pattern(
+        "room",
+        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)"
+    )
     private val blessingPattern by patternGroup.pattern(
         "blessings",
         "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r"
@@ -81,7 +87,7 @@ object DungeonAPI {
         }
     }
 
-    fun inDungeon() = dungeonFloor != null
+    fun inDungeon() = IslandType.CATACOMBS.isInIsland()
 
     fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
 
@@ -124,7 +130,11 @@ object DungeonAPI {
         return DungeonFloor.valueOf(floor.replace("M", "F"))
     }
 
-    fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
+    fun getRoomID(): String? {
+        return ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
+            group("roomId")
+        }
+    }
 
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
@@ -289,7 +299,7 @@ object DungeonAPI {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
-        if (!LorenzUtils.inDungeons) {
+        if (!inDungeon()) {
             event.addIrrelevant("not in dungeons")
             return
         }

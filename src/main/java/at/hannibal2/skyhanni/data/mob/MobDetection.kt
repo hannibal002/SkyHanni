@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -20,7 +19,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityCreeper
@@ -96,7 +95,7 @@ class MobDetection {
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
         MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
-            .filter { it !is EntityArmorStand })
+            .filter { it !is EntityArmorStand && it !is EntityPlayerSP })
 
         if (forceReset) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
@@ -169,7 +168,9 @@ class MobDetection {
 
     /** For mobs that have default health of the entity */
     private enum class EntityPacketType {
-        SPIRIT_BAT, VILLAGER, CREEPER_VAIL
+        SPIRIT_BAT,
+        VILLAGER,
+        CREEPER_VAIL,
     }
 
     /** Handles some mobs that have default health of the entity, specially using the [EntityHealthUpdateEvent] */
@@ -317,11 +318,6 @@ class MobDetection {
                 allEntitiesViaPacketId.clear()
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        MobData.currentEntityLiving.remove(Minecraft.getMinecraft().thePlayer) // Fix for the Player
     }
 
     private val allEntitiesViaPacketId = mutableSetOf<Int>()

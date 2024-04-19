@@ -1,10 +1,15 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 class DiscordLocationKey {
 
+    private val rpcGroup = RepoPattern.group("misc.discordrpc")
+
+    // normal keys follow a distinct pattern: lowercase the skyblock location and replace spaces with -
     private val normalRPC = setOf(
         "auction-house",
         "bank",
@@ -42,7 +47,15 @@ class DiscordLocationKey {
         "rift-gallery",
         "the-rift",
         "village-plaza",
-        "wyld-woods"
+        "wyld-woods",
+        "glacite-tunnels",
+        "jungle",
+        "mithril-deposits",
+        "precursor-remnants",
+        "goblin-holdout",
+        "magma-fields",
+        "crystal-nucleus",
+        "dungeon-hub"
     )
     // list of tokens where the name can be lowercased and spaces can be replaced with dashes
 
@@ -55,14 +68,29 @@ class DiscordLocationKey {
         "Catacombs Entrance" to "coal-mine",
         "Colosseum Arena" to "colosseum",
         "Museum" to "unincorporated",
-        "Mines of Divan" to "gold-mine",
+        "Personal Garden" to "garden",
+
+        "Jerry's Workshop" to "winter-island",
+        "Jerry Pond" to "winter-island",
+        "Mount Jerry" to "winter-island",
+        "Gary's Shack" to "winter-island",
+        "Glacial Cave" to "winter-island",
+        "Terry's Shack" to "winter-island",
+        "Hot Springs" to "winter-island",
+        "Jerry Pond" to "winter-island",
+        "Reflective Pond" to "winter-island",
+        "Sunken Jerry Pond" to "winter-island",
+        "Sherry's Showroom" to "winter-island",
+        "Einary's Emporium" to "winter-island",
 
         "Archery Range" to "village",
         "Bazaar Alley" to "village",
         "Blacksmith" to "village",
+        "Builder's House" to "village",
         "Election Room" to "village",
         "Hexatorum" to "village",
         "Thaumaturgist" to "village",
+        "Weaponsmith" to "village",
 
         "Void Sepulture" to "the-end",
         "Void Slate" to "the-end",
@@ -90,7 +118,52 @@ class DiscordLocationKey {
         "Melody's Plateau" to "savanna-woodland",
         "Viking Longhouse" to "spruce-woods",
         "Lonely Island" to "spruce-woods",
-        "Howling Cave" to "birch-park"
+        "Howling Cave" to "birch-park",
+
+        "Aristocrat Passage" to "dwarven-mines",
+        "Barracks of Heroes" to "dwarven-mines",
+        "C&C Minecarts Co." to "dwarven-mines",
+        "Cliffside Veins" to "dwarven-mines",
+        "Divan's Gateway" to "dwarven-mines",
+        "Dwarven Tavern" to "dwarven-mines",
+        "Dwarven Village" to "dwarven-mines",
+        "Far Reserve" to "dwarven-mines",
+        "Forge Basin" to "dwarven-mines",
+        "Gates to the Mines" to "dwarven-mines",
+        "Goblin Burrows" to "dwarven-mines",
+        "Grand Library" to "dwarven-mines",
+        "Great Ice Wall" to "dwarven-mines",
+        "Hanging Court" to "dwarven-mines",
+        "Lava Springs" to "dwarven-mines",
+        "Miner's Guild" to "dwarven-mines",
+        "Palace Bridge" to "dwarven-mines",
+        "Rampart's Quarry" to "dwarven-mines",
+        "Royal Mines" to "dwarven-mines",
+        "Royal Palace" to "dwarven-mines",
+        "Royal Quarters" to "dwarven-mines",
+        "The Forge" to "dwarven-mines",
+        "The Lift" to "dwarven-mines",
+        "The Mist" to "dwarven-mines",
+        "Upper Mines" to "dwarven-mines",
+
+        "Dragon's Lair" to "mithril-deposits",
+        "Fairy Grotto" to "crystal-nucleus",
+        "Goblin Queen's Den" to "goblin-holdout",
+        "Jungle Temple" to "jungle",
+        "Khazad-dûm" to "magma-fields",
+        "Lost Precursor City" to "precursor-remnants",
+        "Mines of Divan" to "mithril-deposits",
+
+        "Diamond Reserve" to "coal-mine",
+        "Gunpowder Mines" to "coal-mine",
+        "Lapis Quarry" to "coal-mine",
+        "Obsidian Sanctuary" to "coal-mine",
+        "Pigmen's Den" to "coal-mine",
+
+        "Dwarven Base Camp" to "glacite-tunnels",
+        "Fossil Research Center" to "glacite-tunnels",
+        "Glacite Lake" to "glacite-tunnels",
+        "Glacite Mineshafts" to "glacite-tunnels",
     ) // maps sublocations to their broader image
 
     private val specialNetherRPC = arrayOf(
@@ -138,53 +211,6 @@ class DiscordLocationKey {
     )
     // list of nether locations because there are sooo many (truncated some according to scoreboard)
 
-    private val specialMiningRPC = arrayOf(
-        "Diamond Reserve",
-        "Gunpowder Mines",
-        "Lapis Quarry",
-        "Obsidian Sanctuary",
-        "Pigmen's Den",
-
-        "Aristocrat Passage",
-        "Barracks of Heroes",
-        "C&C Minecarts Co.",
-        "Cliffside Veins",
-        "Divan's Gateway",
-        "Dwarven Tavern",
-        "Dwarven Village",
-        "Far Reserve",
-        "Forge Basin",
-        "Gates to the Mines",
-        "Goblin Burrows",
-        "Grand Library",
-        "Great Ice Wall",
-        "Hanging Court",
-        "Lava Springs",
-        "Miner's Guild",
-        "Palace Bridge",
-        "Rampart's Quarry",
-        "Royal Mines",
-        "Royal Palace",
-        "Royal Quarters",
-        "The Forge",
-        "The Lift",
-        "The Mist",
-        "Upper Mines",
-
-        "Crystal Nucleus",
-        "Dragon's Lair",
-        "Fairy Grotto",
-        "Goblin Holdout",
-        "Goblin Queen's Den",
-        "Jungle Temple",
-        "Jungle",
-        "Khazad-dûm",
-        "Lost Precursor City",
-        "Magma Fields",
-        "Mithril Deposits",
-        "Precursor Remnants"
-    ) // using coal-mine because i may as well, except for mines of divan which gets gold mine. also, slimehill actually has an image for some reason.
-
     private val specialRiftRPC = mapOf(
         "Enigma's Crib" to "wyld-woods",
         "Broken Cage" to "wyld-woods",
@@ -225,6 +251,15 @@ class DiscordLocationKey {
 
     private fun getAmbiguousKey(location: String): String {
         val island = LorenzUtils.skyBlockIsland
+
+        DungeonAPI.dungeonFloor?.lowercase()?.let {
+            if (it.startsWith("m")) {
+                return "master-mode"
+            }
+            if (it.startsWith("f")) {
+                return "dungeon"
+            }
+        }
 
         return when (location) {
             "Wizard Tower" -> {
@@ -272,8 +307,6 @@ class DiscordLocationKey {
             specialRPC[location]!!
         } else if (specialNetherRPC.contains(location)) {
             "crimson-isle"
-        } else if (specialMiningRPC.contains(location)) {
-            "coal-mine"
         } else if (specialRiftRPC.containsKey(location)) {
             specialRiftRPC[location]!!
         } else {

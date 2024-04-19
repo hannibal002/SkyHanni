@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -24,7 +25,7 @@ class SuperCraftFeatures {
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
             NEUInternalName.fromItemName(this.group("item")) to (this.group("amount")?.formatInt() ?: 1)
         } ?: return
-        if (!GetFromSackAPI.sackListInternalNames.contains(internalName.asString())) return
+        if (!SackAPI.sackListInternalNames.contains(internalName.asString())) return
         DelayedRun.runNextTick {
             GetFromSackAPI.getFromChatMessageSackItems(PrimitiveItemStack(internalName, amount))
         }

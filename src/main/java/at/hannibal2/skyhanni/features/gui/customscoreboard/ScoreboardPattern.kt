@@ -227,6 +227,14 @@ object ScoreboardPattern {
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$"
     )
+    val mineshaftNotStartedPattern by miningSb.pattern(
+        "mineshaft.notstarted",
+        "(?:§.)*Not started.*"
+    )
+    val fortunateFreezingBonusPattern by miningSb.pattern(
+        "fortunatefreezing.bonus",
+        "Event Bonus: §6\\+\\d+☘"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
@@ -321,6 +329,14 @@ object ScoreboardPattern {
         "objective",
         "^(§.)*(Objective|Quest).*"
     )
+    val queuePattern by miscSb.pattern(
+        "queued",
+        "Queued:.*"
+    )
+    val queuePositionPattern by miscSb.pattern(
+        "queueposition",
+        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
+    )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
     val thirdObjectiveLinePattern by miscSb.pattern(
@@ -391,7 +407,10 @@ object ScoreboardPattern {
         "hotdogeaten",
         "^Eaten: §.\\d+\\/\\d+$"
     )
-
+    val riftAveikxPattern by riftSb.pattern(
+        "aveikx",
+        "Time spent sitting|with Ävaeìkx: .*"
+    )
 
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
@@ -405,15 +424,15 @@ object ScoreboardPattern {
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
-        "^\\s*Mithril Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
+        "^\\s*Mithril(?: Powder)?: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
     )
     val gemstonePowderPattern by tablistGroup.pattern(
         "gemstonepowder",
-        "^\\s*Gemstone Powder: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
+        "^\\s*Gemstone(?: Powder)?: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
     )
     val glacitePowderPattern by tablistGroup.pattern(
         "glacitepowder",
-        "^\\s*Glacite Powder: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
+        "^\\s*Glacite(?: Powder)?: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",
@@ -422,13 +441,5 @@ object ScoreboardPattern {
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
-    )
-    val boosterCookieEffectsWidgetPattern by tablistGroup.pattern(
-        "boostereffects",
-        "\\s*(?:§.)*Cookie Buff(?:§.)*: (?:§r)*(?<time>.*)"
-    )
-    val cookieNotActivePattern by tablistGroup.pattern(
-        "cookienotactive",
-        "((?:§.)*Not active.*)|(§c§lINACTIVE)"
     )
 }
