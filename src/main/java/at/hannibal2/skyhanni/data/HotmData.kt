@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -481,7 +482,7 @@ enum class HotmData(
 
                 if (difference > 0) {
                     type.gain(difference)
-                    ChatUtils.debug("Gained §.$difference ${type.lowName} Powder")
+                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.lowName} Powder")
                 }
             }
         }
