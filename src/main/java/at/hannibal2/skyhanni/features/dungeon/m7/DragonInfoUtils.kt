@@ -20,7 +20,7 @@ class DragonInfoUtils {
 
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (inPhase5) return
+        if (!inPhase5) return
 //        if (event.mob.mobType != Mob.Type.BOSS) return
 //        if (event.mob.name != "Withered Dragon") return
         if (event.mob.baseEntity !is EntityDragon) return
@@ -38,7 +38,7 @@ class DragonInfoUtils {
 
     @SubscribeEvent
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
-        if (inPhase5) return
+        if (!inPhase5) return
 //        if (event.mob.mobType != Mob.Type.BOSS) return
 //        if (event.mob.name != "Withered Dragon") return
         if (event.mob.baseEntity !is EntityDragon) return
