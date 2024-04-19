@@ -103,10 +103,22 @@ class VisitorRewardWarning {
             }
             blockedToolTip.add("")
             val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
-            blockedToolTip.add(
-                if (blockReason == VisitorBlockReason.CHEAP_COPPER || blockReason == VisitorBlockReason.EXPENSIVE_COPPER)
-                    "${blockReason.description} §7(§6$pricePerCopper §7per)" else blockReason.description
-            )
+            val loss = (visitor.totalPrice!! - visitor.totalReward!!)
+            val formattedLoss = loss.let { NumberUtil.format(it) }
+            when (blockReason) {
+                VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER -> blockedToolTip.add(
+                    "${blockReason.description} §7(§6$pricePerCopper §7per)"
+                )
+                VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS -> blockedToolTip.add(
+                    if (loss > 0)
+                        "${blockReason.description} §7(§6$formattedLoss §7selling §9Green Thumb I§7)"
+                    else
+                        "§7(§6$formattedLoss §7profit)"
+                )
+                else -> blockedToolTip.add(
+                        blockReason.description
+                )
+            }
             blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
 
             visitor.blockedLore = blockedToolTip
