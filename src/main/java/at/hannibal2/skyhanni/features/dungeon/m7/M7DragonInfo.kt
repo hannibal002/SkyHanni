@@ -78,12 +78,12 @@ enum class M7DragonLocation(
     val spawnLocation: LorenzVec
 ) {
     POWER(
-        AxisAlignedBB(82.0, 15.0, 88.0, 56.0, 22.0, 62.0),
-        AxisAlignedBB(70.0, 8.0, 47.0, 102.0, 28.0, 77.0),
-        LorenzVec(85.0, 14.0, 56.0),
+        AxisAlignedBB(24.0, 15.0, 30.0, 56.0, 22.0, 62.0),
+        AxisAlignedBB(14.0, 13.0, 46.0, 39.0, 28.0, 71.0),
+        LorenzVec(27.0, 14.0, 59.0),
     ),
     FLAME(
-        AxisAlignedBB(82.0, 15.0, 88.0, 56.0, 22.0, 62.0),
+        AxisAlignedBB(82.0, 15.0, 88.0, 53.0, 22.0, 59.0),
         AxisAlignedBB(70.0, 8.0, 47.0, 102.0, 28.0, 77.0),
         LorenzVec(85.0, 14.0, 56.0),
     ),

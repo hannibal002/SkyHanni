@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,10 +21,8 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!inPhase5) return
-//        if (event.mob.mobType != Mob.Type.BOSS) return
-//        if (event.mob.name != "Withered Dragon") return
-        if (event.mob.baseEntity !is EntityDragon) return
-        ChatUtils.debug("name: '${event.mob.name}', type: '${event.mob.mobType}")
+        if (event.mob.mobType != Mob.Type.BOSS) return
+        if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         ChatUtils.debug("a dragon spawned at ${location.toCleanString()}")
@@ -39,10 +37,8 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
         if (!inPhase5) return
-//        if (event.mob.mobType != Mob.Type.BOSS) return
-//        if (event.mob.name != "Withered Dragon") return
-        if (event.mob.baseEntity !is EntityDragon) return
-        ChatUtils.debug("name: '${event.mob.name}', type: '${event.mob.mobType}")
+        if (event.mob.mobType != Mob.Type.BOSS) return
+        if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId && it != M7DragonInfo.NONE }.forEach {
