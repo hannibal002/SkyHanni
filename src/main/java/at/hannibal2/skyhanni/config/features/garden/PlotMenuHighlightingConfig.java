@@ -33,7 +33,7 @@ public class PlotMenuHighlightingConfig {
         SPRAYS("§6Sprays", LorenzColor.GOLD),
         LOCKED("§7Locked", LorenzColor.DARK_GRAY),
         CURRENT("§aCurrent plot", LorenzColor.GREEN),
-        PASTING("§ePasting", LorenzColor.YELLOW)
+        PASTING("§ePasting", LorenzColor.YELLOW),
         ;
 
         public final String name;

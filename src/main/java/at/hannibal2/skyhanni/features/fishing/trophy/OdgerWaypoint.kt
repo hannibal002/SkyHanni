@@ -27,7 +27,7 @@ class OdgerWaypoint {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled() || !event.isMod(10)) return
         trophyFishInInventory = InventoryUtils.getItemsInOwnInventory()
-                .any { it.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH }
+            .any { it.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH }
     }
 
     @SubscribeEvent

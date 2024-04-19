@@ -98,9 +98,14 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
-    @ConfigOption(name = "No Bits Warning", desc = "")
+    @ConfigOption(name = "Bits Features", desc = "")
     @Accordion
-    public NoBitsWarningConfig noBitsWarning = new NoBitsWarningConfig();
+    public BitsConfig bits = new BitsConfig();
+
+    @Expose
+    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
+    @Accordion
+    public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
@@ -186,13 +191,6 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean restorePieceOfWizardPortalLore = true;
-
-    @Expose
-    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coordinates sent by Patcher.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean patcherSendCoordWaypoint = false;
-
 
     @Expose
     @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
