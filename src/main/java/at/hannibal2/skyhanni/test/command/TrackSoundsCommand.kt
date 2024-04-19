@@ -112,14 +112,18 @@ object TrackSoundsCommand {
                 }
             } else {
                 val sound = value.first()
-                val volumeColor = when(sound.volume) {
-                    in 0.0..0.25 -> ChatFormatting.RED.toString()
-                    in 0.25..0.5 -> ChatFormatting.GOLD.toString()
-                    else -> ChatFormatting.GREEN.toString()
-                }
+                val volumeColor = when (sound.volume) {
+                    in 0.0..0.25 -> ChatFormatting.RED
+                    in 0.25..0.5 -> ChatFormatting.GOLD
+                    else -> ChatFormatting.GREEN
+                }.toString()
 
                 event.drawDynamicText(key, "§7§l${sound.soundName}", 0.8)
-                event.drawDynamicText(key.up(-0.2), "§7P: §e%.2f §7V: $volumeColor%.2f".format(sound.pitch, sound.volume), 0.8)
+                event.drawDynamicText(
+                    key.up(-0.2),
+                    "§7P: §e%.2f §7V: $volumeColor%.2f".format(sound.pitch, sound.volume),
+                    scaleMultiplier = 0.8
+                )
             }
         }
     }
