@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -176,11 +176,9 @@ object DungeonAPI {
     }
 
     @SubscribeEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val tabData = TabListData.getPlayerTabOverlay()
-        if (tabData.footer_skyhanni == null) return
-        val tabList = tabData.footer_skyhanni.formattedText.split("\n")
+        val tabList = event.footer.split("\n")
         tabList.forEach {
             if (noBlessingPattern.matches(it)) {
                 DungeonBlessings.reset()
