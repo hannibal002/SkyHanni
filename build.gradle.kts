@@ -106,7 +106,7 @@ fun RunConfig.setBaseConfig() {
         this.args.indexOf("--gameDir") + 1,
         runDir.absolutePath
     )
-    this.jvmArgs.removeIf { it.startsWith("-Xmx") }
+    this.jvmArgs.removeIf { it.startsWith("-Xmx") || it.startsWith("-XX:") }
     this.jvmArgs.addAll(
         listOf(
             "-Xmx4G",
