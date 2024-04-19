@@ -46,7 +46,7 @@ public class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")")
     @ConfigEditorText
-    public String ETAGoalRank = "10000";
+    public String etaGoalRank = "10000";
 
     @Expose
     @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")

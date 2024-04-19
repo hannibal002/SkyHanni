@@ -7,7 +7,8 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
-import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -17,10 +18,12 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -30,9 +33,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class FarmingWeightDisplay {
@@ -95,6 +101,7 @@ class FarmingWeightDisplay {
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
         event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
         event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
+        event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
     }
 
     companion object {
@@ -104,13 +111,13 @@ class FarmingWeightDisplay {
 
         private var display = emptyList<Renderable>()
         private var profileId = ""
-        private var lastLeaderboardUpdate = 0L
+        private var lastLeaderboardUpdate = SimpleTimeMark.farPast()
         private var apiError = false
         private var leaderboardPosition = -1
         private var weight = -1.0
         private var localWeight = 0.0
         private var weightPerSecond = -1.0
-        private var dirtyCropWeight = false
+        private var weightNeedsRecalculating = false
         private var isLoadingWeight = false
         private var isLoadingLeaderboard = false
         private var rankGoal = -1
@@ -122,6 +129,25 @@ class FarmingWeightDisplay {
             ({
                 resetData()
             })
+        }
+
+        private val eliteWeightApiGson by lazy {
+            ConfigManager.createBaseGsonBuilder()
+                .registerTypeAdapter(CropType::class.java, object : TypeAdapter<CropType>() {
+                    override fun write(out: JsonWriter, value: CropType) {}
+
+                    override fun read(reader: JsonReader): CropType {
+                        return CropType.getByName(reader.nextString())
+                    }
+                }.nullSafe())
+                .registerTypeAdapter(PestType::class.java, object : TypeAdapter<PestType>() {
+                    override fun write(out: JsonWriter, value: PestType) {}
+
+                    override fun read(reader: JsonReader): PestType {
+                        return PestType.getByName(reader.nextString())
+                    }
+                }.nullSafe())
+                .create()
         }
 
         private val errorMessage by lazy {
@@ -197,7 +223,7 @@ class FarmingWeightDisplay {
             if (!config.leaderboard) return ""
 
             // Fetching new leaderboard position every 10.5 minutes
-            if (System.currentTimeMillis() > lastLeaderboardUpdate + 630_000) {
+            if (lastLeaderboardUpdate.passedSince() > 10.5.minutes) {
                 loadLeaderboardIfAble()
             }
 
@@ -210,31 +236,31 @@ class FarmingWeightDisplay {
         }
 
         private fun getWeight(): String {
-            if (dirtyCropWeight) {
+            if (weightNeedsRecalculating) {
                 val values = calculateCollectionWeight().values
                 if (values.isNotEmpty()) {
                     localWeight = values.sum()
-                    dirtyCropWeight = false
+                    weightNeedsRecalculating = false
                 }
             }
 
             val totalWeight = (localWeight + weight)
-            return "§e" + LorenzUtils.formatDouble(totalWeight, 2)
+            return "§e" + totalWeight.round(2).addSeparators()
         }
 
         private fun getRankGoal(): Int {
-            val value = config.ETAGoalRank
+            val value = config.etaGoalRank
             var goal = 10000
 
             // Check that the provided string is valid
             val parsed = value.toIntOrNull() ?: 0
             if (parsed < 1 || parsed > goal) {
-                ChatUtils.error("Invalid Farming Weight Overtake Goal!")
-                ChatUtils.chat(
-                    "§eEdit the Overtake Goal config value with a valid number [1-10000] to use this feature!",
-                    false
+                ChatUtils.chatAndOpenConfig(
+                    "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
+                        "to a valid number [1-10000] to use this feature!",
+                    GardenAPI.config.eliteFarmingWeights::etaGoalRank
                 )
-                config.ETAGoalRank = goal.toString()
+                config.etaGoalRank = goal.toString()
             } else {
                 goal = parsed
             }
@@ -299,7 +325,7 @@ class FarmingWeightDisplay {
                 " §7(§b$format§7)"
             } else ""
 
-            val weightFormat = LorenzUtils.formatDouble(weightUntilOvertake, 2)
+            val weightFormat = weightUntilOvertake.round(2).addSeparators()
             val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
             return if (showRankGoal) {
                 Renderable.string(text)
@@ -319,8 +345,8 @@ class FarmingWeightDisplay {
             weightPerSecond = -1.0
 
             leaderboardPosition = -1
-            dirtyCropWeight = true
-            lastLeaderboardUpdate = 0
+            weightNeedsRecalculating = true
+            lastLeaderboardUpdate = SimpleTimeMark.farPast()
 
             nextPlayers.clear()
             rankGoal = -1
@@ -351,7 +377,7 @@ class FarmingWeightDisplay {
 
             updateWeightPerSecond(crop, before, after, addedCounter)
 
-            dirtyCropWeight = true
+            weightNeedsRecalculating = true
         }
 
         private fun updateWeightPerSecond(crop: CropType, before: Double, after: Double, diff: Int) {
@@ -379,7 +405,7 @@ class FarmingWeightDisplay {
                 }
                 GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
                     leaderboardPosition
-                lastLeaderboardUpdate = System.currentTimeMillis()
+                lastLeaderboardUpdate = SimpleTimeMark.now()
                 isLoadingLeaderboard = false
             }
         }
@@ -441,7 +467,7 @@ class FarmingWeightDisplay {
         private fun toEliteLeaderboardJson(obj: JsonObject): EliteLeaderboardJson {
             val jsonObject = JsonObject()
             jsonObject.add("data", obj)
-            return ConfigManager.gson.fromJson<EliteLeaderboardJson>(jsonObject)
+            return eliteWeightApiGson.fromJson<EliteLeaderboardJson>(jsonObject)
         }
 
         private fun loadWeight(localProfile: String) {
@@ -452,7 +478,8 @@ class FarmingWeightDisplay {
             var error: Throwable? = null
 
             try {
-                val apiData = ConfigManager.gson.fromJson<EliteWeightJson>(apiResponse)
+
+                val apiData = eliteWeightApiGson.fromJson<ElitePlayerWeightJson>(apiResponse)
 
                 val selectedProfileId = apiData.selectedProfileId
                 var selectedProfileEntry = apiData.profiles.find { it.profileId == selectedProfileId }
@@ -466,7 +493,7 @@ class FarmingWeightDisplay {
                     weight = selectedProfileEntry.totalWeight
 
                     localCounter.clear()
-                    dirtyCropWeight = true
+                    weightNeedsRecalculating = true
                     return
                 }
 
@@ -515,7 +542,7 @@ class FarmingWeightDisplay {
         private fun CropType.getLocalCounter() = localCounter[this] ?: 0L
 
         private fun CropType.getFactor(): Double {
-            return factorPerCrop[this] ?: backupFactors[this] ?: error("Crop $this not in backupFactors!")
+            return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
         }
 
         fun lookUpCommand(it: Array<String>) {
@@ -534,24 +561,21 @@ class FarmingWeightDisplay {
             ChatUtils.chat("Opening Farming Profile of player §b$name")
         }
 
-        private val factorPerCrop = mutableMapOf<CropType, Double>()
+        private val cropWeight = mutableMapOf<CropType, Double>()
         private var attemptingCropWeightFetch = false
         private var hasFetchedCropWeights = false
 
         private fun getCropWeights() {
             if (attemptingCropWeightFetch || hasFetchedCropWeights) return
             attemptingCropWeightFetch = true
-            val url = "https://api.elitebot.dev/weights"
+            val url = "https://api.elitebot.dev/weights/all"
             val apiResponse = APIUtil.getJSONResponse(url)
 
             try {
-                val apiData = ConfigManager.gson.fromJson<Map<String, Double>>(
-                    apiResponse,
-                    object : TypeToken<Map<String, Double>>() {}.type
-                )
-                for (crop in apiData) {
-                    val cropType = CropType.getByName(crop.key)
-                    factorPerCrop[cropType] = crop.value
+                val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
+                apiData.crops
+                for (crop in apiData.crops) {
+                    cropWeight[crop.key] = crop.value
                 }
                 hasFetchedCropWeights = true
             } catch (e: Exception) {
@@ -563,7 +587,7 @@ class FarmingWeightDisplay {
         }
 
         // still needed when first joining garden and if they cant make https requests
-        private val backupFactors by lazy {
+        private val backupCropWeights by lazy {
             mapOf(
                 CropType.WHEAT to 100_000.0,
                 CropType.CARROT to 302_061.86,

@@ -491,8 +491,7 @@ open class VisualWordGui : GuiScreen() {
                 else if (KeyboardManager.isDeleteWordDown()) {
                     val lastSpaceIndex = currentText.trimEnd().removeSuffix(" ").lastIndexOf(' ')
                     if (lastSpaceIndex >= 0) currentText.substring(0, lastSpaceIndex + 1) else ""
-                }
-                else {
+                } else {
                     currentText.substring(0, currentText.length - 1)
                 }
                 saveTextChanges()

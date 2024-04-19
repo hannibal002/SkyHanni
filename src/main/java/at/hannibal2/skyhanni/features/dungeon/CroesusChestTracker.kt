@@ -34,19 +34,19 @@ class CroesusChestTracker {
 
     private val config get() = SkyHanniMod.feature.dungeon.chest
 
-    private val repoGroup = RepoPattern.group("dungeon.croesus")
+    private val patternGroup = RepoPattern.group("dungeon.croesus")
 
-    private val croesusPattern by repoGroup.pattern("inventory", "Croesus")
-    private val croesusEmptyPattern by repoGroup.pattern("empty", "§cNo treasures!")
-    private val kismetPattern by repoGroup.pattern("kismet.reroll", "§aReroll Chest")
-    private val kismetUsedPattern by repoGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
+    private val croesusPattern by patternGroup.pattern("inventory", "Croesus")
+    private val croesusEmptyPattern by patternGroup.pattern("empty", "§cNo treasures!")
+    private val kismetPattern by patternGroup.pattern("kismet.reroll", "§aReroll Chest")
+    private val kismetUsedPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
 
-    private val floorPattern by repoGroup.pattern("chest.floor", "§7Tier: §eFloor (?<floor>[IV]+)")
-    private val masterPattern by repoGroup.pattern("chest.master", ".*Master.*")
+    private val floorPattern by patternGroup.pattern("chest.floor", "§7Tier: §eFloor (?<floor>[IV]+)")
+    private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
 
-    private val keyUsedPattern by repoGroup.pattern("chest.state.keyused", "§aNo more Chests to open!")
-    private val openedPattern by repoGroup.pattern("chest.state.opened", "§8Opened Chest:.*")
-    private val unopenedPattern by repoGroup.pattern("chest.state.unopened", "§8No Chests Opened!")
+    private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more Chests to open!")
+    private val openedPattern by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")
+    private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§8No Chests Opened!")
 
     private val kismetSlotId = 50
     private val emptySlotId = 22
@@ -115,7 +115,7 @@ class CroesusChestTracker {
     private fun kismetDungeonChestSetup(event: InventoryFullyOpenedEvent) {
         chestInventory = DungeonChest.getByInventoryName(event.inventoryName) ?: return
         if (config.kismetStackSize) {
-            kismetAmountCache = getKismetAmount().toInt()
+            kismetAmountCache = getKismetAmount()
         }
         if (config.showUsedKismets) {
             val kismetItem = event.inventoryItems[kismetSlotId] ?: return
