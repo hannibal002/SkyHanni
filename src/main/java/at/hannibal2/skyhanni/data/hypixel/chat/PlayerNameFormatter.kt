@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.replaceAll
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -144,12 +145,11 @@ class PlayerNameFormatter {
         map[PlayerMessagesConfig.MessagePart.CRIMSON_FACTION] = faction
         map[PlayerMessagesConfig.MessagePart.MODE_IRONMAN] = ironman
         map[PlayerMessagesConfig.MessagePart.BINGO_LEVEL] = bingo
-        map[PlayerMessagesConfig.MessagePart.EMPTY_CHAR] = " "
         map[PlayerMessagesConfig.MessagePart.GUILD_RANK] = guildRankFormat
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_GUEST] = privateIslandGuestFormat
 
-        return config.partsOrder.map { map[it] }.joinToString(" ").replace("  ", " ").trim()
+        return config.partsOrder.map { map[it] }.joinToString(" ").replaceAll("  ", " ").trim()
     }
 
     private fun formatLevel(rawColor: String?, rawLevel: Int?): String {

@@ -37,7 +37,6 @@ public class PlayerMessagesConfig {
         CRIMSON_FACTION("Crimson Faction"),
         MODE_IRONMAN("Ironman Mode"),
         BINGO_LEVEL("Bingo Level"),
-        EMPTY_CHAR("§7<space>"),
         ;
 
         private final String str;

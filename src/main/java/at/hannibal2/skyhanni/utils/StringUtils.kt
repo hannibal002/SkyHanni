@@ -361,4 +361,15 @@ object StringUtils {
             foundCommands.add(message)
         }
     }
+
+    fun String.replaceAll(oldValue: String, newValue: String): String {
+        var text = this
+        while (true) {
+            val newText = text.replace(oldValue, newValue)
+            if (newText == text) {
+                return text
+            }
+            text = newText
+        }
+    }
 }
