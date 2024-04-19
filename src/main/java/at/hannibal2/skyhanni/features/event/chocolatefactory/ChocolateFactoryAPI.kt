@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -175,7 +176,7 @@ object ChocolateFactoryAPI {
         chocolateItem: ItemStack,
         prestigeItem: ItemStack,
         productionItem: ItemStack,
-        leaderboardItem: ItemStack
+        leaderboardItem: ItemStack,
     ) {
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             chocolateCurrent = group("amount").formatLong()
@@ -234,7 +235,12 @@ object ChocolateFactoryAPI {
         milestoneIndex = data.milestoneIndex
         leaderboardIndex = data.leaderboardIndex
         maxRabbits = data.maxRabbits
+
+        val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
+        HOPPITY_EVENT_DISABLED = disabledFeatures.features["HOPPITY_EVENT_DISABLED"] ?: false
     }
+
+    private var HOPPITY_EVENT_DISABLED = false
 
     private fun List<String>.getUpgradeCost(): Long? {
         val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
@@ -244,5 +250,7 @@ object ChocolateFactoryAPI {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
+
+    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING &&
+        (LorenzUtils.isOnAlphaServer || !HOPPITY_EVENT_DISABLED)
 }
