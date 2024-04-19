@@ -104,7 +104,7 @@ object PartyAPI {
     }
 
     @SubscribeEvent
-    fun onPartyCommand(event: PartyChatEvent) {
+    fun onPartyChat(event: PartyChatEvent) {
         val name = event.author.cleanPlayerName()
         addPlayer(name)
     }
