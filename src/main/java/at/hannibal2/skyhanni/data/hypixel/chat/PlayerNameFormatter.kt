@@ -12,10 +12,12 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.replaceAll
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -27,7 +29,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * E.g. part order, rank hider, etc
  */
 class PlayerNameFormatter {
-    private val config get() = SkyHanniMod.feature.chat.playerMessage
 
     private val patternGroup = RepoPattern.group("data.chat.player.name")
 
@@ -43,6 +44,20 @@ class PlayerNameFormatter {
         "(?<emblem>(?:§.){1,2}.) (?<author>.*)"
     )
 
+    companion object {
+        private val config get() = SkyHanniMod.feature.chat.playerMessage
+        private val prefixConfig get() = config.prefixFormatting
+
+        fun resetPrefix() {
+            prefixConfig.messageText = "&f: "
+            prefixConfig.all = ""
+            prefixConfig.party = "&9Party &8> "
+            prefixConfig.guild = "&2Guild > "
+            prefixConfig.privateMessage = ""
+            ChatUtils.chat("Reset the player chat prefixes.")
+        }
+    }
+
     @SubscribeEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent) {
         if (!isEnabled()) return
@@ -57,7 +72,8 @@ class PlayerNameFormatter {
         val chatColor = if (shouldFilter) "§7" else if (config.sameChatColor) "§f" else event.chatColor
 
         val name = nameFormat(author, levelColor, level, privateIslandRank = privateIslandRank, isAGuest = isAGuest)
-        val newMessage = "$name$chatColor: $message"
+        val prefix = prefixConfig.all.formatPrefix()
+        val newMessage = "$prefix$name$chatColor${formatMessage(message)}"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
@@ -68,7 +84,8 @@ class PlayerNameFormatter {
         val message = event.message
         val author = event.author
         val name = nameFormat(author)
-        val newMessage = "§9Party §8> $name§f: $message"
+        val prefix = prefixConfig.party.formatPrefix()
+        val newMessage = "$prefix$name${formatMessage(message)}"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
@@ -80,7 +97,8 @@ class PlayerNameFormatter {
         val author = event.author
         val guildRank = event.guildRank
         val name = nameFormat(author, guildRank = guildRank)
-        val newMessage = "§2Guild > $name§f: $message"
+        val prefix = prefixConfig.guild.formatPrefix()
+        val newMessage = "$prefix$name${formatMessage(message)}"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
@@ -89,13 +107,21 @@ class PlayerNameFormatter {
     fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         val direction = event.direction
-        val message = event.message
+        val message = event.message.removeColor()
         val author = event.author
         val name = nameFormat(author)
-        val newMessage = "§d$direction §f$name§7: §f$message"
+        val prefix = prefixConfig.privateMessage.formatPrefix()
+        val newMessage = "${prefix}§d$direction §f$name${formatMessage(message)}"
 
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
+
+    private fun formatMessage(message: String): String {
+        val prefix = prefixConfig.messageText.formatPrefix()
+        return prefix + message
+    }
+
+    fun String.formatPrefix() = replace("&", "§")
 
     @SubscribeEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
