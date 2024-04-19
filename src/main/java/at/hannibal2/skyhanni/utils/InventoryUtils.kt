@@ -36,7 +36,9 @@ object InventoryUtils {
 
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
-    fun getItemsInOwnInventory() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filterNotNull()
+    fun getItemsInOwnInventory() =
+        Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.filterNotNull() ?: emptyList()
+
     fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
 
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
