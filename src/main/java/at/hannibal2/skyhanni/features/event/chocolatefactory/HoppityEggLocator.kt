@@ -207,7 +207,7 @@ object HoppityEggLocator {
         && ChocolateFactoryAPI.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
-    private fun hasLocatorInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }
+    fun hasLocatorInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }
 
     private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
         val distToLine = this.distanceToLine(firstPoint, secondPoint)

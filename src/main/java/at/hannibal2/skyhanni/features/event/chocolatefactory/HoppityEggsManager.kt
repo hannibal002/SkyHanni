@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -93,12 +94,17 @@ object HoppityEggsManager {
         }
     }
 
+    private val hasLocatorInInventory = RecalculatingValue(1.seconds) {
+        HoppityEggLocator.hasLocatorInInventory()
+    }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showClaimedEggs) return
         if (ReminderUtils.isBusy()) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
+        if (!hasLocatorInInventory.getValue()) return
 
         val displayList = HoppityEggType.entries
             .filter { !it.isClaimed() }
