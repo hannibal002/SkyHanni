@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
@@ -17,6 +18,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.replaceAll
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonNull
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
@@ -176,4 +179,19 @@ class PlayerNameFormatter {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && (config.playerRankHider || config.chatFilter || config.sameChatColor)
+
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(41, "chat.PlayerMessagesConfig.partsOrder") { element ->
+            val newList = JsonArray()
+            for (entry in element.asJsonArray) {
+                if (entry is JsonNull) continue
+                if (entry.asString != "EMPTY_CHAR") {
+                    newList.add(entry)
+                }
+            }
+            newList
+        }
+    }
 }

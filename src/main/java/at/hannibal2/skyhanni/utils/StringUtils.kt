@@ -362,10 +362,10 @@ object StringUtils {
         }
     }
 
-    fun String.replaceAll(oldValue: String, newValue: String): String {
+    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
         var text = this
         while (true) {
-            val newText = text.replace(oldValue, newValue)
+            val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
             if (newText == text) {
                 return text
             }
