@@ -101,10 +101,14 @@ object FossilExcavatorAPI {
             inLoot = false
             return
         }
-
-        val pair = itemPattern.matchMatcher(message) {
-            ItemUtils.readItemAmount(group("item"))
-        } ?: return
+        // Workaround: If it is a enchanted book, we assume it is a paleontologist I book
+        val pair = if (message == "    §r§fEnchanted Book") {
+            "Paleontologist I" to 1
+        } else {
+            itemPattern.matchMatcher(message) {
+                ItemUtils.readItemAmount(group("item"))
+            } ?: return
+        }
         loot.add(pair)
     }
 }
