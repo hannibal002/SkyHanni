@@ -139,6 +139,9 @@ unimined.minecraft {
         this.config("client") {
             this.setBaseConfig()
         }
+        this.config("server") {
+            this.disabled = true
+        }
     }
     this.mods {
         this.remap(modRuntimeOnly)
@@ -163,10 +166,16 @@ unimined.minecraft(patternSourceSet) {
             this.env.put("SKYHANNI_DUMP_REGEXES", "${gitHash}:${outputFile.absolutePath}")
             this.env.put("SKYHANNI_DUMP_REGEXES_EXIT", "true")
         }
+        this.config("server") {
+            this.disabled = true
+        }
     }
 }
 unimined.minecraft(sourceSets.test.get()) {
     this.defaultMinecraft()
+    this.runs {
+        this.off = true
+    }
 }
 val modImplementation by configurations
 val testModImplementation by configurations
