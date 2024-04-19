@@ -80,6 +80,17 @@ class MarkedPlayerManager {
 
         private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
             && config.highlightInWorld
+
+        fun replaceInChat(string: String): String {
+            if (!config.highlightInChat) return string
+
+            val color = config.chatColor.getChatColor()
+            var text = string
+            for (markedPlayer in playerNamesToMark) {
+                text = text.replace(markedPlayer, "$color$markedPlayer§r")
+            }
+            return text
+        }
     }
 
     @SubscribeEvent
