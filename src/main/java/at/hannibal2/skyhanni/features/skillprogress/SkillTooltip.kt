@@ -25,7 +25,7 @@ class SkillTooltip {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = InventoryUtils.openInventoryName()
         val stack = event.itemStack
-        if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!")})  {
+        if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!") }) {
             val iterator = event.toolTip.listIterator()
             val split = stack.cleanName().split(" ")
             val skillName = split.first()
@@ -65,7 +65,7 @@ class SkillTooltip {
                     val xpFor50 = SkillUtil.xpRequiredForLevel(50.0)
                     val xpFor60 = SkillUtil.xpRequiredForLevel(60.0)
 
-                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50..59) xpFor50
+                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50 .. 59) xpFor50
                     else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
                     else 0
 
@@ -88,13 +88,13 @@ class SkillTooltip {
         }
 
 
-        if ((inventoryName == "SkyBlock Menu" || inventoryName == "Your Skills") && stack.displayName == "§aYour Skills" && overflowConfig.enableSkillAvg){
+        if ((inventoryName == "SkyBlock Menu" || inventoryName == "Your Skills") && stack.displayName == "§aYour Skills" && overflowConfig.enableSkillAvg) {
             val iterator = event.toolTip.listIterator()
-            for (line in iterator){
-                if (line.contains("Skill Avg.")){
+            for (line in iterator) {
+                if (line.contains("Skill Avg.")) {
                     val storage = SkillAPI.storage ?: return
                     var total = 0.0
-                    for ((_, skill) in storage){
+                    for ((_, skill) in storage) {
                         val level = skill.overflowLevel
                         val have = skill.overflowTotalXp
                         val need = skill.overflowCurrentXpMax
@@ -104,16 +104,16 @@ class SkillTooltip {
                     val avg = (total / storage.size).roundToPrecision(2)
                     iterator.set("§6$avg Skill Avg. §8(non-cosmetic)")
 
-                    if(overflowConfig.showAvgInfoKey.isKeyHeld()){
+                    if (overflowConfig.showAvgInfoKey.isKeyHeld()) {
                         iterator.add("")
-                        for((type, info) in storage){
+                        for ((type, info) in storage) {
                             val level = info.overflowLevel
                             val have = info.overflowCurrentXp
                             val need = info.overflowCurrentXpMax
                             val progress = have.toDouble() / need
                             iterator.add("§7${type.displayName}: §6${(level + progress).roundToPrecision(2)}")
                         }
-                    }else{
+                    } else {
                         iterator.add("")
                         iterator.add("§8§oHold ${KeyboardManager.getKeyName(overflowConfig.showAvgInfoKey)} to show more info!")
                     }

@@ -14,7 +14,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
+import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -389,5 +391,20 @@ object ItemUtils {
             return "$it Pet"
         }
         return name
+    }
+
+    fun createToggleItem(enabled: Boolean, featureName: String): ItemStack {
+        val colorCode = if (enabled) "§a" else "§c"
+        val statusText = if (enabled) "Currently ON" else "Currently OFF"
+        val damage = if (enabled) 13 else 14
+        val stack = ItemStack(Blocks.stained_hardened_clay)
+        return Utils.createItemStack(
+            stack.item,
+            "$colorCode$featureName $statusText",
+            damage,
+            "§8(From SkyHanni)",
+            "",
+            "§7§eClick to toggle!"
+        )
     }
 }

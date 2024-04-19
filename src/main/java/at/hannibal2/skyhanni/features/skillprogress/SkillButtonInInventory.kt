@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.utils.ItemUtils.createToggleItem
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -18,71 +19,27 @@ class SkillButtonInInventory {
     private var showItem = false
 
     private val toggleStackSizeEnabled by lazy {
-        val stack = ItemStack(Blocks.stained_hardened_clay)
-        Utils.createItemStack(
-            stack.item,
-            "§aStack Size Currently ON",
-            13,
-            "§8(From SkyHanni)",
-            "",
-            "§7§eClick to toggle!")
+        createToggleItem(true, "Stack Size")
     }
 
     private val toggleTooltipEnabled by lazy {
-        val stack = ItemStack(Blocks.stained_hardened_clay)
-        Utils.createItemStack(
-            stack.item,
-            "§aTooltip Currently ON",
-            13,
-            "§8(From SkyHanni)",
-            "",
-            "§7§eClick to toggle!")
-
+        createToggleItem(true, "Tooltip")
     }
 
     private val toggleCustomGoalEnabled by lazy {
-        val stack = ItemStack(Blocks.stained_hardened_clay)
-        Utils.createItemStack(
-            stack.item,
-            "§aCustom Goal Currently ON",
-            13,
-            "§8(From SkyHanni)",
-            "",
-            "§7§eClick to toggle!")
-
+        createToggleItem(true, "Custom Goal")
     }
 
     private val toggleStackSizeDisabled by lazy {
-        val stack = ItemStack(Blocks.stained_hardened_clay)
-        Utils.createItemStack(
-            stack.item,
-            "§cStack Size Currently OFF",
-            14,
-            "§8(From SkyHanni)",
-            "",
-            "§7§eClick to toggle!")
+        createToggleItem(false, "Stack Size")
     }
 
     private val toggleTooltipDisabled by lazy {
-        val stack = ItemStack(Blocks.stained_hardened_clay)
-        Utils.createItemStack(
-            stack.item,
-            "§cTooltip Currently OFF",
-            14,
-            "§8(From SkyHanni)",
-            "",
-            "§7§eClick to toggle!")
+        createToggleItem(false, "Tooltip")
     }
 
     private val toggleCustomGoalDisabled by lazy {
-        val stack = ItemStack(Blocks.stained_hardened_clay)
-        Utils.createItemStack(
-            stack.item,
-            "§cCustom Goal Currently OFF",
-            14,
-            "§8(From SkyHanni)",
-            "",
-            "§7§eClick to toggle!")
+        createToggleItem(false, "Custom Goal")
     }
 
     @SubscribeEvent

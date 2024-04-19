@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import io.github.notenoughupdates.moulconfig.observer.Observer
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-
 object ConditionalUtils {
 
     fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
