@@ -25,6 +25,7 @@ object ChocolateFactoryStats {
         val perHour = perMinute * 60
         val perDay = perHour * 24
         val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
+        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7(§a$it%§7)" } ?: ""
 
         displayList = formatList(buildList {
             add("§6§lChocolate Factory Stats")
@@ -41,7 +42,7 @@ object ChocolateFactoryStats {
             add("§eChocolate Multiplier: §6${ChocolateFactoryAPI.chocolateMultiplier}")
             add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
-            add("§ePosition: §7#§b$position")
+            add("§ePosition: §7#§b$position $percentile")
 
             add("")
             add("")
