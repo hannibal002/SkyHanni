@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -29,7 +30,6 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
-import org.lwjgl.input.Mouse
 import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
@@ -82,17 +82,24 @@ interface Renderable {
             text: String,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
+            highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
-        ): Renderable = link(string(text), onClick, bypassChecks, condition)
+        ): Renderable =
+            link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
 
         fun link(
             renderable: Renderable,
             onClick: () -> Unit,
             bypassChecks: Boolean = false,
+            highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
         ): Renderable {
             return clickable(
-                hoverable(underlined(renderable), renderable, bypassChecks, condition = condition),
+                hoverable(
+                    underlined(renderable), renderable, bypassChecks,
+                    condition = condition,
+                    highlightsOnHoverSlots = highlightsOnHoverSlots
+                ),
                 onClick,
                 0,
                 bypassChecks,
@@ -114,6 +121,20 @@ interface Renderable {
             )
         }
 
+        fun multiClickAndHover(
+            text: Any,
+            tips: List<Any>,
+            bypassChecks: Boolean = false,
+            click: Map<Int, () -> Unit>,
+            onHover: () -> Unit = {},
+        ): Renderable {
+            return multiClickable(
+                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
+                click,
+                bypassChecks = bypassChecks
+            )
+        }
+
         fun clickable(
             render: Renderable,
             onClick: () -> Unit,
@@ -126,16 +147,34 @@ interface Renderable {
             override val horizontalAlign = render.horizontalAlign
             override val verticalAlign = render.verticalAlign
 
-            private var wasDown = false
-
             override fun render(posX: Int, posY: Int) {
-                val isDown = Mouse.isButtonDown(button)
-                if (isDown > wasDown && isHovered(posX, posY) && condition() &&
-                    shouldAllowLink(true, bypassChecks)
+                if (isHovered(posX, posY) && condition() &&
+                    shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
                 ) {
                     onClick()
                 }
-                wasDown = isDown
+                render.render(posX, posY)
+            }
+        }
+
+        fun multiClickable(
+            render: Renderable,
+            click: Map<Int, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+        ) = object : Renderable {
+            override val width = render.width
+            override val height = render.height
+            override val horizontalAlign = render.horizontalAlign
+            override val verticalAlign = render.verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                if (isHovered(posX, posY) && condition() &&
+                    shouldAllowLink(true, bypassChecks)
+                ) for ((button, onClick) in click) {
+                    if ((button - 100).isKeyClicked())
+                        onClick()
+                }
                 render.render(posX, posY)
             }
         }
@@ -248,6 +287,7 @@ interface Renderable {
             unhovered: Renderable,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
+            highlightsOnHoverSlots: List<Int> = emptyList(),
         ) = object : Renderable {
             override val width: Int
                 get() = max(hovered.width, unhovered.width)
@@ -258,11 +298,14 @@ interface Renderable {
             var isHovered = false
 
             override fun render(posX: Int, posY: Int) {
+                val pair = Pair(posX, posY)
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     hovered.render(posX, posY)
+                    HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
                 } else {
                     unhovered.render(posX, posY)
+                    HighlightOnHoverSlot.currentSlots.remove(pair)
                     false
                 }
             }
@@ -451,7 +494,7 @@ interface Renderable {
                 percent.toInt()
             }
 
-            private var color = if (texture == null) {
+            private val color = if (texture == null) {
                 ColorUtils.blendRGB(startColor, endColor, percent)
             } else {
                 startColor

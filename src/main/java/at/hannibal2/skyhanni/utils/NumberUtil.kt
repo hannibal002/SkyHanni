@@ -248,7 +248,6 @@ object NumberUtil {
         }
     }
 
-
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
     private val Int.billion get() = this * 1_000_000_000.0

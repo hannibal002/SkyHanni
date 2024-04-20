@@ -232,6 +232,8 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, width, height)
 
     enum class FortuneGuidePage {
-        OVERVIEW, CROP, UPGRADES
+        OVERVIEW,
+        CROP,
+        UPGRADES,
     }
 }

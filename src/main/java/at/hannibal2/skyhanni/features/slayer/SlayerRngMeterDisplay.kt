@@ -4,24 +4,29 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
@@ -35,6 +40,10 @@ class SlayerRngMeterDisplay {
         "inventoryname",
         "(?<name>.*) RNG Meter"
     )
+    private val slayerInventoryNamePattern by patternGroup.pattern(
+        "inventoryname.slayer",
+        "Slayer"
+    )
     private val updatePattern by patternGroup.pattern(
         "update",
         " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP"
@@ -46,6 +55,8 @@ class SlayerRngMeterDisplay {
 
     private var display = ""
     private var lastItemDroppedTime = 0L
+
+    var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -92,7 +103,7 @@ class SlayerRngMeterDisplay {
             if (diff > 0) {
                 storage.gainPerBoss = diff
             } else {
-                storage.itemGoal = ""
+                storage.currentMeter = 0
                 blockChat = false
                 val from = old.addSeparators()
                 val to = storage.goalNeeded.addSeparators()
@@ -122,25 +133,56 @@ class SlayerRngMeterDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
+        readRngmeterInventory(event)
+        readSlayerInventory(event)
+    }
+
+    private fun readRngmeterInventory(event: InventoryFullyOpenedEvent) {
         val name = inventoryNamePattern.matchMatcher(event.inventoryName) {
             group("name")
         } ?: return
 
         if (name != getCurrentSlayer()) return
 
-        val storage = getStorage() ?: return
+        val internalName = event.inventoryItems.values
+            .find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
+        setNewGoal(internalName?.getInternalName())
+    }
 
-        val selectedItem =
-            event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
-        if (selectedItem == null) {
+    private fun readSlayerInventory(event: InventoryFullyOpenedEvent) {
+        if (!slayerInventoryNamePattern.matches(event.inventoryName)) return
+        val item = event.inventoryItems[35] ?: return
+        val lore = item.getLore()
+        val name = lore.firstOrNull()?.removeColor() ?: return
+
+        if (name != getCurrentSlayer()) return
+
+        val selectedItem = lore.nextAfter("§7Selected Drop") ?: return
+        val internalName = NEUInternalName.fromItemName(selectedItem)
+        setNewGoal(internalName)
+    }
+
+    private fun setNewGoal(internalName: NEUInternalName?) {
+        val storage = getStorage() ?: return
+        if (internalName == null) {
             storage.itemGoal = ""
             storage.goalNeeded = -1
         } else {
-            storage.itemGoal = selectedItem.itemName
-            val jsonObject = Constants.RNGSCORE["slayer"].asJsonObject.get(getCurrentSlayer()).asJsonObject
-            storage.goalNeeded = jsonObject.get(selectedItem.getInternalName().asString()).asLong
+            storage.itemGoal = internalName.itemName
+            storage.goalNeeded = rngScore[getCurrentSlayer()]?.get(internalName)
+                ?: ErrorManager.skyHanniError(
+                    "RNG Meter goal setting failed",
+                    "internalName" to internalName,
+                    "currentSlayer" to getCurrentSlayer(),
+                    "repo" to rngScore
+                )
         }
         update()
+    }
+
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        rngScore = event.readConstant<NeuRNGScore>("rngscore").slayer
     }
 
     private fun update() {

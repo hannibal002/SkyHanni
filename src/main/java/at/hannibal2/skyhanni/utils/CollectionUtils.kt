@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -174,6 +176,80 @@ object CollectionUtils {
     @Suppress("UNCHECKED_CAST")
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
         takeIf { null !in this } as? List<T>
+
+    // TODO add cache
+    fun MutableList<Renderable>.addString(
+        text: String,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+    }
+
+    // TODO add internal name support, and caching
+    fun MutableList<Renderable>.addItemStack(itemStack: ItemStack) {
+        add(Renderable.itemStack(itemStack))
+    }
+
+    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+        addItemStack(internalName.getItemStack())
+    }
+
+    inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) {
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) = buildList {
+        addString(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                addString("§a[$display]")
+            } else {
+                addString("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                addString("§e]")
+            }
+            addString(" ")
+        }
+    }
+
+    inline fun MutableList<Renderable>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                ChatUtils.lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(Renderable.horizontalContainer(buildList {
+            addString(prefix)
+            addString("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            addString("§a]")
+        }))
+    }
 
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
         if (this.isEmpty()) return xSpace

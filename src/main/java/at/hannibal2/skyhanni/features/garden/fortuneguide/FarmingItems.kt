@@ -27,7 +27,8 @@ enum class FarmingItems {
     ELEPHANT,
     MOOSHROOM_COW,
     RABBIT,
-    BEE;
+    BEE,
+    ;
 
     var selectedState = false
 
