@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -46,6 +47,8 @@ object FossilExcavatorAPI {
 
     var inInventory = false
     var inExcavatorMenu = false
+
+    val scrapItem = "SUSPICIOUS_SCRAP".asInternalName()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -98,10 +101,20 @@ object FossilExcavatorAPI {
             inLoot = false
             return
         }
-
-        val pair = itemPattern.matchMatcher(message) {
+        var pair = itemPattern.matchMatcher(message) {
+            /**
+             * TODO fix the bug that readItemAmount produces two different outputs:
+             * §r§fEnchanted Book -> §fEnchanted
+             * §fEnchanted Book §r§8x -> §fEnchanted Book
+             *
+             * also maybe this is no bug, as enchanted book is no real item?
+             */
             ItemUtils.readItemAmount(group("item"))
         } ?: return
+        // Workaround: If it is a enchanted book, we assume it is a paleontologist I book
+        if (pair.first.let { it ==  "§fEnchanted" || it == "§fEnchanted Book"}) {
+            pair = "Paleontologist I" to pair.second
+        }
         loot.add(pair)
     }
 }

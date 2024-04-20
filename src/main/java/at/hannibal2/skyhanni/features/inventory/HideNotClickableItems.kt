@@ -214,7 +214,7 @@ class HideNotClickableItems {
         showGreenLine = true
 
         val internalName = stack.getInternalNameOrNull() ?: return true
-        if (internalName == "SUSPICIOUS_SCRAP".asInternalName()) {
+        if (internalName == FossilExcavatorAPI.scrapItem) {
             return false
         }
 
@@ -271,7 +271,7 @@ class HideNotClickableItems {
 
     private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
         if (!RiftAPI.inRift()) return false
-        if (chestName != "Motes Grubber") return false
+        if (chestName != "Motes Grubber" && !ShiftClickNPCSell.inInventory) return false
 
         showGreenLine = true
 
@@ -477,6 +477,7 @@ class HideNotClickableItems {
     }
 
     private fun hideNpcSell(stack: ItemStack): Boolean {
+        if (RiftAPI.inRift()) return false
         if (!ShiftClickNPCSell.inInventory) return false
         if (VisitorAPI.inInventory) return false
         showGreenLine = true

@@ -28,9 +28,9 @@ public class MiningConfig {
     public KingTalismanConfig kingTalisman = new KingTalismanConfig();
 
     @Expose
-    @ConfigOption(name = "Deep Caverns Parkour", desc = "")
+    @ConfigOption(name = "Deep Caverns Guide", desc = "")
     @Accordion
-    public DeepCavernsParkourConfig deepCavernsParkour = new DeepCavernsParkourConfig();
+    public DeepCavernsGuideConfig deepCavernsGuide = new DeepCavernsGuideConfig();
 
     @Expose
     @ConfigOption(name = "Area Walls", desc = "")
@@ -38,8 +38,12 @@ public class MiningConfig {
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
     @Expose
-    @ConfigOption(name = "Fossil Excavator", desc = "")
+    @ConfigOption(name = "Cold Overlay", desc = "")
     @Accordion
+    public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
+
+    @Expose
+    @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features")
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
 
     @Expose
@@ -64,4 +68,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean privateIslandNoPickaxeAbility = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlights golden goblins you have spawned in green.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightYourGoldenGoblin = true;
 }
