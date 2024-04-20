@@ -291,10 +291,12 @@ enum class HotmData(
         get() = storage?.perks?.get(this.name)?.level ?: 0
 
     var activeLevel: Int
-        get() = storage?.perks?.get(this.name)?.level?.plus(if (HotmAPI.isBlueEggActive) 1 else 0) ?: 0
+        get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
         private set(value) {
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
         }
+
+    private fun blueEgg() = if (this != PEAK_OF_THE_MOUNTAIN && maxLevel != 1 && HotmAPI.isBlueEggActive) 1 else 0
 
     var enabled: Boolean
         get() = storage?.perks?.get(this.name)?.enabled ?: false
@@ -501,8 +503,10 @@ enum class HotmData(
             inInventory = inventoryPattern.matches(event.inventoryName)
             DelayedRun.runNextTick {
                 InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
+                abilities.filter { it.isUnlocked }.forEach {
+                    it.activeLevel = if (PEAK_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
+                }
             }
-            inventoryPattern.matcher(event.inventoryName)
         }
 
         @SubscribeEvent
