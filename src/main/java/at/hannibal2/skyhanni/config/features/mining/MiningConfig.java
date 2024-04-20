@@ -14,6 +14,10 @@ public class MiningConfig {
     public MiningEventConfig miningEvent = new MiningEventConfig();
 
     @Expose
+    @Category(name = "HotM", desc = "Settings for Heart of the Mountain")
+    public HotmConfig hotmConfig = new HotmConfig();
+
+    @Expose
     @ConfigOption(name = "Powder Tracker", desc = "")
     @Accordion
     public PowderTrackerConfig powderTracker = new PowderTrackerConfig();
@@ -52,6 +56,13 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightCommissionMobs = false;
+
+    @Expose
+    @ConfigOption(name = "Blocks Since Mineshaft", desc = "")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean blocksSinceMineshaft = true;
+
 
     @Expose
     @ConfigOption(name = "Names in Core", desc = "Show the names of the 4 areas while in the center of the Crystal Hollows.")
