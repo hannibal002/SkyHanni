@@ -525,14 +525,21 @@ enum class HotmData(
 
         @SubscribeEvent
         fun onDebug(event: DebugDataCollectEvent) {
-            event.title("Hotm")
+            event.title("HotM")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 HotmAPI.Powder.entries.forEach {
                     add("${it.lowName} Powder: ${it.getCurrent()}/${it.getTotal()}")
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility}")
+                add("Blue Egg: ${HotmAPI.isBlueEggActive}")
             }
+            event.title("HotM - Tree")
+            event.addIrrelevant(
+                entries.filter { it.isUnlocked }.map {
+                    "${it.name} ${if (it.enabled) "✔" else "✖"} : ${it.rawLevel}"
+                }
+            )
         }
     }
 }
