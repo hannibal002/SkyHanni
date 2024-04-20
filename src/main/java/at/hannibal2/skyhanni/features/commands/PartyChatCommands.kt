@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyChatCommands {
@@ -25,7 +26,7 @@ object PartyChatCommands {
             { useConfig().transferCommand },
             requiresPartyLead = true,
             executable = {
-                ChatUtils.sendCommandToServer("party transfer ${it.author}")
+                ChatUtils.sendCommandToServer("party transfer ${it.author.cleanPlayerName()}")
             }
         ),
         PartyChatCommand(
