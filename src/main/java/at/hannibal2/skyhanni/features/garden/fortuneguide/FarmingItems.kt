@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.GuiScreen
 
@@ -36,14 +37,54 @@ enum class FarmingItems {
 
     fun getItemOrNull() = ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.get(this)
 
-    fun getDisplay() = object : Renderable {
+    private fun onClick(): () -> Unit = when (this) {
+        in armor -> {
+            {
+                SoundUtils.playClickSound()
+                currentArmor = if (selectedState) null else this
+                armor.forEach {
+                    it.selectedState = it == currentArmor
+                }
+            }
+        }
+
+        in equip -> {
+            {
+                SoundUtils.playClickSound()
+                currentEquip = if (selectedState) null else this
+                equip.forEach {
+                    it.selectedState = it == currentEquip
+                }
+            }
+        }
+
+        in pets -> {
+            {
+                val prev = currentPet
+                currentPet = if (selectedState) lastEquippedPet else this
+                if (prev != currentPet) {
+                    SoundUtils.playClickSound()
+                }
+                pets.forEach {
+                    it.selectedState = it == currentPet
+                }
+                FFStats.getTotalFF()
+            }
+        }
+
+        else -> {
+            {}
+        }
+    }
+
+    fun getDisplay(clickEnabled: Boolean = false) = object : Renderable {
 
         val content = Renderable.clickable(
             Renderable.itemStackWithTip(
                 getItem(), 1.0, 0, 0, false
             ),
-            onClick = {},
-            condition = { !selectedState })
+            onClick = onClick(),
+            condition = { clickEnabled })
 
         override val width = content.width
         override val height = content.height
@@ -64,10 +105,32 @@ enum class FarmingItems {
 
     companion object {
 
-        fun getArmorDisplay(): List<Renderable> = listOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS).map { it.getDisplay() }
+        var lastEquippedPet = ELEPHANT
 
-        fun getEquipmentDisplay(): List<Renderable> = listOf(NECKLACE, CLOAK, BELT, BRACELET).map { it.getDisplay() }
+        var currentPet: FarmingItems = lastEquippedPet
+        var currentArmor: FarmingItems? = null
+        var currentEquip: FarmingItems? = null
 
-        fun getPetsDisplay(): List<Renderable> = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE).map { it.getDisplay() }
+        val armor = listOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
+        val equip = listOf(NECKLACE, CLOAK, BELT, BRACELET)
+        val pets = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE)
+
+        fun getArmorDisplay(clickEnabled: Boolean = false): List<Renderable> = armor.map { it.getDisplay(clickEnabled) }
+
+        fun getEquipmentDisplay(clickEnabled: Boolean = false): List<Renderable> =
+            equip.map { it.getDisplay(clickEnabled) }
+
+        fun getPetsDisplay(clickEnabled: Boolean = false): List<Renderable> = pets.map { it.getDisplay(clickEnabled) }
+        fun resetClickState() {
+            entries.filterNot { pets.contains(it) }.forEach { it.selectedState = false }
+        }
+
+        fun setDefaultPet(): FarmingItems {
+            currentPet = lastEquippedPet
+            pets.forEach {
+                it.selectedState = it == currentPet
+            }
+            return lastEquippedPet
+        }
     }
 }

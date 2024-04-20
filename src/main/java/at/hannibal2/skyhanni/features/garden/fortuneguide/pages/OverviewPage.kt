@@ -369,7 +369,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         content.addTable(
             5,
             Renderable.horizontalContainer(
-                FarmingItems.getPetsDisplay(),
+                FarmingItems.getPetsDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER
@@ -392,7 +392,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         content.addTable(
             0,
             Renderable.horizontalContainer(
-                FarmingItems.getArmorDisplay(),
+                FarmingItems.getArmorDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER
@@ -401,7 +401,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         content.addTable(
             0,
             Renderable.horizontalContainer(
-                FarmingItems.getEquipmentDisplay(),
+                FarmingItems.getEquipmentDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER

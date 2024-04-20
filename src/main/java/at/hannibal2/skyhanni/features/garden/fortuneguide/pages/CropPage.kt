@@ -19,6 +19,7 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
 ) {
 
     override fun onEnter() {
+        FarmingItems.resetClickState()
         val toolLines = toolLines().split().map { Renderable.verticalContainer(it, 2) }
         update(
             listOf(
@@ -74,7 +75,7 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
                         2,
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                     ),
-                    Renderable.horizontalContainer(FarmingItems.getPetsDisplay(), 2)
+                    Renderable.horizontalContainer(FarmingItems.getPetsDisplay(true), 2)
                 ),
                 2,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM

@@ -6,4 +6,10 @@ abstract class GuidePage {
     abstract fun onEnter()
 
     abstract fun onLeave()
+
+    fun refresh() {
+        onLeave()
+        onEnter()
+    }
+
 }

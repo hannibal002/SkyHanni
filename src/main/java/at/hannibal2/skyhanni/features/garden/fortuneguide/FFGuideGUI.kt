@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -31,9 +30,25 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         var currentCrop: CropType? = null
 
         // todo set this to what they have equip
-        var currentPet = FarmingItems.ELEPHANT
-        var currentArmor = 0
-        var currentEquipment = 0
+        val currentPet get() = FarmingItems.currentPet
+        val currentArmor
+            get() = when (FarmingItems.currentArmor) {
+                null -> 0
+                FarmingItems.HELMET -> 1
+                FarmingItems.CHESTPLATE -> 2
+                FarmingItems.LEGGINGS -> 3
+                FarmingItems.BOOTS -> 4
+                else -> -1
+            }
+        val currentEquipment
+            get() = when (FarmingItems.currentEquip) {
+                null -> 0
+                FarmingItems.NECKLACE -> 1
+                FarmingItems.CLOAK -> 2
+                FarmingItems.BELT -> 3
+                FarmingItems.BRACELET -> 4
+                else -> -1
+            }
 
         var mouseX = 0
         var mouseY = 0
@@ -53,6 +68,13 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             CaptureFarmingGear.captureFarmingGear()
             SkyHanniMod.screenToOpen = FFGuideGUI()
         }
+
+        fun updateDisplay() {
+            with(SkyHanniMod.screenToOpen) {
+                if (this !is FFGuideGUI) return
+                this.refreshPage()
+            }
+        }
     }
 
     init {
@@ -64,6 +86,9 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
 
         // New Code
+
+        FarmingItems.setDefaultPet()
+
         pageList = mapOf(
             FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
             FortuneGuidePage.CROP to CropPage(sizeX, sizeY),
@@ -100,6 +125,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
         horizontalTabs.firstOrNull()?.fakeClick()
         verticalTabs.firstOrNull()?.fakeClick()
+
     }
 
     private fun GuideTab.pageSwitchHorizontal() {
@@ -129,7 +155,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         var x = guiLeft + 15
         var y = guiTop - 28
 
-        if (this.currentPage != FortuneGuidePage.UPGRADES) {
+        /* if (this.currentPage != FortuneGuidePage.UPGRADES) {
             if (currentCrop == null) {
                 when {
                     isMouseInRect(guiLeft + 142, guiTop + 130) && currentPet != FarmingItems.ELEPHANT -> {
@@ -223,7 +249,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
                     }
                 }
             }
-        }
+        } */
     }
 
     private fun isMouseInRect(left: Int, top: Int) = isMouseIn(left, top, 16, 16)

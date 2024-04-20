@@ -45,6 +45,10 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
         var tab: GuideTab?
     }
 
+    fun refreshPage() {
+        pageList[currentPage]?.refresh()
+    }
+
     private fun renderHorizontalTabs() {
         var offset = Pair(tabSpacing.toFloat() * 3f, -tabLongSide.toFloat())
         GlStateManager.translate(offset.first, offset.second, 0f)

@@ -219,6 +219,7 @@ object FFStats {
             (baseFF.toList() + armorTotalFF.toList() + equipmentTotalFF.toList() + petList.toList()).groupBy({ it.first },
                 { it.second }).map { (key, values) -> key to values.sum() }
                 .toMap() as MutableMap<FFTypes, Double>
+        FFGuideGUI.updateDisplay()
     }
 
     private fun getPetFF(pet: ItemStack?): Double {
