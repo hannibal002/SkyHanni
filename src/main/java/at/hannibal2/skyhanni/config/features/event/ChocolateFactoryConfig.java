@@ -86,9 +86,11 @@ public class ChocolateFactoryConfig {
     public int barnCapacityThreshold = 6;
 
     @Expose
-    @ConfigOption(name = "Time Tower Warning", desc = "Warn when you have 3 time tower uses stacked up.")
+    @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
+        "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
-    public boolean timeTowerWarning = true;
+    @FeatureToggle
+    public boolean timeTowerWarning = false;
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")

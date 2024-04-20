@@ -25,6 +25,11 @@ object ChocolateFactoryStats {
         val perHour = perMinute * 60
         val perDay = perHour * 24
         val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
+        val timeTowerInfo = if (ChocolateFactoryAPI.timeTowerActive) {
+            "§d§lActive"
+        } else {
+            "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
+        }
 
         displayList = formatList(buildList {
             add("§6§lChocolate Factory Stats")
@@ -47,7 +52,7 @@ object ChocolateFactoryStats {
             add("")
             add("")
 
-            add("§eTime Tower: §6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}")
+            add("§eTime Tower: §6$timeTowerInfo")
         })
     }
 

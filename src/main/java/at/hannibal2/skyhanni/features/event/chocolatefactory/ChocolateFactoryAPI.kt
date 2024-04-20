@@ -21,12 +21,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -81,6 +83,10 @@ object ChocolateFactoryAPI {
     private val timeTowerStatusPattern by patternGroup.pattern(
         "timetower.status",
         "§7Status: §.§l(?<status>INACTIVE|ACTIVE).*"
+    )
+    private val timeTowerRechargePattern by patternGroup.pattern(
+        "timetower.recharge",
+        "§7Next Charge: §a(?<duration>\\w+)"
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -212,15 +218,18 @@ object ChocolateFactoryAPI {
             ChocolateFactoryBarnManager.trySendBarnFullMessage()
         }
         for (line in timeTowerItem.getLore()) {
-            timeTowerStatusPattern.matchMatcher(line) {
-                timeTowerAmountPattern.matchMatcher(line) {
-                    profileStorage.currentTimeTowerUses = group("uses").formatInt()
-                    profileStorage.maxTimeTowerUses = group("max").formatInt()
-                    ChocolateFactoryTimeTowerManager.trySendTimeTowerFullMessage()
-                }
+            timeTowerAmountPattern.matchMatcher(line) {
+                profileStorage.currentTimeTowerUses = group("uses").formatInt()
+                profileStorage.maxTimeTowerUses = group("max").formatInt()
+                ChocolateFactoryTimeTowerManager.checkTimeTowerWarning(true)
             }
             timeTowerStatusPattern.matchMatcher(line) {
                 timeTowerActive = group("status") == "ACTIVE"
+            }
+            timeTowerRechargePattern.matchMatcher(line) {
+                val timeUntilTower = TimeUtils.getDuration(group("duration"))
+                val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
+                profileStorage.nextTimeTower = nextTimeTower.toMillis()
             }
         }
 
