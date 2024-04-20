@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class CorpseLOSConfig {
+public class CorpseLocatorConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Locates Corpses that are within line of sight then mark it with a waypoint.")

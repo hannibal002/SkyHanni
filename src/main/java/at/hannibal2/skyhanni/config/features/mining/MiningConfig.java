@@ -43,9 +43,8 @@ public class MiningConfig {
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
 
     @Expose
-    @ConfigOption(name = "Corpse LOS", desc = "")
-    @Accordion
-    public CorpseLOSConfig corpseLOS = new CorpseLOSConfig();
+    @Category(name = "Mineshaft Waypoints", desc = "Waypoints options for the Glacite Mineshaft.")
+    public MineshaftWaypointsConfig mineshaftWaypoints = new MineshaftWaypointsConfig();
 
     @Expose
     @ConfigOption(name = "Notifications", desc = "")
