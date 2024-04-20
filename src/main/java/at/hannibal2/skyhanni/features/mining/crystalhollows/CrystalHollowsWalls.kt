@@ -32,7 +32,7 @@ class CrystalHollowsWalls {
 
     private val expandTimes = 20
 
-    private val heatHeight = 64.0
+    private val heatHeight = 65.0
     private val maxHeight = 190.0
 
     private val minX = 0.0
