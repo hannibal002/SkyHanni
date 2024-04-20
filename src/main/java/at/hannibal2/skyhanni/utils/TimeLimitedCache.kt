@@ -13,6 +13,17 @@ class TimeLimitedCache<K, V>(expireAfterWrite: Duration) {
 
     fun getOrNull(key: K): V? = cache.getIfPresent(key)
 
+    fun getOrPut(key: K, defaultValue: () -> V): V {
+        val value = cache.getIfPresent(key)
+        return if (value == null) {
+            val answer = defaultValue()
+            put(key, answer)
+            answer
+        } else {
+            value
+        }
+    }
+
     fun clear() = cache.invalidateAll()
 
     fun values(): MutableCollection<V> = cache.asMap().values
