@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -122,6 +123,13 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -223,6 +231,7 @@ import at.hannibal2.skyhanni.features.garden.pests.StereoHarmonyDisplay
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorSupercraft
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTimer
 import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfGarden
 import at.hannibal2.skyhanni.features.garden.visitor.NPCVisitorFix
@@ -263,7 +272,9 @@ import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
-import at.hannibal2.skyhanni.features.mining.DeepCavernsParkour
+import at.hannibal2.skyhanni.features.mining.ColdOverlay
+import at.hannibal2.skyhanni.features.mining.DeepCavernsGuide
+import at.hannibal2.skyhanni.features.mining.GoldenGoblinHighlight
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MiningNotifications
@@ -273,7 +284,10 @@ import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.GlacitePowderFeatures
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ProfitPerExcavation
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.solver.FossilSolverDisplay
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseLOS
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
@@ -360,6 +374,7 @@ import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftLavaMazeParkour
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkour
 import at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminHighlighter
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonHacking
 import at.hannibal2.skyhanni.features.rift.area.wyldwoods.RiftLarva
@@ -438,7 +453,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.7.1",
+    version = "0.25.Beta.10",
 )
 class SkyHanniMod {
 
@@ -471,7 +486,7 @@ class SkyHanniMod {
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
         loadModule(OtherInventoryData)
-        loadModule(TabListData())
+        loadModule(TabListData)
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropMilestonesCommunityFix)
@@ -499,7 +514,7 @@ class SkyHanniMod {
         loadModule(AdvancedPlayerList)
         loadModule(ItemAddManager())
         loadModule(BingoCardReader())
-        loadModule(DeepCavernsParkour())
+        loadModule(DeepCavernsGuide())
         loadModule(GardenBestCropTime())
         loadModule(ActionBarData)
         loadModule(TrackerManager)
@@ -541,7 +556,9 @@ class SkyHanniMod {
         loadModule(LorenzUtils)
         loadModule(NEUItems)
         loadModule(PestAPI)
+        loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
+        loadModule(ChocolateFactoryAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -597,6 +614,12 @@ class SkyHanniMod {
         loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
+        loadModule(ChocolateFactoryBarnManager)
+        loadModule(ChocolateFactoryInventory)
+        loadModule(HoppityEggsManager)
+        loadModule(HoppityEggLocator)
+        loadModule(HoppityEggsShared)
+        loadModule(ChocolateFactoryStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
         loadModule(SlayerMiniBossFeatures())
@@ -658,6 +681,7 @@ class SkyHanniMod {
         loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
         loadModule(GardenVisitorFeatures)
+        loadModule(GardenVisitorSupercraft())
         loadModule(NPCVisitorFix)
         loadModule(GardenInventoryNumbers())
         loadModule(GardenVisitorTimer())
@@ -668,6 +692,9 @@ class SkyHanniMod {
         loadModule(ChickenHeadTimer())
         loadModule(FossilSolverDisplay)
         loadModule(ExcavatorProfitTracker())
+        loadModule(CorpseLOS)
+        loadModule(ProfitPerExcavation())
+        loadModule(GlacitePowderFeatures())
         loadModule(GardenOptimalSpeed())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
@@ -807,6 +834,7 @@ class SkyHanniMod {
         loadModule(LockMouseLook)
         loadModule(SensitivityReducer)
         loadModule(DungeonFinderFeatures())
+        loadModule(GoldenGoblinHighlight())
         loadModule(TabWidgetSettings())
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
@@ -823,13 +851,14 @@ class SkyHanniMod {
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(MiningEventTracker())
-        loadModule(MiningNotifications())
+        loadModule(MiningNotifications)
         loadModule(JyrreTimer())
         loadModule(TotemOfCorruption())
         loadModule(NewYearCakeReminder())
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
+        loadModule(VerminHighlighter())
         loadModule(SkillProgress)
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
@@ -840,7 +869,8 @@ class SkyHanniMod {
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)
-        loadModule(NoBitsWarning())
+        loadModule(NoBitsWarning)
+        loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
 
