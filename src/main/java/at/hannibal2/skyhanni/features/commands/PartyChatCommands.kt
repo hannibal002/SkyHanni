@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyChatCommands {
@@ -26,7 +25,7 @@ object PartyChatCommands {
             { useConfig().transferCommand },
             requiresPartyLead = true,
             executable = {
-                ChatUtils.sendCommandToServer("party transfer ${it.author.cleanPlayerName()}")
+                ChatUtils.sendCommandToServer("party transfer ${it.cleanedAuthor}")
             }
         ),
         PartyChatCommand(
@@ -65,15 +64,15 @@ object PartyChatCommands {
             return
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
-        if (event.author == LorenzUtils.getPlayerName()) {
+        if (event.cleanedAuthor == LorenzUtils.getPlayerName()) {
             return
         }
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) {
             return
         }
-        if (!isTrustedUser(event.author)) {
-            ChatUtils.chat("§cIgnoring chat command from ${event.author}. Change your party chat command settings or /friend (best) them.")
+        if (!isTrustedUser(event.cleanedAuthor)) {
+            ChatUtils.chat("§cIgnoring chat command from ${event.cleanedAuthor}. Change your party chat command settings or /friend (best) them.")
             return
         }
         command.executable(event)
