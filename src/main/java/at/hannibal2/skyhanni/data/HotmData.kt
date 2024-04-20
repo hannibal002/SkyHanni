@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -287,6 +288,8 @@ enum class HotmData(
 
     private val guiNamePattern by repoGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
 
+    val printName = name.allLettersFirstUppercase()
+
     val rawLevel: Int
         get() = storage?.perks?.get(this.name)?.level ?: 0
 
@@ -535,13 +538,13 @@ enum class HotmData(
                 HotmAPI.Powder.entries.forEach {
                     add("${it.lowName} Powder: ${it.getCurrent()}/${it.getTotal()}")
                 }
-                add("Ability: ${HotmAPI.activeMiningAbility}")
+                add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")
             }
             event.title("HotM - Tree")
             event.addIrrelevant(
                 entries.filter { it.isUnlocked }.map {
-                    "${if (it.enabled) "✔" else "✖"} ${it.name}: ${it.activeLevel}"
+                    "${if (it.enabled) "✔" else "✖"} ${it.printName}: ${it.activeLevel}"
                 }
             )
         }
