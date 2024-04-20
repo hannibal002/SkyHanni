@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -37,11 +36,10 @@ class PunchcardHighlight {
         if (!config.enabled.get()) return
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandType.THE_RIFT.isInIsland()) return
-        ChatUtils.debug("spawned '${event.mob.name}'}")
         val size = playerList.size
         if (size >= 20) return
         val entity = event.mob
-        if (!playerList.contains(entity.name) && entity.name != LorenzUtils.getPlayerName()) {
+        if (!playerList.contains(entity.name)) {
             colorPlayer(entity.baseEntity)
         }
     }
@@ -66,14 +64,10 @@ class PunchcardHighlight {
 
     private fun toggleConfig() {
         if (config.enabled.get()) {
-            MobData.players.filter { it.name != LorenzUtils.getPlayerName() }.forEach {
+            MobData.players.forEach {
                 colorPlayer(it.baseEntity)
             }
-        } else {
-            MobData.players.forEach {
-                RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
-            }
-        }
+        } else clearList()
     }
 
     @SubscribeEvent
@@ -102,7 +96,7 @@ class PunchcardHighlight {
 
     fun clearList() {
         playerList.clear()
-        MobData.players.filter { it.name != LorenzUtils.getPlayerName() }.forEach {
+        MobData.players.forEach {
             RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
         }
     }
