@@ -53,6 +53,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.EMPTY_2,
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
+        ChocolateFactoryStat.TIME_TOWER,
         ChocolateFactoryStat.LEADERBOARD_POS
     ));
 
@@ -83,6 +84,11 @@ public class ChocolateFactoryConfig {
     )
     @ConfigEditorSlider(minValue = 3, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
+
+    @Expose
+    @ConfigOption(name = "Time Tower Warning", desc = "Warn when you have 3 time tower uses stacked up.")
+    @ConfigEditorBoolean
+    public boolean timeTowerWarning = true;
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")

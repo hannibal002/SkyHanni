@@ -46,19 +46,21 @@ object ChocolateFactoryStats {
             add("")
             add("")
             add("")
+
+            add("§eTime Tower: §6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}")
         })
     }
 
     private fun formatList(list: List<String>): List<String> {
         return config.statsDisplayList
-            .filter { ChocolateFactoryAPI.currentPrestige != 1 || it != ChocolateFactoryStat.THIS_PRESTIGE }
+            .filter { it.shouldDisplay() }
             .map { list[it.ordinal] }
     }
 
-    enum class ChocolateFactoryStat(private val display: String) {
+    enum class ChocolateFactoryStat(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         HEADER("§6§lChocolate Factory Stats"),
         CURRENT("§eCurrent Chocolate: §65,272,230"),
-        THIS_PRESTIGE("§eThis Prestige: §6483,023,853"),
+        THIS_PRESTIGE("§eThis Prestige: §6483,023,853", { ChocolateFactoryAPI.currentPrestige != 1 }),
         ALL_TIME("§eAll-time: §6641,119,115"),
         PER_SECOND("§ePer Second: §63,780.72"),
         PER_MINUTE("§ePer Minute: §6226,843.2"),
@@ -70,6 +72,7 @@ object ChocolateFactoryStats {
         EMPTY(""),
         EMPTY_2(""),
         EMPTY_3(""),
+        TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
         ;
 
         override fun toString(): String {

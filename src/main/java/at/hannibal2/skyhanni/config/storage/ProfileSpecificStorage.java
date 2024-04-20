@@ -57,6 +57,15 @@ public class ProfileSpecificStorage {
 
         @Expose
         public int maxRabbits = -1;
+
+        @Expose
+        public long nextTimeTower = -1;
+
+        @Expose
+        public int currentTimeTowerUses = -1;
+
+        @Expose
+        public int maxTimeTowerUses = 3;
     }
 
     @Expose
