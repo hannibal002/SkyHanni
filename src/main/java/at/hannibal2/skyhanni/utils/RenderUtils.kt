@@ -51,7 +51,11 @@ object RenderUtils {
         }
     }
 
-    enum class VerticalAlignment { TOP, CENTER, BOTTOM }
+    enum class VerticalAlignment {
+        TOP,
+        CENTER,
+        BOTTOM,
+    }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
@@ -439,7 +443,7 @@ object RenderUtils {
         string: String?,
         offsetX: Int = 0,
         offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment
+        alignmentEnum: HorizontalAlignment,
     ): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
@@ -482,7 +486,7 @@ object RenderUtils {
     fun Position.renderStringsAlignedWidth(
         list: List<Pair<String, HorizontalAlignment>>,
         extraSpace: Int = 0,
-        posLabel: String
+        posLabel: String,
     ) {
         if (list.isEmpty()) return
 
@@ -558,7 +562,7 @@ object RenderUtils {
      */
     fun Position.renderSingleLineWithItems(
         list: List<Any?>,
-        posLabel: String
+        posLabel: String,
     ) {
         if (list.isEmpty()) return
         renderRenderables(
@@ -590,7 +594,7 @@ object RenderUtils {
     fun MutableList<Any>.addItemIcon(
         item: ItemStack,
         highlight: Boolean = false,
-        scale: Double = NEUItems.itemFontSize
+        scale: Double = NEUItems.itemFontSize,
     ) {
         try {
             if (highlight) {
@@ -1187,7 +1191,7 @@ object RenderUtils {
             middlePoint: LorenzVec,
             sidePoint1: LorenzVec,
             sidePoint2: LorenzVec,
-            c: Color
+            c: Color,
         ) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
             worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
@@ -1201,7 +1205,7 @@ object RenderUtils {
         companion object {
             inline fun draw3D(
                 partialTicks: Float = 0F,
-                crossinline quads: QuadDrawer.() -> Unit
+                crossinline quads: QuadDrawer.() -> Unit,
             ) {
 
                 GlStateManager.enableBlend()
@@ -1456,5 +1460,12 @@ object RenderUtils {
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
+    }
+
+    // TODO move off of neu function
+    fun drawTexturedRect(x: Float, y: Float) {
+        with(ScaledResolution(Minecraft.getMinecraft())) {
+            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
+        }
     }
 }

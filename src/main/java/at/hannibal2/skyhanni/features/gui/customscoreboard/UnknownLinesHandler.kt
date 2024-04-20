@@ -116,6 +116,8 @@ object UnknownLinesHandler {
             SbPattern.mineshaftNotStartedPattern,
             SbPattern.queuePattern,
             SbPattern.queuePositionPattern,
+            SbPattern.fortunateFreezingBonusPattern,
+            SbPattern.riftAveikxPattern,
         )
 
         unknownLines = unknownLines.filterNot { line ->

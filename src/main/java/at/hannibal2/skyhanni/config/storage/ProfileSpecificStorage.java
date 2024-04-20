@@ -51,6 +51,17 @@ public class ProfileSpecificStorage {
     public String currentPet = "";
 
     @Expose
+    public ChocolateFactoryStorage chocolateFactory = new ChocolateFactoryStorage();
+
+    public static class ChocolateFactoryStorage {
+        @Expose
+        public int currentRabbits = 0;
+
+        @Expose
+        public int maxRabbits = -1;
+    }
+
+    @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
 
     public static class MaxwellPowerStorage {
@@ -234,6 +245,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<Integer, GardenPlotAPI.PlotData> plotData = new HashMap<>();
+
+        @Expose
+        public int scoreboardPests = 0;
 
         @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();

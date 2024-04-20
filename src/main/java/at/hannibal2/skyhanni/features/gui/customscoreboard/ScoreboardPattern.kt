@@ -240,6 +240,10 @@ object ScoreboardPattern {
         "mineshaft.notstarted",
         "(?:§.)*Not started.*"
     )
+    val fortunateFreezingBonusPattern by miningSb.pattern(
+        "fortunatefreezing.bonus",
+        "Event Bonus: §6\\+\\d+☘"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
@@ -412,7 +416,10 @@ object ScoreboardPattern {
         "hotdogeaten",
         "^Eaten: §.\\d+\\/\\d+$"
     )
-
+    val riftAveikxPattern by riftSb.pattern(
+        "aveikx",
+        "Time spent sitting|with Ävaeìkx: .*"
+    )
 
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
