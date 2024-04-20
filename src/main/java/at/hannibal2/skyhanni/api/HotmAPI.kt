@@ -79,7 +79,7 @@ object HotmAPI {
             setTotal(getTotal() + value)
         }
 
-        /** Use when new powder gets collected*/ // TODO (future) use this for each Powder source
+        /** Use when new powder gets collected*/
         fun gain(value: Long) {
             addTotal(value)
             addCurrent(value)
