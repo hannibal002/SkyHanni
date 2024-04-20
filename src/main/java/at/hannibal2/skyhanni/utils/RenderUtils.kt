@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -66,6 +67,18 @@ object RenderUtils {
     }
 
     infix fun Slot.highlight(color: Color) {
+        highlight(color, xDisplayPosition, yDisplayPosition)
+    }
+
+    infix fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
+        highlight(color.toColor())
+    }
+
+    infix fun RenderGuiItemOverlayEvent.highlight(color: Color) {
+        highlight(color, x, y)
+    }
+
+    fun highlight(color: Color, x: Int, y: Int) {
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.pushAttrib()
         GL11.glDisable(GL11.GL_LIGHTING)
@@ -73,13 +86,38 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         // TODO don't use z
         GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(
-            this.xDisplayPosition,
-            this.yDisplayPosition,
-            this.xDisplayPosition + 16,
-            this.yDisplayPosition + 16,
-            color.rgb
-        )
+        Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
+        GlStateManager.popMatrix()
+        GlStateManager.popAttrib()
+    }
+
+    infix fun Slot.drawBorder(color: LorenzColor) {
+        drawBorder(color.toColor())
+    }
+
+    infix fun Slot.drawBorder(color: Color) {
+        drawBorder(color, xDisplayPosition, yDisplayPosition)
+    }
+
+    infix fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
+        drawBorder(color.toColor())
+    }
+
+    infix fun RenderGuiItemOverlayEvent.drawBorder(color: Color) {
+        drawBorder(color, x, y)
+    }
+
+    fun drawBorder(color: Color, x: Int, y: Int) {
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.pushAttrib()
+        GL11.glDisable(GL11.GL_LIGHTING)
+        GL11.glEnable(GL11.GL_DEPTH_TEST)
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        Gui.drawRect(x, y, x + 1, y + 16, color.rgb)
+        Gui.drawRect(x, y, x + 16, y + 1, color.rgb)
+        Gui.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
+        Gui.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
     }
