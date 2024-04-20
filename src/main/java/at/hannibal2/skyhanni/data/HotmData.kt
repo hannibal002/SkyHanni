@@ -541,7 +541,7 @@ enum class HotmData(
             event.title("HotM - Tree")
             event.addIrrelevant(
                 entries.filter { it.isUnlocked }.map {
-                    "${it.name} ${if (it.enabled) "✔" else "✖"} : ${it.activeLevel}"
+                    "${if (it.enabled) "✔" else "✖"} ${it.name}: ${it.activeLevel}"
                 }
             )
         }
