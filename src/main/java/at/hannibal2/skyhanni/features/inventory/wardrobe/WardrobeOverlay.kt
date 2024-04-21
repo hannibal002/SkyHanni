@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.Wardrobe.inWardrobe
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -16,7 +17,7 @@ class WardrobeOverlay {
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
-        if (!InventoryUtils.openInventoryName().startsWith("Wardrobe")) return
+        if (!inWardrobe()) return
 
         val gui = event.gui
         val player = Minecraft.getMinecraft().thePlayer
@@ -29,13 +30,14 @@ class WardrobeOverlay {
         val horizontalSpacing = 20
         val verticalSpacing = 20
 
-        val rows = ceil(totalPlayers.toDouble()/maxPlayersPerRow).toInt()
+        val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
         val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
 
         val startY = centerY + playerHeight - totalHeight / 2
 
         for (row in 0 until rows) {
-            val playersInRow = if (row != rows - 1 || totalPlayers%maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers%maxPlayersPerRow
+            val playersInRow =
+                if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
             val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * horizontalSpacing
 
             val startX = centerX - (totalWidth - playerWidth) / 2

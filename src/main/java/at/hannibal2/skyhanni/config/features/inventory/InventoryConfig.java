@@ -92,7 +92,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Wardrobe Overlay", desc = "")
     @Accordion
-    public WardrobeOverlay wardrobeOverlay = new WardrobeOverlay();
+    public WardrobeOverlayConfig wardrobeOverlay = new WardrobeOverlayConfig();
 
     @Expose
     @ConfigOption(

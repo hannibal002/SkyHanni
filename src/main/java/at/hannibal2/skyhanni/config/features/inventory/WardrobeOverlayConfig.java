@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class WardrobeOverlay {
+public class WardrobeOverlayConfig {
 
     @Expose
     @ConfigOption(name = "enble", desc = "")

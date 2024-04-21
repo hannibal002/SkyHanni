@@ -339,7 +339,8 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.inventory.wardrobe.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeOverlay
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.limbo.LimboPlaytime
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
