@@ -48,7 +48,7 @@ object MineshaftWaypoints {
             val waypointType = WaypointsType.LADDER
             val vec = Minecraft.getMinecraft().thePlayer.horizontalFacing.directionVec
             val location = playerLocation
-                // Move 6 blocks in front of the player to be in the ladder shaft
+                // Move 7 blocks in front of the player to be in the ladder shaft
                 .add(x = vec.x * blocksForward, y = -15, z = vec.z * blocksForward)
                 // Adjust 2 blocks to the right to be in the center of the ladder shaft
                 .add(x = vec.z * -2, z = vec.x * 2)
@@ -71,7 +71,8 @@ object MineshaftWaypoints {
                 val z = location.z.toInt()
                 val type = it.waypointType.displayText
 
-                ChatUtils.sendMessageToServer((if (PartyAPI.partyMembers.isEmpty()) "" else "/pc ") + "x: $x, y: $y, z: $z | ($type)")
+                val messagePrefix = if (PartyAPI.partyMembers.isEmpty()) "" else "/pc"
+                ChatUtils.sendMessageToServer("$messagePrefix x: $x, y: $y, z: $z | ($type)")
             }
     }
 
