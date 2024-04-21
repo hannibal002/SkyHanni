@@ -25,7 +25,7 @@ object ChocolateFactoryStats {
         val perHour = perMinute * 60
         val perDay = perHour * 24
         val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
-        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7(§a$it%§7)" } ?: ""
+        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" } ?: ""
         val timeTowerInfo = if (ChocolateFactoryAPI.timeTowerActive) {
             "§d§lActive"
         } else {
@@ -74,7 +74,7 @@ object ChocolateFactoryStats {
         PER_DAY("§ePer Day: §6326,654,208"),
         MULTIPLIER("§eChocolate Multiplier: §61.77"),
         BARN("§eBarn: §6171/190 Rabbits"),
-        LEADERBOARD_POS("§ePosition: §7#§b103"),
+        LEADERBOARD_POS("§ePosition: §7#§b103 §7Top §a0.87%"),
         EMPTY(""),
         EMPTY_2(""),
         EMPTY_3(""),
