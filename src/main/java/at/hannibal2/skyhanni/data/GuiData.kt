@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.NEURenderEvent
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -26,7 +28,11 @@ object GuiData {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onGuiClick(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
+    fun onGuiKeyPress(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
+        val (escKey, invKey) = Minecraft.getMinecraft().gameSettings.let {
+            it.keyBindBack.keyCode to it.keyBindInventory.keyCode
+        }
+        if (escKey.isKeyHeld() || invKey.isKeyHeld()) return
         if (preDrawEventCanceled) event.isCanceled = true
     }
 }
