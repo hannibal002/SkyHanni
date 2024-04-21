@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.NEUMBGuiRenderEvent;
 import at.hannibal2.skyhanni.events.NEURenderEvent;
 import io.github.moulberry.notenoughupdates.NEUOverlay;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,13 +13,6 @@ public class MixinNEUOverlay {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true, remap = false)
     private void render(boolean hoverInv, CallbackInfo ci) {
         if (new NEURenderEvent().postAndCatch()) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "updateGuiGroupSize", at = @At("HEAD"), cancellable = true, remap = false)
-    private void updateGuiGroupSize(CallbackInfo ci) {
-        if (new NEUMBGuiRenderEvent().postAndCatch()) {
             ci.cancel();
         }
     }
