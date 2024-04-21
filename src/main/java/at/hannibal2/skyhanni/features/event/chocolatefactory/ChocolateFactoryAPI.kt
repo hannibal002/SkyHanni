@@ -102,7 +102,7 @@ object ChocolateFactoryAPI {
     private var prestigeIndex = 28
     var milestoneIndex = 53
     private var leaderboardIndex = 51
-    private var timeTowerIndex = 39
+    var timeTowerIndex = 39
     var maxRabbits = 395
 
     var inChocolateFactory = false

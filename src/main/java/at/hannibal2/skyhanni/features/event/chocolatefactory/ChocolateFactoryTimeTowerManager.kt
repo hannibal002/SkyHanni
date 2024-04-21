@@ -77,7 +77,7 @@ object ChocolateFactoryTimeTowerManager {
         return profileStorage?.maxTimeTowerUses ?: 3
     }
 
-    private fun timeTowerFull() = currentCharges() >= maxCharges()
+    fun timeTowerFull() = currentCharges() >= maxCharges()
 
     @SubscribeEvent
     fun onProfileChange(event: ProfileJoinEvent) {

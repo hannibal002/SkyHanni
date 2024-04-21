@@ -64,6 +64,19 @@ object ChocolateFactoryInventory {
             if (slot.slotIndex == ChocolateFactoryAPI.clickRabbitSlot) {
                 slot highlight LorenzColor.RED
             }
+            if (slot.slotIndex == ChocolateFactoryAPI.milestoneIndex) {
+                slot.stack?.getLore()?.matchFirst(unclaimedRewardsPattern) {
+                    slot highlight LorenzColor.RED
+                }
+            }
+            if (slot.slotIndex == ChocolateFactoryAPI.timeTowerIndex) {
+                if (ChocolateFactoryAPI.timeTowerActive) {
+                    slot highlight LorenzColor.LIGHT_PURPLE
+                }
+                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
+                    slot highlight LorenzColor.RED
+                }
+            }
         }
     }
 
@@ -94,11 +107,6 @@ object ChocolateFactoryInventory {
         if (slotNumber in ChocolateFactoryAPI.otherUpgradeSlots) {
             upgradeTierPattern.matchMatcher(itemName) {
                 event.stackTip = group("tier").romanToDecimal().toString()
-            }
-        }
-        if (slotNumber == ChocolateFactoryAPI.milestoneIndex) {
-            item.getLore().matchFirst(unclaimedRewardsPattern) {
-                event.stackTip = "§c!!!"
             }
         }
     }
