@@ -1,5 +1,13 @@
+/**
+ * @author Linnea Gräf
+ */
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.findStyledMatcher
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
@@ -9,6 +17,10 @@ import java.util.regex.Pattern
 
 object ComponentMatcherUtils {
 
+    /**
+     * Convert an [IChatComponent] into a [ComponentSpan], which allows taking substrings of the given component,
+     * while preserving chat style.
+     */
     fun IChatComponent.intoSpan(): ComponentSpan {
         val text = this.unformattedText
         return ComponentSpan(
@@ -19,42 +31,81 @@ object ComponentMatcherUtils {
         )
     }
 
+    /**
+     * Create a styled matcher, analogous to [Pattern.matcher], but while preserving [ChatStyle].
+     */
     fun Pattern.styledMatcher(span: ComponentSpan): ComponentMatcher {
         val matcher = matcher(span.getText())
         return ComponentMatcher(matcher, span)
     }
 
+    /**
+     * Equivalent to [matchMatcher], but while preserving [ChatStyle]
+     */
     inline fun <T> Pattern.matchStyledMatcher(chat: IChatComponent, consumer: ComponentMatcher.() -> T) =
         matchStyledMatcher(chat.intoSpan(), consumer)
 
+    /**
+     * Equivalent to [matchMatcher], but while preserving [ChatStyle]
+     */
     inline fun <T> Pattern.matchStyledMatcher(span: ComponentSpan, consumer: ComponentMatcher.() -> T) =
         styledMatcher(span).let { if (it.matches()) consumer(it) else null }
 
+    /**
+     * Equivalent to [findMatcher], but while preserving [ChatStyle]
+     */
     inline fun <T> Pattern.findStyledMatcher(chat: IChatComponent, consumer: ComponentMatcher.() -> T) =
         findStyledMatcher(chat.intoSpan(), consumer)
 
+    /**
+     * Equivalent to [findMatcher], but while preserving [ChatStyle]
+     */
     inline fun <T> Pattern.findStyledMatcher(span: ComponentSpan, consumer: ComponentMatcher.() -> T) =
         styledMatcher(span).let { if (it.find()) consumer(it) else null }
 }
 
+/**
+ * This is an analogue for [Matcher], but for [ComponentSpan], therefore it is stateful, with [matches] and [find]
+ * mutating this state. Direct usage of this class is recommended against in favor of using
+ * [ComponentMatcherUtils.matchStyledMatcher] and [ComponentMatcherUtils.findStyledMatcher]
+ */
 class ComponentMatcher internal constructor(
     val matcher: Matcher,
     val span: ComponentSpan,
 ) {
+    /**
+     * Try to match the entire input component against the stored regex.
+     */
     fun matches(): Boolean {
         return matcher.matches()
     }
 
+    /**
+     * Try to find the next match in the input component of the stored regex.
+     */
     fun find(): Boolean {
         return matcher.find()
     }
 
+    /**
+     * Return a span equivalent to the entire match found by [matches] or [find]
+     */
+    fun group(): ComponentSpan {
+        return this.span.slice(matcher.start(), matcher.end())
+    }
+
+    /**
+     * Return a span equivalent to the group with the given index found by [matches] or [find]
+     */
     fun group(index: Int): ComponentSpan? {
         val start = matcher.start(index)
         if (start < 0) return null
         return this.span.slice(start, matcher.end(index))
     }
 
+    /**
+     * Return a span equivalent to the group with the given name found by [matches] or [find]
+     */
     fun group(name: String): ComponentSpan? {
         val start = matcher.start(name)
         if (start < 0) return null
@@ -62,6 +113,14 @@ class ComponentMatcher internal constructor(
     }
 }
 
+/**
+ * Represents a substring of a [IChatComponent], preserving the [chat style][IChatComponent.getChatStyle].
+ * This class always deals in what the chat component APIs call [unformatted text][IChatComponent.getUnformattedText].
+ * This text may contain formatting codes, but will not have additional formatting codes inserted based on the chat
+ * style. Specifically, it will look at the [IChatComponent.getUnformattedTextForChat], which *excludes* the text from
+ * the siblings/children of a chat component. To make sure that internal cached states are upheld, use
+ * [ComponentMatcherUtils.intoSpan] instead of the constructor.
+ */
 class ComponentSpan internal constructor(
     val textComponent: IChatComponent,
     private val cachedText: String,
@@ -73,7 +132,14 @@ class ComponentSpan internal constructor(
         require(end <= cachedText.length)
     }
 
-    val length get() = end - start
+    /**
+     * Returns the text length of this span.
+     */
+    val length = end - start
+
+    /**
+     * Slice this component span. This is equivalent to the [String.substring] operation on the [text][getText].
+     */
     fun slice(start: Int, end: Int): ComponentSpan {
         require(0 <= start)
         require(start <= end)
@@ -81,14 +147,37 @@ class ComponentSpan internal constructor(
         return ComponentSpan(textComponent, cachedText, this.start + start, this.start + end)
     }
 
+    /**
+     * Returns the text (without any chat style formatting applied). May still contain formatting codes.
+     */
     fun getText() = cachedText.substring(start, end)
 
+    /**
+     * Sample the chat style at the start of the span.
+     */
     fun sampleStyleAtStart(): ChatStyle? = sampleAtStart().chatStyle
 
+    /**
+     * Sample all the components that intersect with this span. Note that some of the returned components may contain
+     * children/siblings that are not intersecting this span, and that some of the returned components may only
+     * partially intersect with this span.
+     */
     fun sampleComponents(): List<IChatComponent> {
         return sampleSlicedComponents().map { it.first }
     }
 
+    /**
+     * Sample all the components that intersect with this span, with their respective indices. This behaves like
+     * [sampleComponents], but it will also return indices indicating which part of the
+     * [IChatComponent.getUnformattedTextForChat] is actually intersecting with this span.
+     *
+     * ```
+     * val firstComponent = this.sampleSlicedComponents().first()
+     * firstComponent.first.getUnformattedTextForChat().substring(firstComponent.second, firstComponent.third)
+     * ```
+     *
+     * @see intoComponent
+     */
     fun sampleSlicedComponents(): List<Triple<IChatComponent, Int, Int>> {
         var index = start
         val workStack = Stack<IChatComponent>()
@@ -121,6 +210,9 @@ class ComponentSpan internal constructor(
         return listBuilder
     }
 
+    /**
+     * Returns the first [chat component][IChatComponent] that intersects with this span.
+     */
     fun sampleAtStart(): IChatComponent {
         return sampleComponents().first()
     }
@@ -142,6 +234,9 @@ class ComponentSpan internal constructor(
         return parent
     }
 
+    /**
+     * Returns a list of all the styles that intersect with this span.
+     */
     fun sampleStyles(): List<ChatStyle> {
         return sampleComponents().map { it.chatStyle }
     }
