@@ -86,6 +86,12 @@ public class ChocolateFactoryConfig {
     public int barnCapacityThreshold = 6;
 
     @Expose
+    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityCollectionStats = true;
+
+    @Expose
     @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
@@ -95,4 +101,8 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
     public Position position = new Position(183, 160, false, true);
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
+    public Position hoppityStatsPosition = new Position(183, 160, false, true);
 }
