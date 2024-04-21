@@ -308,6 +308,35 @@ interface Renderable {
             }
         }
 
+        fun clickAndHoverable(
+            hovered: Renderable,
+            unhovered: Renderable,
+            onClick: () -> Unit,
+            onHover: () -> Unit = {},
+        ) = object : Renderable {
+            override val width: Int
+                get() = max(hovered.width, unhovered.width)
+            override val height: Int
+                get() = max(hovered.height, unhovered.height)
+            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
+            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
+
+            var isHovered = false
+
+            override fun render(posX: Int, posY: Int) {
+                isHovered = isHovered(posX, posY)
+                if (isHovered) {
+                    hovered.render(posX, posY)
+                    onHover.invoke()
+                } else {
+                    unhovered.render(posX, posY)
+                }
+                if (isHovered && (0 - 100).isKeyClicked()) {
+                    onClick()
+                }
+            }
+        }
+
         fun itemStack(
             item: ItemStack,
             scale: Double = NEUItems.itemFontSize,
@@ -611,5 +640,22 @@ interface Renderable {
                 GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
+
+        fun emptyContainer(
+            width: Int,
+            height: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Gui.drawRect(posX, posY, posX + width, posY + height, 0x00000000)
+            }
+        }
+
     }
 }

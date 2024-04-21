@@ -1,23 +1,30 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.Wardrobe.inWardrobe
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import kotlin.math.ceil
 
 class WardrobeOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.wardrobeOverlay
+    private var display = emptyList<Pair<Position, Renderable>>()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
-        if (!inWardrobe()) return
+
+        display = emptyList()
 
         val gui = event.gui
         val player = Minecraft.getMinecraft().thePlayer
@@ -59,13 +66,41 @@ class WardrobeOverlay {
                     mouseYRelativeToPlayer,
                     player
                 )
+
+                val padding = 5
+                val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
+
+                val renderable = Renderable.drawInsideRoundedRect(
+                    Renderable.clickAndHoverable(
+                        Renderable.emptyContainer(playerWidth, playerHeight),
+                        Renderable.emptyContainer(playerWidth, playerHeight),
+                        onClick = {
+                            ChatUtils.chat("Clicked on player at $i")
+                        },
+                        onHover = {
+                            ChatUtils.chat("Hovered over player at $i")
+                        }
+                    ),
+                    Color.BLACK,
+                    padding,
+                )
+
+                display += pos to renderable
             }
         }
 
         event.cancel()
     }
 
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (!isEnabled()) return
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+        for ((pos, renderable) in display) {
+            pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
+        }
+    }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()
 
 }
