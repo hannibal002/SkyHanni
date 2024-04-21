@@ -335,7 +335,9 @@ object StringUtils {
             return null
         }
 
-        if (LorenzUtils.stripVanillaMessage(original.formattedText) == newText) return null
+        val originalText = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val newTextt = LorenzUtils.stripVanillaMessage(newText)
+        if (originalText == newTextt) return null
 
         val text = ChatComponentText(newText)
         if (size == 1) {
