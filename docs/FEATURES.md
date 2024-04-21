@@ -34,6 +34,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + SkyBlock XP Chat. - Thunderblade73
     + Sends the SkyBlock XP message from the action bar into the chat.
 + Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
++ Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
 
 #### Chat Filter
 
@@ -81,13 +82,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Soulweaver Skull Hider in the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 + Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
-+ Added available classes in the tooltip. - Conutik
++ Show available classes in the tooltip. - Conutik
     + Shows in the dungeon party finder when hovering over a group.
     + Highlights your selected class in green if it's available.
 + Kismet tracking for dungeon chests. - Thunderblade73
     + Highlight chests which have been rerolled inside Croesus
     + Shows kismet amount at the reroll button
-+ Added SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
++ SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
     + Warn shorty before a Shadow Assassin jumps to you in dungeons.
 
 </details>
@@ -659,6 +660,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show all your visited/accepted/denied visitors stats in a display.
 + Stereo Harmony Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1324)
     + Options to show/hide boosted crop and pest icons.
++ Added Super Craft button to visitors for ease of access. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1173)
+    + Checks if you have enough materials to craft the items and depending on that shows the button or not.
 
 </details>
 <details open><summary>
@@ -734,6 +737,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
 + Vermin Tracker. - walker
++ Vermin Highlight. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1457)
+    + Highlights Vermin mobs in the West Village in the Rift.
+    + Change Highlight color.
 
 </details>
 <details open><summary>
@@ -752,7 +758,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
-+ Added Deep Caverns Parkour. - hannibal2
++ Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
 + Display upcoming mining events. - CalMWolfs
     + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
@@ -767,6 +773,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Track Fossil Dust and use it for profit calculation.
 + Mining Notifications. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1429)
     + Mining events, including Mineshaft spawning, Suspicious Scrap drops, and Cold going above a threshold.
++ Profit Per Excavation. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1439)
+    + Show profit/loss in chat after each excavation.
+    + Also include breakdown information on hover.
++ Textured cold overlay to Glacite Tunnels. - j10a1n15, Empa (https://github.com/hannibal002/SkyHanni/pull/1438)
+    + Change at what cold level the texture should appear.
++ Glacial Powder as stack size in the Fossil Excavator. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
++ Highlight own Golden/Diamond Goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
 
 </details>
 <details open><summary>
@@ -1063,6 +1076,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + party chat commands. - !nea (https://github.com/hannibal002/SkyHanni/pull/1433)
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
++ Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
++ Stuff for Chocolate Factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1434)
+    + Show info about your chocolate factory.
+    + Show which upgrades you can afford and which to buy.
+    + Notification to click on rabbit in the inventory.
+    + Notify you if you are close to having your rabbits crushed.
 
 </details>
 <details open><summary>

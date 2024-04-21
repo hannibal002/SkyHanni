@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.TabListData.Companion.getPlayerTabOverlay
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -22,16 +22,17 @@ object TabListRenderer {
 
     private val config get() = SkyHanniMod.feature.gui.compactTabList
 
-    const val maxLines = 22
-    private const val lineHeight = 8 + 1
-    private const val padding = 3
-    private const val columnSpacing = 6
+    const val MAX_LINES = 22
+    private const val LINE_HEIGHT = 8 + 1
+    private const val TAB_PADDING = 3
+    private const val COLUMN_SPACING = 6
+    private const val TAB_Z_OFFSET = 10f
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.type != RenderGameOverlayEvent.ElementType.PLAYER_LIST) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         event.isCanceled = true
 
         if (config.toggleTab) return
@@ -45,7 +46,7 @@ object TabListRenderer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
@@ -63,46 +64,37 @@ object TabListRenderer {
         }
     }
 
-    private val tabZOffest = 10f
-
     internal fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
 
-        GlStateManager.translate(0f, 0f, tabZOffest)
+        GlStateManager.translate(0f, 0f, TAB_Z_OFFSET)
 
         var maxLines = 0
-        var totalWidth = 0 - columnSpacing
+        var totalWidth = 0 - COLUMN_SPACING
 
         for (column in columns) {
             maxLines = maxLines.coerceAtLeast(column.size())
-            totalWidth += column.getMaxWidth() + columnSpacing
+            totalWidth += column.getMaxWidth() + COLUMN_SPACING
         }
 
-        var totalHeight = maxLines * lineHeight
-        val tabList = getPlayerTabOverlay()
+        var totalHeight = maxLines * LINE_HEIGHT
 
         var header = listOf<String>()
-        if (tabList.header_skyhanni != null) {
-            header = tabList.header_skyhanni.formattedText.split("\n").toMutableList()
+
+        if (!config.hideAdverts) {
+            header = TabListData.getHeader().split("\n").toMutableList()
             header.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            if (config.hideAdverts) {
-                header = listOf()
-            } else {
-                totalHeight += header.size * lineHeight + padding
-            }
+            totalHeight += header.size * LINE_HEIGHT + TAB_PADDING
         }
 
         var footer = listOf<String>()
-        if (tabList.footer_skyhanni != null) {
-            footer = tabList.footer_skyhanni.formattedText.split("\n").toMutableList()
+
+        if (!config.hideAdverts) {
+            footer = TabListData.getFooter().split("\n").toMutableList()
             footer.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            if (config.hideAdverts) {
-                footer = listOf()
-            } else {
-                totalHeight += footer.size * lineHeight + padding
-            }
+            totalHeight += footer.size * LINE_HEIGHT + TAB_PADDING
         }
 
         val minecraft = Minecraft.getMinecraft()
@@ -112,10 +104,10 @@ object TabListRenderer {
         val y = 10
 
         Gui.drawRect(
-            x - columnSpacing,
-            y - padding,
-            screenWidth + totalWidth / 2 + columnSpacing,
-            10 + totalHeight + padding,
+            x - COLUMN_SPACING,
+            y - TAB_PADDING,
+            screenWidth + totalWidth / 2 + COLUMN_SPACING,
+            10 + totalHeight + TAB_PADDING,
             -0x80000000
         )
 
@@ -136,7 +128,7 @@ object TabListRenderer {
         var lastTitle: TabLine? = null
         var lastSubTitle: TabLine? = null
         for (originalColumn in columns) {
-            var middleY = if (config.hideAdverts) headerY else headerY + padding + 2
+            var middleY = if (config.hideAdverts) headerY else headerY + TAB_PADDING + 2
 
             val column = originalColumn.lines.filterToMutable { tabLine ->
                 if (tabLine.type == TabStringType.TITLE) {
@@ -150,10 +142,10 @@ object TabListRenderer {
             }.let(::RenderColumn)
 
             Gui.drawRect(
-                middleX - padding + 1,
-                middleY - padding + 1,
-                middleX + column.getMaxWidth() + padding - 2,
-                middleY + column.size() * lineHeight + padding - 2,
+                middleX - TAB_PADDING + 1,
+                middleY - TAB_PADDING + 1,
+                middleX + column.getMaxWidth() + TAB_PADDING - 2,
+                middleY + column.size() * LINE_HEIGHT + TAB_PADDING - 2,
                 0x20AAAAAA
             )
 
@@ -193,14 +185,14 @@ object TabListRenderer {
                         0xFFFFFF
                     )
                 }
-                middleY += lineHeight
+                middleY += LINE_HEIGHT
                 middleX = savedX
             }
-            middleX += column.getMaxWidth() + columnSpacing
+            middleX += column.getMaxWidth() + COLUMN_SPACING
         }
 
         if (footer.isNotEmpty()) {
-            var footerY = y + totalHeight - footer.size * lineHeight + padding / 2 + 1
+            var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
             for (line in footer) {
                 minecraft.fontRendererObj.drawStringWithShadow(
                     line,
@@ -208,15 +200,15 @@ object TabListRenderer {
                     footerY.toFloat(),
                     -0x1
                 )
-                footerY += lineHeight
+                footerY += LINE_HEIGHT
             }
         }
-        GlStateManager.translate(0f, 0f, -tabZOffest)
+        GlStateManager.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
     private val fireSalePattern by RepoPattern.pattern(
         "tablist.firesaletitle",
-        "§b§lFire Sales: §r§f\\([0-9]+\\)"
+        "§.§lFire Sales: §r§f\\([0-9]+\\)"
     )
 
     @SubscribeEvent

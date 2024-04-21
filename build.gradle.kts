@@ -1,12 +1,13 @@
-import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import xyz.wagyourtail.unimined.api.minecraft.MinecraftConfig
+import xyz.wagyourtail.unimined.api.minecraft.task.RemapJarTask
+import xyz.wagyourtail.unimined.api.runs.RunConfig
 import java.io.ByteArrayOutputStream
 
 plugins {
     idea
     java
-    id("gg.essential.loom") version "0.10.0.+"
-    id("dev.architectury.architectury-pack200") version "0.1.3"
+    id("xyz.wagyourtail.unimined") version "1.2.0-SNAPSHOT"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
@@ -15,7 +16,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.7.1"
+version = "0.25.Beta.10"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -38,6 +39,10 @@ sourceSets.main {
     kotlin.destinationDirectory.set(java.destinationDirectory)
 }
 
+val patternSourceSet = sourceSets.create("pattern") {
+    this.runtimeClasspath += sourceSets.main.get().runtimeClasspath
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -51,15 +56,19 @@ repositories {
     maven("https://repo.nea.moe/releases")
     maven("https://maven.notenoughupdates.org/releases")
     maven("https://repo.hypixel.net/repository/Hypixel/")
+    ivy("https://repo1.maven.org/maven2/org/apache/logging/log4j") {
+        this.content {
+            this.includeGroup("log4jhack")
+        }
+        this.patternLayout {
+            this.artifact("log4j-[artifact]/[revision]/log4j-[artifact]-[revision].[ext]")
+        }
+        this.metadataSources {
+            this.artifact()
+        }
+    }
 }
 
-val shadowImpl: Configuration by configurations.creating {
-    configurations.implementation.get().extendsFrom(this)
-}
-
-val shadowModImpl: Configuration by configurations.creating {
-    configurations.modImplementation.get().extendsFrom(this)
-}
 
 val devenvMod: Configuration by configurations.creating {
     isTransitive = false
@@ -73,10 +82,125 @@ val headlessLwjgl by configurations.creating {
 
 val shot = shots.shot("minecraft", project.file("shots.txt"))
 
+val modRuntimeOnly by configurations.creating {
+    configurations.runtimeOnly.get().extendsFrom(this)
+}
+val modCompileOnly by configurations.creating {
+    configurations.compileOnly.get().extendsFrom(this)
+}
+
+fun RunConfig.setBaseConfig() {
+    val runDir = file("run").absoluteFile
+    this.javaVersion = JavaVersion.VERSION_1_8
+    this.args.addAll(
+        listOf(
+            "--tweakClass",
+            "org.spongepowered.asm.launch.MixinTweaker",
+            "--tweakClass",
+            "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker",
+            "--mods",
+            devenvMod.resolve().joinToString(",") { it.relativeTo(runDir).path }
+        )
+    )
+    this.args.set(
+        this.args.indexOf("--gameDir") + 1,
+        runDir.absolutePath
+    )
+    this.jvmArgs.removeIf { it.startsWith("-Xmx") || it.startsWith("-XX:") }
+    this.jvmArgs.addAll(
+        listOf(
+            "-Xmx4G",
+            "-Dmixin.debug=true",
+            "-Dlog4j.configurationFile=${project.file("log4j2.xml").absolutePath}"
+        )
+    )
+    this.workingDir = runDir
+    if (System.getenv("repo_action") != "true") {
+        this.jvmArgs.add("-Ddevauth.configDir=${rootProject.file(".devauth").absolutePath}")
+    }
+    this.env.putAll(parseEnvFile(file(".env")))
+}
+
+fun MinecraftConfig.defaultMinecraft() {
+    this.version("1.8.9")
+    this.mappings {
+        this.searge()
+        this.mcp("stable", "22-1.8.9")
+    }
+    this.minecraftForge {
+        this.loader("11.15.1.2318-1.8.9")
+        this.mixinConfig("mixins.skyhanni.json")
+    }
+}
+
+unimined.minecraft {
+    this.defaultMinecraft()
+    this.runs {
+        this.config("client") {
+            this.setBaseConfig()
+        }
+        this.config("server") {
+            this.disabled = true
+        }
+    }
+    this.mods {
+        this.remap(modRuntimeOnly)
+        this.remap(devenvMod)
+        this.remap(modCompileOnly)
+    }
+}
+
+unimined.minecraft(patternSourceSet) {
+    this.defaultMinecraft()
+    this.runs {
+        this.config("client") {
+            this.setBaseConfig()
+            this.jvmArgs.addAll(
+                listOf(
+                    "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
+                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
+                    "-javaagent:${headlessLwjgl.singleFile.absolutePath}"
+                )
+            )
+            val outputFile = project.file("build/regexes/constants.json")
+            this.env.put("SKYHANNI_DUMP_REGEXES", "${gitHash}:${outputFile.absolutePath}")
+            this.env.put("SKYHANNI_DUMP_REGEXES_EXIT", "true")
+        }
+        this.config("server") {
+            this.disabled = true
+        }
+    }
+}
+unimined.minecraft(sourceSets.test.get()) {
+    this.defaultMinecraft()
+    this.runs {
+        this.off = true
+    }
+}
+val modImplementation by configurations
+val testModImplementation by configurations
+val patternModImplementation by configurations
+
+testModImplementation.extendsFrom(modImplementation)
+patternModImplementation.extendsFrom(testModImplementation)
+
+val shadowImpl: Configuration by configurations.creating {
+    configurations.implementation.get().extendsFrom(this)
+}
+
+val shadowModImpl: Configuration by configurations.creating {
+    modImplementation.extendsFrom(this)
+
+}
+
+configurations.named("minecraftLibraries") {
+    this.resolutionStrategy {
+        this.force("org.apache.logging.log4j:log4j-core:2.8.1")
+        this.force("org.apache.logging.log4j:log4j-api:2.8.1")
+    }
+}
+
 dependencies {
-    minecraft("com.mojang:minecraft:1.8.9")
-    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
-    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
     shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
@@ -92,14 +216,13 @@ dependencies {
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
-    annotationProcessor("org.spongepowered:mixin:0.8.4-SNAPSHOT")
 
     implementation(kotlin("stdlib-jdk8"))
     shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.0")
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
@@ -124,9 +247,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     implementation("net.hypixel:mod-api:0.3.1")
-}
-configurations.getByName("minecraftNamed").dependencies.forEach {
-    shot.applyTo(it as HasConfigurableAttributes<*>)
+
+    runtimeOnly(libs.terminalConsoleAppender)
+    // Manually load 2.0-beta.9 on the class path *after* loading 2.8.X, since forge uses some of the helper classes only available in this version.
+    runtimeOnly("log4jhack:api:2.0-beta9")
+    runtimeOnly("log4jhack:core:2.0-beta9")
 }
 
 tasks.withType(Test::class) {
@@ -145,64 +270,19 @@ kotlin {
     }
 }
 
-// Minecraft configuration:
-loom {
-    launchConfigs {
-        "client" {
-            property("mixin.debug", "true")
-            if (System.getenv("repo_action") != "true") {
-                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
-            }
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
-            arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
-        }
-    }
-    forge {
-        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        mixinConfig("mixins.skyhanni.json")
-    }
-    @Suppress("UnstableApiUsage")
-    mixin {
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
-    }
-    runConfigs {
-        "client" {
-            if (SystemUtils.IS_OS_MAC_OSX) {
-                vmArgs.remove("-XstartOnFirstThread")
-            }
-            vmArgs.add("-Xmx4G")
-        }
-        "server" {
-            isIdeConfigGenerated = false
-        }
-    }
-}
-
 // Tasks:
 tasks.processResources {
     inputs.property("version", version)
     filesMatching("mcmod.info") {
         expand("version" to version)
     }
+    this.filesMatching("mixins.skyhanni.json") {
+        this.autoDiscoverMixins(sourceSets.main.get())
+    }
 }
 
-val generateRepoPatterns by tasks.creating(JavaExec::class) {
-    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-    mainClass.set("net.fabricmc.devlaunchinjector.Main")
-    workingDir(project.file("run"))
-    classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
-    jvmArgs(
-        "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
-        "-Dfabric.dli.env=client",
-        "-Dfabric.dli.main=net.minecraft.launchwrapper.Launch",
-        "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
-        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
-        "-javaagent:${headlessLwjgl.singleFile.absolutePath}"
-    )
-    val outputFile = project.file("build/regexes/constants.json")
-    environment("SKYHANNI_DUMP_REGEXES", "${gitHash}:${outputFile.absolutePath}")
-    environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
+val generateRepoPatterns by tasks.creating() {
+    afterEvaluate { dependsOn(tasks["patternRunClient"]) }
 }
 
 tasks.compileJava {
@@ -215,6 +295,9 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(Jar::class) {
     archiveBaseName.set("SkyHanni")
+    if (this.name != "remapJar") {
+        this.destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+    }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest.attributes.run {
         this["FMLCorePluginContainsFMLMod"] = "true"
@@ -227,21 +310,14 @@ tasks.withType(Jar::class) {
 }
 
 
-val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+val remapJar by tasks.named<RemapJarTask>("remapJar") {
     archiveClassifier.set("")
-    from(tasks.shadowJar)
-    input.set(tasks.shadowJar.get().archiveFile)
+    inputFile.set(tasks.shadowJar.flatMap { it.archiveFile })
 }
 
 tasks.shadowJar {
-    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl, shadowModImpl)
-    doLast {
-        configurations.forEach {
-            println("Config: ${it.files}")
-        }
-    }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
@@ -249,9 +325,8 @@ tasks.shadowJar {
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
-    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
-tasks.assemble.get().dependsOn(tasks.remapJar)
+tasks.assemble.get().dependsOn(remapJar)
 
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
@@ -262,14 +337,13 @@ compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
 val sourcesJar by tasks.creating(Jar::class) {
-    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)
 }
 
 publishing.publications {
     create<MavenPublication>("maven") {
-        artifact(tasks.remapJar)
+        artifact(remapJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")
