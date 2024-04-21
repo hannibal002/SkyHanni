@@ -263,6 +263,7 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.WardrobeOverlay
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
@@ -873,6 +874,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(WardrobeOverlay())
 
         init()
 
