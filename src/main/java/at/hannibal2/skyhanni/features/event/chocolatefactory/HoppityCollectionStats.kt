@@ -110,8 +110,9 @@ class HoppityCollectionStats {
             val hover = buildList {
                 add(title)
                 add("")
-                add("§7Found Rabbits: §a$displayFound§7/§a$displayTotal")
+                add("§7Unique Rabbits: §a$displayFound§7/§a$displayTotal")
                 add("§7Duplicate Rabbits: §a$displayDuplicates")
+                add("§7Total Rabbits Found: §a${displayFound + displayDuplicates}")
                 add("")
                 add("§7Chocolate Per Second: §a$displayChocolatePerSecond")
                 add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
