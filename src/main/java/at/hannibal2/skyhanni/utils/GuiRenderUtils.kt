@@ -312,7 +312,7 @@ object GuiRenderUtils {
         color: Color,
         useChroma: Boolean,
         texture: SkillProgressBarConfig.TexturedBar.UsedTexture,
-        height: Float
+        height: Float,
     ) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, 0f)
@@ -388,7 +388,7 @@ object GuiRenderUtils {
         bottom: Int,
         startColor: Int,
         endColor: Int,
-        zLevel: Double
+        zLevel: Double,
     ) {
         val f = (startColor shr 24 and 255).toFloat() / 255.0f
         val g = (startColor shr 16 and 255).toFloat() / 255.0f
