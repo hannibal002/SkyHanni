@@ -64,7 +64,9 @@ object TabListRenderer {
         }
     }
 
-    private fun drawTabList() {
+    private val tabZOffest = 10f
+
+    internal fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
@@ -46,17 +47,30 @@ object TabListData {
         }
     }
 
-    fun copyCommand(args: Array<String>) {
-        if (debugCache != null) {
-            ChatUtils.clickableChat("Tab list debug is enabled!", "shdebugtablist")
-            return
-        }
+        fun copyCommand(args: Array<String>) {
+            if (debugCache != null) {
+                ChatUtils.clickableChat("Tab list debug is enabled!", "shdebugtablist")
+                return
+            }
 
-        val resultList = mutableListOf<String>()
-        val noColor = args.size == 1 && args[0] == "true"
-        for (line in getTabList()) {
-            val tabListLine = line.transformIf({ noColor }) { removeColor() }
-            if (tabListLine != "") resultList.add("'$tabListLine'")
+            val resultList = mutableListOf<String>()
+            val noColor = args.size == 1 && args[0] == "true"
+            for (line in getTabList()) {
+                val tabListLine = line.transformIf({ noColor }) { removeColor() }
+                if (tabListLine != "") resultList.add("'$tabListLine'")
+            }
+            val tabList = getPlayerTabOverlay()
+            val tabHeader =
+                tabList.header_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
+            val tabFooter =
+                tabList.footer_skyhanni.conditionalTransform(noColor, { unformattedText }, { formattedText })
+
+            val widgets = TabWidget.entries.filter { it.isActive }
+                .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
+            val string =
+                "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
+            OSUtils.copyToClipboard(string)
+            ChatUtils.chat("Tab list copied into the clipboard!")
         }
 
         val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
