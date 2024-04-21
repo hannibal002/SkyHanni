@@ -34,6 +34,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + SkyBlock XP Chat. - Thunderblade73
     + Sends the SkyBlock XP message from the action bar into the chat.
 + Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
++ Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
 
 #### Chat Filter
 
@@ -1076,6 +1077,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
 + Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
++ Stuff for Chocolate Factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1434)
+    + Show info about your chocolate factory.
+    + Show which upgrades you can afford and which to buy.
+    + Notification to click on rabbit in the inventory.
+    + Notify you if you are close to having your rabbits crushed.
 
 </details>
 <details open><summary>

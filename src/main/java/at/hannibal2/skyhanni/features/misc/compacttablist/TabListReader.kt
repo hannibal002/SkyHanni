@@ -59,7 +59,6 @@ object TabListReader {
 
     private fun updateTablistData(tablist: List<String>? = null) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled.get()) return
 
         var tabLines = tablist ?: TabListData.getTabList()
 

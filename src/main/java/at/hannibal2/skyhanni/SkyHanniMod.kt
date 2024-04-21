@@ -54,6 +54,8 @@ import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager
+import at.hannibal2.skyhanni.data.hypixel.chat.PlayerNameFormatter
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -124,6 +126,13 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -313,7 +322,6 @@ import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.PetItemDisplay
-import at.hannibal2.skyhanni.features.misc.PlayerChatSymbols
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.PrivateIslandNoPickaxeAbility
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
@@ -446,7 +454,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.9",
+    version = "0.25.Beta.10",
 )
 class SkyHanniMod {
 
@@ -459,6 +467,8 @@ class SkyHanniMod {
         // data
         loadModule(this)
         loadModule(ChatManager)
+        loadModule(PlayerChatManager())
+        loadModule(PlayerNameFormatter())
         loadModule(HypixelData())
         loadModule(LocationFixData)
         loadModule(DungeonAPI)
@@ -552,6 +562,7 @@ class SkyHanniMod {
         loadModule(PestAPI)
         loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
+        loadModule(ChocolateFactoryAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -607,6 +618,12 @@ class SkyHanniMod {
         loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
+        loadModule(ChocolateFactoryBarnManager)
+        loadModule(ChocolateFactoryInventory)
+        loadModule(HoppityEggsManager)
+        loadModule(HoppityEggLocator)
+        loadModule(HoppityEggsShared)
+        loadModule(ChocolateFactoryStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
         loadModule(SlayerMiniBossFeatures())
@@ -809,7 +826,6 @@ class SkyHanniMod {
         loadModule(DungeonRankTabListColor())
         loadModule(TerracottaPhase())
         loadModule(VolcanoExplosivityDisplay())
-        loadModule(PlayerChatSymbols())
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
         loadModule(SkyBlockKickDuration())

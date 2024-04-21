@@ -73,6 +73,20 @@
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
 
+#### Event Features
+
++ Added stuff for Chocolate Factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1434)
+    + Show info about your Chocolate Factory.
+    + Show which upgrades you can afford and which to buy.
+    + Notification to click on rabbit in the inventory.
+    + Notify you if you are close to having your rabbits crushed.
++ Added solver for the Egg Locator. - CalMWolfs & gravy (https://github.com/hannibal002/SkyHanni/pull/1434)
++ Added other stuff for Hoppity Event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1434)
+    + Display which eggs you have not gotten this SkyBlock day.
+    + Waypoints for every egg on all islands.
+    + Shared waypoints for found eggs.
++ Added Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
+
 #### Misc Features
 
 + Added No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
@@ -113,6 +127,7 @@
 + Added Fortunate Freezing Bonus to Mining Events in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1453)
 + Added line breaks functionality for Custom Scoreboard Title/Footer. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1373)
 + Added Dungeon Room ID to Lobby Code. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1428)
++ Made all rift event entries into one big rift entry in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1480)
 
 #### Commands Improvements
 
@@ -123,6 +138,7 @@
 + Added right click support for many garden GUI elements. - hannibal2 + nea (https://github.com/hannibal002/SkyHanni/pull/1395)
 + Added config links to most features. - jani (https://github.com/hannibal002/SkyHanni/pull/1404)
 + Added all missing config links, or added a comment if no related GUI element exists. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1412)
++ Moved No Bits Warning category into Bits Features category. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
 
 #### Inventory Improvements
 
@@ -137,6 +153,7 @@
 #### Slayer Improvements
 
 + Added Dragon's Nest as a valid Enderman Slayer location. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1399)
++ RNG meter item will now be detected when opening slayer menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1479)
 
 #### Chat Improvements
 
@@ -176,6 +193,7 @@
 #### Slayer Fixes
 
 + Made the fire pit warning actually make a sound. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
++ Fixed resetting the RNG item after dropping it for slayer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1477)
 
 #### Garden Fixes
 
@@ -193,6 +211,8 @@
 + Fixed crash with garden visitor hotkey names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1478)
 + Fixed issues with Pest Count. - Empa (https://github.com/hannibal002/SkyHanni/pull/1406)
 + Fixed some items being tracked incorrectly in the Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1388)
++ Fixed shift click on accept/refusal no longer changes the visitor highlight. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1475)
++ Fixed rare error with visitor reward warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1481)
 
 #### Chat Fixes
 
@@ -217,6 +237,8 @@
 + Fixed Fame rank-up not updating the rank. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1450)
 + Made compact tab list not be invisible when turning it on. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1463)
 + Fixed Bits Available being out of sync after leaving the Rift. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1467)
++ Fixed pet error with Discord Rich Presence. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1488)
++ Fixed Custom Scoreboard missing Ävaeìkx sitting time. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1480)
 
 #### Dungeon Fixes
 
@@ -227,6 +249,10 @@
 
 + Fixes rare error when hovering over a row item in Bingo Card. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1370)
 + Fixed bingo card reward line not found error. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1400)
+
+#### Inventory Fixes
+
++ Fixed bazaar order cancel save to clipboard error again. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1474)
 
 #### Misc Fixes
 
@@ -337,6 +363,8 @@
 + Create TablistFooterUpdateEvent . - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1355)
 + Added direct support of setting the color of a mob. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
 + Crash in dev env with missing @ConfigLink. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1455)
++ Formatted the whole code base to fit new editor config. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1485)
++ Force wrapping of enums. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1484)
 
 ### Removed Features
 
