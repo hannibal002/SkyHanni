@@ -2,24 +2,20 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.atan2
 
 class WardrobeOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.wardrobeOverlay
-    private var inWardrobe = false
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
         if (!InventoryUtils.openInventoryName().startsWith("Wardrobe")) return
-        inWardrobe = true
 
         val gui = event.gui
         val player = Minecraft.getMinecraft().thePlayer
@@ -34,6 +30,7 @@ class WardrobeOverlay {
 
         // Calculate the starting X position to center the players
         val startX = centerX - (totalWidth - playerWidth) / 2
+        val startY = centerY + playerWidth
 
         // Draw each player
         for (i in 0 until totalPlayers) {
@@ -41,11 +38,11 @@ class WardrobeOverlay {
 
             // Calculate the new mouse position relative to the player
             val mouseXRelativeToPlayer = (playerX - event.mouseX).toFloat()
-            val mouseYRelativeToPlayer = (centerY - event.mouseY - 1.62 * playerWidth).toFloat()
+            val mouseYRelativeToPlayer = (startY - event.mouseY - 1.62 * playerWidth).toFloat()
 
             drawEntityOnScreen(
                 playerX,
-                centerY,
+                startY,
                 playerWidth,
                 mouseXRelativeToPlayer,
                 mouseYRelativeToPlayer,
@@ -56,18 +53,6 @@ class WardrobeOverlay {
         event.cancel()
     }
 
-
-    @SubscribeEvent
-    fun onGuiClose(event: InventoryCloseEvent) {
-        if (!inWardrobe) return
-        inWardrobe = false
-    }
-
-    @SubscribeEvent
-    fun onClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!inWardrobe) return
-        event.cancel()
-    }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
