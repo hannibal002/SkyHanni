@@ -116,7 +116,7 @@ class TabEditor {
                     lastClicked = SimpleTimeMark.now()
                 }
             }
-        )
+        ).toMap()
     )
 
     @SubscribeEvent
@@ -176,7 +176,7 @@ class TabEditor {
             toolTips[3] ?: emptyList(), toolTips[4] ?: emptyList(), toolTips[5] ?: emptyList()
         )
 
-    fun drawTabList(width: Int, height: Int) = if (compactConfig.enabled) {
+    fun drawTabList(width: Int, height: Int) = if (compactConfig.enabled.get()) {
         TabListRenderer.drawTabList()
         Unit
     } else {

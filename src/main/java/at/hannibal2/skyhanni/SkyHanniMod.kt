@@ -840,7 +840,7 @@ class SkyHanniMod {
         loadModule(SensitivityReducer)
         loadModule(DungeonFinderFeatures())
         loadModule(GoldenGoblinHighlight())
-        loadModule(TabWidgetSettings())
+        loadModule(TabWidgetSettings)
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
         loadModule(CustomScoreboard())
