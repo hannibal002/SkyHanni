@@ -320,7 +320,7 @@ enum class HotmData(
 
     fun getReward() = rewardFun(activeLevel)
 
-    fun calculateTotalCost(desiredLevel: Int) = (0 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
+    fun calculateTotalCost(desiredLevel: Int) = (1 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
 
     val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
