@@ -99,7 +99,7 @@ class TabEditor {
     ),
         toolTips[slot.slotNumber]?.let { listOf(slot.stack.displayName) + it } ?: listOf("NULL"),
         bypassChecks = true,
-        click = listOf(
+        click = mapOf(
             0 to {
                 if (lastClicked.passedSince() > 500.milliseconds) {
                     Minecraft.getMinecraft().playerController.windowClick(
@@ -176,7 +176,7 @@ class TabEditor {
             toolTips[3] ?: emptyList(), toolTips[4] ?: emptyList(), toolTips[5] ?: emptyList()
         )
 
-    fun drawTabList(width: Int, height: Int) = if (compactConfig.enabled) {
+    fun drawTabList(width: Int, height: Int) = if (compactConfig.enabled.get()) {
         TabListRenderer.drawTabList()
         Unit
     } else {
