@@ -39,8 +39,9 @@ class GuiContainerHook(guiAny: Any) {
             NEUApi.setInventoryButtonsToDisabled()
             GuiData.preDrawEventCanceled = true
             ci.cancel()
+        } else {
+            GuiData.preDrawEventCanceled = false
         }
-        GuiData.preDrawEventCanceled = false
     }
 
     fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
