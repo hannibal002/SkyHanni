@@ -13,7 +13,7 @@ import java.util.List;
 public class PlayerMessagesConfig {
 
     @Expose
-    @ConfigOption(name = "Enable Chat Formatting", desc = "Enable player caht modifications. Required for all settings below.")
+    @ConfigOption(name = "Enable Chat Formatting", desc = "Enable player chat modifications. Required for all settings below.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enable = true;
