@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.CompactUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.OreType
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.init.Blocks
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
@@ -50,6 +49,7 @@ object MiningAPI {
     )
 
     private var recentMinedBlocksMap = mutableListOf<MinedBlock>()
+    private var surroundingHardStone = mutableListOf<MinedBlock>()
     private var soundsList = mutableListOf<Sound>()
     private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth")
 
@@ -98,6 +98,10 @@ object MiningAPI {
         val blockState = event.getBlockState
         val ore = OreBlock.getByStateOrNull(blockState) ?: return
         recentMinedBlocksMap.add(MinedBlock(ore, position, SimpleTimeMark.now()))
+        storeAdjacentHardstoneBlocks(position)
+        surroundingHardStone.forEach {
+            println(it.position)
+        }
     }
 
     @SubscribeEvent
@@ -127,39 +131,31 @@ object MiningAPI {
         if (!inCustomMiningIsland()) return
 
         recentMinedBlocksMap.removeIf { it.time.passedSince() > 20.seconds }
+        surroundingHardStone.removeIf { it.time.passedSince() > 20.seconds }
         soundsList.removeIf { it.time.passedSince() > 500.milliseconds }
 
         val firstSound = soundsList.firstOrNull() ?: return
 
         if (soundsList.last().time.passedSince() > 200.milliseconds) {
-            val blocks = soundsList.count { it.soundName == "random.orb" }
+            val blockAmount = soundsList.count { it.soundName == "random.orb" }
             val block = recentMinedBlocksMap.firstOrNull { it.position == firstSound.location } ?: return
 
+            val adjacentHardstone = block.position.getAdjacentHardstoneNumber()
             recentMinedBlocksMap.removeIf { it.time < block.time }
+            removeNotAdjacentHardstoneBlocks()
             soundsList.clear()
-
-            if (blocks == 0) return
-            val adjacentHardstone = block.position.getAdjacentHardstone()
-            val adjacentBedrock = block.position.getAdjacentBedrock()
-            println("bedrock: $adjacentBedrock")
-            if (hasEpicOrAboveScathaPet() && adjacentHardstone > 0 && block.ore.oreType != OreType.HARD_STONE) {
-                val molePerk = getMinMaxHardstoneMole()
-                val totalPair = Pair(adjacentHardstone + molePerk.first, adjacentHardstone + molePerk.second)
-                val maxEfficientMiner = geMaxBlocksEfficientMiner() + 1
-                if (maxEfficientMiner + totalPair.second == blocks) {
-                    CompactUpdateEvent(blocks - totalPair.second, block.ore)
-                    CompactUpdateEvent(totalPair.second, OreBlock.HARD_STONE_GLACIAL)
-                } else if (totalPair.first == totalPair.second || molePerk.third < 0.5) {
-                    CompactUpdateEvent(blocks - totalPair.first, block.ore)
-                    CompactUpdateEvent(totalPair.first, OreBlock.HARD_STONE_GLACIAL)
-                } else {
-                    CompactUpdateEvent(blocks - totalPair.second, block.ore)
-                    CompactUpdateEvent(totalPair.second, OreBlock.HARD_STONE_GLACIAL)
-                }
-            } else {
-                CompactUpdateEvent(blocks, block.ore).postAndCatch()
+            if (blockAmount == 0) return
+            if (blockAmount == 1) {
+                CompactUpdateEvent(1, block.ore ).postAndCatch()
+                return
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onBlockChange(event: ServerBlockChangeEvent) {
+        if (!inCustomMiningIsland()) return
+        println("old: ${event.old} new: ${event.new} loc: ${event.location}")
     }
 
     @SubscribeEvent
@@ -167,6 +163,7 @@ object MiningAPI {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
         recentMinedBlocksMap = mutableListOf()
+        surroundingHardStone = mutableListOf()
         soundsList = mutableListOf()
     }
 
@@ -195,23 +192,30 @@ object MiningAPI {
         return ceil((0.5 * level) + 0.5).toInt()
     }
 
-    private fun LorenzVec.getAdjacentHardstone(): Int {
-        var count = 0
-        EnumFacing.entries.forEach {
-            val position = this.toBlockPos().offset(it).toLorenzVec()
-            val ore = OreBlock.getByStateOrNull(position.getBlockStateAt())?.oreType
-            if (ore == OreType.HARD_STONE) ++count
-        }
-        return count.coerceIn(0..2)
+    private fun LorenzVec.getAdjacentHardstoneNumber(): Int {
+        return EnumFacing.entries.count { direction ->
+            val offsetLoc = this.toBlockPos().offset(direction).toLorenzVec()
+            surroundingHardStone.any { it.position == offsetLoc }
+        }.coerceIn(0..2)
     }
 
-    private fun LorenzVec.getAdjacentBedrock(): Int {
-        var count = 0
-        EnumFacing.entries.forEach {
-            val position = this.toBlockPos().offset(it).toLorenzVec()
-            val block = position.getBlockAt()
-            if (block == Blocks.bedrock) ++count
+    private fun storeAdjacentHardstoneBlocks(position: LorenzVec) {
+        EnumFacing.entries.forEach { direction ->
+            val offsetLoc = position.toBlockPos().offset(direction).toLorenzVec()
+            val ore = OreBlock.getByStateOrNull(offsetLoc.getBlockStateAt())
+            if (ore?.oreType == OreType.HARD_STONE && surroundingHardStone.none { it.position == offsetLoc } ) {
+                println("hardstone found in $offsetLoc")
+                surroundingHardStone.add(MinedBlock(ore, offsetLoc, SimpleTimeMark.now()))
+            }
         }
-        return count.coerceIn(0..2)
+    }
+
+    private fun removeNotAdjacentHardstoneBlocks() {
+        surroundingHardStone.filter { hardstone ->
+            EnumFacing.entries.any { direction ->
+                val offsetLoc = hardstone.position.toBlockPos().offset(direction).toLorenzVec()
+                recentMinedBlocksMap.any { it.position == offsetLoc }
+            }
+        }
     }
 }
