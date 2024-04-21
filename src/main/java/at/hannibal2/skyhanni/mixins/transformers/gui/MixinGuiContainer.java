@@ -31,11 +31,6 @@ public abstract class MixinGuiContainer extends GuiScreen {
         skyHanni$hook.backgroundDrawn(mouseX, mouseY, partialTicks);
     }
 
-    @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
-    private void preDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.preDraw(mouseX, mouseY, partialTicks, ci);
-    }
-
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/inventory/GuiContainer;drawGuiContainerForegroundLayer(II)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         skyHanni$hook.foregroundDrawn(mouseX, mouseY, partialTicks);

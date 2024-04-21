@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object TabWidgetSettings {
+class TabWidgetSettings {
     private val patternGroup = RepoPattern.group("tab.widget.setting")
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
