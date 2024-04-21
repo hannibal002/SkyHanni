@@ -210,8 +210,7 @@ object HoppityEggLocator {
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
     fun hasLocatorInInventory() = RecalculatingValue(1.seconds) {
-        if (!LorenzUtils.inSkyBlock) return@RecalculatingValue false
-        InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }
+        LorenzUtils.inSkyBlock && InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }
     }.getValue()
 
     private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
