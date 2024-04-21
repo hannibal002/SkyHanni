@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -28,8 +29,6 @@ import com.jagrosh.discordipc.entities.RichPresence
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.util.Timer
-import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -37,7 +36,6 @@ import java.util.concurrent.TimeUnit
 object DiscordRPCManager : IPCListener {
 
     private const val applicationID = 1093298182735282176L
-    private const val updatePeriod = 4200L
 
     val config get() = feature.gui.discordRPC
 
@@ -47,7 +45,7 @@ object DiscordRPCManager : IPCListener {
     private var startTimestamp: Long? = null
     private var startOnce = false
 
-    private var updateTimer: Timer? = null
+    private var runTimer = false
     private var connected = false
 
     private val DiscordLocationKey = DiscordLocationKey()
@@ -127,7 +125,7 @@ object DiscordRPCManager : IPCListener {
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
-    fun updatePresence() {
+    private fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
         // TODO, change functionality to use enum rather than ordinals
@@ -145,12 +143,15 @@ object DiscordRPCManager : IPCListener {
     override fun onReady(client: IPCClient) {
         consoleLog("Discord RPC Started.")
         connected = true
-        updateTimer = Timer()
-        updateTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                updatePresence()
-            }
-        }, 0, updatePeriod)
+        runTimer = true
+    }
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!runTimer) return
+        if (event.repeatSeconds(5)) {
+            updatePresence()
+        }
     }
 
     override fun onClose(client: IPCClient, json: JsonObject?) {
@@ -168,10 +169,7 @@ object DiscordRPCManager : IPCListener {
     }
 
     private fun cancelTimer() {
-        updateTimer?.let {
-            it.cancel()
-            updateTimer = null
-        }
+        runTimer = false
     }
 
     private fun getStatusByConfigId(id: Int) = DiscordStatus.entries.getOrElse(id) { DiscordStatus.NONE }

@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
@@ -16,6 +18,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.util.AxisAlignedBB
+import java.awt.Color
 
 /**
  * Represents a Mob in Hypixel Skyblock.
@@ -80,7 +83,16 @@ class Mob(
     val extraEntities: List<EntityLivingBase> = extraEntitiesList
 
     enum class Type {
-        DISPLAY_NPC, SUMMON, BASIC, DUNGEON, BOSS, SLAYER, PLAYER, PROJECTILE, SPECIAL;
+        DISPLAY_NPC,
+        SUMMON,
+        BASIC,
+        DUNGEON,
+        BOSS,
+        SLAYER,
+        PLAYER,
+        PROJECTILE,
+        SPECIAL,
+        ;
 
         fun isSkyblockMob() = when (this) {
             BASIC, DUNGEON, BOSS, SLAYER -> true
@@ -96,6 +108,23 @@ class Mob(
     fun canBeSeen() = baseEntity.canBeSeen()
 
     fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
+
+    private var highlightColor: Color? = null
+    fun highlight(color: Color) {
+        highlightColor = color
+        internalHighlight()
+    }
+
+    private fun internalHighlight() {
+        highlightColor?.let {
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, it.withAlpha(127)) { true }
+        }
+    }
+
+    private fun internalRemoveColor() {
+        if (highlightColor == null) return
+        RenderLivingEntityHelper.removeCustomRender(baseEntity)
+    }
 
     val boundingBox: AxisAlignedBB
         get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
@@ -135,7 +164,9 @@ class Mob(
     internal fun internalAddEntity(entity: EntityLivingBase) {
         if (baseEntity.entityId > entity.entityId) {
             extraEntitiesList.add(0, baseEntity)
+            internalRemoveColor()
             baseEntity = entity
+            internalHighlight()
         } else {
             extraEntitiesList.add(extraEntitiesList.lastIndex + 1, entity)
         }
@@ -146,14 +177,21 @@ class Mob(
     internal fun internalAddEntity(entities: Collection<EntityLivingBase>) {
         val list = entities.drop(1).toMutableList().apply { add(baseEntity) }
         extraEntitiesList.addAll(0, list)
+        internalRemoveColor()
         baseEntity = entities.first()
+        internalHighlight()
         updateBoundingBox()
         removeExtraEntitiesFromChecking()
         MobData.entityToMob.putAll(entities.associateWith { this })
     }
 
     internal fun internalUpdateOfEntity(entity: EntityLivingBase) = when (entity.entityId) {
-        baseEntity.entityId -> baseEntity = entity
+        baseEntity.entityId -> {
+            internalRemoveColor()
+            baseEntity = entity
+            internalHighlight()
+        }
+
         armorStand?.entityId ?: Int.MIN_VALUE -> armorStand = entity as EntityArmorStand
         else -> {
             extraEntitiesList.remove(entity)

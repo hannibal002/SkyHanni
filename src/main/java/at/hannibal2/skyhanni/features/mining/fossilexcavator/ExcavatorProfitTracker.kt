@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -63,7 +62,7 @@ class ExcavatorProfitTracker {
         var fossilDustGained = 0L
     }
 
-    private val scrapItem = "SUSPICIOUS_SCRAP".asInternalName()
+    private val scrapItem get() = FossilExcavatorAPI.scrapItem
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lFossil Excavation Profit Tracker")
@@ -137,7 +136,7 @@ class ExcavatorProfitTracker {
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
         addAsSingletonList(
             Renderable.hoverTips(
-                "${scrapItem.itemName} §7price: §c-${NumberUtil.format(scrapPrice)}",
+                "$name §7price: §c-${NumberUtil.format(scrapPrice)}",
                 listOf(
                     "§7You paid §c${NumberUtil.format(scrapPrice)} coins §7in total",
                     "§7for all §e$timesExcavated $name",
