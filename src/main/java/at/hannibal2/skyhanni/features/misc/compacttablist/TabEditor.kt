@@ -70,12 +70,6 @@ class TabEditor {
         updateStorage()
     }
 
-    @SubscribeEvent
-    fun onClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!inEditor) return
-        event.cancel()
-    }
-
     var lastClicked = SimpleTimeMark.farPast()
 
     fun createItem(slot: Slot?, windowId: Int) = if (slot?.stack == null) Renderable.placeholder(
