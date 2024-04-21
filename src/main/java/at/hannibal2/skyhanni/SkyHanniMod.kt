@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
@@ -524,6 +525,7 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
+        loadModule(GuiData)
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)

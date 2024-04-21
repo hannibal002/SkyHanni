@@ -8,15 +8,12 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.NEURenderEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -26,7 +23,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
-import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -50,14 +46,6 @@ class TabEditor {
     lateinit var activeStorage: TabProfile
 
     var inEditor = false
-        set(value) {
-            if (value) {
-                DelayedRun.runDelayed(200.milliseconds) {
-                    NEUApi.setInventoryButtonsToDisabled()
-                }
-            }
-            field = value
-        }
 
     fun updateStorage() {
         if (inEditor) return
@@ -137,7 +125,7 @@ class TabEditor {
         val width = event.gui.width
         val zLevel = pre.third + 270f
         GlStateManager.translate(0f, 0f, zLevel)
-        GuiRenderUtils.drawGradientRect(0, 0, width, height, -1072689136, -804253680, 0.0);
+        event.drawDefaultBackground()
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
             Renderable.horizontalContainer(
                 createItem(container.inventorySlots[13], windowId).toSingletonListOrEmpty(),
@@ -193,10 +181,4 @@ class TabEditor {
         ).renderXYAligned(0, 0, width, height)
         Unit
     }
-
-    @SubscribeEvent
-    fun onNEURender(event: NEURenderEvent) {
-        if (inEditor) event.cancel()
-    }
-
 }

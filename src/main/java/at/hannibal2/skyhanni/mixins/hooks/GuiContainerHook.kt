@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -30,12 +32,15 @@ class GuiContainerHook(guiAny: Any) {
         mouseX: Int,
         mouseY: Int,
         partialTicks: Float,
-        ci: CallbackInfo
+        ci: CallbackInfo,
     ) {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiContainerEvent.BeforeDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
+            NEUApi.setInventoryButtonsToDisabled()
+            GuiData.preDrawEventCanceled = true
             ci.cancel()
         }
+        GuiData.preDrawEventCanceled = false
     }
 
     fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -64,4 +69,5 @@ class GuiContainerHook(guiAny: Any) {
     ) {
         if (DrawScreenAfterEvent(mouseX, mouseY, ci).postAndCatch()) ci.cancel()
     }
+
 }
