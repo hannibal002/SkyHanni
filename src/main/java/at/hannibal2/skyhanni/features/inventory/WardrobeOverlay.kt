@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class WardrobeOverlay {
@@ -21,16 +20,33 @@ class WardrobeOverlay {
         if (!InventoryUtils.openInventoryName().startsWith("Wardrobe")) return
         inWardrobe = true
 
-        val y = event.gui.height / 2
+        val gui = event.gui
+        val player = Minecraft.getMinecraft().thePlayer
+        val centerX = gui.width / 2
+        val centerY = gui.height / 2
+        val totalPlayers = 9
+        val playerWidth = 30
+        val spacing = 10
 
-        drawEntityOnScreen(
-            event.gui.width / 2,
-            y,
-            30,
-            (event.gui.width / 2 - event.mouseX).toFloat(),
-            (y - event.mouseY).toFloat(),
-            Minecraft.getMinecraft().thePlayer
-        )
+        // Calculate the total width occupied by players and spacing
+        val totalWidth = totalPlayers * playerWidth + (totalPlayers - 1) * spacing
+
+        // Calculate the starting X position to center the players
+        val startX = centerX - (totalWidth - playerWidth) / 2
+
+        // Draw each player
+        for (i in 0 until totalPlayers) {
+            val playerX = startX + i * (playerWidth + spacing)
+
+            drawEntityOnScreen(
+                playerX,
+                centerY,
+                playerWidth,
+                (centerX - event.mouseX).toFloat(),
+                (centerY - event.mouseY).toFloat(),
+                player
+            )
+        }
 
         event.cancel()
     }
