@@ -17,6 +17,10 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container)
 
+    /**
+     * Clicks on Slots still work when this event is canceled.
+     * To cancel GuiClicks, use [SlotClickEvent] with an "inGui" check.
+     */
     @Cancelable
     data class BeforeDraw(
         override val gui: GuiContainer,

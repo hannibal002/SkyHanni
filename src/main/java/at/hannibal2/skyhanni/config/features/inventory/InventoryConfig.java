@@ -84,10 +84,15 @@ public class InventoryConfig {
     @Accordion
     public GetFromSackConfig gfs = new GetFromSackConfig();
 
+    @Expose
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
-    @Expose
     public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
+
+    @Expose
+    @ConfigOption(name = "Wardrobe Overlay", desc = "")
+    @Accordion
+    public WardrobeOverlay wardrobeOverlay = new WardrobeOverlay();
 
     @Expose
     @ConfigOption(
