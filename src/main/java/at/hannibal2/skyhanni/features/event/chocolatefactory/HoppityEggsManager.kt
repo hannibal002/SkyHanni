@@ -95,7 +95,7 @@ object HoppityEggsManager {
     }
 
     private val hasLocatorInInventory = RecalculatingValue(1.seconds) {
-        HoppityEggLocator.hasLocatorInInventory()
+        LorenzUtils.inSkyBlock && HoppityEggLocator.hasLocatorInInventory()
     }
 
     @SubscribeEvent
