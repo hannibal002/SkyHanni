@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.atan2
 
 class WardrobeOverlay {
 
@@ -38,18 +39,23 @@ class WardrobeOverlay {
         for (i in 0 until totalPlayers) {
             val playerX = startX + i * (playerWidth + spacing)
 
+            // Calculate the new mouse position relative to the player
+            val mouseXRelativeToPlayer = (playerX - event.mouseX).toFloat()
+            val mouseYRelativeToPlayer = (centerY - event.mouseY - 1.62 * playerWidth).toFloat()
+
             drawEntityOnScreen(
                 playerX,
                 centerY,
                 playerWidth,
-                (centerX - event.mouseX).toFloat(),
-                (centerY - event.mouseY).toFloat(),
+                mouseXRelativeToPlayer,
+                mouseYRelativeToPlayer,
                 player
             )
         }
 
         event.cancel()
     }
+
 
     @SubscribeEvent
     fun onGuiClose(event: InventoryCloseEvent) {
