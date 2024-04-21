@@ -25,7 +25,6 @@ public class ChatConfig {
     // TODO move into own sub category
     public FilterTypesConfig filterType = new FilterTypesConfig();
 
-
     @Expose
     @ConfigOption(name = "Player Messages", desc = "")
     @Accordion
