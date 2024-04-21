@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.ceil
 
 class WardrobeOverlay {
 
@@ -21,33 +22,42 @@ class WardrobeOverlay {
         val player = Minecraft.getMinecraft().thePlayer
         val centerX = gui.width / 2
         val centerY = gui.height / 2
-        val totalPlayers = 9
+        val totalPlayers = 18
+        val maxPlayersPerRow = 9
         val playerWidth = 50
-        val spacing = 20
+        val playerHeight = 2 * playerWidth
+        val horizontalSpacing = 20
+        val verticalSpacing = 20
 
-        // Calculate the total width occupied by players and spacing
-        val totalWidth = totalPlayers * playerWidth + (totalPlayers - 1) * spacing
+        val rows = ceil(totalPlayers.toDouble()/maxPlayersPerRow).toInt()
+        val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
 
-        // Calculate the starting X position to center the players
-        val startX = centerX - (totalWidth - playerWidth) / 2
-        val startY = centerY + playerWidth
+        val startY = centerY + playerHeight - totalHeight / 2
 
-        // Draw each player
-        for (i in 0 until totalPlayers) {
-            val playerX = startX + i * (playerWidth + spacing)
+        for (row in 0 until rows) {
+            val playersInRow = if (row != rows - 1 || totalPlayers%maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers%maxPlayersPerRow
+            val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * horizontalSpacing
 
-            // Calculate the new mouse position relative to the player
-            val mouseXRelativeToPlayer = (playerX - event.mouseX).toFloat()
-            val mouseYRelativeToPlayer = (startY - event.mouseY - 1.62 * playerWidth).toFloat()
+            val startX = centerX - (totalWidth - playerWidth) / 2
+            val playerY = startY + row * (playerHeight + verticalSpacing)
 
-            drawEntityOnScreen(
-                playerX,
-                startY,
-                playerWidth,
-                mouseXRelativeToPlayer,
-                mouseYRelativeToPlayer,
-                player
-            )
+            for (i in 0 until playersInRow) {
+                val playerX = startX + i * (playerWidth + horizontalSpacing)
+                val scale = playerWidth
+
+                // Calculate the new mouse position relative to the player
+                val mouseXRelativeToPlayer = (playerX - event.mouseX).toFloat()
+                val mouseYRelativeToPlayer = (playerY - event.mouseY - 1.62 * scale).toFloat()
+
+                drawEntityOnScreen(
+                    playerX,
+                    playerY,
+                    scale,
+                    mouseXRelativeToPlayer,
+                    mouseYRelativeToPlayer,
+                    player
+                )
+            }
         }
 
         event.cancel()
