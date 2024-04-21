@@ -242,7 +242,10 @@ object ChocolateFactoryAPI {
                 timeTowerActive = group("status") == "ACTIVE"
             }
             timeTowerRechargePattern.matchMatcher(line) {
-                val timeUntilTower = TimeUtils.getDuration(group("duration"))
+                // todo in future fix this issue with TimeUtils.getDuration
+                val formattedGroup = group("duration").replace("h", "h ").replace("m", "m ")
+
+                val timeUntilTower = TimeUtils.getDuration(formattedGroup)
                 val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
                 profileStorage.nextTimeTower = nextTimeTower.toMillis()
             }
