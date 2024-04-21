@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
@@ -16,6 +17,18 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val mouseY: Int,
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container)
+
+    @Cancelable
+    data class BeforeDraw(
+        override val gui: GuiContainer,
+        override val container: Container,
+        val mouseX: Int,
+        val mouseY: Int,
+        val partialTicks: Float,
+    ) : GuiContainerEvent(gui, container) {
+        fun drawDefaultBackground() =
+            GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
+    }
 
     @Cancelable
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :

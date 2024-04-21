@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
@@ -46,7 +47,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.RenderData
-import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.SlayerAPI
@@ -317,7 +317,6 @@ import at.hannibal2.skyhanni.features.misc.NoBitsWarning
 import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.features.misc.ParticleHider
 import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
-import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.PetItemDisplay
@@ -522,6 +521,7 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
+        loadModule(GuiData)
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
