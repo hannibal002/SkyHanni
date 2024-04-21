@@ -197,6 +197,7 @@ object ChocolateFactoryAPI {
         leaderboardPosition = null
         leaderboardPercentile = null
         chocolateMultiplier = 1.0
+        timeTowerActive = false
 
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             chocolateCurrent = group("amount").formatLong()
