@@ -25,8 +25,8 @@ class WardrobeOverlay {
         val centerX = gui.width / 2
         val centerY = gui.height / 2
         val totalPlayers = 9
-        val playerWidth = 30
-        val spacing = 10
+        val playerWidth = 50
+        val spacing = 20
 
         // Calculate the total width occupied by players and spacing
         val totalWidth = totalPlayers * playerWidth + (totalPlayers - 1) * spacing
