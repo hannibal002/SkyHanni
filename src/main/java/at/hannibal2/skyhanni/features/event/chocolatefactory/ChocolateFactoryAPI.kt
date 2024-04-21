@@ -189,6 +189,9 @@ object ChocolateFactoryAPI {
     ) {
         val profileStorage = profileStorage ?: return
 
+        chocolateMultiplier = 1.0
+        timeTowerActive = false
+
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             chocolateCurrent = group("amount").formatLong()
         }
