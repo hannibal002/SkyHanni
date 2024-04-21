@@ -85,7 +85,8 @@ class ScoreboardData {
     }
 
     private fun cleanSB(scoreboard: String): String {
-        return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 }.joinToString(separator = "")
+        // 10735 = Rift Blood Effigies symbol
+        return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 || it.code == 10735 }.joinToString(separator = "")
     }
 
     private fun fetchScoreboardLines(): List<String> {
