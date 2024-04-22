@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -62,17 +63,17 @@ class WardrobeOverlay {
         val startY = centerY + playerHeight - totalHeight / 2
 
 
-        val tempTogglePos = Position((gui.width * 0.9).toInt(), (gui.height * 0.9).toInt())
+        val tempTogglePos = Position((gui.width * 0.9).toInt(), (gui.height * 0.8).toInt())
         val tempToggleRenderable = Renderable.drawInsideRoundedRect(
             Renderable.clickable(
-                Renderable.emptyContainer(50, 50),
+                Renderable.emptyContainer(30, 30),
+                bypassChecks = true,
                 onClick = {
                     ChatUtils.chat("Clicked on wardrobe toggle")
                     tempToggleShowOverlay = false
                 },
             ),
             Color.BLACK,
-            5,
         )
 
         display += tempTogglePos to tempToggleRenderable
