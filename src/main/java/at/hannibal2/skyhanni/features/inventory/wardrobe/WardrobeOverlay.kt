@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
@@ -41,6 +42,11 @@ class WardrobeOverlay {
         val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
 
         val startY = centerY + playerHeight - totalHeight / 2
+
+
+        GlStateManager.pushMatrix()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+
 
         for (row in 0 until rows) {
             val playersInRow =
@@ -88,6 +94,8 @@ class WardrobeOverlay {
                 display += pos to renderable
             }
         }
+
+        GlStateManager.popMatrix()
 
         event.cancel()
     }
