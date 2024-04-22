@@ -13,6 +13,13 @@ import java.util.List;
 public class PlayerMessagesConfig {
 
     @Expose
+    @ConfigOption(name = "Enable Chat Formatting", desc = "Enable player chat modifications. Required for all settings below.\n" +
+        "§cThis might break hover/click on chat actions.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enable = false;
+
+    @Expose
     @ConfigOption(
         name = "Part Order",
         desc = "Drag text to change the chat message format order for chat messages."

@@ -182,7 +182,7 @@ class PlayerNameFormatter {
         return MarkedPlayerManager.replaceInChat(result)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && (config.playerRankHider || config.chatFilter || config.sameChatColor)
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

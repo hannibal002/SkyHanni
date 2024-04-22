@@ -35,7 +35,7 @@ class RareDropMessages {
      */
     private val petClaimedPattern by chatGroup.pattern(
         "pet.petclaimedmessage",
-        "(?<start>(?:§.)*You claimed a )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
+        "(?<start>(?:§.)*You claimed a )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*You can manage your Pets.*)"
     )
 
     /**
