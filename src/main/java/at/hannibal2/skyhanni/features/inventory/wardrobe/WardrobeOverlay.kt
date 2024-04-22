@@ -95,10 +95,10 @@ class WardrobeOverlay {
                         Renderable.emptyContainer(playerWidth, playerHeight),
                         Renderable.emptyContainer(playerWidth, playerHeight),
                         onClick = {
-                            ChatUtils.chat("Clicked on player at $i")
+                            ChatUtils.debug("Clicked on wardrobe player at $i")
                         },
                         onHover = {
-                            ChatUtils.chat("Hovered over player at $i")
+                            //ChatUtils.debug("Hovered over wardrobe player at $i")
                         }
                     ),
                     Color.BLACK,
