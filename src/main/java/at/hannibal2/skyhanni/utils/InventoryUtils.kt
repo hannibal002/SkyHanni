@@ -107,4 +107,9 @@ object InventoryUtils {
     }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+
+    fun clickSlot(slot: Int, windowId: Int) {
+        val mc = Minecraft.getMinecraft()
+        mc.playerController.windowClick(windowId, slot, 0, 0, mc.thePlayer)
+    }
 }

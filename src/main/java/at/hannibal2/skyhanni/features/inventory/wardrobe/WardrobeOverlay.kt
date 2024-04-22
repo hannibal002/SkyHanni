@@ -8,11 +8,13 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
@@ -121,6 +123,12 @@ class WardrobeOverlay {
                         Renderable.emptyContainer(playerWidth, playerHeight),
                         onClick = {
                             ChatUtils.debug("Clicked on wardrobe player at $i")
+                            (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId?.let {
+                                clickSlot(
+                                    WardrobeAPI.wardrobeSlots[i].inventorySlot,
+                                    it
+                                )
+                            }
                         },
                         onHover = {
                             //ChatUtils.debug("Hovered over wardrobe player at $i")
