@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.Wardrobe.inWardrobe
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -23,12 +24,15 @@ class WardrobeOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.wardrobeOverlay
     private var display = emptyList<Pair<Position, Renderable>>()
+    private var tempToggleShowOverlay = true
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
 
         display = emptyList()
+
+        if (!tempToggleShowOverlay) return
 
         val gui = event.gui
         val player = Minecraft.getMinecraft().thePlayer
@@ -56,6 +60,22 @@ class WardrobeOverlay {
         val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
 
         val startY = centerY + playerHeight - totalHeight / 2
+
+
+        val tempTogglePos = Position((gui.width * 0.9).toInt(), (gui.height * 0.9).toInt())
+        val tempToggleRenderable = Renderable.drawInsideRoundedRect(
+            Renderable.clickable(
+                Renderable.emptyContainer(50, 50),
+                onClick = {
+                    ChatUtils.chat("Clicked on wardrobe toggle")
+                    tempToggleShowOverlay = false
+                },
+            ),
+            Color.BLACK,
+            5,
+        )
+
+        display += tempTogglePos to tempToggleRenderable
 
 
         GlStateManager.pushMatrix()
@@ -112,6 +132,11 @@ class WardrobeOverlay {
         GlStateManager.popMatrix()
 
         event.cancel()
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        tempToggleShowOverlay = true
     }
 
     @SubscribeEvent
