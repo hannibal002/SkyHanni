@@ -10,4 +10,9 @@ public class WardrobeOverlayConfig {
     @ConfigOption(name = "enble", desc = "")
     @ConfigEditorBoolean
     public boolean enabled = true;
+
+    @Expose
+    @ConfigOption(name = "eyes look mouse", desc = "")
+    @ConfigEditorBoolean
+    public boolean eyesFollowMouse = true;
 }

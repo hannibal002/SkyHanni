@@ -4,9 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,7 +21,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 class WardrobeOverlay {
 
@@ -102,12 +100,15 @@ class WardrobeOverlay {
                 val mouseXRelativeToPlayer = (playerX - event.mouseX).toFloat()
                 val mouseYRelativeToPlayer = (playerY - event.mouseY - 1.62 * scale).toFloat()
 
+                val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
+                val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
+
                 drawEntityOnScreen(
                     playerX,
                     playerY,
                     scale,
-                    mouseXRelativeToPlayer,
-                    mouseYRelativeToPlayer,
+                    eyesX.toFloat(),
+                    eyesY.toFloat(),
                     fakePlayer
                 )
 
