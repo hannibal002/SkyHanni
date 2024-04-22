@@ -21,7 +21,8 @@ class PlayerChatModifier {
     fun onChat(event: SystemMessageEvent) {
         val newMessage = cutMessage(event.chatComponent.formattedText)
 
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+        // TODO apply formattings correctly
+//         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
     }
 
     private fun cutMessage(input: String): String {

@@ -323,6 +323,17 @@ object StringUtils {
         original: IChatComponent,
         newText: String,
     ): ChatComponentText? {
+        return replaceIfNeeded(original, ChatComponentText(newText), applyFormat = true)
+    }
+
+    // TODO: rename and rework this function to be more narrow
+    fun replaceIfNeeded(
+        original: IChatComponent,
+        newText: ChatComponentText,
+        applyFormat: Boolean = false,
+    ): ChatComponentText? {
+        if (true) // TODO: remove after done debugging
+            return newText
         val foundCommands = mutableListOf<IChatComponent>()
 
         addComponent(foundCommands, original)
@@ -336,17 +347,19 @@ object StringUtils {
         }
 
         val originalClean = LorenzUtils.stripVanillaMessage(original.formattedText)
-        val newTextClean = LorenzUtils.stripVanillaMessage(newText)
+        val newTextClean = LorenzUtils.stripVanillaMessage(newText.formattedText)
         if (originalClean == newTextClean) return null
 
-        val text = ChatComponentText(newText)
-        if (size == 1) {
-            val chatStyle = foundCommands[0].chatStyle
-            text.chatStyle.chatClickEvent = chatStyle.chatClickEvent
-            text.chatStyle.chatHoverEvent = chatStyle.chatHoverEvent
-        }
+        return newText
 
-        return text
+//         val text = ChatComponentText(newText)
+//         if (size == 1) {
+//             val chatStyle = foundCommands[0].chatStyle
+//             text.chatStyle.chatClickEvent = chatStyle.chatClickEvent
+//             text.chatStyle.chatHoverEvent = chatStyle.chatHoverEvent
+//         }
+//
+//         return text
     }
 
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
@@ -369,4 +382,38 @@ object StringUtils {
             text = newText
         }
     }
+
+    /**
+     * Removes starting and ending reset formattings that dont sever a benefit at all.
+     */
+    fun String.stripHypixelMessage(): String {
+        var message = this
+
+        while (message.startsWith("§r")) {
+            message = message.substring(2)
+        }
+        while (message.endsWith("§r")) {
+            message = message.substring(0, message.length - 2)
+        }
+        return message
+    }
+
+    fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
+        val text = ChatComponentText(this)
+        text.chatStyle = original.sampleStyleAtStart()
+        return text
+    }
+
+    fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
+        val text = ChatComponentText(this)
+        text.chatStyle = original.chatStyle
+        return text
+    }
+
+    fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
+
+    fun IChatComponent.cleanPlayerName(displayName: Boolean = false): IChatComponent =
+        formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
+
+    fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 }

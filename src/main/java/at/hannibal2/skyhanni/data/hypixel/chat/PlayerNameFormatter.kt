@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.hypixel.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
+import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
@@ -12,14 +13,19 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.utils.ChatComponentUtils
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.replaceAll
+import at.hannibal2.skyhanni.utils.StringUtils.toCleanChatComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
@@ -37,111 +43,142 @@ class PlayerNameFormatter {
      * REGEX-TEST: §7☢ §r§bhannibal2
      * REGEX-TEST: §7☢ §rhannibal2
      * REGEX-TEST: §7☢ §b[MVP§c+§b] hannibal2
+     * REGEX-TEST: ♫ §b[MVP§d+§b] lrg89
      */
     private val emblemPattern by patternGroup.pattern(
         "emblem",
-        "(?<emblem>(?:§.){1,2}.) (?<author>.*)"
+        "(?<emblem>(?:§.){0,2}.) (?<author>.*)"
     )
+
+    private val empty: IChatComponent = ChatComponentText("")
 
     @SubscribeEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent) {
         if (!isEnabled()) return
         val levelColor = event.levelColor
-        val level = event.level
-        val message = event.message
-        val author = event.author
+        val levelComponent = event.levelComponent
+        val message = event.messageComponent
+        val authorComponent = event.authorComponent
         val privateIslandRank = event.privateIslandRank
-        val isAGuest = event.isAGuest
+        val privateIslandGuest = event.privateIslandGuest
 
-        val shouldFilter = config.chatFilter && PlayerChatFilter.shouldChatFilter(message)
+        val shouldFilter = config.chatFilter && PlayerChatFilter.shouldChatFilter(message.intoComponent())
         val chatColor = if (shouldFilter) "§7" else if (config.sameChatColor) "§f" else event.chatColor
 
-        val name = nameFormat(author, levelColor, level, privateIslandRank = privateIslandRank, isAGuest = isAGuest)
-        val newMessage = "$name$chatColor: $message"
-
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+        val name = nameFormat(
+            authorComponent,
+            levelColor?.toString(),
+            level = levelComponent,
+            privateIslandRank = privateIslandRank,
+            privateIslandGuest = privateIslandGuest
+        )
+        val all = ChatComponentText("")
+        all.appendSibling(name)
+        all.appendText(": ")
+        all.appendSibling(chatColor.toCleanChatComponent())
+        all.appendSibling(message.intoComponent())
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
     }
 
     @SubscribeEvent
-    fun onPartyChat(event: PartyChatEvent) {
+    fun onCoopChat(event: CoopChatEvent) {
         if (!isEnabled()) return
-        val message = event.message
-        val author = event.author
-        val name = nameFormat(author)
-        val newMessage = "§9Party §8> $name§f: $message"
-
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+        event.chatComponent = StringUtils.replaceIfNeeded(
+            event.chatComponent,
+            ChatComponentUtils.text("§bCo-Op > ") {
+                appendSibling(nameFormat(event.authorComponent))
+                appendText("§f: ")
+                appendSibling(event.messageComponent.intoComponent())
+            }
+        ) ?: return
     }
 
     @SubscribeEvent
     fun onGuildChat(event: GuildChatEvent) {
         if (!isEnabled()) return
-        val message = event.message
-        val author = event.author
-        val guildRank = event.guildRank
-        val name = nameFormat(author, guildRank = guildRank)
-        val newMessage = "§2Guild > $name§f: $message"
-
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+        event.chatComponent = StringUtils.replaceIfNeeded(
+            event.chatComponent,
+            ChatComponentUtils.text("§2Guild > ") {
+                appendSibling(nameFormat(event.authorComponent, guildRank = event.guildRank))
+                appendText("§f: ")
+                appendSibling(event.messageComponent.intoComponent())
+            }
+        ) ?: return
     }
 
     @SubscribeEvent
-    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
+    fun onPartyChat(event: PartyChatEvent) {
         if (!isEnabled()) return
-        val direction = event.direction
-        val message = event.message
-        val author = event.author
-        val name = nameFormat(author)
-        val newMessage = "§d$direction §f$name§7: §f$message"
-
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+        event.chatComponent = StringUtils.replaceIfNeeded(
+            event.chatComponent,
+            ChatComponentUtils.text("§9Party §8> ") {
+                appendSibling(nameFormat(event.authorComponent))
+                appendText("§f: ")
+                appendSibling(event.messageComponent.intoComponent())
+            }
+        ) ?: return
     }
+
+    @SubscribeEvent
+    fun onPrivateChat(event: PrivateMessageChatEvent) {
+        if (!isEnabled()) return
+        event.chatComponent =
+            StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentUtils.text("§d${event.direction}") {
+                appendSibling(nameFormat(event.authorComponent))
+                appendText("§f: ")
+                appendSibling(event.messageComponent.intoComponent())
+            }) ?: return
+    }
+
 
     @SubscribeEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
         if (!isEnabled()) return
-        val author = event.author
-        val action = event.action
-        val itemName = event.itemName
-        val levelColor = event.levelColor
-        val level = event.level
-        val name = nameFormat(author, levelColor = levelColor, level = level)
-        val newMessage = "$name §7$action §r$itemName"
-
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentUtils.text("") {
+            appendSibling(
+                nameFormat(
+                    event.authorComponent,
+                    levelColor = event.levelComponent?.sampleStyleAtStart()?.color?.toString(),
+                    level = event.levelComponent
+                )
+            )
+            appendSibling(event.action.intoComponent())
+            appendText(" ")
+            appendSibling(event.item.intoComponent())
+        }) ?: return
     }
 
     private fun nameFormat(
-        author: String,
+        author: ComponentSpan,
         levelColor: String? = null,
-        level: Int? = null,
-        guildRank: String? = null,
-        privateIslandRank: String? = null,
-        isAGuest: Boolean = false,
-    ): String {
+        level: ComponentSpan? = null,
+        guildRank: ComponentSpan? = null,
+        privateIslandRank: ComponentSpan? = null,
+        privateIslandGuest: ComponentSpan? = null,
+    ): ChatComponentText {
         var cleanAuthor = cleanAuthor(author)
 
-        var emblemFormat = ""
-        emblemPattern.matchMatcher(author) {
-            emblemFormat = group("emblem")
-            cleanAuthor = LorenzUtils.stripVanillaMessage(group("author"))
+        var emblemFormat = empty
+        emblemPattern.matchStyledMatcher(author) {
+            emblemFormat = componentOrThrow("emblem")
+            cleanAuthor = groupOrThrow("author").stripHypixelMessage()
         }
 
-        val name = formatAuthor(cleanAuthor, levelColor)
+        val name = formatAuthor(cleanAuthor.getText(), levelColor).applyFormattingFrom(cleanAuthor)
         val levelFormat = formatLevel(levelColor, level)
-        val guildRankFormat = guildRank ?: ""
-        val privateIslandRankFormat = privateIslandRank ?: ""
-        val privateIslandGuestFormat = if (isAGuest) "§a[✌]" else ""
+        val guildRankFormat = guildRank?.intoComponent() ?: empty
+        val privateIslandRankFormat = privateIslandRank?.intoComponent() ?: empty
+        val privateIslandGuestFormat = privateIslandGuest?.intoComponent() ?: empty
 
-        val cleanName = cleanAuthor.cleanPlayerName()
+        val cleanName = cleanAuthor.getText().cleanPlayerName()
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
-            val faction = it.faction.icon
-            val ironman = if (it.ironman) "§7♲" else ""
-            val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level) } ?: ""
+            val faction = it.faction.icon.toCleanChatComponent()
+            val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else empty
+            val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level).toCleanChatComponent() } ?: empty
             listOf(faction, ironman, bingo)
-        } ?: listOf("", "", "")
+        } ?: listOf(empty, empty, empty)
 
-        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, String>()
+        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, IChatComponent>()
         map[PlayerMessagesConfig.MessagePart.SKYBLOCK_LEVEL] = levelFormat
         map[PlayerMessagesConfig.MessagePart.EMBLEM] = emblemFormat
         map[PlayerMessagesConfig.MessagePart.PLAYER_NAME] = name
@@ -152,19 +189,46 @@ class PlayerNameFormatter {
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_GUEST] = privateIslandGuestFormat
 
-        return config.partsOrder.map { map[it] }.joinToString(" ").replaceAll("  ", " ").trim()
+        val all = ChatComponentText("")
+        for (text in config.partsOrder.mapNotNull { map[it] }) {
+            all.appendSibling(text)
+            if (!all.unformattedText.endsWith(" ")) {
+                all.appendText(" ")
+            }
+        }
+
+        return all
+//         return config.partsOrder.map { map[it] }.joinToString(" ").replaceAll("  ", " ").trim()
     }
 
-    private fun formatLevel(rawColor: String?, rawLevel: Int?): String {
-        val color = rawColor ?: return ""
-        val level = rawLevel ?: error("level is null, color is not null")
+//     private fun String.add(iChatComponent: IChatComponent): ChatComponentText {
+//         val style = findStyle(iChatComponent)
+//         val text = ChatComponentText(this.trim())
+//         text.chatStyle = style
+//
+//         return text
+//     }
+//
+//     private fun String.findStyle(iChatComponent: IChatComponent): ChatStyle? {
+//         for (sibling in iChatComponent.siblings) {
+//             if (sibling.unformattedText.contains(this)) {
+//                 return sibling.chatStyle
+//             }
+//         }
+//         return null
+//     }
+
+    private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): IChatComponent {
+        val color = rawColor ?: return empty
+        val level = rawLevel?.getText() ?: error("level is null, color is not null")
         val levelData = "$color$level"
-        return if (config.hideLevelBrackets) levelData else "§8[${levelData}§8]"
+        val result = if (config.hideLevelBrackets) levelData else "§8[${levelData}§8]"
+        return result.applyFormattingFrom(rawLevel)
     }
 
-    private fun cleanAuthor(author: String): String {
-        val text = LorenzUtils.stripVanillaMessage(author)
-        return text.removeSuffix("§f")
+    private fun cleanAuthor(author: ComponentSpan): ComponentSpan {
+        // TODO: I don't think we even need to strip this ???
+        return author.stripHypixelMessage().removePrefix("§f")
     }
 
     private fun formatAuthor(author: String, levelColor: String?): String {
