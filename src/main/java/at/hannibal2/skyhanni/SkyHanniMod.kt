@@ -273,7 +273,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialsFromBazaar
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EstimatedWardrobePrice
-import at.hannibal2.skyhanni.features.inventory.wardrobe.Wardrobe
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeOverlay
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
@@ -565,7 +565,7 @@ class SkyHanniMod {
         loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
         loadModule(ChocolateFactoryAPI)
-        loadModule(Wardrobe)
+        loadModule(WardrobeAPI)
 
         // features
         loadModule(BazaarOrderHelper())
