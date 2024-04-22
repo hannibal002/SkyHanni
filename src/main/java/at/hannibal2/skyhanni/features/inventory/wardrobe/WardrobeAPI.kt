@@ -22,7 +22,7 @@ object WardrobeAPI {
     private val group = RepoPattern.group("inventory.wardrobe")
     private val inventoryPattern by group.pattern(
         "inventory.name",
-        "Wardrobe \\((?<currentPage>\\d+/\\d+)\\)"
+        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)"
     )
     /**
      * REGEX-TEST: §7Slot 4: §aEquipped
@@ -158,7 +158,10 @@ object WardrobeAPI {
         }
     }
 
-    private fun getWardrobeItem(itemStack: ItemStack?) = if (itemStack == ItemStack(Blocks.stained_glass_pane)) null else itemStack
+    private fun getWardrobeItem(itemStack: ItemStack?): ItemStack? {
+        println(itemStack?.name)
+        return if (itemStack == ItemStack(Blocks.stained_glass_pane)) null else itemStack
+    }
 
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
 
