@@ -36,6 +36,8 @@ object InventoryUtils {
 
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
+    fun getWindowId() = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
+
     fun getItemsInOwnInventory() =
         Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.filterNotNull() ?: emptyList()
 
@@ -109,6 +111,7 @@ object InventoryUtils {
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
     fun clickSlot(slot: Int, windowId: Int) {
+        if (windowId == -1) return
         val mc = Minecraft.getMinecraft()
         mc.playerController.windowClick(windowId, slot, 0, 0, mc.thePlayer)
     }
