@@ -107,8 +107,8 @@ class WardrobeOverlay {
                     playerX,
                     playerY,
                     scale,
-                    eyesX.toFloat(),
-                    eyesY.toFloat(),
+                    eyesX,
+                    eyesY,
                     fakePlayer
                 )
 
