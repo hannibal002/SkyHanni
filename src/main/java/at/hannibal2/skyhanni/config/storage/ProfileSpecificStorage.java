@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
@@ -493,4 +494,17 @@ public class ProfileSpecificStorage {
 
     @Expose
     public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
+
+    @Expose
+    public WardrobeStorage wardrobe = new WardrobeStorage();
+
+    public static class WardrobeStorage {
+        @Expose
+        public Map<Integer, WardrobeAPI.WardrobeData> wardrobeData = new HashMap<>();
+
+        @Expose
+        public Integer currentWardrobeSlot = null;
+    }
+
+
 }
