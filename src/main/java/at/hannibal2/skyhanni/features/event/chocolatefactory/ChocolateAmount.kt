@@ -27,7 +27,6 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
 
         val timeTowerChocPerSecond = baseChocolatePerSecond * timeTowerMultiplier
-        println("timeMultiplier: $timeTowerMultiplier timeChocPerSecond: $timeTowerChocPerSecond")
 
         val secondsAtRate = needed / timeTowerChocPerSecond
         if (secondsAtRate < secondsUntilTowerExpires) {

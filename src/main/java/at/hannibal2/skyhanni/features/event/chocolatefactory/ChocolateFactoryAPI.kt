@@ -271,8 +271,6 @@ object ChocolateFactoryAPI {
         profileStorage.rawChocPerSecond = (chocolatePerSecond / profileStorage.chocolateMultiplier).toInt()
         profileStorage.lastDataSave = SimpleTimeMark.now().toMillis()
 
-        println(ChocolateAmount.PRESTIGE.timeUntilGoal(chocolateForPrestige))
-
         if (!config.statsDisplay) return
         ChocolateFactoryStats.updateDisplay()
     }
