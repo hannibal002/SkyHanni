@@ -10,8 +10,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.resources.DefaultPlayerSkin
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
@@ -37,6 +40,17 @@ class WardrobeOverlay {
         val playerHeight = 2 * playerWidth
         val horizontalSpacing = 20
         val verticalSpacing = 20
+
+        val playerTexture = player.locationSkin
+        val fakePlayer = object : AbstractClientPlayer(gui.mc.theWorld, player.gameProfile) {
+            override fun getLocationSkin(): ResourceLocation {
+                return playerTexture ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+            }
+
+            override fun getName(): String {
+                return ""
+            }
+        }
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
         val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
@@ -70,7 +84,7 @@ class WardrobeOverlay {
                     scale,
                     mouseXRelativeToPlayer,
                     mouseYRelativeToPlayer,
-                    player
+                    fakePlayer
                 )
 
                 val padding = 5

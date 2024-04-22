@@ -181,18 +181,6 @@ object EntityUtils {
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 
-    fun EntityPlayer.clearInventory(): EntityPlayer {
-        for (i in 0 until this.inventory.mainInventory.size) {
-            this.inventory.mainInventory[i] = null
-        }
-
-        for (i in 0 until this.inventory.armorInventory.size) {
-            this.inventory.armorInventory[i] = null
-        }
-
-        return this
-    }
-
     @SubscribeEvent
     fun onEntityRender(event: RenderLivingEvent<*>) {
         val shEvent = SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z)
