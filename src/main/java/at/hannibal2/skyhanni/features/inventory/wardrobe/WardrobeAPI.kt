@@ -49,7 +49,7 @@ object WardrobeAPI {
         val id: Int,
 
         @Expose
-        var armor: Quad<ItemStack?, ItemStack?, ItemStack?, ItemStack?>,
+        var armor: MutableMap<Int, ItemStack?>,
 
         @Expose
         var locked: Boolean,
@@ -61,38 +61,34 @@ object WardrobeAPI {
     private fun WardrobeSlot.getData() = storage?.wardrobeData?.getOrPut(id) {
         WardrobeData(
             id,
-            Quad(null, null, null, null),
-            true,
+            mutableMapOf(1 to null, 2 to null, 3 to null, 4 to null),
+            false,
             false,
         )
     }
 
     var WardrobeSlot.helmet: ItemStack?
-        get() = getData()?.armor?.first
+        get() = getData()?.armor?.get(1)
         set(value) {
-            val data = getData()?.armor ?: return
-            getData()?.armor = Quad(value, data.second, data.third, data.fourth)
+            getData()?.armor?.set(1, value)
         }
 
     var WardrobeSlot.chestplate: ItemStack?
-        get() = getData()?.armor?.second
+        get() = getData()?.armor?.get(2)
         set(value) {
-            val data = getData()?.armor ?: return
-            getData()?.armor = Quad(data.first, value, data.third, data.fourth)
+            getData()?.armor?.set(2, value)
         }
 
     var WardrobeSlot.leggings: ItemStack?
-        get() = getData()?.armor?.third
+        get() = getData()?.armor?.get(3)
         set(value) {
-            val data = getData()?.armor ?: return
-            getData()?.armor = Quad(data.first, data.second, value, data.fourth)
+            getData()?.armor?.set(3, value)
         }
 
     var WardrobeSlot.boots: ItemStack?
-        get() = getData()?.armor?.fourth
+        get() = getData()?.armor?.get(4)
         set(value) {
-            val data = getData()?.armor ?: return
-            getData()?.armor = Quad(data.first, data.second, data.third, value)
+            getData()?.armor?.set(4, value)
         }
 
     var WardrobeSlot.locked: Boolean
@@ -154,14 +150,10 @@ object WardrobeAPI {
             if (equippedSlotPattern.matches(event.inventoryItems[slot.inventorySlot]?.name)) {
                 currentWardrobeSlot = slot.id
             }
-
         }
     }
 
-    private fun getWardrobeItem(itemStack: ItemStack?): ItemStack? {
-        println(itemStack?.name)
-        return if (itemStack == ItemStack(Blocks.stained_glass_pane)) null else itemStack
-    }
+    private fun getWardrobeItem(itemStack: ItemStack?) = if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
 
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
 
