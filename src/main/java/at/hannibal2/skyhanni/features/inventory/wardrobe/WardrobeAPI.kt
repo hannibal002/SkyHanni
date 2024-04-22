@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.Quad
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -24,6 +24,7 @@ object WardrobeAPI {
         "inventory.name",
         "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)"
     )
+
     /**
      * REGEX-TEST: §7Slot 4: §aEquipped
      */
@@ -153,7 +154,8 @@ object WardrobeAPI {
         }
     }
 
-    private fun getWardrobeItem(itemStack: ItemStack?) = if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
+    private fun getWardrobeItem(itemStack: ItemStack?) =
+        if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
 
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
 
@@ -162,5 +164,22 @@ object WardrobeAPI {
             return group("currentPage").formatInt()
         }
         return null
+    }
+
+    @SubscribeEvent
+    fun onDebugCollect(event: DebugDataCollectEvent) {
+        event.title("Wardrobe")
+        event.addIrrelevant {
+            add("Current wardrobe slot: $currentWardrobeSlot")
+            wardrobeSlots.forEach { slot ->
+                add(
+                    "Slot ${slot.id} - " +
+                        "Helmet: ${slot.helmet?.name} - " +
+                        "Chestplate: ${slot.chestplate?.name} - " +
+                        "Leggings: ${slot.leggings?.name} - " +
+                        "Boots: ${slot.boots?.name}"
+                )
+            }
+        }
     }
 }
