@@ -43,7 +43,7 @@ class DungeonsRaceGuide {
                 it.value["nothing:no_return"]?.locations ?: listOf(),
                 it.value["nothing:no_return"]?.shortCuts ?: listOf(),
                 platformSize = 1.0,
-                detectionRange = 3.5,
+                detectionRange = 7.0,
                 depth = false,
             )
         }
