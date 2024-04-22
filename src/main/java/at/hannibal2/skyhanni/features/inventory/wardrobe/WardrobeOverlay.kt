@@ -5,7 +5,11 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.boots
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.chestplate
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.helmet
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.leggings
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
@@ -104,6 +108,12 @@ class WardrobeOverlay {
 
                 val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
+
+                fakePlayer.inventory.armorInventory[3] = WardrobeAPI.wardrobeSlots[i + row * maxPlayersPerRow].helmet
+                fakePlayer.inventory.armorInventory[2] =
+                    WardrobeAPI.wardrobeSlots[i + row * maxPlayersPerRow].chestplate
+                fakePlayer.inventory.armorInventory[1] = WardrobeAPI.wardrobeSlots[i + row * maxPlayersPerRow].leggings
+                fakePlayer.inventory.armorInventory[0] = WardrobeAPI.wardrobeSlots[i + row * maxPlayersPerRow].boots
 
                 drawEntityOnScreen(
                     playerX,

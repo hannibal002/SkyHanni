@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object WardrobeAPI {
+
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
 
