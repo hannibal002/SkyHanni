@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
@@ -166,7 +167,12 @@ class WardrobeOverlay {
                 fakePlayer.inventory.armorInventory =
                     WardrobeAPI.wardrobeSlots[i + row * maxPlayersPerRow].armor.toTypedArray()
 
+                GlStateManager.pushMatrix()
+                GlStateManager.color(1f, 1f, 1f, 1f)
+
                 drawEntityOnScreen(playerX, playerY, scale, eyesX, eyesY, fakePlayer)
+
+                GlStateManager.popMatrix()
 
                 val padding = 5
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
