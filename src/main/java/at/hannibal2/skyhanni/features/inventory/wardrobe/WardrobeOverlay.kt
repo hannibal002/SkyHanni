@@ -10,7 +10,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.resources.DefaultPlayerSkin
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
@@ -37,10 +41,26 @@ class WardrobeOverlay {
         val horizontalSpacing = 20
         val verticalSpacing = 20
 
+        val playerTexture = player.locationSkin
+        val fakePlayer = object : AbstractClientPlayer(gui.mc.theWorld, player.gameProfile) {
+            override fun getLocationSkin(): ResourceLocation {
+                return playerTexture ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+            }
+
+            override fun getName(): String {
+                return ""
+            }
+        }
+
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
         val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
 
         val startY = centerY + playerHeight - totalHeight / 2
+
+
+        GlStateManager.pushMatrix()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+
 
         for (row in 0 until rows) {
             val playersInRow =
@@ -64,7 +84,7 @@ class WardrobeOverlay {
                     scale,
                     mouseXRelativeToPlayer,
                     mouseYRelativeToPlayer,
-                    player
+                    fakePlayer
                 )
 
                 val padding = 5
@@ -75,10 +95,10 @@ class WardrobeOverlay {
                         Renderable.emptyContainer(playerWidth, playerHeight),
                         Renderable.emptyContainer(playerWidth, playerHeight),
                         onClick = {
-                            ChatUtils.chat("Clicked on player at $i")
+                            ChatUtils.debug("Clicked on wardrobe player at $i")
                         },
                         onHover = {
-                            ChatUtils.chat("Hovered over player at $i")
+                            //ChatUtils.debug("Hovered over wardrobe player at $i")
                         }
                     ),
                     Color.BLACK,
@@ -88,6 +108,8 @@ class WardrobeOverlay {
                 display += pos to renderable
             }
         }
+
+        GlStateManager.popMatrix()
 
         event.cancel()
     }
