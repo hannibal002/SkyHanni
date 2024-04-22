@@ -66,7 +66,11 @@ object ChocolateFactoryAPI {
     )
     private val prestigeLevelPattern by patternGroup.pattern(
         "prestige.level",
-        "'§6Chocolate Factory (?<prestige>[IVX]+)"
+        "§6Chocolate Factory (?<prestige>[IVX]+)"
+    )
+    private val chocolateForPrestigePattern by patternGroup.pattern(
+        "chocolate.forprestige",
+        "§7§cRequires (?<amount>\\w+) Chocolate this.*"
     )
     private val clickMeRabbitPattern by patternGroup.pattern(
         "rabbit.clickme",
@@ -107,15 +111,11 @@ object ChocolateFactoryAPI {
 
     var inChocolateFactory = false
 
-    var currentPrestige = 0
-    var chocolateCurrent = 0L
-    var chocolateAllTime = 0L
+    var currentPrestige = 1
     var chocolatePerSecond = 0.0
-    var chocolateThisPrestige = 0L
-    var chocolateMultiplier = 1.0
     var leaderboardPosition: Int? = null
     var leaderboardPercentile: Double? = null
-    var timeTowerActive = false
+    var chocolateForPrestige = 150_000_000L
 
     val upgradeableSlots: MutableSet<Int> = mutableSetOf()
     var bestUpgrade: Int? = null
@@ -165,7 +165,7 @@ object ChocolateFactoryAPI {
             val lore = item.getLore()
             val upgradeCost = lore.getUpgradeCost() ?: continue
 
-            val canAfford = upgradeCost <= chocolateCurrent
+            val canAfford = upgradeCost <= ChocolateAmount.CURRENT.chocolate()
             if (canAfford) upgradeableSlots.add(slotIndex)
 
             if (slotIndex in rabbitSlots) {
@@ -196,28 +196,38 @@ object ChocolateFactoryAPI {
 
         leaderboardPosition = null
         leaderboardPercentile = null
-        chocolateMultiplier = 1.0
-        timeTowerActive = false
 
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
-            chocolateCurrent = group("amount").formatLong()
+            profileStorage.currentChocolate = group("amount").formatLong()
         }
         for (line in chocolateItem.getLore()) {
             chocolatePerSecondPattern.matchMatcher(line) {
                 chocolatePerSecond = group("amount").formatDouble()
             }
             chocolateAllTimePattern.matchMatcher(line) {
-                chocolateAllTime = group("amount").formatLong()
+                profileStorage.chocolateAllTime = group("amount").formatLong()
             }
         }
         prestigeLevelPattern.matchMatcher(prestigeItem.name) {
             currentPrestige = group("prestige").romanToDecimal()
         }
-        prestigeItem.getLore().matchFirst(chocolateThisPrestigePattern) {
-            chocolateThisPrestige = group("amount").formatLong()
+        for (line in prestigeItem.getLore()) {
+            chocolateThisPrestigePattern.matchMatcher(line) {
+                profileStorage.chocolateThisPrestige = group("amount").formatLong()
+            }
+            chocolateForPrestigePattern.matchMatcher(line) {
+                chocolateForPrestige = group("amount").formatLong()
+            }
         }
         productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
-            chocolateMultiplier = group("amount").formatDouble()
+            val currentMultiplier = group("amount").formatDouble()
+            profileStorage.chocolateMultiplier = currentMultiplier
+
+            if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+                profileStorage.rawChocolateMultiplier = currentMultiplier - profileStorage.timeTowerLevel * 0.1
+            } else {
+                profileStorage.rawChocolateMultiplier = currentMultiplier
+            }
         }
         for (line in leaderboardItem.getLore()) {
             leaderboardPlacePattern.matchMatcher(line) {
@@ -239,8 +249,6 @@ object ChocolateFactoryAPI {
                 ChocolateFactoryTimeTowerManager.checkTimeTowerWarning(true)
             }
             timeTowerStatusPattern.matchMatcher(line) {
-                timeTowerActive = group("status") == "ACTIVE"
-
                 val activeTime = group("acitveTime")
                 if (activeTime.isNotEmpty()) {
                     // todo in future fix this issue with TimeUtils.getDuration
@@ -260,6 +268,10 @@ object ChocolateFactoryAPI {
                 profileStorage.nextTimeTower = nextTimeTower.toMillis()
             }
         }
+        profileStorage.rawChocPerSecond = (chocolatePerSecond / profileStorage.chocolateMultiplier).toInt()
+        profileStorage.lastDataSave = SimpleTimeMark.now().toMillis()
+
+        println(ChocolateAmount.PRESTIGE.timeUntilGoal(chocolateForPrestige))
 
         if (!config.statsDisplay) return
         ChocolateFactoryStats.updateDisplay()

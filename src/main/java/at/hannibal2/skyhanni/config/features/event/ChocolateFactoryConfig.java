@@ -45,6 +45,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.CURRENT,
         ChocolateFactoryStat.THIS_PRESTIGE,
         ChocolateFactoryStat.ALL_TIME,
+        ChocolateFactoryStat.TIME_TO_PRESTIGE,
         ChocolateFactoryStat.EMPTY,
         ChocolateFactoryStat.PER_SECOND,
         ChocolateFactoryStat.PER_MINUTE,
