@@ -72,6 +72,14 @@
 + Added party chat commands. - !nea (https://github.com/hannibal002/SkyHanni/pull/1433)
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
++ Added Option to reorder or hide every part of a player chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Parts to move around: SkyBlock Level, Emblem, player name, guild rank, private island rank, crimson faction, iron man mode, bingo level and Private Island Guest.
+    + Player messages impacted by this: all chat, party, guild, private chat, /show.
+    + This might break hover/click on chat actions (Will be fixed later).
++ Added Hide Level Brackets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Hide the gray brackets in front of and behind the level numbers.
++ Added Level Color As Name. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Use the color of the SkyBlock level for the player color.
 
 #### Event Features
 
@@ -132,6 +140,7 @@
 #### Commands Improvements
 
 + Add /trade to tab completeable commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1354)
++ Improved gfs to have support for calculations in amount. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1493)
 
 #### Config Improvements
 
@@ -158,6 +167,10 @@
 #### Chat Improvements
 
 + Added more messages to Pet Drop Rarity. - Empa (https://github.com/hannibal002/SkyHanni/pull/1213)
++ Added option Ignore YouTube. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Do not remove the rank for YouTubers in chat.
++ Added option Same Chat Color. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + All players, also those with ranks, write with the same, white chat color.
 
 #### Combat Improvements
 
@@ -183,6 +196,7 @@
 + Show enchantment in book bundle name in profit tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1391)
 + Added the option to choose the duration and color of Patcher Coords Waypoints. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1476)
 + Added support to right-click in GUI editor to open config for all remaining GUI elements. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1455)
++ Fixed another memory leak. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1491)
 
 ### Fixes
 
@@ -221,6 +235,8 @@
 + Fixed the Supercraft /gfs prompt not showing when you crafted 1,000 or more items. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1351)
 + Make fire sale hider in tab list work again. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1355)
 + Queued gfs now works with gemstone names. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1468)
++ Fixed pet rarity drop messages modifying unrelated messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1507)
++ Fixed "chat rank hider" changing rank formatting for level 400+. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
 
 #### GUI Fixes
 
@@ -254,6 +270,14 @@
 
 + Fixed bazaar order cancel save to clipboard error again. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1474)
 
+#### Rift Fixes
+
++ Fixed Rift NPC shops being treated as overworld ones for selling items to them. - Luna (https://github.com/hannibal002/SkyHanni/pull/1494)
+
+#### Mining Fixes
+
++ Fixed Paleontologist book not getting detected when excavate fossils. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1490)
+
 #### Misc Fixes
 
 + Fixed tick event being called twice a tick. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
@@ -277,6 +301,7 @@
 + Fixed catch incorrect error type when on alpha 27. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1462)
 + Fixed rendering an empty string on every single item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1465)
     + This change improves performance.
++ Fixed Bits Gained Chat Messages being sent randomly. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1503)
 
 ### Technical Details
 
@@ -365,11 +390,18 @@
 + Crash in dev env with missing @ConfigLink. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1455)
 + Formatted the whole code base to fit new editor config. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1485)
 + Force wrapping of enums. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1484)
++ Fixed a bug in mobDetection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1495)
++ Show sound locations in-world for `/shtracksounds`. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1489)
++ Switched build system to unimined. - !nea (https://github.com/hannibal002/SkyHanni/pull/1456)
++ Changed auto mixins to be gathered at compile time, rather than runtime. - !nea (https://github.com/hannibal002/SkyHanni/pull/1456)
++ A ton. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
 
 ### Removed Features
 
 + Removed the option to change the highlight color in chest value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1118)
 + Removed Bow Sound distance setting. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
++ Removing Player Chat Symbols. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + This is now merged in "Part Order".
 
 ## Version 0.24
 
