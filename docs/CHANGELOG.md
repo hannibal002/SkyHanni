@@ -392,7 +392,6 @@
 + Force wrapping of enums. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1484)
 + Fixed a bug in mobDetection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1495)
 + Show sound locations in-world for `/shtracksounds`. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1489)
-+ Switched build system to unimined. - !nea (https://github.com/hannibal002/SkyHanni/pull/1456)
 + Changed auto mixins to be gathered at compile time, rather than runtime. - !nea (https://github.com/hannibal002/SkyHanni/pull/1456)
 + A ton. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
 
