@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.NamedParkourJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DungeonHubRacesJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -37,7 +37,7 @@ class DungeonsRaceGuide {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<NamedParkourJson>("DungeonHubRaces")
+        val data = event.getConstant<DungeonHubRacesJson>("DungeonHubRaces")
         data.data.forEach {
             parkourHelpers[it.key] = ParkourHelper(
                 it.value["nothing:no_return"]?.locations ?: listOf(),
