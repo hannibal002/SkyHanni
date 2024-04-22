@@ -86,7 +86,7 @@ object ChocolateFactoryAPI {
     )
     private val timeTowerStatusPattern by patternGroup.pattern(
         "timetower.status",
-        "§7Status: §.§l(?<status>INACTIVE|ACTIVE).*"
+        "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)"
     )
     private val timeTowerRechargePattern by patternGroup.pattern(
         "timetower.recharge",
@@ -240,6 +240,16 @@ object ChocolateFactoryAPI {
             }
             timeTowerStatusPattern.matchMatcher(line) {
                 timeTowerActive = group("status") == "ACTIVE"
+
+                val activeTime = group("acitveTime")
+                if (activeTime.isNotEmpty()) {
+                    // todo in future fix this issue with TimeUtils.getDuration
+                    val formattedGroup = activeTime.replace("h", "h ").replace("m", "m ")
+
+                    val activeDuration = TimeUtils.getDuration(formattedGroup)
+                    val activeUntil = SimpleTimeMark.now() + activeDuration
+                    profileStorage.currentTimeTowerEnds = activeUntil.toMillis()
+                }
             }
             timeTowerRechargePattern.matchMatcher(line) {
                 // todo in future fix this issue with TimeUtils.getDuration

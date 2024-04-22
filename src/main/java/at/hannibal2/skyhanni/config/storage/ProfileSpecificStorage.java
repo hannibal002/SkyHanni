@@ -59,6 +59,21 @@ public class ProfileSpecificStorage {
         public int maxRabbits = -1;
 
         @Expose
+        public int currentChocolate = 0;
+
+        @Expose
+        public double rawChocPerSecond = 0.0;
+
+        @Expose
+        public double chocMultiplier = 1.0;
+
+        @Expose
+        public int timeTowerLevel = 0;
+
+        @Expose
+        public long currentTimeTowerEnds = 0;
+
+        @Expose
         public long nextTimeTower = 0;
 
         @Expose
@@ -66,6 +81,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public int maxTimeTowerUses = 3;
+
+        @Expose
+        public long lastDataSave = 0;
     }
 
     @Expose
