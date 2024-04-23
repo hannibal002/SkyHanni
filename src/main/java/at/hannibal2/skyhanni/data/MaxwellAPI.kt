@@ -52,9 +52,13 @@ object MaxwellAPI {
     private var powers = mutableListOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
-    private val chatPowerpattern by patternGroup.pattern(
+    private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
         "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!"
+    )
+    private val chatPowerUnlockedPattern by patternGroup.pattern(
+        "chat.power.unlocked",
+        "§eYou permanently unlocked the §a(?<power>.*) §epower!"
     )
     private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
@@ -120,7 +124,17 @@ object MaxwellAPI {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
-        chatPowerpattern.matchMatcher(message) {
+        chatPowerPattern.matchMatcher(message) {
+            val power = group("power")
+            currentPower = getPowerByNameOrNull(power)
+                ?: return ErrorManager.logErrorWithData(
+                    UnknownMaxwellPower("Unknown power: $power"),
+                    "Unknown power: $power",
+                    "power" to power,
+                    "message" to message
+                )
+        }
+        chatPowerUnlockedPattern.matchMatcher(message) {
             val power = group("power")
             currentPower = getPowerByNameOrNull(power)
                 ?: return ErrorManager.logErrorWithData(
