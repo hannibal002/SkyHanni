@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -54,9 +55,11 @@ object GetFromSackAPI {
 
     fun getFromChatMessageSackItems(
         item: PrimitiveItemStack,
-        text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!"
+        text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!",
     ) =
-        ChatUtils.clickableChat(text, "${commands.first()} ${item.internalName.asString()} ${item.amount}")
+        ChatUtils.clickableChat(text, onClick = {
+            HypixelCommands.getFromSacks(item.internalName.asString(), item.amount)
+        })
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
@@ -86,7 +89,7 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            ChatUtils.sendCommandToServer("gfs ${item.internalName.asString().replace('-', ':')} ${item.amount}")
+            HypixelCommands.getFromSacks(item.internalName.asString().replace('-', ':'), item.amount)
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
@@ -158,7 +161,7 @@ object GetFromSackAPI {
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
         "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
-        "bz ${item.removeColor()}"
+        onClick = { HypixelCommands.bazaar(item.removeColor()) }
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
