@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -51,36 +52,21 @@ class HoppityCollectionStats {
 
         inInventory = true
 
-        for ((_, item) in event.inventoryItems) {
-            val itemName = item.displayName ?: continue
-            val itemLore = item.getLore()
+        loadRabbitCollectionData(event)
 
-            var duplicatesFound = 0
-            var rabbitRarity: RabbitCollectionRarity? = null
-            var found = true
-
-            for (line in itemLore) {
-                rabbitRarityPattern.matchMatcher(line) {
-                    rabbitRarity = RabbitCollectionRarity.fromDisplayName(group("rarity"))
-                }
-                duplicatesFoundPattern.matchMatcher(line) {
-                    duplicatesFound = group("duplicates").formatInt()
-                }
-                if (rabbitNotFoundPattern.matches(line)) found = false
-            }
-
-            val rarity = rabbitRarity ?: continue
-            val duplicates = duplicatesFound.coerceAtLeast(0)
-            loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
+        display = buildList {
+            addString("§eHoppity Rabbit Collection§f:")
+            add(LorenzUtils.fillTable(loadTable(), padding = 5))
         }
+    }
 
+    private fun loadTable() = buildList {
         var totalAmountFound = 0
         var totalRabbits = 0
         var totalDuplicates = 0
         var totalChocolatePerSecond = 0
         var totalChocolateMultiplier = 0.0
 
-        val table = mutableListOf<DisplayTableEntry>()
         for (rarity in RabbitCollectionRarity.entries) {
             val filtered = loggedRabbits.filter { it.value.rarity == rarity }
 
@@ -117,7 +103,7 @@ class HoppityCollectionStats {
                 add("§7Chocolate Per Second: §a$displayChocolatePerSecond")
                 add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
             }
-            table.add(
+            add(
                 DisplayTableEntry(
                     title,
                     "§a$displayFound§7/§a$displayTotal",
@@ -127,11 +113,31 @@ class HoppityCollectionStats {
                 )
             )
         }
+    }
 
-        val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5))
-        display = newList
+    private fun loadRabbitCollectionData(event: InventoryFullyOpenedEvent) {
+        for ((_, item) in event.inventoryItems) {
+            val itemName = item.displayName ?: continue
+            val itemLore = item.getLore()
+
+            var duplicatesFound = 0
+            var rabbitRarity: RabbitCollectionRarity? = null
+            var found = true
+
+            for (line in itemLore) {
+                rabbitRarityPattern.matchMatcher(line) {
+                    rabbitRarity = RabbitCollectionRarity.fromDisplayName(group("rarity"))
+                }
+                duplicatesFoundPattern.matchMatcher(line) {
+                    duplicatesFound = group("duplicates").formatInt()
+                }
+                if (rabbitNotFoundPattern.matches(line)) found = false
+            }
+
+            val rarity = rabbitRarity ?: continue
+            val duplicates = duplicatesFound.coerceAtLeast(0)
+            loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
+        }
     }
 
     @SubscribeEvent
@@ -163,7 +169,7 @@ class HoppityCollectionStats {
     private data class RabbitCollectionInfo(
         val rarity: RabbitCollectionRarity,
         val found: Boolean,
-        val duplicates: Int
+        val duplicates: Int,
     )
 
     // todo in future make the amount and multiplier work with mythic rabbits (can't until I have some)
@@ -171,7 +177,7 @@ class HoppityCollectionStats {
         val displayName: String,
         val chocolatePerSecond: Int,
         val chocolateMultiplier: Double,
-        val item: NEUInternalName
+        val item: NEUInternalName,
     ) {
         COMMON("§fCommon", 1, 0.002, "STAINED_GLASS".asInternalName()),
         UNCOMMON("§aUncommon", 2, 0.003, "STAINED_GLASS-5".asInternalName()),
