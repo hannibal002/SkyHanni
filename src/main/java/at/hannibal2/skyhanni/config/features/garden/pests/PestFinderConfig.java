@@ -33,7 +33,7 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Only With Vacuum",
-        desc = "Only show the pest display and waypoints while holding a vacuum in the hand."
+        desc = "Only show the pest display and waypoints while holding a vacuum."
     )
     @ConfigEditorBoolean
     public boolean onlyWithVacuum = true;

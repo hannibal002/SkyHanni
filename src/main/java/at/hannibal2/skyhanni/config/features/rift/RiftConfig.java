@@ -46,7 +46,7 @@ public class RiftConfig {
     public boolean highlightGuide = true;
 
     @Expose
-    @ConfigOption(name = "Horsezooka Hider", desc = "Hide horses while holding the Horsezooka in the hand.")
+    @ConfigOption(name = "Horsezooka Hider", desc = "Hide horses while holding the Horsezooka.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean horsezookaHider = false;
