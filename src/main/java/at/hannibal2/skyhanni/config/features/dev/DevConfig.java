@@ -78,6 +78,20 @@ public class DevConfig {
 
     @Expose
     @ConfigOption(
+        name = "Flip Contributors",
+        desc = "Make SkyHanni contributors appear upside down in the world.")
+    @ConfigEditorBoolean
+    public boolean flipContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Rotate Contributors",
+        desc = "Make SkyHanni contributors spin around when you are looking at them.")
+    @ConfigEditorBoolean
+    public boolean rotateContributors = false;
+
+    @Expose
+    @ConfigOption(
         name = "SBA Contributors",
         desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
     @ConfigEditorBoolean

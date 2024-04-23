@@ -19,7 +19,6 @@ public class MixinContributorRendererEntityLiving<T extends EntityLivingBase> {
     @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Ljava/lang/String;equals(Ljava/lang/Object;)Z", ordinal = 0))
     private boolean rotateCorpse(String displayName, Object v2, T bat, float p_77043_2_, float p_77043_3_, float partialTicks) {
         return skyHanni$hook.rotateCorpse(displayName, bat);
-
     }
 
     @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;isWearing(Lnet/minecraft/entity/player/EnumPlayerModelParts;)Z"))
