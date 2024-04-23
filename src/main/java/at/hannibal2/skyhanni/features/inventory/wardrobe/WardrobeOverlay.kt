@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
-import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.util.ResourceLocation
@@ -69,17 +68,6 @@ class WardrobeOverlay {
         val horizontalSpacing = 20
         val verticalSpacing = 20
 
-        val playerTexture = player.locationSkin
-        val fakePlayer = object : AbstractClientPlayer(gui.mc.theWorld, player.gameProfile) {
-            override fun getLocationSkin(): ResourceLocation {
-                return playerTexture ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
-            }
-
-            override fun getName(): String {
-                return ""
-            }
-        }
-
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
         val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
 
@@ -87,18 +75,21 @@ class WardrobeOverlay {
 
 
         val tempTogglePos = Position((gui.width * 0.85).toInt(), (gui.height * 0.9).toInt())
-        val tempToggleRenderable = Renderable.horizontalContainer(listOf(
-            Renderable.drawInsideRoundedRect(
-            Renderable.clickable(
-                Renderable.emptyContainer(30, 30),
-                bypassChecks = true,
-                onClick = {
-                    ChatUtils.chat("Clicked on wardrobe toggle")
-                    tempToggleShowOverlay = false
-                },
-            ),
-            Color.BLACK,
-            ), Renderable.string("Temp toggle")), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
+        val tempToggleRenderable = Renderable.horizontalContainer(
+            listOf(
+                Renderable.drawInsideRoundedRect(
+                    Renderable.clickable(
+                        Renderable.emptyContainer(30, 30),
+                        bypassChecks = true,
+                        onClick = {
+                            ChatUtils.chat("Clicked on wardrobe toggle")
+                            tempToggleShowOverlay = false
+                        },
+                    ),
+                    Color.BLACK,
+                ), Renderable.string("Temp toggle")
+            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
+        )
         display += tempTogglePos to tempToggleRenderable
 
         val favoriteTogglePos = Position(tempTogglePos.rawX, tempTogglePos.rawY - 50)
@@ -138,13 +129,25 @@ class WardrobeOverlay {
 
                 val wardrobeSlot = list[slot]
 
-                fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.toTypedArray()
-
                 val padding = 10
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
                 val containerWidth = playerWidth + 2 * padding
                 val containerHeight = playerHeight + 2 * padding
+
+
+                val playerTexture = player.locationSkin
+                val fakePlayer = object : AbstractClientPlayer(gui.mc.theWorld, player.gameProfile) {
+                    override fun getLocationSkin(): ResourceLocation {
+                        return playerTexture ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+                    }
+
+                    override fun getName(): String {
+                        return ""
+                    }
+                }
+
+                fakePlayer.inventory.armorInventory =
+                    wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.toTypedArray()
 
                 val isInPage = wardrobeSlot.isInCurrentPage
                 RenderLivingEntityHelper.removeEntityColor(fakePlayer)
@@ -204,16 +207,9 @@ class WardrobeOverlay {
                 val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
 
-                drawEntityOnScreen(
-                    playerX,
-                    playerY,
-                    scale.toInt(),
-                    eyesX,
-                    eyesY,
-                    fakePlayer
-                )
-
+                display += Position(playerX, playerY) to Renderable.player(fakePlayer, eyesX, eyesY, scale.toInt())
                 display += pos to renderable
+
                 slot++
             }
         }
@@ -237,9 +233,12 @@ class WardrobeOverlay {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
+        GlStateManager.pushMatrix()
         for ((pos, renderable) in display) {
+            GlStateManager.color(1f, 1f, 1f, 1f)
             pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
         }
+        GlStateManager.popMatrix()
     }
 
     private fun clickWardrobeSlot(wardrobeSlot: WardrobeAPI.WardrobeSlot) {

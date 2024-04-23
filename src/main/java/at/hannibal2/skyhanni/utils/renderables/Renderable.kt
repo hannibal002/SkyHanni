@@ -26,7 +26,9 @@ import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
@@ -678,5 +680,20 @@ interface Renderable {
             }
         }
 
+        fun player(
+            player: EntityLivingBase,
+            eyesX: Float = 0f,
+            eyesY: Float = 0f,
+            scale: Int = 30,
+        ) = object : Renderable {
+            override val width = scale
+            override val height = scale * 2
+            override val horizontalAlign = HorizontalAlignment.LEFT
+            override val verticalAlign = VerticalAlignment.TOP
+
+            override fun render(posX: Int, posY: Int) {
+                drawEntityOnScreen(posX, posY, scale, eyesX, eyesY, player)
+            }
+        }
     }
 }
