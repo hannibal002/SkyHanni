@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.events.PartyChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -20,13 +20,15 @@ object PartyChatCommands {
         val executable: (PartyChatEvent) -> Unit,
     )
 
+    private fun useConfig() = SkyHanniMod.feature.misc.partyCommands
+
     private val allPartyCommands = listOf(
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
             { config.transferCommand },
             requiresPartyLead = true,
             executable = {
-                ChatUtils.sendCommandToServer("party transfer ${it.author}")
+                ChatUtils.sendCommandToServer("party transfer ${it.cleanedAuthor}")
             }
         ),
         PartyChatCommand(
@@ -69,19 +71,20 @@ object PartyChatCommands {
 
     @SubscribeEvent
     fun onPartyCommand(event: PartyChatEvent) {
-        if (event.text.firstOrNull() !in commandBeginChars)
+        if (event.message.firstOrNull() !in commandBeginChars)
             return
-        val commandLabel = event.text.substring(1).substringBefore(' ')
+        val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
-        if (event.author == LorenzUtils.getPlayerName()) {
+        val name = event.cleanedAuthor
+        if (name == LorenzUtils.getPlayerName()) {
             return
         }
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) {
             return
         }
-        if (!isTrustedUser(event.author)) {
-            ChatUtils.chat("§cIgnoring chat command from ${event.author}. Change your party chat command settings or /friend (best) them.")
+        if (!isTrustedUser(name)) {
+            ChatUtils.chat("§cIgnoring chat command from $name. Change your party chat command settings or /friend (best) them.")
             return
         }
         command.executable(event)
