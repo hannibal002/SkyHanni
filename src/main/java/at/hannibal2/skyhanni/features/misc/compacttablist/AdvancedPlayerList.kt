@@ -195,10 +195,10 @@ object AdvancedPlayerList {
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
-            suffix += " " + getSocialIcon(data.name).icon()
+            suffix += " ${getSocialIcon(data.name).icon()}"
         }
         ContributorManager.getTabListSuffix(data.name)?.let {
-            suffix += it
+            suffix += " $it"
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
