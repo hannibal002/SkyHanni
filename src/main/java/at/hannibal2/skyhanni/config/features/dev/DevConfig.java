@@ -85,7 +85,7 @@ public class DevConfig {
 
     @Expose
     @ConfigOption(
-        name = "Rotate Contributors",
+        name = "Spin Contributors",
         desc = "Make SkyHanni contributors spin around when you are looking at them.")
     @ConfigEditorBoolean
     public boolean rotateContributors = false;

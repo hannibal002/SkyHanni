@@ -52,7 +52,7 @@ class RendererLivingEntityHook {
 
     private fun isCoolPerson(userName: String?): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
-        if (!config.flipContributors || LorenzUtils.isAprilFoolsDay) return false
+        if (!config.flipContributors && !LorenzUtils.isAprilFoolsDay) return false
         val name = userName ?: return false
         return ContributorManager.canSpin(name)
     }
