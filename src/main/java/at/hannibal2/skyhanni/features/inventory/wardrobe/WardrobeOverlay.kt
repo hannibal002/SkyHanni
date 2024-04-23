@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.armor
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.favorite
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.getArmor
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSlot
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
@@ -141,7 +141,7 @@ class WardrobeOverlay {
                 val fakePlayer = wardrobeSlot.getFakePlayer()
 
                 fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
                 RenderLivingEntityHelper.removeEntityColor(fakePlayer)
                 if (!wardrobeSlot.isInCurrentPage()) {
@@ -167,13 +167,13 @@ class WardrobeOverlay {
                     lore.add("§aEstimated Armor Value:")
 
                     var totalPrice = 0.0
-                    for (item in wardrobeSlot.armor.filterNotNull()) {
+                    for (item in wardrobeSlot.getArmor().filterNotNull()) {
                         val price = item.getPrice()
                         totalPrice += price
                         lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
                     }
 
-                    if (wardrobeSlot.armor.any { it != null }) {
+                    if (wardrobeSlot.getArmor().any { it != null }) {
                         lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
 
                         Renderable.toolTipContainer(lore, containerWidth, containerHeight)

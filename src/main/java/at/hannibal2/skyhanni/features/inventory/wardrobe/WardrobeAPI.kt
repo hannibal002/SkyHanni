@@ -82,8 +82,7 @@ object WardrobeAPI {
             getData()?.armor?.set(4, value)
         }
 
-    val WardrobeSlot.armor: List<ItemStack?>
-        get() = getData()?.armor?.toSortedMap()?.values?.toList() ?: emptyList()
+    fun WardrobeSlot.getArmor(): List<ItemStack?> = getData()?.armor?.toSortedMap()?.values?.toList() ?: emptyList()
 
     var WardrobeSlot.locked: Boolean
         get() = getData()?.locked ?: true
