@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -137,5 +138,6 @@ public class GhostCounterConfig {
     public Runnable resetCounter = GhostUtil.INSTANCE::reset;
 
     @Expose
+    @ConfigLink(owner = GhostCounterConfig.class, field = "enabled")
     public Position position = new Position(50, 50, false, true);
 }

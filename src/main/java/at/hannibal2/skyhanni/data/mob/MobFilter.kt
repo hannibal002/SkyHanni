@@ -91,7 +91,16 @@ object MobFilter {
     const val MINION_MOB_PREFIX = "Minion Mob "
 
     enum class DungeonAttribute {
-        Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
+        Flaming,
+        Stormy,
+        Speedy,
+        Fortified,
+        Healthy,
+        Healing,
+        Boomer,
+        Golden,
+        Stealth,
+        ;
 
         companion object {
 
@@ -129,7 +138,7 @@ object MobFilter {
         else -> true
     }
 
-    fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4
+    fun EntityPlayer.isRealPlayer() = uniqueID?.let { it.version() == 4 } ?: false
 
     fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && displayNPCNameCheck(this.name))
         || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village

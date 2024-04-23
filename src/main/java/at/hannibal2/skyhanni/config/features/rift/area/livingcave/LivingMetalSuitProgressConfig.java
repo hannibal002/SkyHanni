@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class LivingMetalSuitProgressConfig {
@@ -20,5 +21,6 @@ public class LivingMetalSuitProgressConfig {
     public boolean compactWhenMaxed = false;
 
     @Expose
+    @ConfigLink(owner = LivingMetalSuitProgressConfig.class, field = "enabled")
     public Position position = new Position(100, 100);
 }

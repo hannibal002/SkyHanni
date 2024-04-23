@@ -418,7 +418,7 @@ object SkillProgress {
             add(Renderable.string("§9[§d$level§9] "))
 
         if (config.useIcon.get()) {
-            add(Renderable.itemStack(activeSkill.item, 1.2))
+            add(Renderable.itemStack(activeSkill.item, 1.0))
         }
 
         add(Renderable.string(buildString {
