@@ -21,7 +21,7 @@ public class VoltCruxConfig {
     public boolean voltRange = true;
 
     @Expose
-    @ConfigOption(name = "Volt Range Highlighter Colour", desc = "Which colour the Volt range will be highlighted in")
+    @ConfigOption(name = "Volt Range Highlighter Colour", desc = "Which colour the Volt range will be highlighted in.")
     @ConfigEditorColour
     public String voltColour = "0:60:0:0:255";
 
