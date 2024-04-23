@@ -10,13 +10,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class FollowingLineConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Draw a colored line behind the player.")
+    @ConfigOption(name = "Enabled", desc = "Draw a coloured line behind the player.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Line Color", desc = "Color of the line.")
+    @ConfigOption(name = "Line Colour", desc = "Colour of the line.")
     @ConfigEditorColour
     public String lineColor = "0:255:255:255:255";
 

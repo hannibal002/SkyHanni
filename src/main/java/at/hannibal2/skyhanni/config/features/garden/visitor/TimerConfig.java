@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class TimerConfig {
     @Expose
-    @ConfigOption(name = "Visitor Timer", desc = "Timer when the next visitor will appear, " +
+    @ConfigOption(name = "Visitor Timer", desc = "Time until the next visitor will appear, " +
         "and a number for how many visitors are already waiting.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -15,7 +15,7 @@ public class OthersBossConfig {
     public boolean highlight = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Color", desc = "What color to highlight the boss in.")
+    @ConfigOption(name = "Highlight Colour", desc = "Which colour to highlight the boss with.")
     @ConfigEditorColour
     public String highlightColor = "0:249:0:255:88";
 

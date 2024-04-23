@@ -16,7 +16,7 @@ public class PatcherCoordsWaypointConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color of the waypoint.")
+    @ConfigOption(name = "Colour", desc = "Colour of the waypoint.")
     @ConfigEditorColour
     public String color = "0:194:75:197:64";
 

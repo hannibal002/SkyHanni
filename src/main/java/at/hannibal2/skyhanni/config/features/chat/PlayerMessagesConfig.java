@@ -14,7 +14,7 @@ public class PlayerMessagesConfig {
 
     @Expose
     @ConfigOption(name = "Enable Chat Formatting", desc = "Enable player chat modifications. Required for all settings below.\n" +
-        "§cThis might break hover/click on chat actions.")
+        "§cThis might break hovering/clicking on chat actions.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enable = false;
@@ -64,7 +64,7 @@ public class PlayerMessagesConfig {
     public boolean hideLevelBrackets = false;
 
     @Expose
-    @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
+    @ConfigOption(name = "Level Colour As Name", desc = "Use the colour of the SkyBlock level for the player colour.")
     @ConfigEditorBoolean
     public boolean useLevelColorForName = false;
 
@@ -86,7 +86,7 @@ public class PlayerMessagesConfig {
     public boolean chatFilter = false;
 
     @Expose
-    @ConfigOption(name = "Same Chat Color", desc = "All players, also those with ranks, write with the same, white chat color.")
+    @ConfigOption(name = "Same Chat Colour", desc = "All players, also those with ranks, write with the same, white chat colour.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sameChatColor = true;

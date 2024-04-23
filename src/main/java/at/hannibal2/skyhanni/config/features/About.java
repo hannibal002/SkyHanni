@@ -17,7 +17,7 @@ public class About {
     @ConfigVersionDisplay
     public transient Void currentVersion = null;
 
-    @ConfigOption(name = "Auto Updates", desc = "Automatically check for updates on each startup")
+    @ConfigOption(name = "Auto Updates", desc = "Automatically check for updates upon startup")
     @Expose
     @ConfigEditorBoolean
     public boolean autoUpdates = true;

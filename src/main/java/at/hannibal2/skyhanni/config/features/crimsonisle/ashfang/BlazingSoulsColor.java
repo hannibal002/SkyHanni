@@ -15,7 +15,7 @@ public class BlazingSoulsColor {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Souls Color", desc = "Color of the Blazing Souls.")
+    @ConfigOption(name = "Souls Colour", desc = "Colour of the Blazing Souls.")
     @ConfigEditorColour
     public String color = "0:245:85:255:85";
 }

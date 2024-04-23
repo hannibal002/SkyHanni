@@ -46,7 +46,7 @@ public class SlayerConfig {
     public SlayerBossWarningConfig slayerBossWarning = new SlayerBossWarningConfig();
 
     @Expose
-    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss in blue color.")
+    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss blue.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean slayerMinibossHighlight = false;

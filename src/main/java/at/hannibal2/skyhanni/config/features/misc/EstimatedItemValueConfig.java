@@ -43,7 +43,7 @@ public class EstimatedItemValueConfig {
     public boolean exactPrice = false;
 
     @Expose
-    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
+    @ConfigOption(name = "Show Armour Value", desc = "Show the value of the full armour set in the Wardrobe inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armor = true;
@@ -54,7 +54,7 @@ public class EstimatedItemValueConfig {
     public boolean ignoreHelmetSkins = false;
 
     @Expose
-    @ConfigOption(name = "Ignore Armor Dyes", desc = "Ignore Armor Dyes from the total value.")
+    @ConfigOption(name = "Ignore Armour Dyes", desc = "Ignore Armour Dyes from the total value.")
     @ConfigEditorBoolean
     public boolean ignoreArmorDyes = false;
 

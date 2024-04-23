@@ -17,7 +17,7 @@ import java.util.List;
 public class RewardWarningConfig {
 
     @Expose
-    @ConfigOption(name = "Notify in Chat", desc = "Send a chat message once you talk to a visitor with a reward.")
+    @ConfigOption(name = "Notify in Chat", desc = "Send a chat message when you talk to a visitor with a reward.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean notifyInChat = true;
@@ -29,7 +29,7 @@ public class RewardWarningConfig {
     public boolean showOverName = true;
 
     @Expose
-    @ConfigOption(name = "Block Refusing Reward", desc = "Prevent refusing visitors with a reward.")
+    @ConfigOption(name = "Block Refusing Reward", desc = "Prevents refusing visitors with a reward.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventRefusing = true;
@@ -59,7 +59,7 @@ public class RewardWarningConfig {
     @Expose
     @ConfigOption(
         name = "Coins Per Copper",
-        desc = "The price to use for the options below.\n" +
+        desc = "The price used for the options below.\n" +
             "Requires at least one of them to be on."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 50_000, minStep = 250)
@@ -86,7 +86,7 @@ public class RewardWarningConfig {
     @Expose
     @ConfigOption(
         name = "Opacity",
-        desc = "How strong the offer buttons should be grayed out when blocked."
+        desc = "How much the offer buttons should be grayed out when blocked."
     )
     @ConfigEditorSlider(
         minValue = 0,

@@ -22,7 +22,7 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(name = "Show Money per Hour",
         desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
-            "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
+            "Supports Bountiful, Mushroom Cow Perk, Armour Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = false;
@@ -138,7 +138,7 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Include Armor Drops",
-        desc = "Includes the average coins/hr from your armor.")
+        desc = "Includes the average coins/hr from your armour.")
     @ConfigEditorBoolean
     public boolean armor = true;
 

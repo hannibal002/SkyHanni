@@ -14,7 +14,7 @@ public class KillerSpringConfig {
     public boolean highlight = false;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Highlight color.")
+    @ConfigOption(name = "Colour", desc = "Highlight colour.")
     @ConfigEditorColour
     public String color = "0:199:100:0:88";
 
@@ -25,7 +25,7 @@ public class KillerSpringConfig {
     public boolean showLines = false;
 
     @Expose
-    @ConfigOption(name = "Lines Start Color", desc = "Starting color of the lines.")
+    @ConfigOption(name = "Lines Start Colour", desc = "Starting colour of the lines.")
     @ConfigEditorColour
     public String linesColor = "0:255:255:13:0";
 }

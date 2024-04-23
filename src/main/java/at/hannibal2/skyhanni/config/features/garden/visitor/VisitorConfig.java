@@ -44,12 +44,12 @@ public class VisitorConfig {
     public boolean notificationTitle = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Status", desc = "Highlight the status for visitors with a text above or with color.")
+    @ConfigOption(name = "Highlight Status", desc = "Highlight visitors status with text above or by colouring them.")
     @ConfigEditorDropdown
     public HighlightMode highlightStatus = HighlightMode.BOTH;
 
     public enum HighlightMode implements HasLegacyId {
-        COLOR("Color Only", 0),
+        COLOR("Colour Only", 0),
         NAME("Name Only", 1),
         BOTH("Both", 2),
         DISABLED("Disabled", 3);

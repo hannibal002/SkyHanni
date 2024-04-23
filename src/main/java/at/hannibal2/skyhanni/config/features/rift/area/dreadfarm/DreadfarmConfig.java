@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class DreadfarmConfig {
     @Expose
     @ConfigOption(name = "Agaricus Cap", desc = "Counts down the time until §eAgaricus Cap (Mushroom) " +
-        "§7changes color from brown to red and is breakable.")
+        "§7changes colour from brown to red and is breakable.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean agaricusCap = true;

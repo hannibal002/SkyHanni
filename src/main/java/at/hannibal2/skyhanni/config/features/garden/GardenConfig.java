@@ -77,7 +77,7 @@ public class GardenConfig {
     public NextJacobContestConfig nextJacobContests = new NextJacobContestConfig();
 
     @Expose
-    @ConfigOption(name = "Armor Drop Tracker", desc = "")
+    @ConfigOption(name = "Armour Drop Tracker", desc = "")
     @Accordion
     // TODO renmae to armorDropTracker
     public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();

@@ -60,7 +60,7 @@ public class SkillProgressConfig {
     public Property<Boolean> alwaysShow = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Show Action left", desc = "Show action left until you reach the next level.")
+    @ConfigOption(name = "Show Action left", desc = "Show how many actions are left until you reach the next level.")
     @ConfigEditorBoolean
     public Property<Boolean> showActionLeft = Property.of(false);
 

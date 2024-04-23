@@ -11,14 +11,14 @@ public class EndermanBeaconConfig {
 
     @Expose
     @ConfigOption(name = "Highlight Beacon",
-        desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes. " +
+        desc = "Highlight the Enderman Slayer Yang Glyph (beacon) red and add a timer until they explode. " +
             "Supports beacon in hand and beacon flying.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightBeacon = true;
 
     @Expose
-    @ConfigOption(name = "Beacon Color", desc = "Color of the beacon.")
+    @ConfigOption(name = "Beacon Colour", desc = "Colour of the beacon.")
     @ConfigEditorColour
     public String beaconColor = "0:255:255:0:88";
 
@@ -35,7 +35,7 @@ public class EndermanBeaconConfig {
     public boolean showLine = false;
 
     @Expose
-    @ConfigOption(name = "Line Color", desc = "Color of the line.")
+    @ConfigOption(name = "Line Colour", desc = "Colour of the line.")
     @ConfigEditorColour
     public String lineColor = "0:255:255:0:88";
 

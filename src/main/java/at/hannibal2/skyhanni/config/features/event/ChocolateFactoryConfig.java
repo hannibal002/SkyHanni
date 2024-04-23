@@ -57,7 +57,7 @@ public class ChocolateFactoryConfig {
     ));
 
     @Expose
-    @ConfigOption(name = "Show Stack Sizes", desc = "Shows additional info as many items in the chocolate menu as the stack size.")
+    @ConfigOption(name = "Show Stack Sizes", desc = "Shows additional info as the item stack size.")
     @ConfigEditorBoolean
     public boolean showStackSizes = true;
 
@@ -79,7 +79,7 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
-        desc = "How close should you be to your barn capacity should you be before being warned about needing to upgrade it."
+        desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
     )
     @ConfigEditorSlider(minValue = 3, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;

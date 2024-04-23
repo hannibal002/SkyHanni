@@ -156,7 +156,7 @@ public class ComposterConfig {
     public boolean inventoryNumbers = true;
 
     @Expose
-    @ConfigOption(name = "Notification When Low Composter", desc = "")
+    @ConfigOption(name = "Notification When Low Composter Resources", desc = "")
     @Accordion
     public NotifyLowConfig notifyLow = new NotifyLowConfig();
 

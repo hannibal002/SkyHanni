@@ -52,7 +52,7 @@ public class BingoCardConfig {
     public Property<Boolean> nextTipDuration = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Hide Difficulty When Done", desc = "Remove the background difficulty color in the bingo card inventory when the goal is done.")
+    @ConfigOption(name = "Hide Difficulty When Done", desc = "Remove the background difficulty colour in the bingo card inventory when the goal is done.")
     @ConfigEditorBoolean
     public boolean hideDoneDifficulty = true;
 

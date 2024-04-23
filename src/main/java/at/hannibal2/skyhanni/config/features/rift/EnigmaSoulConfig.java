@@ -15,7 +15,7 @@ public class EnigmaSoulConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color of the Enigma Souls.")
+    @ConfigOption(name = "Colour", desc = "Colour of the Enigma Souls.")
     @ConfigEditorColour
     public String color = "0:120:13:49:255";
 

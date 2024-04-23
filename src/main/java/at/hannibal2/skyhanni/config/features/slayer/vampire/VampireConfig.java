@@ -26,7 +26,7 @@ public class VampireConfig {
     public CoopBossHighlightConfig coopBoss = new CoopBossHighlightConfig();
 
     @Expose
-    @ConfigOption(name = "Transparency", desc = "Choose the transparency of the color.")
+    @ConfigOption(name = "Transparency", desc = "Choose the transparency of the colour.")
     @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 250)
     public int withAlpha = 80;
 
@@ -36,13 +36,13 @@ public class VampireConfig {
     public boolean seeThrough = false;
 
     @Expose
-    @ConfigOption(name = "Low Health", desc = "Change color when the boss is below 20% health.")
+    @ConfigOption(name = "Low Health", desc = "Change colour when the boss is below 20% health.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean changeColorWhenCanSteak = true;
 
     @Expose
-    @ConfigOption(name = "Can use Steak Color", desc = "Color when the boss is below 20% health.")
+    @ConfigOption(name = "Can use Steak Colour", desc = "Colour when the boss is below 20% health.")
     @ConfigEditorColour
     public String steakColor = "0:255:255:0:88";
 
@@ -58,7 +58,7 @@ public class VampireConfig {
     public boolean drawLine = false;
 
     @Expose
-    @ConfigOption(name = "Line Color", desc = "Color of the line.")
+    @ConfigOption(name = "Line Colour", desc = "Colour of the line.")
     @ConfigEditorColour
     public String lineColor = "0:255:255:0:88";
 

@@ -28,7 +28,7 @@ public class QuiverDisplayConfig {
     @Expose
     @ConfigOption(
         name = "When to show",
-        desc = "Decides in what conditions to show the display."
+        desc = "Decide when to show the display."
     )
     @ConfigEditorDropdown
     public Property<ShowWhen> whenToShow = Property.of(ShowWhen.ONLY_BOW_HAND);

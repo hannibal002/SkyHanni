@@ -28,7 +28,7 @@ public class CrimsonIsleConfig {
     public boolean pabloHelper = false;
 
     @Expose
-    @ConfigOption(name = "Volcano Explosivity", desc = "Shows a HUD of the current volcano explosivity level.")
+    @ConfigOption(name = "Volcano Explosivity", desc = "Displays the current volcano explosivity level on the HUD.")
     @ConfigEditorBoolean
     public boolean volcanoExplosivity = false;
 
@@ -37,8 +37,8 @@ public class CrimsonIsleConfig {
     public Position positionVolcano = new Position(20, 20, false, true);
 
     @Expose
-    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt\n" +
-        "and points needed for the next belt in the Challenges inventory\n" +
+    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt " +
+        "and points needed for the next belt in the Challenges inventory " +
         "on the Crimson Isles.")
     @ConfigEditorBoolean
     @FeatureToggle

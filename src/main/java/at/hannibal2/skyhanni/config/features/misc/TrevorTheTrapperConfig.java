@@ -42,7 +42,7 @@ public class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Show Between Quests",
-        desc = "Shows the tracker during and between quests otherwise it will only show during them." +
+        desc = "Shows the tracker during and between quests otherwise it will only show during them. " +
             "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
     )
     @ConfigEditorBoolean
@@ -143,7 +143,7 @@ public class TrevorTheTrapperConfig {
 
 
     @Expose
-    @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")
+    @ConfigOption(name = "Trapper Cooldown", desc = "Change the colour of Trevor and adds a cooldown over his head.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean trapperTalkCooldown = true;

@@ -22,7 +22,7 @@ public class DefenseBlockConfig {
     public boolean hideParticles = false;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Set the color of the lines, blocks and the entity.")
+    @ConfigOption(name = "Colour", desc = "Set the colour of the lines, blocks and the entity.")
     @ConfigEditorColour
     public Property<String> color = Property.of("0:255:77:104:255");
 

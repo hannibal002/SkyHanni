@@ -15,7 +15,7 @@ public class LarvasConfig {
     public boolean highlight = true;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color of the Larvas.")
+    @ConfigOption(name = "Colour", desc = "Colour of the Larvas.")
     @ConfigEditorColour
     public String highlightColor = "0:120:13:49:255";
 

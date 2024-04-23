@@ -19,7 +19,7 @@ public class GiftingOpportunitiesConfig {
 
 
     @Expose
-    @ConfigOption(name = "Use Armor Stands", desc = "Make use of armor stands to stop highlighting players. " +
+    @ConfigOption(name = "Use Armour Stands", desc = "Make use of armour stands to stop highlighting players. " +
         "This is a bit inaccurate, but it can help with people you gifted before this feature was used.")
     @ConfigEditorBoolean
     public boolean useArmorStandDetection = false;

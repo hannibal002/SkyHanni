@@ -21,7 +21,7 @@ public class EffigiesConfig {
     public boolean respawningSoon = false;
 
     @Expose
-    @ConfigOption(name = "Respawning Time", desc = "Time before effigies respawn to show.")
+    @ConfigOption(name = "Respawning Time", desc = "Shows the time until effigies respawn.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 15,

@@ -57,7 +57,7 @@ public class TotemOfCorruptionConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Color of the area", desc = "The color of the area of the Totem of Corruption.")
+    @ConfigOption(name = "Colour of the area", desc = "The colour of the area of the Totem of Corruption.")
     @ConfigEditorColour
     public String color = "0:153:18:159:85";
 

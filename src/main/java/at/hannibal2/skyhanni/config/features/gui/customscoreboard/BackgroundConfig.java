@@ -18,8 +18,8 @@ public class BackgroundConfig {
 
     @Expose
     @ConfigOption(
-        name = "Background Color",
-        desc = "The color of the background."
+        name = "Background Colour",
+        desc = "The colour of the background."
     )
     @ConfigEditorColour
     public String color = "0:80:0:0:0";
@@ -51,7 +51,7 @@ public class BackgroundConfig {
     @Expose
     @ConfigOption(
         name = "Use Custom Background Image",
-        desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png\"."
+        desc = "Put an image into a resource pack, using the path \"skyhanni/scoreboard.png\"."
     )
     @ConfigEditorBoolean
     public boolean useCustomBackgroundImage = false;

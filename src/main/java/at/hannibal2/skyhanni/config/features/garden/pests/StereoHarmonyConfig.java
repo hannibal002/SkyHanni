@@ -13,7 +13,7 @@ public class StereoHarmonyConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Shows a display of what pest is being boosted by your vinyl."
+        desc = "Displays which pest is being boosted by your vinyl."
     )
     @ConfigEditorBoolean
     @FeatureToggle

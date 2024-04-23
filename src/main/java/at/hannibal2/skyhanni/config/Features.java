@@ -123,7 +123,7 @@ public class Features extends Config {
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
+    @Category(name = "Dungeons", desc = "Features that change the Dungeons experience in The Catacombs.")
     public DungeonConfig dungeon = new DungeonConfig();
 
     // Misc

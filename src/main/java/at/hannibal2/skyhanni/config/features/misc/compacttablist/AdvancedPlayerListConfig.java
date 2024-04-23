@@ -56,7 +56,7 @@ public class AdvancedPlayerListConfig {
     public boolean hidePlayerIcons = false;
 
     @Expose
-    @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
+    @ConfigOption(name = "Hide Rank Colour", desc = "Hide the player rank colour.")
     @ConfigEditorBoolean
     public boolean hideRankColor = false;
 
@@ -76,7 +76,7 @@ public class AdvancedPlayerListConfig {
     public boolean hideLevelBrackets = false;
 
     @Expose
-    @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
+    @ConfigOption(name = "Level Colour As Name", desc = "Use the colour of the SkyBlock level for the player colour.")
     @ConfigEditorBoolean
     public boolean useLevelColorForName = false;
 

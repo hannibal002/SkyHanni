@@ -16,7 +16,7 @@ public class OdonataConfig {
     public boolean highlight = true;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color of the Odonatas.")
+    @ConfigOption(name = "Colour", desc = "Colour of the Odonatas.")
     @ConfigEditorColour
     public String highlightColor = "0:120:13:49:255";
 

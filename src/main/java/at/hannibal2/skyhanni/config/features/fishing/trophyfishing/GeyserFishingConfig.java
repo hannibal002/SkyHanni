@@ -25,7 +25,7 @@ public class GeyserFishingConfig {
     public boolean drawBox = true;
 
     @Expose
-    @ConfigOption(name = "Geyser Box Color", desc = "Color of the Geyser Box.")
+    @ConfigOption(name = "Geyser Box Colour", desc = "Colour of the Geyser Box.")
     @ConfigEditorColour
     public String boxColor = "0:245:85:255:85";
 

@@ -18,7 +18,7 @@ public class DianaConfig {
     public boolean highlightInquisitors = true;
 
     @Expose
-    @ConfigOption(name = "Inquisitor Highlight", desc = "Color in which Inquisitors will be highlighted.")
+    @ConfigOption(name = "Inquisitor Highlight", desc = "Colotr in which Inquisitors will be highlighted.")
     @ConfigEditorColour
     public String color = "0:127:85:255:255";
 

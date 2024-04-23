@@ -16,7 +16,7 @@ public class ItemAbilityConfig {
     public boolean itemAbilityCooldown = false;
 
     @Expose
-    @ConfigOption(name = "Ability Cooldown Background", desc = "Show the cooldown color of item abilities in the background.")
+    @ConfigOption(name = "Ability Cooldown Background", desc = "Show the cooldown colour of item abilities in the background.")
     @ConfigEditorBoolean
     public boolean itemAbilityCooldownBackground = false;
 

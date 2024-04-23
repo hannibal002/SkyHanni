@@ -48,7 +48,7 @@ public class DisplayConfig {
 
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
-        "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
+        "\n§cMods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideVanillaScoreboard = true;
@@ -60,7 +60,7 @@ public class DisplayConfig {
     public boolean displayNumbersFirst = false;
 
     @Expose
-    @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
+    @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can be claimed.")
     @ConfigEditorBoolean
     public boolean showUnclaimedBits = false;
 

@@ -14,7 +14,7 @@ public class KloonHackingConfig {
     public boolean solver = true;
 
     @Expose
-    @ConfigOption(name = "Color Guide", desc = "Tells you which color to pick.")
+    @ConfigOption(name = "Colour Guide", desc = "Tells you which colour to pick.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colour = true;

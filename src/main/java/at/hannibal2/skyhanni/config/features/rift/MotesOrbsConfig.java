@@ -15,7 +15,7 @@ public class MotesOrbsConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Size", desc = "Set render size for highlighted Motes Orbs.")
+    @ConfigOption(name = "Highlight Size", desc = "Sets the render size for highlighted Motes Orbs.")
     @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 5)
     public int size = 3;
 

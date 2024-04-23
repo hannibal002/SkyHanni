@@ -27,13 +27,13 @@ public class ShoppingListConfig {
 
     @Expose
     @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub. " +
-        "This helps buying the correct amount when not having a Booster Cookie Buff active.")
+        "This helps with buying the correct amount while not having a Booster Cookie Buff active.")
     @ConfigEditorBoolean
     public boolean inBazaarAlley = true;
 
     @Expose
     @ConfigOption(name = "Farming Areas", desc = "Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub. " +
-        "This helps farming the correct amount, especially when in the early game.")
+        "This helps with farming the correct amount, especially when in the early game.")
     @ConfigEditorBoolean
     public boolean inFarmingAreas = false;
 

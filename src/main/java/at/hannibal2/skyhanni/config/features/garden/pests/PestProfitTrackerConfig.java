@@ -13,7 +13,7 @@ public class PestProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Count all items you pick up when killing pests."
+        desc = "Tracks all items you pick up when killing pests."
     )
     @ConfigEditorBoolean
     @FeatureToggle
