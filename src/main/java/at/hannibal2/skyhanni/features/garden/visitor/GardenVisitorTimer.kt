@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -82,23 +82,21 @@ class GardenVisitorTimer {
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
-        loop@ for (line in TabListData.getTabList()) {
-            timePattern.matchMatcher(line) {
-                val timeInfo = group("info").removeColor()
-                if (timeInfo == "Not Unlocked!") {
-                    display = "§cVisitors not unlocked!"
-                    return
-                }
-                if (timeInfo == "Queue Full!") {
-                    queueFull = true
-                    break@loop
-                }
+
+        TabListData.getTabList().matchFirst(timePattern) {
+            val timeInfo = group("info").removeColor()
+            if (timeInfo == "Not Unlocked!") {
+                display = "§cVisitors not unlocked!"
+                return
+            }
+            if (timeInfo == "Queue Full!") {
+                queueFull = true
+            } else {
                 if (lastTimerValue != timeInfo) {
                     lastTimerUpdate = SimpleTimeMark.now()
                     lastTimerValue = timeInfo
                 }
                 millis = TimeUtils.getDuration(timeInfo)
-                break@loop
             }
         }
 

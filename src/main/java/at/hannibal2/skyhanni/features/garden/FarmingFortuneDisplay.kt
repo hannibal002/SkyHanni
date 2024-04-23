@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -135,11 +135,12 @@ object FarmingFortuneDisplay {
     }
 
     private fun update() {
-        display = if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
-            drawMissingFortuneDisplay(false)
-        } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-            drawMissingFortuneDisplay(true)
-        } else drawDisplay()
+        display =
+            if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
+                drawMissingFortuneDisplay(false)
+            } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
+                drawMissingFortuneDisplay(true)
+            } else drawDisplay()
     }
 
     private fun drawDisplay() = buildList {
@@ -157,11 +158,13 @@ object FarmingFortuneDisplay {
             }
         } else getCurrentFarmingFortune()
 
-        list.add(Renderable.string(
-            "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                LorenzUtils.formatDouble(farmingFortune, 0)
-            } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
-        ))
+        list.add(
+            Renderable.string(
+                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
+                    farmingFortune.round(0).addSeparators()
+                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
+            )
+        )
         add(Renderable.horizontalContainer(list))
 
         val ffReduction = getPestFFReduction()
@@ -211,19 +214,20 @@ object FarmingFortuneDisplay {
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
             if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
-                "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget" +
-                "and showing the Farming Fortune stat.",
+                "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
+                    "and showing the Farming Fortune stat.",
                 command = "widget"
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-            if (lastCropFortuneMissingError.passedSince() < 1.minutes) return
+            if (lastCropFortuneMissingError.passedSince() < 1.minutes || !GardenAPI.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
-                "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget" +
+                "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing latest Crop Fortune.",
                 command = "widget"
             )
+            lastCropFortuneMissingError = SimpleTimeMark.now()
         }
     }
 
@@ -327,6 +331,9 @@ object FarmingFortuneDisplay {
         reforgeFortune = 0.0
         itemBaseFortune = 0.0
         greenThumbFortune = 0.0
+
+        //TODO code cleanup
+
         for (line in tool?.getLore()!!) {
             tooltipFortunePattern.matchMatcher(line) {
                 displayedFortune = group(1)!!.toDouble()

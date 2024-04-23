@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.client.Minecraft
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
@@ -12,6 +13,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class ScoreboardData {
 
     companion object {
+
+        private val minecraftColorCodesPattern = "(?i)[0-9a-fkmolnr]".toPattern()
 
         // TODO USE SH-REPO
         private val splitIcons = listOf(
@@ -41,13 +44,11 @@ class ScoreboardData {
                 var end = split[1]
                 // get last color code in start
                 val lastColorIndex = start.lastIndexOf('§')
-                val lastColor = when {
-                    lastColorIndex != -1 && lastColorIndex + 1 < start.length && (start[lastColorIndex + 1] in '0'..'9' || start[lastColorIndex + 1] in 'a'..'f') -> start.substring(
-                        lastColorIndex,
-                        lastColorIndex + 2
-                    )
-                    else -> ""
-                }
+                val lastColor = if (lastColorIndex != -1
+                    && lastColorIndex + 1 < start.length
+                    && (minecraftColorCodesPattern.matches(start[lastColorIndex + 1].toString()))
+                ) start.substring(lastColorIndex, lastColorIndex + 2)
+                else ""
 
                 // remove first color code from end, when it is the same as the last color code in start
                 end = end.removePrefix(lastColor)

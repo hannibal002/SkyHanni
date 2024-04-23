@@ -123,7 +123,9 @@ object MobFactories {
                 baseEntity = baseEntity,
                 mobType = Mob.Type.SPECIAL,
                 armorStand = armorStand,
-                name = if (this.group("points").isNotEmpty()) "Points: " + this.group("points") else this.group("empty")
+                name = if (this.group("points")
+                        ?.isNotEmpty() == true
+                ) "Points: " + this.group("points") else this.group("empty").toString()
             )
         }
 

@@ -44,7 +44,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -54,7 +53,6 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
 
 object ComposterOverlay {
 
@@ -320,20 +318,20 @@ object ComposterOverlay {
         list.add(fuelItem.getItemStack())
         newList.add(list)
 
-        val timePerCompost = ComposterAPI.timePerCompost(null).toLong(DurationUnit.MILLISECONDS)
+        val timePerCompost = ComposterAPI.timePerCompost(null)
         val upgrade = if (maxLevel) null else extraComposterUpgrade
-        val timePerCompostPreview = ComposterAPI.timePerCompost(upgrade).toLong(DurationUnit.MILLISECONDS)
-        val format = TimeUtils.formatDuration(timePerCompost)
+        val timePerCompostPreview = ComposterAPI.timePerCompost(upgrade)
+        val format = timePerCompost.format()
         val formatPreview =
-            if (timePerCompostPreview != timePerCompost) " §c➜ §b" + TimeUtils.formatDuration(timePerCompostPreview) else ""
+            if (timePerCompostPreview != timePerCompost) " §c➜ §b" + timePerCompostPreview.format() else ""
         newList.addAsSingletonList(" §7Time per Compost: §b$format$formatPreview")
 
         val timeText = currentTimeType.display.lowercase()
         val timeMultiplier = if (currentTimeType != TimeType.COMPOST) {
-            (currentTimeType.multiplier * 1000 / (timePerCompost.toDouble()))
+            (currentTimeType.multiplier * 1000.0 / (timePerCompost.inWholeMilliseconds))
         } else 1.0
         val timeMultiplierPreview = if (currentTimeType != TimeType.COMPOST) {
-            (currentTimeType.multiplier * 1000 / (timePerCompostPreview.toDouble()))
+            (currentTimeType.multiplier * 1000.0 / (timePerCompostPreview.inWholeMilliseconds))
         } else 1.0
 
         val multiDropFactor = ComposterAPI.multiDropChance(null) + 1
@@ -491,8 +489,7 @@ object ComposterOverlay {
             return
         }
 
-        val havingInSacks = internalName.getAmountInSacksOrNull()
-        if (havingInSacks == null) {
+        val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
             ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
             // TODO Add sack type repo data
 
@@ -504,7 +501,8 @@ object ComposterOverlay {
                 "sax"
             )
             return
-        } else if (havingInSacks == 0L) {
+        }
+        if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("No $itemName §efound in sacks.")

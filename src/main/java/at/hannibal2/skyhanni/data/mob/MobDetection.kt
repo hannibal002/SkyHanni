@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.mob.MobData.Companion.logger
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -17,10 +17,10 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityCreeper
@@ -36,8 +36,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
 private const val MAX_RETRIES = 20 * 5
-
-private const val MOB_DETECTION_LOG_PREFIX = "MobDetection: "
 
 class MobDetection {
 
@@ -59,8 +57,6 @@ class MobDetection {
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
 
-    private val logger = LorenzLogger("mob/detection")
-
     init {
         MobFilter.bossMobNameFilter
         MobFilter.mobNameFilter
@@ -73,6 +69,7 @@ class MobDetection {
         MobFilter.wokeSleepingGolemPattern
         MobFilter.jerryPattern
         MobFilter.jerryMagmaCubePattern
+        MobUtils.defaultArmorStandName
     }
 
     private fun mobDetectionReset() {
@@ -100,7 +97,7 @@ class MobDetection {
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
         MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
-            .filter { it !is EntityArmorStand })
+            .filter { it !is EntityArmorStand && it !is EntityPlayerSP })
 
         if (forceReset) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
@@ -173,7 +170,9 @@ class MobDetection {
 
     /** For mobs that have default health of the entity */
     private enum class EntityPacketType {
-        SPIRIT_BAT, VILLAGER, CREEPER_VAIL
+        SPIRIT_BAT,
+        VILLAGER,
+        CREEPER_VAIL,
     }
 
     /** Handles some mobs that have default health of the entity, specially using the [EntityHealthUpdateEvent] */
@@ -321,11 +320,6 @@ class MobDetection {
                 allEntitiesViaPacketId.clear()
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        MobData.currentEntityLiving.remove(Minecraft.getMinecraft().thePlayer) // Fix for the Player
     }
 
     private val allEntitiesViaPacketId = mutableSetOf<Int>()

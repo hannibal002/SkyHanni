@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
@@ -87,7 +88,7 @@ object GardenAPI {
     }
 
     @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
     }
@@ -157,8 +158,13 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    fun MutableList<Any>.addCropIcon(crop: CropType, highlight: Boolean = false) =
-        addItemIcon(crop.icon.copy(), highlight)
+    @Deprecated("use renderable list instead", ReplaceWith(""))
+    fun MutableList<Any>.addCropIcon(
+        crop: CropType,
+        scale: Double = NEUItems.itemFontSize,
+        highlight: Boolean = false,
+    ) =
+        addItemIcon(crop.icon.copy(), highlight, scale = scale)
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
         SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
@@ -220,7 +226,7 @@ object GardenAPI {
         return 0
     }
 
-    fun getGardenLevel(): Int {
+    fun getGardenLevel(overflow: Boolean = true): Int {
         val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
@@ -231,11 +237,13 @@ object GardenAPI {
             }
             tier++
         }
-        totalExp += gardenOverflowExp
-
-        while (totalExp < gardenExp) {
-            tier++
+        if (overflow) {
             totalExp += gardenOverflowExp
+
+            while (totalExp < gardenExp) {
+                tier++
+                totalExp += gardenOverflowExp
+            }
         }
         return tier
     }

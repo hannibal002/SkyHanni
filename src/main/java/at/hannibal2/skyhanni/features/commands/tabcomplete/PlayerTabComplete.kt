@@ -28,6 +28,7 @@ object PlayerTabComplete {
     enum class PlayerCategory {
         FRIENDS,
         ISLAND_PLAYERS,
+        PARTY,
     }
 
     fun handleTabComplete(command: String): List<String>? {
@@ -46,6 +47,8 @@ object PlayerTabComplete {
 
             "pv" to listOf(), // NEU's Profile Viewer
             "shmarkplayer" to listOf(), // SkyHanni's Mark Player
+
+            "trade" to listOf(PlayerCategory.FRIENDS, PlayerCategory.PARTY)
         )
         val ignored = commands[command] ?: return null
 
@@ -62,7 +65,7 @@ object PlayerTabComplete {
                 }
             }
 
-            if (config.party) {
+            if (config.party && PlayerCategory.PARTY !in ignored) {
                 for (member in PartyAPI.partyMembers) {
                     add(member)
                 }
