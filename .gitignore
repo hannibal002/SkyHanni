@@ -15,5 +15,3 @@ gradle.properties
 
 .devauth/*
 !.devauth/config.toml
-
-.env

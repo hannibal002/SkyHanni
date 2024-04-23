@@ -18,6 +18,9 @@ public class PlayerSpecificStorage {
     public Map<String, ProfileSpecificStorage> profiles = new HashMap<>(); // profile name
 
     @Expose
+    public Boolean useRomanNumerals = true;
+
+    @Expose
     public Integer gardenCommunityUpgrade = -1;
 
     @Expose
