@@ -87,17 +87,16 @@ class GardenLevelDisplay {
         GardenAPI.gardenExp = gardenExp + moreExp
         if (!config.overflowMessages) return
         val newLevel = GardenAPI.getGardenLevel()
-        if (newLevel == oldLevel + 1 && newLevel > 15) {
-            LorenzUtils.runDelayed(50.milliseconds) {
-                ChatUtils.clickableChat(
-                    " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
-                        " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                    "/gardenlevels",
-                    false
-                )
-            }
-        }
         update()
+        if (newLevel != oldLevel + 1 || newLevel <= 15) return
+        LorenzUtils.runDelayed(50.milliseconds) {
+            ChatUtils.clickableChat(
+                " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
+                    " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
+                "/gardenlevels",
+                false
+            )
+        }
     }
 
     @SubscribeEvent
