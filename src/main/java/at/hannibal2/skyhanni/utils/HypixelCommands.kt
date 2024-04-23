@@ -6,6 +6,10 @@ object HypixelCommands {
         send("bz $searchTerm")
     }
 
+    fun teleportToPlot(plotName: String) {
+        send("tptoplot $plotName")
+    }
+
     fun getFromSacks(itemName: String, amount: Int) {
         send("gfs $itemName $amount")
     }
