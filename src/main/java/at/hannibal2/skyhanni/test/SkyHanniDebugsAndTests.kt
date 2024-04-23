@@ -190,16 +190,13 @@ class SkyHanniDebugsAndTests {
             }
         }
 
-        fun configManagerResetCommand(args: Array<String>) {
-            if (args.size == 1 && args[0] == "confirm") {
-                configManagerReset()
-                return
-            }
-
+        fun configManagerResetCommand() {
             ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm",
-                false
+                onClick = {
+                    configManagerReset()
+                },
+                prefix = false
             )
         }
 
