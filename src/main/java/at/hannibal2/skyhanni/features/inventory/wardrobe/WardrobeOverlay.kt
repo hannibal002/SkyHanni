@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
+import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -138,7 +139,8 @@ class WardrobeOverlay {
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
 
                 fakePlayer.inventory.armorInventory =
-                    WardrobeAPI.wardrobeSlots[i + row * maxPlayersPerRow].armor.toTypedArray()
+                    WardrobeAPI.wardrobeSlots[i + row * maxPlayersPerRow].armor.map { it?.removeEnchants() }
+                        .toTypedArray()
 
                 drawEntityOnScreen(
                     playerX,
