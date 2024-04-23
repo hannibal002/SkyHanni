@@ -52,7 +52,6 @@ import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerNameFormatter
@@ -309,6 +308,7 @@ import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
 import at.hannibal2.skyhanni.features.misc.FixGhostEntities
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
+import at.hannibal2.skyhanni.features.misc.HideFarEntities
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
@@ -499,7 +499,6 @@ class SkyHanniMod {
         loadModule(VisitorListener())
         loadModule(VisitorRewardWarning())
         loadModule(OwnInventoryData())
-        loadModule(ToolTipData())
         loadModule(HighlightVisitorsOutsideOfGarden())
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
@@ -575,6 +574,7 @@ class SkyHanniMod {
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures)
         loadModule(CurrentPetDisplay())
+        loadModule(HideFarEntities())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(BetterWikiFromMenus())
         loadModule(DamageIndicatorManager())
