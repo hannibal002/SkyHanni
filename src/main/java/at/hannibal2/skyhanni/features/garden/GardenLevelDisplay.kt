@@ -85,9 +85,10 @@ class GardenLevelDisplay {
         val gardenExp = GardenAPI.gardenExp ?: return
         val oldLevel = GardenAPI.getGardenLevel()
         GardenAPI.gardenExp = gardenExp + moreExp
+        update()
+
         if (!config.overflowMessages) return
         val newLevel = GardenAPI.getGardenLevel()
-        update()
         if (newLevel != oldLevel + 1 || newLevel <= 15) return
         LorenzUtils.runDelayed(50.milliseconds) {
             ChatUtils.clickableChat(
