@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -38,6 +39,10 @@ class HoppityCollectionStats {
         "rabbit.notfound",
         "(?:§.)+You have not found this rabbit yet!"
     )
+    private val rabbitsFoundPattern by patternGroup.pattern(
+        "rabbits.found",
+            "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
+    )
 
     private var display = emptyList<Renderable>()
     private val loggedRabbits = mutableMapOf<String, RabbitCollectionInfo>()
@@ -50,6 +55,8 @@ class HoppityCollectionStats {
         if (!pagePattern.matches(event.inventoryName)) return
 
         inInventory = true
+
+        var totalAmount = 0
 
         for ((_, item) in event.inventoryItems) {
             val itemName = item.displayName ?: continue
@@ -67,6 +74,10 @@ class HoppityCollectionStats {
                     duplicatesFound = group("duplicates").formatInt()
                 }
                 if (rabbitNotFoundPattern.matches(line)) found = false
+
+                rabbitsFoundPattern.matchMatcher(line) {
+                    totalAmount = group("total").formatInt()
+                }
             }
 
             val rarity = rabbitRarity ?: continue
@@ -131,6 +142,18 @@ class HoppityCollectionStats {
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
         newList.add(LorenzUtils.fillTable(table, padding = 5))
+
+        if (totalAmount != totalRabbits) {
+            newList.add(Renderable.string(""))
+            newList.add(
+                Renderable.wrappedString(
+                    "§cPlease Scroll through \n" +
+                        "§call pages first!",
+                    width = 200,
+                )
+            )
+        }
+
         display = newList
     }
 

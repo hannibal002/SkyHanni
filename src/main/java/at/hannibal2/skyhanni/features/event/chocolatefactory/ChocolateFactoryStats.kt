@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.chocolatefactory
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -11,11 +12,11 @@ object ChocolateFactoryStats {
     private val config get() = ChocolateFactoryAPI.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
-    private var displayList = listOf<String>()
+    private var displayList = mutableListOf<String>()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryAPI.inChocolateFactory && !ChocolateFactoryAPI.chocolateFactoryPaused) return
         if (!config.statsDisplay) return
 
         config.position.renderStrings(displayList, posLabel = "Chocolate Factory Stats")
@@ -63,12 +64,24 @@ object ChocolateFactoryStats {
             add("§eTime To Prestige: §6${timeUntilPrestige.format()}")
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
+
+        val firstElement = displayList.firstOrNull { it.isNotEmpty() } ?: return
+
+        if (ChocolateFactoryAPI.chocolateFactoryPaused) {
+
+            val leftMargin = (firstElement.width() - "§f(§cPaused§f)".width()) / 2
+            val spaceWidth = " ".width()
+            displayList.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")
+        } else {
+            displayList.add(0, "")
+        }
     }
 
-    private fun formatList(list: List<String>): List<String> {
+    private fun formatList(list: List<String>): MutableList<String> {
         return config.statsDisplayList
             .filter { it.shouldDisplay() }
             .map { list[it.ordinal] }
+            .toMutableList()
     }
 
 

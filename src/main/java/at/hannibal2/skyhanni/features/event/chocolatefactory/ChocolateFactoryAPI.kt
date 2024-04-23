@@ -96,6 +96,10 @@ object ChocolateFactoryAPI {
         "timetower.recharge",
         "§7Next Charge: §a(?<duration>\\w+)"
     )
+    private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Hoppity|Chocolate Shop|Chocolate Factory Milestones"
+    )
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
@@ -110,6 +114,7 @@ object ChocolateFactoryAPI {
     var maxRabbits = 395
 
     var inChocolateFactory = false
+    var chocolateFactoryPaused = false
 
     var currentPrestige = 1
     var chocolatePerSecond = 0.0
@@ -125,6 +130,12 @@ object ChocolateFactoryAPI {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+
+        if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
+            chocolateFactoryPaused = true
+            ChocolateFactoryStats.updateDisplay()
+            return
+        }
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
@@ -287,6 +298,7 @@ object ChocolateFactoryAPI {
 
     private fun clearData() {
         inChocolateFactory = false
+        chocolateFactoryPaused = false
     }
 
     @SubscribeEvent
