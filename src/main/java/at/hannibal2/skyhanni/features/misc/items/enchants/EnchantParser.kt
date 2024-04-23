@@ -65,14 +65,18 @@ object EnchantParser {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         // Add observers to config options that would need us to mark cache dirty
-        config.format.addObserver { _, _ -> markCacheDirty() }
-        config.perfectEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.greatEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.goodEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.poorEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.commaFormat.addObserver { _, _ -> markCacheDirty() }
-        config.hideVanillaEnchants.addObserver { _, _ -> markCacheDirty() }
-        config.hideEnchantDescriptions.addObserver { _, _ -> markCacheDirty() }
+        ConditionalUtils.onToggle(
+            config.format,
+            config.perfectEnchantColor,
+            config.greatEnchantColor,
+            config.goodEnchantColor,
+            config.poorEnchantColor,
+            config.commaFormat,
+            config.hideVanillaEnchants,
+            config.hideEnchantDescriptions,
+        ) {
+            markCacheDirty()
+        }
     }
 
     @SubscribeEvent
