@@ -18,6 +18,10 @@ object HypixelCommands {
         send("cf")
     }
 
+    fun openBaker() {
+        send("openbaker")
+    }
+
     private fun send(command: String) {
         ChatUtils.sendCommandToServer(command)
     }
