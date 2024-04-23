@@ -60,36 +60,6 @@ class WardrobeOverlay {
             override fun getName(): String {
                 return ""
             }
-
-            override fun hasCustomName(): Boolean {
-                return false
-            }
-
-            override fun getDisplayNameString(): String? {
-                return null
-            }
-
-            override fun getAlwaysRenderNameTag(): Boolean {
-                return false
-            }
-
-            override fun getAlwaysRenderNameTagForRender(): Boolean {
-                return false
-            }
-
-            override fun getDisplayName(): IChatComponent {
-                return IChatComponent.Serializer.jsonToComponent("{\"text\":\"\"}")
-            }
-
-            override fun getCustomNameTag(): String? {
-                return null
-            }
-
-            override fun setCustomNameTag(name: String?) {}
-
-            override fun setAlwaysRenderNameTag(alwaysRenderNameTag: Boolean) {
-                super.setAlwaysRenderNameTag(false)
-            }
         }
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
