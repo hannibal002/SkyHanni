@@ -9,4 +9,8 @@ object HypixelCommands {
     fun getFromSacks(itemName: String, amount: Int) {
         ChatUtils.sendCommandToServer("gfs $itemName $amount")
     }
+
+    fun widget() {
+        ChatUtils.sendCommandToServer("widget")
+    }
 }
