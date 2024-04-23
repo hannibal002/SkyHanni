@@ -30,7 +30,7 @@ object GuiChatHook {
         replacement = newComponent
     }
 
-    fun getReplacementAsIChatComponent() : IChatComponent {
+    fun getReplacementAsIChatComponent(): IChatComponent {
         if (!this::replacement.isInitialized) {
             // Return an extremely basic chat component as to not error downstream
             return ChatComponentText("Original component was not set")

@@ -7,10 +7,13 @@ import java.util.TreeSet
 open class Enchant : Comparable<Enchant> {
     @Expose
     var nbtName = ""
+
     @Expose
     var loreName = ""
+
     @Expose
     private var goodLevel = 0
+
     @Expose
     private var maxLevel = 0
 
@@ -20,7 +23,7 @@ open class Enchant : Comparable<Enchant> {
 
     open fun getFormattedName(level: Int) = getFormat(level) + loreName
 
-    open fun getFormat(level: Int) : String {
+    open fun getFormat(level: Int): String {
         val config = SkyHanniMod.feature.gui.enchantParsing
 
         if (level >= maxLevel) return config.perfectEnchantColor.get().getChatColor()
@@ -51,8 +54,10 @@ open class Enchant : Comparable<Enchant> {
     class Stacking : Enchant() {
         @Expose
         private var nbtNum: String? = null
+
         @Expose
         private var statLabel: String? = null
+
         @Expose
         private var stackLevel: TreeSet<Int>? = null
 

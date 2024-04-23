@@ -8,18 +8,19 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.util.TreeSet
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.TreeSet
 
 /**
  * Modified Enchant Parser from [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/enchants/EnchantManager.java)
@@ -29,15 +30,21 @@ object EnchantParser {
     private val config get() = SkyHanniMod.feature.gui.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
-    val ENCHANTMENT_PATTERN by patternGroup.pattern("enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)")
-    private val GRAY_ENCHANT_PATTERN by patternGroup.pattern("grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*")
+    val ENCHANTMENT_PATTERN by patternGroup.pattern(
+        "enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)"
+    )
+    private val GRAY_ENCHANT_PATTERN by patternGroup.pattern(
+        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
+    )
 
     private var indexOfLastGrayEnchant = -1
     private var startEnchant = -1
     private var endEnchant = -1
+
     // Stacking enchants with their progress visible should have the
     // enchants stacked in a single column
     private var shouldBeSingleColumn = false
+
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
     private var maxEnchantsPerLine = 0
@@ -45,6 +52,7 @@ object EnchantParser {
     private var orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
 
     private val loreCache: Cache = Cache()
+
     // Maps for all enchants
     private var enchants: Enchants = Enchants()
 
@@ -57,14 +65,18 @@ object EnchantParser {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         // Add observers to config options that would need us to mark cache dirty
-        config.format.addObserver { _, _ -> markCacheDirty() }
-        config.perfectEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.greatEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.goodEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.poorEnchantColor.addObserver { _, _ -> markCacheDirty() }
-        config.commaFormat.addObserver { _, _ -> markCacheDirty() }
-        config.hideVanillaEnchants.addObserver { _, _ -> markCacheDirty() }
-        config.hideEnchantDescriptions.addObserver { _, _ -> markCacheDirty() }
+        ConditionalUtils.onToggle(
+            config.format,
+            config.perfectEnchantColor,
+            config.greatEnchantColor,
+            config.goodEnchantColor,
+            config.poorEnchantColor,
+            config.commaFormat,
+            config.hideVanillaEnchants,
+            config.hideEnchantDescriptions,
+        ) {
+            markCacheDirty()
+        }
     }
 
     @SubscribeEvent
@@ -96,7 +108,11 @@ object EnchantParser {
         parseEnchants(lore, mapOf(), event.component)
     }
 
-    private fun parseEnchants(loreList: MutableList<String>, enchants: Map<String, Int>, chatComponent: IChatComponent?) {
+    private fun parseEnchants(
+        loreList: MutableList<String>,
+        enchants: Map<String, Int>,
+        chatComponent: IChatComponent?,
+    ) {
         // Check if the lore is already cached so continuous hover isn't 1 fps
         if (loreCache.isCached(loreList)) {
             loreList.clear()
@@ -243,10 +259,11 @@ object EnchantParser {
 
             // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
             if (insertEnchants.last().last() == ' ') {
-                insertEnchants[insertEnchants.lastIndex] = insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
+                insertEnchants[insertEnchants.lastIndex] =
+                    insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
             }
 
-        // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
+            // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
         } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
             var builder = StringBuilder()
 
@@ -266,10 +283,11 @@ object EnchantParser {
 
             // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
             if (insertEnchants.last().last() == ' ') {
-                insertEnchants[insertEnchants.lastIndex] = insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
+                insertEnchants[insertEnchants.lastIndex] =
+                    insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
             }
 
-        // Stacked is always forcing 1 enchant per line
+            // Stacked is always forcing 1 enchant per line
         } else {
             if (!config.hideEnchantDescriptions.get()) {
                 for (enchant: FormattedEnchant in orderedEnchants) {
@@ -294,7 +312,7 @@ object EnchantParser {
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
 
-    private fun accountForAndRemoveGrayEnchants(loreList: MutableList<String>, item: ItemStack) : Int {
+    private fun accountForAndRemoveGrayEnchants(loreList: MutableList<String>, item: ItemStack): Int {
         // If the item has no enchantmentTagList then there will be no gray enchants
         if (!item.isEnchanted() || item.enchantmentTagList.tagCount() == 0) return -1
 
@@ -325,6 +343,7 @@ object EnchantParser {
     class Cache {
         var cachedLoreBefore: List<String> = listOf()
         var cachedLoreAfter: List<String> = listOf()
+
         // So tooltip gets changed on the same item if the config was changed in the interim
         var configChanged = false
 
@@ -337,7 +356,7 @@ object EnchantParser {
             configChanged = false
         }
 
-        fun isCached(loreBeforeModification: List<String>) : Boolean {
+        fun isCached(loreBeforeModification: List<String>): Boolean {
             if (configChanged || loreBeforeModification.size != cachedLoreBefore.size) return false
 
             for (i in loreBeforeModification.indices) {

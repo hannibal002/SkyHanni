@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 
 class FormattedEnchant(
-        private val enchant: Enchant,
-        private val level: Int,
-        stacking: String
+    private val enchant: Enchant,
+    private val level: Int,
+    stacking: String,
 ) : Comparable<FormattedEnchant> {
     private val stacking: String = stacking
         get() = "§8$field"
@@ -17,7 +17,7 @@ class FormattedEnchant(
 
     override fun compareTo(other: FormattedEnchant) = this.enchant.compareTo(other.enchant)
 
-    fun getFormattedString() : String {
+    fun getFormattedString(): String {
         val builder = StringBuilder()
         builder.append(enchant.getFormattedName(level)).append(" ").append(level.toRoman())
 
