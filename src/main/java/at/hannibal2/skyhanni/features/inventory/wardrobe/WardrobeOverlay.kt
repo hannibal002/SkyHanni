@@ -6,19 +6,27 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.armor
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.getWardrobePage
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.favorite
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.getArmorPrice
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSlot
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.locked
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -37,6 +45,7 @@ class WardrobeOverlay {
     private val config get() = SkyHanniMod.feature.inventory.wardrobeOverlay
     private var display = emptyList<Pair<Position, Renderable>>()
     private var tempToggleShowOverlay = true
+    private var favoriteToggle = false
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -52,7 +61,8 @@ class WardrobeOverlay {
         val player = Minecraft.getMinecraft().thePlayer
         val centerX = gui.width / 2
         val centerY = gui.height / 2
-        val totalPlayers = 18
+        //val totalPlayers = 18
+        val totalPlayers = list.size
         val maxPlayersPerRow = 9
         val playerWidth = 50
         val playerHeight = 2 * playerWidth
@@ -76,8 +86,9 @@ class WardrobeOverlay {
         val startY = centerY + playerHeight - totalHeight / 2
 
 
-        val tempTogglePos = Position((gui.width * 0.9).toInt(), (gui.height * 0.8).toInt())
-        val tempToggleRenderable = Renderable.drawInsideRoundedRect(
+        val tempTogglePos = Position((gui.width * 0.85).toInt(), (gui.height * 0.9).toInt())
+        val tempToggleRenderable = Renderable.horizontalContainer(listOf(
+            Renderable.drawInsideRoundedRect(
             Renderable.clickable(
                 Renderable.emptyContainer(30, 30),
                 bypassChecks = true,
@@ -87,9 +98,26 @@ class WardrobeOverlay {
                 },
             ),
             Color.BLACK,
-        )
-
+            ), Renderable.string("Temp toggle")), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         display += tempTogglePos to tempToggleRenderable
+
+        val favoriteTogglePos = Position(tempTogglePos.rawX, tempTogglePos.rawY - 50)
+        val favoriteToggleRenderable = Renderable.horizontalContainer(
+            listOf(
+                Renderable.drawInsideRoundedRect(
+                    Renderable.clickable(
+                        Renderable.emptyContainer(30, 30),
+                        bypassChecks = true,
+                        onClick = {
+                            ChatUtils.chat("Clicked on favorite toggle")
+                            favoriteToggle = !favoriteToggle
+                        },
+                    ),
+                    if (favoriteToggle) Color.GREEN else Color.RED
+                ), Renderable.string("Favorite toggle")
+            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
+        )
+        display += favoriteTogglePos to favoriteToggleRenderable
 
 
         GlStateManager.pushMatrix()
@@ -110,13 +138,23 @@ class WardrobeOverlay {
 
                 val wardrobeSlot = list[slot]
 
-                fakePlayer.inventory.armorInventory = wardrobeSlot.armor.map { it?.removeEnchants() }.toTypedArray()
+                fakePlayer.inventory.armorInventory =
+                    wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.toTypedArray()
 
                 val padding = 5
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
 
                 val isInPage = wardrobeSlot.isInCurrentPage
-                if (!isInPage) scale *= 0.9
+                RenderLivingEntityHelper.removeEntityColor(fakePlayer)
+                if (!isInPage) {
+                    scale *= 0.9
+                    RenderLivingEntityHelper.setEntityColor(
+                        fakePlayer,
+                        Color.GRAY.withAlpha(100),
+                        ::isEnabled
+                    )
+                }
+
 
                 val isHovered = GuiRenderUtils.isPointInRect(
                     event.mouseX,
@@ -127,12 +165,11 @@ class WardrobeOverlay {
                     playerHeight
                 )
 
-                /*val hoverRenderable = {
+                val hoverRenderable = {
                     val lore = mutableListOf<String>()
                     lore.add("§aEstimated Armor Value:")
 
                     for (item in wardrobeSlot.armor.filterNotNull()) {
-                        println(item)
                         val price = EstimatedItemValueCalculator.calculate(item).first
                         lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
                     }
@@ -144,11 +181,11 @@ class WardrobeOverlay {
                     } else {
                         Renderable.emptyContainer(playerWidth, playerHeight)
                     }
-                }*/
+                }
 
                 val renderable = Renderable.drawInsideRoundedRect(
                     Renderable.clickAndHoverable(
-                        Renderable.emptyContainer(playerWidth, playerHeight),
+                        hoverRenderable.invoke(),
                         Renderable.emptyContainer(playerWidth, playerHeight),
                         onClick = {
                             clickWardrobeSlot(wardrobeSlot)
@@ -165,7 +202,6 @@ class WardrobeOverlay {
                 val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
 
-                GlStateManager.color(0.6f, 0.6f, 0.6f, 1f)
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -174,7 +210,6 @@ class WardrobeOverlay {
                     eyesY,
                     fakePlayer
                 )
-                GlStateManager.color(1f, 1f, 1f, 1f)
 
                 display += pos to renderable
                 slot++
@@ -189,7 +224,10 @@ class WardrobeOverlay {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runDelayed(500.milliseconds) {
-            if (!inWardrobe()) tempToggleShowOverlay = true
+            if (!inWardrobe()) {
+                tempToggleShowOverlay = true
+                favoriteToggle = false
+            }
         }
     }
 
@@ -205,7 +243,11 @@ class WardrobeOverlay {
     private fun clickWardrobeSlot(wardrobeSlot: WardrobeAPI.WardrobeSlot) {
         val previousPageSlot = 45
         val nextPageSlot = 53
-        val wardrobePage = getWardrobePage() ?: return
+        val wardrobePage = currentPage ?: return
+        if (favoriteToggle) {
+            wardrobeSlot.favorite = !wardrobeSlot.favorite
+            return
+        }
         if (wardrobeSlot.isInCurrentPage) {
             clickSlot(wardrobeSlot.inventorySlot, getWindowId() ?: -1)
         } else {
@@ -218,13 +260,15 @@ class WardrobeOverlay {
         val color = if (wardrobeSlot.isInCurrentPage) {
             if (isHovered) LorenzColor.GOLD.toColor()
             else if (wardrobeSlot.isCurrentSlot) LorenzColor.GREEN.toColor()
+            else if (wardrobeSlot.favorite) LorenzColor.RED.toColor()
             else LorenzColor.BLUE.toColor()
         } else {
             if (isHovered) LorenzColor.GOLD.toColor().darker()
             else if (wardrobeSlot.isCurrentSlot) LorenzColor.GREEN.toColor().darker()
+            else if (wardrobeSlot.favorite) LorenzColor.RED.toColor().darker()
             else LorenzColor.BLACK.toColor()
         }
-        return color
+        return Color(color.withAlpha(170), true)
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()

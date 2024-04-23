@@ -126,7 +126,6 @@ object ItemUtils {
         val tag = tagCompound ?: NBTTagCompound()
         tag.removeTag("ench")
         tag.removeTag("StoredEnchantments")
-        tag.removeTag("ExtraAttributes")
         tagCompound = tag
     }
 

@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,6 +17,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 object WardrobeAPI {
 
@@ -122,6 +125,7 @@ object WardrobeAPI {
     val WardrobeSlot.getArmorPrice: Double
         get() = armor.filterNotNull().sumOf { EstimatedItemValueCalculator.calculate(it).first }
 
+
     var WardrobeSlot.favorite: Boolean
         get() = getData()?.favorite ?: false
         set(value) {
@@ -132,13 +136,15 @@ object WardrobeAPI {
         get() = getData()?.id == currentWardrobeSlot
 
     val WardrobeSlot.isInCurrentPage: Boolean
-        get() = page == getWardrobePage()
+        get() = page == currentPage
 
     var currentWardrobeSlot: Int?
         get() = storage?.currentWardrobeSlot
         set(value) {
             storage?.currentWardrobeSlot = value
         }
+
+    var currentPage: Int? = null
 
     init {
         val list = mutableListOf<WardrobeSlot>()
@@ -171,14 +177,19 @@ object WardrobeAPI {
     fun onInventoryOpen(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!inWardrobe()) return
-        val page = getWardrobePage() ?: return
 
-        for (slot in wardrobeSlots.filter { it.page == page }) {
-            slot.helmet = getWardrobeItem(event.inventoryItems[slot.helmetSlot])
-            slot.chestplate = getWardrobeItem(event.inventoryItems[slot.chestplateSlot])
-            slot.leggings = getWardrobeItem(event.inventoryItems[slot.leggingsSlot])
-            slot.boots = getWardrobeItem(event.inventoryItems[slot.bootsSlot])
-            if (equippedSlotPattern.matches(event.inventoryItems[slot.inventorySlot]?.name)) {
+        inventoryPattern.matchMatcher(event.inventoryName) {
+            currentPage = group("currentPage").formatInt()
+        }
+        if (currentPage == null) return
+
+        val itemsList = event.inventoryItems
+        for (slot in wardrobeSlots.filter { it.isInCurrentPage }) {
+            slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
+            slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
+            slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
+            slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
                 currentWardrobeSlot = slot.id
             }
         }
@@ -189,11 +200,11 @@ object WardrobeAPI {
 
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
 
-    fun getWardrobePage(): Int? {
-        inventoryPattern.matchMatcher(InventoryUtils.openInventoryName()) {
-            return group("currentPage").formatInt()
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        DelayedRun.runDelayed(500.milliseconds) {
+            if (!inWardrobe()) currentPage = null
         }
-        return null
     }
 
     @SubscribeEvent
