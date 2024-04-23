@@ -20,7 +20,6 @@ import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -60,36 +59,6 @@ class WardrobeOverlay {
 
             override fun getName(): String {
                 return ""
-            }
-
-            override fun hasCustomName(): Boolean {
-                return false
-            }
-
-            override fun getDisplayNameString(): String? {
-                return null
-            }
-
-            override fun getAlwaysRenderNameTag(): Boolean {
-                return false
-            }
-
-            override fun getAlwaysRenderNameTagForRender(): Boolean {
-                return false
-            }
-
-            override fun getDisplayName(): IChatComponent {
-                return IChatComponent.Serializer.jsonToComponent("{\"text\":\"\"}")
-            }
-
-            override fun getCustomNameTag(): String? {
-                return null
-            }
-
-            override fun setCustomNameTag(name: String?) {}
-
-            override fun setAlwaysRenderNameTag(alwaysRenderNameTag: Boolean) {
-                super.setAlwaysRenderNameTag(false)
             }
         }
 
