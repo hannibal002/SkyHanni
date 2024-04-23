@@ -19,7 +19,8 @@ object PartyChatCommands {
     )
 
     private fun useConfig() = SkyHanniMod.feature.misc.partyCommands
-    val allPartyCommands = listOf(
+
+    private val allPartyCommands = listOf(
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
             { useConfig().transferCommand },
@@ -38,7 +39,7 @@ object PartyChatCommands {
         ),
     )
 
-    val indexedPartyChatCommands = buildMap {
+    private val indexedPartyChatCommands = buildMap {
         for (command in allPartyCommands) {
             for (name in command.names) {
                 put(name.lowercase(), command)
@@ -46,7 +47,7 @@ object PartyChatCommands {
         }
     }
 
-    fun isTrustedUser(name: String): Boolean {
+    private fun isTrustedUser(name: String): Boolean {
         val friend = FriendAPI.getAllFriends().find { it.name == name }
         return when (useConfig().defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
@@ -64,15 +65,16 @@ object PartyChatCommands {
             return
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
-        if (event.cleanedAuthor == LorenzUtils.getPlayerName()) {
+        val name = event.cleanedAuthor
+        if (name == LorenzUtils.getPlayerName()) {
             return
         }
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) {
             return
         }
-        if (!isTrustedUser(event.cleanedAuthor)) {
-            ChatUtils.chat("§cIgnoring chat command from ${event.cleanedAuthor}. Change your party chat command settings or /friend (best) them.")
+        if (!isTrustedUser(name)) {
+            ChatUtils.chat("§cIgnoring chat command from $name. Change your party chat command settings or /friend (best) them.")
             return
         }
         command.executable(event)
