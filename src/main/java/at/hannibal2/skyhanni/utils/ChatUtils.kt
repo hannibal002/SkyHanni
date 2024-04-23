@@ -139,6 +139,7 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     //TODO rename to runHypixelCommand
+    @Deprecated("Use clickableChat with onClick or use HypixelCommands", ReplaceWith(""))
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val fullMessage = msgPrefix + message
@@ -146,7 +147,7 @@ object ChatUtils {
         internalChat(createClickableChat(fullMessage, command))
     }
 
-    fun createClickableChat(message: String, command: String): ChatComponentText {
+    private fun createClickableChat(message: String, command: String): ChatComponentText {
         val text = ChatComponentText(message)
         val fullCommand = "/" + command.removePrefix("/")
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
