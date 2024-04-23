@@ -29,7 +29,7 @@ class AnitaExtraFarmingFortune {
     private var levelPrice = mapOf<Int, Price>()
 
     @SubscribeEvent
-    fun onItemTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!config.extraFarmingFortune) return
 
         if (InventoryUtils.openInventoryName() != "Anita") return

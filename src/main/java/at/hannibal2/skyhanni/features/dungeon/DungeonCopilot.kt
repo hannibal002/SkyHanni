@@ -86,7 +86,11 @@ class DungeonCopilot {
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
-            changeNextStep("Enter Boss Room")
+            if (DungeonAPI.getCurrentBoss() == DungeonFloor.ENTRANCE) {
+                changeNextStep("")
+            } else {
+                changeNextStep("Enter Boss Room")
+            }
             return "dungeon_copilot"
         }
         return null
@@ -98,7 +102,7 @@ class DungeonCopilot {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
@@ -137,9 +141,7 @@ class DungeonCopilot {
         changeNextStep("")
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && config.enabled
-    }
+    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

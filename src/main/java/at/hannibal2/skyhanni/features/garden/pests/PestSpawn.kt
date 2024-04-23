@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -20,29 +21,89 @@ class PestSpawn {
     private val config get() = PestAPI.config.pestSpawn
 
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
+
+    /**
+     * REGEX-TEST: §6§lGROSS! §7A §6Pest §7has appeared in §aPlot §7- §b4§7!
+     */
     private val onePestPattern by patternGroup.pattern(
         "one",
         "§6§l.*! §7A §6Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!"
     )
-    private val multiplePestSpawn by patternGroup.pattern(
+
+    /**
+     * REGEX-TEST: §6§lGROSS! §7A §6Pest §7has appeared in §aThe Barn§7!
+     */
+    private val onePestBarnPattern by patternGroup.pattern(
+        "onebarn",
+        "§6§l.*! §7A §6Pest §7has appeared in §a(?<plot>The Barn)§7!"
+    )
+
+    /**
+     * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aPlot §7- §b2§7!
+     */
+    private val multiplePestsSpawn by patternGroup.pattern(
         "multiple",
         "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!"
     )
 
+    /**
+     * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aThe Barn§7!
+     */
+    private val multiplePestsBarnSpawn by patternGroup.pattern(
+        "multiplebarn",
+        "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §a(?<plot>The Barn)§7!"
+    )
+
+    /**
+     * REGEX-TEST: §6§lGROSS! §7While you were offline, §6Pests §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
+     */
+    private val offlinePestsSpawn by patternGroup.pattern(
+        "offline",
+        "§6§l.*! §7While you were offline, §6Pests §7spawned in §aPlots (?<plots>.*)!"
+    )
+    private var plotNames = mutableListOf<String>()
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-
+        val message = event.message
         var blocked = false
 
-        onePestPattern.matchMatcher(event.message) {
-            pestSpawn(1, group("plot"))
+        plotNames.clear()
+
+        onePestPattern.matchMatcher(message) {
+            val plotName = group("plot")
+            plotNames.add(plotName)
+            pestSpawn(1, plotNames, false)
             blocked = true
         }
-        multiplePestSpawn.matchMatcher(event.message) {
-            pestSpawn(group("amount").toInt(), group("plot"))
+        onePestBarnPattern.matchMatcher(message) {
+            val plotName = group("plot")
+            plotNames.add(plotName)
+            pestSpawn(1, plotNames, false)
             blocked = true
         }
+        multiplePestsSpawn.matchMatcher(message) {
+            val plotName = group("plot")
+            plotNames.add(plotName)
+            val amount = group("amount").toInt()
+            pestSpawn(amount, plotNames, false)
+            blocked = true
+        }
+        multiplePestsBarnSpawn.matchMatcher(message) {
+            val plotName = group("plot")
+            plotNames.add(plotName)
+            val amount = group("amount").toInt()
+            pestSpawn(amount, plotNames, false)
+            blocked = true
+        }
+        offlinePestsSpawn.matchMatcher(message) {
+            val plots = group("plots")
+            plotNames = plots.removeColor().split(", ", " and ").toMutableList()
+            pestSpawn(0, plotNames, true)
+            // blocked = true
+        }
+
         if (event.message == "  §r§e§lCLICK HERE §eto teleport to the plot!") {
             if (PestSpawnTimer.lastSpawnTime.passedSince() < 1.seconds) {
                 blocked = true
@@ -54,8 +115,11 @@ class PestSpawn {
         }
     }
 
-    private fun pestSpawn(amount: Int, plotName: String) {
-        PestSpawnEvent(amount, plotName).postAndCatch()
+    private fun pestSpawn(amount: Int, plotNames: List<String>, unknownAmount: Boolean) {
+        PestSpawnEvent(amount, plotNames, unknownAmount).postAndCatch()
+
+        if (unknownAmount) return // todo make this work with offline pest spawn messages
+        val plotName = plotNames.firstOrNull()
         val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 

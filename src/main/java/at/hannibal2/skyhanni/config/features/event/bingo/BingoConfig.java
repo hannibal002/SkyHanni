@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.event.bingo;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BingoConfig {
 
@@ -19,6 +20,7 @@ public class BingoConfig {
     @Accordion
     public CompactChatConfig compactChat = new CompactChatConfig();
 
+    // TODO move into own category
     @Expose
     @ConfigOption(name = "Minion Craft Helper", desc = "Show how many more items you need to upgrade the minion in your inventory. Especially useful for Bingo.")
     @ConfigEditorBoolean
@@ -32,5 +34,6 @@ public class BingoConfig {
     public boolean minionCraftHelperProgressFirst = false;
 
     @Expose
+    @ConfigLink(owner = BingoConfig.class, field = "minionCraftHelperEnabled")
     public Position minionCraftHelperPos = new Position(10, 10, false, true);
 }

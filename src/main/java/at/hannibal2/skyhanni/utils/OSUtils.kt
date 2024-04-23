@@ -9,7 +9,9 @@ object OSUtils {
 
     @JvmStatic
     fun openBrowser(url: String) {
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        val desktopSupported = Desktop.isDesktopSupported()
+        val supportedActionBrowse = Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
+        if (desktopSupported && supportedActionBrowse) {
             try {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: IOException) {
@@ -20,7 +22,12 @@ object OSUtils {
             }
         } else {
             copyToClipboard(url)
-            ErrorManager.skyHanniError("Cannot open website, web browser is not supported! Copied url to clipboard.")
+            ErrorManager.logErrorStateWithData(
+                "Cannot open website! Copied url to clipboard instead", "Web browser is not supported",
+                "url" to url,
+                "desktopSupported" to desktopSupported,
+                "supportedActionBrowse" to supportedActionBrowse,
+            )
         }
     }
 

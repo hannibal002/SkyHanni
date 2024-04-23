@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -40,8 +41,11 @@ import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -76,10 +80,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
-import net.minecraft.client.Minecraft
 import net.minecraft.command.ICommandSender
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
@@ -209,6 +210,10 @@ object Commands {
             "shresetfishingtracker",
             "Resets the Fishing Profit Tracker"
         ) { FishingProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetvisitordrops",
+            "Reset the Visitors Drop Statistics"
+        ) { GardenVisitorDropStatistics.resetCommand() }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -216,11 +221,13 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "<language code (2 letters)> <messsage to translate>\n" +
-                "Requires the Chat > Translator feature to be enabled.\n" +
-                "Copies the translation for a given message to your clipboard. " +
-                "Language codes are at the end of the translation when you click on a message."
+            "Copy the English translation of a message in another language to the clipboard.\n" +
+                "Uses a 2 letter language code that can be found at the end of a translation message."
         ) { Translator.fromEnglish(it) }
+        registerCommand(
+            "shtranslate",
+            "Translate a message in another language to English."
+        ) { Translator.toEnglish(it) }
         registerCommand(
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
@@ -237,6 +244,10 @@ object Commands {
             "shresetdianaprofittracker",
             "Resets the Diana Profit Tracker"
         ) { DianaProfitTracker.resetCommand(it) }
+        registerCommand(
+            "shresetpestprofittracker",
+            "Resets the Pest Profit Tracker"
+        ) { PestProfitTracker.resetCommand(it) }
         registerCommand(
             "shresetmythologicalcreatureracker",
             "Resets the Mythological Creature Tracker"
@@ -285,12 +296,16 @@ object Commands {
         )
         registerCommand(
             "shlimbostats",
-            "Prints your Limbo Stats!"
+            "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
         ) { LimboTimeTracker.printStats() }
         registerCommand(
             "shlimbo",
             "Warps you to Limbo."
         ) { MiscFeatures().goToLimbo() }
+        registerCommand(
+            "shlanedetection",
+            "Detect a farming lane in garden"
+        ) { FarmingLaneCreator.commandLaneDetection() }
     }
 
     private fun usersBugFix() {
@@ -482,10 +497,7 @@ object Commands {
         registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
-        registerCommand(
-            "shsendtranslation",
-            "Respond with a translation of the message that the user clicks"
-        ) { Translator.toEnglish(it) }
+        registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 
     private fun shortenedCommands() {
@@ -507,30 +519,33 @@ object Commands {
         } else {
             title = "All SkyHanni commands"
         }
-        val base = ChatComponentText(" \n§7$title:\n")
+
+        val components = mutableListOf<ChatComponentText>()
+        components.add(ChatComponentText(" \n§7$title:\n"))
+
         for (command in commands) {
             if (!filter(command.name) && !filter(command.description)) continue
             val category = command.category
             val name = command.name
             val color = category.color
-            val text = ChatComponentText("$color/$name")
-            text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/$name")
 
             val hoverText = buildList {
                 add("§e/$name")
-                add(" §7${command.description}")
+                if (command.description.isNotEmpty()) {
+                    add(" §7${command.description}")
+                }
                 add("")
                 add("$color${category.categoryName}")
                 add("  §7${category.description}")
             }
 
-            text.chatStyle.chatHoverEvent =
-                HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(hoverText.joinToString("\n")))
-            base.appendSibling(text)
-            base.appendSibling(ChatComponentText("§7, "))
+            val commandInfo = ChatUtils.createHoverableChat("$color/$name", hoverText, "/$name", false)
+
+            components.add(commandInfo)
+            components.add(ChatComponentText("§7, "))
         }
-        base.appendSibling(ChatComponentText("\n "))
-        Minecraft.getMinecraft().thePlayer.addChatMessage(base)
+        components.add(ChatComponentText("\n "))
+        ChatUtils.multiComponentMessage(components)
     }
 
     @JvmStatic
@@ -538,8 +553,7 @@ object Commands {
         if (!LorenzUtils.inSkyBlock) {
             ChatUtils.userError("Join SkyBlock to open the fortune guide!")
         } else {
-            CaptureFarmingGear.captureFarmingGear()
-            SkyHanniMod.screenToOpen = FFGuideGUI()
+            FFGuideGUI.open()
         }
     }
 

@@ -31,8 +31,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
 
-    private var lastClickDelay = 0L
-
     fun addCoins(coins: Int) {
         addItem(SKYBLOCK_COIN, coins)
     }
@@ -129,21 +127,20 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
 
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
-                if (System.currentTimeMillis() > lastClickDelay + 150) {
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore,
+                onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
                         ChatUtils.chat("Removed $cleanName §efrom $name.")
-                        lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         modify {
                             it.items[internalName]?.hidden = !hidden
                         }
-                        lastClickDelay = System.currentTimeMillis()
                     }
                     update()
+
                 }
-            } else Renderable.string(displayName)
+            ) else Renderable.string(displayName)
 
             lists.addAsSingletonList(renderable)
         }
@@ -181,7 +178,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     }
 
     fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
-        val profitFormat = profit.addSeparators()
+        val profitFormat = profit.toInt().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
         val tips = if (totalAmount > 0) {

@@ -7,9 +7,14 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -25,6 +30,14 @@ class GardenCropMilestoneFix {
         " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)"
     )
 
+    /**
+     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
+     */
+    private val pestRareDropPattern by patternGroup.pattern(
+        "pests.raredrop",
+        "§6§lRARE DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)"
+    )
+
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 
     @SubscribeEvent
@@ -38,19 +51,41 @@ class GardenCropMilestoneFix {
             val crops = GardenCropMilestones.getCropsForTier(tier, crop)
             changedValue(crop, crops, "level up chat message", 0)
         }
+        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
+            val amount = group("amount").toInt()
+            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+
+            val multiplier = NEUItems.getMultiplier(item)
+            val rawName = multiplier.first.itemNameWithoutColor
+            val cropType = CropType.getByNameOrNull(rawName) ?: return
+
+            cropType.setCounter(
+                cropType.getCounter() + (amount * multiplier.second)
+            )
+            GardenCropMilestoneDisplay.update()
+        }
+        pestRareDropPattern.matchMatcher(event.message) {
+            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+
+            val multiplier = NEUItems.getMultiplier(item)
+            val rawName = multiplier.first.itemNameWithoutColor
+            val cropType = CropType.getByNameOrNull(rawName) ?: return
+
+            cropType.setCounter(
+                cropType.getCounter() + multiplier.second
+            )
+            GardenCropMilestoneDisplay.update()
+        }
     }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            tabListPattern.matchMatcher(line) {
-                val tier = group("tier").toInt()
-                val percentage = group("percentage").toDouble()
-                val cropName = group("crop")
+        event.tabList.matchFirst(tabListPattern) {
+            val tier = group("tier").toInt()
+            val percentage = group("percentage").toDouble()
+            val cropName = group("crop")
 
-                check(cropName, tier, percentage)
-                return
-            }
+            check(cropName, tier, percentage)
         }
     }
 

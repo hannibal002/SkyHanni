@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.dungeon;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class DungeonConfig {
 
@@ -22,6 +23,7 @@ public class DungeonConfig {
     public boolean showMilestonesDisplay = false;
 
     @Expose
+    @ConfigLink(owner = DungeonConfig.class, field = "showMilestonesDisplay")
     public Position showMileStonesDisplayPos = new Position(10, 10, false, true);
 
     @Expose
@@ -31,6 +33,7 @@ public class DungeonConfig {
     public boolean deathCounterDisplay = false;
 
     @Expose
+    @ConfigLink(owner = DungeonConfig.class, field = "deathCounterDisplay")
     public Position deathCounterPos = new Position(10, 10, false, true);
 
     @Expose
@@ -116,4 +119,11 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean croesusUnopenedChestTracker = true;
+
+    @Expose
+    @ConfigOption(name = "SA Jump Notification", desc = "Notifies you when a Shadow Assassin is about " +
+        "to jump on you.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shadowAssassinJumpNotifier = false;
 }

@@ -20,11 +20,13 @@ object StringUtils {
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
     private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
     fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
+    fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
@@ -91,16 +93,27 @@ object StringUtils {
         return cleanedString.toString()
     }
 
-    fun UUID.toDashlessUUID(): String {
-        return toString().replace("-", "")
-    }
-
+    fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
+
+    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.matches()) return consumer(it) }
+        }
+        return null
+    }
+
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.find()) consumer(it) }
+        }
+        return null
+    }
 
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
@@ -114,6 +127,7 @@ object StringUtils {
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
         } else {
@@ -181,13 +195,13 @@ object StringUtils {
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
-    fun createCommaSeparatedList(list: List<String>, delimiterColor: String = ""): String {
-        if (list.isEmpty()) return ""
-        if (list.size == 1) return list[0]
-        if (list.size == 2) return "${list[0]}$delimiterColor and ${list[1]}"
-        val lastIndex = list.size - 1
-        val allButLast = list.subList(0, lastIndex).joinToString("$delimiterColor, ")
-        return "$allButLast$delimiterColor, and ${list[lastIndex]}"
+    fun List<String>.createCommaSeparatedList(delimiterColor: String = ""): String {
+        if (this.isEmpty()) return ""
+        if (this.size == 1) return this[0]
+        if (this.size == 2) return "${this[0]}$delimiterColor and ${this[1]}"
+        val lastIndex = this.size - 1
+        val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
+        return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
@@ -261,15 +275,9 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerNameFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("username")
-    }
+    fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
-    fun String.getPlayerNameAndRankFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("rankedName")
-    }
+    fun String.getPlayerNameAndRankFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("rankedName")
 
     private fun matchPlayerChatMessage(string: String): Matcher? {
         var username = ""
@@ -305,7 +313,60 @@ object StringUtils {
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 
-    fun String.isRoman(): Boolean {
-        return UtilsPatterns.isRomanPattern.matches(this)
+    fun String.isRoman(): Boolean = UtilsPatterns.isRomanPattern.matches(this)
+
+    fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
+
+    fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun replaceIfNeeded(
+        original: IChatComponent,
+        newText: String,
+    ): ChatComponentText? {
+        val foundCommands = mutableListOf<IChatComponent>()
+
+        addComponent(foundCommands, original)
+        for (sibling in original.siblings) {
+            addComponent(foundCommands, sibling)
+        }
+
+        val size = foundCommands.size
+        if (size > 1) {
+            return null
+        }
+
+        val originalClean = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val newTextClean = LorenzUtils.stripVanillaMessage(newText)
+        if (originalClean == newTextClean) return null
+
+        val text = ChatComponentText(newText)
+        if (size == 1) {
+            val chatStyle = foundCommands[0].chatStyle
+            text.chatStyle.chatClickEvent = chatStyle.chatClickEvent
+            text.chatStyle.chatHoverEvent = chatStyle.chatHoverEvent
+        }
+
+        return text
+    }
+
+    private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
+        val clickEvent = message.chatStyle.chatClickEvent
+        if (clickEvent != null) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+                return
+            }
+            foundCommands.add(message)
+        }
+    }
+
+    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
+        var text = this
+        while (true) {
+            val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
+            if (newText == text) {
+                return text
+            }
+            text = newText
+        }
     }
 }

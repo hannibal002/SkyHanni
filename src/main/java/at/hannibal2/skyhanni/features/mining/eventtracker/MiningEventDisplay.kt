@@ -16,10 +16,7 @@ object MiningEventDisplay {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
     private var display = mutableListOf<String>()
 
-    private var dwarvenEvents = listOf<RunningEventType>()
-    private var crystalEvents = listOf<RunningEventType>()
-    private var lastDwarvenEvent: MiningEventType? = null
-    private var lastCrystalEvent: MiningEventType? = null
+    private val islandEventData: MutableMap<IslandType, MiningIslandEventInfo> = mutableMapOf()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -35,31 +32,29 @@ object MiningEventDisplay {
 
     private fun updateDisplay() {
         display.clear()
-        updateEvents(IslandType.DWARVEN_MINES, dwarvenEvents, lastDwarvenEvent)
-        updateEvents(IslandType.CRYSTAL_HOLLOWS, crystalEvents, lastCrystalEvent)
+        updateEvents()
     }
 
-    private fun updateEvents(islandType: IslandType, events: List<RunningEventType>, lastEvent: MiningEventType?) {
-        val shouldShow = when (config.showType) {
-            MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
-            MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
-            MiningEventConfig.ShowType.CURRENT -> islandType.isInIsland()
-            else -> true
-        }
+    private fun updateEvents() {
+        islandEventData.forEach { (islandType, eventDetails) ->
+            val shouldShow = when (config.showType) {
+                MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
+                MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
+                MiningEventConfig.ShowType.MINESHAFT -> islandType == IslandType.MINESHAFT
+                MiningEventConfig.ShowType.CURRENT -> islandType.isInIsland()
+                else -> true
+            }
 
-        events.firstOrNull()?.let { firstEvent ->
-            if (firstEvent.endsAt.asTimeMark().isInPast()) {
-                when (islandType) {
-                    IslandType.DWARVEN_MINES -> lastDwarvenEvent = firstEvent.event
-                    IslandType.CRYSTAL_HOLLOWS -> lastCrystalEvent = firstEvent.event
-                    else -> Unit
+            eventDetails.islandEvents.firstOrNull()?.let { firstEvent ->
+                if (firstEvent.endsAt.asTimeMark().isInPast()) {
+                    eventDetails.lastEvent = firstEvent.event
                 }
             }
-        }
 
-        if (shouldShow) {
-            val upcomingEvents = formatUpcomingEvents(events, lastEvent)
-            display.add("§a${islandType.displayName}§8: $upcomingEvents")
+            if (shouldShow) {
+                val upcomingEvents = formatUpcomingEvents(eventDetails.islandEvents, eventDetails.lastEvent)
+                display.add("§a${islandType.displayName}§8: $upcomingEvents")
+            }
         }
     }
 
@@ -75,14 +70,17 @@ object MiningEventDisplay {
 
     fun updateData(eventData: MiningEventData) {
         eventData.runningEvents.forEach { (islandType, events) ->
-            when (islandType) {
-                IslandType.DWARVEN_MINES -> dwarvenEvents =
-                    events.sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
+            val sorted = events.filter { islandType == IslandType.DWARVEN_MINES || !it.event.dwarvenSpecific }
+                .sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
 
-                IslandType.CRYSTAL_HOLLOWS -> crystalEvents =
-                    events.filter { !it.event.dwarvenSpecific }
-                        .sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
-                else -> Unit
+            val oldData = islandEventData[islandType]
+            if (oldData == null) {
+                //todo remove once mineshaft is on main server
+                if (sorted.isNotEmpty() || islandType != IslandType.MINESHAFT) {
+                    islandEventData[islandType] = MiningIslandEventInfo(sorted)
+                }
+            } else {
+                oldData.islandEvents = sorted
             }
         }
     }
@@ -90,3 +88,5 @@ object MiningEventDisplay {
     private fun shouldDisplay() = LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() &&
         !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
 }
+
+private class MiningIslandEventInfo(var islandEvents: List<RunningEventType>, var lastEvent: MiningEventType? = null)

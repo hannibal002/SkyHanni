@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.misc.compacttablist;
 
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class AdvancedPlayerListConfig {
 
@@ -94,13 +94,4 @@ public class AdvancedPlayerListConfig {
     @ConfigOption(name = "Mark Special Persons", desc = "Show special icons behind the name of guild members, party members, friends, and marked players.")
     @ConfigEditorBoolean
     public boolean markSpecialPersons = false;
-
-    @Expose
-    @ConfigOption(
-        name = "Mark SkyHanni Devs",
-        desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
-            "§eThose are the folks that coded the mod for you for free :)"
-    )
-    @ConfigEditorBoolean
-    public boolean markSkyHanniContributors = false;
 }

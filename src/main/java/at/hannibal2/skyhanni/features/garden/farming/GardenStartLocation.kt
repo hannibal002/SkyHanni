@@ -20,10 +20,9 @@ object GardenStartLocation {
             return
         }
         if (!config.enabled) {
-            ChatUtils.clickableChat(
+            ChatUtils.chatAndOpenConfig(
                 "This feature is disabled. Enable it in the config: §e/sh crop start location",
-                "sh crop start location",
-                prefixColor = "§c"
+                GardenAPI.config::cropStartLocation
             )
             return
         }
@@ -45,7 +44,7 @@ object GardenStartLocation {
     }
 
     @SubscribeEvent
-    fun onBlockClick(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         val startLocations = GardenAPI.storage?.cropStartLocations ?: return
         val crop = GardenAPI.getCurrentlyFarmedCrop() ?: return

@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class DisplayConfig {
 
@@ -16,9 +16,35 @@ public class DisplayConfig {
     public AlignmentConfig alignment = new AlignmentConfig();
 
     @Expose
+    @ConfigOption(name = "Arrow Options", desc = "")
+    @Accordion
+    public ArrowConfig arrow = new ArrowConfig();
+
+    @Expose
+    @ConfigOption(name = "Events Options", desc = "")
+    @Accordion
+    public EventsConfig events = new EventsConfig();
+
+    @Expose
+    @ConfigOption(name = "Maxwell Options", desc = "")
+    @Accordion
+    public MaxwellConfig maxwell = new MaxwellConfig();
+
+    @Expose
+    @ConfigOption(name = "Mayor Options", desc = "")
+    @Accordion
+    public MayorConfig mayor = new MayorConfig();
+
+    @Expose
+    @ConfigOption(name = "Party Options", desc = "")
+    @Accordion
+    public PartyConfig party = new PartyConfig();
+
+    @Expose
     @ConfigOption(name = "Title and Footer Options", desc = "")
     @Accordion
     public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
+
 
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
@@ -37,17 +63,6 @@ public class DisplayConfig {
     @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
     @ConfigEditorBoolean
     public boolean showUnclaimedBits = false;
-
-    @Expose
-    @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of one.")
-    @ConfigEditorBoolean
-    public boolean showAllActiveEvents = false;
-
-
-    @Expose
-    @ConfigOption(name = "Show Magical Power", desc = "Show your amount of Magical Power in the scoreboard.")
-    @ConfigEditorBoolean
-    public boolean showMagicalPower = true;
 
     @Expose
     @ConfigOption(name = "Show Max Island Players", desc = "Show the maximum amount of players that can join your current island.")
@@ -74,33 +89,6 @@ public class DisplayConfig {
             return str;
         }
     }
-
-    @Expose
-    @ConfigOption(name = "Arrow Amount Display", desc = "Determines how the arrow amount is displayed.")
-    @ConfigEditorDropdown
-    public ArrowAmountDisplay arrowAmountDisplay = ArrowAmountDisplay.NUMBER;
-
-    public enum ArrowAmountDisplay {
-        NUMBER("Number"),
-        PERCENTAGE("Percentage"),
-        ;
-
-        private final String str;
-
-        ArrowAmountDisplay(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
-
-    @Expose
-    @ConfigOption(name = "Color Arrow Amount", desc = "Color the arrow amount based on the percentage.")
-    @ConfigEditorBoolean
-    public boolean colorArrowAmount = false;
 
     @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")

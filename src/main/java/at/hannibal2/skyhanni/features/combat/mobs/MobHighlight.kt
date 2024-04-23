@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
+import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MobHighlight {
@@ -59,15 +61,27 @@ class MobHighlight {
         }
 
         if (entity is EntityEnderman) {
+            val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 4 // runic
+            val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 4 // runic
+
             if (config.zealotBruiserHighlighter) {
-                val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 4 // runic
-                val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 4 // runic
                 if (isZealot || isBruiser) {
                     RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
                         LorenzColor.DARK_AQUA.toColor().withAlpha(127)
                     )
                     { config.zealotBruiserHighlighter }
+                }
+            }
+
+            if (config.chestZealotHighlighter) {
+                val isHoldingChest = (entity as? EntityEnderman)?.getBlockInHand()?.block == Blocks.ender_chest
+                if ((isZealot || isBruiser) && isHoldingChest) {
+                    RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                        entity,
+                        LorenzColor.GREEN.toColor().withAlpha(127)
+                    )
+                    { config.chestZealotHighlighter }
                 }
             }
 
