@@ -68,9 +68,10 @@ public class MixinGuiChat {
         // Only ChatComponentText components can make it to this point
 
         // Only set the replacement once if it has not been initialised
-        if (!GuiChatHook.INSTANCE.isReplacementInitialised()) GuiChatHook.INSTANCE.setReplacement((ChatComponentText)component);
+        if (!GuiChatHook.INSTANCE.isReplacementInitialised())
+            GuiChatHook.INSTANCE.setReplacement((ChatComponentText) component);
 
-        new ChatHoverEvent((ChatComponentText)component).postAndCatch();
+        new ChatHoverEvent((ChatComponentText) component).postAndCatch();
     }
 
     @ModifyArg(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiChat;handleComponentHover(Lnet/minecraft/util/IChatComponent;II)V"), index = 0)

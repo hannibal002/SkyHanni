@@ -6,12 +6,14 @@ import com.google.gson.annotations.Expose
 class Enchants {
     @Expose
     var NORMAL: HashMap<String, Enchant.Normal> = hashMapOf()
+
     @Expose
     var ULTIMATE: HashMap<String, Enchant.Ultimate> = hashMapOf()
+
     @Expose
     var STACKING: HashMap<String, Enchant.Stacking> = hashMapOf()
 
-    fun getFromLore(passedLoreName: String) : Enchant {
+    fun getFromLore(passedLoreName: String): Enchant {
         val loreName = passedLoreName.lowercase()
         var enchant: Enchant? = NORMAL[loreName]
         if (enchant == null) enchant = ULTIMATE[loreName]
@@ -20,7 +22,7 @@ class Enchants {
         return enchant
     }
 
-    fun containsEnchantment(enchants: Map<String, Int>, line: String) : Boolean {
+    fun containsEnchantment(enchants: Map<String, Int>, line: String): Boolean {
         val matcher = ENCHANTMENT_PATTERN.matcher(line)
         while (matcher.find()) {
             val enchant = this.getFromLore(matcher.group("enchant"))
