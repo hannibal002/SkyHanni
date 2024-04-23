@@ -77,6 +77,13 @@ public class DevConfig {
     public boolean fancyContributors = true;
 
     @Expose
+    @ConfigOption(
+        name = "SBA Contributors",
+        desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
+    @ConfigEditorBoolean
+    public boolean fancySbaContributors = false;
+
+    @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
