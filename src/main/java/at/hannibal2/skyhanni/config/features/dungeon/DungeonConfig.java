@@ -62,7 +62,7 @@ public class DungeonConfig {
     @Expose
     @ConfigOption(name = "Architect Notifier",
         desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed. " +
-            "§cOnly works when having enough §5Architect First Drafts §cin the sacks.")
+            "§cOnly works when having enough §5Architect First Drafts §cin the sack.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean architectNotifier = true;
