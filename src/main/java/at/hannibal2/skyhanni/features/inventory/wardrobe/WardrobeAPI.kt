@@ -108,6 +108,12 @@ object WardrobeAPI {
             getData()?.favorite = value
         }
 
+    val WardrobeSlot.isCurrentSlot: Boolean
+        get() = getData()?.id == currentWardrobeSlot
+
+    val WardrobeSlot.isInCurrentPage: Boolean
+        get() = page == getWardrobePage()
+
     var currentWardrobeSlot: Int?
         get() = storage?.currentWardrobeSlot
         set(value) {
