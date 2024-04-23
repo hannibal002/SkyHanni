@@ -27,7 +27,6 @@ class DungeonsRaceGuide {
     private val parkourHelpers: MutableMap<String, ParkourHelper> = mutableMapOf()
 
     private var currentRace: String? = null
-    //:3
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
@@ -39,9 +38,10 @@ class DungeonsRaceGuide {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DungeonHubRacesJson>("DungeonHubRaces")
         data.data.forEach {
+            val nothingNoReturn = it.value["nothing:no_return"]
             parkourHelpers[it.key] = ParkourHelper(
-                it.value["nothing:no_return"]?.locations ?: listOf(),
-                it.value["nothing:no_return"]?.shortCuts ?: listOf(),
+                nothingNoReturn?.locations ?: listOf(),
+                nothingNoReturn?.shortCuts ?: listOf(),
                 platformSize = 1.0,
                 detectionRange = 7.0,
                 depth = false,
