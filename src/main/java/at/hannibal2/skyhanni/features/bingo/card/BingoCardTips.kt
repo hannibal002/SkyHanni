@@ -36,7 +36,7 @@ class BingoCardTips {
     )
     private val rowNamePattern by patternGroup.pattern(
         "row.name",
-        "§o§eRow #.*"
+        "§o§.Row #.*"
     )
 
     @SubscribeEvent

@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
@@ -158,6 +159,7 @@ public class CropMilestonesConfig {
     public int blocksBrokenResetTime = 5;
 
     @Expose
+    @ConfigLink(owner = CropMilestonesConfig.class, field = "progress")
     public Position progressDisplayPos = new Position(-400, -200, false, true);
 
     @Expose

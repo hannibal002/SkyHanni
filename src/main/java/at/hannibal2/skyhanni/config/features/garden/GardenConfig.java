@@ -14,6 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
@@ -179,6 +180,7 @@ public class GardenConfig {
     public boolean farmingFortuneForContest = true;
 
     @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "farmingFortuneForContest")
     public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
@@ -188,7 +190,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean jacobContextTimes = true;
+    public boolean jacobContestTimes = true;
 
     @Expose
     @ConfigOption(
@@ -209,7 +211,8 @@ public class GardenConfig {
     public double jacobContestCustomBpsValue = 19.9;
 
     @Expose
-    public Position jacobContextTimesPos = new Position(-359, 149, false, true);
+    @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
+    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
 
     @Expose
     @ConfigOption(
@@ -220,6 +223,7 @@ public class GardenConfig {
     @FeatureToggle
     public boolean jacobContestSummary = true;
 
+    // Does not have a config element!
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 
@@ -242,5 +246,6 @@ public class GardenConfig {
     public boolean showLogBookStats = true;
 
     @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "showLogBookStats")
     public Position logBookStatsPos = new Position(427, 92, false, true);
 }

@@ -35,10 +35,8 @@ _Frequently Asked Questions_
 
 > **10: How do I remove SkyHanni GUI elements?**
 > 1. Type `/sh gui`.
-> 2. Hover over the UI element.
-> 3. See the element name in the top center of screen.
-> 4. Search for that element with `/sh <name>`.
-> 5. Disable this feature.
+> 2. Click the UI element (if the UI element is not shown, follow FaQ #5).
+> 3. Disable this feature.
   
 > **11: How do I reset a SkyHanni tracker?**
 > 1. Do you want to **view only the current session**? 
@@ -55,5 +53,5 @@ _Frequently Asked Questions_
 >  - Execute the obtained command to reset the tracker.
 
 
-*This FAQ was last updated on February 20th, 2024.
+*This FAQ was last updated on April 22nd, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
