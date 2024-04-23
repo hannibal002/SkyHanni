@@ -101,9 +101,9 @@ public class ChocolateFactoryConfig {
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
-    public Position position = new Position(183, 160, false, true);
+    public Position position = new Position(163, 160, false, true);
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
-    public Position hoppityStatsPosition = new Position(183, 160, false, true);
+    public Position hoppityStatsPosition = new Position(163, 160, false, true);
 }
