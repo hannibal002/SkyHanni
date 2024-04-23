@@ -22,6 +22,10 @@ object HypixelCommands {
         send("openbaker")
     }
 
+    fun gardenLevels() {
+        send("gardenlevels")
+    }
+
     private fun send(command: String) {
         ChatUtils.sendCommandToServer(command)
     }
