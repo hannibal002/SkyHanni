@@ -3,14 +3,18 @@ package at.hannibal2.skyhanni.utils
 object HypixelCommands {
 
     fun bazaar(searchTerm: String) {
-        ChatUtils.sendCommandToServer("bz $searchTerm")
+        send("bz $searchTerm")
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        ChatUtils.sendCommandToServer("gfs $itemName $amount")
+        send("gfs $itemName $amount")
     }
 
     fun widget() {
-        ChatUtils.sendCommandToServer("widget")
+        send("widget")
+    }
+
+    private fun send(command: String) {
+        ChatUtils.sendCommandToServer(command)
     }
 }
