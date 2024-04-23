@@ -66,20 +66,6 @@ object WardrobeAPI {
         }
     }
 
-    class WardrobeData(
-        @Expose
-        val id: Int,
-
-        @Expose
-        var armor: MutableMap<Int, ItemStack?>,
-
-        @Expose
-        var locked: Boolean,
-
-        @Expose
-        var favorite: Boolean,
-    )
-
     private fun WardrobeSlot.getData() = storage?.wardrobeData?.getOrPut(id) {
         WardrobeData(
             id,
@@ -173,6 +159,11 @@ object WardrobeAPI {
         wardrobeSlots = list
     }
 
+    private fun getWardrobeItem(itemStack: ItemStack?) =
+        if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
+
+    fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -194,11 +185,6 @@ object WardrobeAPI {
             }
         }
     }
-
-    private fun getWardrobeItem(itemStack: ItemStack?) =
-        if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
-
-    fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -227,4 +213,19 @@ object WardrobeAPI {
             }
         }
     }
+
+
+    class WardrobeData(
+        @Expose
+        val id: Int,
+
+        @Expose
+        var armor: MutableMap<Int, ItemStack?>,
+
+        @Expose
+        var locked: Boolean,
+
+        @Expose
+        var favorite: Boolean,
+    )
 }
