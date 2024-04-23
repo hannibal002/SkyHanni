@@ -87,7 +87,7 @@ class GardenLevelDisplay {
         GardenAPI.gardenExp = gardenExp + moreExp
         update()
 
-        if (!config.overflowMessages) return
+        if (!config.overflowChat) return
         val newLevel = GardenAPI.getGardenLevel()
         if (newLevel != oldLevel + 1 || newLevel <= 15) return
         LorenzUtils.runDelayed(50.milliseconds) {

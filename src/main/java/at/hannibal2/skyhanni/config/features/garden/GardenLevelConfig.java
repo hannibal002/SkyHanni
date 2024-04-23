@@ -25,7 +25,7 @@ public class GardenLevelConfig {
     @ConfigOption(name = "Overflow Chat", desc = "Enable overflow Garden level up messages in chat.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean overflowMessages = true;
+    public boolean overflowChat = true;
 
     @Expose
     @ConfigLink(owner = GardenLevelConfig.class, field = "display")
