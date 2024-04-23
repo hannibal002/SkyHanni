@@ -58,7 +58,7 @@ object MaxwellAPI {
     )
     private val chatPowerUnlockedPattern by patternGroup.pattern(
         "chat.power.unlocked",
-        "§eYou permanently unlocked the §a(?<power>.*) §epower!"
+        "§eYour selected power was set to (?:§r)*§a(?<power>.*)(?:§r)*§e!"
     )
     private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
