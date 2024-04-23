@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -44,7 +45,23 @@ object WardrobeAPI {
         val chestplateSlot: Int,
         val leggingsSlot: Int,
         val bootsSlot: Int,
-    )
+    ) {
+        fun getHelmetPrice(): Double {
+            return helmet?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
+        }
+
+        fun getChestplatePrice(): Double {
+            return chestplate?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
+        }
+
+        fun getLeggingsPrice(): Double {
+            return leggings?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
+        }
+
+        fun getBootsPrice(): Double {
+            return boots?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
+        }
+    }
 
     class WardrobeData(
         @Expose
@@ -101,6 +118,9 @@ object WardrobeAPI {
         set(value) {
             getData()?.locked = value
         }
+
+    val WardrobeSlot.getArmorPrice: Double
+        get() = armor.filterNotNull().sumOf { EstimatedItemValueCalculator.calculate(it).first }
 
     var WardrobeSlot.favorite: Boolean
         get() = getData()?.favorite ?: false

@@ -127,6 +127,25 @@ class WardrobeOverlay {
                     playerHeight
                 )
 
+                /*val hoverRenderable = {
+                    val lore = mutableListOf<String>()
+                    lore.add("§aEstimated Armor Value:")
+
+                    for (item in wardrobeSlot.armor.filterNotNull()) {
+                        println(item)
+                        val price = EstimatedItemValueCalculator.calculate(item).first
+                        lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
+                    }
+
+                    if (wardrobeSlot.armor.any { it != null }) {
+                        lore.add(" §aTotal Value: §6§l${NumberUtil.format(wardrobeSlot.getArmorPrice)} coins")
+
+                        Renderable.toolTipContainer(lore, playerWidth, playerHeight)
+                    } else {
+                        Renderable.emptyContainer(playerWidth, playerHeight)
+                    }
+                }*/
+
                 val renderable = Renderable.drawInsideRoundedRect(
                     Renderable.clickAndHoverable(
                         Renderable.emptyContainer(playerWidth, playerHeight),

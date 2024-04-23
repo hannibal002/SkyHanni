@@ -657,5 +657,26 @@ interface Renderable {
             }
         }
 
+        fun toolTipContainer(
+            content: List<String>,
+            width: Int,
+            height: Int,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = HorizontalAlignment.LEFT
+            override val verticalAlign = VerticalAlignment.TOP
+
+            override fun render(posX: Int, posY: Int) {
+                RenderLineTooltips.drawHoveringText(
+                    posX = posX,
+                    posY = posY,
+                    tips = content.map { string(it) },
+                    mouseX = currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
+                    mouseY = currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
+                )
+            }
+        }
+
     }
 }
