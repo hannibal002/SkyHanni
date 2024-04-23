@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.moulberry.notenoughupdates.util.Calculator
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
@@ -165,11 +166,10 @@ object GetFromSackAPI {
             return CommandResult.WRONG_ARGUMENT to null
         }
 
-        val amountString = args.last()
+        var amountString = args.last()
+        amountString = Calculator.calculate(amountString).toString()
 
-        if (!amountString.isInt()) {
-            return CommandResult.WRONG_AMOUNT to null
-        }
+        if (!amountString.isInt()) return CommandResult.WRONG_AMOUNT to null
 
         val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
 

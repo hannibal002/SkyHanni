@@ -774,7 +774,6 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
         .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
     ).flatten()
 
-
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
