@@ -176,13 +176,17 @@ object WardrobeAPI {
         event.addIrrelevant {
             add("Current wardrobe slot: $currentWardrobeSlot")
             wardrobeSlots.forEach { slot ->
-                add(
-                    "Slot ${slot.id} - " +
-                        "Helmet: ${slot.helmet?.name} - " +
-                        "Chestplate: ${slot.chestplate?.name} - " +
-                        "Leggings: ${slot.leggings?.name} - " +
-                        "Boots: ${slot.boots?.name}"
-                )
+                if (slot.locked) {
+                    add("Slot ${slot.id} is locked")
+                } else {
+                    add(
+                        "Slot ${slot.id} - " +
+                            "Helmet: ${slot.helmet?.name} - " +
+                            "Chestplate: ${slot.chestplate?.name} - " +
+                            "Leggings: ${slot.leggings?.name} - " +
+                            "Boots: ${slot.boots?.name}"
+                    )
+                }
             }
         }
     }
