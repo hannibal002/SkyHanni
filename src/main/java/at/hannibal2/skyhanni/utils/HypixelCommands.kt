@@ -6,6 +6,10 @@ object HypixelCommands {
         send("bz $searchTerm")
     }
 
+    fun warp(warp: String) {
+        send("warp $warp")
+    }
+
     fun teleportToPlot(plotName: String) {
         send("tptoplot $plotName")
     }

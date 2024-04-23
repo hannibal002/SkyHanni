@@ -33,7 +33,7 @@ class GardenWarpCommands {
 
         if (message == "/home") {
             event.isCanceled = true
-            ChatUtils.sendCommandToServer("warp garden")
+            HypixelCommands.warp("garden")
             ChatUtils.chat("§aTeleported you to the spawn location!", prefix = false)
         }
 
@@ -61,7 +61,7 @@ class GardenWarpCommands {
 
         when (event.keyCode) {
             config.homeHotkey -> {
-                ChatUtils.sendCommandToServer("warp garden")
+                HypixelCommands.warp("garden")
             }
 
             config.sethomeHotkey -> {
