@@ -48,23 +48,7 @@ object WardrobeAPI {
         val chestplateSlot: Int,
         val leggingsSlot: Int,
         val bootsSlot: Int,
-    ) {
-        fun getHelmetPrice(): Double {
-            return helmet?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
-        }
-
-        fun getChestplatePrice(): Double {
-            return chestplate?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
-        }
-
-        fun getLeggingsPrice(): Double {
-            return leggings?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
-        }
-
-        fun getBootsPrice(): Double {
-            return boots?.let { EstimatedItemValueCalculator.calculate(it).first } ?: 0.0
-        }
-    }
+    )
 
     private fun WardrobeSlot.getData() = storage?.wardrobeData?.getOrPut(id) {
         WardrobeData(
@@ -165,7 +149,7 @@ object WardrobeAPI {
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!inWardrobe()) return
 
