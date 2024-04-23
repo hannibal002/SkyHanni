@@ -56,7 +56,7 @@ class QuickCraftFeatures {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
         if (event.gui !is GuiChest) return

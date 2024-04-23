@@ -23,7 +23,7 @@ class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!VisitorAPI.inInventory) return
         if (!config.preventRefusing && !config.preventRefusingCopper && !config.preventAcceptingCopper) return
 
