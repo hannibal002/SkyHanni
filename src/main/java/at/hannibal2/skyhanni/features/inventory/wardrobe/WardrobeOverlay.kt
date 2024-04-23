@@ -143,6 +143,8 @@ class WardrobeOverlay {
 
                 val padding = 5
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
+                val containerWidth = playerWidth + 2 * padding
+                val containerHeight = playerHeight + 2 * padding
 
                 val isInPage = wardrobeSlot.isInCurrentPage
                 RenderLivingEntityHelper.removeEntityColor(fakePlayer)
@@ -161,8 +163,8 @@ class WardrobeOverlay {
                     event.mouseY,
                     pos.rawX,
                     pos.rawY,
-                    playerWidth,
-                    playerHeight
+                    containerWidth,
+                    containerHeight
                 )
 
                 val hoverRenderable = {
@@ -177,22 +179,22 @@ class WardrobeOverlay {
                     if (wardrobeSlot.armor.any { it != null }) {
                         lore.add(" §aTotal Value: §6§l${NumberUtil.format(wardrobeSlot.getArmorPrice)} coins")
 
-                        Renderable.toolTipContainer(lore, playerWidth, playerHeight)
+                        Renderable.toolTipContainer(lore, containerWidth, containerHeight)
                     } else {
-                        Renderable.emptyContainer(playerWidth, playerHeight)
+                        Renderable.emptyContainer(containerWidth, containerHeight)
                     }
                 }
 
                 val renderable = Renderable.drawInsideRoundedRect(
                     Renderable.clickAndHoverable(
                         hoverRenderable.invoke(),
-                        Renderable.emptyContainer(playerWidth, playerHeight),
+                        Renderable.emptyContainer(containerWidth, containerHeight),
                         onClick = {
                             clickWardrobeSlot(wardrobeSlot)
                         }
                     ),
                     getWardrobeSlotColor(wardrobeSlot, isHovered),
-                    padding,
+                    0,
                 )
 
                 // Calculate the new mouse position relative to the player
