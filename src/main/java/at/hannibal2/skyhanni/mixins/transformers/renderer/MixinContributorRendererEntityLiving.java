@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,11 +18,8 @@ public class MixinContributorRendererEntityLiving<T extends EntityLivingBase> {
 
     @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Ljava/lang/String;equals(Ljava/lang/Object;)Z", ordinal = 0))
     private boolean rotateCorpse(String displayName, Object v2, T bat, float p_77043_2_, float p_77043_3_, float partialTicks) {
-        if (skyHanni$hook.isCoolPerson(displayName)) {
-            GlStateManager.scale(1.1f, 1.1f, 1.1f);
-            GlStateManager.rotate(skyHanni$hook.getRotation(bat), 0f, 1f, 0f);
-        }
-        return skyHanni$hook.isCoolPerson(displayName);
+        return skyHanni$hook.rotateCorpse(displayName, bat);
+
     }
 
     @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;isWearing(Lnet/minecraft/entity/player/EnumPlayerModelParts;)Z"))

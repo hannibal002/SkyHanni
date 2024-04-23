@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.player.EnumPlayerModelParts
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 class RendererLivingEntityHook {
 
@@ -23,18 +24,44 @@ class RendererLivingEntityHook {
         }
     }
 
-    fun isCoolPerson(userName: String?): Boolean {
+    fun isWearing(entityPlayer: EntityPlayer, parts: EnumPlayerModelParts?): Boolean {
+        if (!LorenzUtils.inSkyBlock) return entityPlayer.isWearing(parts)
+        return isCoolPerson(entityPlayer.name) || entityPlayer.isWearing(parts)
+    }
+
+    fun <T> rotateCorpse(displayName: String, bat: T): Boolean {
+        if (isCoolPerson(displayName)) {
+            GlStateManager.scale(1.1f, 1.1f, 1.1f)
+            GlStateManager.rotate(getRotation(bat).toFloat(), 0f, 1f, 0f)
+        }
+        return isCoolPerson(displayName)
+    }
+
+    fun onIsWearing(entityPlayer: EntityPlayer, cir: CallbackInfoReturnable<Boolean>) {
+        if (!isCoolPerson(entityPlayer.name)) return
+        GlStateManager.scale(1.1f, 1.1f, 1.1f)
+        GlStateManager.rotate(
+            getRotation(entityPlayer).toFloat(),
+            0f,
+            1f,
+            0f
+        )
+        cir.returnValue = true
+    }
+
+    fun onEquals(displayName: String, cir: CallbackInfoReturnable<Boolean>) {
+        if (isCoolPerson(displayName)) {
+            cir.returnValue = true
+        }
+    }
+
+    private fun isCoolPerson(userName: String?): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
         val name = userName ?: return false
         return ContributorManager.canSpin(name)
     }
 
-    fun isWearing(entityPlayer: EntityPlayer, p_175148_1_: EnumPlayerModelParts?): Boolean {
-        if (!LorenzUtils.inSkyBlock) return entityPlayer.isWearing(p_175148_1_)
-        return isCoolPerson(entityPlayer.name) || entityPlayer.isWearing(p_175148_1_)
-    }
-
-    fun getRotation(entity: Any): Int {
+    private fun <T> getRotation(entity: T): Int {
         if (entity !is EntityPlayer) return 0
         return (entity.ticksExisted % 90) * 4
     }
