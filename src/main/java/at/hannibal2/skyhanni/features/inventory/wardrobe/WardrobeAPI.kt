@@ -100,7 +100,7 @@ object WardrobeAPI {
         }
 
     val WardrobeSlot.armor: List<ItemStack?>
-        get() = listOf(boots, leggings, chestplate, helmet)
+        get() = listOf(helmet, chestplate, leggings, boots)
 
     var WardrobeSlot.locked: Boolean
         get() = getData()?.locked ?: true

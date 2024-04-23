@@ -147,7 +147,7 @@ class WardrobeOverlay {
                 }
 
                 fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.toTypedArray()
+                    wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
                 val isInPage = wardrobeSlot.isInCurrentPage
                 RenderLivingEntityHelper.removeEntityColor(fakePlayer)
