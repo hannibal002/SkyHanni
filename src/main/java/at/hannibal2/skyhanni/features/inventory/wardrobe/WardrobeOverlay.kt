@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.armor
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.favorite
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.getArmorPrice
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSlot
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
@@ -33,6 +32,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
+import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -45,6 +45,8 @@ class WardrobeOverlay {
     private var display = emptyList<Pair<Position, Renderable>>()
     private var tempToggleShowOverlay = true
     private var favoriteToggle = false
+
+    private var itemPriceCache = mutableMapOf<ItemStack, Double>()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -159,7 +161,6 @@ class WardrobeOverlay {
                     )
                 }
 
-
                 val isHovered = GuiRenderUtils.isPointInRect(
                     event.mouseX,
                     event.mouseY,
@@ -173,13 +174,15 @@ class WardrobeOverlay {
                     val lore = mutableListOf<String>()
                     lore.add("§aEstimated Armor Value:")
 
+                    var totalPrice = 0.0
                     for (item in wardrobeSlot.armor.filterNotNull()) {
-                        val price = EstimatedItemValueCalculator.calculate(item).first
+                        val price = item.getPrice()
+                        totalPrice += price
                         lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
                     }
 
                     if (wardrobeSlot.armor.any { it != null }) {
-                        lore.add(" §aTotal Value: §6§l${NumberUtil.format(wardrobeSlot.getArmorPrice)} coins")
+                        lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
 
                         Renderable.toolTipContainer(lore, containerWidth, containerHeight)
                     } else {
@@ -224,8 +227,13 @@ class WardrobeOverlay {
             if (!inWardrobe()) {
                 tempToggleShowOverlay = true
                 favoriteToggle = false
+                itemPriceCache = mutableMapOf()
             }
         }
+    }
+
+    private fun ItemStack.getPrice(): Double {
+        return itemPriceCache.getOrPut(this) { EstimatedItemValueCalculator.calculate(this).first }
     }
 
     @SubscribeEvent
