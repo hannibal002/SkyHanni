@@ -18,7 +18,6 @@ import kotlin.math.round
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-
 data class LorenzVec(
     val x: Double,
     val y: Double,
