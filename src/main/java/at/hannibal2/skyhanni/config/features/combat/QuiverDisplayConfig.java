@@ -36,7 +36,7 @@ public class QuiverDisplayConfig {
     public enum ShowWhen {
         ALWAYS("Always"),
         ONLY_BOW_INVENTORY("Bow in inventory"),
-        ONLY_BOW_HAND("Bow in hand"),
+        ONLY_BOW_HAND("Bow held"),
 
         ;
         private final String str;
