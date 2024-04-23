@@ -38,6 +38,10 @@ object HypixelCommands {
         send("sax")
     }
 
+    fun toggleMusic() {
+        send("togglemusic")
+    }
+
     private fun send(command: String) {
         ChatUtils.sendCommandToServer(command)
     }
