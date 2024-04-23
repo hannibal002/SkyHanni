@@ -48,6 +48,7 @@ class WardrobeOverlay {
     private var favoriteToggle = false
 
     private var itemPriceCache = mutableMapOf<String?, Double>()
+    private var fakePlayerCache = mutableMapOf<WardrobeAPI.WardrobeSlot, AbstractClientPlayer>()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -137,17 +138,7 @@ class WardrobeOverlay {
                 val containerWidth = playerWidth + 2 * padding
                 val containerHeight = playerHeight + 2 * padding
 
-
-                val playerTexture = player.locationSkin
-                val fakePlayer = object : AbstractClientPlayer(gui.mc.theWorld, player.gameProfile) {
-                    override fun getLocationSkin(): ResourceLocation {
-                        return playerTexture ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
-                    }
-
-                    override fun getName(): String {
-                        return ""
-                    }
-                }
+                val fakePlayer = wardrobeSlot.getFakePlayer()
 
                 fakePlayer.inventory.armorInventory =
                     wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
@@ -229,12 +220,31 @@ class WardrobeOverlay {
                 tempToggleShowOverlay = true
                 favoriteToggle = false
                 itemPriceCache = mutableMapOf()
+                fakePlayerCache = mutableMapOf()
             }
         }
     }
 
     private fun ItemStack.getPrice(): Double =
         itemPriceCache.getOrPut(this.getItemUuid()) { EstimatedItemValueCalculator.calculate(this).first }
+
+    private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): AbstractClientPlayer =
+        fakePlayerCache.getOrPut(this) {
+            val playerTexture = Minecraft.getMinecraft().thePlayer.locationSkin
+            object : AbstractClientPlayer(
+                Minecraft.getMinecraft().theWorld,
+                Minecraft.getMinecraft().thePlayer.gameProfile
+            ) {
+                override fun getLocationSkin(): ResourceLocation {
+                    return playerTexture
+                        ?: DefaultPlayerSkin.getDefaultSkin(Minecraft.getMinecraft().thePlayer.uniqueID)
+                }
+
+                override fun getName(): String {
+                    return ""
+                }
+            }
+        }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
