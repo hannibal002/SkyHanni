@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -25,6 +25,8 @@ class DungeonArchitectFeatures {
         "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*"
     )
 
+    private val architectsFirstDraftItem = "ARCHITECT_FIRST_DRAFT".asInternalName()
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
@@ -38,12 +40,13 @@ class DungeonArchitectFeatures {
     }
 
     private fun generateMessage(name: String, event: LorenzChatEvent) {
-        val architectItem = SackAPI.fetchSackItem("ARCHITECT_FIRST_DRAFT".asInternalName())
-        if (architectItem.amount <= 0) return
+        val architectItemAmount = architectsFirstDraftItem.getAmountInSacks()
+        if (architectItemAmount <= 0) return
 
+        // TODO use hypxel command class (once the pr is merged
         ChatUtils.clickableChat(
-            "§c§lPUZZLE FAILED! §r§b$name §r§failed a puzzle.\n" +
-                "§eClick here to get §5Architect's First Draft §7(§e${architectItem.amount}x left§7)",
+            "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle.\n" +
+                "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)",
             "/gfs ARCHITECT_FIRST_DRAFT 1",
             false
         )
@@ -51,7 +54,5 @@ class DungeonArchitectFeatures {
         event.blockedReason = "puzzle_fail"
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && config.architectNotifier
-    }
+    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.architectNotifier
 }

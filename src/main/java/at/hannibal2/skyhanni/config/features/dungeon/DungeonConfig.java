@@ -60,7 +60,9 @@ public class DungeonConfig {
     public boolean highlightTeammates = true;
 
     @Expose
-    @ConfigOption(name = "Architect Notifier", desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.")
+    @ConfigOption(name = "Architect Notifier",
+        desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed. " +
+            "§cOnly works when having enough §5Architect First Drafts §cin the sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean architectNotifier = true;
