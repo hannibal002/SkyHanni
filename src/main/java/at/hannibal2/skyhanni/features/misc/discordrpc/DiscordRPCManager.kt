@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -26,6 +27,7 @@ import com.google.gson.JsonObject
 import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
 import com.jagrosh.discordipc.entities.RichPresence
+import com.jagrosh.discordipc.entities.RichPresenceButton
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
@@ -131,13 +133,20 @@ object DiscordRPCManager : IPCListener {
         // TODO, change functionality to use enum rather than ordinals
         secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
         firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
-        val presence: RichPresence = RichPresence.Builder()
+
+        var presence = RichPresence.Builder()
             .setDetails(firstLine.getDisplayString())
             .setState(secondLine.getDisplayString())
             .setStartTimestamp(startTimestamp!!)
             .setLargeImage(discordIconKey, location)
-            .build()
-        client?.sendRichPresence(presence)
+        if (config.showSkyCryptButton.get()) {
+            val skyCryptUrl = "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}"
+            presence = presence.setButtons(arrayOf(
+                RichPresenceButton(skyCryptUrl, "Open SkyCrypt Profile")
+            ))
+        }
+
+        client?.sendRichPresence(presence.build())
     }
 
     override fun onReady(client: IPCClient) {
