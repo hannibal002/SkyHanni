@@ -14,6 +14,10 @@ object HypixelCommands {
         send("widget")
     }
 
+    fun chocolateFactory() {
+        send("cf")
+    }
+
     private fun send(command: String) {
         ChatUtils.sendCommandToServer(command)
     }
