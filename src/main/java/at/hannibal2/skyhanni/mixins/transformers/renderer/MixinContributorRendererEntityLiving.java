@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(RendererLivingEntity.class)
+@Mixin(value = RendererLivingEntity.class, priority = 500)
 public class MixinContributorRendererEntityLiving<T extends EntityLivingBase> {
 
     @Unique
