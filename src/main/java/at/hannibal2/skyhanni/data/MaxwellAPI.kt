@@ -124,33 +124,27 @@ object MaxwellAPI {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
-        chatPowerPattern.matchMatcher(message) {
-            val power = group("power")
-            currentPower = getPowerByNameOrNull(power)
-                ?: return ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: $power"),
-                    "Unknown power: $power",
-                    "power" to power,
-                    "message" to message
-                )
-        }
-        chatPowerUnlockedPattern.matchMatcher(message) {
-            val power = group("power")
-            currentPower = getPowerByNameOrNull(power)
-                ?: return ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: $power"),
-                    "Unknown power: $power",
-                    "power" to power,
-                    "message" to message
-                )
-        }
+        tryReadPower(chatPowerPattern, message)
+        tryReadPower(chatPowerUnlockedPattern, message)
         tuningAutoAssignedPattern.matchMatcher(event.message) {
-            if (tunings?.isNotEmpty() == true) {
+            if (tunings?.isNotEmpty() != true) {
                 val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
                 if (tuningsInScoreboard) {
                     ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
                 }
             }
+        }
+    }
+
+    private fun tryReadPower(pattern: Pattern, message: String) {
+        pattern.matchMatcher(message) {
+            val power = group("power")
+            currentPower = getPowerByNameOrNull(power) ?: return ErrorManager.logErrorWithData(
+                UnknownMaxwellPower("Unknown power: $power"),
+                "Unknown power: $power",
+                "power" to power,
+                "message" to message
+            )
         }
     }
 
