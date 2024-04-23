@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -84,17 +83,13 @@ object WardrobeAPI {
         }
 
     val WardrobeSlot.armor: List<ItemStack?>
-        get() = getData()?.armor?.values?.toList() ?: emptyList()
+        get() = getData()?.armor?.toSortedMap()?.values?.toList() ?: emptyList()
 
     var WardrobeSlot.locked: Boolean
         get() = getData()?.locked ?: true
         set(value) {
             getData()?.locked = value
         }
-
-    val WardrobeSlot.getArmorPrice: Double
-        get() = armor.filterNotNull().sumOf { EstimatedItemValueCalculator.calculate(it).first }
-
 
     var WardrobeSlot.favorite: Boolean
         get() = getData()?.favorite ?: false

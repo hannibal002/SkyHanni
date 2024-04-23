@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
@@ -46,7 +47,7 @@ class WardrobeOverlay {
     private var tempToggleShowOverlay = true
     private var favoriteToggle = false
 
-    private var itemPriceCache = mutableMapOf<ItemStack, Double>()
+    private var itemPriceCache = mutableMapOf<String?, Double>()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -232,9 +233,8 @@ class WardrobeOverlay {
         }
     }
 
-    private fun ItemStack.getPrice(): Double {
-        return itemPriceCache.getOrPut(this) { EstimatedItemValueCalculator.calculate(this).first }
-    }
+    private fun ItemStack.getPrice(): Double =
+        itemPriceCache.getOrPut(this.getItemUuid()) { EstimatedItemValueCalculator.calculate(this).first }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
