@@ -119,8 +119,8 @@ object PartyChatCommands {
                 if (isBlockedUser(input[1])) {
                     ChatUtils.userError("${input[1]} is already ignored!")
                 } else blacklistModify(input[1])
-                return
             }
+
             "remove" -> {
                 if (input.size != 2) {
                     ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
@@ -129,26 +129,23 @@ object PartyChatCommands {
                 if (!isBlockedUser(input[1])) {
                     ChatUtils.userError("${input[1]} isn't ignored!")
                 } else blacklistModify(input[1])
-                return
             }
+
             "list" -> {
                 if (input.size == 2) {
                     blacklistView(input[1])
                 } else blacklistView()
-                return
             }
+
             "clear" -> {
                 ChatUtils.clickableChat("Are you sure you want to do this? Click here to confirm.",
-                    {
+                    onClick = {
                         config.blacklistedUsers.clear()
                         ChatUtils.chat("Cleared your ignored players list!")
                     })
-                return
             }
-            else -> {
-                blacklistModify(firstArg)
-                return
-            }
+
+            else -> blacklistModify(firstArg)
         }
     }
 
@@ -157,11 +154,10 @@ object PartyChatCommands {
             ChatUtils.chat("§cNow ignoring §b$player§e!")
             config.blacklistedUsers.add(player)
             return
-        } else {
-            ChatUtils.chat("§aStopped ignoring §b$player§e!")
-            config.blacklistedUsers.remove(player)
-            return
         }
+        ChatUtils.chat("§aStopped ignoring §b$player§e!")
+        config.blacklistedUsers.remove(player)
+        return
     }
 
     private fun blacklistView(player: String? = null) {
@@ -173,7 +169,9 @@ object PartyChatCommands {
                     message += "\n§e"
                     blacklist.forEachIndexed { i, it ->
                         message += it
-                        if (i < blacklist.size - 1) { message += ", "}
+                        if (i < blacklist.size - 1) {
+                            message += ", "
+                        }
                     }
                 } else {
                     blacklist.forEach {
@@ -185,12 +183,11 @@ object PartyChatCommands {
             }
             ChatUtils.chat("Your ignored players list is empty!")
             return
+        }
+        if (isBlockedUser(player)) {
+            ChatUtils.chat("$player §ais §eignored.")
         } else {
-            if (isBlockedUser(player)) {
-                ChatUtils.chat("$player §ais §eignored.")
-            } else {
-                ChatUtils.chat("$player §cisn't §eignored.")
-            }
+            ChatUtils.chat("$player §cisn't §eignored.")
         }
     }
 }
