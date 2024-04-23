@@ -162,26 +162,25 @@ object PartyChatCommands {
 
     private fun blacklistView() {
         val blacklist = config.blacklistedUsers
-        if (blacklist.size > 0) {
-            var message = "Ignored player list:"
-            if (blacklist.size > 15) {
-                message += "\n§e"
-                blacklist.forEachIndexed { i, it ->
-                    message += it
-                    if (i < blacklist.size - 1) {
-                        message += ", "
-                    }
-                }
-            } else {
-                blacklist.forEach {
-                    message += "\n§e$it"
-                }
-            }
-            ChatUtils.chat(message)
+        if (blacklist.size <= 0) {
+            ChatUtils.chat("Your ignored players list is empty!")
             return
         }
-        ChatUtils.chat("Your ignored players list is empty!")
-        return
+        var message = "Ignored player list:"
+        if (blacklist.size > 15) {
+            message += "\n§e"
+            blacklist.forEachIndexed { i, it ->
+                message += it
+                if (i < blacklist.size - 1) {
+                    message += ", "
+                }
+            }
+        } else {
+            blacklist.forEach {
+                message += "\n§e$it"
+            }
+        }
+        ChatUtils.chat(message)
     }
 
     private fun blacklistView(player: String) {
