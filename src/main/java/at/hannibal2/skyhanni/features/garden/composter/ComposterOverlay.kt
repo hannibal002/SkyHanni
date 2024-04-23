@@ -491,7 +491,7 @@ object ComposterOverlay {
         }
 
         val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
+            HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
             val isDwarvenMineable =
@@ -514,7 +514,7 @@ object ComposterOverlay {
             return
         }
 
-        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
+        HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
         if (itemsNeeded > havingInInventory - havingInSacks) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
