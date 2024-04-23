@@ -47,7 +47,10 @@ open class FFGuideGUI : GuiScreen() {
                     }
 
                     20 -> {
-                        ChatUtils.chat("What do you mean with \"farming fortune\"? This is a web browser!", prefix = false)
+                        ChatUtils.chat(
+                            "What do you mean with \"farming fortune\"? This is a web browser!",
+                            prefix = false
+                        )
                     }
 
                     30 -> {
