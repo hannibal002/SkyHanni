@@ -148,7 +148,7 @@ object ErrorManager {
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
             onClick = {
                 command(randomId)
-                      },
+            },
             prefix = false
         )
     }
