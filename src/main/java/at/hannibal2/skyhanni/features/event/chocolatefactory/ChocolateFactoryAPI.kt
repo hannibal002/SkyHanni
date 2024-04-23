@@ -74,6 +74,10 @@ object ChocolateFactoryAPI {
         "leaderboard.place",
         "§7You are §8#§b(?<position>[\\d,]+)"
     )
+    private val leaderboardPercentilePattern by patternGroup.pattern(
+        "leaderboard.percentile",
+        "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!"
+    )
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
@@ -95,6 +99,7 @@ object ChocolateFactoryAPI {
     var chocolateThisPrestige = 0L
     var chocolateMultiplier = 1.0
     var leaderboardPosition: Int? = null
+    var leaderboardPercentile: Double? = null
 
     val upgradeableSlots: MutableSet<Int> = mutableSetOf()
     var bestUpgrade: Int? = null
@@ -178,6 +183,11 @@ object ChocolateFactoryAPI {
         productionItem: ItemStack,
         leaderboardItem: ItemStack,
     ) {
+        leaderboardPosition = null
+        leaderboardPercentile = null
+
+        chocolateMultiplier = 1.0
+
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             chocolateCurrent = group("amount").formatLong()
         }
@@ -198,9 +208,15 @@ object ChocolateFactoryAPI {
         productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
             chocolateMultiplier = group("amount").formatDouble()
         }
-        leaderboardItem.getLore().matchFirst(leaderboardPlacePattern) {
-            leaderboardPosition = group("position").formatInt()
+        for (line in leaderboardItem.getLore()) {
+            leaderboardPlacePattern.matchMatcher(line) {
+                leaderboardPosition = group("position").formatInt()
+            }
+            leaderboardPercentilePattern.matchMatcher(line) {
+                leaderboardPercentile = group("percent").formatDouble()
+            }
         }
+
         if (!config.statsDisplay) return
         ChocolateFactoryStats.updateDisplay()
     }

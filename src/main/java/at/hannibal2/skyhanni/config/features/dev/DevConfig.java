@@ -68,6 +68,15 @@ public class DevConfig {
     public Position debugItemPos = new Position(90, 70);
 
     @Expose
+    @ConfigOption(
+        name = "Fancy Contributors",
+        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
+            "§eThose are the folks that coded the mod for you for free :)"
+    )
+    @ConfigEditorBoolean
+    public boolean fancyContributors = true;
+
+    @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
