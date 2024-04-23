@@ -172,7 +172,7 @@ object ChatUtils {
         onClick: () -> Any,
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         ChatClickActionManager.oneTimeClick(msgPrefix + message, onClick, expireAt)
@@ -291,6 +291,7 @@ object ChatUtils {
         sendQueue.add(message)
     }
 
+    @Deprecated("use HypixelCommands instead", ReplaceWith(""))
     fun sendCommandToServer(command: String) {
         if (command.startsWith("/")) {
             debug("Sending wrong command to server? ($command)")
