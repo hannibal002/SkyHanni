@@ -98,6 +98,7 @@ object GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
+    private val greenThumb = "GREEN_THUMB;1".asInternalName()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -374,7 +375,7 @@ object GardenVisitorFeatures {
                 visitor.pricePerCopper = (totalPrice / copper).toInt()
                 visitor.totalPrice = totalPrice
                 // Estimate could be changed to most value per copper item, instead of green thumb
-                val estimatedCopperValue = "GREEN_THUMB;1".asInternalName().getPrice() / 1500
+                val estimatedCopperValue = greenThumb.getPrice() / 1500
                 visitor.totalReward = copper * estimatedCopperValue
                 val timePerCopper = (farmingTimeRequired / copper).format()
                 var copperLine = formattedLine

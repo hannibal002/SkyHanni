@@ -89,41 +89,54 @@ class VisitorRewardWarning {
         if (!blockReason.blockRefusing && !isAcceptSlot) return
 
         if (visitor.blockedLore.isEmpty()) {
-            val copiedTooltip = event.toolTip.toList()
-            val blockedToolTip = mutableListOf<String>()
-
-            for (line in copiedTooltip) {
-                if (line.contains("§aAccept Offer§r")) {
-                    blockedToolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
-                } else if (line.contains("§cRefuse Offer§r")) {
-                    blockedToolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
-                } else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
-                    blockedToolTip.add("§8" + line.removeColor())
-                }
-            }
-            blockedToolTip.add("")
-            val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
-            val loss = (visitor.totalPrice!! - visitor.totalReward!!)
-            val formattedLoss = loss.let { NumberUtil.format(it) }
-            when (blockReason) {
-                VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER -> blockedToolTip.add(
-                    "${blockReason.description} §7(§6$pricePerCopper §7per)"
-                )
-                VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS -> blockedToolTip.add(
-                    if (loss > 0)
-                        "${blockReason.description} §7(§6$formattedLoss §7selling §9Green Thumb I§7)"
-                    else
-                        "§7(§6$formattedLoss §7profit)"
-                )
-                else -> blockedToolTip.add(
-                        blockReason.description
-                )
-            }
-            blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
-
-            visitor.blockedLore = blockedToolTip
+            updateBlockedLore(event.toolTip.toList(), visitor, blockReason)
         }
         event.toolTip.clear()
         event.toolTip.addAll(visitor.blockedLore)
+    }
+
+    private fun updateBlockedLore(
+        copiedTooltip: List<String>,
+        visitor: VisitorAPI.Visitor,
+        blockReason: VisitorBlockReason,
+    ) {
+        val blockedToolTip = mutableListOf<String>()
+        for (line in copiedTooltip) {
+            if (line.contains("§aAccept Offer§r")) {
+                blockedToolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
+            } else if (line.contains("§cRefuse Offer§r")) {
+                blockedToolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
+            } else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
+                blockedToolTip.add("§8" + line.removeColor())
+            }
+        }
+
+        blockedToolTip.add("")
+        val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
+        // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
+        val loss = visitor.totalPrice!! - visitor.totalReward!!
+        val formattedLoss = loss.let { NumberUtil.format(it) }
+        blockedToolTip.add(blockReason(blockReason, pricePerCopper, loss, formattedLoss))
+        blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
+
+        visitor.blockedLore = blockedToolTip
+    }
+
+    private fun blockReason(
+        blockReason: VisitorBlockReason,
+        pricePerCopper: String?,
+        loss: Double,
+        formattedLoss: String,
+    ) = when (blockReason) {
+        VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER ->
+            "${blockReason.description} §7(§6$pricePerCopper §7per)"
+
+        VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS ->
+            if (loss > 0)
+                "${blockReason.description} §7(§6$formattedLoss §7selling §9Green Thumb I§7)"
+            else
+                "§7(§6$formattedLoss §7profit)"
+
+        else -> blockReason.description
     }
 }
