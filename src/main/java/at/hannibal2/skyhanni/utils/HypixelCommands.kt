@@ -26,6 +26,10 @@ object HypixelCommands {
         send("gardenlevels")
     }
 
+    fun calendar() {
+        send("calendar")
+    }
+
     private fun send(command: String) {
         ChatUtils.sendCommandToServer(command)
     }
