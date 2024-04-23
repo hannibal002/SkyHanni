@@ -124,8 +124,8 @@ object MaxwellAPI {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
-        tryReadPower(chatPowerPattern, message)
-        tryReadPower(chatPowerUnlockedPattern, message)
+        chatPowerPattern.tryReadPower(message)
+        chatPowerUnlockedPattern.tryReadPower(message)
         tuningAutoAssignedPattern.matchMatcher(event.message) {
             if (tunings.isNullOrEmpty()) return
             val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
@@ -135,8 +135,8 @@ object MaxwellAPI {
         }
     }
 
-    private fun tryReadPower(pattern: Pattern, message: String) {
-        pattern.matchMatcher(message) {
+    private fun Pattern.tryReadPower(message: String) {
+        matchMatcher(message) {
             val power = group("power")
             currentPower = getPowerByNameOrNull(power) ?: return ErrorManager.logErrorWithData(
                 UnknownMaxwellPower("Unknown power: $power"),
