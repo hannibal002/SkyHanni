@@ -41,6 +41,8 @@ class WardrobeOverlay {
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
+        val list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
+        if (list.isEmpty()) return
 
         display = emptyList()
 
@@ -93,8 +95,6 @@ class WardrobeOverlay {
         GlStateManager.pushMatrix()
         GlStateManager.color(1f, 1f, 1f, 1f)
 
-
-        val list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
         var slot = 0
         for (row in 0 until rows) {
             val playersInRow =
