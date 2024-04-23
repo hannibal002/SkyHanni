@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BackgroundConfig {
     @Expose

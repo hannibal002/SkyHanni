@@ -90,7 +90,14 @@ object ErrorManager {
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
     ) {
-        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
+        logError(
+            IllegalStateException(internalMessage),
+            userMessage,
+            ignoreErrorCache,
+            noStackTrace,
+            *extraData,
+            betaOnly = betaOnly,
+        )
     }
 
     fun logErrorWithData(

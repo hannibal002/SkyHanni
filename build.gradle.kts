@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.3"
+version = "0.25.Beta.11"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -50,6 +50,7 @@ repositories {
     }
     maven("https://repo.nea.moe/releases")
     maven("https://maven.notenoughupdates.org/releases")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -104,7 +105,7 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -115,12 +116,14 @@ dependencies {
     implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
+
+    implementation("net.hypixel:mod-api:0.3.1")
 }
 configurations.getByName("minecraftNamed").dependencies.forEach {
     shot.applyTo(it as HasConfigurableAttributes<*>)
@@ -151,7 +154,7 @@ loom {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
+            arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
     }
@@ -241,7 +244,7 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
-    relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
+    relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
 }
 tasks.jar {

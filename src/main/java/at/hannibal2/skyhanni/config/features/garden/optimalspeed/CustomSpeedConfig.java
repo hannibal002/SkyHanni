@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden.optimalspeed;
 
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CustomSpeedConfig {
 

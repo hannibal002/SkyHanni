@@ -11,13 +11,14 @@ import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListC
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class GUIConfig {
@@ -91,6 +92,7 @@ public class GUIConfig {
     public boolean realTimeFormatToggle = false;
 
     @Expose
+    @ConfigLink(owner = GUIConfig.class, field = "realTime")
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
@@ -104,6 +106,7 @@ public class GUIConfig {
     public boolean tpsDisplay = false;
 
     @Expose
+    @ConfigLink(owner = GUIConfig.class, field = "tpsDisplay")
     public Position tpsDisplayPosition = new Position(10, 10, false, true);
 
     @Expose

@@ -130,7 +130,7 @@ class PestParticleWaypoint {
 
         val waypoint = getWaypoint() ?: return
 
-        val text = if (isPointingToPest) "§aPest Guess" else "§cInfected Plot Guess"
+        val text = if (isPointingToPest) "§aPest Guess" else "§cInfested Plot Guess"
         val color = color ?: error("color is null")
 
         event.drawWaypointFilled(waypoint, color, beacon = true)
