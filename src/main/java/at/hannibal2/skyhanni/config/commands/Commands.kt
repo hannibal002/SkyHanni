@@ -469,9 +469,9 @@ object Commands {
             "Display a title on the screen with the specified settings."
         ) { TitleManager.command(it) }
         registerCommand(
-            "shconfigmanagerreset",
+            "shresetconfig",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
-        ) { SkyHanniDebugsAndTests.configManagerResetCommand() }
+        ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"

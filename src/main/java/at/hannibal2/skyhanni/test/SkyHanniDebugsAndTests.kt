@@ -190,19 +190,17 @@ class SkyHanniDebugsAndTests {
             }
         }
 
-        fun configManagerResetCommand() {
+        fun resetConfigCommand() {
             ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
                 onClick = {
-                    configManagerReset()
+                    resetConfig()
                 },
                 prefix = false
             )
         }
 
-        private fun configManagerReset() {
-            // TODO make it so that it does not reset the config
-
+        private fun resetConfig() {
             // saving old config state
             SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
