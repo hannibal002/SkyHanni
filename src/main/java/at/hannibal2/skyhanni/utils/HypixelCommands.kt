@@ -30,6 +30,10 @@ object HypixelCommands {
         send("calendar")
     }
 
+    fun sacks() {
+        send("sax")
+    }
+
     private fun send(command: String) {
         ChatUtils.sendCommandToServer(command)
     }

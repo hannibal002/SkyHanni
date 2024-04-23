@@ -499,7 +499,9 @@ object ComposterOverlay {
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
-                "sax"
+                onClick = {
+                    HypixelCommands.sacks()
+                }
             )
             return
         }
