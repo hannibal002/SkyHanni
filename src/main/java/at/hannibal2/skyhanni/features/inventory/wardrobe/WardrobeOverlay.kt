@@ -141,7 +141,7 @@ class WardrobeOverlay {
                 fakePlayer.inventory.armorInventory =
                     wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.toTypedArray()
 
-                val padding = 5
+                val padding = 10
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
                 val containerWidth = playerWidth + 2 * padding
                 val containerHeight = playerHeight + 2 * padding
