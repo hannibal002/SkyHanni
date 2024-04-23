@@ -49,7 +49,7 @@ class ItemAbilityCooldown {
     )
 
     private var lastAbility = ""
-    private var items = mapOf<String?, List<ItemText>>()
+    private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
@@ -260,6 +260,8 @@ class ItemAbilityCooldown {
             { it.key.getIdentifier() },
             { kp -> kp.value.map { createItemText(it) } }
         )
+        .filter { it.key != null }
+        .mapKeys { it.key!! }
     }
 
     private fun createItemText(ability: ItemAbility): ItemText {
