@@ -149,9 +149,8 @@ class WardrobeOverlay {
                 fakePlayer.inventory.armorInventory =
                     wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
-                val isInPage = wardrobeSlot.isInCurrentPage
                 RenderLivingEntityHelper.removeEntityColor(fakePlayer)
-                if (!isInPage) {
+                if (!wardrobeSlot.isInCurrentPage()) {
                     scale *= 0.9
                     RenderLivingEntityHelper.setEntityColor(
                         fakePlayer,
@@ -249,7 +248,7 @@ class WardrobeOverlay {
             wardrobeSlot.favorite = !wardrobeSlot.favorite
             return
         }
-        if (wardrobeSlot.isInCurrentPage) {
+        if (wardrobeSlot.isInCurrentPage()) {
             clickSlot(wardrobeSlot.inventorySlot, getWindowId() ?: -1)
         } else {
             if (wardrobeSlot.page < wardrobePage) clickSlot(previousPageSlot, getWindowId() ?: -1)
@@ -258,14 +257,14 @@ class WardrobeOverlay {
     }
 
     private fun getWardrobeSlotColor(wardrobeSlot: WardrobeAPI.WardrobeSlot, isHovered: Boolean): Color {
-        val color = if (wardrobeSlot.isInCurrentPage) {
+        val color = if (wardrobeSlot.isInCurrentPage()) {
             if (isHovered) LorenzColor.GOLD.toColor()
-            else if (wardrobeSlot.isCurrentSlot) LorenzColor.GREEN.toColor()
+            else if (wardrobeSlot.isCurrentSlot()) LorenzColor.GREEN.toColor()
             else if (wardrobeSlot.favorite) LorenzColor.RED.toColor()
             else LorenzColor.BLUE.toColor()
         } else {
             if (isHovered) LorenzColor.GOLD.toColor().darker()
-            else if (wardrobeSlot.isCurrentSlot) LorenzColor.GREEN.toColor().darker()
+            else if (wardrobeSlot.isCurrentSlot()) LorenzColor.GREEN.toColor().darker()
             else if (wardrobeSlot.favorite) LorenzColor.RED.toColor().darker()
             else LorenzColor.BLACK.toColor()
         }

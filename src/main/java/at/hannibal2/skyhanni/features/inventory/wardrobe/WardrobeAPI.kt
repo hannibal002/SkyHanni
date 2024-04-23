@@ -102,11 +102,9 @@ object WardrobeAPI {
             getData()?.favorite = value
         }
 
-    val WardrobeSlot.isCurrentSlot: Boolean
-        get() = getData()?.id == currentWardrobeSlot
+    fun WardrobeSlot.isCurrentSlot(): Boolean = getData()?.id == currentWardrobeSlot
 
-    val WardrobeSlot.isInCurrentPage: Boolean
-        get() = page == currentPage
+    fun WardrobeSlot.isInCurrentPage(): Boolean = page == currentPage
 
     var currentWardrobeSlot: Int?
         get() = storage?.currentWardrobeSlot
@@ -159,7 +157,7 @@ object WardrobeAPI {
         if (currentPage == null) return
 
         val itemsList = event.inventoryItems
-        for (slot in wardrobeSlots.filter { it.isInCurrentPage }) {
+        for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
             slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
             slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
             slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
