@@ -176,8 +176,8 @@ object VerminTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetvermintracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = RiftAPI.inRift() && config.enabled

@@ -138,6 +138,7 @@ object ChatUtils {
      *
      * @see CHAT_PREFIX
      */
+    //TODO rename to runHypixelCommand
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val fullMessage = msgPrefix + message
