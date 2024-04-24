@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,6 +23,10 @@ object MiningAPI {
     val coldReset by group.pattern(
         "cold.reset",
         "§cThe warmth of the campfire reduced your §r§b❄ Cold §r§cto 0!|§c ☠ §r§7You froze to death§r§7."
+    )
+    val coldResetDeath by group.pattern(
+        "cold.deathreset",
+        "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)"
     )
 
     private var cold = 0
@@ -50,6 +56,12 @@ object MiningAPI {
         if (coldReset.matches(event.message)) {
             updateCold(0)
             lastColdReset = SimpleTimeMark.now()
+        }
+        coldResetDeath.matchMatcher(event.message) {
+            if (group("name") == LorenzUtils.getPlayerName()) {
+                updateCold(0)
+                lastColdReset = SimpleTimeMark.now()
+            }
         }
     }
 
