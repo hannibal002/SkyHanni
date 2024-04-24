@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.abs
 
 class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
@@ -115,7 +116,7 @@ class VisitorRewardWarning {
         val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
-        val formattedLoss = loss.let { NumberUtil.format(it) }
+        val formattedLoss = abs(loss).let { NumberUtil.format(it) }
         blockedToolTip.add(blockReason(blockReason, pricePerCopper, loss, formattedLoss))
         blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
 
@@ -135,7 +136,7 @@ class VisitorRewardWarning {
             if (loss > 0)
                 "${blockReason.description} §7(§6$formattedLoss §7selling §9Green Thumb I§7)"
             else
-                "§7(§6$formattedLoss §7profit)"
+                "§7(§6$formattedLoss §7profit §7selling §9Green Thumb I§7)"
 
         else -> blockReason.description
     }
