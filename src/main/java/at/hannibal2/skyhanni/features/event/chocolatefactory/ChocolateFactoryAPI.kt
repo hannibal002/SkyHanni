@@ -66,7 +66,7 @@ object ChocolateFactoryAPI {
     )
     private val prestigeLevelPattern by patternGroup.pattern(
         "prestige.level",
-        "'§6Chocolate Factory (?<prestige>[IVX]+)"
+        "§6Chocolate Factory (?<prestige>[IVX]+)"
     )
     private val clickMeRabbitPattern by patternGroup.pattern(
         "rabbit.clickme",
