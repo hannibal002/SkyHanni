@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -38,7 +39,9 @@ object ChocolateFactoryTimeTowerManager {
             ChatUtils.clickableChat(
                 "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
                     "Click here to use one",
-                "cf"
+                onClick = {
+                    HypixelCommands.chocolateFactory()
+                }
             )
             SoundUtils.playBeepSound()
             lastTimeTowerWarning = SimpleTimeMark.now()
@@ -59,7 +62,9 @@ object ChocolateFactoryTimeTowerManager {
         ChatUtils.clickableChat(
             "§cYour Time Tower is full §7(${timeTowerCharges()})§c, " +
                 "Use one to avoid wasting time tower usages!",
-            "cf"
+            onClick = {
+                HypixelCommands.chocolateFactory()
+            }
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()
