@@ -39,6 +39,8 @@ object WardrobeAPI {
 
     var wardrobeSlots = listOf<WardrobeSlot>()
 
+    val AIR = ItemStack(Blocks.air)
+
     class WardrobeSlot(
         val id: Int,
         val page: Int,
@@ -52,7 +54,7 @@ object WardrobeAPI {
     private fun WardrobeSlot.getData() = storage?.wardrobeData?.getOrPut(id) {
         WardrobeData(
             id,
-            mutableMapOf(1 to null, 2 to null, 3 to null, 4 to null),
+            (1..4).associateWith { null }.toMutableMap(),
             false,
             false,
         )
@@ -82,7 +84,8 @@ object WardrobeAPI {
             getData()?.armor?.set(4, value)
         }
 
-    fun WardrobeSlot.getArmor(): List<ItemStack?> = getData()?.armor?.toSortedMap()?.values?.toList() ?: emptyList()
+    fun WardrobeSlot.getArmor(): List<ItemStack> =
+        (1..4).associateWith { getData()?.armor?.get(it) ?: AIR }.toSortedMap().values.toList()
 
     var WardrobeSlot.locked: Boolean
         get() = getData()?.locked ?: true
