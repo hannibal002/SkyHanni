@@ -4,15 +4,17 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,10 @@ public class MiscConfig {
     @Expose
     @Category(name = "Commands", desc = "Enable or disable commands.")
     public CommandsConfig commands = new CommandsConfig();
+
+    @Expose
+    @Category(name = "Party Commands", desc = "Enable or disable party commands.")
+    public PartyCommandsConfig partyCommands = new PartyCommandsConfig();
 
     @Expose
     @Category(name = "Minions", desc = "The minions on your private island.")
@@ -92,6 +98,16 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Bits Features", desc = "")
+    @Accordion
+    public BitsConfig bits = new BitsConfig();
+
+    @Expose
+    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
+    @Accordion
+    public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
@@ -131,12 +147,6 @@ public class MiscConfig {
     public boolean colorMonthNames = false;
 
     @Expose
-    @ConfigOption(name = "No Bits Warning", desc = "Alerts you when you have no bits available.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean noBitsWarning = true;
-
-    @Expose
     @ConfigOption(name = "Explosions Hider", desc = "Hide explosions.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -167,6 +177,7 @@ public class MiscConfig {
     public boolean playerMovementSpeed = false;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
     @Expose
@@ -180,13 +191,6 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean restorePieceOfWizardPortalLore = true;
-
-    @Expose
-    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coordinates sent by Patcher.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean patcherSendCoordWaypoint = false;
-
 
     @Expose
     @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
@@ -215,6 +219,10 @@ public class MiscConfig {
     public boolean showTimeInLimbo = true;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "showTimeInLimbo")
+    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
+
+    @Expose
     @ConfigOption(
         name = "Lesser Orb of Healing Hider",
         desc = "Hides the Lesser Orb of Healing.")
@@ -229,13 +237,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     public boolean lockMouseLookChatMessage = true;
 
-    @Expose
-    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
-
+    // Does not have a config element!
     @Expose
     public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
+    @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose
@@ -244,4 +251,9 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
+
+    @ConfigOption(name = "Hide Far Entities", desc = "")
+    @Accordion
+    @Expose
+    public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 }

@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -491,14 +492,16 @@ object ComposterOverlay {
         }
 
         val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
+            HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
             val isDwarvenMineable = internalName.let { it.equals("VOLTA") || it.equals("OIL_BARREL") || it.equals("BIOFUEL") }
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
-                "sax"
+                onClick = {
+                    HypixelCommands.sacks()
+                }
             )
             return
         }
@@ -513,15 +516,18 @@ object ComposterOverlay {
             return
         }
 
-        ChatUtils.sendCommandToServer("gfs ${internalName.asString()} ${itemsNeeded - havingInInventory}")
+
+        HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
-            } else if (!SkyHanniMod.feature.inventory.gfs.bazaarGFS || itemsNeeded == havingInTotal){
+            } else {
                 ChatUtils.clickableChat( // TODO Add this as a seperate feature, and then don't send any msg if the feature is disabled
-                    "You're out of $itemName §ein your sacks! §lCLICK §r§eto buy more on the Bazaar!",
-                    "bz ${itemName.removeColor()}"
+                    "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
+                    onClick = {
+                        HypixelCommands.bazaar(itemName.removeColor())
+                    }
                 )
             }
         }

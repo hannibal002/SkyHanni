@@ -34,6 +34,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + SkyBlock XP Chat. - Thunderblade73
     + Sends the SkyBlock XP message from the action bar into the chat.
 + Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
++ Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
++ Option to reorder or hide every part of a player chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Parts to move around: SkyBlock Level, Emblem, player name, guild rank, private island rank, crimson faction, iron man mode, bingo level and Private Island Guest.
+    + Player messages impacted by this: all chat, party, guild, private chat, /show.
+    + This might break hover/click on chat actions (Will be fixed later).
++ Hide Level Brackets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Hide the gray brackets in front of and behind the level numbers.
++ Level Color As Name. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Use the color of the SkyBlock level for the player color.
 
 #### Chat Filter
 
@@ -81,14 +90,18 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Soulweaver Skull Hider in the Dungeon Object Hider. - nea
     + Hide the annoying soulweaver skulls that float around you if you have the soulweaver gloves equipped.
 + Hide particles and damage splashes during the terracotta phase in dungeons F6 and M6. - hannibal2
-+ Added available classes in the tooltip. - Conutik
++ Show available classes in the tooltip. - Conutik
     + Shows in the dungeon party finder when hovering over a group.
     + Highlights your selected class in green if it's available.
 + Kismet tracking for dungeon chests. - Thunderblade73
     + Highlight chests which have been rerolled inside Croesus
     + Shows kismet amount at the reroll button
-+ Added SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
++ SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
     + Warn shorty before a Shadow Assassin jumps to you in dungeons.
++ Notifications for architect on puzzle fail. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1197)
+    + Shows Title.
+    + Shows button in chat to retrieve from sack.
+    + Only works when having enough Architect First Drafts in the sack.
 
 </details>
 <details open><summary>
@@ -657,6 +670,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
 + Visitor's Logbook Stats. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1287)
     + Show all your visited/accepted/denied visitors stats in a display.
++ Stereo Harmony Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1324)
+    + Options to show/hide boosted crop and pest icons.
++ Added Super Craft button to visitors for ease of access. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1173)
+    + Checks if you have enough materials to craft the items and depending on that shows the button or not.
 
 </details>
 <details open><summary>
@@ -732,6 +749,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Horsezooka Hider**
     + Hide horses while holding the Horsezooka in the hand.
 + Vermin Tracker. - walker
++ Vermin Highlight. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1457)
+    + Highlights Vermin mobs in the West Village in the Rift.
+    + Change Highlight color.
 
 </details>
 <details open><summary>
@@ -750,13 +770,28 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
-+ Added Deep Caverns Parkour. - hannibal2
++ Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
 + Display upcoming mining events. - CalMWolfs
     + Show what mining events are currently occurring in both the Dwarven Mines and Crystal Hollows.
 + Area Walls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1266)
     + Show walls between the main areas of the Crystal Hollows.
     + Option to show the walls also when inside the Nucleus.
++ Fossil Excavator Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1427)
+    + Shows where to next click for optimal chance of solving the fossil. If there is a fossil this will find it within 18 moves.
++ Excavation Profit Tracker. - hannibal2 + Empa (https://github.com/hannibal002/SkyHanni/pull/1432)
+    + Count all drops you gain while excavating in the Fossil Research Center.
+    + Track Glacite Powder gained as well (no profit, but progress).
+    + Track Fossil Dust and use it for profit calculation.
++ Mining Notifications. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1429)
+    + Mining events, including Mineshaft spawning, Suspicious Scrap drops, and Cold going above a threshold.
++ Profit Per Excavation. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1439)
+    + Show profit/loss in chat after each excavation.
+    + Also include breakdown information on hover.
++ Textured cold overlay to Glacite Tunnels. - j10a1n15, Empa (https://github.com/hannibal002/SkyHanni/pull/1438)
+    + Change at what cold level the texture should appear.
++ Glacial Powder as stack size in the Fossil Excavator. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
++ Highlight own Golden/Diamond Goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
 
 </details>
 <details open><summary>
@@ -1044,6 +1079,28 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + A ton of settings.
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
++ Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
+    + Simply right-click a HUD element in the HUD editor to jump to its associated options.
+    + Does not yet work on every GUI element. Wait for the missing elements in the following betas.
++ Quiver Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
+    + Only shows the type of arrow when wearing a Skeleton Master Chestplate.
++ Low Quiver Reminder at the end of Dungeon/Kuudra run. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
++ party chat commands. - !nea (https://github.com/hannibal002/SkyHanni/pull/1433)
+    + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
+    + Added `!pw` (and aliases) as a command that allows others to request a warp.
++ Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
++ Stuff for Chocolate Factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1434)
+    + Show info about your chocolate factory.
+    + Show which upgrades you can afford and which to buy.
+    + Notification to click on rabbit in the inventory.
+    + Notify you if you are close to having your rabbits crushed.
++ Allow party members to request allinvite to be turned on. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1464)
+    + Say !allinv in party chat for them to enable all invite.
++ Added Hide Far Entities. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1064)
+    + Can perhaps increase FPS for some users by 5% to 150%.
+    + Options to change the distance and number of mobs to always show.
+    + Option to disable in garden.
++ Hoppity rabbit collection stats summary. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1482)
 
 </details>
 <details open><summary>

@@ -46,7 +46,7 @@ class ShowMotesNpcSellPrice {
         if (inInventory) {
             config.inventoryValue.position.renderStringsAndItems(
                 display,
-                itemScale = 1.3,
+                itemScale = 0.7,
                 posLabel = "Inventory Motes Value"
             )
         }
@@ -146,7 +146,14 @@ class ShowMotesNpcSellPrice {
                     add("")
                     add("§6Total value: §d$price coins")
                 }
-                add(Renderable.hoverTips("§6${stack.displayName}: §b$price", tips, highlightsOnHoverSlots = index, stack = stack))
+                add(
+                    Renderable.hoverTips(
+                        "§6${stack.displayName}: §b$price",
+                        tips,
+                        highlightsOnHoverSlots = index,
+                        stack = stack
+                    )
+                )
             })
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()

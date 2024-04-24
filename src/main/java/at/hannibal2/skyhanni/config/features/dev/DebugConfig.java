@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.config.features.dev;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.data.Mayor;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class DebugConfig {
@@ -136,6 +136,7 @@ public class DebugConfig {
     @ConfigEditorBoolean
     public boolean neverFunnyTime = false;
 
+    // Does not have a config element!
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
 }

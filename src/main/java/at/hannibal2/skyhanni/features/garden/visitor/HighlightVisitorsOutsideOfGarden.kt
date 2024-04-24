@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -63,9 +63,8 @@ class HighlightVisitorsOutsideOfGarden {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.highlightVisitors) return
-        if (!event.repeatSeconds(1)) return
         EntityUtils.getEntities<EntityLivingBase>()
             .filter { it !is EntityArmorStand && isVisitor(it) }
             .forEach {
@@ -98,9 +97,8 @@ class HighlightVisitorsOutsideOfGarden {
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             event.isCanceled = true
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
-                ChatUtils.clickableChat(
-                    "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    "/sh block interacting with visitors"
+                ChatUtils.chatAndOpenConfig("Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                    GardenAPI.config.visitors::blockInteracting
                 )
             }
         }

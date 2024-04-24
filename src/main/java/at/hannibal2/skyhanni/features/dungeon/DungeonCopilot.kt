@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,14 +20,24 @@ class DungeonCopilot {
 
     private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
 
-    private val countdownPattern =
-        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern()
+    private val patternGroup = RepoPattern.group("dungeon.copilot")
+    private val countdownPattern by patternGroup.pattern(
+        "countdown",
+        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute."
+    )
+    private val witherDoorPattern by patternGroup.pattern(
+        "wither.door",
+        "(.*) opened a §r§8§lWITHER §r§adoor!"
+    )
+    private val bloodDoorPattern by patternGroup.pattern(
+        "blood.door",
+        "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
+    )
+
     private val keyPatternsList = listOf(
         "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
     )
-    private val witherDoorPattern = "(.*) opened a §r§8§lWITHER §r§adoor!".toPattern()
-    private val bloodDoorPattern = "§cThe §r§c§lBLOOD DOOR§r§c has been opened!".toPattern()
 
     private var nextStep = ""
     private var searchForKey = false
@@ -91,7 +102,7 @@ class DungeonCopilot {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
@@ -130,9 +141,7 @@ class DungeonCopilot {
         changeNextStep("")
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && config.enabled
-    }
+    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

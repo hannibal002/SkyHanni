@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
@@ -71,7 +71,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
@@ -175,19 +175,20 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
-        if (quests.any {
-                it.state == QuestState.READY_TO_COLLECT ||
-                it.state == QuestState.NOT_ACCEPTED ||
-                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
-            val location = when (reputationHelper.factionType) {
-                FactionType.BARBARIAN -> townBoardBarbarian
-                FactionType.MAGE -> townBoardMage
+        if (!quests.any { it.needsTownBoardLocation() }) return
+        val location = when (reputationHelper.factionType) {
+            FactionType.BARBARIAN -> townBoardBarbarian
+            FactionType.MAGE -> townBoardMage
 
-                FactionType.NONE -> return
-            }
-            event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(location, "Town Board", 1.5)
+            FactionType.NONE -> return
         }
+        event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+        event.drawDynamicText(location, "Town Board", 1.5)
+    }
+
+    private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
+        state == QuestState.READY_TO_COLLECT || state == QuestState.NOT_ACCEPTED ||
+            (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
     fun render(display: MutableList<List<Any>>) {

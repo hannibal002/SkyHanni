@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -21,6 +22,7 @@ class PestSpawn {
     private val config get() = PestAPI.config.pestSpawn
 
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
+
     /**
      * REGEX-TEST: §6§lGROSS! §7A §6Pest §7has appeared in §aPlot §7- §b4§7!
      */
@@ -28,6 +30,7 @@ class PestSpawn {
         "one",
         "§6§l.*! §7A §6Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!"
     )
+
     /**
      * REGEX-TEST: §6§lGROSS! §7A §6Pest §7has appeared in §aThe Barn§7!
      */
@@ -35,6 +38,7 @@ class PestSpawn {
         "onebarn",
         "§6§l.*! §7A §6Pest §7has appeared in §a(?<plot>The Barn)§7!"
     )
+
     /**
      * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aPlot §7- §b2§7!
      */
@@ -42,6 +46,7 @@ class PestSpawn {
         "multiple",
         "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!"
     )
+
     /**
      * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aThe Barn§7!
      */
@@ -49,6 +54,7 @@ class PestSpawn {
         "multiplebarn",
         "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §a(?<plot>The Barn)§7!"
     )
+
     /**
      * REGEX-TEST: §6§lGROSS! §7While you were offline, §6Pests §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
      */
@@ -94,7 +100,7 @@ class PestSpawn {
         }
         offlinePestsSpawn.matchMatcher(message) {
             val plots = group("plots")
-            plotNames = plots.removeColor().split(", "," and ").toMutableList()
+            plotNames = plots.removeColor().split(", ", " and ").toMutableList()
             pestSpawn(0, plotNames, true)
             // blocked = true
         }
@@ -114,7 +120,7 @@ class PestSpawn {
         PestSpawnEvent(amount, plotNames, unknownAmount).postAndCatch()
 
         if (unknownAmount) return // todo make this work with offline pest spawn messages
-        val plotName = plotNames.firstOrNull()
+        val plotName = plotNames.firstOrNull() ?: error("first plot name is null")
         val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 
@@ -123,7 +129,9 @@ class PestSpawn {
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
-            ChatUtils.clickableChat(message, "tptoplot $plotName")
+            ChatUtils.clickableChat(message, onClick = {
+                HypixelCommands.teleportToPlot(plotName)
+            })
         }
     }
 
