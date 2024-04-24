@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -57,15 +58,18 @@ object ChocolateFactoryBarnManager {
         if (profileStorage.maxRabbits == -1) {
             ChatUtils.clickableChat(
                 "Open your chocolate factory to see your barn's capacity status!",
-                "cf"
+                onClick = {
+                    HypixelCommands.chocolateFactory()
+                }
             )
             return
         }
 
         ChatUtils.clickableChat(
-            "§cYour barn is almost full! " +
-                "§7(${barnStatus()}). §cUpgrade it so they don't get crushed!",
-            "cf"
+            "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed!",
+            onClick = {
+                HypixelCommands.chocolateFactory()
+            }
         )
         SoundUtils.playBeepSound()
         lastBarnFullWarning = SimpleTimeMark.now()
