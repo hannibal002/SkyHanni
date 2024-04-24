@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -107,6 +108,7 @@ public class TrevorTheTrapperConfig {
     }
 
     @Expose
+    @ConfigLink(owner = TrevorTheTrapperConfig.class, field = "dataTracker")
     public Position position = new Position(10, 80, false, true);
 
     @Expose
@@ -155,5 +157,6 @@ public class TrevorTheTrapperConfig {
     public boolean trapperCooldownGui = false;
 
     @Expose
+    @ConfigLink(owner = TrevorTheTrapperConfig.class, field = "trapperCooldownGui")
     public Position trapperCooldownPos = new Position(10, 10, false, true);
 }

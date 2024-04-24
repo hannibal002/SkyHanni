@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -111,8 +112,8 @@ class HypixelData {
         var profileName = ""
         var joinedWorld = SimpleTimeMark.farPast()
 
-        var skyBlockArea = "?"
-        var skyBlockAreaWithSymbol = "?"
+        var skyBlockArea: String? = null
+        var skyBlockAreaWithSymbol: String? = null
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -182,6 +183,7 @@ class HypixelData {
             ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
                 return group("maxamount").toInt()
             }
+            if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) return 24
             return if (serverId?.startsWith("mega") == true) 80 else 26
         }
 
@@ -227,6 +229,8 @@ class HypixelData {
         locraw.forEach { locraw[it.key] = "" }
         joinedWorld = SimpleTimeMark.now()
         serverId = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent
@@ -237,6 +241,8 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         locrawData = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent

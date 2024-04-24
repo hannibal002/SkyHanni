@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -192,8 +192,7 @@ object FishingProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         coinsChatPattern.matchMatcher(event.message) {
-            val coins = group("coins").formatNumber()
-            tracker.addCoins(coins.toInt())
+            tracker.addCoins(group("coins").formatInt())
             addCatch()
         }
     }
@@ -238,8 +237,8 @@ object FishingProfitTracker {
         tracker.firstUpdate()
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetfishingtracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight

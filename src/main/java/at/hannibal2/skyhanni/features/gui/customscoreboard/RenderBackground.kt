@@ -56,7 +56,7 @@ class RenderBackground {
         GlStateManager.pushAttrib()
 
         GlStateManager.color(1f, 1f, 1f, 1f)
-
+        GL11.glDepthMask(false)
 
         if (backgroundConfig.enabled) {
             if (backgroundConfig.useCustomBackgroundImage) {
@@ -81,7 +81,7 @@ class RenderBackground {
                 )
             }
         }
-
+        GL11.glDepthMask(true)
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
     }

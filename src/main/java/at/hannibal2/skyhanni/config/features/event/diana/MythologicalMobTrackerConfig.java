@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.event.diana;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class MythologicalMobTrackerConfig {
 
@@ -16,6 +17,7 @@ public class MythologicalMobTrackerConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigLink(owner = MythologicalMobTrackerConfig.class, field = "enabled")
     public Position position = new Position(20, 20, false, true);
 
     @Expose

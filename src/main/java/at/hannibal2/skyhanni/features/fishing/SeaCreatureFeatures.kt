@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -94,7 +95,7 @@ class SeaCreatureFeatures {
         event.move(2, "fishing.rareSeaCreatureHighlight", "fishing.rareCatches.highlight")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.inDungeons && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         if (entity is EntityLivingBase && entity in rareSeaCreatures && entity.distanceToPlayer() < 30) {

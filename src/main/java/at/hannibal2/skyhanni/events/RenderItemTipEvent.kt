@@ -9,6 +9,7 @@ class RenderItemTipEvent(
 
     var stackTip = ""
         set(value) {
+            if (value.isEmpty()) return
             renderObjects.add(RenderObject(value, 0, 0))
         }
 }
