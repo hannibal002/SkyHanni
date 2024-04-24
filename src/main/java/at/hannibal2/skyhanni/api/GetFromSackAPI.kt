@@ -58,6 +58,13 @@ object GetFromSackAPI {
     ) =
         ChatUtils.clickableChat(text, "${commands.first()} ${item.internalName.asString()} ${item.amount}")
 
+    fun getFromChatMessageSackItem(
+        item: NEUInternalName,
+        amount: Int,
+        text: String = "§lCLICK HERE§r§e to grab §ax${amount} §9${item.asString()}§e from sacks!"
+    ) =
+        getFromChatMessageSackItems(item.makePrimitiveStack(amount), text)
+
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
     fun Slot.getFromSackWhenClicked(items: List<PrimitiveItemStack>) = getFromSlotClickedSackItems(items, slotIndex)

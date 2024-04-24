@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.GetFromSackAPI.getFromChatMessageSackItem
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
@@ -9,11 +10,11 @@ import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.runDelayed
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -22,6 +23,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object MiningNotifications {
+
+    val ASCENSION_ROPE = "ASCENSION_ROPE".asInternalName()
 
     enum class MiningNotificationList(val str: String, val notification: String) {
         MINESHAFT_SPAWN("§bGlacite Mineshaft", "§bMineshaft"),
@@ -72,7 +75,7 @@ object MiningNotifications {
             frostbitePattern.matches(message) -> {
                 if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope) {
                     runDelayed(0.5.seconds) {
-                        ChatUtils.clickableChat("Click here to get an Ascension Rope!", "/gfs ASCENSION_ROPE 1")
+                        getFromChatMessageSackItem(ASCENSION_ROPE, 1)
                     }
                 }
             }
