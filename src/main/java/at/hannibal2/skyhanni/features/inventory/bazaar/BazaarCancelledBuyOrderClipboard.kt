@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -47,9 +48,16 @@ class BazaarCancelledBuyOrderClipboard {
         val stack = event.inventoryItems[11] ?: return
         if (!stack.name.contains("Cancel Order")) return
 
-        stack.getLore().matchFirst(lastAmountPattern) {
+        val lore = stack.getLore()
+        lore.matchFirst(lastAmountPattern) {
             latestAmount = group("amount").formatInt()
+            return
         }
+        ErrorManager.logErrorStateWithData(
+            "BazaarCancelledBuyOrderClipboard error",
+            "lastAmountPattern can not find latestAmount",
+            "lore" to lore,
+        )
     }
 
     @SubscribeEvent
@@ -59,7 +67,7 @@ class BazaarCancelledBuyOrderClipboard {
             group("coins").formatInt().addSeparators()
         } ?: return
 
-        val latestAmount = latestAmount ?: error("latest amount is null")
+        val latestAmount = latestAmount ?: return
         event.blockedReason = "bazaar cancelled buy order clipboard"
         ChatUtils.chat("Bazaar buy order cancelled. ${latestAmount.addSeparators()} saved to clipboard. ($coins coins)")
         OSUtils.copyToClipboard(latestAmount.toString())
