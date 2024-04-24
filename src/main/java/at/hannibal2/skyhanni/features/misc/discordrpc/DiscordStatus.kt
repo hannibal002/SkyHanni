@@ -72,7 +72,7 @@ private fun getCropMilestoneDisplay(): String {
 
     if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
 
-    val text = if (crop.isMaxed() && !allowOverflow) {
+    val text = if (crop.isMaxed(allowOverflow)) {
         "MAXED (${cropCounter.addSeparators()} crops collected)"
     } else {
         "Milestone $tier ($progress)"

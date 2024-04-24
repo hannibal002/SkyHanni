@@ -100,6 +100,8 @@ public class CropMilestonesConfig {
         name = "Overflow Milestones",
         desc = "Show overflow crop milestones beyond 46.")
     @ConfigEditorBoolean
+    @Deprecated
+    // TODO delete
     public boolean overflowMilestones = false;
 
     @Expose

@@ -3,19 +3,15 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -103,8 +99,12 @@ object GardenCropMilestones {
         cropCounter?.set(this, counter)
     }
 
-    fun CropType.isMaxed(): Boolean {
-        if (config.overflowMilestones) return false
+    // TODO create new option in overflow settings for best crop time
+    @Deprecated("do not use config.overflowMilestones", ReplaceWith(""))
+    fun CropType.isMaxed() = isMaxed(config.overflowMilestones)
+
+    fun CropType.isMaxed(useOverflow: Boolean): Boolean {
+        if (useOverflow) return false
 
         // TODO change 1b
         val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now

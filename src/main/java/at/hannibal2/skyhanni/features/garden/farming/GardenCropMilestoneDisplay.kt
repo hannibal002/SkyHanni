@@ -160,7 +160,7 @@ object GardenCropMilestoneDisplay {
 
         val list = mutableListOf<Any>()
         list.addCropIcon(crop)
-        if (crop.isMaxed() && !overflowDisplay) {
+        if (crop.isMaxed(overflowDisplay)) {
             list.add("§7" + crop.cropName + " §eMAXED")
         } else {
             list.add("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
@@ -178,7 +178,7 @@ object GardenCropMilestoneDisplay {
             Pair(have, need)
         }
 
-        lineMap[2] = if (crop.isMaxed() && !overflowDisplay) {
+        lineMap[2] = if (crop.isMaxed(overflowDisplay)) {
             val haveFormat = counter.addSeparators()
             Collections.singletonList("§7Counter: §e$haveFormat")
         } else {
@@ -193,7 +193,7 @@ object GardenCropMilestoneDisplay {
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
-            if (!crop.isMaxed() || overflowDisplay) {
+            if (!crop.isMaxed(overflowDisplay)) {
                 val missing = need - have
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
@@ -219,7 +219,7 @@ object GardenCropMilestoneDisplay {
         }
 
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
-        lineMap[6] = if (crop.isMaxed() && !overflowDisplay) {
+        lineMap[6] = if (crop.isMaxed(overflowDisplay)) {
             Collections.singletonList("§7Percentage: §e100%")
         } else {
             Collections.singletonList("§7Percentage: §e$percentageFormat")
@@ -275,7 +275,7 @@ object GardenCropMilestoneDisplay {
     private fun addMushroomCowData() {
         val mushroom = CropType.MUSHROOM
         val allowOverflow = overflowConfig.display
-        if (mushroom.isMaxed() && !allowOverflow) {
+        if (mushroom.isMaxed(allowOverflow)) {
             mushroomCowPerkDisplay = listOf(
                 listOf("§6Mooshroom Cow Perk"),
                 listOf("§eMushroom crop is maxed!"),
