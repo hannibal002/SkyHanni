@@ -192,7 +192,7 @@ class WardrobeOverlay {
     }
 
     private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
-        val buttonWidth = 20
+        val buttonWidth = 25
         val centerX = screenWidth / 2
         val buttonY = screenHeight / 2 + playerHeight / 2 + 15
         val padding = 10
@@ -213,6 +213,7 @@ class WardrobeOverlay {
                     onClick = { tempToggleShowOverlay = false },
                 ),
                 Color.BLACK,
+                padding = 0,
             ),
             Renderable.drawInsideRoundedRect(
                 Renderable.clickAndHoverable(
@@ -229,6 +230,7 @@ class WardrobeOverlay {
                     onClick = { favoriteToggle = !favoriteToggle },
                 ),
                 if (favoriteToggle) Color.GREEN else Color.RED,
+                padding = 0,
             ),
         )
 
@@ -256,6 +258,7 @@ class WardrobeOverlay {
                 }
 
                 override fun getName(): String {
+                    // Future TODO: Empa wants to add per slot names
                     return ""
                 }
             }
