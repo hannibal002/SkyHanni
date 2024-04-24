@@ -23,14 +23,15 @@ object ChocolateFactoryTimeTowerManager {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (ChocolateFactoryAPI.inChocolateFactory) return
         val profileStorage = profileStorage ?: return
-
-        val nextCharge = SimpleTimeMark(profileStorage.nextTimeTower)
 
         if (SimpleTimeMark(profileStorage.currentTimeTowerEnds).isInPast()) {
             profileStorage.currentTimeTowerEnds = SimpleTimeMark.farPast().toMillis()
         }
+
+        if (ChocolateFactoryAPI.inChocolateFactory) return
+
+        val nextCharge = SimpleTimeMark(profileStorage.nextTimeTower)
 
         if (nextCharge.isInPast() && !nextCharge.isFarPast() && currentCharges() < maxCharges()) {
             profileStorage.currentTimeTowerUses++
