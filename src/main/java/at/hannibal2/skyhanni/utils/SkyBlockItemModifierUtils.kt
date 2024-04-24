@@ -226,7 +226,7 @@ object SkyBlockItemModifierUtils {
 
                 val quality = GemstoneQuality.getByName(value)
                 if (quality == null) {
-                    ChatUtils.debug("Gemstone quality is null for item $name: ('$key' = '$value')")
+                    ChatUtils.debug("Gemstone quality is null for item $name§7: ('$key' = '$value')")
                     continue
                 }
                 if (type != null) {
@@ -235,7 +235,7 @@ object SkyBlockItemModifierUtils {
                     val newKey = gemstones.getString(key + "_gem")
                     val newType = GemstoneType.getByName(newKey)
                     if (newType == null) {
-                        ChatUtils.debug("Gemstone type is null for item $name: ('$newKey' with '$key' = '$value')")
+                        ChatUtils.debug("Gemstone type is null for item $name§7: ('$newKey' with '$key' = '$value')")
                         continue
                     }
                     list.add(GemstoneSlot(newType, quality))

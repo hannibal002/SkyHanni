@@ -93,7 +93,7 @@ public class AdvancedPlayerListConfig {
     public boolean hideFactions = false;
 
     @Expose
-    @ConfigOption(name = "Mark Known Players", desc = "Show special icons behind the name of known players.")
+    @ConfigOption(name = "Mark Known Players", desc = "Show special icons after the name of known players.")
     @ConfigEditorBoolean
     public boolean markKnownPlayers = false;
 
@@ -101,13 +101,4 @@ public class AdvancedPlayerListConfig {
     @ConfigOption(name = "Known Players Customization", desc = "")
     @Accordion
     public KnownPlayersCustomization knownPlayersCustomization = new KnownPlayersCustomization();
-
-    @Expose
-    @ConfigOption(
-        name = "Mark SkyHanni Devs",
-        desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
-            "§eThose are the folks that coded the mod for you for free :)"
-    )
-    @ConfigEditorBoolean
-    public boolean markSkyHanniContributors = false;
 }

@@ -24,7 +24,7 @@ object PurseAPI {
 
     private var inventoryCloseTime = 0L
     var currentPurse = 0.0
-      private set
+        private set
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {

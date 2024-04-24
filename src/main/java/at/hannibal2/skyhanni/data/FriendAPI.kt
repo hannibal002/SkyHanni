@@ -33,6 +33,7 @@ object FriendAPI {
         "addbest",
         ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*"
     )
+
     /**
      * REGEX-TEST:
      * §eClick here to view §bAaronL_Jackson§e's profile

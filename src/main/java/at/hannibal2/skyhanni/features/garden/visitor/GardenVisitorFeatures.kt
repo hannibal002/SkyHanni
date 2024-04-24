@@ -118,8 +118,7 @@ object GardenVisitorFeatures {
             if (line == "§7Items Required:") continue
             if (line.isEmpty()) break
 
-            val pair = ItemUtils.readItemAmount(line)
-            if (pair == null) {
+            val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Could not read Shopping List in Visitor Inventory", "ItemUtils.readItemAmount returns null",
                     "line" to line,
@@ -129,7 +128,6 @@ object GardenVisitorFeatures {
                 )
                 continue
             }
-            val (itemName, amount) = pair
             val internalName = NEUInternalName.fromItemName(itemName)
             visitor.shoppingList[internalName] = amount
         }
@@ -357,7 +355,7 @@ object GardenVisitorFeatures {
         }
 
         readingShoppingList = true
-        val finalList = toolTip.map { it.removePrefix("§5§o")}.toMutableList()
+        val finalList = toolTip.map { it.removePrefix("§5§o") }.toMutableList()
         var offset = 0
         for ((i, formattedLine) in finalList.toMutableList().withIndex()) {
             val index = i + offset
@@ -464,6 +462,7 @@ object GardenVisitorFeatures {
             event.blockedReason = "new_visitor_arrived"
         }
 
+        // TODO use NpcChatEvent
         if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
         }

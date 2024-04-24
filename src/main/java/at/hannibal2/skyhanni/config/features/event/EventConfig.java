@@ -23,6 +23,10 @@ public class EventConfig {
     @Expose
     public WinterConfig winter = new WinterConfig();
 
+    @Expose
+    @Category(name = "Hoppity", desc = "Features for the Hoppity event and the chocolate factory.")
+    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
+
     @ConfigOption(name = "City Project", desc = "")
     @Accordion
     @Expose
