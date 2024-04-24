@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.event.chocolatefactory
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryStats {
@@ -71,6 +73,17 @@ object ChocolateFactoryStats {
             .map { list[it.ordinal] }
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(42, "event.chocolateFactory.statsDisplayList") { element ->
+            val jsonArray = element.asJsonArray
+
+            jsonArray.add(JsonPrimitive("TIME_TOWER"))
+            jsonArray.add(JsonPrimitive("TIME_TO_PRESTIGE"))
+
+            jsonArray
+        }
+    }
 
     enum class ChocolateFactoryStat(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         HEADER("§6§lChocolate Factory Stats"),
