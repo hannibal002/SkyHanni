@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -51,7 +51,11 @@ object RenderUtils {
         }
     }
 
-    enum class VerticalAlignment { TOP, CENTER, BOTTOM }
+    enum class VerticalAlignment {
+        TOP,
+        CENTER,
+        BOTTOM,
+    }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
@@ -439,7 +443,7 @@ object RenderUtils {
         string: String?,
         offsetX: Int = 0,
         offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment
+        alignmentEnum: HorizontalAlignment,
     ): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
@@ -482,7 +486,7 @@ object RenderUtils {
     fun Position.renderStringsAlignedWidth(
         list: List<Pair<String, HorizontalAlignment>>,
         extraSpace: Int = 0,
-        posLabel: String
+        posLabel: String,
     ) {
         if (list.isEmpty()) return
 
@@ -558,12 +562,15 @@ object RenderUtils {
      */
     fun Position.renderSingleLineWithItems(
         list: List<Any?>,
-        itemScale: Double = NEUItems.itemFontSize,
-        posLabel: String
+        posLabel: String,
     ) {
         if (list.isEmpty()) return
-        val longestX = renderLine(list, 0, itemScale)
-        GuiEditManager.add(this, posLabel, longestX, 10)
+        renderRenderables(
+            listOf(
+                Renderable.horizontalContainer(
+                    list.mapNotNull { Renderable.fromAny(it) }
+                )), posLabel = posLabel)
+        // TODO Future write that better
     }
 
     private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
@@ -584,13 +591,17 @@ object RenderUtils {
         return offsetX
     }
 
-    fun MutableList<Any>.addItemIcon(item: ItemStack, highlight: Boolean = false) {
+    fun MutableList<Any>.addItemIcon(
+        item: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize,
+    ) {
         try {
             if (highlight) {
                 // Hack to add enchant glint, like Hypixel does it
                 item.addEnchantment(Enchantment.protection, 0)
             }
-            add(item)
+            add(Renderable.itemStack(item, scale))
         } catch (e: NullPointerException) {
             ErrorManager.logErrorWithData(
                 e, "Add item icon to renderable list",
@@ -1180,7 +1191,7 @@ object RenderUtils {
             middlePoint: LorenzVec,
             sidePoint1: LorenzVec,
             sidePoint2: LorenzVec,
-            c: Color
+            c: Color,
         ) {
             GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
             worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
@@ -1194,7 +1205,7 @@ object RenderUtils {
         companion object {
             inline fun draw3D(
                 partialTicks: Float = 0F,
-                crossinline quads: QuadDrawer.() -> Unit
+                crossinline quads: QuadDrawer.() -> Unit,
             ) {
 
                 GlStateManager.enableBlend()
@@ -1449,5 +1460,12 @@ object RenderUtils {
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
+    }
+
+    // TODO move off of neu function
+    fun drawTexturedRect(x: Float, y: Float) {
+        with(ScaledResolution(Minecraft.getMinecraft())) {
+            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
+        }
     }
 }

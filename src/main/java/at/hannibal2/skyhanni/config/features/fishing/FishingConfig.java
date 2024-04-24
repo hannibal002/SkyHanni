@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FishingConfig {
@@ -75,6 +76,7 @@ public class FishingConfig {
     public boolean sharkFishCounter = false;
 
     @Expose
+    @ConfigLink(owner = FishingConfig.class, field = "sharkFishCounter")
     public Position sharkFishCounterPos = new Position(10, 10, false, true);
 
     @Expose

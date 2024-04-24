@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -31,6 +33,32 @@ public class PestFinderConfig {
 
     @Expose
     @ConfigOption(
+        name = "Plot Visibility Type",
+        desc = "Choose how to show infested plots in the world."
+    )
+    @ConfigEditorDropdown
+    public VisibilityType visibilityType = VisibilityType.BOTH;
+
+    public enum VisibilityType {
+        BORDER("Border"),
+        NAME("Name"),
+        BOTH("Both"),
+        ;
+
+        private final String str;
+
+        VisibilityType(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigOption(
         name = "Only With Vacuum",
         desc = "Only show the pest display and waypoints while holding a vacuum in the hand."
     )
@@ -47,6 +75,7 @@ public class PestFinderConfig {
     public int showBorderForSeconds = 1;
 
     @Expose
+    @ConfigLink(owner = PestFinderConfig.class, field = "showDisplay")
     public Position position = new Position(-350, 200, 1.3f);
 
     @Expose

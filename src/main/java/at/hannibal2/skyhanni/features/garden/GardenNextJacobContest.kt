@@ -10,13 +10,14 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,12 +27,15 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
+import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import io.github.moulberry.notenoughupdates.util.toJsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,8 +76,9 @@ object GardenNextJacobContest {
         "§(e○|6☘) §7(?<crop>.*)"
     )
 
-    private val closeToNewYear = "§7Close to new SB year!"
-    private const val maxContestsPerYear = 124
+    private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
+    private const val MAX_CONTESTS_PER_YEAR = 124
+
     private val contestDuration = 20.minutes
 
     private var lastWarningTime = SimpleTimeMark.farPast()
@@ -144,7 +149,7 @@ object GardenNextJacobContest {
         }
 
         if (isCloseToNewYear()) {
-            newList.add(closeToNewYear)
+            newList.add(CLOSE_TO_NEW_YEAR_TEXT)
         } else {
             newList.add("§cOpen calendar for")
             newList.add("§cmore exact data!")
@@ -164,9 +169,8 @@ object GardenNextJacobContest {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(2)) return
 
         if (inCalendar) return
         update()
@@ -183,12 +187,7 @@ object GardenNextJacobContest {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
-
-        val backItem = event.inventoryItems[48] ?: return
-        if (backItem.name != "§aGo Back") return
-        val lore = backItem.getLore()
-        if (lore.size != 1) return
-        if (lore[0] != "§7To Calendar and Events") return
+        if (!monthPattern.matches(event.inventoryName)) return
 
         inCalendar = true
 
@@ -219,7 +218,7 @@ object GardenNextJacobContest {
         }
 
         // Skip if contests are already loaded for this year
-        if (contests.size == maxContestsPerYear) return
+        if (contests.size == MAX_CONTESTS_PER_YEAR) return
 
         // Manually loading contests
         for (item in items) {
@@ -239,7 +238,7 @@ object GardenNextJacobContest {
         }
 
         // If contests were just fully saved
-        if (contests.size == maxContestsPerYear) {
+        if (contests.size == MAX_CONTESTS_PER_YEAR) {
             nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toMillis()
 
             if (isSendEnabled()) {
@@ -248,7 +247,9 @@ object GardenNextJacobContest {
                 } else {
                     ChatUtils.clickableChat(
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
-                        "shsendcontests"
+                        onClick = {
+                            shareContests()
+                        }
                     )
                 }
             }
@@ -291,22 +292,18 @@ object GardenNextJacobContest {
         }
     }
 
-    fun shareContestConfirmed(array: Array<String>) {
-        if (array.size == 1) {
-            if (array[0] == "enable") {
-                config.shareAutomatically = ShareContestsEntry.AUTO
-                SkyHanniMod.feature.storage.contestSendingAsked = true
-                ChatUtils.chat("§2Enabled automatic sharing of future contests!")
-            }
-            return
-        }
-        if (contests.size == maxContestsPerYear) {
+    private fun shareContests() {
+        if (contests.size == MAX_CONTESTS_PER_YEAR) {
             sendContests()
         }
         if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == ShareContestsEntry.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to automatically share future contests!",
-                "shsendcontests enable"
+                onClick = {
+                    config.shareAutomatically = ShareContestsEntry.AUTO
+                    SkyHanniMod.feature.storage.contestSendingAsked = true
+                    ChatUtils.chat("§2Enabled automatic sharing of future contests!")
+                }
             )
         }
     }
@@ -336,7 +333,7 @@ object GardenNextJacobContest {
 
         if (inCalendar) {
             val size = contests.size
-            val percentage = size.toDouble() / maxContestsPerYear
+            val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
             val formatted = LorenzUtils.formatPercentage(percentage)
             list.add("§eDetected $formatted of farming contests this year")
 
@@ -345,7 +342,7 @@ object GardenNextJacobContest {
 
         if (contests.isEmpty()) {
             if (isCloseToNewYear()) {
-                list.add(closeToNewYear)
+                list.add(CLOSE_TO_NEW_YEAR_TEXT)
             } else {
                 list.add("§cOpen calendar to read Jacob contest times!")
             }
@@ -359,7 +356,7 @@ object GardenNextJacobContest {
         if (nextContest != null) return drawNextContest(nextContest, list)
 
         if (isCloseToNewYear()) {
-            list.add(closeToNewYear)
+            list.add(CLOSE_TO_NEW_YEAR_TEXT)
         } else {
             list.add("§cOpen calendar to read Jacob contest times!")
         }
@@ -376,7 +373,7 @@ object GardenNextJacobContest {
     ): MutableList<Any> {
         var duration = nextContest.endTime.timeUntil()
         if (duration > 4.days) {
-            list.add(closeToNewYear)
+            list.add(CLOSE_TO_NEW_YEAR_TEXT)
             return list
         }
 
@@ -390,8 +387,7 @@ object GardenNextJacobContest {
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            list.add(" ")
-            list.addCropIcon(crop, highlight = (crop == boostedCrop))
+            list.addCropIcon(crop, 1.0, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
         if (!activeContest) {
@@ -494,7 +490,7 @@ object GardenNextJacobContest {
         if (display.isEmpty()) {
             config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, 1.0, posLabel = "Next Jacob Contest")
+            config.pos.renderSingleLineWithItems(display, posLabel = "Next Jacob Contest")
         }
     }
 
@@ -513,7 +509,7 @@ object GardenNextJacobContest {
 
     private fun isEnabled() =
         config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
-            (OutsideSbFeature.NEXT_JACOB_CONTEXT.isSelected() && !LorenzUtils.inSkyBlock))
+            (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock))
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -523,7 +519,7 @@ object GardenNextJacobContest {
         config.shareAutomatically == ShareContestsEntry.ASK // (Only call if isSendEnabled())
 
     private fun fetchContestsIfAble() {
-        if (isFetchingContests || contests.size == maxContestsPerYear || !isFetchEnabled()) return
+        if (isFetchingContests || contests.size == MAX_CONTESTS_PER_YEAR || !isFetchEnabled()) return
         // Allows retries every 10 minutes when it's after 1 day into the new year
         val currentMills = System.currentTimeMillis()
         if (lastFetchAttempted + 600_000 > currentMills || currentMills < nextContestsAvailableAt) return
@@ -561,10 +557,12 @@ object GardenNextJacobContest {
                 }
             } else {
                 ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
-                ChatUtils.clickableChat("Click here to open your calendar!", "calendar")
+                ChatUtils.clickableChat("Click here to open your calendar!", onClick = {
+                    HypixelCommands.calendar()
+                })
             }
 
-            if (newContests.count() == maxContestsPerYear) {
+            if (newContests.count() == MAX_CONTESTS_PER_YEAR) {
                 ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
 
                 contests = newContests
@@ -584,7 +582,7 @@ object GardenNextJacobContest {
     }
 
     private fun sendContests() {
-        if (isSendingContests || contests.size != maxContestsPerYear || isCloseToNewYear()) return
+        if (isSendingContests || contests.size != MAX_CONTESTS_PER_YEAR || isCloseToNewYear()) return
 
         isSendingContests = true
 
@@ -613,7 +611,7 @@ object GardenNextJacobContest {
         } else {
             ErrorManager.logErrorStateWithData(
                 "Something went wrong submitting upcoming contests!",
-                "submitContestsToElite not sucessful"
+                "submitContestsToElite not successful"
             )
         }
     } catch (e: Exception) {
@@ -645,6 +643,13 @@ object GardenNextJacobContest {
             ConfigUtils.migrateIntToEnum(element, ShareContestsEntry::class.java)
         }
         event.move(18, "garden.nextJacobContests.everywhere", "garden.nextJacobContests.showOutsideGarden")
+        event.move(33, "garden.jacobContextTimesPos", "garden.jacobContestTimesPosition")
+        event.move(33, "garden.jacobContextTimes", "garden.jacobContestTimes")
+        event.move(33, "garden.everywhere", "garden.outsideGarden")
+        event.transform(33, "misc.showOutsideSB") { element ->
+            element.asJsonArray.map { setting ->
+                if (setting.asString == "NEXT_JACOB_CONTEXT") JsonPrimitive("NEXT_JACOB_CONTEST") else setting
+            }.toJsonArray()
+        }
     }
 }
-

@@ -190,22 +190,17 @@ class SkyHanniDebugsAndTests {
             }
         }
 
-        fun configManagerResetCommand(args: Array<String>) {
-            if (args.size == 1 && args[0] == "confirm") {
-                configManagerReset()
-                return
-            }
-
+        fun resetConfigCommand() {
             ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm",
-                false
+                onClick = {
+                    resetConfig()
+                },
+                prefix = false
             )
         }
 
-        private fun configManagerReset() {
-            // TODO make it so that it does not reset the config
-
+        private fun resetConfig() {
             // saving old config state
             SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
@@ -337,9 +332,9 @@ class SkyHanniDebugsAndTests {
 
         fun copyLocation(args: Array<String>) {
             val location = LocationUtils.playerLocation()
-            val x = LorenzUtils.formatDouble(location.x + 0.001).replace(",", ".")
-            val y = LorenzUtils.formatDouble(location.y + 0.001).replace(",", ".")
-            val z = LorenzUtils.formatDouble(location.z + 0.001).replace(",", ".")
+            val x = (location.x + 0.001).round(1)
+            val y = (location.y + 0.001).round(1)
+            val z = (location.z + 0.001).round(1)
             if (args.size == 1 && args[0].equals("json", false)) {
                 OSUtils.copyToClipboard("\"$x:$y:$z\"")
                 return
