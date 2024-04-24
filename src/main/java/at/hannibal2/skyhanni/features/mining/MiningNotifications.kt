@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
 import at.hannibal2.skyhanni.data.MiningAPI.lastColdReset
@@ -8,8 +9,11 @@ import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.runDelayed
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -46,6 +50,10 @@ object MiningNotifications {
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!"
     )
+    private val frostbitePattern by patternGroup.pattern(
+        "cold.frostbite",
+        "§9§lBRRR! §r§bYou're freezing! All you can think about is getting out of here to a warm campfire..."
+    )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
 
@@ -61,6 +69,13 @@ object MiningNotifications {
             scrapDrop.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
             goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
+            frostbitePattern.matches(message) -> {
+                if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope) {
+                    runDelayed(0.5.seconds) {
+                        ChatUtils.clickableChat("Click here to get an Ascension Rope!", "/gfs ASCENSION_ROPE 1")
+                    }
+                }
+            }
         }
     }
 
