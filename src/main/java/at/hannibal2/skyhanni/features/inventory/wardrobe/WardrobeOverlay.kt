@@ -103,7 +103,7 @@ class WardrobeOverlay {
                 val fakePlayer = wardrobeSlot.getFakePlayer()
 
                 fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.getArmor().map { it.copy().removeEnchants() }.reversed().toTypedArray()
+                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
                 if (!wardrobeSlot.isInCurrentPage()) {
                     scale *= 0.9
@@ -128,13 +128,13 @@ class WardrobeOverlay {
                     lore.add("§aEstimated Armor Value:")
 
                     var totalPrice = 0.0
-                    for (item in wardrobeSlot.getArmor().filter { it != WardrobeAPI.AIR }) {
+                    for (item in wardrobeSlot.getArmor().filterNotNull()) {
                         val price = item.getPrice()
                         totalPrice += price
                         lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
                     }
 
-                    if (wardrobeSlot.getArmor().any { it != WardrobeAPI.AIR }) {
+                    if (wardrobeSlot.getArmor().any { it != null }) {
                         lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
 
                         Renderable.toolTipContainer(lore, containerWidth, containerHeight)
