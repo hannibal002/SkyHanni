@@ -64,15 +64,21 @@ fun getPetDisplay(): String = PetAPI.currentPet?.let {
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
     val cropCounter = crop?.getCounter()
-    val tier = cropCounter?.let { getTierForCropCount(it, crop) }
-
+    val allowOverflow = GardenAPI.config.cropMilestones.overflow.discordRPC
+    val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
     val progress = tier?.let {
-        LorenzUtils.formatPercentage(crop.progressToNextLevel())
+        LorenzUtils.formatPercentage(crop.progressToNextLevel(allowOverflow))
     } ?: 100 // percentage to next milestone
 
     return if (tier != null) {
-        "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
+        val text = if (crop.isMaxed() && !allowOverflow) {
+            "MAXED (${cropCounter.addSeparators()} crops collected)"
+        } else {
+            "Milestone $tier ($progress)"
+        }
+        "${crop.cropName}: $text"
     } else AutoStatus.CROP_MILESTONES.placeholderText
+
 }
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {

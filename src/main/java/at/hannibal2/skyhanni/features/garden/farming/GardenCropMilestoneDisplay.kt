@@ -149,7 +149,8 @@ object GardenCropMilestoneDisplay {
         lineMap[0] = Collections.singletonList("§6Crop Milestones")
 
         val customTargetLevel = storage?.get(crop) ?: 0
-        val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, (config.overflow.display || (customTargetLevel != 0)))
+        val allowOverflow = config.overflow.display || (customTargetLevel != 0)
+        val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow)
         var nextTier = if (config.bestShowMaxedNeeded.get() && currentTier <= 46) 46 else currentTier + 1
         val nextRealTier = nextTier
         val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
@@ -164,11 +165,12 @@ object GardenCropMilestoneDisplay {
         }
         lineMap[1] = list
 
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, (config.overflow.display || useCustomGoal))
+        val allowOverflowOrCustom = config.overflow.display || useCustomGoal
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflowOrCustom)
         val (have, need) = if (config.bestShowMaxedNeeded.get() && !config.overflow.display) {
             Pair(counter, cropsForNextTier)
         } else {
-            val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop, (config.overflow.display || useCustomGoal))
+            val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop, allowOverflowOrCustom)
             val have = if (useCustomGoal) counter else counter - cropsForCurrentTier
             val need = if (useCustomGoal) cropsForNextTier else cropsForNextTier - cropsForCurrentTier
             Pair(have, need)
