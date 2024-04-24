@@ -61,10 +61,8 @@ class WardrobeOverlay {
         if (!tempToggleShowOverlay) return
 
         val gui = event.gui
-        val player = Minecraft.getMinecraft().thePlayer
         val centerX = gui.width / 2
         val centerY = gui.height / 2
-        //val totalPlayers = 18
         val totalPlayers = list.size
         val maxPlayersPerRow = 9
         val playerWidth = 50
@@ -77,43 +75,7 @@ class WardrobeOverlay {
 
         val startY = centerY + playerHeight - totalHeight / 2
 
-
-        val tempTogglePos = Position((gui.width * 0.85).toInt(), (gui.height * 0.9).toInt())
-        val tempToggleRenderable = Renderable.horizontalContainer(
-            listOf(
-                Renderable.drawInsideRoundedRect(
-                    Renderable.clickable(
-                        Renderable.emptyContainer(30, 30),
-                        bypassChecks = true,
-                        onClick = {
-                            ChatUtils.chat("Clicked on wardrobe toggle")
-                            tempToggleShowOverlay = false
-                        },
-                    ),
-                    Color.BLACK,
-                ), Renderable.string("Temp toggle")
-            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
-        )
-        display += tempTogglePos to tempToggleRenderable
-
-        val favoriteTogglePos = Position(tempTogglePos.rawX, tempTogglePos.rawY - 50)
-        val favoriteToggleRenderable = Renderable.horizontalContainer(
-            listOf(
-                Renderable.drawInsideRoundedRect(
-                    Renderable.clickable(
-                        Renderable.emptyContainer(30, 30),
-                        bypassChecks = true,
-                        onClick = {
-                            ChatUtils.chat("Clicked on favorite toggle")
-                            favoriteToggle = !favoriteToggle
-                        },
-                    ),
-                    if (favoriteToggle) Color.GREEN else Color.RED
-                ), Renderable.string("Favorite toggle")
-            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
-        )
-        display += favoriteTogglePos to favoriteToggleRenderable
-
+        display += addButtons(gui.width, gui.height, totalHeight)
 
         GlStateManager.pushMatrix()
         GlStateManager.color(1f, 1f, 1f, 1f)
@@ -223,6 +185,49 @@ class WardrobeOverlay {
                 fakePlayerCache = mutableMapOf()
             }
         }
+    }
+
+    private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
+        val buttonWidth = 20
+        val centerX = screenWidth / 2
+        val centerButtonX = centerX - buttonWidth / 2
+        val buttonY = screenHeight / 2 + playerHeight / 2 + 15
+
+        val tempTogglePos = Position(centerButtonX, buttonY)
+        val tempToggleRenderable = Renderable.verticalContainer(
+            listOf(
+                Renderable.drawInsideRoundedRect(
+                    Renderable.clickable(
+                        Renderable.emptyContainer(buttonWidth, buttonWidth),
+                        bypassChecks = true,
+                        onClick = {
+                            ChatUtils.chat("Clicked on wardrobe toggle")
+                            tempToggleShowOverlay = false
+                        },
+                    ),
+                    Color.BLACK,
+                ), Renderable.string("Temp toggle", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
+        )
+        add(tempTogglePos to tempToggleRenderable)
+
+        val favoriteTogglePos = Position(tempTogglePos.rawX - 50, tempTogglePos.rawY)
+        val favoriteToggleRenderable = Renderable.verticalContainer(
+            listOf(
+                Renderable.drawInsideRoundedRect(
+                    Renderable.clickable(
+                        Renderable.emptyContainer(buttonWidth, buttonWidth),
+                        bypassChecks = true,
+                        onClick = {
+                            ChatUtils.chat("Clicked on favorite toggle")
+                            favoriteToggle = !favoriteToggle
+                        },
+                    ),
+                    if (favoriteToggle) Color.GREEN else Color.RED
+                ), Renderable.string("Favorite toggle", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
+        )
+        add(favoriteTogglePos to favoriteToggleRenderable)
     }
 
     private fun ItemStack.getPrice(): Double =
