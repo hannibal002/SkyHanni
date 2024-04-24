@@ -105,6 +105,8 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
+    // Apr 23, 2024, 6:08 PM GMT+2
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/commit/faf22b5dd9
     devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
