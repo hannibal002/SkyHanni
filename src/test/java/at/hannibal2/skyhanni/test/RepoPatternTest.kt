@@ -149,4 +149,5 @@ object RepoPatternTest {
 
         RepoPatternManager.inTestDuplicateUsage = true
     }
+
 }
