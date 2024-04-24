@@ -190,22 +190,17 @@ class SkyHanniDebugsAndTests {
             }
         }
 
-        fun configManagerResetCommand(args: Array<String>) {
-            if (args.size == 1 && args[0] == "confirm") {
-                configManagerReset()
-                return
-            }
-
+        fun resetConfigCommand() {
             ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm",
-                false
+                onClick = {
+                    resetConfig()
+                },
+                prefix = false
             )
         }
 
-        private fun configManagerReset() {
-            // TODO make it so that it does not reset the config
-
+        private fun resetConfig() {
             // saving old config state
             SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")

@@ -161,7 +161,6 @@ object SensitivityReducer {
         isToggled = state
     }
 
-
     fun doTheMath(input: Float, reverse: Boolean = false): Float {
         val divisor = config.reducingFactor.get()
         return if (!reverse) ((input - LOCKED) / divisor) + LOCKED

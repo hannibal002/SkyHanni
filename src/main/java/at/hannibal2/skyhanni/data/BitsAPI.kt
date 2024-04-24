@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -153,10 +152,10 @@ object BitsAPI {
                 if (amount == bits) return
 
                 if (amount > bits) {
-                    bitsAvailable -= amount - bits
-                    ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
+                    val difference = amount - bits
+                    bitsAvailable -= difference
                     bits = amount
-                    sendBitsGainEvent()
+                    sendBitsGainEvent(difference)
                 } else {
                     bits = amount
                     sendBitsSpentEvent()
@@ -228,7 +227,6 @@ object BitsAPI {
 
                     val difference = bits - bitsAvailable
                     if (difference > 0) {
-                        ChatUtils.debug("You have gained §3${difference} Bits §7according to the menu!")
                         bits += difference
                     }
                 }
@@ -308,7 +306,7 @@ object BitsAPI {
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
-    private fun sendBitsGainEvent() = BitsUpdateEvent.BitsGain(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsGainEvent(difference: Int) = BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
     private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
     private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
 

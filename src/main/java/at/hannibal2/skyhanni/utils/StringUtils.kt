@@ -127,6 +127,7 @@ object StringUtils {
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
         } else {
@@ -317,4 +318,55 @@ object StringUtils {
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun replaceIfNeeded(
+        original: IChatComponent,
+        newText: String,
+    ): ChatComponentText? {
+        val foundCommands = mutableListOf<IChatComponent>()
+
+        addComponent(foundCommands, original)
+        for (sibling in original.siblings) {
+            addComponent(foundCommands, sibling)
+        }
+
+        val size = foundCommands.size
+        if (size > 1) {
+            return null
+        }
+
+        val originalClean = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val newTextClean = LorenzUtils.stripVanillaMessage(newText)
+        if (originalClean == newTextClean) return null
+
+        val text = ChatComponentText(newText)
+        if (size == 1) {
+            val chatStyle = foundCommands[0].chatStyle
+            text.chatStyle.chatClickEvent = chatStyle.chatClickEvent
+            text.chatStyle.chatHoverEvent = chatStyle.chatHoverEvent
+        }
+
+        return text
+    }
+
+    private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
+        val clickEvent = message.chatStyle.chatClickEvent
+        if (clickEvent != null) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+                return
+            }
+            foundCommands.add(message)
+        }
+    }
+
+    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
+        var text = this
+        while (true) {
+            val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
+            if (newText == text) {
+                return text
+            }
+            text = newText
+        }
+    }
 }

@@ -149,8 +149,8 @@ object DianaProfitTracker {
         allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetdianaprofittracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled

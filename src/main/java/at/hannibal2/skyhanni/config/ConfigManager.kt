@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.utils.FeatureTogglesByDefaultAdapter
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -152,7 +154,8 @@ class ConfigManager {
         }
 
         val gson: Gson = createBaseGsonBuilder()
-            .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
+            // TODO reenable with toggle that is default disabled
+//             .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
             .create()
 
         var configDirectory = File("config/skyhanni")
@@ -338,15 +341,34 @@ class ConfigManager {
                 writer.write(gson.toJson(data))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
+            move(unit, file, reason)
+        } catch (e: IOException) {
+            logger.log("Could not save $fileName file to $file")
+            e.printStackTrace()
+        }
+    }
+
+    private fun move(unit: File, file: File, reason: String, loop: Int = 0) {
+        try {
             Files.move(
                 unit.toPath(),
                 file.toPath(),
                 StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.ATOMIC_MOVE
             )
-        } catch (e: IOException) {
-            logger.log("Could not save $fileName file to $file")
-            e.printStackTrace()
+        } catch (e: AccessDeniedException) {
+            if (loop == 5) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "could not save config.",
+                    "config save reason" to reason,
+                )
+                return
+            }
+            ChatUtils.debug("config save AccessDeniedException! (loop $loop)")
+            DelayedRun.runNextTick {
+                move(unit, file, reason, loop + 1)
+            }
         }
     }
 

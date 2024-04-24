@@ -22,16 +22,16 @@ public class MiningNotificationsConfig {
 
     @Expose
     @ConfigOption(
-            name = "Notification List",
-            desc = "Drag text to change which events send a title."
+        name = "Notification List",
+        desc = "Drag text to change which events send a title."
     )
     @ConfigEditorDraggableList
     public List<MiningNotificationList> notifications = new ArrayList<>(Arrays.asList(
-            MiningNotificationList.MINESHAFT_SPAWN,
-            MiningNotificationList.SCRAP,
-            MiningNotificationList.COLD,
-            MiningNotificationList.GOLDEN_GOBLIN,
-            MiningNotificationList.DIAMOND_GOBLIN
+        MiningNotificationList.MINESHAFT_SPAWN,
+        MiningNotificationList.SCRAP,
+        MiningNotificationList.COLD,
+        MiningNotificationList.GOLDEN_GOBLIN,
+        MiningNotificationList.DIAMOND_GOBLIN
     ));
 
     @Expose

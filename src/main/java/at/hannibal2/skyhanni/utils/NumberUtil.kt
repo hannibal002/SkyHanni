@@ -175,9 +175,9 @@ object NumberUtil {
     private val numberPattern = "^[0-9]*$".toPattern()
     private val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
-    fun String.isInt(): Boolean {
-        return isNotEmpty() && numberPattern.matcher(this).matches()
-    }
+    fun String.isInt(): Boolean = isNotEmpty() && numberPattern.matcher(this).matches()
+
+    fun String.isDouble(): Boolean = runCatching { toDouble() }.getOrNull() != null
 
     fun String.isFormatNumber(): Boolean {
         return isNotEmpty() && formatPattern.matches(this)
@@ -250,12 +250,11 @@ object NumberUtil {
         }
     }
 
-
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
     private val Int.billion get() = this * 1_000_000_000.0
     val Double.million get() = (this * 1_000_000.0).toLong()
-    
+
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
