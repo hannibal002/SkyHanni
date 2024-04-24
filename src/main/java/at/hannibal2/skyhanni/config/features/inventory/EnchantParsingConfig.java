@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.enchantparsing;
+package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.utils.LorenzColor;
@@ -14,7 +14,7 @@ public class EnchantParsingConfig {
     @ConfigOption(name = "Enable", desc = "Toggle for coloring the enchants. Turn this off if you want to use enchant parsing from other mods.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean colorParsing = true;
+    public Property<Boolean> colorParsing = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Format", desc = "The way the enchants are formatted in the tooltip.")

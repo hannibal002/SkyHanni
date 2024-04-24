@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.gui;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
-import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
 import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig;
@@ -31,10 +30,6 @@ public class GUIConfig {
     @Expose
     @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
     public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
-
-    @Expose
-    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
-    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose
     @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")

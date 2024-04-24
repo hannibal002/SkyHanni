@@ -24,7 +24,7 @@ open class Enchant : Comparable<Enchant> {
     open fun getFormattedName(level: Int) = getFormat(level) + loreName
 
     open fun getFormat(level: Int): String {
-        val config = SkyHanniMod.feature.gui.enchantParsing
+        val config = SkyHanniMod.feature.inventory.enchantParsing
 
         if (level >= maxLevel) return config.perfectEnchantColor.get().getChatColor()
         if (level > goodLevel) return config.greatEnchantColor.get().getChatColor()

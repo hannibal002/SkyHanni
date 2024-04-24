@@ -37,6 +37,4 @@ object GuiChatHook {
         }
         return replacement
     }
-
-    fun isReplacementInitialised() = this::replacement.isInitialized
 }

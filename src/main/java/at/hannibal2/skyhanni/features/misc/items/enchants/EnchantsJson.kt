@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
-import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser.ENCHANTMENT_PATTERN
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser.enchantmentPattern
 import com.google.gson.annotations.Expose
 
-class Enchants {
+class EnchantsJson {
     @Expose
     var NORMAL: HashMap<String, Enchant.Normal> = hashMapOf()
 
@@ -23,7 +23,7 @@ class Enchants {
     }
 
     fun containsEnchantment(enchants: Map<String, Int>, line: String): Boolean {
-        val matcher = ENCHANTMENT_PATTERN.matcher(line)
+        val matcher = enchantmentPattern.matcher(line)
         while (matcher.find()) {
             val enchant = this.getFromLore(matcher.group("enchant"))
             if (enchants.isNotEmpty()) {

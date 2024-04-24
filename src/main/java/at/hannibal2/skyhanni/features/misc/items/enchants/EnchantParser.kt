@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig
-import at.hannibal2.skyhanni.config.features.enchantparsing.EnchantParsingConfig.CommaFormat
+import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
+import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -27,13 +27,13 @@ import java.util.TreeSet
  */
 object EnchantParser {
 
-    private val config get() = SkyHanniMod.feature.gui.enchantParsing
+    private val config get() = SkyHanniMod.feature.inventory.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
-    val ENCHANTMENT_PATTERN by patternGroup.pattern(
+    val enchantmentPattern by patternGroup.pattern(
         "enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)"
     )
-    private val GRAY_ENCHANT_PATTERN by patternGroup.pattern(
+    private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
     )
 
@@ -54,18 +54,18 @@ object EnchantParser {
     private val loreCache: Cache = Cache()
 
     // Maps for all enchants
-    private var enchants: Enchants = Enchants()
+    private var enchants: EnchantsJson = EnchantsJson()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        this.enchants = event.getConstant<Enchants>("Enchants")
+        this.enchants = event.getConstant<EnchantsJson>("Enchants")
     }
 
-    @Suppress("DuplicatedCode")
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         // Add observers to config options that would need us to mark cache dirty
         ConditionalUtils.onToggle(
+            config.colorParsing,
             config.format,
             config.perfectEnchantColor,
             config.greatEnchantColor,
@@ -117,6 +117,8 @@ object EnchantParser {
         if (loreCache.isCached(loreList)) {
             loreList.clear()
             loreList.addAll(loreCache.cachedLoreAfter)
+            // Need to still set replacement component even if its cached
+            if (chatComponent != null) editChatComponent(chatComponent, loreList)
             return
         }
         loreCache.updateBefore(loreList)
@@ -143,7 +145,7 @@ object EnchantParser {
         }
 
         // If we have color parsing off and hide enchant descriptions on, remove them and return from method
-        if (!config.colorParsing) {
+        if (!config.colorParsing.get()) {
             if (config.hideEnchantDescriptions.get()) {
                 loreList.removeAll(loreLines)
                 loreCache.updateAfter(loreList)
@@ -194,7 +196,7 @@ object EnchantParser {
 
         for (i in startEnchant..endEnchant) {
             val unformattedLine = loreList[i].removeColor()
-            val matcher = ENCHANTMENT_PATTERN.matcher(unformattedLine)
+            val matcher = enchantmentPattern.matcher(unformattedLine)
             var containsEnchant = false
             var enchantsOnThisLine = 0
 
@@ -233,72 +235,80 @@ object EnchantParser {
     }
 
     private fun formatEnchants(insertEnchants: MutableList<String>) {
-        val commaFormat = config.commaFormat.get()
-
         // Normal is leaving the formatting as Hypixel provides it
         if (config.format.get() == EnchantParsingConfig.EnchantFormat.NORMAL) {
-            var builder = StringBuilder()
-
-            for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
-                val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
-
-                builder.append(orderedEnchant.getFormattedString())
-                if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1) {
-                    builder.append(comma)
-                } else {
-                    insertEnchants.add(builder.toString())
-
-                    // This will only add enchant descriptions if there were any to begin with
-                    if (!config.hideEnchantDescriptions.get()) insertEnchants.addAll(orderedEnchant.getLore())
-
-                    builder = StringBuilder()
-                }
-            }
-
-            if (builder.isNotEmpty()) insertEnchants.add(builder.toString())
-
-            // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
-            if (insertEnchants.last().last() == ' ') {
-                insertEnchants[insertEnchants.lastIndex] =
-                    insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
-            }
-
-            // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
+            normalFormatting(insertEnchants)
+        // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
         } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
-            var builder = StringBuilder()
-
-            for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
-                val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
-
-                builder.append(orderedEnchant.getFormattedString())
-                if (i % 3 != 2) {
-                    builder.append(comma)
-                } else {
-                    insertEnchants.add(builder.toString())
-                    builder = StringBuilder()
-                }
-            }
-
-            if (builder.isNotEmpty()) insertEnchants.add(builder.toString())
-
-            // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
-            if (insertEnchants.last().last() == ' ') {
-                insertEnchants[insertEnchants.lastIndex] =
-                    insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
-            }
-
-            // Stacked is always forcing 1 enchant per line
+            compressedFormatting(insertEnchants)
+        // Stacked is always forcing 1 enchant per line
         } else {
-            if (!config.hideEnchantDescriptions.get()) {
-                for (enchant: FormattedEnchant in orderedEnchants) {
-                    insertEnchants.add(enchant.getFormattedString())
-                    insertEnchants.addAll(enchant.getLore())
-                }
+            stackedFormatting(insertEnchants)
+        }
+    }
+
+    private fun normalFormatting(insertEnchants: MutableList<String>) {
+        val commaFormat = config.commaFormat.get()
+        var builder = StringBuilder()
+
+        for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
+            val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
+
+            builder.append(orderedEnchant.getFormattedString())
+            if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1) {
+                builder.append(comma)
             } else {
-                for (enchant: FormattedEnchant in orderedEnchants) {
-                    insertEnchants.add(enchant.getFormattedString())
-                }
+                insertEnchants.add(builder.toString())
+
+                // This will only add enchant descriptions if there were any to begin with
+                if (!config.hideEnchantDescriptions.get()) insertEnchants.addAll(orderedEnchant.getLore())
+
+                builder = StringBuilder()
             }
+        }
+
+        finishFormatting(insertEnchants, builder, commaFormat)
+    }
+
+    private fun compressedFormatting(insertEnchants: MutableList<String>) {
+        val commaFormat = config.commaFormat.get()
+        var builder = StringBuilder()
+
+        for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
+            val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
+
+            builder.append(orderedEnchant.getFormattedString())
+            if (i % 3 != 2) {
+                builder.append(comma)
+            } else {
+                insertEnchants.add(builder.toString())
+                builder = StringBuilder()
+            }
+        }
+
+        finishFormatting(insertEnchants, builder, commaFormat)
+    }
+
+    private fun stackedFormatting(insertEnchants: MutableList<String>) {
+        if (!config.hideEnchantDescriptions.get()) {
+            for (enchant: FormattedEnchant in orderedEnchants) {
+                insertEnchants.add(enchant.getFormattedString())
+                insertEnchants.addAll(enchant.getLore())
+            }
+        } else {
+            for (enchant: FormattedEnchant in orderedEnchants) {
+                insertEnchants.add(enchant.getFormattedString())
+            }
+        }
+    }
+
+    private fun finishFormatting(insertEnchants: MutableList<String>, builder: StringBuilder, commaFormat: CommaFormat) {
+        if (builder.isNotEmpty()) insertEnchants.add(builder.toString())
+
+        // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
+        if (insertEnchants.last().last() == ' ') {
+            insertEnchants[insertEnchants.lastIndex] =
+                insertEnchants.last().dropLast(if (commaFormat == CommaFormat.COPY_ENCHANT) 2 else 4)
         }
     }
 
@@ -322,7 +332,7 @@ object EnchantParser {
         var i = 1
         for (total in 0 until (1 + item.enchantmentTagList.tagCount())) {
             val line = loreList[i]
-            if (GRAY_ENCHANT_PATTERN.matcher(line).matches()) {
+            if (grayEnchantPattern.matcher(line).matches()) {
                 lastGrayEnchant = i
 
                 if (removeGrayEnchants) loreList.removeAt(i) else i++
@@ -334,35 +344,12 @@ object EnchantParser {
         return if (removeGrayEnchants) -1 else lastGrayEnchant
     }
 
+    // We don't check if the main toggle here since we still need to go into
+    // the parseEnchants method to deal with hiding vanilla enchants
+    // and enchant descriptions
     fun isEnabled() = LorenzUtils.inSkyBlock
 
     private fun markCacheDirty() {
         loreCache.configChanged = true
-    }
-
-    class Cache {
-        var cachedLoreBefore: List<String> = listOf()
-        var cachedLoreAfter: List<String> = listOf()
-
-        // So tooltip gets changed on the same item if the config was changed in the interim
-        var configChanged = false
-
-        fun updateBefore(loreBeforeModification: List<String>) {
-            cachedLoreBefore = loreBeforeModification.toList()
-        }
-
-        fun updateAfter(loreAfterModification: List<String>) {
-            cachedLoreAfter = loreAfterModification.toList()
-            configChanged = false
-        }
-
-        fun isCached(loreBeforeModification: List<String>): Boolean {
-            if (configChanged || loreBeforeModification.size != cachedLoreBefore.size) return false
-
-            for (i in loreBeforeModification.indices) {
-                if (loreBeforeModification[i] != cachedLoreBefore[i]) return false
-            }
-            return true
-        }
     }
 }
