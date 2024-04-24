@@ -70,7 +70,6 @@ object ChocolateFactoryStats {
         val firstElement = displayList.firstOrNull { it.isNotEmpty() } ?: return
 
         if (ChocolateFactoryAPI.chocolateFactoryPaused) {
-
             val leftMargin = (firstElement.width() - "§f(§cPaused§f)".width()) / 2
             val spaceWidth = " ".width()
             displayList.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")

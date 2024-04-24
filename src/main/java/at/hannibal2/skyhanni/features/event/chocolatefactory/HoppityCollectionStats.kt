@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -148,7 +147,7 @@ class HoppityCollectionStats {
             newList.add(
                 Renderable.wrappedString(
                     "§cPlease Scroll through \n" +
-                        "§call pages first!",
+                        "§call pages!",
                     width = 200,
                 )
             )
