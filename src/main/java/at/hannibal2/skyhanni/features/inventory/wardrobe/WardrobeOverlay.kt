@@ -186,7 +186,7 @@ class WardrobeOverlay {
         }
     }
 
-    private fun update() {
+    private fun reset() {
         renderablesCache = mutableListOf()
         fakePlayerCache = mutableMapOf()
     }
