@@ -167,8 +167,8 @@ object SeaCreatureTracker {
         tracker.renderDisplay(config.position)
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetseacreaturetracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing && !LorenzUtils.inKuudraFight

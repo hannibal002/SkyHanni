@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -190,7 +191,7 @@ object FarmingFortuneDisplay {
                     "§cshowing latest Crop Fortune."
                 ),
                 onClick = {
-                    ChatUtils.sendCommandToServer("widget")
+                    HypixelCommands.widget()
                 }
             ))
         } else {
@@ -201,7 +202,7 @@ object FarmingFortuneDisplay {
                     "§cshowing the Farming Fortune stat."
                 ),
                 onClick = {
-                    ChatUtils.sendCommandToServer("widget")
+                    HypixelCommands.widget()
                 }
             ))
         }
@@ -216,7 +217,9 @@ object FarmingFortuneDisplay {
             ChatUtils.clickableChat(
                 "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing the Farming Fortune stat.",
-                command = "widget"
+                onClick = {
+                    HypixelCommands.widget()
+                }
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
@@ -225,7 +228,9 @@ object FarmingFortuneDisplay {
             ChatUtils.clickableChat(
                 "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing latest Crop Fortune.",
-                command = "widget"
+                onClick = {
+                    HypixelCommands.widget()
+                }
             )
             lastCropFortuneMissingError = SimpleTimeMark.now()
         }
