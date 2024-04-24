@@ -285,7 +285,7 @@ class WardrobeOverlay {
         val wardrobePage = currentPage ?: return
         if (favoriteToggle) {
             wardrobeSlot.favorite = !wardrobeSlot.favorite
-            update()
+            reset()
             return
         }
         if (wardrobeSlot.isInCurrentPage()) {
