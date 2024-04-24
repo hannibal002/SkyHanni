@@ -85,6 +85,8 @@ object WardrobeAPI {
     fun WardrobeSlot.getArmor(): List<ItemStack?> =
         (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
 
+    fun WardrobeSlot.isEmpty(): Boolean = getArmor().all { it == null }
+
     var WardrobeSlot.locked: Boolean
         get() = getData()?.locked ?: true
         set(value) {
