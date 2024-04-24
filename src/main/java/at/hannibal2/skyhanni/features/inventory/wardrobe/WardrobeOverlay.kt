@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.favorite
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.getArmor
@@ -13,10 +14,8 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSl
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.locked
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -42,6 +41,7 @@ class WardrobeOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.wardrobeOverlay
     private var display = emptyList<Pair<Position, Renderable>>()
+    private var renderablesCache = emptyList<Pair<Position, Renderable>>()
     private var tempToggleShowOverlay = true
     private var favoriteToggle = false
 
@@ -69,11 +69,13 @@ class WardrobeOverlay {
         val verticalSpacing = 20
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
-        val totalHeight = rows * playerHeight + (rows - 1) * verticalSpacing
+        val totalHeight = rows * playerHeight + (rows - 1) * (verticalSpacing + 1)
 
         val startY = centerY + playerHeight - totalHeight / 2
 
         display += addButtons(gui.width, gui.height, totalHeight)
+
+        val isRenderableCacheEmpty = renderablesCache.isEmpty()
 
         GlStateManager.pushMatrix()
         GlStateManager.color(1f, 1f, 1f, 1f)
@@ -82,76 +84,65 @@ class WardrobeOverlay {
         for (row in 0 until rows) {
             val playersInRow =
                 if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
-            val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * horizontalSpacing
+            val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * (horizontalSpacing + 1)
 
             val startX = centerX - (totalWidth - playerWidth) / 2
-            val playerY = startY + row * (playerHeight + verticalSpacing)
+            val playerY = startY + row * ((playerHeight + verticalSpacing) + 1)
 
             for (i in 0 until playersInRow) {
-                val playerX = startX + i * (playerWidth + horizontalSpacing)
+                val playerX = startX + i * ((playerWidth + horizontalSpacing) + 1)
                 var scale = playerWidth.toDouble()
 
                 val wardrobeSlot = list[slot]
-
-                val padding = 10
-                val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
-                val containerWidth = playerWidth + 2 * padding
-                val containerHeight = playerHeight + 2 * padding
 
                 val fakePlayer = wardrobeSlot.getFakePlayer()
 
                 fakePlayer.inventory.armorInventory =
                     wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
-                if (!wardrobeSlot.isInCurrentPage()) {
-                    scale *= 0.9
-                    RenderLivingEntityHelper.setEntityColor(
-                        fakePlayer,
-                        Color.GRAY.withAlpha(100),
-                        ::isEnabled
-                    )
-                }
+                if (isRenderableCacheEmpty) {
+                    val padding = 10
+                    val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
+                    val containerWidth = playerWidth + 2 * padding
+                    val containerHeight = playerHeight + 2 * padding
 
-                val isHovered = GuiRenderUtils.isPointInRect(
-                    event.mouseX,
-                    event.mouseY,
-                    pos.rawX,
-                    pos.rawY,
-                    containerWidth,
-                    containerHeight
-                )
+                    val hoverRenderable = {
+                        if (wardrobeSlot.getArmor().any { it != null }) {
+                            val lore = mutableListOf<String>()
+                            lore.add("§aEstimated Armor Value:")
 
-                val hoverRenderable = {
-                    val lore = mutableListOf<String>()
-                    lore.add("§aEstimated Armor Value:")
+                            var totalPrice = 0.0
+                            for (item in wardrobeSlot.getArmor().filterNotNull()) {
+                                val price = item.getPrice()
+                                totalPrice += price
+                                lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
+                            }
 
-                    var totalPrice = 0.0
-                    for (item in wardrobeSlot.getArmor().filterNotNull()) {
-                        val price = item.getPrice()
-                        totalPrice += price
-                        lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
+                            lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+
+                            Renderable.toolTipContainer(lore, containerWidth, containerHeight)
+                        } else {
+                            Renderable.placeholder(containerWidth, containerHeight)
+                        }
                     }
 
-                    if (wardrobeSlot.getArmor().any { it != null }) {
-                        lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
-
-                        Renderable.toolTipContainer(lore, containerWidth, containerHeight)
-                    } else {
-                        Renderable.emptyContainer(containerWidth, containerHeight)
-                    }
-                }
-
-                val renderable = Renderable.drawInsideRoundedRect(
-                    Renderable.clickAndHoverable(
-                        hoverRenderable.invoke(),
-                        Renderable.emptyContainer(containerWidth, containerHeight),
+                    val renderable = Renderable.clickAndHoverable(
+                        Renderable.drawInsideRoundedRect(
+                            hoverRenderable.invoke(),
+                            getWardrobeSlotColor(wardrobeSlot, true),
+                            padding = 0
+                        ),
+                        Renderable.drawInsideRoundedRect(
+                            Renderable.placeholder(containerWidth, containerHeight),
+                            getWardrobeSlotColor(wardrobeSlot, false),
+                            padding = 0
+                        ),
                         onClick = {
                             clickWardrobeSlot(wardrobeSlot)
-                        }
-                    ),
-                    getWardrobeSlotColor(wardrobeSlot, isHovered),
-                    0,
-                )
+                        },
+                    )
+                    renderablesCache += pos to renderable
+                }
 
                 // Calculate the new mouse position relative to the player
                 val mouseXRelativeToPlayer = (playerX - event.mouseX).toFloat()
@@ -160,13 +151,22 @@ class WardrobeOverlay {
                 val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
 
-                display += Position(playerX, playerY) to Renderable.entity(fakePlayer, eyesX, eyesY, scale.toInt())
-                display += pos to renderable
-                RenderLivingEntityHelper.removeEntityColor(fakePlayer)
+                val color = if (!wardrobeSlot.isInCurrentPage()) {
+                    scale *= 0.9
+                    Color.GRAY.withAlpha(100)
+                } else null
 
+                display += Position(playerX, playerY) to Renderable.entity(
+                    fakePlayer,
+                    eyesX,
+                    eyesY,
+                    scale.toInt(),
+                    color
+                )
                 slot++
             }
         }
+        renderablesCache.forEach { display += it.first to it.second }
 
         GlStateManager.popMatrix()
 
@@ -181,8 +181,14 @@ class WardrobeOverlay {
                 favoriteToggle = false
                 itemPriceCache = mutableMapOf()
                 fakePlayerCache = mutableMapOf()
+                renderablesCache = mutableListOf()
             }
         }
+    }
+
+    private fun reset() {
+        renderablesCache = mutableListOf()
+        fakePlayerCache = mutableMapOf()
     }
 
     private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
@@ -267,12 +273,19 @@ class WardrobeOverlay {
         GlStateManager.popMatrix()
     }
 
+    @SubscribeEvent
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+        if (!inWardrobe()) return
+        reset()
+    }
+
     private fun clickWardrobeSlot(wardrobeSlot: WardrobeAPI.WardrobeSlot) {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = currentPage ?: return
         if (favoriteToggle) {
             wardrobeSlot.favorite = !wardrobeSlot.favorite
+            reset()
             return
         }
         if (wardrobeSlot.isInCurrentPage()) {
@@ -299,5 +312,4 @@ class WardrobeOverlay {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()
-
 }
