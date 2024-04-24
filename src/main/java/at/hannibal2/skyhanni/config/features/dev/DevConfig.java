@@ -68,6 +68,37 @@ public class DevConfig {
     public Position debugItemPos = new Position(90, 70);
 
     @Expose
+    @ConfigOption(
+        name = "Fancy Contributors",
+        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
+            "§eThose are the folks that coded the mod for you for free :)"
+    )
+    @ConfigEditorBoolean
+    public boolean fancyContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Flip Contributors",
+        desc = "Make SkyHanni contributors appear upside down in the world.")
+    @ConfigEditorBoolean
+    public boolean flipContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Spin Contributors",
+        desc = "Make SkyHanni contributors spin around when you are looking at them. " +
+            "§eRequires 'Flip Contributors' to be enabled.")
+    @ConfigEditorBoolean
+    public boolean rotateContributors = false;
+
+    @Expose
+    @ConfigOption(
+        name = "SBA Contributors",
+        desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
+    @ConfigEditorBoolean
+    public boolean fancySbaContributors = false;
+
+    @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
