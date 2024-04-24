@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 
 object ChocolateFactoryStats {
 
@@ -63,7 +64,11 @@ object ChocolateFactoryStats {
             add("")
 
             add("§eTime Tower: §6$timeTowerInfo")
-            add("§eTime To Prestige: §6${timeUntilPrestige.format()}")
+            if (timeUntilPrestige == Duration.INFINITE) {
+                add("§eTime To Prestige: §cNever")
+            } else {
+                add("§eTime To Prestige: §6${timeUntilPrestige.format()}")
+            }
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
 
