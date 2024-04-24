@@ -213,8 +213,15 @@ object GardenCropMilestoneDisplay {
                 }
             }
 
-            val format = (farmingFortuneSpeed * 60).addSeparators()
-            lineMap[MilestoneTextEntry.CROPS_PER_MINUTE] = Renderable.string("§7Crops/Minute§8: §e$format")
+            val secondFormat = (farmingFortuneSpeed).addSeparators()
+            lineMap[MilestoneTextEntry.CROPS_PER_SECOND] = Renderable.string("§7Crops/Second§8: §e$secondFormat")
+
+            val minuteFormat = (farmingFortuneSpeed * 60).addSeparators()
+            lineMap[MilestoneTextEntry.CROPS_PER_MINUTE] = Renderable.string("§7Crops/Minute§8: §e$minuteFormat")
+
+            val hourFormat = (farmingFortuneSpeed * 60 * 60).addSeparators()
+            lineMap[MilestoneTextEntry.CROPS_PER_HOUR] = Renderable.string("§7Crops/Hour§8: §e$hourFormat")
+
             val formatBps = speed.round(config.blocksBrokenPrecision).addSeparators()
             lineMap[MilestoneTextEntry.BLOCKS_PER_SECOND] = Renderable.string("§7Blocks/Second§8: §e$formatBps")
         }
@@ -225,7 +232,6 @@ object GardenCropMilestoneDisplay {
         } else {
             Renderable.string("§7Percentage: §e$percentageFormat")
         }
-
 
         if (overflowConfig.chat) {
             if (currentTier >= 46 && currentTier == previousNext && nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {

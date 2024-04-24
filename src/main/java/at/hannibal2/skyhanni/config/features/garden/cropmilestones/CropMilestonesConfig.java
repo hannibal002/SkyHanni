@@ -123,7 +123,9 @@ public class CropMilestonesConfig {
         MILESTONE_TIER("§7Pumpkin Tier 22", 1),
         NUMBER_OUT_OF_TOTAL("§e12,300§8/§e100,000", 2),
         TIME("§7In §b12m 34s", 3),
+        CROPS_PER_SECOND("§7Crops/Second§8: §e205.75"),
         CROPS_PER_MINUTE("§7Crops/Minute§8: §e12,345", 4),
+        CROPS_PER_HOUR("§7Crops/Hour§8: §e740,700"),
         BLOCKS_PER_SECOND("§7Blocks/Second§8: §e19.85", 5),
         PERCENTAGE("§7Percentage: §e12.34%", 6),
         ;
