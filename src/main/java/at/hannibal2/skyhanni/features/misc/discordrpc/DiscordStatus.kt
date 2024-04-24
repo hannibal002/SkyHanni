@@ -70,14 +70,14 @@ private fun getCropMilestoneDisplay(): String {
         LorenzUtils.formatPercentage(crop.progressToNextLevel(allowOverflow))
     } ?: 100 // percentage to next milestone
 
-    return if (tier != null) {
-        val text = if (crop.isMaxed() && !allowOverflow) {
-            "MAXED (${cropCounter.addSeparators()} crops collected)"
-        } else {
-            "Milestone $tier ($progress)"
-        }
-        "${crop.cropName}: $text"
-    } else AutoStatus.CROP_MILESTONES.placeholderText
+    if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
+
+    val text = if (crop.isMaxed() && !allowOverflow) {
+        "MAXED (${cropCounter.addSeparators()} crops collected)"
+    } else {
+        "Milestone $tier ($progress)"
+    }
+    return "${crop.cropName}: $text"
 
 }
 
