@@ -197,10 +197,8 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
-        if (SkyHanniMod.feature.dev.fancyContributors) {
-            ContributorManager.getTabListSuffix(data.name)?.let {
-                suffix += " $it"
-            }
+        ContributorManager.getTabListSuffix(data.name)?.let {
+            suffix += " $it"
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
