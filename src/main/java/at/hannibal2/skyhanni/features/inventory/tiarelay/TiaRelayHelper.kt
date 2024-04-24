@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -74,7 +75,9 @@ class TiaRelayHelper {
         for (sound in sounds.toMutableMap()) {
             if (sound.value.name != name) {
                 ChatUtils.error("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
-                ChatUtils.clickableChat("Click here to run /togglemusic", "togglemusic")
+                ChatUtils.clickableChat("Click here to run /togglemusic", onClick = {
+                    HypixelCommands.toggleMusic()
+                })
                 sounds.clear()
                 return
             }
