@@ -48,7 +48,7 @@ class WardrobeOverlay {
     private var favoriteToggle = false
 
     private var itemPriceCache = mutableMapOf<String?, Double>()
-    private var fakePlayerCache = mutableMapOf<WardrobeAPI.WardrobeSlot, AbstractClientPlayer>()
+    private var fakePlayerCache = mutableMapOf<Int, AbstractClientPlayer>()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -141,9 +141,8 @@ class WardrobeOverlay {
                 val fakePlayer = wardrobeSlot.getFakePlayer()
 
                 fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+                    wardrobeSlot.getArmor().map { it.copy().removeEnchants() }.reversed().toTypedArray()
 
-                RenderLivingEntityHelper.removeEntityColor(fakePlayer)
                 if (!wardrobeSlot.isInCurrentPage()) {
                     scale *= 0.9
                     RenderLivingEntityHelper.setEntityColor(
@@ -167,13 +166,13 @@ class WardrobeOverlay {
                     lore.add("§aEstimated Armor Value:")
 
                     var totalPrice = 0.0
-                    for (item in wardrobeSlot.getArmor().filterNotNull()) {
+                    for (item in wardrobeSlot.getArmor().filter { it != WardrobeAPI.AIR }) {
                         val price = item.getPrice()
                         totalPrice += price
                         lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
                     }
 
-                    if (wardrobeSlot.getArmor().any { it != null }) {
+                    if (wardrobeSlot.getArmor().any { it != WardrobeAPI.AIR }) {
                         lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
 
                         Renderable.toolTipContainer(lore, containerWidth, containerHeight)
@@ -203,6 +202,7 @@ class WardrobeOverlay {
 
                 display += Position(playerX, playerY) to Renderable.player(fakePlayer, eyesX, eyesY, scale.toInt())
                 display += pos to renderable
+                RenderLivingEntityHelper.removeEntityColor(fakePlayer)
 
                 slot++
             }
@@ -229,7 +229,7 @@ class WardrobeOverlay {
         itemPriceCache.getOrPut(this.getItemUuid()) { EstimatedItemValueCalculator.calculate(this).first }
 
     private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): AbstractClientPlayer =
-        fakePlayerCache.getOrPut(this) {
+        fakePlayerCache.getOrPut(this.id) {
             val playerTexture = Minecraft.getMinecraft().thePlayer.locationSkin
             object : AbstractClientPlayer(
                 Minecraft.getMinecraft().theWorld,
