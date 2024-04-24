@@ -680,7 +680,7 @@ interface Renderable {
             }
         }
 
-        fun player(
+        fun entity(
             player: EntityLivingBase,
             eyesX: Float = 0f,
             eyesY: Float = 0f,

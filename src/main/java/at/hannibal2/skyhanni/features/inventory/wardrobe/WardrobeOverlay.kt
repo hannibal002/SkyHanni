@@ -201,7 +201,7 @@ class WardrobeOverlay {
                 val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
 
-                display += Position(playerX, playerY) to Renderable.player(fakePlayer, eyesX, eyesY, scale.toInt())
+                display += Position(playerX, playerY) to Renderable.entity(fakePlayer, eyesX, eyesY, scale.toInt())
                 display += pos to renderable
 
                 slot++
