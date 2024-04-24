@@ -173,9 +173,9 @@ object NumberUtil {
     private val numberPattern = "^[0-9]*$".toPattern()
     private val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
-    fun String.isInt(): Boolean {
-        return isNotEmpty() && numberPattern.matcher(this).matches()
-    }
+    fun String.isInt(): Boolean = isNotEmpty() && numberPattern.matcher(this).matches()
+
+    fun String.isDouble(): Boolean = runCatching { toDouble() }.getOrNull() != null
 
     fun String.isFormatNumber(): Boolean {
         return isNotEmpty() && formatPattern.matches(this)
