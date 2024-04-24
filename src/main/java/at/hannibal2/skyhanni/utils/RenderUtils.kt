@@ -5,9 +5,12 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -970,43 +973,10 @@ object RenderUtils {
         }
     }
 
-    fun LorenzRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        GlStateManager.disableCull()
-
-        val render = Minecraft.getMinecraft().renderViewEntity
-        val worldRenderer = Tessellator.getInstance().worldRenderer
-        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(-realX, -realY, -realZ)
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        GL11.glLineWidth(lineWidth.toFloat())
-        if (!depth) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(false)
+    fun LorenzRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
+        LineDrawer.draw3D(partialTicks) {
+            draw3DLine(p1, p2, color, lineWidth, depth)
         }
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
-        worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
-        Tessellator.getInstance().draw()
-        GlStateManager.translate(realX, realY, realZ)
-        if (!depth) {
-            GL11.glEnable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(true)
-        }
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
-        GlStateManager.enableDepth()
-    }
 
     fun LorenzRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
@@ -1183,6 +1153,79 @@ object RenderUtils {
             sidePoint2,
             c
         )
+    }
+
+    fun LorenzRenderWorldEvent.draw3DPathWithWaypoint(
+        path: Graph,
+        colorLine: Color,
+        lineWidth: Int,
+        depth: Boolean,
+        waypointColor: Color,
+    ) {
+        if (path.isEmpty()) return
+        LineDrawer.draw3D(partialTicks) { drawPath(path.toPositionsList(), colorLine, lineWidth, depth) }
+        path.filter { it.name?.isNotEmpty() == true }.forEach {
+            this.drawDynamicText(it.position, it.name!!, 1.0)
+        }
+        val last = path.last()
+        drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+    }
+
+    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+        val worldRenderer = tessellator.worldRenderer
+        fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean) {
+            path.zipWithNext().forEach {
+                draw3DLine(it.first, it.second, color, lineWidth, depth)
+            }
+        }
+
+        fun draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+            GL11.glLineWidth(lineWidth.toFloat())
+            if (!depth) {
+                GL11.glDisable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(false)
+            }
+            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+            worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
+            worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
+            worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
+            Tessellator.getInstance().draw()
+            if (!depth) {
+                GL11.glEnable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(true)
+            }
+        }
+
+        companion object {
+            inline fun draw3D(
+                partialTicks: Float = 0F,
+                crossinline quads: LineDrawer.() -> Unit,
+            ) {
+
+                GlStateManager.enableBlend()
+                GlStateManager.disableLighting()
+                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+                GlStateManager.disableTexture2D()
+                GlStateManager.disableCull()
+                GlStateManager.disableAlpha()
+
+                val tessellator = Tessellator.getInstance()
+
+                GlStateManager.pushMatrix()
+                RenderUtils.translate(getViewerPos(partialTicks).negated())
+                getViewerPos(partialTicks)
+
+                quads.invoke(LineDrawer(Tessellator.getInstance()))
+
+                GlStateManager.popMatrix()
+
+                GlStateManager.enableAlpha()
+                GlStateManager.enableTexture2D()
+                GlStateManager.enableCull()
+                GlStateManager.disableBlend()
+                GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+            }
+        }
     }
 
     class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
