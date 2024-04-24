@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.FeatureTogglesByDefaultAdapter
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -155,7 +154,8 @@ class ConfigManager {
         }
 
         val gson: Gson = createBaseGsonBuilder()
-            .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
+            // TODO reenable with toggle that is default disabled
+//             .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
             .create()
 
         var configDirectory = File("config/skyhanni")
