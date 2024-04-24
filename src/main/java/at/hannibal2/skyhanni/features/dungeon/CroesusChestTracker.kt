@@ -261,6 +261,14 @@ class CroesusChestTracker {
 
         private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
+        fun resetChest() = croesusChests?.let {
+            it.clear()
+            it.addAll(generateMaxChest())
+        }
+
+        fun generateMaxChest() = generateSequence { DungeonRunInfo() }.take(maxChests)
+        fun generateMaxChestAsArrayList() = generateMaxChest().toCollection(ArrayList())
+
         fun getLastActiveChest(includeDungeonKey: Boolean = false) =
             (croesusChests?.indexOfLast {
                 it.floor != null &&
