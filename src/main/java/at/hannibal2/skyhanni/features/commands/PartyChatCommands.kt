@@ -7,9 +7,13 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object PartyChatCommands {
+
+    private val config get() = SkyHanniMod.feature.misc.partyCommands
 
     data class PartyChatCommand(
         val names: List<String>,
@@ -18,12 +22,13 @@ object PartyChatCommands {
         val executable: (PartyChatEvent) -> Unit,
     )
 
-    private fun useConfig() = SkyHanniMod.feature.misc.partyCommands
+    private var lastWarp = SimpleTimeMark.farPast()
+    private var lastAllInvite = SimpleTimeMark.farPast()
 
     private val allPartyCommands = listOf(
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
-            { useConfig().transferCommand },
+            { config.transferCommand },
             requiresPartyLead = true,
             executable = {
                 ChatUtils.sendCommandToServer("party transfer ${it.cleanedAuthor}")
@@ -31,10 +36,20 @@ object PartyChatCommands {
         ),
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
-            { useConfig().warpCommand },
+            { config.warpCommand && lastWarp.passedSince() > 5.seconds },
             requiresPartyLead = true,
             executable = {
+                lastWarp = SimpleTimeMark.now()
                 ChatUtils.sendCommandToServer("party warp")
+            }
+        ),
+        PartyChatCommand(
+            listOf("allinv", "allinvite"),
+            { config.allInviteCommand && lastAllInvite.passedSince() > 2.seconds },
+            requiresPartyLead = true,
+            executable = {
+                lastAllInvite = SimpleTimeMark.now()
+                ChatUtils.sendCommandToServer("party settings allinvite")
             }
         ),
     )
@@ -49,7 +64,7 @@ object PartyChatCommands {
 
     private fun isTrustedUser(name: String): Boolean {
         val friend = FriendAPI.getAllFriends().find { it.name == name }
-        return when (useConfig().defaultRequiredTrustLevel) {
+        return when (config.defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
             PartyCommandsConfig.TrustedUser.ANYONE -> true

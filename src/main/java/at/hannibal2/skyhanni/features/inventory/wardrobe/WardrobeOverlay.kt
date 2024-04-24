@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -62,10 +63,8 @@ class WardrobeOverlay {
         if (!tempToggleShowOverlay) return
 
         val gui = event.gui
-        val player = Minecraft.getMinecraft().thePlayer
         val centerX = gui.width / 2
         val centerY = gui.height / 2
-        //val totalPlayers = 18
         val totalPlayers = list.size
         val maxPlayersPerRow = 9
         val playerWidth = 50
@@ -78,44 +77,7 @@ class WardrobeOverlay {
 
         val startY = centerY + playerHeight - totalHeight / 2
 
-
-        val tempTogglePos = Position((gui.width * 0.85).toInt(), (gui.height * 0.9).toInt())
-        val tempToggleRenderable = Renderable.horizontalContainer(
-            listOf(
-                Renderable.drawInsideRoundedRect(
-                    Renderable.clickable(
-                        Renderable.placeholder(30, 30),
-                        bypassChecks = true,
-                        onClick = {
-                            ChatUtils.chat("Clicked on wardrobe toggle")
-                            tempToggleShowOverlay = false
-                        },
-                    ),
-                    Color.BLACK,
-                ), Renderable.string("Temp toggle")
-            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
-        )
-        display += tempTogglePos to tempToggleRenderable
-
-        val favoriteTogglePos = Position(tempTogglePos.rawX, tempTogglePos.rawY - 50)
-        val favoriteToggleRenderable = Renderable.horizontalContainer(
-            listOf(
-                Renderable.drawInsideRoundedRect(
-                    Renderable.clickable(
-                        Renderable.placeholder(30, 30),
-                        bypassChecks = true,
-                        onClick = {
-                            ChatUtils.chat("Clicked on favorite toggle")
-                            favoriteToggle = !favoriteToggle
-                        },
-                    ),
-                    if (favoriteToggle) Color.GREEN else Color.RED
-                ), Renderable.string("Favorite toggle")
-            ), spacing = 10, verticalAlign = RenderUtils.VerticalAlignment.CENTER
-        )
-        display += favoriteTogglePos to favoriteToggleRenderable
-
-        val isRenderableCacheEmpty = renderablesCache.isEmpty()
+        display += addButtons(gui.width, gui.height, totalHeight)
 
         GlStateManager.pushMatrix()
         GlStateManager.color(1f, 1f, 1f, 1f)
@@ -138,7 +100,7 @@ class WardrobeOverlay {
                 val fakePlayer = wardrobeSlot.getFakePlayer()
 
                 fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.getArmor().map { it.copy().removeEnchants() }.reversed().toTypedArray()
+                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
                 if (!wardrobeSlot.isInCurrentPage()) {
                     scale *= 0.9
@@ -160,15 +122,14 @@ class WardrobeOverlay {
                         lore.add("§aEstimated Armor Value:")
 
                         var totalPrice = 0.0
-                        for (item in wardrobeSlot.getArmor().filter { it != WardrobeAPI.AIR }) {
+                        for (item in wardrobeSlot.getArmor().filterNotNull()) {
                             val price = item.getPrice()
                             totalPrice += price
                             lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
                         }
 
-                        if (wardrobeSlot.getArmor().any { it != WardrobeAPI.AIR }) {
+                        if (wardrobeSlot.getArmor().any { it != null }) {
                             lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
-
                             Renderable.toolTipContainer(lore, containerWidth, containerHeight)
                         } else {
                             Renderable.placeholder(containerWidth, containerHeight)
@@ -200,7 +161,7 @@ class WardrobeOverlay {
                 val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
 
-                display += Position(playerX, playerY) to Renderable.player(fakePlayer, eyesX, eyesY, scale.toInt())
+                display += Position(playerX, playerY) to Renderable.entity(fakePlayer, eyesX, eyesY, scale.toInt())
                 RenderLivingEntityHelper.removeEntityColor(fakePlayer)
 
                 slot++
@@ -228,6 +189,55 @@ class WardrobeOverlay {
 
     private fun update() {
         renderablesCache = mutableListOf()
+    }
+
+    private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
+        val buttonWidth = 20
+        val centerX = screenWidth / 2
+        val buttonY = screenHeight / 2 + playerHeight / 2 + 15
+        val padding = 10
+
+        val renderables = listOf(
+            Renderable.drawInsideRoundedRect(
+                Renderable.clickAndHoverable(
+                    Renderable.toolTipContainer(
+                        listOf(
+                            "§aToggle Wardrobe Overlay for one time",
+                            " §7This will hide the overlay",
+                            " §7until you open the wardrobe again",
+                        ),
+                        buttonWidth,
+                        buttonWidth,
+                    ),
+                    Renderable.placeholder(buttonWidth, buttonWidth),
+                    onClick = { tempToggleShowOverlay = false },
+                ),
+                Color.BLACK,
+            ),
+            Renderable.drawInsideRoundedRect(
+                Renderable.clickAndHoverable(
+                    Renderable.toolTipContainer(
+                        listOf(
+                            "§aToggle Favorite Selector",
+                            " §7This will allow you to toggle",
+                            " §7the favorite status of the armor pieces",
+                        ),
+                        buttonWidth,
+                        buttonWidth,
+                    ),
+                    Renderable.placeholder(buttonWidth, buttonWidth),
+                    onClick = { favoriteToggle = !favoriteToggle },
+                ),
+                if (favoriteToggle) Color.GREEN else Color.RED,
+            ),
+        )
+
+        val totalWidth = renderables.sumOf { it.width } + (renderables.size - 1) * padding
+        val startX = centerX - totalWidth / 2
+
+        for ((index, renderable) in renderables.withIndex()) {
+            add(Position(startX + index * (renderable.width + padding), buttonY) to renderable)
+        }
     }
 
     private fun ItemStack.getPrice(): Double =

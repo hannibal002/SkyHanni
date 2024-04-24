@@ -680,7 +680,11 @@ interface Renderable {
             }
         }
 
-        fun player(
+        /**
+         * The x and y coordinates are the bottom middle of the renderable.
+         * Don't ask me, ask Mojang.
+         */
+        fun entity(
             player: EntityLivingBase,
             eyesX: Float = 0f,
             eyesY: Float = 0f,
