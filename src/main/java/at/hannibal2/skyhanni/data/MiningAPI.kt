@@ -22,7 +22,7 @@ object MiningAPI {
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels")
     val coldReset by group.pattern(
         "cold.reset",
-        "§cThe warmth of the campfire reduced your §r§b❄ Cold §r§cto 0!|§c ☠ §r§7You froze to death§r§7."
+        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7."
     )
     val coldResetDeath by group.pattern(
         "cold.deathreset",
