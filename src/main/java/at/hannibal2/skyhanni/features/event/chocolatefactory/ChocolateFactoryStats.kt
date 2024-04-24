@@ -42,6 +42,13 @@ object ChocolateFactoryStats {
 
         val timeUntilPrestige = ChocolateAmount.PRESTIGE.timeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
 
+        // todo once TimeUtils.formatDuration() is no longer used add custom formatting for infinite
+        val prestigeEstimate = if (timeUntilPrestige == Duration.INFINITE) {
+            "§cNever"
+        } else {
+            "§6${timeUntilPrestige.format()}"
+        }
+
         displayList = formatList(buildList {
             add("§6§lChocolate Factory Stats")
 
@@ -64,11 +71,7 @@ object ChocolateFactoryStats {
             add("")
 
             add("§eTime Tower: §6$timeTowerInfo")
-            if (timeUntilPrestige == Duration.INFINITE) {
-                add("§eTime To Prestige: §cNever")
-            } else {
-                add("§eTime To Prestige: §6${timeUntilPrestige.format()}")
-            }
+            add("§eTime To Prestige: $prestigeEstimate")
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
 
