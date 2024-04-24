@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.JsonElement
-import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import io.github.moulberry.notenoughupdates.util.ApiUtil
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
+import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
@@ -99,10 +99,10 @@ object UpdateManager {
                         ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now. ")
                         queueUpdate()
                     } else if (config.autoUpdates) {
-                        ChatUtils.clickableChat(
+                        ChatUtils.chatAndOpenConfig(
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
-                            "sh"
+                            SkyHanniMod.feature.about::autoUpdates
                         )
                     }
                 }

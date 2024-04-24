@@ -371,7 +371,7 @@ object PowderTracker {
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetpowdertracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

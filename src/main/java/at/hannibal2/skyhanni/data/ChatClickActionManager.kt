@@ -15,6 +15,8 @@ object ChatClickActionManager {
     }
 
     private fun ClickableAction.sendToChat() {
+        @Suppress("DEPRECATION")
+        // TODO rename function
         ChatUtils.clickableChat(message, "shaction $token", prefix = false)
     }
 
@@ -42,6 +44,6 @@ object ChatClickActionManager {
         val message: String,
         val onClick: () -> Any,
         val oneTime: Boolean = true,
-        val expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture()
+        val expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
     )
 }
