@@ -141,5 +141,5 @@ object IslandLeaveJoinMsgs {
         return isPlayerKnown(cleanPlayer) || (config.alwaysOnYourIsland && IslandType.onPrivateWorld()) || (config.alwaysOnKnownIslands && onKnownIsland)
     }
 
-    private fun isPlayerKnown(player: String): Boolean = AdvancedPlayerList.socialScore(player) > 1
+    private fun isPlayerKnown(player: String): Boolean = AdvancedPlayerList.getSocialIcon(player) != AdvancedPlayerList.SocialIcon.OTHER
 }

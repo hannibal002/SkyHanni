@@ -221,13 +221,18 @@ object AdvancedPlayerList {
         return r
     }
 
-    private fun getSocialIcon(name: String) = when {
+    fun getSocialIcon(name: String) = when {
         LorenzUtils.getPlayerName() == name -> SocialIcon.ME
-        MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
-        PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
-        FriendAPI.isFriend(name, onlyBest = true) -> SocialIcon.BEST_FRIEND
-        FriendAPI.isFriend(name) -> SocialIcon.FRIEND
-        GuildAPI.isInGuild(name) -> SocialIcon.GUILD
+        config.knownPlayersCustomization.isMarkedPlayersKnown &&
+            MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
+        !config.knownPlayersCustomization.isFriendsKnown.equals(IsFriendsKnown.NO_FRIENDS) &&
+            FriendAPI.isFriend(name, onlyBest = true) -> SocialIcon.BEST_FRIEND
+        config.knownPlayersCustomization.isPartyKnown &&
+            PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
+        config.knownPlayersCustomization.isFriendsKnown.equals(IsFriendsKnown.ALL_FRIENDS) &&
+            FriendAPI.isFriend(name) -> SocialIcon.FRIEND
+        config.knownPlayersCustomization.isGuildKnown &&
+            GuildAPI.isInGuild(name) -> SocialIcon.GUILD
         else -> SocialIcon.OTHER
     }
 
@@ -251,6 +256,7 @@ object AdvancedPlayerList {
     enum class SocialIcon(val icon: () -> String, val score: Int) {
         ME("", 10),
         MARKED({ "${MarkedPlayerManager.config.chatColor.getChatColor()}§lMARKED" }, 8),
+        BEST_FRIEND("§d§lBF", 6),
         PARTY("§9§lP", 5),
         FRIEND("§d§lF", 4),
         GUILD("§2§lG", 3),
