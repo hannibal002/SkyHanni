@@ -23,10 +23,11 @@ class BazaarCancelledBuyOrderClipboard {
     /**
      * REGEX-TEST: §6§7from §a50§7x §7missing items.
      * REGEX-TEST: §7§a22§7x §7missing items.
+     * REGEX-TEST: §6coins §7from §a2,000§7x §7missing items.
      */
     private val lastAmountPattern by patternGroup.pattern(
         "lastamount",
-        "(?:§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\."
+        "(?:§6coins §7from |§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\."
     )
     private val cancelledMessagePattern by patternGroup.pattern(
         "cancelledmessage",
