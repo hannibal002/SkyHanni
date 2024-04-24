@@ -14,11 +14,8 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSl
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.locked
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -26,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -79,6 +75,8 @@ class WardrobeOverlay {
 
         display += addButtons(gui.width, gui.height, totalHeight)
 
+        val isRenderableCacheEmpty = renderablesCache.isEmpty()
+
         GlStateManager.pushMatrix()
         GlStateManager.color(1f, 1f, 1f, 1f)
 
@@ -102,15 +100,6 @@ class WardrobeOverlay {
                 fakePlayer.inventory.armorInventory =
                     wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
-                if (!wardrobeSlot.isInCurrentPage()) {
-                    scale *= 0.9
-                    RenderLivingEntityHelper.setEntityColor(
-                        fakePlayer,
-                        Color.GRAY.withAlpha(100),
-                        ::isEnabled
-                    )
-                }
-
                 if (isRenderableCacheEmpty) {
                     val padding = 10
                     val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
@@ -118,18 +107,19 @@ class WardrobeOverlay {
                     val containerHeight = playerHeight + 2 * padding
 
                     val hoverRenderable = {
-                        val lore = mutableListOf<String>()
-                        lore.add("§aEstimated Armor Value:")
-
-                        var totalPrice = 0.0
-                        for (item in wardrobeSlot.getArmor().filterNotNull()) {
-                            val price = item.getPrice()
-                            totalPrice += price
-                            lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
-                        }
-
                         if (wardrobeSlot.getArmor().any { it != null }) {
+                            val lore = mutableListOf<String>()
+                            lore.add("§aEstimated Armor Value:")
+
+                            var totalPrice = 0.0
+                            for (item in wardrobeSlot.getArmor().filterNotNull()) {
+                                val price = item.getPrice()
+                                totalPrice += price
+                                lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
+                            }
+
                             lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+
                             Renderable.toolTipContainer(lore, containerWidth, containerHeight)
                         } else {
                             Renderable.placeholder(containerWidth, containerHeight)
@@ -161,9 +151,18 @@ class WardrobeOverlay {
                 val eyesX = if (config.eyesFollowMouse) mouseXRelativeToPlayer else 0f
                 val eyesY = if (config.eyesFollowMouse) mouseYRelativeToPlayer else 0f
 
-                display += Position(playerX, playerY) to Renderable.entity(fakePlayer, eyesX, eyesY, scale.toInt())
-                RenderLivingEntityHelper.removeEntityColor(fakePlayer)
+                val color = if (!wardrobeSlot.isInCurrentPage()) {
+                    scale *= 0.9
+                    Color.GRAY.withAlpha(100)
+                } else null
 
+                display += Position(playerX, playerY) to Renderable.entity(
+                    fakePlayer,
+                    eyesX,
+                    eyesY,
+                    scale.toInt(),
+                    color
+                )
                 slot++
             }
         }
@@ -189,6 +188,7 @@ class WardrobeOverlay {
 
     private fun update() {
         renderablesCache = mutableListOf()
+        fakePlayerCache = mutableMapOf()
     }
 
     private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
@@ -312,5 +312,4 @@ class WardrobeOverlay {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()
-
 }

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -685,10 +686,12 @@ interface Renderable {
          * Don't ask me, ask Mojang.
          */
         fun entity(
-            player: EntityLivingBase,
+            entity: EntityLivingBase,
             eyesX: Float = 0f,
             eyesY: Float = 0f,
             scale: Int = 30,
+            color: Int? = null,
+            condition: () -> Boolean = { true }
         ) = object : Renderable {
             override val width = scale
             override val height = scale * 2
@@ -696,7 +699,8 @@ interface Renderable {
             override val verticalAlign = VerticalAlignment.TOP
 
             override fun render(posX: Int, posY: Int) {
-                drawEntityOnScreen(posX, posY, scale, eyesX, eyesY, player)
+                if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, condition)
+                drawEntityOnScreen(posX, posY, scale, eyesX, eyesY, entity)
             }
         }
     }
