@@ -276,7 +276,7 @@ class WardrobeOverlay {
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!inWardrobe()) return
-        update()
+        reset()
     }
 
     private fun clickWardrobeSlot(wardrobeSlot: WardrobeAPI.WardrobeSlot) {
