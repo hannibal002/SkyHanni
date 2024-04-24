@@ -40,11 +40,11 @@ class GardenInventoryTooltipOverflow {
 
         var next = false
         val iterator = event.toolTip.listIterator()
-        val percent = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
+        val percentage = have.toDouble() / need.toDouble()
         for (line in iterator) {
             val maxTierReached = "§7§8Max tier reached!"
             if (line.contains(maxTierReached)) {
-                iterator.set("§7Progress to tier $nextLevel: §e$percent")
+                iterator.set("§7Progress to tier $nextLevel: §e${LorenzUtils.formatPercentage(percentage)}")
                 event.itemStack.name = "§a${crop.cropName} $level"
                 next = true
                 continue
@@ -52,7 +52,7 @@ class GardenInventoryTooltipOverflow {
             if (next) {
                 val bar = "                    "
                 if (line.contains(bar)) {
-                    val progressBar = StringUtils.progressBar(have.toDouble() / need.toDouble())
+                    val progressBar = StringUtils.progressBar(percentage)
                     iterator.set("$progressBar §e${have.addSeparators()}§6/§e${need.addSeparators()}")
                 }
             }
