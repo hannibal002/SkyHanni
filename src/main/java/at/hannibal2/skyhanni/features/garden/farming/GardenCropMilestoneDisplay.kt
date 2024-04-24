@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIconRenderable
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
@@ -36,13 +35,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 
 object GardenCropMilestoneDisplay {
 
     private var progressDisplay = emptyList<Renderable>()
-    private var mushroomCowPerkDisplay = emptyList<List<Any>>()
+    private var mushroomCowPerkDisplay = emptyList<Renderable>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
     private val config get() = GardenAPI.config.cropMilestones
     private val overflowConfig get() = config.overflow
@@ -79,7 +77,7 @@ object GardenCropMilestoneDisplay {
         )
 
         if (config.mushroomPetPerk.enabled) {
-            config.mushroomPetPerk.pos.renderStringsAndItems(
+            config.mushroomPetPerk.pos.renderRenderables(
                 mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk"
             )
         }
@@ -280,13 +278,13 @@ object GardenCropMilestoneDisplay {
         val allowOverflow = overflowConfig.display
         if (mushroom.isMaxed() && !allowOverflow) {
             mushroomCowPerkDisplay = listOf(
-                listOf("§6Mooshroom Cow Perk"),
-                listOf("§eMushroom crop is maxed!"),
+                Renderable.string("§6Mooshroom Cow Perk"),
+                Renderable.string("§eMushroom crop is maxed!"),
             )
             return
         }
 
-        val lineMap = HashMap<Int, List<Any>>()
+        val lineMap = HashMap<Int, Renderable>()
         val counter = mushroom.getCounter()
 
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, mushroom, allowOverflow)
@@ -303,14 +301,14 @@ object GardenCropMilestoneDisplay {
 
         val missing = need - have
 
-        lineMap[0] = Collections.singletonList("§6Mooshroom Cow Perk")
+        lineMap[0] = Renderable.string("§6Mooshroom Cow Perk")
 
-        val list = mutableListOf<Any>()
-        list.addCropIcon(mushroom)
-        list.add("§7Mushroom Tier $nextTier")
-        lineMap[1] = list
+        val list = mutableListOf<Renderable>()
+        list.addCropIconRenderable(mushroom)
+        list.addString("§7Mushroom Tier $nextTier")
+        lineMap[1] = Renderable.horizontalContainer(list)
 
-        lineMap[2] = Collections.singletonList("§e$haveFormat§8/§e$needFormat")
+        lineMap[2] = Renderable.string("§e$haveFormat§8/§e$needFormat")
 
         val speed = GardenCropSpeed.averageBlocksPerSecond
         if (speed != 0.0) {
@@ -321,18 +319,18 @@ object GardenCropMilestoneDisplay {
             // TODO, change functionality to use enum rather than ordinals
             val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
             val duration = TimeUtils.formatDuration(millis.toLong(), biggestUnit)
-            lineMap[3] = Collections.singletonList("§7In §b$duration")
+            lineMap[3] = Renderable.string("§7In §b$duration")
         }
 
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
-        lineMap[4] = Collections.singletonList("§7Percentage: §e$percentageFormat")
+        lineMap[4] = Renderable.string("§7Percentage: §e$percentageFormat")
 
         if (currentTier >= 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
             GardenCropMilestones.onOverflowLevelUp(mushroom, currentTier - 1, nextTier - 1)
             lastMushWarnedLevel = currentTier
         }
 
-        val newList = mutableListOf<List<Any>>()
+        val newList = mutableListOf<Renderable>()
         for (index in config.mushroomPetPerk.text) {
             // TODO, change functionality to use enum rather than ordinals
             lineMap[index.ordinal]?.let {
