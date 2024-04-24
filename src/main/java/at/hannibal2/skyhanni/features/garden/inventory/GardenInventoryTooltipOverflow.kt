@@ -30,25 +30,20 @@ class GardenInventoryTooltipOverflow {
         val stack = event.itemStack
         if (!stack.getLore().any { it.contains("Max tier reached!") }) return
 
-        val iterator = event.toolTip.listIterator()
         val split = stack.cleanName().split(" ")
-        val useRoman = split.last().toIntOrNull() == null
-        val cropName = split.dropLast(1).joinToString(" ")
-        val crop = CropType.getByName(cropName.removeColor()) ?: return
+        val crop = getCrop(split)
         val counter = crop.getCounter()
+
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
-        val nextTier = currentTier + 1
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflow = true)
-        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop, allowOverflow = true)
-        val have = counter - cropsForCurrentTier
-        val need = cropsForNextTier - cropsForCurrentTier
+        val (have, need) = getHaveNeed(currentTier, crop, counter)
+        val (level, nextLevel) = getLevels(split, currentTier)
+
         var next = false
+        val iterator = event.toolTip.listIterator()
         val percent = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
         for (line in iterator) {
             val maxTierReached = "§7§8Max tier reached!"
             if (line.contains(maxTierReached)) {
-                val level = if (useRoman) currentTier.toRoman() else currentTier
-                val nextLevel = if (useRoman) nextTier.toRoman() else nextTier
                 iterator.set("§7Progress to tier $nextLevel: §e$percent")
                 event.itemStack.name = "§a${crop.cropName} $level"
                 next = true
@@ -62,6 +57,35 @@ class GardenInventoryTooltipOverflow {
                 }
             }
         }
+    }
+
+    private fun getLevels(
+        split: List<String>,
+        currentTier: Int,
+    ): Pair<String, String> {
+        val nextTier = currentTier + 1
+        val useRoman = split.last().toIntOrNull() == null
+        val level = if (useRoman) currentTier.toRoman() else "" + currentTier
+        val nextLevel = if (useRoman) nextTier.toRoman() else "" + nextTier
+        return Pair(level, nextLevel)
+    }
+
+    private fun getHaveNeed(
+        currentTier: Int,
+        crop: CropType,
+        counter: Long,
+    ): Pair<Long, Long> {
+        val nextTier = currentTier + 1
+        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop, allowOverflow = true)
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflow = true)
+        val have = counter - cropsForCurrentTier
+        val need = cropsForNextTier - cropsForCurrentTier
+        return Pair(have, need)
+    }
+
+    private fun getCrop(split: List<String>): CropType {
+        val cropName = split.dropLast(1).joinToString(" ")
+        return CropType.getByName(cropName.removeColor())
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.inventoryTooltip
