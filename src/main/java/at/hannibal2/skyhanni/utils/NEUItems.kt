@@ -258,9 +258,7 @@ object NEUItems {
     }
 
     fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
-        if (multiplierCache.contains(internalName)) {
-            return multiplierCache[internalName]!!
-        }
+        multiplierCache[internalName]?.let { return it }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
                 "Could not load recipe data.",
