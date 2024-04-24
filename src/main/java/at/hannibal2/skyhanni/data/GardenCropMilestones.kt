@@ -57,6 +57,7 @@ object GardenCropMilestones {
         val customGoalLevel = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone?.get(crop) ?: 0
         val goalReached = newLevel == customGoalLevel
 
+        // TODO utils function that is shared with Garden Level Display
         val rewards = buildList {
             add("    §r§8+§aRespect from Elite Farmers and SkyHanni members :)")
             add("    §r§8+§b1 Flexing Point")
