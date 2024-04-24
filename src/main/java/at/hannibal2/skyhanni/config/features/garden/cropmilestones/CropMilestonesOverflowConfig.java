@@ -7,9 +7,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CropMilestonesOverflowConfig {
 
     @Expose
-    @ConfigOption(name = "Display", desc = "Overflow in Crop Milestone display.")
+    @ConfigOption(name = "Crop Milestone Display", desc = "Overflow in Crop Milestone display.")
     @ConfigEditorBoolean
-    public boolean display = false;
+    public boolean cropMilestoneDisplay = false;
 
     @Expose
     @ConfigOption(name = "Best Crop Time", desc = "Overflow in Best Crop Time Display.")

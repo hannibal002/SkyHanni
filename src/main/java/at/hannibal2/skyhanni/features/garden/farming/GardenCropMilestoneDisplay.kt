@@ -150,7 +150,7 @@ object GardenCropMilestoneDisplay {
         lineMap[0] = Collections.singletonList("§6Crop Milestones")
 
         val customTargetLevel = storage?.get(crop) ?: 0
-        val overflowDisplay = overflowConfig.display
+        val overflowDisplay = overflowConfig.cropMilestoneDisplay
         val allowOverflow = overflowDisplay || (customTargetLevel != 0)
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow)
         var nextTier = if (config.bestShowMaxedNeeded.get() && currentTier <= 46) 46 else currentTier + 1
@@ -274,7 +274,7 @@ object GardenCropMilestoneDisplay {
 
     private fun addMushroomCowData() {
         val mushroom = CropType.MUSHROOM
-        val allowOverflow = overflowConfig.display
+        val allowOverflow = overflowConfig.cropMilestoneDisplay
         if (mushroom.isMaxed(allowOverflow)) {
             mushroomCowPerkDisplay = listOf(
                 listOf("§6Mooshroom Cow Perk"),
