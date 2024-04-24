@@ -99,10 +99,6 @@ object GardenCropMilestones {
         cropCounter?.set(this, counter)
     }
 
-    // TODO create new option in overflow settings for best crop time
-    @Deprecated("do not use config.overflowMilestones", ReplaceWith(""))
-    fun CropType.isMaxed() = isMaxed(config.overflowMilestones)
-
     fun CropType.isMaxed(useOverflow: Boolean): Boolean {
         if (useOverflow) return false
 
