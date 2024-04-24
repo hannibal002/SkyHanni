@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -169,7 +169,7 @@ object GetFromSackAPI {
         var amountString = args.last()
         amountString = Calculator.calculate(amountString).toString()
 
-        if (!amountString.isInt()) return CommandResult.WRONG_AMOUNT to null
+        if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
         val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
 
@@ -187,7 +187,7 @@ object GetFromSackAPI {
             else -> return CommandResult.WRONG_IDENTIFIER to null
         }
 
-        return CommandResult.VALID to PrimitiveItemStack(item, amountString.toInt())
+        return CommandResult.VALID to PrimitiveItemStack(item, amountString.toDouble().toInt())
     }
 
     @SubscribeEvent

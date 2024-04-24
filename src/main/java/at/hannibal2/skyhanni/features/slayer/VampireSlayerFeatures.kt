@@ -127,16 +127,9 @@ object VampireSlayerFeatures {
                         else if (containCoop && configCoopBoss.twinClawsTitle) true
                         else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsTitle
 
-                    val shouldSendSound =
-                        if (containUser && configOwnBoss.twinClawsSound) true
-                        else if (containCoop && configCoopBoss.twinClawsSound) true
-                        else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsSound
-
-                    if (shouldSendTitle || shouldSendSound) {
+                    if (shouldSendTitle) {
                         DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
                             if (nextClawSend < System.currentTimeMillis()) {
-                                if (shouldSendSound)
-                                    playTwinclawsSound()
                                 if (shouldSendTitle) {
                                     LorenzUtils.sendTitle(
                                         "§6§lTWINCLAWS",
@@ -200,15 +193,6 @@ object VampireSlayerFeatures {
             if (shouldRender) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(this, color) { isEnabled() }
                 entityList.add(this)
-            }
-        }
-    }
-
-    private fun playTwinclawsSound() {
-        SkyHanniMod.coroutineScope.launch {
-            repeat(15) {
-                delay(50)
-                SoundUtils.createSound("random.orb", 0.5f).playSound()
             }
         }
     }

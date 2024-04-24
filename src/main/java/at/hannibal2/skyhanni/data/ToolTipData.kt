@@ -6,20 +6,16 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import net.minecraft.inventory.Slot
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // Please use LorenzToolTipEvent over ItemTooltipEvent if no special EventPriority is necessary
-class ToolTipData {
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: ItemTooltipEvent) {
-        val toolTip = event.toolTip ?: return
-        val slot = lastSlot ?: return
-        val itemStack = event.itemStack ?: return
+object ToolTipData {
+    fun onTooltip(toolTip: MutableList<String>): List<String> {
+        val slot = lastSlot ?: return toolTip
+        val itemStack = slot.stack ?: return toolTip
         try {
-            LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()
+            if (LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()) {
+                toolTip.clear()
+            }
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error in item tool tip parsing or rendering detected",
@@ -33,10 +29,9 @@ class ToolTipData {
                 "lore" to itemStack.getLore(),
             )
         }
+        return toolTip
     }
 
-    companion object {
+    var lastSlot: Slot? = null
 
-        var lastSlot: Slot? = null
-    }
 }

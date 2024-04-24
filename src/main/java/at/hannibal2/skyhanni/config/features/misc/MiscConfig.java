@@ -251,4 +251,9 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
+
+    @ConfigOption(name = "Hide Far Entities", desc = "")
+    @Accordion
+    @Expose
+    public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 }

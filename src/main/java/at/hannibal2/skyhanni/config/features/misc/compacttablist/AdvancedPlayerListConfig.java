@@ -94,13 +94,4 @@ public class AdvancedPlayerListConfig {
     @ConfigOption(name = "Mark Special Persons", desc = "Show special icons behind the name of guild members, party members, friends, and marked players.")
     @ConfigEditorBoolean
     public boolean markSpecialPersons = false;
-
-    @Expose
-    @ConfigOption(
-        name = "Mark SkyHanni Devs",
-        desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
-            "§eThose are the folks that coded the mod for you for free :)"
-    )
-    @ConfigEditorBoolean
-    public boolean markSkyHanniDevs = true;
 }
