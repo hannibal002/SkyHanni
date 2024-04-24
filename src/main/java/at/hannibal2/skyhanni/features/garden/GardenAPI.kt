@@ -174,7 +174,7 @@ object GardenAPI {
         scale: Double = NEUItems.itemFontSize,
         highlight: Boolean = false,
     ) {
-        addItemStack(crop.icon.copy(), highlight, scale = scale)
+        addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
