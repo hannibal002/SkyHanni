@@ -246,7 +246,9 @@ object GardenNextJacobContest {
                 } else {
                     ChatUtils.clickableChat(
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
-                        "shsendcontests"
+                        onClick = {
+                            shareContests()
+                        }
                     )
                 }
             }
@@ -289,22 +291,18 @@ object GardenNextJacobContest {
         }
     }
 
-    fun shareContestConfirmed(array: Array<String>) {
-        if (array.size == 1) {
-            if (array[0] == "enable") {
-                config.shareAutomatically = ShareContestsEntry.AUTO
-                SkyHanniMod.feature.storage.contestSendingAsked = true
-                ChatUtils.chat("§2Enabled automatic sharing of future contests!")
-            }
-            return
-        }
+    private fun shareContests() {
         if (contests.size == MAX_CONTESTS_PER_YEAR) {
             sendContests()
         }
         if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == ShareContestsEntry.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to automatically share future contests!",
-                "shsendcontests enable"
+                onClick = {
+                    config.shareAutomatically = ShareContestsEntry.AUTO
+                    SkyHanniMod.feature.storage.contestSendingAsked = true
+                    ChatUtils.chat("§2Enabled automatic sharing of future contests!")
+                }
             )
         }
     }
