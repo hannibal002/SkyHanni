@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
@@ -159,6 +158,17 @@ class ConfigManager {
             .create()
 
         var configDirectory = File("config/skyhanni")
+
+        inline fun <reified T> GsonBuilder.registerTypeAdapter(
+            crossinline write: (JsonWriter, T) -> Unit,
+            crossinline read: (JsonReader) -> T,
+        ): GsonBuilder {
+            this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
+                override fun write(out: JsonWriter, value: T) = write(out, value)
+                override fun read(reader: JsonReader) = read(reader)
+            }.nullSafe())
+            return this
+        }
     }
 
     val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
