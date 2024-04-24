@@ -7,11 +7,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
@@ -23,7 +21,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -33,7 +30,6 @@ import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.TypeAdapterFactory
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
@@ -153,32 +149,6 @@ class ConfigManager {
                         return reader.nextString().toLong().asTimeMark()
                     }
                 }.nullSafe())
-                .registerTypeAdapter(HypixelApiTrophyFish::class.java, object : TypeAdapter<HypixelApiTrophyFish>() {
-                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
-
-                    override fun read(reader: JsonReader): HypixelApiTrophyFish {
-                        val trophyFish = mutableMapOf<String, Int>()
-                        var totalCaught = 0
-                        reader.beginObject()
-                        while (reader.hasNext()) {
-                            val key = reader.nextName()
-                            if (key == "total_caught") {
-                                totalCaught = reader.nextInt()
-                                continue
-                            }
-                            if (reader.peek() == JsonToken.NUMBER) {
-                                val valueAsString = reader.nextString()
-                                if (valueAsString.isInt()) {
-                                    trophyFish[key] = valueAsString.toInt()
-                                    continue
-                                }
-                            }
-                            reader.skipValue()
-                        }
-                        reader.endObject()
-                        return HypixelApiTrophyFish(totalCaught, trophyFish)
-                    }
-                }.nullSafe())
                 .enableComplexMapKeySerialization()
         }
 
@@ -191,7 +161,7 @@ class ConfigManager {
 
         inline fun <reified T> GsonBuilder.registerTypeAdapter(
             crossinline write: (JsonWriter, T) -> Unit,
-            crossinline read: (JsonReader) -> T
+            crossinline read: (JsonReader) -> T,
         ): GsonBuilder {
             this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
                 override fun write(out: JsonWriter, value: T) = write(out, value)
