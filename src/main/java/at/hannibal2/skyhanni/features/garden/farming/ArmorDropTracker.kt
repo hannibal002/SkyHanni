@@ -165,7 +165,7 @@ object ArmorDropTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetarmordroptracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }
