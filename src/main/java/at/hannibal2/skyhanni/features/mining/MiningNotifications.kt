@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI.getFromChatMessageSackItems
+import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
@@ -76,7 +76,7 @@ object MiningNotifications {
             frostbitePattern.matches(message) -> {
                 if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope) {
                     runDelayed(0.5.seconds) {
-                        getFromChatMessageSackItems(ASCENSION_ROPE)
+                        GetFromSackAPI.getFromChatMessageSackItems(ASCENSION_ROPE)
                     }
                 }
             }
