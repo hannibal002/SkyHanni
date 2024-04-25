@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI.getFromChatMessageSackItem
+import at.hannibal2.skyhanni.api.GetFromSackAPI.getFromChatMessageSackItems
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.runDelayed
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -24,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object MiningNotifications {
 
-    val ASCENSION_ROPE = "ASCENSION_ROPE".asInternalName()
+    private val ASCENSION_ROPE = "ASCENSION_ROPE".asInternalName().makePrimitiveStack(1)
 
     enum class MiningNotificationList(val str: String, val notification: String) {
         MINESHAFT_SPAWN("§bGlacite Mineshaft", "§bMineshaft"),
@@ -75,7 +76,7 @@ object MiningNotifications {
             frostbitePattern.matches(message) -> {
                 if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope) {
                     runDelayed(0.5.seconds) {
-                        getFromChatMessageSackItem(ASCENSION_ROPE, 1)
+                        getFromChatMessageSackItems(ASCENSION_ROPE)
                     }
                 }
             }
