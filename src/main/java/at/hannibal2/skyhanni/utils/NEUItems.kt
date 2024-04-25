@@ -125,7 +125,8 @@ object NEUItems {
         for (rawInternalName in allNeuRepoItems().keys) {
             val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
             val internalName = rawInternalName.asInternalName()
-            map[name] = internalName
+            val storedName = name.removePrefix("[lvl 1➡100] ")
+            map[storedName] = internalName
             allInternalNames.add(internalName)
         }
         return map
