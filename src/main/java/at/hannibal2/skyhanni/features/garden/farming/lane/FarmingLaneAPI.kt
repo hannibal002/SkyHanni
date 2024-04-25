@@ -50,7 +50,9 @@ object FarmingLaneAPI {
 
         ChatUtils.clickableChat(
             "No ${crop.cropName} lane defined yet! Use §e/shlanedetection",
-            command = "shlanedetection"
+            onClick = {
+                FarmingLaneCreator.commandLaneDetection()
+            }
         )
     }
 

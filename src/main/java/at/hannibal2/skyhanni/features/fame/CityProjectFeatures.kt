@@ -80,7 +80,9 @@ class CityProjectFeatures {
 
         ChatUtils.clickableChat(
             "Daily City Project Reminder! (Click here to disable this reminder)",
-            "shstopcityprojectreminder"
+            onClick = {
+                disable()
+            }
         )
     }
 

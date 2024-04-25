@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
@@ -13,8 +11,10 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.item.ItemStack
+import net.minecraft.inventory.Slot
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,25 +23,29 @@ class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!VisitorAPI.inInventory) return
         if (!config.preventRefusing && !config.preventRefusingCopper && !config.preventAcceptingCopper) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
-        val refuseOfferStack = event.gui.inventorySlots.getSlot(REFUSE_SLOT).stack
-        val acceptOfferStack = event.gui.inventorySlots.getSlot(ACCEPT_SLOT).stack
+        val refuseOfferSlot = event.gui.inventorySlots.getSlot(REFUSE_SLOT)
+        val acceptOfferSlot = event.gui.inventorySlots.getSlot(ACCEPT_SLOT)
         val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
-            renderColor(refuseOfferStack, acceptOfferStack, LorenzColor.GREEN)
+            renderColor(refuseOfferSlot, acceptOfferSlot, LorenzColor.GREEN)
         } else {
-            renderColor(acceptOfferStack, refuseOfferStack, LorenzColor.RED)
+            renderColor(acceptOfferSlot, refuseOfferSlot, LorenzColor.RED)
         }
     }
 
-    private fun renderColor(backgroundStack: ItemStack?, outlineStack: ItemStack?, outlineColor: LorenzColor) {
-        if (!config.bypassKey.isKeyHeld()) backgroundStack?.background = LorenzColor.DARK_GRAY.addOpacity(config.opacity).rgb
-        if (config.optionOutline) outlineStack?.borderLine = outlineColor.addOpacity(200).rgb
+    private fun renderColor(backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
+        if (!config.bypassKey.isKeyHeld() && backgroundSlot != null) {
+            backgroundSlot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
+        }
+        if (config.optionOutline && outlineSlot != null) {
+            outlineSlot drawBorder outlineColor.addOpacity(200)
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -56,8 +60,8 @@ class VisitorRewardWarning {
         val isRefuseSlot = stack.name == "§cRefuse Offer"
         val isAcceptSlot = stack.name == "§aAccept Offer"
 
-        if (blockReason != null && !config.bypassKey.isKeyHeld() &&
-            ((blockReason.blockRefusing && isRefuseSlot) || !blockReason.blockRefusing && isAcceptSlot)) {
+        val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
+        if (!config.bypassKey.isKeyHeld() && shouldBlock) {
             event.isCanceled = true
             return
         }
@@ -83,7 +87,7 @@ class VisitorRewardWarning {
         val isRefuseSlot = event.itemStack.name == "§cRefuse Offer"
         val isAcceptSlot = event.itemStack.name == "§aAccept Offer"
 
-        val blockReason = visitor.blockReason?: return
+        val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return
         if (!blockReason.blockRefusing && !isAcceptSlot) return
 

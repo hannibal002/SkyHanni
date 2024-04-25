@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -71,7 +72,9 @@ object ProfileStorageData {
                 ChatUtils.clickableChat(
                     "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
                         "This is needed for the mod to function! And therefore this warning cannot be disabled",
-                    command = "widget"
+                    onClick = {
+                        HypixelCommands.widget()
+                    }
                 )
             } else {
                 ChatUtils.chat(
