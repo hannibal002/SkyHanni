@@ -93,7 +93,7 @@ object PartyChatCommands {
         if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) {
             return
         }
-        if (isBlockedUser(event.author)) {
+        if (isBlockedUser(name)) {
             if (config.showIgnoredReminder) ChatUtils.clickableChat("§cIgnoring chat command from ${event.author}. Unignore them using /shignore remove <player> or click here!",
                 { blacklistModify(event.author) })
             return
