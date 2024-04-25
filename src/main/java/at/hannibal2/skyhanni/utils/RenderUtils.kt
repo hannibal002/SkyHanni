@@ -37,6 +37,7 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -64,7 +65,9 @@ object RenderUtils {
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
-    private val matrixBuffer = GLAllocation.createDirectFloatBuffer(16);
+    private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16);
+
+    private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -1244,11 +1247,33 @@ object RenderUtils {
             worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
             worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
             worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
-            Tessellator.getInstance().draw()
+            tessellator.draw()
             if (!depth) {
                 GL11.glEnable(GL11.GL_DEPTH_TEST)
                 GlStateManager.depthMask(true)
             }
+        }
+
+        fun drawBezier2(p1: LorenzVec, p2: LorenzVec, p3: LorenzVec, color: Color, segments: Int = 30) {
+            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+            val ctrlpoints = p1.toFloatArray() + p2.toFloatArray() + p3.toFloatArray()
+            bezier2Buffer.clear()
+            ctrlpoints.forEach {
+                bezier2Buffer.put(it)
+            }
+            bezier2Buffer.flip()
+            GL11.glMap1f(
+                GL11.GL_MAP1_VERTEX_3, 0.0f, 1.0f, 3, 3,
+                bezier2Buffer
+            )
+
+            GL11.glEnable(GL11.GL_MAP1_VERTEX_3)
+
+            GL11.glBegin(GL11.GL_LINE_STRIP)
+            for (i in 0..segments) {
+                GL11.glEvalCoord1f(i.toFloat() / segments.toFloat())
+            }
+            GL11.glEnd()
         }
 
         companion object {
