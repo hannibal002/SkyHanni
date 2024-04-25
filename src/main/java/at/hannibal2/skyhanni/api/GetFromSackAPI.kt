@@ -61,7 +61,7 @@ object GetFromSackAPI {
     fun getFromChatMessageSackItem(
         item: NEUInternalName,
         amount: Int,
-        text: String = "§lCLICK HERE§r§e to grab §ax${amount} §9${item.asString()}§e from sacks!"
+        text: String = "§lCLICK HERE§r§e to grab §ax${amount} §9${item.itemName}§e from sacks!"
     ) =
         getFromChatMessageSackItems(item.makePrimitiveStack(amount), text)
 
