@@ -33,7 +33,7 @@ object TabListData {
     fun getHeader() = header
     fun getFooter() = footer
 
-    fun toggleDebugCommand() {
+    fun toggleDebug() {
         if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
             debugCache = null
@@ -48,7 +48,12 @@ object TabListData {
 
     fun copyCommand(args: Array<String>) {
         if (debugCache != null) {
-            ChatUtils.clickableChat("Tab list debug is enabled!", "shdebugtablist")
+            ChatUtils.clickableChat(
+                "Tab list debug is enabled!",
+                onClick = {
+                    toggleDebug()
+                }
+            )
             return
         }
 

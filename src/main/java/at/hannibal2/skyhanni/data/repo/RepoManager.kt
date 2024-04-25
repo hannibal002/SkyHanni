@@ -177,7 +177,9 @@ class RepoManager(private val configLocation: File) {
             if (error) {
                 ChatUtils.clickableChat(
                     "Error with the repo detected, try /shupdaterepo to fix it!",
-                    "shupdaterepo",
+                    onClick = {
+                        SkyHanniMod.repo.updateRepo()
+                    },
                     prefixColor = "§c"
                 )
                 if (unsuccessfulConstants.isEmpty()) {

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -119,7 +120,7 @@ class PestSpawn {
         PestSpawnEvent(amount, plotNames, unknownAmount).postAndCatch()
 
         if (unknownAmount) return // todo make this work with offline pest spawn messages
-        val plotName = plotNames.firstOrNull()
+        val plotName = plotNames.firstOrNull() ?: error("first plot name is null")
         val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 
@@ -128,7 +129,9 @@ class PestSpawn {
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
-            ChatUtils.clickableChat(message, "tptoplot $plotName")
+            ChatUtils.clickableChat(message, onClick = {
+                HypixelCommands.teleportToPlot(plotName)
+            })
         }
     }
 
