@@ -22,8 +22,8 @@ public class TunnelMapsConfig {
 
     @Expose
     @ConfigOption(name = "Campfire Hotkey", desc = "Hotkey to warp to the campfire, if the travel scroll is not unlocked shows a path to the campfire.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_X)
-    public int campfireKey = Keyboard.KEY_X;
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int campfireKey = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Travel Scroll", desc = "Lets the mod know that you have unlocked the travel scroll to basecamp.")
