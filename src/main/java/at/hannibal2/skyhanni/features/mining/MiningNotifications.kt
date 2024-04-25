@@ -56,7 +56,7 @@ object MiningNotifications {
     )
     private val frostbitePattern by patternGroup.pattern(
         "cold.frostbite",
-        "§9§lBRRR! §r§bYou're freezing! All you can think about is getting out of here to a warm campfire..."
+        "§9§lBRRR! §r§bYou're freezing! All you can think about is getting out of here to a warm campfire\\.\\.\\."
     )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
