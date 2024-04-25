@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.findShortestDistance
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
@@ -19,9 +20,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 class TunnelsMaps {
 
@@ -36,20 +40,21 @@ class TunnelsMaps {
     private var path: Graph? = null
 
     private var possibleLocations = mapOf<String, List<GraphNode>>()
-    private val locationIndex = mutableMapOf<String, Int>()
+    private val cooldowns = mutableMapOf<GraphNode, SimpleTimeMark>()
     private var active: String = ""
 
     private fun getNext(name: String = active): GraphNode? {
+        val closed = closedNote ?: return null
         val list = possibleLocations[name] ?: return null
-        val preIndex = locationIndex[name]
-        val index = when {
-            preIndex == null -> 0
-            preIndex >= list.lastIndex -> 0
-            else -> preIndex + 1
-        }
-        locationIndex[name] = index
+
+        val offCooldown = list.filter { cooldowns[it]?.isInPast() != false }
+        val goodOnes = offCooldown.filter { it.position.distanceSqToPlayer() > 400.0 }
+        val best = goodOnes.minByOrNull { graph.findShortestDistance(closed, it) }
+            ?: list.random()
+
+        cooldowns[best] = 25.0.seconds.fromNow()
         goalReached = false
-        return list[index]
+        return best
     }
 
     private fun hasNext(name: String = active): Boolean {
@@ -61,8 +66,7 @@ class TunnelsMaps {
     fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
-            val randomPick = value.random()
-            value.sortedBy { it.position.distanceSq(randomPick.position) } // TODO implement TSP solution for this
+            value
         }
         campfire = graph.first { it.name?.contains("Campfire") ?: false }
     }
