@@ -85,7 +85,4 @@ class FeatureToggleProcessor : ConfigStructureReader {
             )
         )
     }
-
-    override fun emitGuiOverlay(baseObject: Any?, field: Field?, option: ConfigOption?) {
-    }
 }

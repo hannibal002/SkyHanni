@@ -8,7 +8,17 @@ object ConfigGuiManager {
 
     var editor: MoulConfigEditor<Features>? = null
 
-    fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also { editor = it }
+    private val replacedSearchTerms = mapOf(
+        "color" to "colour",
+        "armor" to "armour",
+    )
+
+    fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also {
+        it.setSearchFunction { optionEditor, word ->
+            return@setSearchFunction optionEditor.fulfillsSearch(replacedSearchTerms[word] ?: word)
+        }
+        editor = it
+    }
 
     fun openConfigGui(search: String? = null) {
         val editor = getEditorInstance()
