@@ -164,13 +164,6 @@ object CollectionUtils {
         return toList().sorted().reversed().toMap()
     }
 
-    inline fun <reified T> ConcurrentLinkedQueue<T>.drainForEach(action: (T) -> Unit) {
-        while (true) {
-            val value = this.poll() ?: break
-            action(value)
-        }
-    }
-
     fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
         with(iterator()) {
             while (hasNext()) {
