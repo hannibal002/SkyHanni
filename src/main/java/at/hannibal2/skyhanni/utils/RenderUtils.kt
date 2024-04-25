@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -33,6 +34,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
@@ -1436,7 +1438,7 @@ object RenderUtils {
      *
      * @param color color of rect
      * @param radius the radius of the corners (default 10)
-     * @param smoothness how smooth the corners will appear (default 2). NOTE: This does very
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
      * It is best kept at its default.
      */
@@ -1456,12 +1458,111 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader("rounded_rect")
 
-        Gui.drawRect(x, y, x + width, y + height, color)
+        Gui.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
     }
 
+    /**
+     * Method to draw the outline of a rounded rectangle with a color gradient. For a single color just pass
+     * in the color to both topColor and bottomColor.
+     *
+     * This is *not* a method that draws a rounded rectangle **with** an outline, rather, this draws **only** the outline.
+     *
+     * **NOTE:** The same notices given from [drawRoundRect] should be acknowledged with this method also.
+     *
+     * @param topColor color of the top of the outline
+     * @param bottomColor color of the bottom of the outline
+     * @param borderThickness the thickness of the border
+     * @param radius radius of the corners of the rectangle (default 10)
+     * @param blur the amount to blur the outline (default 0.7f)
+     */
+    fun drawRoundRectOutline(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        borderThickness: Int,
+        radius: Int = 10,
+        blur: Float = 0.7f
+    ) {
+        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
+        val widthIn = width * scaledRes.scaleFactor
+        val heightIn = height * scaledRes.scaleFactor
+        val xIn = x * scaledRes.scaleFactor
+        val yIn = y * scaledRes.scaleFactor
+
+        val borderAdjustment = borderThickness / 2
+
+        RoundedRectangleOutlineShader.scaleFactor = scaledRes.scaleFactor.toFloat()
+        RoundedRectangleOutlineShader.radius = radius.toFloat()
+        RoundedRectangleOutlineShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleOutlineShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        RoundedRectangleOutlineShader.borderThickness = borderThickness.toFloat()
+        // The blur argument is a bit misleading, the greater the value the more sharp the edges of the
+        // outline will be and the smaller the value the blurrier. So we take the difference from 1
+        // so the shader can blur the edges accordingly. This is because a 'blurriness' option makes more sense
+        // to users than a 'sharpness' option in this context
+        RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
+
+        GlStateManager.pushMatrix()
+        ShaderManager.enableShader("rounded_rect_outline")
+
+        drawGradientRect(
+            x - borderAdjustment,
+            y - borderAdjustment,
+            x + width + borderAdjustment,
+            y + height + borderAdjustment,
+            topColor,
+            bottomColor
+        )
+
+        ShaderManager.disableShader()
+        GlStateManager.popMatrix()
+    }
+
+    fun drawGradientRect(
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        startColor: Int = -0xfeffff0,
+        endColor: Int = -0xfeffff0,
+    ) {
+        val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
+        val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
+        val startGreen = (startColor shr 8 and 255).toFloat() / 255.0f
+        val startBlue = (startColor and 255).toFloat() / 255.0f
+        val endAlpha = (endColor shr 24 and 255).toFloat() / 255.0f
+        val endRed = (endColor shr 16 and 255).toFloat() / 255.0f
+        val endGreen = (endColor shr 8 and 255).toFloat() / 255.0f
+        val endBlue = (endColor and 255).toFloat() / 255.0f
+        GlStateManager.disableTexture2D()
+        GlStateManager.enableBlend()
+        GlStateManager.disableAlpha()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.shadeModel(7425)
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
+        worldrenderer.pos(right.toDouble(), top.toDouble(), 0.0)
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldrenderer.pos(left.toDouble(), top.toDouble(), 0.0)
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldrenderer.pos(left.toDouble(), bottom.toDouble(), 0.0)
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
+        worldrenderer.pos(right.toDouble(), bottom.toDouble(), 0.0)
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
+        tessellator.draw()
+        GlStateManager.shadeModel(7424)
+        GlStateManager.disableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
+    }
+    
     // TODO move off of neu function
     fun drawTexturedRect(x: Float, y: Float) {
         with(ScaledResolution(Minecraft.getMinecraft())) {
