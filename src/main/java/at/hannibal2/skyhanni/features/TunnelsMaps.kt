@@ -23,14 +23,33 @@ import java.awt.Color
 class TunnelsMaps {
 
     var graph: Graph = Graph(emptyList())
+    lateinit var campfire: GraphNode
     var goal: GraphNode? = null
 
     var possibleLocations = mapOf<String, List<GraphNode>>()
+    val locationIndex = mutableMapOf<String, Int>()
+    var active: String = ""
+
+    fun getNext(name: String): GraphNode? {
+        val list = possibleLocations[name] ?: return null
+        val preIndex = locationIndex[name]
+        val index = when {
+            preIndex == null -> 0
+            preIndex >= list.lastIndex -> 0
+            else -> preIndex + 1
+        }
+        locationIndex[name] = index
+        return list[index]
+    }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
-        possibleLocations = graph.groupBy { it.name }.filterNotNullKeys()
+        possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
+            val randomPick = value.random()
+            value.sortedBy { it.position.distanceSq(randomPick.position) }
+        }
+        campfire = graph.first { it.name?.contains("Campfire") ?: false }
     }
 
     fun getNearestNode() = graph.minBy { it.position.distanceSqToPlayer() }
@@ -49,12 +68,34 @@ class TunnelsMaps {
     @SubscribeEvent
     fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         val display = buildList<Renderable> {
+            if (active.isNotEmpty()) {
+                add(Renderable.string("§6Active: $active"))
+            }
             add(Renderable.string("§6Loactions:"))
+            val fairySouls = possibleLocations.filter { it.key.contains("Fairy") }
+            val other = possibleLocations.filterNot { it.key.contains("Fairy") }
+
+            /* add(Renderable.hoverable(
+                Renderable.string("§dFairy Souls"),
+                Renderable.horizontalContainer(
+                    listOf(
+                        Renderable.string("§dFairy Souls"),
+                        Renderable.clickable(Renderable.string("[Lake]"), onClick = {
+                            active = ""
+                        })
+                    )
+                )
+            )) */
+
             addAll(possibleLocations.map {
                 Renderable.clickable(Renderable.string(it.key), onClick = {
-                    goal = it.value.random()
+                    active = it.key
+                    goal = getNext(it.key)
                 })
             })
+            add(Renderable.clickable(Renderable.string("Next"), onClick = {
+                goal = getNext(active)
+            }))
         }
         position.renderRenderables(display, posLabel = "TunnelsMaps")
     }
