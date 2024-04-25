@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import kotlinx.coroutines.launch
 import net.minecraft.util.ChatComponentText
@@ -41,7 +42,7 @@ object TestChatCommand {
             ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
         } else {
             val finalMessage = event.chatComponent.formattedText
-            if (finalMessage != message) {
+            if (LorenzUtils.stripVanillaMessage(finalMessage) != LorenzUtils.stripVanillaMessage(message)) {
                 ChatUtils.chat("§eChat modified!")
             }
             ChatUtils.chat(finalMessage, false)
