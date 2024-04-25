@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CraftableItemListConfig {
 
@@ -33,5 +34,6 @@ public class CraftableItemListConfig {
     public boolean excludeVanillaItems = true;
 
     @Expose
+    @ConfigLink(owner = CraftableItemListConfig.class, field = "enabled")
     public Position position = new Position(144, 139, false, true);
 }
