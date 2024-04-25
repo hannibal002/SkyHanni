@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features
+package at.hannibal2.skyhanni.features.mining
 
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -22,6 +22,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 class TunnelsMaps {
+
+    private val config get() = SkyHanniMod.feature.mining.tunnelMaps
 
     private var graph: Graph = Graph(emptyList())
     private lateinit var campfire: GraphNode
@@ -67,8 +69,6 @@ class TunnelsMaps {
         goal = it
     } ?: ErrorManager.logErrorStateWithData("Goal not found", "", "name" to name, "graph" to graph)
 
-    val position = Position(20, 20)
-
     @SubscribeEvent
     fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -108,7 +108,7 @@ class TunnelsMaps {
                 })
             })
         }
-        position.renderRenderables(display, posLabel = "TunnelsMaps")
+        config.position.renderRenderables(display, posLabel = "TunnelsMaps")
     }
 
     @SubscribeEvent
@@ -148,5 +148,5 @@ class TunnelsMaps {
     }
 
     private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isInIsland() && (LorenzUtils.skyBlockArea == "Glacite Tunnels" || LorenzUtils.skyBlockArea == "Dwarven Base Camp" || LorenzUtils.skyBlockArea == "Glacite Lake")
+        IslandType.DWARVEN_MINES.isInIsland() && config.enable && (LorenzUtils.skyBlockArea == "Glacite Tunnels" || LorenzUtils.skyBlockArea == "Dwarven Base Camp" || LorenzUtils.skyBlockArea == "Glacite Lake")
 }
