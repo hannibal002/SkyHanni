@@ -193,16 +193,9 @@ object WardrobeAPI {
 
 
     class WardrobeData(
-        @Expose
-        val id: Int,
-
-        @Expose
-        var armor: MutableMap<Int, ItemStack?>,
-
-        @Expose
-        var locked: Boolean,
-
-        @Expose
-        var favorite: Boolean,
+        @Expose val id: Int,
+        @Expose var armor: MutableMap<Int, ItemStack?>,
+        @Expose var locked: Boolean,
+        @Expose var favorite: Boolean,
     )
 }
