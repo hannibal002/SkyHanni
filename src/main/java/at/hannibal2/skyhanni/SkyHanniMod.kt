@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PlayerDeathManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -557,6 +558,7 @@ class SkyHanniMod {
         loadModule(VisitorAPI)
         loadModule(KuudraAPI)
         loadModule(PetAPI)
+        loadModule(PlayerDeathManager)
         loadModule(IsFishingDetection)
         loadModule(LorenzUtils)
         loadModule(NEUItems)

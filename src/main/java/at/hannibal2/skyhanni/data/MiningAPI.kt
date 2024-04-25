@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -20,13 +19,9 @@ object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels")
-    val coldReset by group.pattern(
+    private val coldReset by group.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7."
-    )
-    val coldResetDeath by group.pattern(
-        "cold.deathreset",
-        "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)"
     )
 
     private var cold = 0
@@ -57,11 +52,13 @@ object MiningAPI {
             updateCold(0)
             lastColdReset = SimpleTimeMark.now()
         }
-        coldResetDeath.matchMatcher(event.message) {
-            if (group("name") == LorenzUtils.getPlayerName()) {
-                updateCold(0)
-                lastColdReset = SimpleTimeMark.now()
-            }
+    }
+
+    @SubscribeEvent
+    fun onPlayerDeath(event: PlayerDeathEvent) {
+        if (event.name == LorenzUtils.getPlayerName()) {
+            updateCold(0)
+            lastColdReset = SimpleTimeMark.now()
         }
     }
 

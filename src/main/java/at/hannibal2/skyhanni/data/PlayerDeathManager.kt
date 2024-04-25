@@ -1,0 +1,30 @@
+package at.hannibal2.skyhanni.data
+
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzEvent
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
+object PlayerDeathManager {
+
+    //§c ☠ §r§7§r§bZeroHazel§r§7 was killed by §r§8§lAshfang§r§7§r§7.
+    private val deathMessagePattern by RepoPattern.pattern(
+        "chat.player.death",
+        "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)"
+    )
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        val message = event.message
+        deathMessagePattern.matchMatcher(message) {
+            val name = group("name")
+            val reason = group("reason").removeColor()
+            PlayerDeathEvent(name, reason, event).postAndCatch()
+
+        }
+    }
+}
+
+class PlayerDeathEvent(val name: String, val reason: String, val chatEvent: LorenzChatEvent) : LorenzEvent()
