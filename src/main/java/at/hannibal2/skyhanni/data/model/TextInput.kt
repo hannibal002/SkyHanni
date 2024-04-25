@@ -28,6 +28,7 @@ class TextInput {
     fun handle() = Companion.handleTextInput()
     fun clear() {
         textBox = ""
+        carriage = null
     }
 
     companion object {
