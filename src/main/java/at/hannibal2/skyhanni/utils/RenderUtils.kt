@@ -79,6 +79,7 @@ object RenderUtils {
     }
 
     fun highlight(color: Color, x: Int, y: Int) {
+        GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         GlStateManager.pushMatrix()
         // TODO don't use z
@@ -86,6 +87,7 @@ object RenderUtils {
         Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
         GlStateManager.popMatrix()
         GlStateManager.enableDepth()
+        GlStateManager.enableLighting()
     }
 
     infix fun Slot.drawBorder(color: LorenzColor) {
@@ -105,6 +107,7 @@ object RenderUtils {
     }
 
     fun drawBorder(color: Color, x: Int, y: Int) {
+        GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
@@ -114,6 +117,7 @@ object RenderUtils {
         Gui.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
         GlStateManager.popMatrix()
         GlStateManager.enableDepth()
+        GlStateManager.enableLighting()
     }
 
     fun LorenzRenderWorldEvent.drawColor(
