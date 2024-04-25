@@ -253,10 +253,7 @@ object ChocolateFactoryAPI {
         maxRabbits = data.maxRabbits
 
         val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
-        HOPPITY_EVENT_DISABLED = disabledFeatures.features["HOPPITY_EVENT_DISABLED"] ?: false
     }
-
-    private var HOPPITY_EVENT_DISABLED = false
 
     private fun List<String>.getUpgradeCost(): Long? {
         val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
@@ -267,6 +264,5 @@ object ChocolateFactoryAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING &&
-        (LorenzUtils.isOnAlphaServer || !HOPPITY_EVENT_DISABLED)
+    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
 }
