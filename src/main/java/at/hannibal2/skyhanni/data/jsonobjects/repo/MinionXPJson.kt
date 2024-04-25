@@ -1,10 +1,8 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.Map;
-
-public class MinionXPJson {
-    @Expose
-    public Map<String, Map<String, Double>> minion_xp;
-}
+class MinionXPJson(
+    @Expose @SerializedName("minion_xp") val minionXp: Map<String, Map<String, Double>>
+)

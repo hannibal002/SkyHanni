@@ -1,20 +1,13 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.LorenzVec;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.LorenzVec
+import com.google.gson.annotations.Expose
 
-import java.util.List;
-import java.util.Map;
+class EnigmaSoulsJson(
+    @Expose val areas: Map<String, List<EnigmaPosition>>
+)
 
-public class EnigmaSoulsJson {
-    @Expose
-    public Map<String, List<EnigmaPosition>> areas;
-
-    public static class EnigmaPosition {
-        @Expose
-        public String name;
-
-        @Expose
-        public LorenzVec position;
-    }
-}
+data class EnigmaPosition(
+    @Expose val name: String,
+    @Expose val position: LorenzVec
+)

@@ -103,8 +103,8 @@ object FishingAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        lavaRods = data.lava_fishing_rods
-        waterRods = data.water_fishing_rods
+        lavaRods = data.lavaFishingRods
+        waterRods = data.waterFishingRods
     }
 
     private fun getAllowedBlocks() = if (holdingLavaRod) lavaBlocks else waterBlocks

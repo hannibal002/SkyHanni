@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -27,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightVisitorsOutsideOfGarden {
 
-    private var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
+    private var visitorJson = mapOf<String?, List<GardenVisitor>>()
 
     private val config get() = GardenAPI.config.visitors
 
@@ -57,7 +58,7 @@ class HighlightVisitorsOutsideOfGarden {
         val possibleJsons = visitorJson[mode] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            (it.position == null || it.position!!.distance(entity.position.toLorenzVec()) < 1)
+            (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1)
                 && it.skinOrType == skinOrType
         }
     }

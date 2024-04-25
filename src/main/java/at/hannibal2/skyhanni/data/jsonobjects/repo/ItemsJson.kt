@@ -1,27 +1,14 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.NEUInternalName;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.List;
-import java.util.Map;
-
-public class ItemsJson {
-    @Expose
-    public List<String> crimson_armors;
-
-    @Expose
-    public Map<String, Integer> crimson_tiers;
-
-    @Expose
-    public Map<String, Float> enchant_multiplier;
-
-    @Expose
-    public List<NEUInternalName> lava_fishing_rods;
-
-    @Expose
-    public List<NEUInternalName> water_fishing_rods;
-
-    @Expose
-    public Map<String, Integer> book_bundle_amount;
-}
+class ItemsJson(
+    @Expose @SerializedName("crimson_armors") val crimsonArmors: List<String>,
+    @Expose @SerializedName("crimson_tiers") val crimsonTiers: Map<String, Int>,
+    @Expose @SerializedName("enchant_multiplier") val enchantMultiplier: Map<String, Float>,
+    @Expose @SerializedName("lava_fishing_rods") val lavaFishingRods: List<NEUInternalName>,
+    @Expose @SerializedName("water_fishing_rods") val waterFishingRods: List<NEUInternalName>,
+    @Expose @SerializedName("book_bundle_amount") val bookBundleAmount: Map<String, Int>,
+)

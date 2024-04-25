@@ -1,25 +1,12 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
 
-import java.util.List;
-
-public class MultiFilterJson {
-    @Expose
-    public List<String> equals;
-
-    @Expose
-    public List<String> startsWith;
-
-    @Expose
-    public List<String> endsWith;
-
-    @Expose
-    public List<String> contains;
-
-    @Expose
-    public List<String> containsWord;
-
-    @Expose
-    public String description;
-}
+class MultiFilterJson(
+    @Expose val equals: List<String>,
+    @Expose val startsWith: List<String>,
+    @Expose val endsWith: List<String>,
+    @Expose val contains: List<String>,
+    @Expose val containsWord: List<String>,
+    @Expose val description: String,
+)

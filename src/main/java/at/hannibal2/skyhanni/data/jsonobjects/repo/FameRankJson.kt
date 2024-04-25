@@ -1,24 +1,15 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.Map;
+data class FameRankJson(
+    @Expose @SerializedName("fame_rank") val fameRank: Map<String, FameRank>
+)
 
-public class FameRankJson {
-    @Expose
-    public Map<String, FameRank> fame_rank;
-
-    public static class FameRank {
-        @Expose
-        public String name;
-
-        @Expose
-        public int fame_required;
-
-        @Expose
-        public double bits_multiplier;
-
-        @Expose
-        public int votes;
-    }
-}
+data class FameRank(
+    @Expose val name: String,
+    @Expose @SerializedName("fame_required") val fameRequired: Int,
+    @Expose @SerializedName("bits_multiplier") val bitsMultiplier: Double,
+    @Expose val votes: Int
+)

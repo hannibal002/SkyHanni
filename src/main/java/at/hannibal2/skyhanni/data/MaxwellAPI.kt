@@ -49,7 +49,7 @@ object MaxwellAPI {
             storage?.maxwell?.tunings = value ?: return
         }
 
-    private var powers = mutableListOf<String>()
+    private var powers = listOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
     private val chatPowerPattern by patternGroup.pattern(

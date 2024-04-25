@@ -1,25 +1,16 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.Map;
+data class TrophyFishJson(
+    @Expose @SerializedName("trophy_fish") val trophyFish: Map<String, TrophyFishInfo>
+)
 
-public class TrophyFishJson {
-    @Expose
-    public Map<String, TrophyFishInfo> trophy_fish;
-
-    public static class TrophyFishInfo {
-        @Expose
-        public String displayName;
-
-        @Expose
-        public String description;
-
-        @Expose
-        public Integer rate;
-
-        @Expose
-        public Map<TrophyRarity, Integer> fillet;
-    }
-}
+data class TrophyFishInfo(
+    val displayName: String,
+    val description: String,
+    val rate: Int?,
+    val fillet: Map<TrophyRarity, Int>
+)

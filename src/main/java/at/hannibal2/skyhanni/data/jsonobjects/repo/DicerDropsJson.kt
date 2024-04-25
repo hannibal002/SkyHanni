@@ -1,31 +1,19 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.List;
+class DicerDropsJson(
+    @Expose val MELON: DicerType,
+    @Expose val PUMPKIN: DicerType
+)
 
-public class DicerDropsJson {
-    @Expose
-    public DicerType MELON;
+data class DicerType(
+    @Expose @SerializedName("total chance") val totalChance: Int,
+    @Expose val drops: List<DropInfo>
+)
 
-    @Expose
-    public DicerType PUMPKIN;
-
-    public static class DicerType {
-        @Expose
-        @SerializedName("total chance")
-        public Integer totalChance;
-
-        @Expose
-        public List<DropInfo> drops;
-    }
-
-    public static class DropInfo {
-        @Expose
-        public Integer chance;
-
-        @Expose
-        public List<Integer> amount;
-    }
-}
+data class DropInfo(
+    @Expose val chance: Int,
+    @Expose val amount: List<Int>
+)

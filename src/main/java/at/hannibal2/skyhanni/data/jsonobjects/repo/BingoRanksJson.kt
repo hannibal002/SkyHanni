@@ -1,10 +1,7 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
 
-import java.util.Map;
-
-public class BingoRanksJson {
-    @Expose
-    public Map<String, Integer> ranks;
-}
+data class BingoRanksJson(
+    @Expose val ranks: Map<String, Int>
+)

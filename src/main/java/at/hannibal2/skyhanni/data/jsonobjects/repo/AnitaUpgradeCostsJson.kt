@@ -1,18 +1,13 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.Map;
+data class AnitaUpgradeCostsJson(
+    @Expose @SerializedName("level_price") val levelPrice: Map<Int, AnitaUpgradePrice>
+)
 
-public class AnitaUpgradeCostsJson {
-    @Expose
-    public Map<Integer, Price> level_price;
-
-    public static class Price {
-        @Expose
-        public Integer gold_medals;
-
-        @Expose
-        public Integer jacob_tickets;
-    }
-}
+data class AnitaUpgradePrice(
+    @Expose @SerializedName("gold_medals") val goldMedals: Int,
+    @Expose @SerializedName("jacob_tickets") val jacobTickets: Int
+)

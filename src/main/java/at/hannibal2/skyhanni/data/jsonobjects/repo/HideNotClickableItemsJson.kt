@@ -1,30 +1,17 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.List;
+class HideNotClickableItemsJson(
+    @Expose @SerializedName("hide_npc_sell") val hideNpcSell: MultiFilterJson,
+    @Expose @SerializedName("hide_in_storage") val hideInStorage: MultiFilterJson,
+    @Expose @SerializedName("hide_player_trade") val hidePlayerTrade: MultiFilterJson,
+    @Expose @SerializedName("not_auctionable") val notAuctionable: MultiFilterJson,
+    @Expose val salvage: SalvageFilter,
+)
 
-public class HideNotClickableItemsJson {
-    @Expose
-    public MultiFilterJson hide_npc_sell;
-
-    @Expose
-    public MultiFilterJson hide_in_storage;
-
-    @Expose
-    public MultiFilterJson hide_player_trade;
-
-    @Expose
-    public MultiFilterJson not_auctionable;
-
-    @Expose
-    public SalvageFilter salvage;
-
-    public static class SalvageFilter {
-        @Expose
-        public List<String> armor;
-
-        @Expose
-        public List<String> items;
-    }
-}
+data class SalvageFilter(
+    @Expose val armor: List<String>,
+    @Expose val items: List<String>
+)

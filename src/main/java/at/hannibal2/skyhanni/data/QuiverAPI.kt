@@ -283,7 +283,7 @@ object QuiverAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val itemData = event.getConstant<ItemsJson>("Items")
-        infinityQuiverLevelMultiplier = itemData.enchant_multiplier["infinite_quiver"] ?: 0.03f
+        infinityQuiverLevelMultiplier = itemData.enchantMultiplier["infinite_quiver"] ?: 0.03f
 
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.asInternalName()) }

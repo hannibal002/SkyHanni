@@ -1,25 +1,15 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.List;
-import java.util.Map;
+data class BingoJson(
+    @Expose @SerializedName("bingo_tips") val bingoTips: Map<String, BingoData>
+)
 
-public class BingoJson {
-    @Expose
-    public Map<String, BingoData> bingo_tips;
-
-    public static class BingoData {
-        @Expose
-        public String difficulty;
-
-        @Expose
-        public List<String> note;
-
-        @Expose
-        public List<String> guide;
-
-        @Expose
-        public String found;
-    }
-}
+data class BingoData(
+    @Expose val difficulty: String,
+    @Expose val note: List<String>,
+    @Expose val guide: List<String>,
+    @Expose val found: String
+)

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
@@ -73,10 +73,10 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
-        hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
-        hideInStorageFilter.load(hideNotClickable.hide_in_storage)
-        hidePlayerTradeFilter.load(hideNotClickable.hide_player_trade)
-        notAuctionableFilter.load(hideNotClickable.not_auctionable)
+        hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
+        hideInStorageFilter.load(hideNotClickable.hideInStorage)
+        hidePlayerTradeFilter.load(hideNotClickable.hidePlayerTrade)
+        notAuctionableFilter.load(hideNotClickable.notAuctionable)
         updateSalvageList(hideNotClickable.salvage)
     }
 

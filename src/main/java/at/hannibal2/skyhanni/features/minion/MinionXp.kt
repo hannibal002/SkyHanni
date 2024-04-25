@@ -182,7 +182,7 @@ class MinionXp {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minion_xp.mapNotNull { xpType ->
+        xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minionXp.mapNotNull { xpType ->
             xpType.value.mapNotNull { it.key.asInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }
         }.flatten().toMap()
     }

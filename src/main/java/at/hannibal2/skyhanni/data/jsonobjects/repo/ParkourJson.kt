@@ -1,23 +1,14 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.LorenzVec;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.LorenzVec
+import com.google.gson.annotations.Expose
 
-import java.util.ArrayList;
-import java.util.List;
+class ParkourJson(
+    @Expose val locations: List<LorenzVec>,
+    @Expose val shortCuts: List<ParkourShortCut> = listOf()
+)
 
-public class ParkourJson {
-    @Expose
-    public List<LorenzVec> locations;
-
-    @Expose
-    public List<ShortCut> shortCuts = new ArrayList<>();
-
-    public static class ShortCut {
-        @Expose
-        public int from;
-
-        @Expose
-        public int to;
-    }
-}
+data class ParkourShortCut(
+    @Expose val from: Int,
+    @Expose val to: Int
+)

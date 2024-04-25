@@ -1,27 +1,16 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.LorenzVec;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.LorenzVec
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.Map;
+data class LocationFixJson(
+    @Expose val locationFixes: Map<String, LocationFix>
+)
 
-public class LocationFixJson {
-
-    @Expose
-    public Map<String, LocationFix> locationFixes;
-
-    public static class LocationFix {
-        @Expose
-        public LorenzVec a;
-
-        @Expose
-        public LorenzVec b;
-
-        @Expose
-        public String island_name;
-
-        @Expose
-        public String real_location;
-    }
-
-}
+data class LocationFix(
+    @Expose val a: LorenzVec,
+    @Expose val b: LorenzVec,
+    @Expose @SerializedName("island_name") val islandName: String,
+    @Expose @SerializedName("real_location") val realLocation: String,
+)

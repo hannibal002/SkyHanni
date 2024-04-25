@@ -1,10 +1,7 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
 
-import java.util.List;
-
-public class WarpsJson {
-    @Expose
-    public List<String> warpCommands;
-}
+data class WarpsJson(
+    @Expose val warpCommands: List<String>
+)

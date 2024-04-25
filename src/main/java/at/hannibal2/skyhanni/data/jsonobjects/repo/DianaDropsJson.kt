@@ -1,11 +1,9 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.NEUInternalName;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.List;
-
-public class DianaDrops {
-    @Expose
-    public List<NEUInternalName> diana_drops;
-}
+data class DianaDropsJson(
+    @Expose @SerializedName("diana_drops") val dianaDrops: List<NEUInternalName>
+)

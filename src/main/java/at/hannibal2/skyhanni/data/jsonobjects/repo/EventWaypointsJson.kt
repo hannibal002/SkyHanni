@@ -1,25 +1,15 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.LorenzVec;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.LorenzVec
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.List;
-import java.util.Map;
+data class EventWaypointsJson(
+    @Expose val presents: Map<String, List<EventWaypointData>>,
+    @Expose @SerializedName("presents_entrances") val presentsEntrances: Map<String, List<EventWaypointData>>
+)
 
-public class EventWaypointsJson {
-
-    @Expose
-    public Map<String, List<Waypoint>> presents;
-
-    @Expose
-    public Map<String, List<Waypoint>> presents_entrances;
-
-    public static class Waypoint {
-        @Expose
-        public String name;
-
-        //format: "x:y:z"
-        @Expose
-        public LorenzVec position;
-    }
-}
+data class EventWaypointData(
+    @Expose val name: String,
+    @Expose val position: LorenzVec
+)

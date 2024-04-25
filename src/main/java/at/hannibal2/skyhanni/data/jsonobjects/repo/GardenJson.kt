@@ -1,59 +1,26 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.features.garden.CropType;
-import at.hannibal2.skyhanni.utils.LorenzRarity;
-import at.hannibal2.skyhanni.utils.LorenzVec;
-import at.hannibal2.skyhanni.utils.NEUInternalName;
-import com.google.gson.annotations.Expose;
-import org.jetbrains.annotations.Nullable;
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-import java.util.List;
-import java.util.Map;
+data class GardenJson(
+    @Expose @SerializedName("garden_exp") val gardenExp: List<Int>,
+    @Expose @SerializedName("crop_milestones") val cropMilestones: Map<CropType, List<Int>>,
+    @Expose @SerializedName("crop_milestone_community_help") val cropMilestoneCommunityHelp: Map<String, Boolean>,
+    @Expose val visitors: Map<String, GardenVisitor>,
+    @Expose @SerializedName("organic_matter") val organicMatter: Map<NEUInternalName, Double>,
+    @Expose val fuel: Map<NEUInternalName, Double>
+)
 
-public class GardenJson {
-    @Expose
-    public List<Integer> garden_exp;
-
-    @Expose
-    public Map<CropType, List<Integer>> crop_milestones;
-
-    @Expose
-    public Map<String, Boolean> crop_milestone_community_help;
-
-    @Expose
-    public Map<String, GardenVisitor> visitors;
-
-    @Expose
-    public Map<NEUInternalName, Double> organic_matter;
-
-    @Expose
-    public Map<NEUInternalName, Double> fuel;
-
-    public static class GardenVisitor {
-        @Expose
-        public LorenzRarity rarity;
-
-        @Expose
-        public LorenzRarity new_rarity;
-
-        @Nullable
-        @Expose
-        public LorenzVec position;
-
-        /**
-         * Formatted as follows:
-         * - If this visitor is a player, get the encoded skin value
-         * - If this visitor is a mob, get their mob class name
-         */
-        @Nullable
-        @Expose
-        public String skinOrType;
-
-        @Nullable
-        @Expose
-        public String mode;
-
-        @Expose
-        public List<String> need_items;
-    }
-}
+data class GardenVisitor(
+    @Expose val rarity: LorenzRarity,
+    @Expose @SerializedName("new_rarity") val newRarity: LorenzRarity?,
+    @Expose val position: LorenzVec?,
+    @Expose var skinOrType: String?,
+    @Expose val mode: String,
+    @Expose @SerializedName("need_items") val needItems: List<String>
+)

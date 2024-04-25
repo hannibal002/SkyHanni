@@ -1,15 +1,11 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
 
-import java.util.Map;
+data class ArrowTypeJson(
+    @Expose val arrows: Map<String, ArrowAttributes>
+)
 
-public class ArrowTypeJson {
-    @Expose
-    public Map<String, ArrowAttributes> arrows;
-
-    public static class ArrowAttributes {
-        @Expose
-        public String arrow;
-    }
-}
+data class ArrowAttributes(
+    @Expose val arrow: String
+)

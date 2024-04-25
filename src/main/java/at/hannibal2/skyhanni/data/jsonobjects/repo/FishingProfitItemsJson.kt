@@ -1,12 +1,8 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo;
+package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.NEUInternalName;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import com.google.gson.annotations.Expose
 
-import java.util.List;
-import java.util.Map;
-
-public class FishingProfitItemsJson {
-    @Expose
-    public Map<String, List<NEUInternalName>> categories;
-}
+class FishingProfitItemsJson(
+    @Expose val categories: Map<String, List<NEUInternalName>>
+)
