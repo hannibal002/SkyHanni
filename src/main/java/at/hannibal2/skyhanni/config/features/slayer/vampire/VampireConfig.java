@@ -47,7 +47,7 @@ public class VampireConfig {
     public String steakColor = "0:255:255:0:88";
 
     @Expose
-    @ConfigOption(name = "Twinclaws", desc = "Delay the sound and title of Twinclaws alert for a given amount in milliseconds.")
+    @ConfigOption(name = "Twinclaws", desc = "Delay the Twinclaws alert for a given amount in milliseconds.")
     @ConfigEditorSlider(minStep = 1, minValue = 0, maxValue = 1000)
     public int twinclawsDelay = 0;
 

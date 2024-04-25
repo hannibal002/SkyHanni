@@ -33,15 +33,13 @@ import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import com.google.gson.annotations.Expose;
-import jline.internal.Nullable;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ProfileSpecificStorage {
 
@@ -434,10 +432,7 @@ public class ProfileSpecificStorage {
         public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
-        public List<DungeonStorage.DungeonRunInfo> runs = Stream.generate(DungeonStorage.DungeonRunInfo::new)
-            .limit(CroesusChestTracker.Companion.getMaxChests())
-            .collect(Collectors.toCollection(ArrayList::new));
-
+        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsList();
 
         public static class DungeonRunInfo {
 
