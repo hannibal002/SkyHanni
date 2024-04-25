@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
@@ -26,7 +26,6 @@ class VisitorRewardWarning {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!VisitorAPI.inInventory) return
-        if (!config.preventRefusing && !config.preventRefusingCopper && !config.preventAcceptingCopper) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val refuseOfferStack = event.gui.inventorySlots.getSlot(REFUSE_SLOT).stack
@@ -116,7 +115,7 @@ class VisitorRewardWarning {
         val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
-        val formattedLoss = abs(loss).let { NumberUtil.format(it) }
+        val formattedLoss = NumberUtil.format(loss.absoluteValue)
         blockedToolTip.add(blockReason(blockReason, pricePerCopper, loss, formattedLoss))
         blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
 
