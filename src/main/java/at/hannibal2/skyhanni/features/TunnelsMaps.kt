@@ -6,15 +6,16 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,15 +23,19 @@ import java.awt.Color
 
 class TunnelsMaps {
 
-    var graph: Graph = Graph(emptyList())
-    lateinit var campfire: GraphNode
-    var goal: GraphNode? = null
+    private var graph: Graph = Graph(emptyList())
+    private lateinit var campfire: GraphNode
+    private var goal: GraphNode? = null
+    private var goalReached = false
 
-    var possibleLocations = mapOf<String, List<GraphNode>>()
-    val locationIndex = mutableMapOf<String, Int>()
-    var active: String = ""
+    private var closedNote: GraphNode? = null
+    private var path: Graph? = null
 
-    fun getNext(name: String): GraphNode? {
+    private var possibleLocations = mapOf<String, List<GraphNode>>()
+    private val locationIndex = mutableMapOf<String, Int>()
+    private var active: String = ""
+
+    private fun getNext(name: String = active): GraphNode? {
         val list = possibleLocations[name] ?: return null
         val preIndex = locationIndex[name]
         val index = when {
@@ -39,7 +44,13 @@ class TunnelsMaps {
             else -> preIndex + 1
         }
         locationIndex[name] = index
+        goalReached = false
         return list[index]
+    }
+
+    private fun hasNext(name: String = active): Boolean {
+        val list = possibleLocations[name] ?: return false
+        return list.size > 1
     }
 
     @SubscribeEvent
@@ -52,58 +63,63 @@ class TunnelsMaps {
         campfire = graph.first { it.name?.contains("Campfire") ?: false }
     }
 
-    fun getNearestNode() = graph.minBy { it.position.distanceSqToPlayer() }
-
     fun setGoalByName(name: String) = graph.firstOrNull { it.name == name }?.let {
         goal = it
     } ?: ErrorManager.logErrorStateWithData("Goal not found", "", "name" to name, "graph" to graph)
-
-    @SubscribeEvent
-    fun onIslandSwitch(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.DWARVEN_MINES) return
-    }
 
     val position = Position(20, 20)
 
     @SubscribeEvent
     fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!isEnabled()) return
         val display = buildList<Renderable> {
             if (active.isNotEmpty()) {
-                add(Renderable.string("§6Active: $active"))
+                add(Renderable.string("§6Active: §f$active"))
+                if (hasNext()) {
+                    add(Renderable.clickable(Renderable.string("§eNext Spot"), onClick = {
+                        goal = getNext()
+                    }))
+                }
             }
             add(Renderable.string("§6Loactions:"))
             val fairySouls = possibleLocations.filter { it.key.contains("Fairy") }
-            val other = possibleLocations.filterNot { it.key.contains("Fairy") }
+            val other = possibleLocations.filterNot { fairySouls.contains(it.key) }
 
-            /* add(Renderable.hoverable(
-                Renderable.string("§dFairy Souls"),
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.string("§dFairy Souls"),
-                        Renderable.clickable(Renderable.string("[Lake]"), onClick = {
-                            active = ""
-                        })
-                    )
+            add(
+                Renderable.hoverable(
+                    Renderable.horizontalContainer(
+                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                            val name = it.key.removePrefix("§dFairy Soul ")
+                            Renderable.clickable(Renderable.string("[${name}]"), onClick = {
+                                active = it.key
+                                goal = getNext()
+                            })
+                        }
+
+                    ),
+                    Renderable.string("§dFairy Souls")
                 )
-            )) */
+            )
 
-            addAll(possibleLocations.map {
+            addAll(other.map {
                 Renderable.clickable(Renderable.string(it.key), onClick = {
                     active = it.key
-                    goal = getNext(it.key)
+                    goal = getNext()
                 })
             })
-            add(Renderable.clickable(Renderable.string("Next"), onClick = {
-                goal = getNext(active)
-            }))
         }
         position.renderRenderables(display, posLabel = "TunnelsMaps")
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        checkGoalReached()
+        closedNote = graph.minBy { it.position.distanceSqToPlayer() }
+        val closest = closedNote ?: return
         val goal = goal ?: return
-        var path = graph.findShortestPathAsGraph(getNearestNode(), goal)
+        path = graph.findShortestPathAsGraph(closest, goal)
+        val path = path ?: return
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
         if (first != null && second != null) {
@@ -111,11 +127,26 @@ class TunnelsMaps {
             val direct = playerPosition.distance(second.position)
             val around = playerPosition.distance(first.position) + first.neighbours[second]!!
             if (direct < around) {
-                path = Graph(path.drop(1))
+                this.path = Graph(path.drop(1))
             }
         }
-        path = Graph(listOf(GraphNode(-1, event.exactPlayerEyeLocation().add(-0.5, -0.5, -0.5))) + path)
+
+    }
+
+    private fun checkGoalReached() {
+        if (goalReached) return
+        val distance = goal?.position?.distanceSqToPlayer() ?: return
+        goalReached = distance < 25.0
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
+        if (goalReached) return
+        val path = path ?: return
         event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true)
     }
 
+    private fun isEnabled() =
+        IslandType.DWARVEN_MINES.isInIsland() && (LorenzUtils.skyBlockArea == "Glacite Tunnels" || LorenzUtils.skyBlockArea == "Dwarven Base Camp" || LorenzUtils.skyBlockArea == "Glacite Lake")
 }

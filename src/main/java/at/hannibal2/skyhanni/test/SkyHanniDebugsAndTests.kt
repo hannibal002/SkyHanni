@@ -434,7 +434,7 @@ class SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onTestGraphPath(event: LorenzRenderWorldEvent) {
-        event.draw3DPathWithWaypoint(path, Color.GREEN, 8, true, Color.BLUE)
+        event.draw3DPathWithWaypoint(path, Color.GREEN, 8, true)
     }
 
     @SubscribeEvent

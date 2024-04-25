@@ -1161,10 +1161,21 @@ object RenderUtils {
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,
-        waypointColor: Color = (path.lastOrNull()?.name?.getOrNull(1)?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+        startAtEye: Boolean = true,
+        waypointColor: Color = (path.lastOrNull()?.name?.takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
+            ?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
     ) {
         if (path.isEmpty()) return
         LineDrawer.draw3D(partialTicks) {
+            if (startAtEye) {
+                draw3DLine(
+                    this@draw3DPathWithWaypoint.exactPlayerEyeLocation(),
+                    path.first().position.add(0.5, 0.5, 0.5),
+                    colorLine,
+                    lineWidth,
+                    depth
+                )
+            }
             drawPath(
                 path.toPositionsList().map { it.add(0.5, 0.5, 0.5) },
                 colorLine,
