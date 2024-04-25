@@ -62,7 +62,7 @@ class TunnelsMaps {
         return list.size > 1
     }
 
-    @SubscribeEvent
+    @SubscribeEvent // TODO lift up all nodes from the ground
     fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
@@ -71,6 +71,7 @@ class TunnelsMaps {
         campfire = graph.first { it.name?.contains("Campfire") ?: false }
     }
 
+    // TODO remove
     fun setGoalByName(name: String) = graph.firstOrNull { it.name == name }?.let {
         goal = it
     } ?: ErrorManager.logErrorStateWithData("Goal not found", "", "name" to name, "graph" to graph)
@@ -88,6 +89,7 @@ class TunnelsMaps {
                 }
             }
             add(Renderable.string("§6Loactions:"))
+            // TODO cache
             val fairySouls = possibleLocations.filter { it.key.contains("Fairy") }
             val other = possibleLocations.filterNot { fairySouls.contains(it.key) }
 
@@ -150,7 +152,7 @@ class TunnelsMaps {
         if (!isEnabled()) return
         if (goalReached) return
         val path = path ?: return
-        event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true, bezierPoint = 2.0)
+        event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true, bezierPoint = 2.0) // TODO dynamic color
     }
 
     @SubscribeEvent
