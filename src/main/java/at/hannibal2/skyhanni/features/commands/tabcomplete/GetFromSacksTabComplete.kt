@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 
 object GetFromSacksTabComplete {
 
-    private val config get() = SkyHanniMod.feature.commands.tabComplete
+    private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
 
     fun handleTabComplete(command: String): List<String>? {
         if (!isEnabled()) return null

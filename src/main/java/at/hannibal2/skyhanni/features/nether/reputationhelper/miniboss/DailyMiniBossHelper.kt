@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -90,7 +90,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         }
     }
 
-    fun saveConfig(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         storage.miniBossesDoneToday.clear()
 
         miniBosses.filter { it.doneToday }
@@ -107,7 +107,7 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         }
     }
 
-    fun loadData(storage: Storage.ProfileSpecific.CrimsonIsleStorage) {
+    fun loadData(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         if (miniBosses.isEmpty()) return
         for (name in storage.miniBossesDoneToday) {
             getByDisplayName(name)!!.doneToday = true

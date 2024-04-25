@@ -15,7 +15,7 @@ class FixNEUHeavyPearls {
     private val heavyPearl = "HEAVY_PEARL".asInternalName()
 
     @SubscribeEvent
-    fun onSackChange(event: ItemAddEvent) {
+    fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
         if (event.internalName == heavyPearl && event.amount == 3) {

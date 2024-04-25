@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -113,7 +113,7 @@ object TrevorTracker {
         display = formatDisplay(drawTrapperDisplay(storage))
     }
 
-    private fun drawTrapperDisplay(storage: Storage.ProfileSpecific.TrapperData) = buildList<List<Any>> {
+    private fun drawTrapperDisplay(storage: ProfileSpecificStorage.TrapperData) = buildList<List<Any>> {
         addAsSingletonList("§b§lTrevor Data Tracker")
         addAsSingletonList("§b${storage.questsDone.addSeparators()} §9Quests Started")
         addAsSingletonList("§b${storage.peltsGained.addSeparators()} §5Total Pelts Gained")

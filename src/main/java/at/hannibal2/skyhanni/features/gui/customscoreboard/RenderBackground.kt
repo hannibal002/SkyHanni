@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.alignmentConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.backgroundConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -32,15 +33,15 @@ class RenderBackground {
 
         // Update the position to the alignment options
         if (
-            config.displayConfig.alignment.alignRight
-            || config.displayConfig.alignment.alignCenterVertically
+            alignmentConfig.alignRight
+            || alignmentConfig.alignCenterVertically
         ) {
             position.set(
                 Position(
-                    if (config.displayConfig.alignment.alignRight)
+                    if (alignmentConfig.alignRight)
                         scaledWidth - elementWidth - (border * 2)
                     else x,
-                    if (config.displayConfig.alignment.alignCenterVertically)
+                    if (alignmentConfig.alignCenterVertically)
                         scaledHeight / 2 - elementHeight / 2
                     else y,
                     position.getScale(),
@@ -55,7 +56,7 @@ class RenderBackground {
         GlStateManager.pushAttrib()
 
         GlStateManager.color(1f, 1f, 1f, 1f)
-
+        GL11.glDepthMask(false)
 
         if (backgroundConfig.enabled) {
             if (backgroundConfig.useCustomBackgroundImage) {
@@ -80,7 +81,7 @@ class RenderBackground {
                 )
             }
         }
-
+        GL11.glDepthMask(true)
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
     }

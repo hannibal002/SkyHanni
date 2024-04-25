@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.transformers.AccessorFontRenderer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -63,8 +63,8 @@ object FontRendererHook {
     @JvmStatic
     fun beginChromaRendering(text: String, shadow: Boolean) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.chroma.enabled) return
-        if (SkyHanniMod.feature.chroma.allChroma && SkyHanniMod.feature.chroma.ignoreChat && cameFromChat) {
+        if (!ChromaManager.config.enabled) return
+        if (ChromaManager.config.allChroma && ChromaManager.config.ignoreChat && cameFromChat) {
             endChromaFont()
             return
         }
@@ -84,7 +84,7 @@ object FontRendererHook {
         }
 
         // Best feature ngl
-        if (SkyHanniMod.feature.chroma.allChroma) {
+        if (ChromaManager.config.allChroma) {
             // Handles setting the base color of text when they don't use color codes i.e. MoulConfig
             if (shadow) {
                 GlStateManager.color(0.33f, 0.33f, 0.33f, 1f)
@@ -108,7 +108,7 @@ object FontRendererHook {
     fun forceWhiteColorCode(i1: Int): Int {
         if (!LorenzUtils.inSkyBlock) return i1
 
-        if (!SkyHanniMod.feature.chroma.enabled) return i1
+        if (!ChromaManager.config.enabled) return i1
 
         val drawState = currentDrawState ?: return i1
         if (drawState.getChromaState()) {
@@ -123,7 +123,7 @@ object FontRendererHook {
     @JvmStatic
     fun restoreChromaState() {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.chroma.enabled) return
+        if (!ChromaManager.config.enabled) return
 
         currentDrawState?.restoreChromaEnv()
     }
@@ -131,21 +131,21 @@ object FontRendererHook {
     @JvmStatic
     fun endChromaRendering() {
         if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.chroma.enabled) return
+        if (!ChromaManager.config.enabled) return
 
         if (previewChroma) {
             previewChroma = false
             endChromaFont()
         }
 
-        if (SkyHanniMod.feature.chroma.allChroma) endChromaFont()
+        if (ChromaManager.config.allChroma) endChromaFont()
 
         currentDrawState?.endChromaEnv()
     }
 
     @JvmStatic
     fun insertZColorCode(constant: String): String {
-        return if (LorenzUtils.inSkyBlock && !SkyHanniMod.feature.chroma.enabled) constant else "0123456789abcdefklmnorz"
+        return if (LorenzUtils.inSkyBlock && !ChromaManager.config.enabled) constant else "0123456789abcdefklmnorz"
     }
 
     // TODO add better parameter names
@@ -159,7 +159,7 @@ object FontRendererHook {
         i1: Int,
     ): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
-        if (!SkyHanniMod.feature.chroma.enabled) return false
+        if (!ChromaManager.config.enabled) return false
         if (i1 == 22) {
             toggleChromaOn()
             return true

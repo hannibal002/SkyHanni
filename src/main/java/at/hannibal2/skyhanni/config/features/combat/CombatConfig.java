@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CombatConfig {
 
@@ -18,6 +18,11 @@ public class CombatConfig {
     @Expose
     @Category(name = "Ghost Counter", desc = "Ghost counter settings")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
+
+    @Expose
+    @ConfigOption(name = "Quiver", desc = "")
+    @Accordion
+    public QuiverConfig quiverConfig = new QuiverConfig();
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")

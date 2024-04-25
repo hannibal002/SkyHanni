@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -28,8 +29,6 @@ import com.jagrosh.discordipc.entities.RichPresence
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.util.Timer
-import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -37,9 +36,8 @@ import java.util.concurrent.TimeUnit
 object DiscordRPCManager : IPCListener {
 
     private const val applicationID = 1093298182735282176L
-    private const val updatePeriod = 4200L
 
-    private val config get() = feature.misc.discordRPC
+    val config get() = feature.gui.discordRPC
 
     private var client: IPCClient? = null
     private lateinit var secondLine: DiscordStatus
@@ -47,7 +45,7 @@ object DiscordRPCManager : IPCListener {
     private var startTimestamp: Long? = null
     private var startOnce = false
 
-    private var updateTimer: Timer? = null
+    private var runTimer = false
     private var connected = false
 
     private val DiscordLocationKey = DiscordLocationKey()
@@ -80,7 +78,10 @@ object DiscordRPCManager : IPCListener {
                     ChatUtils.clickableChat(
                         "Discord Rich Presence was unable to start! " +
                             "This usually happens when you join SkyBlock when Discord is not started. " +
-                            "Please run /shrpcstart to retry once you have launched Discord.", "shrpcstart"
+                            "Please run /shrpcstart to retry once you have launched Discord.",
+                        onClick = {
+                            startCommand()
+                        }
                     )
                 }
             } catch (ex: Throwable) {
@@ -127,7 +128,7 @@ object DiscordRPCManager : IPCListener {
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
-    fun updatePresence() {
+    private fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
         // TODO, change functionality to use enum rather than ordinals
@@ -145,12 +146,15 @@ object DiscordRPCManager : IPCListener {
     override fun onReady(client: IPCClient) {
         consoleLog("Discord RPC Started.")
         connected = true
-        updateTimer = Timer()
-        updateTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                updatePresence()
-            }
-        }, 0, updatePeriod)
+        runTimer = true
+    }
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!runTimer) return
+        if (event.repeatSeconds(5)) {
+            updatePresence()
+        }
     }
 
     override fun onClose(client: IPCClient, json: JsonObject?) {
@@ -168,10 +172,7 @@ object DiscordRPCManager : IPCListener {
     }
 
     private fun cancelTimer() {
-        updateTimer?.let {
-            it.cancel()
-            updateTimer = null
-        }
+        runTimer = false
     }
 
     private fun getStatusByConfigId(id: Int) = DiscordStatus.entries.getOrElse(id) { DiscordStatus.NONE }
@@ -230,7 +231,7 @@ object DiscordRPCManager : IPCListener {
 
     // Events that change things in DiscordStatus
     @SubscribeEvent
-    fun onKeybind(event: LorenzKeyPressEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
@@ -249,6 +250,8 @@ object DiscordRPCManager : IPCListener {
         event.transform(11, "misc.discordRPC.autoPriority") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
         }
+
+        event.move(31, "misc.discordRPC", "gui.discordRPC")
     }
 
     private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)

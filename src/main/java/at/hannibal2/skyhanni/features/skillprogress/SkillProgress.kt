@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object SkillProgress {
 
-    private val config get() = SkyHanniMod.feature.skillProgress
+    val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
     val etaConfig get() = config.skillETADisplayConfig
@@ -374,17 +374,18 @@ object SkillProgress {
             )
         }
 
-
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         add(
-            Renderable.clickAndHover(
-                "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
-                listOf("§eClick to reset!")
-            ) {
-            xpInfo.sessionTimerActive = false
-            xpInfo.timeActive = 0L
-            chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
-        })
+            Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
+                listOf("§eClick to reset!"),
+                onClick = {
+                    xpInfo.sessionTimerActive = false
+
+                    xpInfo.timeActive = 0L
+                    chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
+                }
+            )
+        )
     }
 
     private fun drawDisplay() = buildList {
@@ -417,7 +418,7 @@ object SkillProgress {
             add(Renderable.string("§9[§d$level§9] "))
 
         if (config.useIcon.get()) {
-            add(Renderable.itemStack(activeSkill.item, 1.2))
+            add(Renderable.itemStack(activeSkill.item, 1.0))
         }
 
         add(Renderable.string(buildString {

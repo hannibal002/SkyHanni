@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Mayor
+import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
@@ -26,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -206,7 +209,8 @@ object GriffinBurrowHelper {
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE)
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
-                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
+                    // TODO use round(1)
+                    val formattedDistance = distance.toInt().addSeparators()
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {
                     event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
@@ -268,7 +272,7 @@ object GriffinBurrowHelper {
                 val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
                 event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
                 if (distance > 5) {
-                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
+                    val formattedDistance = distance.toInt().addSeparators()
                     event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
@@ -323,8 +327,12 @@ object GriffinBurrowHelper {
         }
 
         if (!isEnabled()) {
-            if (!config.alwaysDiana) {
-                ChatUtils.clickableChat("§cEnable Always Diana in the config!", "sh always diana")
+            if (currentMayor != Mayor.DIANA) {
+                ChatUtils.chatAndOpenConfig(
+                    "§cSelect Diana as mayor overwrite!",
+                    SkyHanniMod.feature.dev.debug::assumeMayor
+                )
+
             } else {
                 ChatUtils.userError("Have an Ancestral Spade in the inventory!")
             }

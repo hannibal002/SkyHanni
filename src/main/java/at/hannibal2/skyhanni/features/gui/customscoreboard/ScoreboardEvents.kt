@@ -3,18 +3,19 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
@@ -31,121 +32,187 @@ private fun getSbLines(): List<String> {
     return ScoreboardData.sidebarLinesFormatted
 }
 
-enum class ScoreboardEvents(private val displayLine: Supplier<List<String>>, private val showWhen: () -> Boolean) {
+enum class ScoreboardEvents(
+    private val displayLine: Supplier<List<String>>,
+    private val showWhen: () -> Boolean,
+    private val configLine: String,
+) {
     VOTING(
         ::getVotingLines,
-        ::getVotingShowWhen
+        ::getVotingShowWhen,
+        "§7(All Voting Lines)"
     ),
     SERVER_CLOSE(
         ::getServerCloseLines,
-        ::getServerCloseShowWhen
+        ::getServerCloseShowWhen,
+        "§cServer closing soon!"
     ),
     DUNGEONS(
         ::getDungeonsLines,
-        ::getDungeonsShowWhen
+        ::getDungeonsShowWhen,
+        "§7(All Dungeons Lines)"
     ),
     KUUDRA(
         ::getKuudraLines,
-        ::getKuudraShowWhen
+        ::getKuudraShowWhen,
+        "§7(All Kuudra Lines)"
     ),
     DOJO(
         ::getDojoLines,
-        ::getDojoShowWhen
+        ::getDojoShowWhen,
+        "§7(All Dojo Lines)"
     ),
     DARK_AUCTION(
         ::getDarkAuctionLines,
-        ::getDarkAuctionShowWhen
+        ::getDarkAuctionShowWhen,
+        "Time Left: §b11\n" +
+            "Current Item:\n" +
+            " §5Travel Scroll to Sirius"
     ),
     JACOB_CONTEST(
         ::getJacobContestLines,
-        ::getJacobContestShowWhen
+        ::getJacobContestShowWhen,
+        "§eJacob's Contest\n" +
+            "§e○ §fCarrot §a18m17s\n" +
+            " Collected §e8,264"
     ),
     JACOB_MEDALS(
         ::getJacobMedalsLines,
-        ::getJacobMedalsShowWhen
+        ::getJacobMedalsShowWhen,
+        "§6§lGOLD §fmedals: §613\n" +
+            "§f§lSILVER §fmedals: §f3\n" +
+            "§c§lBRONZE §fmedals: §c4"
     ),
     TRAPPER(
         ::getTrapperLines,
-        ::getTrapperShowWhen
+        ::getTrapperShowWhen,
+        "Pelts: §5711\n" +
+            "Tracker Mob Location:\n" +
+            "§bMushroom Gorge"
     ),
     GARDEN_CLEAN_UP(
         ::getGardenCleanUpLines,
-        ::getGardenCleanUpShowWhen
+        ::getGardenCleanUpShowWhen,
+        "Cleanup: §c12.6%"
     ),
     GARDEN_PASTING(
         ::getGardenPastingLines,
-        ::getGardenPastingShowWhen
+        ::getGardenPastingShowWhen,
+        "§fBarn Pasting§7: §e12.3%"
     ),
     FLIGHT_DURATION(
         ::getFlightDurationLines,
-        ::getFlightDurationShowWhen
+        ::getFlightDurationShowWhen,
+        "Flight Duration: §a10m 0s"
     ),
     WINTER(
         ::getWinterLines,
-        ::getWinterShowWhen
+        ::getWinterShowWhen,
+        "§7(All Winter Event Lines)"
     ),
     SPOOKY(
         ::getSpookyLines,
-        ::getSpookyShowWhen
+        ::getSpookyShowWhen,
+        "§7(All Spooky Event Lines)"
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
-        ::getBroodmotherShowWhen
-    ),
-    NEW_YEAR(
-        ::getNewYearLines,
-        ::getNewYearShowWhen
-    ),
-    ORINGO(
-        ::getOringoLines,
-        ::getOringoShowWhen
+        ::getBroodmotherShowWhen,
+        "§4Broodmother§7: §eDormant"
     ),
     MINING_EVENTS(
         ::getMiningEventsLines,
-        ::getMiningEventsShowWhen
+        ::getMiningEventsShowWhen,
+        "§7(All Mining Event Lines)"
     ),
     DAMAGE(
         ::getDamageLines,
-        ::getDamageShowWhen
+        ::getDamageShowWhen,
+        "Dragon HP: §a6,180,925 §c❤\n" +
+            "Your Damage: §c375,298.5"
     ),
     MAGMA_BOSS(
         ::getMagmaBossLines,
-        ::getMagmaBossShowWhen
+        ::getMagmaBossShowWhen,
+        "§7(All Magma Boss Lines)\n" +
+            "§7Boss: §c0%\n" +
+            "§7Damage Soaked:\n" +
+            "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
+    ),
+    RIFT(
+        ::getRiftLines,
+        { IslandType.THE_RIFT.isInIsland() },
+        "§7(All Rift Lines)"
     ),
     ESSENCE(
         ::getEssenceLines,
-        ::getEssenceShowWhen
+        ::getEssenceShowWhen,
+        "Dragon Essence: §d1,285"
     ),
-    EFFIGIES(
-        ::getEffigiesLines,
-        ::getEffigiesShowWhen
+    QUEUE(
+        ::getQueueLines,
+        ::getQueueShowWhen,
+        "Queued: Glacite Mineshafts\n" +
+            "Position: §b#45 §fSince: §a00:00"
     ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
-        ::getActiveEventShowWhen
+        ::getActiveEventShowWhen,
+        "§7(All Active Tablist Events)"
     ),
     REDSTONE(
         ::getRedstoneLines,
-        ::getRedstoneShowWhen
+        ::getRedstoneShowWhen,
+        "§e§l⚡ §cRedstone: §e§b7%"
     ),
+    ;
 
-    // Maybe as a default state, use tablist "Events: ..."
-    NONE(
-        ::getNoneLines,
-        { false }
-    );
+    override fun toString(): String {
+        return configLine
+    }
 
     fun getLines(): List<String> {
         return displayLine.get()
     }
 
     companion object {
-        fun getEvent(): List<ScoreboardEvents> {
-            if (config.displayConfig.showAllActiveEvents) {
-                return entries.filter { it.showWhen() }
+        fun getEvent() = buildList<ScoreboardEvents?> {
+            if (eventsConfig.showAllActiveEvents) {
+                for (event in eventsConfig.eventEntries) {
+                    if (event.showWhen()) {
+                        add(event)
+                    }
+                }
+            } else {
+                add(eventsConfig.eventEntries.firstOrNull { it.showWhen() && it.getLines().isNotEmpty() })
             }
-            return listOf(entries.firstOrNull { it.showWhen() } ?: NONE)
         }
+
+        // I don't know why, but this field is needed for it to work
+        @JvmField
+        val defaultOption = listOf(
+            VOTING,
+            SERVER_CLOSE,
+            DUNGEONS,
+            KUUDRA,
+            DOJO,
+            DARK_AUCTION,
+            JACOB_CONTEST,
+            JACOB_MEDALS,
+            TRAPPER,
+            GARDEN_CLEAN_UP,
+            GARDEN_PASTING,
+            FLIGHT_DURATION,
+            WINTER,
+            SPOOKY,
+            BROODMOTHER,
+            MINING_EVENTS,
+            DAMAGE,
+            MAGMA_BOSS,
+            RIFT,
+            ESSENCE,
+            ACTIVE_TABLIST_EVENTS
+        )
     }
 }
 
@@ -164,7 +231,6 @@ private fun getVotingLines() = buildList {
         }
     }
 }
-
 
 private fun getVotingShowWhen(): Boolean {
     return SbPattern.yearVotesPattern.anyMatches(getSbLines())
@@ -191,12 +257,10 @@ private fun getDungeonsLines() = listOf(
     SbPattern.floor3GuardiansPattern
 ).let { patterns ->
     // BetterMap adds a random §r at the start, making it go black
-    getSbLines().filter { line -> patterns.any { it.matches(line.replace("§r", "")) } }
+    getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
 }
 
-private fun getDungeonsShowWhen(): Boolean {
-    return IslandType.CATACOMBS.isInIsland() || inDungeons
-}
+private fun getDungeonsShowWhen(): Boolean = DungeonAPI.inDungeon()
 
 private fun getKuudraLines() = listOf(
     SbPattern.autoClosingPattern,
@@ -233,8 +297,7 @@ private fun getDarkAuctionLines() = buildList {
     getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { add(it) }
     getSbLines().firstOrNull { SbPattern.timeLeftPattern.matches(it) }?.let { add(it) }
 
-    val darkAuctionCurrentItemLine =
-        getSbLines().firstOrNull { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
+    val darkAuctionCurrentItemLine = getSbLines().firstOrNull { SbPattern.darkAuctionCurrentItemPattern.matches(it) }
 
     if (darkAuctionCurrentItemLine != null) {
         add(darkAuctionCurrentItemLine)
@@ -251,7 +314,9 @@ private fun getJacobContestLines() = buildList {
         add(line)
         getSbLines().nextAfter(line)?.let { add(it) }
         getSbLines().nextAfter(line, 2)?.let { add(it) }
-        getSbLines().nextAfter(line, 3)?.let { add(it) }
+        getSbLines().nextAfter(line, 3)?.let {
+            if (!SbPattern.footerPattern.matches(it)) add(it)
+        }
     }
 }
 
@@ -328,7 +393,8 @@ private fun getSpookyLines() = buildList {
     getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }?.let { add(it) } // Time
     add("§7Your Candy: ")
     add(
-        CustomScoreboardUtils.getTablistFooter()
+        TabListData.getFooter()
+            .removeResets()
             .split("\n")
             .firstOrNull { it.startsWith("§7Your Candy:") }
             ?.removePrefix("§7Your Candy:") ?: "§cCandy not found"
@@ -367,22 +433,6 @@ private fun getBroodmotherLines(): List<String> {
 
 private fun getBroodmotherShowWhen(): Boolean {
     return getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
-}
-
-private fun getNewYearLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
-}
-
-private fun getNewYearShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.newYearPattern.matches(it) }
-}
-
-private fun getOringoLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.travelingZooPattern.matches(it) })
-}
-
-private fun getOringoShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.travelingZooPattern.matches(it) }
 }
 
 private fun getMiningEventsLines() = buildList {
@@ -433,6 +483,11 @@ private fun getMiningEventsLines() = buildList {
         add(getSbLines().first { SbPattern.yourGoblinKillsPattern.matches(it) })
         add(getSbLines().first { SbPattern.remainingGoblinPattern.matches(it) })
     }
+
+    // Fortunate Freezing
+    if (getSbLines().any { SbPattern.fortunateFreezingBonusPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fortunateFreezingBonusPattern.matches(it) })
+    }
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
@@ -463,6 +518,22 @@ private fun getMagmaBossShowWhen(): Boolean {
     return SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 }
 
+private fun getRiftLines() = buildList {
+    if (SbPattern.riftHotdogTitlePattern.anyMatches(getSbLines())) {
+        add(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) })
+        add(getSbLines().first { SbPattern.timeLeftPattern.matches(it) })
+        add(getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
+    }
+
+    if (RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())) {
+        add(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
+    }
+
+    if (SbPattern.riftAveikxPattern.anyMatches(getSbLines())) {
+        addAll(getSbLines().filter { SbPattern.riftAveikxPattern.matches(it) })
+    }
+}
+
 private fun getEssenceLines(): List<String> {
     return listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
 }
@@ -471,12 +542,13 @@ private fun getEssenceShowWhen(): Boolean {
     return SbPattern.essencePattern.anyMatches(getSbLines())
 }
 
-private fun getEffigiesLines(): List<String> {
-    return listOf(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
+private fun getQueueLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
 }
 
-private fun getEffigiesShowWhen(): Boolean {
-    return RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())
+private fun getQueueShowWhen(): Boolean {
+    return SbPattern.queuePattern.anyMatches(getSbLines())
 }
 
 private fun getRedstoneLines(): List<String> {
@@ -485,11 +557,4 @@ private fun getRedstoneLines(): List<String> {
 
 private fun getRedstoneShowWhen(): Boolean {
     return SbPattern.redstonePattern.anyMatches(getSbLines())
-}
-
-private fun getNoneLines(): List<String> {
-    return when {
-        config.informationFilteringConfig.hideEmptyLines -> listOf("<hidden>")
-        else -> listOf("§cNo Event")
-    }
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.Slot
@@ -56,5 +57,16 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slotId: Int,
         val clickedButton: Int,
         val clickType: Int,
-    ) : GuiContainerEvent(gui, container)
+    ) : GuiContainerEvent(gui, container) {
+
+        fun makePickblock() {
+            if (this.clickedButton == 2 && this.clickType == 3) return
+            slot?.slotNumber?.let { slotNumber ->
+                Minecraft.getMinecraft().playerController.windowClick(
+                    container.windowId, slotNumber, 2, 3, Minecraft.getMinecraft().thePlayer
+                )
+                isCanceled = true
+            }
+        }
+    }
 }

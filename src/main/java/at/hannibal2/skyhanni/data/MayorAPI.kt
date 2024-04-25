@@ -2,15 +2,19 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.Mayor.Companion.setMayorWithActivePerks
+import at.hannibal2.skyhanni.data.Mayor.Companion.setAssumeMayor
+import at.hannibal2.skyhanni.data.Mayor.Companion.setAssumeMayorJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,6 +24,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 object MayorAPI {
+
+    val foxyExtraEventPattern by RepoPattern.pattern(
+        "mayorapi.foxy.extraevent",
+        "Schedules an extra §.(?<event>.*) §.event during the year\\."
+    )
+
     var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
@@ -36,15 +46,13 @@ object MayorAPI {
 
     /**
      * @param input: The name of the mayor
-     * @return: The neu color of the mayor; If no mayor was found, it will return "§cUnknown: §7"
+     * @return: The neu color of the mayor; If no mayor was found, it will return "§c"
      */
-    fun mayorNameToColorCode(input: String): String {
-        return Mayor.getMayorFromName(input).color
-    }
+    fun mayorNameToColorCode(input: String): String = Mayor.getMayorFromName(input)?.color ?: "§c"
 
     /**
      * @param input: The name of the mayor
-     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§cUnknown: §7[input]"
+     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§c[input]"
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
@@ -81,7 +89,7 @@ object MayorAPI {
         // Check if it is still the mayor from the old SkyBlock year
         currentMayor = candidates[nextMayorTime.toSkyBlockTime().year - 1]?.let {
             // TODO: Once Jerry is active, add the sub mayor perks in here
-            setMayorWithActivePerks(it.name, it.perks)
+            setAssumeMayorJson(it.name, it.perks)
         }
     }
 
@@ -107,6 +115,20 @@ object MayorAPI {
     private fun MayorJson.Election.getPairs() = year + 1 to candidates.bestCandidate()
 
     private fun List<MayorJson.Candidate>.bestCandidate() = maxBy { it.votes }
+
+    @SubscribeEvent
+    fun onConfigReload(event: ConfigLoadEvent) {
+        SkyHanniMod.feature.dev.debug.assumeMayor.onToggle {
+            val mayor = SkyHanniMod.feature.dev.debug.assumeMayor.get()
+
+            if (mayor == Mayor.DISABLED) {
+                checkCurrentMayor()
+            } else {
+                mayor.setAssumeMayor(mayor.perks.toList())
+                currentMayor = mayor
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {

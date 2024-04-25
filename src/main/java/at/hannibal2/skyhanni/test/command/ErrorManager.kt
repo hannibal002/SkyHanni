@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.client.Minecraft
-import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 
 object ErrorManager {
@@ -61,18 +62,12 @@ object ErrorManager {
         throw exception
     }
 
-    fun command(array: Array<String>) {
-        if (array.size != 1) {
-            ChatUtils.userError("Use /shcopyerror <error id>")
-            return
-        }
-
-        val id = array[0]
+    private fun copyError(errorId: String) {
         val fullErrorMessage = KeyboardManager.isModifierKeyDown()
         val errorMessage = if (fullErrorMessage) {
-            fullErrorMessages[id]
+            fullErrorMessages[errorId]
         } else {
-            errorMessages[id]
+            errorMessages[errorId]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
         ChatUtils.chat(errorMessage?.let {
@@ -87,13 +82,16 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
+        betaOnly: Boolean = false,
     ) {
-        logError(IllegalStateException(internalMessage), userMessage, ignoreErrorCache, noStackTrace, *extraData)
-    }
-
-    @Deprecated("Use data as well", ReplaceWith("ErrorManager.logErrorWithData(throwable, message)"))
-    fun logError(throwable: Throwable, message: String) {
-        logError(throwable, message, ignoreErrorCache = false, noStackTrace = false)
+        logError(
+            IllegalStateException(internalMessage),
+            userMessage,
+            ignoreErrorCache,
+            noStackTrace,
+            *extraData,
+            betaOnly = betaOnly,
+        )
     }
 
     fun logErrorWithData(
@@ -102,8 +100,9 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
+        betaOnly: Boolean = false,
     ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData)
+        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
     }
 
     private fun logError(
@@ -112,18 +111,19 @@ object ErrorManager {
         ignoreErrorCache: Boolean,
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
+        betaOnly: Boolean = false,
     ) {
-        val error = Error(message, throwable)
-        error.printStackTrace()
-        Minecraft.getMinecraft().thePlayer ?: return
-
+        if (betaOnly && !LorenzUtils.isBetaVersion()) return
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
-                throwable.stackTrace[0].let { it.fileName!! to it.lineNumber }
+                throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
             } else message to 0
             if (cache.contains(pair)) return
             cache.add(pair)
         }
+
+        Error(message, throwable).printStackTrace()
+        Minecraft.getMinecraft().thePlayer ?: return
 
         val fullStackTrace: String
         val stackTrace: String
@@ -135,7 +135,7 @@ object ErrorManager {
             fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
             stackTrace = throwable.getCustomStackTrace(false).joinToString("\n")
         }
-        val randomId = UUID.randomUUID().toString()
+        val randomId = StringUtils.generateRandomId()
 
         val extraDataString = buildExtraDataString(extraData)
         val rawMessage = message.removeColor()
@@ -146,8 +146,10 @@ object ErrorManager {
 
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
-            "shcopyerror $randomId",
-            false
+            onClick = {
+                copyError(randomId)
+            },
+            prefix = false
         )
     }
 
@@ -175,7 +177,7 @@ object ErrorManager {
 
     private fun Throwable.getCustomStackTrace(
         fullStackTrace: Boolean,
-        parent: List<String> = emptyList()
+        parent: List<String> = emptyList(),
     ): List<String> = buildList {
         add("Caused by ${this@getCustomStackTrace.javaClass.name}: $message")
 

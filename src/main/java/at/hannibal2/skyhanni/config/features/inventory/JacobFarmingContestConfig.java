@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class JacobFarmingContestConfig {
     @Expose
@@ -17,6 +19,11 @@ public class JacobFarmingContestConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean realTime = true;
+
+    @Expose
+    @ConfigOption(name = "Open On Elite", desc = "Opens the contest on §eelitebot.dev§7 when pressing this key in Jacob's menu or the calendar.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int openOnElite = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Medal Icon", desc = "Adds a symbol that shows what medal you received in this Contest. " +

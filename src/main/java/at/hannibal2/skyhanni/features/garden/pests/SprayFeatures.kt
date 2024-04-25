@@ -32,7 +32,7 @@ class SprayFeatures {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.pestWhenSelector) return
+        if (!isEnabled()) return
 
         val type = changeMaterialPattern.matchMatcher(event.message) {
             val sprayName = group("spray")

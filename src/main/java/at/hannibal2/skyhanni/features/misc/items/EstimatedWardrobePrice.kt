@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EstimatedWardrobePrice {
 
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
 
     @SubscribeEvent

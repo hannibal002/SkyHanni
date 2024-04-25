@@ -5,21 +5,23 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.LorenzUtils.fillTable
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -30,7 +32,7 @@ class SkyMartCopperPrice {
         "§c(?<amount>.*) Copper"
     )
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private val config get() = GardenAPI.config.skyMart
 
     companion object {
@@ -64,23 +66,23 @@ class SkyMartCopperPrice {
 
         inInventory = true
         val table = mutableListOf<DisplayTableEntry>()
-        for (stack in event.inventoryItems.values) {
-            val lore = stack.getLore()
-            val otherItemsPrice = stack.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
+        for ((slot, item) in event.inventoryItems) {
+            val lore = item.getLore()
+            val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
 
             for (line in lore) {
                 val copper = copperPattern.matchMatcher(line) {
                     group("amount").formatInt()
                 } ?: continue
 
-                val internalName = stack.getInternalName()
+                val internalName = item.getInternalName()
                 val lowestBin = internalName.getPriceOrNull() ?: continue
                 val profit = lowestBin - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
                 val perFormat = NumberUtil.format(factor)
 
-                val itemName = stack.itemName
+                val itemName = item.itemName
                 val hover = buildList {
                     add(itemName)
                     add("")
@@ -93,13 +95,22 @@ class SkyMartCopperPrice {
                     add("§7Copper amount: §c${copper.addSeparators()} ")
                     add("§7Profit per copper: §6${perFormat} ")
                 }
-                table.add(DisplayTableEntry("$itemName§f:", "§6§l$perFormat", factor, internalName, hover))
+                table.add(
+                    DisplayTableEntry(
+                        "$itemName§f:",
+                        "§6§l$perFormat",
+                        factor,
+                        internalName,
+                        hover,
+                        highlightsOnHoverSlots = listOf(slot)
+                    )
+                )
             }
         }
 
-        val newList = mutableListOf<List<Any>>()
-        newList.addAsSingletonList("§eCoins per Copper§f:")
-        newList.fillTable(table)
+        val newList = mutableListOf<Renderable>()
+        newList.add(Renderable.string("§eCoins per Copper§f:"))
+        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         display = newList
     }
 
@@ -111,10 +122,9 @@ class SkyMartCopperPrice {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
-            config.copperPricePos.renderStringsAndItems(
+            config.copperPricePos.renderRenderables(
                 display,
                 extraSpace = 5,
-                itemScale = config.itemScale,
                 posLabel = "SkyMart Copper Price"
             )
         }
@@ -127,5 +137,8 @@ class SkyMartCopperPrice {
         event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
         event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
         event.move(3, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")
+        event.transform(32, "garden.skyMart.itemScale") {
+            JsonPrimitive((it.asDouble / 1.851).round(1))
+        }
     }
 }

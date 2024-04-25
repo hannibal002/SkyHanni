@@ -1,32 +1,33 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemBow
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 private var infinityQuiverLevelMultiplier = 0.03f
@@ -38,7 +39,7 @@ object QuiverAPI {
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
-    var arrowAmount: MutableMap<NEUInternalName, Float>
+    var arrowAmount: MutableMap<NEUInternalName, Int>
         get() = storage?.arrows?.arrowAmount ?: mutableMapOf()
         set(value) {
             storage?.arrows?.arrowAmount = value
@@ -46,10 +47,13 @@ object QuiverAPI {
     var currentAmount: Int
         get() = arrowAmount[currentArrow?.internalName]?.toInt() ?: 0
         set(value) {
-            arrowAmount[currentArrow?.internalName ?: return] = value.toFloat()
+            arrowAmount[currentArrow?.internalName ?: return] = value
         }
 
     private var arrows: List<ArrowType> = listOf()
+
+    private var wearingSkeletonMasterChestplate = false
+    private var hasBow = false
 
     const val MAX_ARROW_AMOUNT = 2880
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".asInternalName()
@@ -59,25 +63,36 @@ object QuiverAPI {
 
     private val group = RepoPattern.group("data.quiver")
     private val chatGroup = group.group("chat")
-    private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §f(?<arrow>.*)§a!")
+    private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §.(?<arrow>.*)§a!")
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
-        "(§.)*Jax forged (§.)*(?<type>.*?)(§.)* x(?<amount>[\\d,]+)( (§.)*for (§.)*(?<coins>[\\d,]+) Coins)?(§.)*!"
+        "(?:§.)*Jax forged (?:§.)*(?<type>.*?)(?:§.)* x(?<amount>[\\d,]+)(?: (?:§.)*for (?:§.)*(?<coins>[\\d,]+) Coins)?(?:§.)*!"
     )
     private val fillUpPattern by chatGroup.pattern(
         "fillup",
         "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!"
     )
-    private val clearedPattern by chatGroup.pattern("cleared", "§aCleared your quiver!")
+    private val clearedPattern by chatGroup.pattern(
+        "cleared",
+        "§aCleared your quiver!|§c§lYour quiver is now completely empty!"
+    )
+    private val arrowRanOutPattern by chatGroup.pattern(
+        "ranout",
+        "§c§lQUIVER! §cYou have run out of §f(?<type>.*)s§c!"
+    )
     private val arrowResetPattern by chatGroup.pattern("arrowreset", "§cYour favorite arrow has been reset!")
     private val addedToQuiverPattern by chatGroup.pattern(
         "addedtoquiver",
-        "(§.)*You've added (§.)*(?<type>.*) x(?<amount>.*) (§.)*to your quiver!"
+        "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!"
     )
 
     // Bows that don't use the players arrows, checked using the SkyBlock Id
     private val fakeBowsPattern by group.pattern("fakebows", "^(BOSS_SPIRIT_BOW|CRYPT_BOW)$")
     private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
+    private val quiverInventoryPattern by group.pattern(
+        "quiver.inventory",
+        "§7Active Arrow: §.(?<type>.*) §7\\(§e(?<amount>.*)§7\\)"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -92,12 +107,25 @@ object QuiverAPI {
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             return
+        }
+
+        arrowRanOutPattern.matchMatcher(message) {
+            val type = group("type")
+            val ranOutType = getArrowByNameOrNull(type)
+                ?: return ErrorManager.logErrorWithData(
+                    UnknownArrowType("Unknown arrow type: $type"),
+                    "Unknown arrow type: $type",
+                    "message" to message,
+                )
+            arrowAmount[ranOutType.internalName] = 0
+            QuiverUpdateEvent(ranOutType, currentAmount, shouldHideAmount()).postAndCatch()
         }
 
         fillUpJaxPattern.matchMatcher(message) {
             val type = group("type")
-            val amount = group("amount").formatNumber().toFloat()
+            val amount = group("amount").formatInt()
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
                     UnknownArrowType("Unknown arrow type: $type"),
@@ -106,19 +134,27 @@ object QuiverAPI {
                 )
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
+            if (filledUpType == currentArrow) {
+                QuiverUpdateEvent(filledUpType, currentAmount, shouldHideAmount()).postAndCatch()
+            }
             return
+
         }
 
         fillUpPattern.matchMatcher(message) {
-            val flintAmount = group("flintAmount").formatNumber().toFloat()
+            val flintAmount = group("flintAmount").formatInt()
 
             FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
+
+            if (currentArrow == FLINT_ARROW_TYPE) {
+                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            }
             return
         }
 
         addedToQuiverPattern.matchMatcher(message) {
             val type = group("type")
-            val amount = group("amount").formatNumber().toFloat()
+            val amount = group("amount").formatInt()
 
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
@@ -128,6 +164,9 @@ object QuiverAPI {
                 )
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
+            if (filledUpType == currentArrow) {
+                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            }
             return
         }
 
@@ -135,6 +174,7 @@ object QuiverAPI {
             currentAmount = 0
             arrowAmount.clear()
 
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             return
         }
 
@@ -142,6 +182,7 @@ object QuiverAPI {
             currentArrow = NONE_ARROW_TYPE
             currentAmount = 0
 
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
             return
         }
     }
@@ -158,72 +199,46 @@ object QuiverAPI {
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
             if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
-
             val arrow = stack.getInternalNameOrNull() ?: continue
-
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
 
-            arrowAmount.addOrPut(arrowType.internalName, stack.stackSize.toFloat())
+            arrowAmount.addOrPut(arrowType.internalName, stack.stackSize)
         }
     }
 
-    /*
-     Modified method to remove arrows from SkyblockFeatures QuiverOverlay
-     Original method source:
-     https://github.com/MrFast-js/SkyblockFeatures/blob/ae4bf0b91ed0fb17114d9cdaccaa9aef9a6c8d01/src/main/java/mrfast/sbf/features/overlays/QuiverOverlay.java#L127
-
-     Changes made:
-     - Added "fake bows" check
-     - Added "infinite quiver" check
-     - Added "sneaking" check
-     - Added "bow sound distance" check
-     - Added "skeleton master chestplate" check
-    */
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onPlaySound(event: PlaySoundEvent) {
-        if (!isEnabled()) return
-        if (event.soundName != "random.bow") return
-
-        val holdingBow = InventoryUtils.getItemInHand()?.item is ItemBow
-            && !fakeBowsPattern.matches(InventoryUtils.getItemInHand()?.getInternalNameOrNull()?.asString() ?: "")
-
-        if (!holdingBow) return
-
-        // check if sound location is more than configAmount block away from player
-        val soundLocation = event.distanceToPlayer
-        if (soundLocation > SkyHanniMod.feature.dev.bowSoundDistance) return
-
-        val arrowType = currentArrow?.internalName ?: return
-        val amount = arrowAmount[arrowType] ?: return
-        if (amount <= 0) return
-
-        if (InventoryUtils.getChestplate()
-                // The chestplate has the ability to not use arrows
-                // https://hypixel-skyblock.fandom.com/wiki/Skeleton_Master_Armor
-                ?.getInternalNameOrNull() == SKELETON_MASTER_CHESTPLATE
-        ) return
-
-        val infiniteQuiverLevel = InventoryUtils.getItemInHand()?.getEnchantments()?.get("infinite_quiver") ?: 0
-
-        val amountToRemove = {
-            when (Minecraft.getMinecraft().thePlayer.isSneaking) {
-                true -> 1.0f
-                false -> {
-                    when (infiniteQuiverLevel) {
-                        in 1..10 -> 1 - (infinityQuiverLevelMultiplier * infiniteQuiverLevel)
-                        else -> 1.0f
+    @SubscribeEvent
+    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
+        if (!isEnabled() && event.slot != 44) return
+        val stack = event.itemStack
+        if (stack.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
+            for (line in stack.getLore()) {
+                quiverInventoryPattern.matchMatcher(line) {
+                    val type = group("type")
+                    val amount = group("amount").formatInt()
+                    val currentArrowType = getArrowByNameOrNull(type)
+                        ?: return ErrorManager.logErrorWithData(
+                            UnknownArrowType("Unknown arrow type: $type"),
+                            "Unknown arrow type: $type",
+                            "line" to line,
+                        )
+                    if (currentArrowType != currentArrow || amount != currentAmount) {
+                        currentArrow = currentArrowType
+                        currentAmount = amount
+                        QuiverUpdateEvent(currentArrowType, currentAmount, shouldHideAmount()).postAndCatch()
                     }
                 }
             }
         }
-
-        arrowAmount[arrowType] = amount - amountToRemove()
     }
 
     fun Int.asArrowPercentage() = ((this.toFloat() / MAX_ARROW_AMOUNT) * 100).round(1)
 
-    fun hasBowInInventory(): Boolean {
-        return InventoryUtils.getItemsInOwnInventory().any { it.item is ItemBow }
+    fun hasBowInInventory() = hasBow
+
+    fun isHoldingBow(): Boolean {
+        InventoryUtils.getItemInHand()?.let {
+            return it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
+        } ?: return false
     }
 
     fun getArrowByNameOrNull(name: String): ArrowType? {
@@ -238,6 +253,31 @@ object QuiverAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
+    private fun shouldHideAmount() = wearingSkeletonMasterChestplate
+
+    private fun checkBowInventory() {
+        hasBow = InventoryUtils.getItemsInOwnInventory().any {
+            it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
+        }
+    }
+
+    private fun checkChestplate() {
+        val wasWearing = wearingSkeletonMasterChestplate
+        wearingSkeletonMasterChestplate =
+            InventoryUtils.getChestplate()?.getInternalName() == SKELETON_MASTER_CHESTPLATE
+        if (wasWearing != wearingSkeletonMasterChestplate) {
+            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        if (event.repeatSeconds(2)) {
+            checkChestplate()
+            checkBowInventory()
+        }
+    }
 
     // Load arrows from repo
     @SubscribeEvent
@@ -249,7 +289,7 @@ object QuiverAPI {
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.asInternalName()) }
 
         NONE_ARROW_TYPE = getArrowByNameOrNull("NONE".asInternalName())
-        FLINT_ARROW_TYPE = getArrowByNameOrNull("FLINT".asInternalName())
+        FLINT_ARROW_TYPE = getArrowByNameOrNull("ARROW".asInternalName())
     }
 
     class UnknownArrowType(message: String) : Exception(message)
