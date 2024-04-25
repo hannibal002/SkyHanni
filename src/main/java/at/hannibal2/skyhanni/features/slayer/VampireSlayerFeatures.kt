@@ -156,13 +156,7 @@ object VampireSlayerFeatures {
                 }
                 contain
             }
-            val neededHealth = when (baseMaxHealth) {
-                625 -> 125f // t1
-                1100 -> 220f // t2
-                1800 -> 360f // t3
-                2400 -> 480f // t4
-                else -> 600f // t5
-            }
+            val neededHealth = baseMaxHealth * 0.2f
             if (containUser && taggedEntityList.contains(this.entityId)) {
                 taggedEntityList.remove(this.entityId)
             }
