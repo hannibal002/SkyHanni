@@ -15,22 +15,22 @@ public class MatriarchHelperConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Highlight", desc = "Highlight the pearls in a color of your choosing")
+    @ConfigOption(name = "Highlight", desc = "Highlight the pearls in a color of your choosing.")
     @ConfigEditorBoolean
     public boolean highlight = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Color", desc = "Color of the line.")
+    @ConfigOption(name = "Highlight Color", desc = "Colour the pearls are highlighted in.")
     @ConfigEditorColour
     public String highlightColor = "0:114:126:255:41";
 
     @Expose
-    @ConfigOption(name = "Draw Line", desc = "Draw Line to the lowest Heavy Pearl")
+    @ConfigOption(name = "Draw Line", desc = "Draw Line to the lowest Heavy Pearl.")
     @ConfigEditorBoolean
     public boolean line = true;
 
     @Expose
-    @ConfigOption(name = "Line Color", desc = "Color of the line.")
+    @ConfigOption(name = "Line Color", desc = "Colour of the line.")
     @ConfigEditorColour
     public String lineColor = "0:230:163:38:255";
 }

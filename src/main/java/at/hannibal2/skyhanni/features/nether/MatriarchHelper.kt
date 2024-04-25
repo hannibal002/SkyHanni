@@ -27,7 +27,7 @@ class MatriarchHelper {
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.Special) {
-        if (!isEnabledMob(event)) return
+        if (!isHeavyPearl(event)) return
         pearlList.add(event.mob)
         if (pearlList.size > 3) {
             ErrorManager.logErrorStateWithData(
@@ -39,12 +39,12 @@ class MatriarchHelper {
         }
     }
 
-    private fun isEnabledMob(event: MobEvent) =
+    private fun isHeavyPearl(event: MobEvent) =
         config.enabled && IslandType.CRIMSON_ISLE.isInIsland() && event.mob.name == "Heavy Pearl"
 
     @SubscribeEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
-        if (!isEnabledMob(event)) return
+        if (!isHeavyPearl(event)) return
         pearlList.remove(event.mob)
     }
 
