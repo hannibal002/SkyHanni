@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -358,6 +359,10 @@ object Commands {
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
+        registerCommand(
+            "shclearksimet",
+            "Cleares the saved values of the applied kismet feathers in Croesus"
+        ) { CroesusChestTracker.resetChest() }
         registerCommand(
             "shkingfix",
             "Reseting the local King Talisman Helper offset."
