@@ -45,8 +45,11 @@ public class MiningNotificationsConfig {
     public Property<Integer> coldThreshold = Property.of(50);
 
     @Expose
-    @ConfigOption(name = "Get Ascension Rope", desc = "Click on a chat message to get an Ascension Rope when you're at 90 Cold and in the §bMineshaft§7. " +
-        "§cOnly works if you have an Ascension Rope in your sacks.")
+    @ConfigOption(
+        name = "Get Ascension Rope",
+        desc = "Click on a chat message to get an Ascension Rope when you're at 90 Cold and in the §bMineshaft§7. " +
+            "§cOnly works if you have an Ascension Rope in your sacks."
+    )
     @ConfigEditorBoolean
     public boolean getAscensionRope = true;
 }
