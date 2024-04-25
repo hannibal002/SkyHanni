@@ -93,17 +93,30 @@ object PartyChatCommands {
             return
         }
         if (isBlockedUser(name)) {
-            if (config.showIgnoredReminder) ChatUtils.clickableChat("§cIgnoring chat command from ${event.author}. Unignore them using /shignore remove <player> or click here!",
-                { blacklistModify(event.author) })
+            if (config.showIgnoredReminder) ChatUtils.clickableChat(
+                "§cIgnoring chat command from ${event.author}. " +
+                    "Unignore them using /shignore remove <player> or click here!",
+                onClick = { blacklistModify(event.author) }
+            )
             return
         }
         if (!isTrustedUser(name)) {
-            if (config.showIgnoredReminder) ChatUtils.chat("§cIgnoring chat command from $name. Change your party chat command settings or /friend (best) them.")
+            if (config.showIgnoredReminder) {
+                ChatUtils.chat(
+                    "§cIgnoring chat command from $name. " +
+                        "Change your party chat command settings or /friend (best) them."
+                )
+            }
             return
         }
         command.executable(event)
     }
 
+    /**
+     * TODO use a utils function for add/remove/list/clear
+     * function(args: Array<String>, list: List<String>, listName: String,
+     * precondition(string): () -> Boolean, onAdd(string), onRemove(string), onList(list))
+     */
     fun blacklist(input: Array<String>) {
         if (input.size !in 1..2) {
             ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
