@@ -139,8 +139,8 @@ object PestProfitTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetpestprofittracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
