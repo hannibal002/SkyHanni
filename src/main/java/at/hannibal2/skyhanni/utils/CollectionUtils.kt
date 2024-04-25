@@ -262,4 +262,15 @@ object CollectionUtils {
             addString("§a]")
         }))
     }
+
+    inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
+        val destination = LinkedHashMap<R, V>()
+        for (element in this) {
+            val newKey = transform(element)
+            if (newKey != null) {
+                destination[newKey] = element.value
+            }
+        }
+        return destination
+    }
 }
