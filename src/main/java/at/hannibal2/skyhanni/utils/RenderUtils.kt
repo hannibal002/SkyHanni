@@ -1163,7 +1163,14 @@ object RenderUtils {
         waypointColor: Color,
     ) {
         if (path.isEmpty()) return
-        LineDrawer.draw3D(partialTicks) { drawPath(path.toPositionsList(), colorLine, lineWidth, depth) }
+        LineDrawer.draw3D(partialTicks) {
+            drawPath(
+                path.toPositionsList().map { it.add(0.5, 0.5, 0.5) },
+                colorLine,
+                lineWidth,
+                depth
+            )
+        }
         path.filter { it.name?.isNotEmpty() == true }.forEach {
             this.drawDynamicText(it.position, it.name!!, 1.0)
         }
