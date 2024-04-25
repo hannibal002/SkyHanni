@@ -432,7 +432,7 @@ public class ProfileSpecificStorage {
         public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
-        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsArrayList();
+        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsList();
 
         public static class DungeonRunInfo {
 
