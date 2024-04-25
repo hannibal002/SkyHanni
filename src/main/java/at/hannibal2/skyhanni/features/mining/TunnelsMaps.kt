@@ -6,10 +6,12 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -147,6 +149,26 @@ class TunnelsMaps {
         event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true)
     }
 
+    @SubscribeEvent
+    fun onKeyPress(event: LorenzKeyPressEvent) {
+        if (!isEnabled()) return
+        if (event.keyCode != config.campfireKey) return
+        if (config.travelScroll) {
+            ChatUtils.sendMessageToServer("/warp basecamp")
+        } else {
+            goalReached = false
+            goal = campfire
+            active = campfire.name!!
+        }
+    }
+
+    val areas = setOf(
+        "Glacite Tunnels",
+        "Dwarven Base Camp",
+        "Glacite Lake",
+        "Fossil Research Center"
+    )
+
     private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isInIsland() && config.enable && (LorenzUtils.skyBlockArea == "Glacite Tunnels" || LorenzUtils.skyBlockArea == "Dwarven Base Camp" || LorenzUtils.skyBlockArea == "Glacite Lake")
+        IslandType.DWARVEN_MINES.isInIsland() && config.enable && areas.contains(LorenzUtils.skyBlockArea)
 }
