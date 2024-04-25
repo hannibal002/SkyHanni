@@ -2,6 +2,6 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo
 
 import com.google.gson.annotations.Expose
 
-class MaxwellPowersJson(
+data class MaxwellPowersJson(
     @Expose val powers: List<String>
 )
