@@ -274,6 +274,26 @@ object CollectionUtils {
         return destination
     }
 
+    inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {
+        val iterator = iterator()
+        if (!iterator.hasNext()) return emptyList()
+        var one = iterator.next()
+        if (!iterator.hasNext()) return emptyList()
+        var two = iterator.next()
+        val result = mutableListOf<R>()
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            result.add(transform(one, two, next))
+            one = two
+            two = next
+        }
+        return result
+    }
+
+    fun <T> Iterable<T>.zipWithNext3(): List<Triple<T, T, T>> {
+        return zipWithNext3 { a, b, c -> Triple(a, b, c) }
+    }
+
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
         return filterKeys { it != null } as Map<K, V>
     }

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -1203,23 +1204,21 @@ object RenderUtils {
         startAtEye: Boolean = true,
         waypointColor: Color = (path.lastOrNull()?.name?.takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
             ?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+        bezierPoint: Double = 1.0,
     ) {
         if (path.isEmpty()) return
+        val points = if (startAtEye) {
+            listOf(this@draw3DPathWithWaypoint.exactPlayerEyeLocation())
+        } else {
+            emptyList()
+        } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
         LineDrawer.draw3D(partialTicks) {
-            if (startAtEye) {
-                draw3DLine(
-                    this@draw3DPathWithWaypoint.exactPlayerEyeLocation(),
-                    path.first().position.add(0.5, 0.5, 0.5),
-                    colorLine,
-                    lineWidth,
-                    depth
-                )
-            }
             drawPath(
-                path.toPositionsList().map { it.add(0.5, 0.5, 0.5) },
+                points,
                 colorLine,
                 lineWidth,
-                depth
+                depth,
+                bezierPoint
             )
         }
         path.filter { it.name?.isNotEmpty() == true }.forEach {
@@ -1231,9 +1230,29 @@ object RenderUtils {
 
     class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
         val worldRenderer = tessellator.worldRenderer
-        fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean) {
-            path.zipWithNext().forEach {
-                draw3DLine(it.first, it.second, color, lineWidth, depth)
+        fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean, bezierPoint: Double = 1.0) {
+            if (bezierPoint < 0) {
+                path.zipWithNext().forEach {
+                    draw3DLine(it.first, it.second, color, lineWidth, depth)
+                }
+            } else {
+                val pathLines = path.zipWithNext()
+                pathLines.forEachIndexed { index, it ->
+                    val reduce = it.second.minus(it.first).normalize().times(bezierPoint)
+                    draw3DLine(
+                        if (index != 0) it.first + reduce else it.first,
+                        if (index != pathLines.lastIndex) it.second - reduce else it.second,
+                        color,
+                        lineWidth,
+                        depth
+                    )
+                }
+                path.zipWithNext3().forEach {
+                    val p1 = it.second.minus(it.second.minus(it.first).normalize().times(bezierPoint))
+                    val p3 = it.second.minus(it.second.minus(it.third).normalize().times(bezierPoint))
+                    val p2 = it.second
+                    drawBezier2(p1, p2, p3, color, lineWidth, depth)
+                }
             }
         }
 
@@ -1254,7 +1273,20 @@ object RenderUtils {
             }
         }
 
-        fun drawBezier2(p1: LorenzVec, p2: LorenzVec, p3: LorenzVec, color: Color, segments: Int = 30) {
+        fun drawBezier2(
+            p1: LorenzVec,
+            p2: LorenzVec,
+            p3: LorenzVec,
+            color: Color,
+            lineWidth: Int,
+            depth: Boolean,
+            segments: Int = 30,
+        ) {
+            GL11.glLineWidth(lineWidth.toFloat())
+            if (!depth) {
+                GL11.glDisable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(false)
+            }
             GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
             val ctrlpoints = p1.toFloatArray() + p2.toFloatArray() + p3.toFloatArray()
             bezier2Buffer.clear()
@@ -1274,6 +1306,10 @@ object RenderUtils {
                 GL11.glEvalCoord1f(i.toFloat() / segments.toFloat())
             }
             GL11.glEnd()
+            if (!depth) {
+                GL11.glEnable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(true)
+            }
         }
 
         companion object {

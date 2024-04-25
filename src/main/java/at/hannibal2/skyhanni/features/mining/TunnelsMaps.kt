@@ -150,7 +150,7 @@ class TunnelsMaps {
         if (!isEnabled()) return
         if (goalReached) return
         val path = path ?: return
-        event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true)
+        event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true, bezierPoint = 2.0)
     }
 
     @SubscribeEvent
