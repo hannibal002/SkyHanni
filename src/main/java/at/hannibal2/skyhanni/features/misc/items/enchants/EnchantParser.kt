@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -356,9 +358,8 @@ object EnchantParser {
         return if (removeGrayEnchants) -1 else lastGrayEnchant
     }
 
-    // Surely Hypixel won't change Enchanted Book display names right... right?
     private fun itemIsBook() : Boolean {
-        return currentItem?.displayName?.contains("Enchanted Book") ?: false
+        return currentItem?.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
     }
 
     // We don't check if the main toggle here since we still need to go into
