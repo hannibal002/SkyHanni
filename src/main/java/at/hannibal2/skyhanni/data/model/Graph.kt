@@ -129,7 +129,10 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null) 
     }
 }
 
-fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph {
+fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph =
+    this.findShortestPathAsGraphWithDistance(start, end).first
+
+fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
     val distances = mutableMapOf<GraphNode, Double>()
     val previous = mutableMapOf<GraphNode, GraphNode>()
     val visited = mutableSetOf<GraphNode>()
@@ -160,14 +163,17 @@ fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph {
         var current = end
         while (current != start) {
             add(current)
-            current = previous[current] ?: return Graph(emptyList())
+            current = previous[current] ?: return Graph(emptyList()) to 0.0
         }
         add(start)
-    }.reversed())
+    }.reversed()) to distances[end]!!
 }
 
 fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> =
     this.findShortestPathAsGraph(start, end).toPositionsList()
+
+fun Graph.findShortestDistance(start: GraphNode, end: GraphNode): Double =
+    this.findShortestPathAsGraphWithDistance(start, end).second
 
 fun Graph.toPositionsList() = this.map { it.position }
 

@@ -47,7 +47,7 @@ class TunnelsMaps {
         graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             val randomPick = value.random()
-            value.sortedBy { it.position.distanceSq(randomPick.position) }
+            value.sortedBy { it.position.distanceSq(randomPick.position) } // TODO implement TSP solution for this
         }
         campfire = graph.first { it.name?.contains("Campfire") ?: false }
     }
@@ -60,7 +60,7 @@ class TunnelsMaps {
 
     @SubscribeEvent
     fun onIslandSwitch(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.DWARVEN_MINES) return/*         setGoalByName("§0Onyx Gemstone Mine") // TODO remove test */
+        if (event.newIsland != IslandType.DWARVEN_MINES) return
     }
 
     val position = Position(20, 20)
