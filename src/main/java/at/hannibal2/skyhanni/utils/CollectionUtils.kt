@@ -248,4 +248,8 @@ object CollectionUtils {
             addString("§a]")
         }))
     }
+
+    fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
+        return filterKeys { it != null } as Map<K, V>
+    }
 }

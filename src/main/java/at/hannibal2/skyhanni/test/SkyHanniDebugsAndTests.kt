@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.graphFromJson
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -126,7 +125,7 @@ class SkyHanniDebugsAndTests {
             SoundUtils.playBeepSound()
             runBlocking {
                 val input = OSUtils.readFromClipboard() ?: return@runBlocking
-                path = graphFromJson(input)
+                path = Graph.fromJson(input)
             }
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }

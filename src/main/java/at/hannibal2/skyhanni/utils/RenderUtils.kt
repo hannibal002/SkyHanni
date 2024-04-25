@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
@@ -1160,7 +1161,7 @@ object RenderUtils {
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,
-        waypointColor: Color,
+        waypointColor: Color = (path.lastOrNull()?.name?.getOrNull(1)?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
     ) {
         if (path.isEmpty()) return
         LineDrawer.draw3D(partialTicks) {
