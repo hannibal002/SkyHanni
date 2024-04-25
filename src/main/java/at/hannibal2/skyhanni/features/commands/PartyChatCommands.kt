@@ -73,8 +73,7 @@ object PartyChatCommands {
     }
 
     private fun isBlockedUser(name: String): Boolean {
-        val blacklist = config.blacklistedUsers
-        return name in blacklist
+        return config.blacklistedUsers.any { it.equals(name, ignoreCase = true) }
     }
 
     private val commandBeginChars = ".!?".toSet()
