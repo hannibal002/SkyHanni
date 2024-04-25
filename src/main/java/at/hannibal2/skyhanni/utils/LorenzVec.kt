@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -55,6 +56,17 @@ data class LorenzVec(
         return (dx * dx + dz * dz)
     }
 
+    operator fun plus(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
+
+    operator fun minus(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
+
+    operator fun times(other: LorenzVec) = LorenzVec(x * other.x, y * other.y, z * other.z)
+    operator fun times(other: Double) = LorenzVec(x * other, y * other, z * other)
+    operator fun times(other: Int) = LorenzVec(x * other, y * other, z * other)
+
+    operator fun div(other: LorenzVec) = LorenzVec(x / other.x, y / other.y, z / other.z)
+    operator fun div(other: Double) = LorenzVec(x / other, y / other, z / other)
+
     fun add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): LorenzVec =
         LorenzVec(this.x + x, this.y + y, this.z + z)
 
@@ -62,17 +74,21 @@ data class LorenzVec(
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
     fun multiply(d: Double): LorenzVec = LorenzVec(x multiplyZeroSave d, y multiplyZeroSave d, z multiplyZeroSave d)
 
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
     fun multiply(d: Int): LorenzVec =
         LorenzVec(x multiplyZeroSave d.toDouble(), y multiplyZeroSave d.toDouble(), z multiplyZeroSave d.toDouble())
 
-    fun divide(d : Double) = multiply(1.0/d)
+    @Deprecated("Use operator fun div instead", ReplaceWith("this / LorenzVec(x, y, z)"))
+    fun divide(d: Double) = multiply(1.0 / d)
 
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
     fun multiply(v: LorenzVec) = LorenzVec(x multiplyZeroSave v.x, y multiplyZeroSave v.y, z multiplyZeroSave v.z)
 
     fun dotProduct(other: LorenzVec): Double =
-        x multiplyZeroSave other.x + y multiplyZeroSave other.y + z multiplyZeroSave other.z
+        (x multiplyZeroSave other.x) + (y multiplyZeroSave other.y) + (z multiplyZeroSave other.z)
 
     fun angleAsCos(other: LorenzVec) = this.normalize().dotProduct(other.normalize())
 
@@ -80,8 +96,10 @@ data class LorenzVec(
 
     fun angleInDeg(other: LorenzVec) = Math.toDegrees(this.angleInRad(other))
 
+    @Deprecated("Use operator fun plus instead", ReplaceWith("this + other"))
     fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
 
+    @Deprecated("Use operator fun minus instead", ReplaceWith("this - other"))
     fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
 
     fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
@@ -108,21 +126,16 @@ data class LorenzVec(
         }
     }
 
-    fun toCleanString(): String {
-        return "$x $y $z"
-    }
+    fun toCleanString(): String = "$x $y $z"
 
-    fun length(): Double {
-        return sqrt(x * x + y * y + z * z)
-    }
+    fun lengthSquared(): Double = x * x + y * y + z * z
+    fun length(): Double = sqrt(this.lengthSquared())
 
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
     fun clone(): LorenzVec = LorenzVec(x, y, z)
 
-    fun toDoubleArray(): Array<Double> {
-        return arrayOf(x, y, z)
-    }
+    fun toDoubleArray(): Array<Double> = arrayOf(x, y, z)
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
 
@@ -162,11 +175,15 @@ data class LorenzVec(
     fun boundingToOffset(offX: Double, offY: Double, offZ: Double) =
         AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
 
-    fun scale(scalar: Double): LorenzVec {
-        return LorenzVec(scalar * x, scalar * y, scalar * z)
+    fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
+
+    fun applyTranslationToGL() {
+        GlStateManager.translate(x, y, z)
     }
 
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
+
+    fun up(offset: Double): LorenzVec = copy(y = y + offset)
 
     fun interpolate(other: LorenzVec, factor: Double): LorenzVec {
         require(factor in 0.0..1.0) { "Percentage must be between 0 and 1: $factor" }
@@ -178,9 +195,29 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
+    fun negated() = LorenzVec(-x, -y, -z)
+
     fun rotateXY(theta: Double) = LorenzVec(x * cos(theta) - y * sin(theta), x * sin(theta) + y * cos(theta), z)
     fun rotateXZ(theta: Double) = LorenzVec(x * cos(theta) + z * sin(theta), y, -x * sin(theta) + z * cos(theta))
     fun rotateYZ(theta: Double) = LorenzVec(x, y * cos(theta) - z * sin(theta), y * sin(theta) + z * cos(theta))
+
+    fun nearestPointOnLine(startPos: LorenzVec, endPos: LorenzVec): LorenzVec {
+        var d = endPos - startPos
+        val w = this - startPos
+
+        val dp = d.lengthSquared()
+        var dt = 0.0
+
+        if (dp != dt) dt = (w.dotProduct(d) / dp).coerceIn(0.0, 1.0)
+
+        d *= dt
+        d += startPos
+        return d
+    }
+
+    fun distanceToLine(startPos: LorenzVec, endPos: LorenzVec): Double {
+        return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
+    }
 
     companion object {
 
@@ -201,6 +238,8 @@ data class LorenzVec(
         }
 
         fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().add(y = -1.0)
+
+        val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
 }
 
@@ -224,3 +263,9 @@ fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoor
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
+
+fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
+
+fun AxisAlignedBB.expand(vec: LorenzVec) = this.expand(vec.x, vec.y, vec.z)
+
+fun AxisAlignedBB.expand(amount: Double) = this.expand(amount, amount, amount)

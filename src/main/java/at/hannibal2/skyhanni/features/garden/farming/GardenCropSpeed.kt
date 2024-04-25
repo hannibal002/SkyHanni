@@ -174,11 +174,7 @@ object GardenCropSpeed {
         secondsStopped = 0
     }
 
-    fun finneganPerkActive(): Boolean {
-        val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
-        val perkActive = Perk.FARMING_SIMULATOR.isActive
-        return forcefullyEnabledAlwaysFinnegan || perkActive
-    }
+    fun finneganPerkActive() = Perk.FARMING_SIMULATOR.isActive
 
     fun isEnabled() = GardenAPI.inGarden()
 

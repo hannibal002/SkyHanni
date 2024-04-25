@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -30,10 +31,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
@@ -41,12 +43,18 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
+import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -182,22 +190,17 @@ class SkyHanniDebugsAndTests {
             }
         }
 
-        fun configManagerResetCommand(args: Array<String>) {
-            if (args.size == 1 && args[0] == "confirm") {
-                configManagerReset()
-                return
-            }
-
+        fun resetConfigCommand() {
             ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm",
-                false
+                onClick = {
+                    resetConfig()
+                },
+                prefix = false
             )
         }
 
-        private fun configManagerReset() {
-            // TODO make it so that it does not reset the config
-
+        private fun resetConfig() {
             // saving old config state
             SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
@@ -240,8 +243,8 @@ class SkyHanniDebugsAndTests {
                 list.add("$coloredName§7 (")
                 for (itemName in item.value) {
                     try {
-                        val internalName = NEUItems.getRawInternalName(itemName)
-                        list.add(NEUItems.getItemStack(internalName))
+                        val internalName = NEUInternalName.fromItemName(itemName)
+                        list.add(internalName.getItemStack())
                     } catch (e: Error) {
                         ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                         errors++
@@ -329,9 +332,9 @@ class SkyHanniDebugsAndTests {
 
         fun copyLocation(args: Array<String>) {
             val location = LocationUtils.playerLocation()
-            val x = LorenzUtils.formatDouble(location.x + 0.001).replace(",", ".")
-            val y = LorenzUtils.formatDouble(location.y + 0.001).replace(",", ".")
-            val z = LorenzUtils.formatDouble(location.z + 0.001).replace(",", ".")
+            val x = (location.x + 0.001).round(1)
+            val y = (location.y + 0.001).round(1)
+            val z = (location.z + 0.001).round(1)
             if (args.size == 1 && args[0].equals("json", false)) {
                 OSUtils.copyToClipboard("\"$x:$y:$z\"")
                 return
@@ -482,6 +485,11 @@ class SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
+        @Suppress("ConstantConditionIf")
+        if (false) {
+            itemRenderDebug()
+        }
+
         if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
@@ -495,6 +503,34 @@ class SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+    }
+
+    private fun itemRenderDebug() {
+        val scale = 0.1
+        val renderables = listOf(
+            ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
+            ItemStack(Blocks.melon_block)
+        ).map { item ->
+            generateSequence(scale) { it + 0.1 }.take(25).map {
+                Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
+            }.toList()
+        }.editCopy {
+            this.add(
+                0,
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList()
+            )
+        }
+        config.debugItemPos.renderRenderables(
+            listOf(
+                Renderable.table(renderables),
+                Renderable.horizontalContainer(
+                    listOf(
+                        Renderable.string("Test:").renderBounds(),
+                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds()
+                    ), spacing = 1
+                )
+            ), posLabel = "Item Debug"
+        )
     }
 
     @SubscribeEvent
