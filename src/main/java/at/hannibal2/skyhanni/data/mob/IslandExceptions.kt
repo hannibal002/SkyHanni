@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.makeMobResult
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -38,9 +37,8 @@ object IslandExceptions {
         armorStand: EntityArmorStand?,
         nextEntity: EntityLivingBase?,
     ): MobData.MobResult? {
-        return if (DungeonAPI.inDungeon()) {
-            dungeon(baseEntity, armorStand, nextEntity)
-        } else when (LorenzUtils.skyBlockIsland) {
+        return when (LorenzUtils.skyBlockIsland) {
+            IslandType.CATACOMBS -> dungeon(baseEntity, armorStand, nextEntity)
             IslandType.PRIVATE_ISLAND -> privateIsland(armorStand, baseEntity)
             IslandType.THE_RIFT -> theRift(baseEntity, nextEntity, armorStand)
             IslandType.CRIMSON_ISLE -> crimsonIsle(baseEntity, armorStand, nextEntity)
