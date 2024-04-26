@@ -288,6 +288,7 @@ interface Renderable {
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             highlightsOnHoverSlots: List<Int> = emptyList(),
+            onHover: () -> Unit = {},
         ) = object : Renderable {
             override val width: Int
                 get() = max(hovered.width, unhovered.width)
@@ -301,6 +302,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 val pair = Pair(posX, posY)
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    onHover()
                     hovered.render(posX, posY)
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
@@ -312,33 +314,26 @@ interface Renderable {
             }
         }
 
-        fun clickAndHoverable(
-            hovered: Renderable,
-            unhovered: Renderable,
-            onClick: () -> Unit,
-            onHover: () -> Unit = {},
+        /** Bottom Layer must be bigger then the top layer */
+        fun doubleLayered(
+            bottomLayer: Renderable,
+            topLayer: Renderable,
         ) = object : Renderable {
-            override val width: Int
-                get() = max(hovered.width, unhovered.width)
-            override val height: Int
-                get() = max(hovered.height, unhovered.height)
-            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
-            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
-
-            var isHovered = false
+            override val width = bottomLayer.width
+            override val height = bottomLayer.height
+            override val horizontalAlign = bottomLayer.horizontalAlign
+            override val verticalAlign = bottomLayer.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                isHovered = isHovered(posX, posY)
-                if (isHovered) {
-                    hovered.render(posX, posY)
-                    onHover.invoke()
+                val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
+                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y)) {
+                    bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
-                    unhovered.render(posX, posY)
+                    posX to posY
                 }
-                if (isHovered && (0 - 100).isKeyClicked()) {
-                    onClick()
-                }
+                bottomLayer.render(posX, posY)
             }
+
         }
 
         fun itemStack(
@@ -683,6 +678,10 @@ interface Renderable {
             }
         }
 
+        @Deprecated(
+            "No not how things work",
+            ReplaceWith("Renderable.hoverTips(Renderable.placeholder(width,height),content)")
+        )
         fun toolTipContainer(
             content: List<String>,
             width: Int,
@@ -715,7 +714,7 @@ interface Renderable {
             eyesY: Float = 0f,
             scale: Int = 30,
             color: Int? = null,
-            condition: () -> Boolean = { true }
+            condition: () -> Boolean = { true },
         ) = object : Renderable {
             override val width = scale
             override val height = scale * 2
