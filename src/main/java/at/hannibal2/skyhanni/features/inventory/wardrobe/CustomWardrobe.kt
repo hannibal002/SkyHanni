@@ -139,11 +139,12 @@ class CustomWardrobe {
                     /*
                     estimated wardrobe price hover text
                     val estimatedWardrobePriceRenderable = {
+                        val placeHolder = Renderable.placeholder(containerWidth, containerHeight)
                         if (wardrobeSlot.getArmor().any { it != null }) {
                             val lore = createWardrobePriceLore(wardrobeSlot)
-                            Renderable.toolTipContainer(lore, containerWidth, containerHeight)
+                            Renderable.hoverTips(placeHolder, lore)
                         } else {
-                            Renderable.placeholder(containerWidth, containerHeight)
+                            placeHolder
                         }
                     }
                     */
@@ -181,7 +182,7 @@ class CustomWardrobe {
 
                     val renderable = createHoverableRenderable(
                         armorTooltipRenderable.invoke(),
-                        getWardrobeSlotColor(wardrobeSlot),
+                        hoveredColor = getWardrobeSlotColor(wardrobeSlot),
                         borderOutlineThickness = config.color.outlineThickness,
                         borderOutlineBlur = config.color.outlineBlur,
                         onClick = {
@@ -253,7 +254,7 @@ class CustomWardrobe {
                     buttonWidth,
                     buttonWidth,
                 ),
-                Color.BLACK,
+                hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
                     tempToggleShowOverlay = false
@@ -270,7 +271,7 @@ class CustomWardrobe {
                     buttonWidth,
                     buttonWidth,
                 ),
-                if (favoriteToggle) Color.GREEN else Color.RED,
+                hoveredColor = if (favoriteToggle) Color.GREEN else Color.RED,
                 borderOutlineThickness = 2,
                 onClick = { favoriteToggle = !favoriteToggle }
             ),
@@ -284,7 +285,7 @@ class CustomWardrobe {
                     buttonWidth,
                     buttonWidth,
                 ),
-                if (onlyFavoriteToggle) Color.GREEN else Color.RED,
+                hoveredColor = if (onlyFavoriteToggle) Color.GREEN else Color.RED,
                 borderOutlineThickness = 2,
                 onClick = {
                     onlyFavoriteToggle = !onlyFavoriteToggle
@@ -301,7 +302,7 @@ class CustomWardrobe {
                     buttonWidth,
                     buttonWidth,
                 ),
-                Color.BLACK,
+                hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
                     clickSlot(48, getWindowId() ?: -1)
@@ -315,7 +316,7 @@ class CustomWardrobe {
                     buttonWidth,
                     buttonWidth,
                 ),
-                Color.BLACK,
+                hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
                     clickSlot(49, getWindowId() ?: -1)
@@ -354,16 +355,22 @@ class CustomWardrobe {
 
     private fun createHoverableRenderable(
         hoveredRenderable: Renderable,
+        topLayerRenderable: Renderable = Renderable.placeholder(0, 0),
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
         borderOutlineThickness: Int,
         borderOutlineBlur: Float = 0f,
         onClick: () -> Unit,
-        onHover: () -> Unit = {}
-    ): Renderable {
-        return Renderable.clickAndHoverable(
+        onHover: () -> Unit = {},
+    ): Renderable =
+        Renderable.hoverable(
             Renderable.drawInsideRoundedRectWithOutline(
-                hoveredRenderable,
+                Renderable.doubleLayered(
+                    Renderable.clickable(
+                        hoveredRenderable,
+                        onClick
+                    ), topLayerRenderable
+                ),
                 hoveredColor,
                 padding = 0,
                 topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
@@ -376,10 +383,8 @@ class CustomWardrobe {
                 unHoveredColor,
                 padding = 0
             ),
-            onClick = { onClick() },
             onHover = { onHover() }
         )
-    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
