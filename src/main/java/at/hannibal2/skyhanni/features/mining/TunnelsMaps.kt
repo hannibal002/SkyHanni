@@ -87,7 +87,7 @@ class TunnelsMaps {
         }
         campfire = graph.first { it.name?.contains("Campfire") ?: false }
         fairySouls = possibleLocations.filter { it.key.contains("Fairy") }.mapValues { it.value.first() }
-        normalLocations = possibleLocations.filterNot { fairySouls.contains(it.key) }
+        normalLocations = possibleLocations.filterNot { fairySouls.contains(it.key) && campfire.name != it.key }
     }
 
     @SubscribeEvent
@@ -95,23 +95,45 @@ class TunnelsMaps {
         if (!isEnabled()) return
         val display = buildList<Renderable> {
             if (active.isNotEmpty()) {
-                add(Renderable.string("§6Active: §f$active"))
-                if (hasNext()) {
-                    add(Renderable.clickable(Renderable.string("§eNext Spot"), onClick = {
+                if (goal == campfire && active != campfire.name) {
+                    add(Renderable.string("§6Override for ${campfire.name}"))
+                    add(Renderable.clickable(Renderable.string("§eMake §f$active §eactive"), onClick = {
                         goal = getNext()
                     }))
+                } else {
+                    add(Renderable.string("§6Active: §f$active"))
+                    if (hasNext()) {
+                        add(Renderable.clickable(Renderable.string("§eNext Spot"), onClick = {
+                            goal = getNext()
+                        }))
+                    } else {
+                        add(Renderable.string(""))
+                    }
                 }
+            } else {
+                add(Renderable.string(""))
+                add(Renderable.string(""))
             }
             add(Renderable.string("§6Loactions:"))
+            add(
+                Renderable.multiClickAndHover(
+                    campfire.name!!,
+                    listOf(
+                        "§eLeft Click to set active",
+                        "§eRight Click for override"
+                    ),
+                    click = mapOf(
+                        0 to guiSetActive(campfire.name!!),
+                        1 to ::campfireOverride
+                    )
+                )
+            )
             add(
                 Renderable.hoverable(
                     Renderable.horizontalContainer(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("[${name}]"), onClick = {
-                                active = it.key
-                                goal = getNext()
-                            })
+                            Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
                         }
 
                     ),
@@ -120,13 +142,20 @@ class TunnelsMaps {
             )
 
             addAll(normalLocations.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = {
-                    active = it.key
-                    goal = getNext()
-                })
+                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
             })
         }
         config.position.renderRenderables(display, posLabel = "TunnelsMaps")
+    }
+
+    private fun campfireOverride() {
+        goalReached = false
+        goal = campfire
+    }
+
+    private fun guiSetActive(it: String): () -> Unit = {
+        active = it
+        goal = getNext()
     }
 
     @SubscribeEvent
@@ -189,9 +218,7 @@ class TunnelsMaps {
         if (config.travelScroll) {
             ChatUtils.sendMessageToServer("/warp basecamp")
         } else {
-            goalReached = false
-            goal = campfire
-            active = campfire.name!!
+            campfireOverride()
         }
     }
 
