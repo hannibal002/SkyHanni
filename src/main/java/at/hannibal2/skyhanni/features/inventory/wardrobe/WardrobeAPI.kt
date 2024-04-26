@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -142,6 +144,20 @@ object WardrobeAPI {
         if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
 
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
+
+    fun createWardrobePriceLore(slot: WardrobeSlot) = buildList {
+        if (slot.isEmpty()) return@buildList
+        val armor = slot.getArmor()
+        var totalPrice = 0.0
+        armor.forEach {
+            if (it != null) {
+                val price = EstimatedItemValueCalculator.calculate(it).first
+                add("  §7- ${it.name}: §6${NumberUtil.format(price)}")
+                totalPrice += price
+            }
+        }
+        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+    }
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {

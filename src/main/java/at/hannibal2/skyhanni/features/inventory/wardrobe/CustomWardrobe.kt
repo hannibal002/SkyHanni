@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -140,33 +139,24 @@ class CustomWardrobe {
                     val containerWidth = playerWidth + 2 * padding
                     val containerHeight = playerHeight + 2 * padding
 
-                    // estimated wardrobe price hover text
-                    /*val hoverRenderable = {
+                    /*
+                    estimated wardrobe price hover text
+                    val estimatedWardrobePrice = {
                         if (wardrobeSlot.getArmor().any { it != null }) {
-                            val lore = mutableListOf<String>()
-                            lore.add("§aEstimated Armor Value:")
-
-                            var totalPrice = 0.0
-                            for (item in wardrobeSlot.getArmor().filterNotNull()) {
-                                val price = item.getPrice()
-                                totalPrice += price
-                                lore.add("  §7- ${item.name}: §6${NumberUtil.format(price)}")
-                            }
-
-                            lore.add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
-
+                            val lore = createWardrobePriceLore(wardrobeSlot)
                             Renderable.toolTipContainer(lore, containerWidth, containerHeight)
                         } else {
                             Renderable.placeholder(containerWidth, containerHeight)
                         }
-                    }*/
+                    }
+                    */
 
                     val hoverRenderable = {
                         val loreList = mutableListOf<List<Renderable>>()
                         val height = (containerHeight / 4)
 
                         for (j in 0 until 4) {
-                            val stack = wardrobeSlot.getArmor()[j]
+                            val stack = wardrobeSlot.getArmor()[j]?.copy()
                             if (stack == null) {
                                 loreList.add(
                                     listOf(
@@ -181,7 +171,9 @@ class CustomWardrobe {
                                     listOf(
                                     Renderable.hoverable(
                                         Renderable.toolTipContainer(
-                                            listOf(stack.displayName) + stack.getLore(), containerWidth, height
+                                            stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                                            containerWidth,
+                                            height
                                         ),
                                         Renderable.placeholder(containerWidth, height),
                                         bypassChecks = true
