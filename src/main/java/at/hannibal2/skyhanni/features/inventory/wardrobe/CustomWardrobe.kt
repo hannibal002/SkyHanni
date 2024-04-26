@@ -155,7 +155,11 @@ class CustomWardrobe {
 
                     val hoverRenderable = {
                         val loreList = mutableListOf<List<Renderable>>()
-                        val height = (containerHeight / 4)
+                        val height = containerHeight - 3
+
+                        // this is needed to keep the total size of the renderable the same as the others
+                        val hoverableSizes = MutableList(4) { height / 4 }
+                        for (k in 0 until height % 4) hoverableSizes[k]++
 
                         for (j in 0 until 4) {
                             val stack = wardrobeSlot.getArmor()[j]?.copy()
@@ -164,7 +168,7 @@ class CustomWardrobe {
                                     listOf(
                                         Renderable.placeholder(
                                             containerWidth,
-                                            height
+                                            hoverableSizes[j]
                                         )
                                     )
                                 )
@@ -175,16 +179,16 @@ class CustomWardrobe {
                                         Renderable.toolTipContainer(
                                             stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
                                             containerWidth,
-                                            height
+                                            hoverableSizes[j]
                                         ),
-                                        Renderable.placeholder(containerWidth, height),
+                                        Renderable.placeholder(containerWidth, hoverableSizes[j]),
                                         bypassChecks = true
                                     )
                                     )
                                 )
                             }
                         }
-                        Renderable.table(loreList)
+                        Renderable.table(loreList, yPadding = 1)
                     }
 
                     val renderable = Renderable.clickAndHoverable(
