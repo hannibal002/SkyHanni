@@ -110,9 +110,14 @@ class Mob(
     fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
 
     private var highlightColor: Color? = null
-    fun highlight(color: Color) {
+    fun highlight(color: Color?) {
+        if (color == highlightColor) return
         highlightColor = color
-        internalHighlight()
+        if (color == null) {
+            internalRemoveColor()
+        } else {
+            internalHighlight()
+        }
     }
 
     private fun internalHighlight() {

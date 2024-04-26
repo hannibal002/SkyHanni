@@ -33,4 +33,5 @@ object ColorUtils {
     }
 
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+    fun Color.addAlpha(alpha: Int): Color = Color(this.red, this.green, this.blue, alpha)
 }

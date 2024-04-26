@@ -18,6 +18,8 @@ object GriffinUtils {
         extraSize: Double = 0.0,
         extraSizeTopY: Double = extraSize,
         extraSizeBottomY: Double = extraSize,
+        minimumAlpha: Float = 0.2f,
+        inverseAlphaScale: Boolean = false,
     ) {
         val (viewerX, viewerY, viewerZ) = RenderUtils.getViewerPos(partialTicks)
         val x = location.x - viewerX
@@ -35,7 +37,10 @@ object GriffinUtils {
                 x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize
             ).expandBlock(),
             color,
-            (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
+            if (inverseAlphaScale)
+                (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
+            else
+                (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
         )
         GlStateManager.disableTexture2D()
         if (distSq > 5 * 5 && beacon) RenderUtils.renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
