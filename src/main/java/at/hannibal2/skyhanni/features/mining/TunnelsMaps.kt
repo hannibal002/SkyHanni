@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -33,8 +32,14 @@ class TunnelsMaps {
 
     private var graph: Graph = Graph(emptyList())
     private lateinit var campfire: GraphNode
-    private var goal: GraphNode? = null
+
     private var goalReached = false
+    private var prevGoal: GraphNode? = null
+    private var goal: GraphNode? = null
+        set(value) {
+            prevGoal = field
+            field = value
+        }
 
     private var closedNote: GraphNode? = null
     private var path: Graph? = null
@@ -43,14 +48,22 @@ class TunnelsMaps {
     private val cooldowns = mutableMapOf<GraphNode, SimpleTimeMark>()
     private var active: String = ""
 
+    private lateinit var fairySouls: Map<String, GraphNode>
+    private lateinit var normalLocations: Map<String, List<GraphNode>>
+
     private fun getNext(name: String = active): GraphNode? {
+        fairySouls[name]?.let {
+            goalReached = false
+            return it
+        }
+
         val closed = closedNote ?: return null
         val list = possibleLocations[name] ?: return null
 
         val offCooldown = list.filter { cooldowns[it]?.isInPast() != false }
         val goodOnes = offCooldown.filter { it.position.distanceSqToPlayer() > 400.0 }
         val best = goodOnes.minByOrNull { graph.findShortestDistance(closed, it) }
-            ?: list.random()
+            ?: list.minBy { cooldowns[it] ?: SimpleTimeMark.farPast() }
 
         cooldowns[best] = 25.0.seconds.fromNow()
         goalReached = false
@@ -69,12 +82,9 @@ class TunnelsMaps {
             value
         }
         campfire = graph.first { it.name?.contains("Campfire") ?: false }
+        fairySouls = possibleLocations.filter { it.key.contains("Fairy") }.mapValues { it.value.first() }
+        normalLocations = possibleLocations.filterNot { fairySouls.contains(it.key) }
     }
-
-    // TODO remove
-    fun setGoalByName(name: String) = graph.firstOrNull { it.name == name }?.let {
-        goal = it
-    } ?: ErrorManager.logErrorStateWithData("Goal not found", "", "name" to name, "graph" to graph)
 
     @SubscribeEvent
     fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -89,10 +99,6 @@ class TunnelsMaps {
                 }
             }
             add(Renderable.string("§6Loactions:"))
-            // TODO cache
-            val fairySouls = possibleLocations.filter { it.key.contains("Fairy") }
-            val other = possibleLocations.filterNot { fairySouls.contains(it.key) }
-
             add(
                 Renderable.hoverable(
                     Renderable.horizontalContainer(
@@ -109,7 +115,7 @@ class TunnelsMaps {
                 )
             )
 
-            addAll(other.map {
+            addAll(normalLocations.map {
                 Renderable.clickable(Renderable.string(it.key), onClick = {
                     active = it.key
                     goal = getNext()
@@ -122,12 +128,14 @@ class TunnelsMaps {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (goalReached) return
         checkGoalReached()
+        val prevClosed = closedNote
         closedNote = graph.minBy { it.position.distanceSqToPlayer() }
         val closest = closedNote ?: return
         val goal = goal ?: return
-        path = graph.findShortestPathAsGraph(closest, goal)
-        val path = path ?: return
+        if (closest == prevClosed && goal == prevGoal) return
+        val path = graph.findShortestPathAsGraph(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
         if (first != null && second != null) {
@@ -136,21 +144,23 @@ class TunnelsMaps {
             val around = playerPosition.distance(first.position) + first.neighbours[second]!!
             if (direct < around) {
                 this.path = Graph(path.drop(1))
+                return
             }
         }
-
+        this.path = path
     }
 
     private fun checkGoalReached() {
-        if (goalReached) return
         val distance = goal?.position?.distanceSqToPlayer() ?: return
         goalReached = distance < 25.0
+        if (goalReached) {
+            path = null
+        }
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (goalReached) return
         val path = path ?: return
         event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true, bezierPoint = 2.0) // TODO dynamic color
     }
