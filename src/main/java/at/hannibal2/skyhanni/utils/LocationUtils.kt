@@ -92,7 +92,7 @@ object LocationUtils {
 
     fun AxisAlignedBB.getEdgeLengths() = this.maxBox() - this.minBox()
 
-    fun AxisAlignedBB.getCenter() = this.getEdgeLengths() * 0.5 - this.minBox()
+    fun AxisAlignedBB.getCenter() = this.getEdgeLengths() * 0.5 + this.minBox()
 
     fun AxisAlignedBB.getTopCenter() = this.getCenter().add(y = (maxY - minY) / 2)
 
