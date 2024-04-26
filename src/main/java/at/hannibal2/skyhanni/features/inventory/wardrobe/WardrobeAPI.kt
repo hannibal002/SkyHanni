@@ -105,7 +105,7 @@ object WardrobeAPI {
 
     fun WardrobeSlot.isCurrentSlot(): Boolean = getData()?.id == currentWardrobeSlot
 
-    fun WardrobeSlot.isInCurrentPage(): Boolean = page == currentPage
+    fun WardrobeSlot.isInCurrentPage(): Boolean = (currentPage == null && page == 1) || (page == currentPage)
 
     var currentWardrobeSlot: Int?
         get() = storage?.currentWardrobeSlot
