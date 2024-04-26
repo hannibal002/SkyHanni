@@ -1209,7 +1209,11 @@ object RenderUtils {
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
-            listOf(this@draw3DPathWithWaypoint.exactPlayerEyeLocation())
+            listOf(
+                this.exactPlayerEyeLocation()
+                    + Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks)
+                    .toLorenzVec()/* .rotateXZ(-Math.PI / 72.0) */.times(2).add(y = -3e-1)
+            )
         } else {
             emptyList()
         } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
