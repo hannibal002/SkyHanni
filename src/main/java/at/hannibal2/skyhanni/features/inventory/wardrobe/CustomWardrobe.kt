@@ -54,6 +54,10 @@ class CustomWardrobe {
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
         var list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
+
+        if (!tempToggleShowOverlay) return
+        inCustomWardrobe = true
+
         var wardrobeWarning = false
         var wardrobeWarningText = ""
 
@@ -76,9 +80,6 @@ class CustomWardrobe {
                 wardrobeWarningText = "§cDidnt set any favorites"
             }
         }
-
-        if (!tempToggleShowOverlay) return
-        inCustomWardrobe = true
 
         val gui = event.gui
         val centerX = gui.width / 2
@@ -258,6 +259,7 @@ class CustomWardrobe {
                 onClick = {
                     tempToggleShowOverlay = false
                     inCustomWardrobe = false
+                    reset()
                 }
             ),
             createHoverableRenderable(
