@@ -273,9 +273,9 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialsFromBazaar
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeOverlay
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
@@ -884,7 +884,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(WardrobeOverlay())
+        loadModule(CustomWardrobe())
 
         init()
 

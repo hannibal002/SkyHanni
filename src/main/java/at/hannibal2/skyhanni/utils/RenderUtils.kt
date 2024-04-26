@@ -1562,7 +1562,7 @@ object RenderUtils {
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
     }
-    
+
     // TODO move off of neu function
     fun drawTexturedRect(x: Float, y: Float) {
         with(ScaledResolution(Minecraft.getMinecraft())) {

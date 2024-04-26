@@ -4,16 +4,20 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -21,7 +25,6 @@ import kotlin.time.Duration.Companion.milliseconds
 object WardrobeAPI {
 
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
-
 
     private val group = RepoPattern.group("inventory.wardrobe")
     private val inventoryPattern by group.pattern(
@@ -38,6 +41,7 @@ object WardrobeAPI {
     )
 
     var wardrobeSlots = listOf<WardrobeSlot>()
+    var inCustomWardrobe = false
 
     class WardrobeSlot(
         val id: Int,
@@ -84,6 +88,8 @@ object WardrobeAPI {
 
     fun WardrobeSlot.getArmor(): List<ItemStack?> =
         (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
+
+    fun WardrobeSlot.isEmpty(): Boolean = getArmor().all { it == null }
 
     var WardrobeSlot.locked: Boolean
         get() = getData()?.locked ?: true
@@ -139,7 +145,23 @@ object WardrobeAPI {
     private fun getWardrobeItem(itemStack: ItemStack?) =
         if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
 
+    private fun getWardrobeSlotFromId(id: Int?) = wardrobeSlots.find { it.id == currentWardrobeSlot }
+
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
+
+    fun createWardrobePriceLore(slot: WardrobeSlot) = buildList {
+        if (slot.isEmpty()) return@buildList
+        val armor = slot.getArmor()
+        var totalPrice = 0.0
+        armor.forEach {
+            if (it != null) {
+                val price = EstimatedItemValueCalculator.calculate(it).first
+                add("  §7- ${it.name}: §6${NumberUtil.format(price)}")
+                totalPrice += price
+            }
+        }
+        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+    }
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
@@ -150,6 +172,7 @@ object WardrobeAPI {
             currentPage = group("currentPage").formatInt()
         }
         if (currentPage == null) return
+        var foundCurrentSlot = false
 
         val itemsList = event.inventoryItems
         for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
@@ -159,8 +182,12 @@ object WardrobeAPI {
             slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
             if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
                 currentWardrobeSlot = slot.id
+                foundCurrentSlot = true
             }
+            slot.locked = itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage)
         }
+        if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage) currentWardrobeSlot =
+            null
     }
 
     @SubscribeEvent
