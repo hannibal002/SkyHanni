@@ -260,6 +260,7 @@ class CustomWardrobe {
                     tempToggleShowOverlay = false
                     inCustomWardrobe = false
                     reset()
+                    display = mutableListOf()
                 }
             ),
             createHoverableRenderable(
