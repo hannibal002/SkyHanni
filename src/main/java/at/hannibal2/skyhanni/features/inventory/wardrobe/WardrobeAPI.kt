@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -143,6 +145,8 @@ object WardrobeAPI {
     private fun getWardrobeItem(itemStack: ItemStack?) =
         if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
 
+    private fun getWardrobeSlotFromId(id: Int?) = wardrobeSlots.find { it.id == currentWardrobeSlot }
+
     fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
 
     fun createWardrobePriceLore(slot: WardrobeSlot) = buildList {
@@ -168,6 +172,7 @@ object WardrobeAPI {
             currentPage = group("currentPage").formatInt()
         }
         if (currentPage == null) return
+        var foundCurrentSlot = false
 
         val itemsList = event.inventoryItems
         for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
@@ -177,8 +182,12 @@ object WardrobeAPI {
             slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
             if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
                 currentWardrobeSlot = slot.id
+                foundCurrentSlot = true
             }
+            slot.locked = itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage)
         }
+        if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage) currentWardrobeSlot =
+            null
     }
 
     @SubscribeEvent
