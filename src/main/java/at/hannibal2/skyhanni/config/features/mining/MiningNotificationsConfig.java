@@ -27,7 +27,6 @@ public class MiningNotificationsConfig {
     )
     @ConfigEditorDraggableList
     public List<MiningNotificationList> notifications = new ArrayList<>(Arrays.asList(
-        MiningNotificationList.MINESHAFT_SPAWN,
         MiningNotificationList.SCRAP,
         MiningNotificationList.COLD,
         MiningNotificationList.GOLDEN_GOBLIN,
