@@ -132,8 +132,7 @@ class TunnelsMaps {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (goalReached) return
-        checkGoalReached()
+        if (checkGoalReached()) return
         val prevClosed = closedNote
         closedNote = graph.minBy { it.position.distanceSqToPlayer() }
         val closest = closedNote ?: return
@@ -154,12 +153,15 @@ class TunnelsMaps {
         this.path = path
     }
 
-    private fun checkGoalReached() {
-        val distance = goal?.position?.distanceSqToPlayer() ?: return
-        goalReached = distance < 25.0
+    private fun checkGoalReached(): Boolean {
+        if (goalReached) return true
+        val distance = goal?.position?.distanceSqToPlayer() ?: return false
+        goalReached = distance < 36.0
         if (goalReached) {
             path = null
+            return true
         }
+        return false
     }
 
     @SubscribeEvent
