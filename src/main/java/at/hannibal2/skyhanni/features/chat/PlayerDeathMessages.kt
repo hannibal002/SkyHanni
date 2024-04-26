@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils

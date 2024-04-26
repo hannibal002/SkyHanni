@@ -55,8 +55,8 @@ object LocationUtils {
     fun AxisAlignedBB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
         // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
-        val t1 = (this.minBox().subtract(origin)).multiply(rayDirectionInverse)
-        val t2 = (this.maxBox().subtract(origin)).multiply(rayDirectionInverse)
+        val t1 = (this.minBox() - origin) * rayDirectionInverse
+        val t2 = (this.maxBox() - origin) * rayDirectionInverse
 
         val tmin = max(t1.minOfEachElement(t2).max(), Double.NEGATIVE_INFINITY)
         val tmax = min(t1.maxOfEachElement(t2).min(), Double.POSITIVE_INFINITY)
@@ -90,9 +90,9 @@ object LocationUtils {
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    fun AxisAlignedBB.getEdgeLengths() = this.maxBox().subtract(this.minBox())
+    fun AxisAlignedBB.getEdgeLengths() = this.maxBox() - this.minBox()
 
-    fun AxisAlignedBB.getCenter() = this.getEdgeLengths().multiply(0.5).add(this.minBox())
+    fun AxisAlignedBB.getCenter() = this.getEdgeLengths() * 0.5 - this.minBox()
 
     fun AxisAlignedBB.getTopCenter() = this.getCenter().add(y = (maxY - minY) / 2)
 
@@ -106,4 +106,3 @@ object LocationUtils {
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 }
-

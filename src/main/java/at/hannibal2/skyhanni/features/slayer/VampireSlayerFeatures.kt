@@ -30,11 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
