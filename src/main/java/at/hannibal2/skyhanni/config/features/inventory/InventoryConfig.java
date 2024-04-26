@@ -50,6 +50,10 @@ public class InventoryConfig {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
+    @Category(name = "Custom Wardrobe", desc = "")
+    public CustomWardrobeConfig customWardrobe = new CustomWardrobeConfig();
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
@@ -93,11 +97,6 @@ public class InventoryConfig {
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
     public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
-
-    @Expose
-    @ConfigOption(name = "Custom Wardrobe", desc = "")
-    @Accordion
-    public CustomWardrobeConfig customWardrobe = new CustomWardrobeConfig();
 
     @Expose
     @ConfigOption(
