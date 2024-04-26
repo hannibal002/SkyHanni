@@ -48,32 +48,20 @@ class HoppityCollectionStats {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!pagePattern.matches(event.inventoryName)) return
-
         inInventory = true
 
-        for ((_, item) in event.inventoryItems) {
-            val itemName = item.displayName ?: continue
-            val itemLore = item.getLore()
+        display = buildRabbitList(event)
+    }
 
-            var duplicatesFound = 0
-            var rabbitRarity: RabbitCollectionRarity? = null
-            var found = true
+    private fun buildRabbitList(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
+        logRabbits(event)
+        val newList = mutableListOf<Renderable>()
+        newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
+        newList.add(LorenzUtils.fillTable(getRabbitStats(), padding = 5))
+        return newList
+    }
 
-            for (line in itemLore) {
-                rabbitRarityPattern.matchMatcher(line) {
-                    rabbitRarity = RabbitCollectionRarity.fromDisplayName(group("rarity"))
-                }
-                duplicatesFoundPattern.matchMatcher(line) {
-                    duplicatesFound = group("duplicates").formatInt()
-                }
-                if (rabbitNotFoundPattern.matches(line)) found = false
-            }
-
-            val rarity = rabbitRarity ?: continue
-            val duplicates = duplicatesFound.coerceAtLeast(0)
-            loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
-        }
-
+    private fun getRabbitStats(): MutableList<DisplayTableEntry> {
         var totalAmountFound = 0
         var totalRabbits = 0
         var totalDuplicates = 0
@@ -127,11 +115,32 @@ class HoppityCollectionStats {
                 )
             )
         }
+        return table
+    }
 
-        val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5))
-        display = newList
+    private fun logRabbits(event: InventoryFullyOpenedEvent) {
+        for ((_, item) in event.inventoryItems) {
+            val itemName = item.displayName ?: continue
+            val itemLore = item.getLore()
+
+            var duplicatesFound = 0
+            var rabbitRarity: RabbitCollectionRarity? = null
+            var found = true
+
+            for (line in itemLore) {
+                rabbitRarityPattern.matchMatcher(line) {
+                    rabbitRarity = RabbitCollectionRarity.fromDisplayName(group("rarity"))
+                }
+                duplicatesFoundPattern.matchMatcher(line) {
+                    duplicatesFound = group("duplicates").formatInt()
+                }
+                if (rabbitNotFoundPattern.matches(line)) found = false
+            }
+
+            val rarity = rabbitRarity ?: continue
+            val duplicates = duplicatesFound.coerceAtLeast(0)
+            loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
+        }
     }
 
     @SubscribeEvent
