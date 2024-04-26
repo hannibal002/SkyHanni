@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
+import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -1202,8 +1203,8 @@ object RenderUtils {
         lineWidth: Int,
         depth: Boolean,
         startAtEye: Boolean = true,
-        waypointColor: Color = (path.lastOrNull()?.name?.takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
-            ?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+        waypointColor: Color =
+            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
     ) {
         if (path.isEmpty()) return

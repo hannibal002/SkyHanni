@@ -13,8 +13,12 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
+import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
@@ -162,8 +166,14 @@ class TunnelsMaps {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path ?: return
-        event.draw3DPathWithWaypoint(path, Color.GREEN, 7, true, bezierPoint = 2.0) // TODO dynamic color
+        event.draw3DPathWithWaypoint(path, getPathColor(), 7, true, bezierPoint = 2.0)
     }
+
+    private fun getPathColor(): Color = if (config.dynamicPathColour) {
+        goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
+    } else {
+        null
+    } ?: config.pathColour.toChromaColor()
 
     @SubscribeEvent
     fun onKeyPress(event: LorenzKeyPressEvent) {

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -26,12 +27,22 @@ public class TunnelMapsConfig {
     public int campfireKey = Keyboard.KEY_NONE;
 
     @Expose
+    @ConfigOption(name = "Travel Scroll", desc = "Lets the mod know that you have unlocked the travel scroll to basecamp.")
+    @ConfigEditorBoolean
+    public boolean travelScroll = false;
+
+    @Expose
     @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int nextSpotHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Travel Scroll", desc = "Lets the mod know that you have unlocked the travel scroll to basecamp.")
+    @ConfigOption(name = "Dynamic Path Colour", desc = "Instead of the selected color use the color of the target as line colour.")
     @ConfigEditorBoolean
-    public boolean travelScroll = false;
+    public boolean dynamicPathColour = true;
+
+    @Expose
+    @ConfigOption(name = "Path Colour", desc = "The colour for the paths, if the dynamic colour option is turned off.")
+    @ConfigEditorColour
+    public String pathColour = "0:255:0:255:0";
 }
