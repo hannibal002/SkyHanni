@@ -1524,13 +1524,6 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    // TODO move off of neu function
-    fun drawTexturedRect(x: Float, y: Float) {
-        with(ScaledResolution(Minecraft.getMinecraft())) {
-            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
-        }
-    }
-
     fun drawGradientRect(
         left: Int,
         top: Int,
@@ -1568,5 +1561,12 @@ object RenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
+    }
+
+    // TODO move off of neu function
+    fun drawTexturedRect(x: Float, y: Float) {
+        with(ScaledResolution(Minecraft.getMinecraft())) {
+            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
+        }
     }
 }
