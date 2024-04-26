@@ -168,6 +168,11 @@ class TunnelsMaps {
     @SubscribeEvent
     fun onKeyPress(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
+        campfireKey(event)
+        nextSpotKey(event)
+    }
+
+    private fun campfireKey(event: LorenzKeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
         if (config.travelScroll) {
             ChatUtils.sendMessageToServer("/warp basecamp")
@@ -176,6 +181,15 @@ class TunnelsMaps {
             goal = campfire
             active = campfire.name!!
         }
+    }
+
+    private var nextSpotDelay = SimpleTimeMark.farPast()
+
+    private fun nextSpotKey(event: LorenzKeyPressEvent) {
+        if (event.keyCode != config.nextSpotHotkey) return
+        if (!nextSpotDelay.isInPast()) return
+        nextSpotDelay = 1.0.seconds.fromNow()
+        goal = getNext()
     }
 
     val areas = setOf(

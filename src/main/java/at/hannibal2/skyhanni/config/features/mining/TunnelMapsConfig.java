@@ -26,6 +26,11 @@ public class TunnelMapsConfig {
     public int campfireKey = Keyboard.KEY_NONE;
 
     @Expose
+    @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int nextSpotHotkey = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(name = "Travel Scroll", desc = "Lets the mod know that you have unlocked the travel scroll to basecamp.")
     @ConfigEditorBoolean
     public boolean travelScroll = false;
