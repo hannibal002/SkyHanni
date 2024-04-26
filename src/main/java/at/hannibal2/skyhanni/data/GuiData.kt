@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.NEURenderEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.Minecraft
@@ -44,7 +45,11 @@ object GuiData {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        preDrawEventCanceled = false
+        DelayedRun.runNextTick {
+            if (Minecraft.getMinecraft().currentScreen == null) {
+                preDrawEventCanceled = false
+            }
+        }
     }
 
     @SubscribeEvent
