@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.favorite
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.getArmor
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inCustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSlot
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isEmpty
@@ -81,6 +82,7 @@ class CustomWardrobe {
         display = emptyList()
 
         if (!tempToggleShowOverlay) return
+        inCustomWardrobe = true
 
         val gui = event.gui
         val centerX = gui.width / 2
@@ -163,7 +165,7 @@ class CustomWardrobe {
                                         Renderable.placeholder(
                                             containerWidth,
                                             height
-                                        )/*.renderBounds(LorenzColor.entries[j].toColor())*/
+                                        )
                                     )
                                 )
                             } else {
@@ -177,7 +179,7 @@ class CustomWardrobe {
                                         ),
                                         Renderable.placeholder(containerWidth, height),
                                         bypassChecks = true
-                                    )/*renderBounds(LorenzColor.entries[j].toColor())*/
+                                    )
                                     )
                                 )
                             }
@@ -237,6 +239,7 @@ class CustomWardrobe {
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runDelayed(500.milliseconds) {
             if (!inWardrobe()) {
+                inCustomWardrobe = false
                 tempToggleShowOverlay = true
                 favoriteToggle = false
                 itemPriceCache = mutableMapOf()
@@ -281,7 +284,10 @@ class CustomWardrobe {
                     Color.BLACK,
                     padding = 0
                 ),
-                onClick = { tempToggleShowOverlay = false }
+                onClick = {
+                    tempToggleShowOverlay = false
+                    inCustomWardrobe = false
+                }
             ),
             Renderable.clickAndHoverable(
                 Renderable.drawInsideRoundedRectWithOutline(

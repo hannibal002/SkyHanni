@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inCustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.wardrobeSlots
@@ -18,6 +19,7 @@ class EstimatedWardrobePrice {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.armor) return
         if (!inWardrobe()) return
+        if (inCustomWardrobe) return
 
         val slot = wardrobeSlots.firstOrNull {
             event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()

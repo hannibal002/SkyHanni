@@ -24,7 +24,6 @@ object WardrobeAPI {
 
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
-
     private val group = RepoPattern.group("inventory.wardrobe")
     private val inventoryPattern by group.pattern(
         "inventory.name",
@@ -40,6 +39,7 @@ object WardrobeAPI {
     )
 
     var wardrobeSlots = listOf<WardrobeSlot>()
+    var inCustomWardrobe = false
 
     class WardrobeSlot(
         val id: Int,
