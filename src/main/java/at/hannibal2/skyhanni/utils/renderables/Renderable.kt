@@ -314,10 +314,10 @@ interface Renderable {
             }
         }
 
-        /** Bottom Layer must be bigger then the bottom layer, also the bottom layer is not allowed to have a negative coordinates */
+        /** Bottom Layer must be bigger then the top layer */
         fun doubleLayered(
             bottomLayer: Renderable,
-            topLayerRenderable: Renderable,
+            topLayer: Renderable,
         ) = object : Renderable {
             override val width = bottomLayer.width
             override val height = bottomLayer.height
@@ -325,8 +325,8 @@ interface Renderable {
             override val verticalAlign = bottomLayer.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                val (x, y) = topLayerRenderable.renderXYAligned(posX, posY, width, height)
-                val (posX, posY) = if (topLayerRenderable.isHovered(posX + x, posY + y)) {
+                val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
+                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y)) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     posX to posY
@@ -679,7 +679,7 @@ interface Renderable {
         }
 
         @Deprecated(
-            "No not how fix work",
+            "No not how things work",
             ReplaceWith("Renderable.hoverTips(Renderable.placeholder(width,height),content)")
         )
         fun toolTipContainer(
