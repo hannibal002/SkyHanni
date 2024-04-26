@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSl
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isEmpty
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.locked
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -25,13 +24,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -171,15 +168,15 @@ class CustomWardrobe {
                             } else {
                                 loreList.add(
                                     listOf(
-                                    Renderable.hoverable(
-                                        Renderable.toolTipContainer(
-                                            stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
-                                            containerWidth,
-                                            height
-                                        ),
-                                        Renderable.placeholder(containerWidth, height),
-                                        bypassChecks = true
-                                    )
+                                        Renderable.hoverable(
+                                            Renderable.toolTipContainer(
+                                                stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                                                containerWidth,
+                                                height
+                                            ),
+                                            Renderable.placeholder(containerWidth, height),
+                                            bypassChecks = true
+                                        )
                                     )
                                 )
                             }
@@ -219,7 +216,7 @@ class CustomWardrobe {
 
                 display += Triple(
                     Position(playerX, playerY), Renderable.entity(
-                    fakePlayer,
+                        fakePlayer,
                         config.eyesFollowMouse,
                         scale = scale.toInt(),
                         color = color
@@ -352,19 +349,18 @@ class CustomWardrobe {
         }
     }
 
-    private fun ItemStack.getPrice(): Double =
-        itemPriceCache.getOrPut(this.getItemUuid()) { EstimatedItemValueCalculator.calculate(this).first }
-
     private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): AbstractClientPlayer =
         fakePlayerCache.getOrPut(this.id) {
-            val playerTexture = Minecraft.getMinecraft().thePlayer.locationSkin
+            val mc = Minecraft.getMinecraft()
             object : AbstractClientPlayer(
-                Minecraft.getMinecraft().theWorld,
-                Minecraft.getMinecraft().thePlayer.gameProfile
+                mc.theWorld,
+                mc.thePlayer.gameProfile
             ) {
                 override fun getLocationSkin(): ResourceLocation {
-                    return playerTexture
-                        ?: DefaultPlayerSkin.getDefaultSkin(Minecraft.getMinecraft().thePlayer.uniqueID)
+                    // TODO: where second layer
+                    // please someone fixed this ive been trying for 5h
+                    return mc.thePlayer.locationSkin
+                        ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
                 }
 
                 override fun getName(): String {
