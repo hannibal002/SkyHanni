@@ -16,11 +16,11 @@ public class ObjectHighlighterConfig {
     @Expose
     @ConfigOption(name = "Stared", desc = "")
     @Accordion
-    public StarredConfig stared = new StarredConfig();
+    public StarredConfig starred = new StarredConfig();
 
     public static class StarredConfig {
         @Expose
-        @ConfigOption(name = "Highlight Stared", desc = "Highlights all stared mobs in one colour.")
+        @ConfigOption(name = "Highlight Starred", desc = "Highlights all starred mobs in one colour.")
         @ConfigEditorBoolean
         @FeatureToggle
         public Property<Boolean> highlight = Property.of(true);
@@ -46,14 +46,14 @@ public class ObjectHighlighterConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Fell Skull", desc = "")
+    @ConfigOption(name = "Fels Skull", desc = "")
     @Accordion
     public FelConfig fel = new FelConfig();
 
     public static class FelConfig {
 
         @Expose
-        @ConfigOption(name = "Highlight Fel Skull", desc = "Highlights fels that are not yet active.")
+        @ConfigOption(name = "Highlight Fels Skull", desc = "Highlights fels that are not yet active.")
         @ConfigEditorBoolean
         @FeatureToggle
         public Property<Boolean> highlight = Property.of(true);

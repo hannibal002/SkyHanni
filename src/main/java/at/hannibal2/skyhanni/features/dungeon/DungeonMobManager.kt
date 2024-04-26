@@ -21,21 +21,21 @@ import java.awt.Color
 class DungeonMobManager {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHighlighter
-    private val stared get() = config.stared
+    private val starred get() = config.starred
     private val fel get() = config.fel
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
-            stared.highlight,
-            stared.colour,
+            starred.highlight,
+            starred.colour,
             //stared.showOutline
         ) {
-            val color = if (stared.highlight.get()) null else stared.colour.get().toChromaColor()
+            val color = if (starred.highlight.get()) null else starred.colour.get().toChromaColor()
             MobData.skyblockMobs.filter { it.hasStar }.forEach {
                 handleStar0(it, color)
             }
-            if (!stared.highlight.get()) {
+            if (!starred.highlight.get()) {
                 staredInvisible.clear()
             }
         }
@@ -63,7 +63,7 @@ class DungeonMobManager {
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
-        if (stared.highlight.get()) {
+        if (starred.highlight.get()) {
             staredInvisible.remove(event.mob)
         }
         handleFelDespawn(event.mob)
@@ -78,18 +78,18 @@ class DungeonMobManager {
     private val staredInvisible = mutableSetOf<Mob>()
 
     private fun handleStar(mob: Mob) {
-        if (!stared.highlight.get()) return
+        if (!starred.highlight.get()) return
         if (!mob.hasStar) return
-        handleStar0(mob, stared.colour.get().toChromaColor())
+        handleStar0(mob, starred.colour.get().toChromaColor())
     }
 
     private fun handleInvisibleStar() {
-        if (!stared.highlight.get()) return
+        if (!starred.highlight.get()) return
         if (staredInvisible.isEmpty()) return
         staredInvisible.removeIf {
             val visible = !it.isInvisible()
             if (visible) {
-                it.highlight(stared.colour.get().toChromaColor())
+                it.highlight(starred.colour.get().toChromaColor())
             }
             visible
         }
