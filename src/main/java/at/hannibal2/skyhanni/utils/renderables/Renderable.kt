@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
