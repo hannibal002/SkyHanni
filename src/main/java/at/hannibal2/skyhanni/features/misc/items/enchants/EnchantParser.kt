@@ -166,6 +166,7 @@ object EnchantParser {
                 if (chatComponent != null) editChatComponent(chatComponent, loreList)
                 return
             }
+            loreCache.updateAfter(loreList)
             return
         }
 
