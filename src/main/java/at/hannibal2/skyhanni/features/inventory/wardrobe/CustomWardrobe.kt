@@ -291,6 +291,36 @@ class CustomWardrobe {
                     reset()
                 }
             ),
+            createHoverableRenderable(
+                Renderable.toolTipContainer(
+                    listOf(
+                        "§aGo Back",
+                        " §7To SkyBlock Menu",
+
+                        ),
+                    buttonWidth,
+                    buttonWidth,
+                ),
+                Color.BLACK,
+                borderOutlineThickness = 2,
+                onClick = {
+                    clickSlot(48, getWindowId() ?: -1)
+                }
+            ),
+            createHoverableRenderable(
+                Renderable.toolTipContainer(
+                    listOf(
+                        "§cClose",
+                    ),
+                    buttonWidth,
+                    buttonWidth,
+                ),
+                Color.BLACK,
+                borderOutlineThickness = 2,
+                onClick = {
+                    clickSlot(49, getWindowId() ?: -1)
+                }
+            ),
         )
 
         val totalWidth = renderables.sumOf { it.width } + (renderables.size - 1) * padding
