@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
@@ -291,7 +292,8 @@ interface Renderable {
         ) = object : Renderable {
             override val width: Int
                 get() = max(hovered.width, unhovered.width)
-            override val height = 10
+            override val height: Int
+                get() = max(hovered.height, unhovered.height)
             override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
             override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
 
@@ -644,19 +646,41 @@ interface Renderable {
             }
         }
 
-        fun emptyContainer(
-            width: Int,
-            height: Int,
+        fun drawInsideRoundedRectWithOutline(
+            input: Renderable,
+            color: Color,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            topOutlineColor: Int,
+            bottomOutlineColor: Int,
+            borderOutlineThickness: Int,
+            blur: Float = 0.7f,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            override val width = width
-            override val height = height
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(posX, posY, posX + width, posY + height, 0x00000000)
+                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                RenderUtils.drawRoundRectOutline(
+                    posX,
+                    posY,
+                    width,
+                    height,
+                    topOutlineColor,
+                    bottomOutlineColor,
+                    borderOutlineThickness,
+                    radius,
+                    blur
+                )
+
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -687,6 +711,7 @@ interface Renderable {
          */
         fun entity(
             entity: EntityLivingBase,
+            followMouse: Boolean = false,
             eyesX: Float = 0f,
             eyesY: Float = 0f,
             scale: Int = 30,
@@ -700,7 +725,12 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, condition)
-                drawEntityOnScreen(posX, posY, scale, eyesX, eyesY, entity)
+                val mouse = currentRenderPassMousePosition
+                val mouseXRelativeToPlayer =
+                    if (followMouse) (posX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
+                val mouseYRelativeToPlayer =
+                    if (followMouse) (posX - (mouse?.second ?: Utils.getMouseY()) - 1.62 * scale).toFloat() else eyesY
+                drawEntityOnScreen(posX, posY, scale, mouseXRelativeToPlayer, mouseYRelativeToPlayer, entity)
             }
         }
     }

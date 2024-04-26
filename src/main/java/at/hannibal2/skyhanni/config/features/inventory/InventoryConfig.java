@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -90,9 +91,9 @@ public class InventoryConfig {
     public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
 
     @Expose
-    @ConfigOption(name = "Wardrobe Overlay", desc = "")
+    @ConfigOption(name = "Custom Wardrobe", desc = "")
     @Accordion
-    public WardrobeOverlayConfig wardrobeOverlay = new WardrobeOverlayConfig();
+    public CustomWardrobeConfig customWardrobe = new CustomWardrobeConfig();
 
     @Expose
     @ConfigOption(
