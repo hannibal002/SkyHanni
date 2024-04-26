@@ -19,7 +19,7 @@ object GriffinUtils {
         extraSizeTopY: Double = extraSize,
         extraSizeBottomY: Double = extraSize,
         minimumAlpha: Float = 0.2f,
-        inverseAlphaScale: Boolean = false
+        inverseAlphaScale: Boolean = false,
     ) {
         val (viewerX, viewerY, viewerZ) = RenderUtils.getViewerPos(partialTicks)
         val x = location.x - viewerX
@@ -29,8 +29,9 @@ object GriffinUtils {
 
         if (seeThroughBlocks) {
             GlStateManager.disableDepth()
-            GlStateManager.disableCull()
         }
+
+        GlStateManager.disableCull()
         RenderUtils.drawFilledBoundingBox(
             AxisAlignedBB(
                 x - extraSize, y - extraSizeBottomY, z - extraSize,
@@ -46,10 +47,10 @@ object GriffinUtils {
         if (distSq > 5 * 5 && beacon) RenderUtils.renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
+        GlStateManager.enableCull()
 
         if (seeThroughBlocks) {
             GlStateManager.enableDepth()
-            GlStateManager.enableCull()
         }
     }
 }

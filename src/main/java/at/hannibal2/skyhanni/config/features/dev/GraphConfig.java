@@ -61,9 +61,14 @@ public class GraphConfig {
     public int loadKey = Keyboard.KEY_I;
 
     @Expose
-    @ConfigOption(name = "Clear Key", desc = "Clears the graph. Also saves the graph to the clipboard")
+    @ConfigOption(name = "Clear Key", desc = "Clears the graph. Also saves the graph to the clipboard.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_P)
     public int clearKey = Keyboard.KEY_P;
+
+    @Expose
+    @ConfigOption(name = "Vision Key", desc = "Toggles if the graph should render trough blocks.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_M)
+    public int throughBlocksKey = Keyboard.KEY_M;
 
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
     public Position infoDisplay = new Position(20, 20);

@@ -45,6 +45,8 @@ object GraphEditor {
     private var activeNode: GraphingNode? = null
     private var closedNode: GraphingNode? = null
 
+    private var seeThroughBlocks = true
+
     private var inEditMode = false
     private var inTextMode = false
         set(value) {
@@ -90,6 +92,7 @@ object GraphEditor {
                     add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
                     add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
                     add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
+                    add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
                     add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
                     add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
                     add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
@@ -124,10 +127,14 @@ object GraphEditor {
 
     private fun LorenzRenderWorldEvent.drawNode(node: GraphingNode) {
         this.drawWaypointFilled(
-            node.position, node.getNodeColor(), seeThroughBlocks = true, minimumAlpha = 0.2f, inverseAlphaScale = true
+            node.position,
+            node.getNodeColor(),
+            seeThroughBlocks = seeThroughBlocks,
+            minimumAlpha = 0.2f,
+            inverseAlphaScale = true
         )
         if (node.name == null) return
-        this.drawString(node.position, node.name!!)
+        this.drawString(node.position, node.name!!, seeThroughBlocks)
     }
 
     private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) = this.draw3DLine_nea(
@@ -135,7 +142,7 @@ object GraphEditor {
         edge.node2.position.add(0.5, 0.5, 0.5),
         if (edge !in highlightedEdges) edgeColor else edgeDijkstraColor,
         7,
-        true
+        !seeThroughBlocks
     )
 
     private fun GraphingNode.getNodeColor() = when (this) {
@@ -234,6 +241,9 @@ object GraphEditor {
             } else {
                 this.edge.removeAt(edge)
             }
+        }
+        if (config.throughBlocksKey.isKeyClicked()) {
+            seeThroughBlocks = !seeThroughBlocks
         }
         if (config.dijkstraKey.isKeyClicked()) {
             testDijkstra()
