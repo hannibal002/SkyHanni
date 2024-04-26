@@ -19,7 +19,7 @@ object HotmAPI {
 
     val activeMiningAbility get() = HotmData.abilities.firstOrNull { it.enabled }
 
-    private val blueGoblinEgg = "GOBLIN_EGG_BLUE".asInternalName()
+    private val blueGoblinEgg = "goblin_omelette_blue_cheese".asInternalName()
 
     private val blueEggCache = TimeLimitedCache<ItemStack, Boolean>(10.0.seconds)
     val isBlueEggActive
