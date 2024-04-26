@@ -257,7 +257,7 @@ object EnderNodeTracker {
         return newList
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetendernodetracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

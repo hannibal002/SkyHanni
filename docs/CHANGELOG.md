@@ -42,6 +42,7 @@
     + Change at what cold level the texture should appear.
 + Added option to highlight own Golden/Diamond Goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
 + Added Glacial Powder as stack size in the Fossil Excavator. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
++ Click to get an Ascension Rope from sacks in the Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1542)
 
 #### Dungeon Features
 
@@ -102,6 +103,14 @@
 + Added Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
 + Added Hoppity rabbit collection stats summary. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1482)
 
+#### Inventory Features
+
++ Added SBA style Enchant Parsing. - Vixid (https://github.com/hannibal002/SkyHanni/pull/654)
+    + Option to remove vanilla enchants in tooltip.
+    + Option to remove enchant descriptions.
+    + Option to change enchant formatting.
+    + Also parses tooltips from /show.
+
 #### Misc Features
 
 + Added No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
@@ -156,6 +165,7 @@
 
 + Add /trade to tab completeable commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1354)
 + Improved gfs to have support for calculations in amount. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1493)
++ Cleanup the format for the /shcommand hover description. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1531)
 
 #### Config Improvements
 
@@ -163,6 +173,7 @@
 + Added config links to most features. - jani (https://github.com/hannibal002/SkyHanni/pull/1404)
 + Added all missing config links, or added a comment if no related GUI element exists. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1412)
 + Moved No Bits Warning category into Bits Features category. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
++ Changed Reset Config Command. - seraid (https://github.com/hannibal002/SkyHanni/pull/1524)
 
 #### Inventory Improvements
 
@@ -208,6 +219,10 @@
 
 + Added ranking percentage to Hoppity Display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1501)
 
+#### Dungeon Improvements
+
++ Added a command to clear the kismet state in Croesus. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1539)
+
 #### Misc Improvements
 
 + Improved mod performance. - CalMWolfs, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1342)
@@ -216,6 +231,7 @@
 + Added the option to choose the duration and color of Patcher Coords Waypoints. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1476)
 + Added support to right-click in GUI editor to open config for all remaining GUI elements. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1455)
 + Fixed another memory leak. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1491)
++ Don't send some reminders while in dark auction. - seraid (https://github.com/hannibal002/SkyHanni/pull/1533)
 
 ### Fixes
 
@@ -300,6 +316,7 @@
 #### Mining Fixes
 
 + Fixed Paleontologist book not getting detected when excavate fossils. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1490)
++ Fixed cold overlay not resetting. - Empa (https://github.com/hannibal002/SkyHanni/pull/1540)
 
 #### Misc Fixes
 
@@ -429,6 +446,15 @@
     + Allows transforming back into an equivalent chat component (excluding hierarchy information).
 + Added component matcher. - !nea (https://github.com/hannibal002/SkyHanni/pull/1512)
     + Allows matching regexes against chat component spans (and by extension, chat components).
++ Removed `ItemRenderBackground`. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1497)
+    + Added helpers in `RenderUtils` for drawing borders.
+    + Added helpers in `RenderUtils` for drawing borders and highlights on `RenderGuiItemOverlayEvent`.
++ Changed `RenderRealOverlayEvent` to `RenderGuiItemOverlayEvent` to be more representative of what the event is for. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1497)
++ Added more queue draining functions. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1182)
++ Unit Test for RepoPatterns. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1410)
++ Created and used HypixelCommands. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1525)
++ Replace many internal commands with onClick() feature. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1522)
++ Using PrimitiveItemStack at getMultiplier. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1165)
 
 ### Removed Features
 

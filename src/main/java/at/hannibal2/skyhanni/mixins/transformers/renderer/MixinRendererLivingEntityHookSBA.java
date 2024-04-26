@@ -20,11 +20,14 @@ public class MixinRendererLivingEntityHookSBA<T extends EntityLivingBase> {
 
     @Inject(method = "equals", at = @At("HEAD"), cancellable = true, remap = false)
     private static void onEquals(String displayName, Object otherString, CallbackInfoReturnable<Boolean> cir) {
-        skyHanni$hook.onEquals(displayName, cir);
+        if (skyHanni$hook.isCoolPerson(displayName)) {
+            cir.setReturnValue(true);
+        }
     }
 
     @Inject(method = "isWearing", at = @At("HEAD"), cancellable = true, remap = false)
-    private static void onIsWearing(EntityPlayer entityPlayer, EnumPlayerModelParts p_175148_1_, CallbackInfoReturnable<Boolean> cir) {
-        skyHanni$hook.onIsWearing(entityPlayer, cir);
+    private static void onIsWearing(EntityPlayer player, EnumPlayerModelParts p_175148_1_, CallbackInfoReturnable<Boolean> cir) {
+        skyHanni$hook.rotatePlayer(player);
+        cir.setReturnValue(true);
     }
 }

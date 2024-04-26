@@ -189,6 +189,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight options in /tab. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1175)
     + Green for enabled
     + Red for disabled
++ SBA style Enchant Parsing. - Vixid (https://github.com/hannibal002/SkyHanni/pull/654)
+    + Option to remove vanilla enchants in tooltip.
+    + Option to remove enchant descriptions.
+    + Option to change enchant formatting.
+    + Also parses tooltips from /show.
 
 </details>
 <details open><summary>
@@ -792,6 +797,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Change at what cold level the texture should appear.
 + Glacial Powder as stack size in the Fossil Excavator. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
 + Highlight own Golden/Diamond Goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
++ Click to get an Ascension Rope from sacks in the Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1542)
 
 </details>
 <details open><summary>

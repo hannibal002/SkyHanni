@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
-import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
 import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MaxwellAPI
@@ -345,6 +344,7 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser
 import at.hannibal2.skyhanni.features.misc.limbo.LimboPlaytime
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -459,7 +459,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.12",
+    version = "0.25.Beta.13",
 )
 class SkyHanniMod {
 
@@ -480,7 +480,6 @@ class SkyHanniMod {
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
-        loadModule(ItemRenderBackground())
         loadModule(EntityData())
         loadModule(MobData())
         loadModule(MobDetection())
@@ -847,6 +846,7 @@ class SkyHanniMod {
         loadModule(DungeonFinderFeatures())
         loadModule(GoldenGoblinHighlight())
         loadModule(TabWidgetSettings())
+        loadModule(EnchantParser)
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
         loadModule(CustomScoreboard())
