@@ -38,7 +38,7 @@ import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 
-class WardrobeOverlay {
+class CustomWardrobe {
 
     private val config get() = SkyHanniMod.feature.inventory.customWardrobe
     private var display = emptyList<Triple<Position, Renderable, Int?>>()
