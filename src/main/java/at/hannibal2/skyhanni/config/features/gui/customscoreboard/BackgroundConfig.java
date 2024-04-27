@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
@@ -49,52 +50,9 @@ public class BackgroundConfig {
     public int roundedCornerSmoothness = 10;
 
     @Expose
-    @ConfigOption(
-            name = "Outline",
-            desc = "Shows an outline around the scoreboard"
-    )
-    @ConfigEditorBoolean
-    public boolean outline = false;
-
-    @Expose
-    @ConfigOption(
-            name = "Outline Thickness",
-            desc = "Thickness of the outline"
-    )
-    @ConfigEditorSlider(
-            minValue = 1,
-            maxValue = 15,
-            minStep = 1
-    )
-    public int outlineThickness = 5;
-
-    @Expose
-    @ConfigOption(
-            name = "Outline Blur",
-            desc = "Amount that the outline is blurred"
-    )
-    @ConfigEditorSlider(
-            minValue = 0.0f,
-            maxValue = 1.0f,
-            minStep = 0.1f
-    )
-    public float outlineBlur = 0.7f;
-
-    @Expose
-    @ConfigOption(
-            name = "Outline Color Top",
-            desc = "Color of the top of the outline"
-    )
-    @ConfigEditorColour
-    public String outlineColorTop = "0:255:175:89:255";
-
-    @Expose
-    @ConfigOption(
-            name = "Outline Color Bottom",
-            desc = "Color of the bottom of the outline"
-    )
-    @ConfigEditorColour
-    public String outlineColorBottom = "0:255:127:237:255";
+    @ConfigOption(name = "Background Outline", desc = "")
+    @Accordion
+    public BackgroundOutlineConfig outline = new BackgroundOutlineConfig();
 
     @Expose
     @ConfigOption(
