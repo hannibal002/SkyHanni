@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServe
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.devConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.maxwellConfig
@@ -449,11 +450,11 @@ private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
-    val cold = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.coldPattern, "cold")
+    val cold = -getCold()
 
     return listOf(
         when {
-            informationFilteringConfig.hideEmptyLines && cold == "0" -> "<hidden>"
+            informationFilteringConfig.hideEmptyLines && cold == 0 -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
             else -> "Cold: §b$cold❄"
         } to HorizontalAlignment.LEFT
@@ -773,12 +774,11 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
         .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
     ).flatten()
 
-
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
     val size = unknownLines.size
-    if (amountOfUnknownLines != size && devConfig.unknownLinesWarning) {
+    if (amountOfUnknownLines != size && config.unknownLinesWarning) {
         val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
         ErrorManager.logErrorWithData(
             CustomScoreboardUtils.UndetectedScoreboardLines(message),
@@ -787,6 +787,7 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
             noStackTrace = true,
+            betaOnly = true,
         )
         amountOfUnknownLines = size
     }

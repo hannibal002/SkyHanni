@@ -23,8 +23,8 @@ class TeleportPadCompactName {
     )
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLivingB(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
-    if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return
         val entity = event.entity
         if (entity !is EntityArmorStand) return

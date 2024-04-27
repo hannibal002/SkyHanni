@@ -37,6 +37,10 @@ public class InventoryConfig {
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
+    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
+    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
+
+    @Expose
     @Category(name = "Helpers", desc = "Settings for Helpers")
     public HelperConfig helper = new HelperConfig();
 

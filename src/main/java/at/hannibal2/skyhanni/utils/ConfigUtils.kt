@@ -98,7 +98,7 @@ object ConfigUtils {
         )
     }
 
-   private fun KMutableProperty0<*>.tryJumpToEditor(editor: MoulConfigEditor<*>): Boolean {
+    private fun KMutableProperty0<*>.tryJumpToEditor(editor: MoulConfigEditor<*>): Boolean {
         val option = tryFindEditor(editor) ?: return false
         editor.search("")
         if (!editor.goToOption(option)) return false

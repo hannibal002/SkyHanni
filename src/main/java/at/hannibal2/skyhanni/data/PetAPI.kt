@@ -32,7 +32,7 @@ object PetAPI {
 
     // Contains color code + name and for older SkyHanni users maybe also the pet level
     var currentPet: String?
-        get() = ProfileStorageData.profileSpecific?.currentPet
+        get() = ProfileStorageData.profileSpecific?.currentPet?.takeIf { it.isNotEmpty() }
         set(value) {
             ProfileStorageData.profileSpecific?.currentPet = value
         }

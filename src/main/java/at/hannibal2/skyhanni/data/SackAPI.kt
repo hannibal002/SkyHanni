@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -278,7 +279,7 @@ object SackAPI {
         }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.uppercase() }.toSet()
+        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
     }
 
     private fun updateSacks(changes: SackChangeEvent) {
@@ -352,21 +353,21 @@ object SackAPI {
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-    ): AbstractSackItem()
+    ) : AbstractSackItem()
 
     data class SackRune(
         var stack: ItemStack? = null,
         var lvl1: Int = 0,
         var lvl2: Int = 0,
         var lvl3: Int = 0,
-    ): AbstractSackItem()
+    ) : AbstractSackItem()
 
     data class SackOtherItem(
         var internalName: NEUInternalName = NEUInternalName.NONE,
         var colorCode: String = "",
         var total: Int = 0,
         var magmaFish: Int = 0,
-    ): AbstractSackItem()
+    ) : AbstractSackItem()
 
     abstract class AbstractSackItem(
         var stored: Int = 0,
