@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.createWardrobePriceLore
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentWardrobeSlot
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.favorite
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -137,18 +139,20 @@ class CustomWardrobe {
                     val containerWidth = playerWidth + 2 * padding
                     val containerHeight = playerHeight + 2 * padding
 
-                    /*
-                    estimated wardrobe price hover text
                     val estimatedWardrobePriceRenderable = {
-                        val placeHolder = Renderable.placeholder(containerWidth, containerHeight)
                         if (wardrobeSlot.getArmor().any { it != null }) {
                             val lore = createWardrobePriceLore(wardrobeSlot)
-                            Renderable.hoverTips(placeHolder, lore)
+                            Renderable.hoverTips(
+                                Renderable.string(
+                                    "$",
+                                    horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
+                                    verticalAlign = RenderUtils.VerticalAlignment.TOP
+                                ), lore
+                            )
                         } else {
-                            placeHolder
+                            Renderable.placeholder(0, 0)
                         }
                     }
-                    */
 
                     val armorTooltipRenderable = {
                         val loreList = mutableListOf<List<Renderable>>()
@@ -182,6 +186,7 @@ class CustomWardrobe {
 
                     val renderable = createHoverableRenderable(
                         armorTooltipRenderable.invoke(),
+                        topLayerRenderable = estimatedWardrobePriceRenderable.invoke(),
                         hoveredColor = getWardrobeSlotColor(wardrobeSlot),
                         borderOutlineThickness = config.color.outlineThickness,
                         borderOutlineBlur = config.color.outlineBlur,

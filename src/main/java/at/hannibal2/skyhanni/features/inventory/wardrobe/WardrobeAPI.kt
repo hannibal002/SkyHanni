@@ -151,6 +151,7 @@ object WardrobeAPI {
 
     fun createWardrobePriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
+        add("§aEstimated Armor Value:")
         val armor = slot.getArmor()
         var totalPrice = 0.0
         armor.forEach {
