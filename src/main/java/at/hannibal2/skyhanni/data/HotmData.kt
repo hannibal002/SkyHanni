@@ -529,11 +529,9 @@ enum class HotmData(
                 else {
                     val lore = skymallItem.getLore()
                     val index = lore.indexOf("§aYour Current Effect")+1
-                    ChatUtils.debug("'${lore[index]}'")
                     skymallPattern.matchMatcher(lore[index]) {
                         val perk = group("perk")
                         skymall = SkymallPerk.entries.find { it.itemString == perk }
-                        ChatUtils.debug("found ${SkymallPerk.entries.find { it.itemString == perk }}")
                     }
                 }
             }
