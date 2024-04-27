@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -68,6 +69,7 @@ class MobDetection {
         MobFilter.wokeSleepingGolemPattern
         MobFilter.jerryPattern
         MobFilter.jerryMagmaCubePattern
+        MobUtils.defaultArmorStandName
     }
 
     private fun mobDetectionReset() {
@@ -168,7 +170,9 @@ class MobDetection {
 
     /** For mobs that have default health of the entity */
     private enum class EntityPacketType {
-        SPIRIT_BAT, VILLAGER, CREEPER_VAIL
+        SPIRIT_BAT,
+        VILLAGER,
+        CREEPER_VAIL,
     }
 
     /** Handles some mobs that have default health of the entity, specially using the [EntityHealthUpdateEvent] */

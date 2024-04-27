@@ -83,7 +83,16 @@ class Mob(
     val extraEntities: List<EntityLivingBase> = extraEntitiesList
 
     enum class Type {
-        DISPLAY_NPC, SUMMON, BASIC, DUNGEON, BOSS, SLAYER, PLAYER, PROJECTILE, SPECIAL;
+        DISPLAY_NPC,
+        SUMMON,
+        BASIC,
+        DUNGEON,
+        BOSS,
+        SLAYER,
+        PLAYER,
+        PROJECTILE,
+        SPECIAL,
+        ;
 
         fun isSkyblockMob() = when (this) {
             BASIC, DUNGEON, BOSS, SLAYER -> true

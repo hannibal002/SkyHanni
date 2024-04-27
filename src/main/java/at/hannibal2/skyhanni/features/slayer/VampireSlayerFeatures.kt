@@ -30,11 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -127,23 +123,14 @@ object VampireSlayerFeatures {
                         else if (containCoop && configCoopBoss.twinClawsTitle) true
                         else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsTitle
 
-                    val shouldSendSound =
-                        if (containUser && configOwnBoss.twinClawsSound) true
-                        else if (containCoop && configCoopBoss.twinClawsSound) true
-                        else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsSound
-
-                    if (shouldSendTitle || shouldSendSound) {
+                    if (shouldSendTitle) {
                         DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
                             if (nextClawSend < System.currentTimeMillis()) {
-                                if (shouldSendSound)
-                                    playTwinclawsSound()
-                                if (shouldSendTitle) {
-                                    LorenzUtils.sendTitle(
-                                        "§6§lTWINCLAWS",
-                                        (1750 - config.twinclawsDelay).milliseconds,
-                                        2.6
-                                    )
-                                }
+                                LorenzUtils.sendTitle(
+                                    "§6§lTWINCLAWS",
+                                    (1750 - config.twinclawsDelay).milliseconds,
+                                    2.6
+                                )
                                 nextClawSend = System.currentTimeMillis() + 5_000
                             }
                         }
@@ -204,15 +191,6 @@ object VampireSlayerFeatures {
         }
     }
 
-    private fun playTwinclawsSound() {
-        SkyHanniMod.coroutineScope.launch {
-            repeat(15) {
-                delay(50)
-                SoundUtils.createSound("random.orb", 0.5f).playSound()
-            }
-        }
-    }
-
     private fun EntityOtherPlayerMP.isHighlighted(): Boolean {
         return entityList.contains(this) || taggedEntityList.contains(this.entityId)
     }
@@ -258,7 +236,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun pre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
@@ -267,7 +245,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun post(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {

@@ -245,7 +245,7 @@ object GardenVisitorFeatures {
                         continue
                     }
                     if (items.isEmpty()) {
-                        list.add("§7(§fAny§7)")
+                        list.add(" §7(§fAny§7)")
                     } else {
                         for (item in items) {
                             list.add(NEUInternalName.fromItemName(item).getItemStack())
@@ -355,7 +355,7 @@ object GardenVisitorFeatures {
         }
 
         readingShoppingList = true
-        val finalList = toolTip.map { it.removePrefix("§5§o")}.toMutableList()
+        val finalList = toolTip.map { it.removePrefix("§5§o") }.toMutableList()
         var offset = 0
         for ((i, formattedLine) in finalList.toMutableList().withIndex()) {
             val index = i + offset
@@ -462,6 +462,7 @@ object GardenVisitorFeatures {
             event.blockedReason = "new_visitor_arrived"
         }
 
+        // TODO use NpcChatEvent
         if (GardenAPI.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
         }

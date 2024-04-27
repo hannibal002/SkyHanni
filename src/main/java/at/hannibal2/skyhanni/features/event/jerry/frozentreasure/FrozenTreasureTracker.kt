@@ -190,7 +190,7 @@ object FrozenTreasureTracker {
     private fun inGlacialCave() =
         onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetfrozentreasuretracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }
