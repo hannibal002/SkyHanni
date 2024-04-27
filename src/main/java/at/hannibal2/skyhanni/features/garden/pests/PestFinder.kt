@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
@@ -16,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
@@ -54,8 +57,11 @@ class PestFinder {
             val plotName = plot.name
             val isInaccurate = plot.isPestCountInaccurate
             val pestsName = StringUtils.pluralize(pests, "pest")
+            val name = "§e" + if (isInaccurate) "1+?" else {
+                pests
+            } + " §c$pestsName §7in §b$plotName"
             val renderable = Renderable.clickAndHover(
-                "§e" + if (isInaccurate) "1+?" else {pests} + " §c$pestsName §7in §b$plotName",
+                name,
                 listOf(
                     "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
@@ -108,22 +114,43 @@ class PestFinder {
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
 
         val playerLocation = event.exactPlayerEyeLocation()
+        val visibility = config.visibilityType
+        val showBorder = visibility == VisibilityType.BOTH || visibility == VisibilityType.BORDER
+        val showName = visibility == VisibilityType.BOTH || visibility == VisibilityType.NAME
         for (plot in PestAPI.getInfestedPlots()) {
             if (plot.isPlayerInside()) {
-                event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                if (showBorder) {
+                    event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                }
                 continue
             }
-            event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
-
-            val pests = plot.pests
-            val pestsName = StringUtils.pluralize(pests, "pest")
-            val plotName = plot.name
-            val middle = plot.middle
-            val isInaccurate = plot.isPestCountInaccurate
-            val location = playerLocation.copy(x = middle.x, z = middle.z)
-            event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-            event.drawDynamicText(location, "§e" + if (isInaccurate) "?" else {pests} + " §c$pestsName §7in §b$plotName", 1.5)
+            if (showBorder) {
+                event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
+            }
+            if (showName) {
+                drawName(plot, playerLocation, event)
+            }
         }
+    }
+
+    private fun drawName(
+        plot: GardenPlotAPI.Plot,
+        playerLocation: LorenzVec,
+        event: LorenzRenderWorldEvent,
+    ) {
+        val pests = plot.pests
+        val pestsName = StringUtils.pluralize(pests, "pest")
+        val plotName = plot.name
+        val middle = plot.middle
+        val isInaccurate = plot.isPestCountInaccurate
+        val location = playerLocation.copy(x = middle.x, z = middle.z)
+        event.drawWaypointFilled(location, LorenzColor.RED.toColor())
+        val text = "§e" + (if (isInaccurate) "?" else
+            pests
+            ) + " §c$pestsName §7in §b$plotName"
+        event.drawDynamicText(
+            location, text, 1.5
+        )
     }
 
     private var lastKeyPress = SimpleTimeMark.farPast()

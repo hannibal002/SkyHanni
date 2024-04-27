@@ -59,7 +59,6 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val clickType: Int,
     ) : GuiContainerEvent(gui, container) {
 
-
         fun makePickblock() {
             if (this.clickedButton == 2 && this.clickType == 3) return
             slot?.slotNumber?.let { slotNumber ->

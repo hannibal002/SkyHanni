@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -45,7 +46,7 @@ import org.lwjgl.opengl.GL11
 object NEUItems {
 
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
+    private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
 
@@ -124,7 +125,8 @@ object NEUItems {
         for (rawInternalName in allNeuRepoItems().keys) {
             val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
             val internalName = rawInternalName.asInternalName()
-            map[name] = internalName
+            val storedName = name.removePrefix("[lvl 1➡100] ")
+            map[storedName] = internalName
             allInternalNames.add(internalName)
         }
         return map
@@ -250,18 +252,21 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
-    // TODO create extended function
+    @Deprecated("outdated", ReplaceWith("NEUItems.getPrimitiveMultiplier(internalName, tryCount)"))
     fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
-        if (multiplierCache.contains(internalName)) {
-            return multiplierCache[internalName]!!
-        }
+        val (name, amount) = getPrimitiveMultiplier(internalName, tryCount)
+        return Pair(name, amount)
+    }
+
+    fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
+        multiplierCache[internalName]?.let { return it }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
                 "Could not load recipe data.",
                 "Failed to find item multiplier",
                 "internalName" to internalName
             )
-            return Pair(internalName, 1)
+            return internalName.makePrimitiveStack()
         }
         for (recipe in getRecipes(internalName)) {
             if (recipe !is CraftingRecipe) continue
@@ -297,16 +302,16 @@ object NEUItems {
             val current = map.iterator().next().toPair()
             val id = current.first
             return if (current.second > 1) {
-                val child = getMultiplier(id, tryCount + 1)
-                val result = Pair(child.first, child.second * current.second)
+                val child = getPrimitiveMultiplier(id, tryCount + 1)
+                val result = child.multiply(current.second)
                 multiplierCache[internalName] = result
                 result
             } else {
-                Pair(internalName, 1)
+                internalName.makePrimitiveStack()
             }
         }
 
-        val result = Pair(internalName, 1)
+        val result = internalName.makePrimitiveStack()
         multiplierCache[internalName] = result
         return result
     }
@@ -317,7 +322,7 @@ object NEUItems {
         }
     }
 
-    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { allIngredients() }
 
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
@@ -344,4 +349,6 @@ object NEUItems {
         val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
         return manager.jsonToStack(jsonObject, false)
     }
+
+    fun NeuRecipe.allIngredients(): Set<Ingredient> = ingredients
 }

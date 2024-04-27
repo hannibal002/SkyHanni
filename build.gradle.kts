@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.8"
+version = "0.25.Beta.13"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -105,7 +105,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
+    // Apr 23, 2024, 6:08 PM GMT+2
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/commit/faf22b5dd9
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -116,7 +118,7 @@ dependencies {
     implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }

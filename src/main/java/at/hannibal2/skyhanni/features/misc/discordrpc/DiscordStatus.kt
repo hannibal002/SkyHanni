@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -28,7 +29,6 @@ import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurre
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import java.util.function.Supplier
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -53,9 +53,31 @@ private fun getVisitingName(): String {
 
 var beenAfkFor = SimpleTimeMark.now()
 
-enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
+fun getPetDisplay(): String = PetAPI.currentPet?.let {
+    val colorCode = it.substring(1..2).first()
+    val petName = it.substring(2)
+    val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
 
-    NONE(null),
+    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+} ?: "No pet equipped"
+
+private fun getCropMilestoneDisplay(): String {
+    val crop = InventoryUtils.getItemInHand()?.getCropType()
+    val cropCounter = crop?.getCounter()
+    val tier = cropCounter?.let { getTierForCropCount(it, crop) }
+
+    val progress = tier?.let {
+        LorenzUtils.formatPercentage(crop.progressToNextLevel())
+    } ?: 100 // percentage to next milestone
+
+    return if (tier != null) {
+        "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
+    } else AutoStatus.CROP_MILESTONES.placeholderText
+}
+
+enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
+
+    NONE({ null }),
 
     LOCATION({
         var location = LorenzUtils.skyBlockArea?.removeColor() ?: "invalid"
@@ -144,20 +166,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     PROFILE({
-        val player = LorenzUtils.getPlayerName()
-
-        val tabData = TabListData.getTabList()
-        val levelRegex = Regex("""\[(\d{1,3})] $player""")
-        var sbLevel = ""
-// SkyBlock Level: [999] on Lemon
-        for (line in tabData) {
-            if (line.contains(player)) {
-                val colorlessLine = line.removeColor()
-                sbLevel = levelRegex.find(colorlessLine)!!.groupValues[1]
-                break
-            }
-        }
-
+        val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
         var profile = "SkyBlock Level: [$sbLevel] on "
 
         profile += when {
@@ -231,29 +240,9 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         autoReturn
     }),
 
-    CROP_MILESTONES({
-        val crop = InventoryUtils.getItemInHand()?.getCropType()
-        val cropCounter = crop?.getCounter()
-        val tier = cropCounter?.let { getTierForCropCount(it, crop) }
+    CROP_MILESTONES({ getCropMilestoneDisplay() }),
 
-        val progress = tier?.let {
-            LorenzUtils.formatPercentage(crop.progressToNextLevel())
-        } ?: 100 // percentage to next milestone
-
-        if (tier != null) {
-            "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
-        } else AutoStatus.CROP_MILESTONES.placeholderText
-    }),
-
-    PETS({
-        PetAPI.currentPet?.let {
-            val colorCode = it.substring(1..2).first()
-            val petName = it.substring(2)
-            val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
-
-            "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
-        } ?: "No pet equipped"
-    }),
+    PETS({ getPetDisplay() }),
 
     // Dynamic-only
     STACKING({
@@ -333,12 +322,7 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     })
     ;
 
-    fun getDisplayString(): String {
-        if (displayMessageSupplier != null) {
-            return displayMessageSupplier.get()
-        }
-        return ""
-    }
+    fun getDisplayString(): String = displayMessageSupplier() ?: ""
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {

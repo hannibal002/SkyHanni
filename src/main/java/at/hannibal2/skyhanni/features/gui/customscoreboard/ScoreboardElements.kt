@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companio
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.chunkedConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.devConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.maxwellConfig
@@ -777,12 +777,11 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
         .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
     ).flatten()
 
-
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
     val size = unknownLines.size
-    if (amountOfUnknownLines != size && devConfig.unknownLinesWarning) {
+    if (amountOfUnknownLines != size && config.unknownLinesWarning) {
         val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
         ErrorManager.logErrorWithData(
             CustomScoreboardUtils.UndetectedScoreboardLines(message),
@@ -791,6 +790,7 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
             noStackTrace = true,
+            betaOnly = true,
         )
         amountOfUnknownLines = size
     }
