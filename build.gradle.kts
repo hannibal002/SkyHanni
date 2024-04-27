@@ -51,6 +51,7 @@ repositories {
     maven("https://repo.nea.moe/releases")
     maven("https://maven.notenoughupdates.org/releases")
     maven("https://repo.hypixel.net/repository/Hypixel/")
+    maven("https://maven.teamresourceful.com/repository/thatgravyboat/")
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -79,7 +80,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
+    shadowImpl("com.jagrosh:DiscordIPC:0.5") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
