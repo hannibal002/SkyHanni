@@ -57,8 +57,8 @@ object WardrobeAPI {
         WardrobeData(
             id,
             (1..4).associateWith { null }.toMutableMap(),
-            false,
-            false,
+            locked = false,
+            favorite = false,
         )
     }
 
@@ -86,8 +86,7 @@ object WardrobeAPI {
             getData()?.armor?.set(4, value)
         }
 
-    fun WardrobeSlot.getArmor(): List<ItemStack?> =
-        (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
+    fun WardrobeSlot.getArmor() = (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
 
     fun WardrobeSlot.isEmpty(): Boolean = getArmor().all { it == null }
 
@@ -103,9 +102,9 @@ object WardrobeAPI {
             getData()?.favorite = value
         }
 
-    fun WardrobeSlot.isCurrentSlot(): Boolean = getData()?.id == currentWardrobeSlot
+    fun WardrobeSlot.isCurrentSlot() = getData()?.id == currentWardrobeSlot
 
-    fun WardrobeSlot.isInCurrentPage(): Boolean = (currentPage == null && page == 1) || (page == currentPage)
+    fun WardrobeSlot.isInCurrentPage() = (currentPage == null && page == 1) || (page == currentPage)
 
     var currentWardrobeSlot: Int?
         get() = storage?.currentWardrobeSlot
@@ -185,10 +184,11 @@ object WardrobeAPI {
                 currentWardrobeSlot = slot.id
                 foundCurrentSlot = true
             }
-            slot.locked = itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage)
+            slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
+            if (slot.locked) wardrobeSlots.forEach { if (it.id > slot.id) it.locked = true }
         }
-        if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage) currentWardrobeSlot =
-            null
+        if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage)
+            currentWardrobeSlot = null
     }
 
     @SubscribeEvent

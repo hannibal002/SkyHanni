@@ -29,10 +29,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.AbstractClientPlayer
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.util.ResourceLocation
+import net.minecraft.entity.player.EnumPlayerModelParts
+import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
@@ -48,7 +49,7 @@ class CustomWardrobe {
     private var onlyFavoriteToggle = false
 
     private var itemPriceCache = mutableMapOf<String?, Double>()
-    private var fakePlayerCache = mutableMapOf<Int, AbstractClientPlayer>()
+    private var fakePlayerCache = mutableMapOf<Int, EntityOtherPlayerMP>()
 
     private var hoveredSlot: Int? = null
 
@@ -100,7 +101,7 @@ class CustomWardrobe {
 
         if (wardrobeWarning) {
             val warningRenderable = Renderable.string(wardrobeWarningText)
-            val warningPos = Position(centerX - (warningRenderable.width * 3) / 2, centerY - 70, 3f, true);
+            val warningPos = Position(centerX - (warningRenderable.width * 3) / 2, centerY - 70, 3f, true)
             renderablesCache += Triple(warningPos, warningRenderable, 0)
             renderablesCache += addButtons(gui.width, gui.height, totalHeight)
             event.cancel()
@@ -327,24 +328,22 @@ class CustomWardrobe {
         }
     }
 
-    private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): AbstractClientPlayer =
+    private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): EntityOtherPlayerMP =
         fakePlayerCache.getOrPut(this.id) {
             val mc = Minecraft.getMinecraft()
-            object : AbstractClientPlayer(
+            object : EntityOtherPlayerMP(
                 mc.theWorld,
                 mc.thePlayer.gameProfile
             ) {
-                override fun getLocationSkin(): ResourceLocation {
-                    // TODO: where second layer
-                    // please someone fixed this ive been trying for 5h
-                    return mc.thePlayer.locationSkin
-                        ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
+                override fun getLocationSkin() =
+                    mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
+
+                override fun getTeam() = object : ScorePlayerTeam(null, null) {
+                    override fun getNameTagVisibility() = EnumVisible.NEVER
                 }
 
-                override fun getName(): String {
-                    // Future TODO: Empa wants to add per slot names
-                    return ""
-                }
+                override fun isWearing(part: EnumPlayerModelParts?) =
+                    mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
             }
         }
 
