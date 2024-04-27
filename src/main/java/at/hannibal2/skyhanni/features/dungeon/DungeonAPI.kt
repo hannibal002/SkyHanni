@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -79,6 +80,8 @@ object DungeonAPI {
         STONE(0),
         WISDOM(0),
         TIME(0);
+
+        val displayName by lazy { name.firstLetterUppercase() }
 
         companion object {
             fun reset() {
@@ -312,11 +315,10 @@ object DungeonAPI {
             add("isUniqueClass: $isUniqueClass")
             add("playerClassLevel: $playerClassLevel")
             add("")
-            add("Life: ${DungeonBlessings.LIFE.power}")
-            add("Stone: ${DungeonBlessings.STONE.power}")
-            add("Wisdom: ${DungeonBlessings.WISDOM.power}")
-            add("Power: ${DungeonBlessings.POWER.power}")
-            add("Time: ${DungeonBlessings.TIME.power}")
+            add("Blessings: ")
+            for (blessing in DungeonBlessings.entries) {
+                add("  ${blessing.displayName} ${blessing.power}")
+            }
         }
     }
 
