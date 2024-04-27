@@ -101,6 +101,7 @@ import at.hannibal2.skyhanni.features.commands.WarpIsCommand
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete
+import at.hannibal2.skyhanni.features.commands.tabcomplete.TabComplete
 import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
 import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
@@ -530,6 +531,7 @@ class SkyHanniMod {
         loadModule(FixedRateTimerManager())
         loadModule(ChromaManager)
         loadModule(ContributorManager)
+        loadModule(TabComplete)
 
         // APIs
         loadModule(BazaarApi())
