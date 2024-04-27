@@ -1523,7 +1523,7 @@ object RenderUtils {
         bottomColor: Int,
         borderThickness: Int,
         radius: Int = 10,
-        blur: Float = 0.7f
+        blur: Float = 0.7f,
     ) {
         val scaledRes = ScaledResolution(Minecraft.getMinecraft())
         val widthIn = width * scaledRes.scaleFactor
