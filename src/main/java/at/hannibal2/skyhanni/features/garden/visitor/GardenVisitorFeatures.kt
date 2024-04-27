@@ -245,7 +245,7 @@ object GardenVisitorFeatures {
                         continue
                     }
                     if (items.isEmpty()) {
-                        list.add("§7(§fAny§7)")
+                        list.add(" §7(§fAny§7)")
                     } else {
                         for (item in items) {
                             list.add(NEUInternalName.fromItemName(item).getItemStack())
