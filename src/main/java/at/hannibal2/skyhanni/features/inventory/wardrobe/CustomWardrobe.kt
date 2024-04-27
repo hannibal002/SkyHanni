@@ -225,9 +225,8 @@ class CustomWardrobe {
                 tempToggleShowOverlay = true
                 favoriteToggle = false
                 itemPriceCache = mutableMapOf()
-                fakePlayerCache = mutableMapOf()
                 display = mutableListOf()
-                renderablesCache = mutableListOf()
+                reset()
             }
         }
     }
