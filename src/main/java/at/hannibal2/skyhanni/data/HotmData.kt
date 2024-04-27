@@ -1,11 +1,16 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
+import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
+import at.hannibal2.skyhanni.api.HotmAPI.mineshaftMayhem
+import at.hannibal2.skyhanni.api.HotmAPI.skymall
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
@@ -365,6 +370,16 @@ enum class HotmData(
             "inventory.reset.token", "\\s+§8- §5(?<token>\\d+) Token of the Mountain"
         )
 
+        private val skymallPattern by repoGroup.pattern(
+            "skymall",
+            "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?<perk>.*)"
+        )
+
+        private val mayhemChatPattern by repoGroup.pattern(
+            "mayhem",
+            "§b§lMAYHEM! §r§7(?<perk>.*)"
+        )
+
         var inInventory = false
 
         var tokens: Int
@@ -509,14 +524,43 @@ enum class HotmData(
                 abilities.filter { it.isUnlocked }.forEach {
                     it.activeLevel = if (PEAK_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
                 }
+                val skymallItem = InventoryUtils.getItemsInOpenChest().find { it.stack.name == "§aSky Mall" || it.stack.name == "§cSky Mall" }?.stack ?: return@runNextTick
+                if (skymallItem.name.contains("§c")) skymall = null
+                else {
+                    val lore = skymallItem.getLore()
+                    val index = lore.indexOf("§aYour Current Effect")+1
+                    ChatUtils.debug("'${lore[index]}'")
+                    skymallPattern.matchMatcher(lore[index]) {
+                        val perk = group("perk")
+                        skymall = SkymallPerk.entries.find { it.itemString == perk }
+                        ChatUtils.debug("found ${SkymallPerk.entries.find { it.itemString == perk }}")
+                    }
+                }
             }
         }
 
         @SubscribeEvent
         fun onChat(event: LorenzChatEvent) {
             if (!LorenzUtils.inSkyBlock) return
-            if (!resetChatPattern.matches(event.message)) return
-            resetTree()
+            if (resetChatPattern.matches(event.message)) {
+                resetTree()
+                return
+            }
+            skymallPattern.matchMatcher(event.message) {
+                val perk = group("perk")
+                skymall = SkymallPerk.entries.find { it.chat == perk }
+                return
+            }
+            mayhemChatPattern.matchMatcher(event.message) {
+                val perk = group("perk")
+                mineshaftMayhem = MayhemPerk.entries.find { it.chat == perk }
+                return
+            }
+        }
+
+        @SubscribeEvent
+        fun onWorldSwitch(event: IslandChangeEvent) {
+            mineshaftMayhem = null
         }
 
         @SubscribeEvent
@@ -540,6 +584,8 @@ enum class HotmData(
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")
+                add("SkyMall: $skymall")
+                add("Mineshaft Mayhem: $mineshaftMayhem")
             }
             event.title("HotM - Tree")
             event.addIrrelevant(
