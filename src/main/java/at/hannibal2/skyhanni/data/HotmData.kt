@@ -550,17 +550,18 @@ enum class HotmData(
                 ChatUtils.debug("setting skymall to $skymall")
                 return
             }
-            mayhemChatPattern.matchMatcher(event.message) {
-                val perk = group("perk")
-                mineshaftMayhem = MayhemPerk.entries.find { it.chat == perk }
-                ChatUtils.debug("setting mineshaftMayhem to $mineshaftMayhem")
-                return
+            DelayedRun.runNextTick {
+                mayhemChatPattern.matchMatcher(event.message) {
+                    val perk = group("perk")
+                    mineshaftMayhem = MayhemPerk.entries.find { it.chat == perk }
+                    ChatUtils.debug("setting mineshaftMayhem to $mineshaftMayhem")
+                }
             }
         }
 
         @SubscribeEvent
         fun onWorldSwitch(event: IslandChangeEvent) {
-            if (event.oldIsland != IslandType.MINESHAFT) return
+            if (mineshaftMayhem != null) return
             mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
