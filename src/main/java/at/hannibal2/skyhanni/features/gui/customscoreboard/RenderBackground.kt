@@ -5,9 +5,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.alignmentConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.backgroundConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -19,7 +16,9 @@ import org.lwjgl.opengl.GL11
 
 class RenderBackground {
     fun renderBackground() {
-        val position = config.position
+        val alignmentConfig = CustomScoreboard.alignmentConfig
+        val backgroundConfig = CustomScoreboard.backgroundConfig
+        val position = CustomScoreboard.config.position
         val border = backgroundConfig.borderSize
 
         val x = position.getAbsX()
