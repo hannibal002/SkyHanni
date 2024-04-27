@@ -41,17 +41,17 @@ sourceSets.main {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://repo.spongepowered.org/maven/")
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-    maven("https://jitpack.io") {
+    maven("https://repo.spongepowered.org/maven/") // mixin
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
         content {
             includeGroupByRegex("com\\.github\\..*")
         }
     }
-    maven("https://repo.nea.moe/releases")
-    maven("https://maven.notenoughupdates.org/releases")
-    maven("https://repo.hypixel.net/repository/Hypixel/")
-    maven("https://maven.teamresourceful.com/repository/thatgravyboat/")
+    maven("https://repo.nea.moe/releases") // libautoupdate
+    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
+    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
+    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -118,7 +118,6 @@ dependencies {
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(libs.hotswapagentforge)
 
-//    testImplementation(kotlin("test"))
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
@@ -228,7 +227,6 @@ tasks.withType(Jar::class) {
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
 }
-
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
