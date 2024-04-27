@@ -39,8 +39,7 @@ class MatriarchHelper {
         }
     }
 
-    private fun isHeavyPearl(event: MobEvent) =
-        config.enabled && IslandType.CRIMSON_ISLE.isInIsland() && event.mob.name == "Heavy Pearl"
+    private fun isHeavyPearl(event: MobEvent) = isEnabled() && event.mob.name == "Heavy Pearl"
 
     @SubscribeEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
@@ -50,6 +49,7 @@ class MatriarchHelper {
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
         if (config.highlight) {
             val color = config.highlightColor.toChromaColor()
             pearlList.forEach {
@@ -66,4 +66,6 @@ class MatriarchHelper {
             }
         }
     }
+
+    fun isEnabled() = config.enabled && IslandType.CRIMSON_ISLE.isInIsland()
 }
