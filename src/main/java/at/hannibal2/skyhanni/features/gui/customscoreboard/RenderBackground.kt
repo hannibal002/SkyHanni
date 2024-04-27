@@ -5,11 +5,8 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.alignmentConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.backgroundConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SpecialColour
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -19,7 +16,10 @@ import org.lwjgl.opengl.GL11
 
 class RenderBackground {
     fun renderBackground() {
-        val position = config.position
+        val alignmentConfig = CustomScoreboard.alignmentConfig
+        val backgroundConfig = CustomScoreboard.backgroundConfig
+        val outlineConfig = backgroundConfig.outline
+        val position = CustomScoreboard.config.position
         val border = backgroundConfig.borderSize
 
         val x = position.getAbsX()
@@ -36,14 +36,17 @@ class RenderBackground {
             alignmentConfig.alignRight
             || alignmentConfig.alignCenterVertically
         ) {
+            var newX = if (alignmentConfig.alignRight) scaledWidth - elementWidth - (border * 2) else x
+            val newY = if (alignmentConfig.alignCenterVertically) scaledHeight / 2 - elementHeight / 2 else y
+
+            if (outlineConfig.enabled) {
+                newX -= outlineConfig.thickness / 2
+            }
+
             position.set(
                 Position(
-                    if (alignmentConfig.alignRight)
-                        scaledWidth - elementWidth - (border * 2)
-                    else x,
-                    if (alignmentConfig.alignCenterVertically)
-                        scaledHeight / 2 - elementHeight / 2
-                    else y,
+                    newX,
+                    newY,
                     position.getScale(),
                     position.isCenter
                 )
@@ -76,9 +79,22 @@ class RenderBackground {
                     y - border,
                     elementWidth + border * 3,
                     elementHeight + border * 2,
-                    SpecialColour.specialToChromaRGB(backgroundConfig.color),
+                    backgroundConfig.color.toChromaColor().rgb,
                     backgroundConfig.roundedCornerSmoothness
                 )
+                if (outlineConfig.enabled) {
+                    RenderUtils.drawRoundRectOutline(
+                        x - border,
+                        y - border,
+                        elementWidth + border * 3,
+                        elementHeight + border * 2,
+                        outlineConfig.colorTop.toChromaColor().rgb,
+                        outlineConfig.colorBottom.toChromaColor().rgb,
+                        outlineConfig.thickness,
+                        backgroundConfig.roundedCornerSmoothness,
+                        outlineConfig.blur
+                    )
+                }
             }
         }
         GL11.glDepthMask(true)
