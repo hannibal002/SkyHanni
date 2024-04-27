@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.events.RenderRealOverlayEvent
+import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.item.ItemStack
@@ -25,5 +25,5 @@ fun renderItemOverlayPost(
 
 fun renderItemReturn(stack: ItemStack, x: Int, y: Int) {
     if (!SkyHanniDebugsAndTests.globalRender) return
-    RenderRealOverlayEvent(stack, x, y).postAndCatch()
+    RenderGuiItemOverlayEvent(stack, x, y).postAndCatch()
 }
