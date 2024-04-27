@@ -37,16 +37,16 @@ class RenderBackground {
             || alignmentConfig.verticalAlignment != RenderUtils.VerticalAlignment.DONT_ALIGN
         ) {
             var newX = when (alignmentConfig.horizontalAlignment) {
-                RenderUtils.HorizontalAlignment.LEFT -> x
-                RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - elementWidth / 2
-                RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - elementWidth - (border * 2)
+                RenderUtils.HorizontalAlignment.LEFT -> border
+                RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - (elementWidth + border * 3) / 2
+                RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - (elementWidth + border * 2)
                 else -> x
             }
 
             val newY = when (alignmentConfig.verticalAlignment) {
-                RenderUtils.VerticalAlignment.TOP -> y
-                RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - elementHeight / 2
-                RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - (border * 2)
+                RenderUtils.VerticalAlignment.TOP -> border
+                RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - (elementHeight + border * 2) / 2
+                RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - border
                 else -> y
             }
 
