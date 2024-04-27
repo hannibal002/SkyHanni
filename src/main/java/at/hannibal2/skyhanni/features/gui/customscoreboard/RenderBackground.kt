@@ -33,14 +33,29 @@ class RenderBackground {
 
         // Update the position to the alignment options
         if (
-            alignmentConfig.alignRight
-            || alignmentConfig.alignCenterVertically
+            alignmentConfig.horizontalAlignment != RenderUtils.HorizontalAlignment.DONT_ALIGN
+            || alignmentConfig.verticalAlignment != RenderUtils.VerticalAlignment.DONT_ALIGN
         ) {
-            var newX = if (alignmentConfig.alignRight) scaledWidth - elementWidth - (border * 2) else x
-            val newY = if (alignmentConfig.alignCenterVertically) scaledHeight / 2 - elementHeight / 2 else y
+            var newX = when (alignmentConfig.horizontalAlignment) {
+                RenderUtils.HorizontalAlignment.LEFT -> x
+                RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - elementWidth / 2
+                RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - elementWidth - (border * 2)
+                else -> x
+            }
+
+            val newY = when (alignmentConfig.verticalAlignment) {
+                RenderUtils.VerticalAlignment.TOP -> y
+                RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - elementHeight / 2
+                RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - (border * 2)
+                else -> y
+            }
 
             if (outlineConfig.enabled) {
-                newX -= outlineConfig.thickness / 2
+                if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.RIGHT) {
+                    newX -= outlineConfig.thickness / 2
+                } else if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.LEFT) {
+                    newX += outlineConfig.thickness / 2
+                }
             }
 
             position.set(

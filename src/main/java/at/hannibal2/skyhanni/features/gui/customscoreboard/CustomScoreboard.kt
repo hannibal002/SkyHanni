@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -68,9 +69,11 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
-            if (alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
-                alignmentConfig.alignRight = false
-                alignmentConfig.alignCenterVertically = false
+            if (alignmentConfig.horizontalAlignment != HorizontalAlignment.DONT_ALIGN
+                || alignmentConfig.verticalAlignment != RenderUtils.VerticalAlignment.DONT_ALIGN
+            ) {
+                alignmentConfig.horizontalAlignment = HorizontalAlignment.DONT_ALIGN
+                alignmentConfig.verticalAlignment = RenderUtils.VerticalAlignment.DONT_ALIGN
                 ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
             }
         }
@@ -231,5 +234,19 @@ class CustomScoreboard {
             newArray
         }
 
+        event.move(42, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
+            if (it.asBoolean) {
+                JsonPrimitive(HorizontalAlignment.RIGHT.name)
+            } else {
+                JsonPrimitive(HorizontalAlignment.DONT_ALIGN.name)
+            }
+        }
+        event.move(42, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
+            if (it.asBoolean) {
+                JsonPrimitive(RenderUtils.VerticalAlignment.CENTER.name)
+            } else {
+                JsonPrimitive(RenderUtils.VerticalAlignment.DONT_ALIGN.name)
+            }
+        }
     }
 }
