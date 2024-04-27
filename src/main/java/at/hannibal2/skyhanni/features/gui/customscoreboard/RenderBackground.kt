@@ -51,11 +51,18 @@ class RenderBackground {
             }
 
             if (outlineConfig.enabled) {
+								val thickness = outlineConfig.thickness
                 if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.RIGHT) {
-                    newX -= outlineConfig.thickness / 2
+                    newX -= thickness / 2
                 } else if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.LEFT) {
-                    newX += outlineConfig.thickness / 2
+                    newX += thickness / 2
                 }
+								
+								if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.TOP) {
+									newY -= thickness / 2
+								} else if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.BOTTOM) {
+									newY += thickness / 2
+								}
             }
 
             position.set(
