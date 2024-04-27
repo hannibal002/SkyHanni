@@ -5,9 +5,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.alignmentConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.backgroundConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -19,7 +16,10 @@ import org.lwjgl.opengl.GL11
 
 class RenderBackground {
     fun renderBackground() {
-        val position = config.position
+        val alignmentConfig = CustomScoreboard.alignmentConfig
+        val backgroundConfig = CustomScoreboard.backgroundConfig
+        val outlineConfig = backgroundConfig.outline
+        val position = CustomScoreboard.config.position
         val border = backgroundConfig.borderSize
 
         val x = position.getAbsX()
@@ -39,8 +39,8 @@ class RenderBackground {
             var newX = if (alignmentConfig.alignRight) scaledWidth - elementWidth - (border * 2) else x
             val newY = if (alignmentConfig.alignCenterVertically) scaledHeight / 2 - elementHeight / 2 else y
 
-            if (backgroundConfig.outline) {
-                newX -= backgroundConfig.outlineThickness / 2
+            if (outlineConfig.enabled) {
+                newX -= outlineConfig.thickness / 2
             }
 
             position.set(
@@ -82,17 +82,17 @@ class RenderBackground {
                     backgroundConfig.color.toChromaColor().rgb,
                     backgroundConfig.roundedCornerSmoothness
                 )
-                if (backgroundConfig.outline) {
+                if (outlineConfig.enabled) {
                     RenderUtils.drawRoundRectOutline(
                         x - border,
                         y - border,
                         elementWidth + border * 3,
                         elementHeight + border * 2,
-                        backgroundConfig.outlineColorTop.toChromaColor().rgb,
-                        backgroundConfig.outlineColorBottom.toChromaColor().rgb,
-                        backgroundConfig.outlineThickness,
+                        outlineConfig.colorTop.toChromaColor().rgb,
+                        outlineConfig.colorBottom.toChromaColor().rgb,
+                        outlineConfig.thickness,
                         backgroundConfig.roundedCornerSmoothness,
-                        backgroundConfig.outlineBlur
+                        outlineConfig.blur
                     )
                 }
             }

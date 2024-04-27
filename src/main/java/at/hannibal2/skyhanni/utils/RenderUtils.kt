@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -1523,7 +1524,7 @@ object RenderUtils {
         bottomColor: Int,
         borderThickness: Int,
         radius: Int = 10,
-        blur: Float = 0.7f
+        blur: Float = 0.7f,
     ) {
         val scaledRes = ScaledResolution(Minecraft.getMinecraft())
         val widthIn = width * scaledRes.scaleFactor

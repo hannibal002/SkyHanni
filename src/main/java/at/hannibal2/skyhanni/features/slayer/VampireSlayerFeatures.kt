@@ -30,11 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -130,13 +126,11 @@ object VampireSlayerFeatures {
                     if (shouldSendTitle) {
                         DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
                             if (nextClawSend < System.currentTimeMillis()) {
-                                if (shouldSendTitle) {
-                                    LorenzUtils.sendTitle(
-                                        "§6§lTWINCLAWS",
-                                        (1750 - config.twinclawsDelay).milliseconds,
-                                        2.6
-                                    )
-                                }
+                                LorenzUtils.sendTitle(
+                                    "§6§lTWINCLAWS",
+                                    (1750 - config.twinclawsDelay).milliseconds,
+                                    2.6
+                                )
                                 nextClawSend = System.currentTimeMillis() + 5_000
                             }
                         }
@@ -242,7 +236,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun pre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
@@ -251,7 +245,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun post(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {

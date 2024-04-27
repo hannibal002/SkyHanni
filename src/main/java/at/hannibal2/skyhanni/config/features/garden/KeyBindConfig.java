@@ -16,6 +16,12 @@ public class KeyBindConfig {
     @FeatureToggle
     public boolean enabled = false;
 
+    @Expose
+    @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean excludeBarn = false;
+
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(buttonText = "Disable")
     public Runnable presetDisable = () -> {

@@ -40,7 +40,7 @@ object ItemNameResolver {
                         "jasper" -> '❁'
                         else -> ' '
                     }
-                }_${split.joinToString("_")}".allLettersFirstUppercase()
+                } ${split.joinToString("_").allLettersFirstUppercase()}"
                 ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, true)?.let {
                     return itemNameCache.getOrPut(lowercase) { it.asInternalName() }
                 }
