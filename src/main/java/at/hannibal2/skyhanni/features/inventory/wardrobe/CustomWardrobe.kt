@@ -166,10 +166,9 @@ class CustomWardrobe {
                                 loreList.add(
                                     listOf(
                                         Renderable.hoverable(
-                                            Renderable.toolTipContainer(
-                                                stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
-                                                containerWidth,
-                                                hoverableSizes[j]
+                                            Renderable.hoverTips(
+                                                Renderable.placeholder(containerWidth, hoverableSizes[j]),
+                                                stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
                                             ),
                                             Renderable.placeholder(containerWidth, hoverableSizes[j]),
                                             bypassChecks = true
@@ -246,14 +245,13 @@ class CustomWardrobe {
 
         val renderables = listOf(
             createHoverableRenderable(
-                Renderable.toolTipContainer(
+                Renderable.hoverTips(
+                    Renderable.placeholder(buttonWidth, buttonWidth),
                     listOf(
                         "§aToggle Wardrobe Overlay for one time",
                         " §7This will hide the overlay",
                         " §7until you open the wardrobe again",
-                    ),
-                    buttonWidth,
-                    buttonWidth,
+                    )
                 ),
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
@@ -265,28 +263,26 @@ class CustomWardrobe {
                 }
             ),
             createHoverableRenderable(
-                Renderable.toolTipContainer(
+                Renderable.hoverTips(
+                    Renderable.placeholder(buttonWidth, buttonWidth),
                     listOf(
                         "§aToggle Favorite Selector",
                         " §7This will allow you to toggle",
                         " §7the favorite status of the armor pieces",
-                    ),
-                    buttonWidth,
-                    buttonWidth,
+                    )
                 ),
                 hoveredColor = if (favoriteToggle) Color.GREEN else Color.RED,
                 borderOutlineThickness = 2,
                 onClick = { favoriteToggle = !favoriteToggle }
             ),
             createHoverableRenderable(
-                Renderable.toolTipContainer(
+                Renderable.hoverTips(
+                    Renderable.placeholder(buttonWidth, buttonWidth),
                     listOf(
                         "§aToggle Only Favorite",
                         " §7This will allow you to toggle",
                         " §7only showing favorite armors",
-                    ),
-                    buttonWidth,
-                    buttonWidth,
+                    )
                 ),
                 hoveredColor = if (onlyFavoriteToggle) Color.GREEN else Color.RED,
                 borderOutlineThickness = 2,
@@ -296,14 +292,9 @@ class CustomWardrobe {
                 }
             ),
             createHoverableRenderable(
-                Renderable.toolTipContainer(
-                    listOf(
-                        "§aGo Back",
-                        " §7To SkyBlock Menu",
-
-                        ),
-                    buttonWidth,
-                    buttonWidth,
+                Renderable.hoverTips(
+                    Renderable.placeholder(buttonWidth, buttonWidth),
+                    listOf("§aGo Back", " §7To SkyBlock Menu")
                 ),
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
@@ -312,12 +303,9 @@ class CustomWardrobe {
                 }
             ),
             createHoverableRenderable(
-                Renderable.toolTipContainer(
-                    listOf(
-                        "§cClose",
-                    ),
-                    buttonWidth,
-                    buttonWidth,
+                Renderable.hoverTips(
+                    Renderable.placeholder(buttonWidth, buttonWidth),
+                    listOf("§cClose")
                 ),
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
