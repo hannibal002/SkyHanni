@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
@@ -28,29 +29,22 @@ import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
 import com.jagrosh.discordipc.entities.RichPresence
 import com.jagrosh.discordipc.entities.RichPresenceButton
+import com.jagrosh.discordipc.entities.pipe.PipeStatus
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
 object DiscordRPCManager : IPCListener {
 
-    private const val applicationID = 1093298182735282176L
+    private const val APPLICATION_ID = 1093298182735282176L
 
     val config get() = feature.gui.discordRPC
 
     private var client: IPCClient? = null
-    private lateinit var secondLine: DiscordStatus
-    private lateinit var firstLine: DiscordStatus
-    private var startTimestamp: Long? = null
-    private var startOnce = false
-
-    private var runTimer = false
-    private var connected = false
-
-    private val DiscordLocationKey = DiscordLocationKey()
+    private var startTimestamp: Long = 0
+    private var started = false
+    private var nextUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
     var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
 
@@ -61,11 +55,8 @@ object DiscordRPCManager : IPCListener {
                     return@launch
                 }
                 consoleLog("Starting Discord RPC...")
-                // TODO, change functionality to use enum rather than ordinals
-                firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
-                secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
                 startTimestamp = System.currentTimeMillis()
-                client = IPCClient(applicationID)
+                client = IPCClient(APPLICATION_ID)
                 client?.setListener(this@DiscordRPCManager)
 
                 try {
@@ -96,30 +87,23 @@ object DiscordRPCManager : IPCListener {
     private fun stop() {
         coroutineScope.launch {
             if (isActive()) {
-                connected = false
                 client?.close()
-                startOnce = false
+                started = false
             }
         }
     }
 
-    private fun isActive() = client != null && connected
+    private fun isActive() = client?.status == PipeStatus.CONNECTED
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(
-            config.firstLine,
-            config.secondLine,
-            config.customText
-        ) {
+        ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
             if (isActive()) {
                 updatePresence()
             }
         }
         config.enabled.whenChanged { _, new ->
-            if (new) {
-//                start()
-            } else {
+            if (!new) {
                 stop()
             }
         }
@@ -133,34 +117,28 @@ object DiscordRPCManager : IPCListener {
     private fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
-        // TODO, change functionality to use enum rather than ordinals
-        secondLine = getStatusByConfigId(config.secondLine.get().ordinal)
-        firstLine = getStatusByConfigId(config.firstLine.get().ordinal)
+        client?.sendRichPresence(RichPresence.Builder().apply {
+            setDetails(getStatusByConfigId(config.firstLine.get()).getDisplayString())
+            setState(getStatusByConfigId(config.secondLine.get()).getDisplayString())
+            setStartTimestamp(startTimestamp)
+            setLargeImage(discordIconKey, location)
 
-        var presence = RichPresence.Builder()
-            .setDetails(firstLine.getDisplayString())
-            .setState(secondLine.getDisplayString())
-            .setStartTimestamp(startTimestamp!!)
-            .setLargeImage(discordIconKey, location)
-        if (config.showSkyCryptButton.get()) {
-            val skyCryptUrl = "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}"
-            presence = presence.setButtons(arrayOf(
-                RichPresenceButton(skyCryptUrl, "Open SkyCrypt Profile")
-            ))
-        }
-
-        client?.sendRichPresence(presence.build())
+            if (config.showSkyCryptButton.get()) {
+                addButton(RichPresenceButton(
+                    "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
+                    "Open SkyCrypt Profile"
+                ))
+            }
+        }.build())
     }
 
     override fun onReady(client: IPCClient) {
         consoleLog("Discord RPC Started.")
-        connected = true
-        runTimer = true
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!runTimer) return
+        if (!isActive()) return
         if (event.repeatSeconds(5)) {
             updatePresence()
         }
@@ -169,46 +147,38 @@ object DiscordRPCManager : IPCListener {
     override fun onClose(client: IPCClient, json: JsonObject?) {
         consoleLog("Discord RPC closed.")
         this.client = null
-        connected = false
-        cancelTimer()
     }
 
     override fun onDisconnect(client: IPCClient?, t: Throwable?) {
         consoleLog("Discord RPC disconnected.")
         this.client = null
-        connected = false
-        cancelTimer()
     }
 
-    private fun cancelTimer() {
-        runTimer = false
-    }
-
-    private fun getStatusByConfigId(id: Int) = DiscordStatus.entries.getOrElse(id) { DiscordStatus.NONE }
+    private fun getStatusByConfigId(entry: LineEntry) =
+        DiscordStatus.entries.getOrElse(entry.ordinal) { DiscordStatus.NONE }
 
     private fun isEnabled() = config.enabled.get()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins SkyBlock but only running it again once they join and leave.
+        // the mod has already started the connection process. this variable is my way of running a function when
+        // the player joins SkyBlock but only running it again once they join and leave.
+        if (started || !isEnabled()) return
         if (LorenzUtils.inSkyBlock) {
             start()
-            startOnce = true
+            started = true
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-        executor.schedule(
-            {
-                if (!LorenzUtils.inSkyBlock) {
-                    stop()
-                }
-            },
-            5,
-            TimeUnit.SECONDS
-        ) // wait 5 seconds to check if the new world is skyblock or not before stopping the function
+        if (nextUpdate.isInFuture()) return
+        // wait 5 seconds to check if the new world is skyblock or not before stopping the function
+        nextUpdate = DelayedRun.runDelayed(5.seconds) {
+            if (!LorenzUtils.inSkyBlock) {
+                stop()
+            }
+        }
     }
 
     @SubscribeEvent
