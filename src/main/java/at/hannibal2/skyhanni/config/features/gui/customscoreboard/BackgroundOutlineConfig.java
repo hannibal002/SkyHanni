@@ -18,7 +18,7 @@ public class BackgroundOutlineConfig {
 
     @Expose
     @ConfigOption(
-        name = "Outline Thickness",
+        name = "Thickness",
         desc = "Thickness of the outline."
     )
     @ConfigEditorSlider(
@@ -30,7 +30,7 @@ public class BackgroundOutlineConfig {
 
     @Expose
     @ConfigOption(
-        name = "Outline Blur",
+        name = "Blur",
         desc = "Amount that the outline is blurred."
     )
     @ConfigEditorSlider(
@@ -42,7 +42,7 @@ public class BackgroundOutlineConfig {
 
     @Expose
     @ConfigOption(
-        name = "Outline Color Top",
+        name = "Color Top",
         desc = "Color of the top of the outline."
     )
     @ConfigEditorColour
@@ -50,7 +50,7 @@ public class BackgroundOutlineConfig {
 
     @Expose
     @ConfigOption(
-        name = "Outline Color Bottom",
+        name = "Color Bottom",
         desc = "Color of the bottom of the outline."
     )
     @ConfigEditorColour
