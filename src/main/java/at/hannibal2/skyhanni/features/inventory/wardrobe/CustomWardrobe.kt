@@ -152,7 +152,6 @@ class CustomWardrobe {
                 val wardrobeSlot = list[maxPlayersPerRow * row + playerIndex]
 
                 val padding = 10
-                val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
                 val containerWidth = playerWidth + 2 * padding
                 val containerHeight = playerHeight + 2 * padding
 
@@ -184,7 +183,9 @@ class CustomWardrobe {
                     Renderable.verticalContainer(loreList, spacing = 1)
                 }
 
-                val renderable = createHoverableRenderable(
+                val playerBackgroundPosition =
+                    Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
+                val playerBackground = createHoverableRenderable(
                     armorTooltipRenderable.invoke(),
                     topLayerRenderable = addSlotHoverableButtons(wardrobeSlot),
                     hoveredColor = getWardrobeSlotColor(wardrobeSlot),
@@ -197,7 +198,7 @@ class CustomWardrobe {
                         hoveredSlot = wardrobeSlot.id
                     }
                 )
-                add(Triple(pos, renderable, wardrobeSlot.id))
+                add(Triple(playerBackgroundPosition, playerBackground, wardrobeSlot.id))
 
                 val fakePlayer = getFakePlayer()
 
@@ -211,12 +212,14 @@ class CustomWardrobe {
 
                 add(
                     Triple(
-                        Position(playerX, playerY), Renderable.entity(
+                        Position(playerX, playerY),
+                        Renderable.entity(
                             fakePlayer,
                             config.eyesFollowMouse,
                             scale = scale.toInt(),
                             color = playerColor
-                        ), wardrobeSlot.id
+                        ),
+                        wardrobeSlot.id
                     )
                 )
             }
