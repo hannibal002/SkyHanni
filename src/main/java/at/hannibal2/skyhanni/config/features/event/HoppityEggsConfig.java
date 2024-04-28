@@ -35,9 +35,9 @@ public class HoppityEggsConfig {
     public boolean sharedWaypoints = true;
 
     @Expose
-    @ConfigOption(name = "Adjust player opacity", desc = "Adjust the opacity of players near shared & guessed egg waypoints.")
-    @ConfigEditorSlider(minValue = 0, maxValue = 255, minStep = 1)
-    public int playerOpacity = 100;
+    @ConfigOption(name = "Adjust player opacity", desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)")
+    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
+    public int playerOpacity = 40;
 
     @Expose
     @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")

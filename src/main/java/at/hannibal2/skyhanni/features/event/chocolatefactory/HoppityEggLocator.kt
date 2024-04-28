@@ -74,7 +74,7 @@ object HoppityEggLocator {
         if (entity.distanceTo(location) < 4.0) {
             GlStateManager.enableBlend()
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-            GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 255f)
+            GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 100f * 255f)
             val armorInventory = entity.getArmorInventory() ?: return
 
             armor = buildMap {
@@ -136,7 +136,7 @@ object HoppityEggLocator {
     @SubscribeEvent
     fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         if (!isEnabled()) return
-        if (config.playerOpacity == 255) return
+        if (config.playerOpacity == 100) return
         if (event.entity !is EntityPlayer) return
         if (event.entity.name == LorenzUtils.getPlayerName()) return
 
@@ -147,7 +147,7 @@ object HoppityEggLocator {
     @SubscribeEvent
     fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         if (!isEnabled()) return
-        if (config.playerOpacity == 255) return
+        if (config.playerOpacity == 100) return
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.disableBlend()
         val armorInventory = event.entity.getArmorInventory() ?: return
