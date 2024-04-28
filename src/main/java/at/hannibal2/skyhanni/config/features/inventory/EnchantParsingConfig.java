@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class EnchantParsingConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Toggle for coloring the enchants. Turn this off if you want to use enchant parsing from other mods.")
+    @ConfigOption(name = "Enable", desc = "Toggle for colouring the enchants. Turn this off if you want to use enchant parsing from other mods.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> colorParsing = Property.of(true);
@@ -39,22 +39,22 @@ public class EnchantParsingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
+    @ConfigOption(name = "Perfect Enchantment Colour", desc = "The colour an enchantment will be at max level.")
     @ConfigEditorDropdown
     public Property<LorenzColor> perfectEnchantColor = Property.of(LorenzColor.CHROMA);
 
     @Expose
-    @ConfigOption(name = "Great Enchantment Color", desc = "The color an enchantment will be at a great level.")
+    @ConfigOption(name = "Great Enchantment Colour", desc = "The colour an enchantment will be at a great level.")
     @ConfigEditorDropdown
     public Property<LorenzColor> greatEnchantColor = Property.of(LorenzColor.GOLD);
 
     @Expose
-    @ConfigOption(name = "Good Enchantment Color", desc = "The color an enchantment will be at a good level.")
+    @ConfigOption(name = "Good Enchantment Colour", desc = "The colour an enchantment will be at a good level.")
     @ConfigEditorDropdown
     public Property<LorenzColor> goodEnchantColor = Property.of(LorenzColor.BLUE);
 
     @Expose
-    @ConfigOption(name = "Poor Enchantment Color", desc = "The color an enchantment will be at a poor level.")
+    @ConfigOption(name = "Poor Enchantment Colour", desc = "The colour an enchantment will be at a poor level.")
     @ConfigEditorDropdown
     public Property<LorenzColor> poorEnchantColor = Property.of(LorenzColor.GRAY);
 

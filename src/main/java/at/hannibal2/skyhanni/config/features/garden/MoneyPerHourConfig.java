@@ -137,7 +137,7 @@ public class MoneyPerHourConfig {
 
     @Expose
     @ConfigOption(
-        name = "Include Armor Drops",
+        name = "Include Armour Drops",
         desc = "Includes the average coins/hr from your armour.")
     @ConfigEditorBoolean
     public boolean armor = true;

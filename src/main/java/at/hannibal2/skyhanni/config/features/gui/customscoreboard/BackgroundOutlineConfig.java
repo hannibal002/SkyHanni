@@ -42,16 +42,16 @@ public class BackgroundOutlineConfig {
 
     @Expose
     @ConfigOption(
-        name = "Color Top",
-        desc = "Color of the top of the outline."
+        name = "Colour Top",
+        desc = "Colour of the top of the outline."
     )
     @ConfigEditorColour
     public String colorTop = "0:255:175:89:255";
 
     @Expose
     @ConfigOption(
-        name = "Color Bottom",
-        desc = "Color of the bottom of the outline."
+        name = "Colour Bottom",
+        desc = "Colour of the bottom of the outline."
     )
     @ConfigEditorColour
     public String colorBottom = "0:255:127:237:255";
