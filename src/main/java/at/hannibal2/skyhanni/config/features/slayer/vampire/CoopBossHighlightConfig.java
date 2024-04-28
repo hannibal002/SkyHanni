@@ -35,10 +35,4 @@ public class CoopBossHighlightConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean twinClawsTitle = true;
-
-    @Expose
-    @ConfigOption(name = "Twinclaws Sound", desc = "Play a sound when Twinclaws is about to happen.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean twinClawsSound = true;
 }

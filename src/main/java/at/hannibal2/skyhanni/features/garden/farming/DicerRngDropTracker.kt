@@ -172,7 +172,7 @@ object DicerRngDropTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetdicertracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

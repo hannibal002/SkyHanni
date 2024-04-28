@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
-import at.hannibal2.skyhanni.data.ItemRenderBackground
 import at.hannibal2.skyhanni.data.ItemTipHelper
 import at.hannibal2.skyhanni.data.LocationFixData
 import at.hannibal2.skyhanni.data.MaxwellAPI
@@ -52,7 +51,6 @@ import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerNameFormatter
@@ -108,6 +106,7 @@ import at.hannibal2.skyhanni.features.cosmetics.ArrowTrail
 import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonArchitectFeatures
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossHideDamageSplash
 import at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages
 import at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter
@@ -301,12 +300,14 @@ import at.hannibal2.skyhanni.features.misc.BetterWikiFromMenus
 import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
 import at.hannibal2.skyhanni.features.misc.FixGhostEntities
 import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
+import at.hannibal2.skyhanni.features.misc.HideFarEntities
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
@@ -340,6 +341,7 @@ import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser
 import at.hannibal2.skyhanni.features.misc.limbo.LimboPlaytime
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -350,6 +352,7 @@ import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.MatriarchHelper
 import at.hannibal2.skyhanni.features.nether.PabloHelper
 import at.hannibal2.skyhanni.features.nether.SulphurSkitterBox
 import at.hannibal2.skyhanni.features.nether.VolcanoExplosivityDisplay
@@ -454,7 +457,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.11",
+    version = "0.25.Beta.14",
 )
 class SkyHanniMod {
 
@@ -475,7 +478,6 @@ class SkyHanniMod {
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
-        loadModule(ItemRenderBackground())
         loadModule(EntityData())
         loadModule(MobData())
         loadModule(MobDetection())
@@ -497,7 +499,6 @@ class SkyHanniMod {
         loadModule(VisitorListener())
         loadModule(VisitorRewardWarning())
         loadModule(OwnInventoryData())
-        loadModule(ToolTipData())
         loadModule(HighlightVisitorsOutsideOfGarden())
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
@@ -528,6 +529,7 @@ class SkyHanniMod {
         loadModule(ChatUtils)
         loadModule(FixedRateTimerManager())
         loadModule(ChromaManager)
+        loadModule(ContributorManager)
 
         // APIs
         loadModule(BazaarApi())
@@ -572,6 +574,7 @@ class SkyHanniMod {
         loadModule(HideNotClickableItems())
         loadModule(ItemDisplayOverlayFeatures)
         loadModule(CurrentPetDisplay())
+        loadModule(HideFarEntities())
         loadModule(ExpOrbsOnGroundHider())
         loadModule(BetterWikiFromMenus())
         loadModule(DamageIndicatorManager())
@@ -631,6 +634,7 @@ class SkyHanniMod {
         loadModule(HighlightDungeonDeathmite())
         loadModule(DungeonHideItems())
         loadModule(DungeonCopilot())
+        loadModule(DungeonArchitectFeatures())
         loadModule(EndermanSlayerFeatures())
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
@@ -665,6 +669,7 @@ class SkyHanniMod {
         loadModule(CompactBingoChat())
         loadModule(BrewingStandOverlay())
         loadModule(FishingTimer())
+        loadModule(MatriarchHelper())
         loadModule(LesserOrbHider())
         loadModule(FishingHookDisplay())
         loadModule(CrimsonIsleReputationHelper(this))
@@ -838,6 +843,7 @@ class SkyHanniMod {
         loadModule(DungeonFinderFeatures())
         loadModule(GoldenGoblinHighlight())
         loadModule(TabWidgetSettings())
+        loadModule(EnchantParser)
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
         loadModule(CustomScoreboard())

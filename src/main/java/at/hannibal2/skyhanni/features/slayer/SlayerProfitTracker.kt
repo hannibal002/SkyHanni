@@ -249,6 +249,6 @@ object SlayerProfitTracker {
             return
         }
 
-        getTracker()?.resetCommand(args, "shclearslayerprofits")
+        getTracker()?.resetCommand()
     }
 }
