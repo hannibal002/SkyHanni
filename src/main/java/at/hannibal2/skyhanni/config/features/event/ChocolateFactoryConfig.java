@@ -62,7 +62,7 @@ public class ChocolateFactoryConfig {
     public boolean showStackSizes = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford.")
+    @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford. The upgrade with a star is the most optimal and the lightest colour of green is the most optimal you can afford.")
     @ConfigEditorBoolean
     public boolean highlightUpgrades = true;
 
