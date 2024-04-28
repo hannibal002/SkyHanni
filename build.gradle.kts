@@ -114,7 +114,9 @@ dependencies {
     }
 
     shadowModImpl(libs.moulconfig)
-    shadowImpl(libs.libautoupdate)
+    shadowImpl(libs.libautoupdate) {
+        exclude(module = "gson")
+    }
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(libs.hotswapagentforge)
 
@@ -247,6 +249,7 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
+    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
