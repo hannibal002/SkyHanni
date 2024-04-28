@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -20,8 +21,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -62,6 +65,30 @@ object DungeonAPI {
         "room",
         "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)"
     )
+    private val blessingPattern by patternGroup.pattern(
+        "blessings",
+        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r"
+    )
+    private val noBlessingPattern by patternGroup.pattern(
+        "noblessings",
+        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r"
+    )
+
+    enum class DungeonBlessings(var power: Int) {
+        LIFE(0),
+        POWER(0),
+        STONE(0),
+        WISDOM(0),
+        TIME(0);
+
+        val displayName by lazy { name.firstLetterUppercase() }
+
+        companion object {
+            fun reset() {
+                entries.forEach { it.power = 0 }
+            }
+        }
+    }
 
     fun inDungeon() = IslandType.CATACOMBS.isInIsland()
 
@@ -152,6 +179,26 @@ object DungeonAPI {
     }
 
     @SubscribeEvent
+    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+        if (!inDungeon()) return
+        val tabList = event.footer.split("\n")
+        tabList.forEach {
+            if (noBlessingPattern.matches(it)) {
+                DungeonBlessings.reset()
+                return
+            }
+            val matcher = blessingPattern.matcher(it)
+            if (matcher.find()) {
+                val type = matcher.group("type") ?: return@forEach
+                val amount = matcher.group("amount").romanToDecimalIfNecessary()
+                if (DungeonBlessings.valueOf(type.uppercase()).power != amount) {
+                    DungeonBlessings.valueOf(type.uppercase()).power = amount
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         dungeonFloor = null
         started = false
@@ -159,6 +206,7 @@ object DungeonAPI {
         isUniqueClass = false
         playerClass = null
         playerClassLevel = -1
+        DungeonBlessings.reset()
     }
 
     @SubscribeEvent
@@ -266,6 +314,11 @@ object DungeonAPI {
             add("playerClass: $playerClass")
             add("isUniqueClass: $isUniqueClass")
             add("playerClassLevel: $playerClassLevel")
+            add("")
+            add("Blessings: ")
+            for (blessing in DungeonBlessings.entries) {
+                add("  ${blessing.displayName} ${blessing.power}")
+            }
         }
     }
 
