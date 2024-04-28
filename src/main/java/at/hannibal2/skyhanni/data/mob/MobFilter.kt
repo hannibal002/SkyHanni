@@ -54,9 +54,19 @@ object MobFilter {
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+"
     )
     val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
+
+    /** REGEX-TEST: ﴾ Storm ﴿
+     *  REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
+     *  REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
+     *  REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
+     *  REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
+     *  REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
+     *  REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
+     *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
+     *  */
     val bossMobNameFilter by repoGroup.pattern(
         "filter.boss",
-        "^. (?:\\[\\w+(?<level>\\d+)\\] )?(?<name>[^ᛤ]*)(?: ᛤ)? (?:[\\d\\/BMk.,❤]+|█+) .$"
+        "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+|█+)? .$"
     )
     val dungeonNameFilter by repoGroup.pattern(
         "filter.dungeon",
@@ -91,7 +101,16 @@ object MobFilter {
     const val MINION_MOB_PREFIX = "Minion Mob "
 
     enum class DungeonAttribute {
-        Flaming, Stormy, Speedy, Fortified, Healthy, Healing, Boomer, Golden, Stealth;
+        Flaming,
+        Stormy,
+        Speedy,
+        Fortified,
+        Healthy,
+        Healing,
+        Boomer,
+        Golden,
+        Stealth,
+        ;
 
         companion object {
 
@@ -129,7 +148,7 @@ object MobFilter {
         else -> true
     }
 
-    fun EntityPlayer.isRealPlayer() = uniqueID != null && uniqueID.version() == 4
+    fun EntityPlayer.isRealPlayer() = uniqueID?.let { it.version() == 4 } ?: false
 
     fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && displayNPCNameCheck(this.name))
         || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village

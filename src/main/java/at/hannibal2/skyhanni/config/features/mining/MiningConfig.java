@@ -37,7 +37,11 @@ public class MiningConfig {
     @Accordion
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
-    // TODO rename to fossilExcavator
+    @Expose
+    @ConfigOption(name = "Cold Overlay", desc = "")
+    @Accordion
+    public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
+
     @Expose
     @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features")
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
@@ -64,4 +68,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean privateIslandNoPickaxeAbility = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlights golden goblins you have spawned in green.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightYourGoldenGoblin = true;
 }

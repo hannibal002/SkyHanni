@@ -127,8 +127,8 @@ object MythologicalCreatureTracker {
         tracker.renderDisplay(config.position)
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetmythologicalcreatureracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
