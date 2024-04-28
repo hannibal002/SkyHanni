@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // This entire file was taken from SkyblockAddons code, ported to SkyHanni
 
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
+import at.hannibal2.skyhanni.SkyHanniMod.Companion.logger
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
@@ -54,32 +54,31 @@ object DiscordRPCManager : IPCListener {
                 if (isActive()) {
                     return@launch
                 }
-                consoleLog("Starting Discord RPC...")
+                logger.info("Starting Discord RPC...")
                 startTimestamp = System.currentTimeMillis()
-                client = IPCClient(APPLICATION_ID)
-                client?.setListener(this@DiscordRPCManager)
+                client = IPCClient(APPLICATION_ID).apply {
+                    setListener(DiscordRPCManager)
 
-                try {
-                    client?.connect()
-                    if (fromCommand) ChatUtils.chat(
-                        "Successfully started Rich Presence!",
-                        prefixColor = "§a"
-                    ) // confirm that /shrpcstart worked
-                } catch (ex: Exception) {
-                    consoleLog("Warn: Failed to connect to RPC!")
-                    consoleLog(ex.toString())
-                    ChatUtils.clickableChat(
-                        "Discord Rich Presence was unable to start! " +
-                            "This usually happens when you join SkyBlock when Discord is not started. " +
-                            "Please run /shrpcstart to retry once you have launched Discord.",
-                        onClick = {
-                            startCommand()
-                        }
-                    )
+                    try {
+                        connect()
+                        if (fromCommand) ChatUtils.chat(
+                            "Successfully started Rich Presence!",
+                            prefixColor = "§a"
+                        ) // confirm that /shrpcstart worked
+                    } catch (ex: Exception) {
+                        logger.warn("Failed to connect to RPC!", ex)
+                        ChatUtils.clickableChat(
+                            "Discord Rich Presence was unable to start! " +
+                                "This usually happens when you join SkyBlock when Discord is not started. " +
+                                "Please run /shrpcstart to retry once you have launched Discord.",
+                            onClick = {
+                                startCommand()
+                            }
+                        )
+                    }
                 }
             } catch (ex: Throwable) {
-                consoleLog("Warn: Discord RPC has thrown an unexpected error while trying to start...")
-                consoleLog(ex.toString())
+                logger.warn("Discord RPC has thrown an unexpected error while trying to start...", ex)
             }
         }
     }
@@ -133,7 +132,7 @@ object DiscordRPCManager : IPCListener {
     }
 
     override fun onReady(client: IPCClient) {
-        consoleLog("Discord RPC Started.")
+        logger.info("Discord RPC Ready.")
     }
 
     @SubscribeEvent
@@ -145,12 +144,12 @@ object DiscordRPCManager : IPCListener {
     }
 
     override fun onClose(client: IPCClient, json: JsonObject?) {
-        consoleLog("Discord RPC closed.")
+        logger.info("Discord RPC closed.")
         this.client = null
     }
 
     override fun onDisconnect(client: IPCClient?, t: Throwable?) {
-        consoleLog("Discord RPC disconnected.")
+        logger.info("Discord RPC disconnected.")
         this.client = null
     }
 
