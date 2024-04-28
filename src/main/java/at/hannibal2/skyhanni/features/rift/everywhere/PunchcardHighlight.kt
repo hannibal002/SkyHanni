@@ -5,10 +5,13 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -28,6 +31,9 @@ class PunchcardHighlight {
         "rift.punchcard.new",
         "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
     )
+//     §5§lPUNCHCARD! §r§eYou punched §r§a[VIP] mcavaco§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
+//     §c§lAWKWARD! §r§cThis player has already been punched by you... somehow!
+//     §c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!
 
     private val playerList: MutableSet<String> = mutableSetOf()
 
@@ -99,6 +105,12 @@ class PunchcardHighlight {
         MobData.players.forEach {
             RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
         }
+    }
+
+    @SubscribeEvent
+    fun onPunch(event: EntityClickEvent) {
+        if (!RiftAPI.inRift())
+        ChatUtils.chat("clicked on an entity!")
     }
 
     private fun addPunch(playerName: String) { playerList.add(playerName) }
