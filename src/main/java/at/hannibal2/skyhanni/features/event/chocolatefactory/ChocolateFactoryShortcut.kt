@@ -27,9 +27,7 @@ class ChocolateFactoryShortcut {
             "",
             "§7Click here to run",
             "§e/chocolatefactory"
-
         )
-
     }
 
     @SubscribeEvent
@@ -57,5 +55,4 @@ class ChocolateFactoryShortcut {
             HypixelCommands.chocolateFactory()
         }
     }
-
 }
