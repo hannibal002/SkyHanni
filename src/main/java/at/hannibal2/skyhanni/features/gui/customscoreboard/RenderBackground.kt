@@ -43,7 +43,7 @@ class RenderBackground {
                 else -> x
             }
 
-            val newY = when (alignmentConfig.verticalAlignment) {
+            var newY = when (alignmentConfig.verticalAlignment) {
                 RenderUtils.VerticalAlignment.TOP -> border
                 RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - (elementHeight + border * 2) / 2
                 RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - border
@@ -51,18 +51,18 @@ class RenderBackground {
             }
 
             if (outlineConfig.enabled) {
-								val thickness = outlineConfig.thickness
+                val thickness = outlineConfig.thickness
                 if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.RIGHT) {
                     newX -= thickness / 2
                 } else if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.LEFT) {
                     newX += thickness / 2
                 }
-								
-								if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.TOP) {
-									newY -= thickness / 2
-								} else if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.BOTTOM) {
-									newY += thickness / 2
-								}
+
+                if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.TOP) {
+                    newY += thickness / 2
+                } else if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.BOTTOM) {
+                    newY -= thickness / 2
+                }
             }
 
             position.set(
