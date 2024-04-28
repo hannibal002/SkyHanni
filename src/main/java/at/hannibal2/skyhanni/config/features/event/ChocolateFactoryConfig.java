@@ -81,7 +81,7 @@ public class ChocolateFactoryConfig {
         name = "Rabbit Crush Threshold",
         desc = "How close should you be to your barn capacity should you be before being warned about needing to upgrade it."
     )
-    @ConfigEditorSlider(minValue = 3, maxValue = 20, minStep = 1)
+    @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
 
     @Expose

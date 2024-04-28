@@ -346,6 +346,7 @@ object EnchantParser {
 
         var i = 1
         for (total in 0 until (1 + item.enchantmentTagList.tagCount())) {
+            if (i + 1 == loreList.size) break
             val line = loreList[i]
             if (grayEnchantPattern.matcher(line).matches()) {
                 lastGrayEnchant = i
