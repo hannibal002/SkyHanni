@@ -96,7 +96,7 @@ public class FilterTypesConfig {
     @ConfigOption(name = "Factory Upgrade", desc = "Hide chocolate factory upgrade and employee promotion messages.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean factoryUpgrade = false;
+    public boolean factoryUpgrade = true;
 
     //TODO remove
     @Expose
