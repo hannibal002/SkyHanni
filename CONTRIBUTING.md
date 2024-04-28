@@ -173,6 +173,7 @@ Hot Swap allows reloading edited code while debugging, removing the need to rest
 
 We use [dcevm](https://dcevm.github.io/) and the IntelliJ
 Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
+Dcevm needs [Java8u181](https://download.oracle.com/otn/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/jdk-8u181-windows-x64.exe?AuthParam=1714341811_0fc7b66228e8d2c2aab40bf6b1d0c4db)
 
 Follow [this](https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/)
 tutorial.
