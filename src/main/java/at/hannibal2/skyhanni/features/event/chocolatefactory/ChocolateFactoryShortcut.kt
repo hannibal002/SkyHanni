@@ -25,8 +25,8 @@ class ChocolateFactoryShortcut {
             "§6Open Chocolate Factory",
             "§8(From SkyHanni)",
             "",
-            "§7Click here to",
-            "§7run §e/chocolatefactory"
+            "§7Click here to run",
+            "§e/chocolatefactory"
 
         )
 
