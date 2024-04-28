@@ -624,6 +624,7 @@ class SkyHanniMod {
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
         loadModule(ChocolateFactoryBarnManager)
+        loadModule(ChocolateFactoryShortcut())
         loadModule(ChocolateFactoryInventory)
         loadModule(ChocolateFactoryStats)
         loadModule(HoppityEggsManager)
@@ -884,7 +885,6 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(ChocolateFactoryShortcut())
 
         init()
 
