@@ -44,6 +44,11 @@ object ChocolateFactoryBarnManager {
 
     fun trySendBarnFullMessage() {
         if (!ChocolateFactoryAPI.isEnabled()) return
+
+        if (config.barnCapacityThreshold <= 0) {
+            return
+        }
+
         val profileStorage = profileStorage ?: return
 
         val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
