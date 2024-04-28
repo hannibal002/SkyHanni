@@ -108,4 +108,14 @@ public class ChocolateFactoryConfig {
     @ConfigOption(name = "Always Compact", desc = "Always Compact the item toolip on the chocolate. Requires the above option to be enabled.")
     @ConfigEditorBoolean
     public boolean compactOnClickAlways = false;
+
+    @Expose
+    @ConfigOption(name = "Tooltip Move", desc = "Move Tooltip away from the item you hover over while inside the Chocolate Factory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean tooltipMove = false;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "tooltipMove")
+    public Position tooltipMovePosition = new Position(-380, 150, false, true);
 }
