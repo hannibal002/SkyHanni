@@ -137,7 +137,6 @@ class CustomWardrobe {
             return@buildList
         }
 
-        var slot = 0
         for (row in 0 until rows) {
             val playersInRow =
                 if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
@@ -150,7 +149,7 @@ class CustomWardrobe {
                 val playerX = startX + i * ((playerWidth + horizontalSpacing) + 1)
                 var scale = playerWidth.toDouble()
 
-                val wardrobeSlot = list[slot]
+                val wardrobeSlot = list[maxPlayersPerRow * row + i]
 
                 val padding = 10
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
@@ -161,7 +160,7 @@ class CustomWardrobe {
                     val loreList = mutableListOf<Renderable>()
                     val height = containerHeight - 3
 
-                    // this is needed to keep the total size of the renderable the same as the others
+                    // This is needed to keep the total size of the renderable the same as the others
                     val hoverableSizes = MutableList(4) { height / 4 }
                     for (k in 0 until height % 4) hoverableSizes[k]++
 
@@ -220,7 +219,6 @@ class CustomWardrobe {
                         ), wardrobeSlot.id
                     )
                 )
-                slot++
             }
         }
     }
