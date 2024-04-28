@@ -25,6 +25,16 @@ public class CustomWardrobeConfig {
     public boolean hideEmptySlots = false;
 
     @Expose
+    @ConfigOption(name = "onli favs", desc = "")
+    @ConfigEditorBoolean
+    public boolean onlyFavorites = false;
+
+    @Expose
+    @ConfigOption(name = "estimdtaded valu", desc = "")
+    @ConfigEditorBoolean
+    public boolean estimatedValue = true;
+
+    @Expose
     @ConfigOption(name = "colr", desc = "")
     @Accordion
     public ColorConfig color = new ColorConfig();
