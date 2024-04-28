@@ -91,6 +91,12 @@ public class ChocolateFactoryConfig {
     public boolean hoppityCollectionStats = true;
 
     @Expose
+    @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityMenuShortcut = true;
+
+    @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
     public Position position = new Position(183, 160, false, true);
 
