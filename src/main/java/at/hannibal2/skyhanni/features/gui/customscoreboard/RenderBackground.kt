@@ -104,19 +104,19 @@ class RenderBackground {
                     backgroundConfig.color.toChromaColor().rgb,
                     backgroundConfig.roundedCornerSmoothness
                 )
-                if (outlineConfig.enabled) {
-                    RenderUtils.drawRoundRectOutline(
-                        x - border,
-                        y - border,
-                        elementWidth + border * 3,
-                        elementHeight + border * 2,
-                        outlineConfig.colorTop.toChromaColor().rgb,
-                        outlineConfig.colorBottom.toChromaColor().rgb,
-                        outlineConfig.thickness,
-                        backgroundConfig.roundedCornerSmoothness,
-                        outlineConfig.blur
-                    )
-                }
+            }
+            if (outlineConfig.enabled) {
+                RenderUtils.drawRoundRectOutline(
+                    x - border,
+                    y - border,
+                    elementWidth + border * 3,
+                    elementHeight + border * 2,
+                    outlineConfig.colorTop.toChromaColor().rgb,
+                    outlineConfig.colorBottom.toChromaColor().rgb,
+                    outlineConfig.thickness,
+                    backgroundConfig.roundedCornerSmoothness,
+                    outlineConfig.blur
+                )
             }
         }
         GL11.glDepthMask(true)
