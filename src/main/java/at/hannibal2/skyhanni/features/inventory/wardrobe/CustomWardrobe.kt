@@ -58,6 +58,30 @@ class CustomWardrobe {
         update()
     }
 
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (!isEnabled()) return
+        if (!tempToggleShowOverlay) return
+
+        display.ifEmpty { update() }
+        if (display.isEmpty()) return
+
+        for ((pos, renderable, _) in display.sortedBy { if (it.third == hoveredSlot) 1 else 0 }) {
+            GlStateManager.color(1f, 1f, 1f, 1f)
+            pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
+        }
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        DelayedRun.runDelayed(500.milliseconds) {
+            if (!inWardrobe()) {
+                reset()
+            }
+        }
+    }
+
+
     private fun update() {
         display = createRenderables()
     }
@@ -128,11 +152,6 @@ class CustomWardrobe {
 
                 val wardrobeSlot = list[slot]
 
-                val fakePlayer = wardrobeSlot.getFakePlayer()
-
-                fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
-
                 val padding = 10
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
                 val containerWidth = playerWidth + 2 * padding
@@ -181,7 +200,12 @@ class CustomWardrobe {
                 )
                 add(Triple(pos, renderable, wardrobeSlot.id))
 
-                val color = if (!wardrobeSlot.isInCurrentPage()) {
+                val fakePlayer = getFakePlayer()
+
+                fakePlayer.inventory.armorInventory =
+                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+
+                val playerColor = if (!wardrobeSlot.isInCurrentPage()) {
                     scale *= 0.9
                     Color.GRAY.withAlpha(100)
                 } else null
@@ -192,20 +216,11 @@ class CustomWardrobe {
                             fakePlayer,
                             config.eyesFollowMouse,
                             scale = scale.toInt(),
-                            color = color
+                            color = playerColor
                         ), wardrobeSlot.id
                     )
                 )
                 slot++
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        DelayedRun.runDelayed(500.milliseconds) {
-            if (!inWardrobe()) {
-                reset()
             }
         }
     }
@@ -308,24 +323,6 @@ class CustomWardrobe {
         }
     }
 
-    private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): EntityOtherPlayerMP {
-        val mc = Minecraft.getMinecraft()
-        return object : EntityOtherPlayerMP(
-            mc.theWorld,
-            mc.thePlayer.gameProfile
-        ) {
-            override fun getLocationSkin() =
-                mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
-
-            override fun getTeam() = object : ScorePlayerTeam(null, null) {
-                override fun getNameTagVisibility() = EnumVisible.NEVER
-            }
-
-            override fun isWearing(part: EnumPlayerModelParts?) =
-                mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
-        }
-    }
-
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
         val list = mutableListOf<Renderable>()
         list.add(
@@ -406,20 +403,6 @@ class CustomWardrobe {
             onHover = { onHover() }
         )
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!tempToggleShowOverlay) return
-
-        display.ifEmpty { update() }
-        if (display.isEmpty()) return
-
-        for ((pos, renderable, _) in display.sortedBy { if (it.third == hoveredSlot) 1 else 0 }) {
-            GlStateManager.color(1f, 1f, 1f, 1f)
-            pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
-        }
-    }
-
     private fun clickWardrobeSlot(wardrobeSlot: WardrobeAPI.WardrobeSlot) {
         val previousPageSlot = 45
         val nextPageSlot = 53
@@ -439,6 +422,24 @@ class CustomWardrobe {
             }
         }
         update()
+    }
+
+    private fun getFakePlayer(): EntityOtherPlayerMP {
+        val mc = Minecraft.getMinecraft()
+        return object : EntityOtherPlayerMP(
+            mc.theWorld,
+            mc.thePlayer.gameProfile
+        ) {
+            override fun getLocationSkin() =
+                mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
+
+            override fun getTeam() = object : ScorePlayerTeam(null, null) {
+                override fun getNameTagVisibility() = EnumVisible.NEVER
+            }
+
+            override fun isWearing(part: EnumPlayerModelParts?) =
+                mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+        }
     }
 
     private fun getWardrobeSlotColor(wardrobeSlot: WardrobeAPI.WardrobeSlot): Color {
