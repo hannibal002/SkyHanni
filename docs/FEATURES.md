@@ -903,6 +903,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Dojo Rank Display. - HiZe
     + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
       Crimson Isles.
++ Matriarch Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1385)
+    + Highlights the Heavy Pearls.
+    + Draws a line to the Heavy Pearls.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -927,6 +930,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Dynamic Priority Box.
         + Change the order or disable dynamically rendered features (e.g. Slayer, Dungeon, Crop Milestone, Stacking
           Enchantment)
+    + AFK time. - NetheriteMiner
+    + SkyCrypt Button. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1526)
 + Server Restart Title
 + **City Project Features**
     + Show missing items to contribute inside the inventory
@@ -1052,7 +1057,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Working **Livid Finder** (should work 100% of the time). - hannibal2
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
-+ AFK time to Discord RPC. - NetheriteMiner
 + Option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
 + Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73

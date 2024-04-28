@@ -316,14 +316,16 @@ object SkyBlockItemModifierUtils {
         COMBAT('4'),
         DEFENSIVE('a'),
         MINING('5'),
-        UNIVERSAL('f')
+        UNIVERSAL('f'),
         ;
 
         companion object {
 
-            fun getColorCode(name: String) = entries.stream().filter {
-                name.uppercase(Locale.ENGLISH).contains(it.name)
-            }.findFirst().get().colorCode
+            fun getByName(name: String): GemstoneSlotType =
+                entries.firstOrNull { name.uppercase(Locale.ENGLISH).contains(it.name) }
+                    ?: error("Unknwon GemstoneSlotType: '$name'")
+
+            fun getColorCode(name: String) = getByName(name).colorCode
         }
     }
 }

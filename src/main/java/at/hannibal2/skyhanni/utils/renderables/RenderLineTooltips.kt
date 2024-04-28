@@ -5,14 +5,12 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.moulberry.notenoughupdates.util.Utils
+import java.awt.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.item.ItemStack
-import java.awt.Color
 
 object RenderLineTooltips {
 
@@ -66,38 +64,38 @@ object RenderLineTooltips {
         val zLevel = 300f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -4,
             right = tooltipTextWidth + 3,
             bottom = -3,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 3,
             right = tooltipTextWidth + 3,
             bottom = tooltipHeight + 4,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -3,
             right = tooltipTextWidth + 3,
             bottom = tooltipHeight + 3,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -4,
             top = -3,
             right = -3,
             bottom = tooltipHeight + 3,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = tooltipTextWidth + 3,
             top = -3,
             right = tooltipTextWidth + 4,
             bottom = tooltipHeight + 3,
         )
         val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -3 + 1,
             right = -3 + 1,
@@ -105,7 +103,7 @@ object RenderLineTooltips {
             startColor = borderColorStart,
             endColor = borderColorEnd
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = tooltipTextWidth + 2,
             top = -3 + 1,
             right = tooltipTextWidth + 3,
@@ -113,7 +111,7 @@ object RenderLineTooltips {
             startColor = borderColorStart,
             endColor = borderColorEnd
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -3,
             right = tooltipTextWidth + 3,
@@ -121,7 +119,7 @@ object RenderLineTooltips {
             startColor = borderColorStart,
             endColor = borderColorStart
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 2,
             right = tooltipTextWidth + 3,
@@ -146,44 +144,5 @@ object RenderLineTooltips {
         RenderHelper.enableStandardItemLighting()
         GlStateManager.enableRescaleNormal()
         GlStateManager.disableLighting()
-    }
-
-    private fun drawGradientRect(
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int,
-        startColor: Int = -0xfeffff0,
-        endColor: Int = -0xfeffff0,
-    ) {
-        val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
-        val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
-        val startGreen = (startColor shr 8 and 255).toFloat() / 255.0f
-        val startBlue = (startColor and 255).toFloat() / 255.0f
-        val endAlpha = (endColor shr 24 and 255).toFloat() / 255.0f
-        val endRed = (endColor shr 16 and 255).toFloat() / 255.0f
-        val endGreen = (endColor shr 8 and 255).toFloat() / 255.0f
-        val endBlue = (endColor and 255).toFloat() / 255.0f
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        GlStateManager.shadeModel(7425)
-        val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos(right.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        worldrenderer.pos(right.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        tessellator.draw()
-        GlStateManager.shadeModel(7424)
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
     }
 }
