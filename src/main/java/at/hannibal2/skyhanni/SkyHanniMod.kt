@@ -128,6 +128,7 @@ import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryShortcut
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
@@ -883,6 +884,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(ChocolateFactoryShortcut())
 
         init()
 
