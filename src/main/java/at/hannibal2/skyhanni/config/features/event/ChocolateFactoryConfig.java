@@ -97,4 +97,10 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
     public Position hoppityStatsPosition = new Position(183, 160, false, true);
+
+    @Expose
+    @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactOnClick = true;
 }
