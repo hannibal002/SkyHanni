@@ -90,24 +90,22 @@ class PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: §c[Tiffany] §b[MVP§c+§b] hannibal2
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2
-     * REGEX-TEST: §6§l℻ §r§f[Gamer] §b[MVP§f+§b] SchrankLP§f§r
+     * REGEX-TEST: ♫ §c[Buddy ツ] §b[MVP§d+§b] lrg89
+     * REGEX-TEST: ℻ §b[MVP§5+§b] Alea1337
      */
     private val privateIslandRankPattern by patternGroup.pattern(
         "privateislandrank",
-        "(?<prefix>.*)(?<privateIslandRank>§.\\[\\w+])(?<suffix>.*)"
+        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\])(?<suffix>.*)"
     )
 
     /**
-     * REGEX-TEST: §8[§r§5396§r§8] §r§7☢ §r§a[✌] §b[MVP§c+§b] hannibal2§f: hey
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2
-     * REGEX-TEST: §6§l℻ §r§f[Gamer] §b[MVP§f+§b] SchrankLP§f§r
-     * REGEX-TEST: §7☢ §r§a[✌] §b[MVP§c+§b] hannibal2
+     * REGEX-TEST: ♫ §a[✌] §f[Gamer] §b[MVP§d+§b] lrg89
+     * REGEX-TEST: ℻ §b[MVP§5+§b] Alea1337
+     * REGEX-TEST: ♫ §a[✌] §c[Buddy ツ] §b[MVP§d+§b] lrg89
      */
     private val privateIslandGuestPattern by patternGroup.pattern(
         "privateislandguest",
-        "(?<prefix>.*)(?<guest>§r§a\\[✌])(?<suffix>.*)"
+        "(?<prefix>.*)(?<guest>§a\\[✌] )(?<suffix>.*)"
     )
 
     @SubscribeEvent
@@ -156,7 +154,6 @@ class PlayerChatManager {
             ).postChat(event)
             return
         }
-        println("Matching against: " + chatComponent.getText())
         globalPattern.matchStyledMatcher(chatComponent) {
             if (isGlobalChat(event)) return
         }
@@ -175,14 +172,14 @@ class PlayerChatManager {
         var privateIslandRank: ComponentSpan? = null
         var privateIslandGuest: ComponentSpan? = null
         if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
-            privateIslandRankPattern.matchStyledMatcher(author) {
-                privateIslandRank = groupOrThrow("privateIslandRank")
+            privateIslandGuestPattern.matchStyledMatcher(author) {
+                privateIslandGuest = groupOrThrow("guest")
                 val prefix = groupOrThrow("prefix")
                 val suffix = groupOrThrow("suffix")
                 author = prefix + suffix
             }
-            privateIslandGuestPattern.matchStyledMatcher(author) {
-                privateIslandGuest = groupOrThrow("guest")
+            privateIslandRankPattern.matchStyledMatcher(author) {
+                privateIslandRank = groupOrThrow("privateIslandRank")
                 val prefix = groupOrThrow("prefix")
                 val suffix = groupOrThrow("suffix")
                 author = prefix + suffix

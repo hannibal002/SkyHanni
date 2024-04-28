@@ -124,6 +124,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent =
             StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentUtils.text("§d${event.direction}") {
+                appendText(" ")
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())

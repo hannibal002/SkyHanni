@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -102,11 +103,11 @@ object PartyAPI {
         }
     }
 
-//     @SubscribeEvent
-//     fun onPartyChat(event: at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent) {
-//         val name = event.author.cleanPlayerName()
-//         addPlayer(name)
-//     }
+    @SubscribeEvent
+    fun onPartyChat(event: PartyChatEvent) {
+        val name = event.author.cleanPlayerName()
+        addPlayer(name)
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
