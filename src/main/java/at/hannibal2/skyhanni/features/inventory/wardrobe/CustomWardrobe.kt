@@ -55,6 +55,7 @@ class CustomWardrobe {
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
         if (tempToggleShowOverlay) event.cancel()
+        update()
     }
 
     private fun update() {
