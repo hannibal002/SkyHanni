@@ -128,7 +128,7 @@ class CustomWardrobe {
 
         val startY = centerY + playerHeight - totalHeight / 2
 
-        addButtons(gui.width, gui.height, totalHeight).forEach { add(it) }
+        addAll(addButtons(gui.width, gui.height, totalHeight))
 
         if (wardrobeWarning) {
             val warningRenderable = Renderable.string(wardrobeWarningText)
