@@ -133,6 +133,7 @@ import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityCollectionSt
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsShared
+import at.hannibal2.skyhanni.features.event.chocolatefactory.clicks.CompactFactoryClick
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -625,6 +626,7 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryBarnManager)
         loadModule(ChocolateFactoryInventory)
         loadModule(ChocolateFactoryStats)
+        loadModule(CompactFactoryClick)
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
