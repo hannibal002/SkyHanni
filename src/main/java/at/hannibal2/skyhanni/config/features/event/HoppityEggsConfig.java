@@ -34,6 +34,12 @@ public class HoppityEggsConfig {
     public boolean sharedWaypoints = true;
 
     @Expose
+    @ConfigOption(name = "Hide Players", desc = "Hide players around shared and guessed egg waypoints.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hidePlayers = true;
+
+    @Expose
     @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")
     public Position position = new Position(33, 72, false, true);
 }

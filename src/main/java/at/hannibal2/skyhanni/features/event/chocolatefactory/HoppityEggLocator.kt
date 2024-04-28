@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -104,6 +107,23 @@ object HoppityEggLocator {
                 seeThroughBlocks = true,
             )
             event.drawDynamicText(eggLocation.add(y = 1), "§aEgg", 1.5)
+        }
+    }
+
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+        if (!isEnabled()) return
+        if (!config.hidePlayers) return
+        if (event.entity !is EntityPlayer) return
+
+        if (event.entity.distanceTo(sharedEggLocation ?: return) < 4.0) {
+            event.isCanceled = true
+        }
+
+        possibleEggLocations.forEach {
+            if (event.entity.distanceTo(it) < 4.0) {
+                event.isCanceled = true
+            }
         }
     }
 
