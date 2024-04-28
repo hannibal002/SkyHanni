@@ -53,7 +53,7 @@ class ChocolateFactoryShortcut {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showItem && event.slotId == 15) {
-            event.isCanceled = true
+            event.cancel()
             HypixelCommands.chocolateFactory()
         }
     }
