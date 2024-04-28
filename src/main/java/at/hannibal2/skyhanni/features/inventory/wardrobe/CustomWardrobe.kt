@@ -49,8 +49,6 @@ class CustomWardrobe {
     private var display = emptyList<Triple<Position, Renderable, Int>>()
     private var tempToggleShowOverlay = true
 
-    private var fakePlayerCache = mutableMapOf<Int, EntityOtherPlayerMP>()
-
     private var hoveredSlot: Int? = null
 
     @SubscribeEvent
@@ -60,7 +58,6 @@ class CustomWardrobe {
     }
 
     private fun update() {
-        fakePlayerCache = mutableMapOf()
         display = createRenderables()
     }
 
@@ -277,7 +274,6 @@ class CustomWardrobe {
                     clickSlot(48, getWindowId() ?: -1)
                     reset()
                     currentPage = null
-                    fakePlayerCache = mutableMapOf()
                 }
             ),
             createHoverableRenderable(
@@ -299,7 +295,6 @@ class CustomWardrobe {
                 onClick = {
                     clickSlot(49, getWindowId() ?: -1)
                     reset()
-                    fakePlayerCache = mutableMapOf()
                 }
             ),
         )
@@ -312,24 +307,23 @@ class CustomWardrobe {
         }
     }
 
-    private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): EntityOtherPlayerMP =
-        fakePlayerCache.getOrPut(this.id) {
-            val mc = Minecraft.getMinecraft()
-            object : EntityOtherPlayerMP(
-                mc.theWorld,
-                mc.thePlayer.gameProfile
-            ) {
-                override fun getLocationSkin() =
-                    mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
+    private fun WardrobeAPI.WardrobeSlot.getFakePlayer(): EntityOtherPlayerMP {
+        val mc = Minecraft.getMinecraft()
+        return object : EntityOtherPlayerMP(
+            mc.theWorld,
+            mc.thePlayer.gameProfile
+        ) {
+            override fun getLocationSkin() =
+                mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
 
-                override fun getTeam() = object : ScorePlayerTeam(null, null) {
-                    override fun getNameTagVisibility() = EnumVisible.NEVER
-                }
-
-                override fun isWearing(part: EnumPlayerModelParts?) =
-                    mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+            override fun getTeam() = object : ScorePlayerTeam(null, null) {
+                override fun getNameTagVisibility() = EnumVisible.NEVER
             }
+
+            override fun isWearing(part: EnumPlayerModelParts?) =
+                mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
         }
+    }
 
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
         val list = mutableListOf<Renderable>()
