@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonChest
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -260,6 +261,15 @@ class CroesusChestTracker {
         val maxChests = 60
 
         private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
+
+        fun resetChest() = croesusChests?.let {
+            it.clear()
+            it.addAll(generateMaxChest())
+            ChatUtils.chat("Kismet State was cleared!")
+        }
+
+        fun generateMaxChest() = generateSequence { DungeonRunInfo() }.take(maxChests)
+        fun generateMaxChestAsList() = generateMaxChest().toList()
 
         fun getLastActiveChest(includeDungeonKey: Boolean = false) =
             (croesusChests?.indexOfLast {

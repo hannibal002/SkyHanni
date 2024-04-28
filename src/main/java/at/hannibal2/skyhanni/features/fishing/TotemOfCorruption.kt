@@ -134,7 +134,6 @@ class TotemOfCorruption {
                 }
             }
 
-
     private fun createDisplay() = buildList {
         val totem = getTotemToShow() ?: return@buildList
         add("§5§lTotem of Corruption")

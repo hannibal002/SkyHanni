@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.PartyChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -78,16 +78,6 @@ object PartyAPI {
         "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)"
     )
 
-    /**
-     * REGEX-TEST: §9Party §8> §b§l⚛ §b[MVP§f+§b] Dankbarkeit§f: §rx: -190, y: 5, z: -163
-     * REGEX-TEST: §9Party §8> §6⚔ §6[MVP§3++§6] RealBacklight§f: §r!warp
-     * REGEX-TEST: §9Party §8> §b[MVP§3+§b] Eisengolem§f: §r!pt
-     */
-    private val partyChatMessagePattern by patternGroup.pattern(
-        "chat.message",
-        "§9Party §8> (?<name>[^:]*): §r(?<message>.*)"
-    )
-
     val partyMembers = mutableListOf<String>()
 
     var partyLeader: String? = null
@@ -114,15 +104,14 @@ object PartyAPI {
     }
 
     @SubscribeEvent
+    fun onPartyChat(event: PartyChatEvent) {
+        val name = event.author.cleanPlayerName()
+        addPlayer(name)
+    }
+
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val message = event.message.trimWhiteSpace().removeResets()
-
-        partyChatMessagePattern.matchMatcher(event.message) {
-            val name = group("name").cleanPlayerName()
-            val message = group("message")
-            addPlayer(name)
-            PartyChatEvent(name, message, event).postAndCatch()
-        }
 
         // new member joined
         youJoinedPartyPattern.matchMatcher(message) {
@@ -179,19 +168,16 @@ object PartyAPI {
 
         // party disbanded
         disbandedPattern.matchMatcher(message) {
-            partyMembers.clear()
-            partyLeader = null
+            partyLeft()
         }
         kickedPattern.matchMatcher(message) {
-            partyMembers.clear()
-            partyLeader = null
+            partyLeft()
         }
         if (message == "§eYou left the party." ||
             message == "§cThe party was disbanded because all invites expired and the party was empty." ||
             message == "§cYou are not currently in a party."
         ) {
-            partyMembers.clear()
-            partyLeader = null
+            partyLeft()
         }
 
         // party list
@@ -216,5 +202,10 @@ object PartyAPI {
         if (partyMembers.contains(playerName)) return
         if (playerName == LorenzUtils.getPlayerName()) return
         partyMembers.add(playerName)
+    }
+
+    private fun partyLeft() {
+        partyMembers.clear()
+        partyLeader = null
     }
 }

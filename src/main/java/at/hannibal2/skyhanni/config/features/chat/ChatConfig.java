@@ -22,18 +22,15 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
+    // TODO move into own sub category
     public FilterTypesConfig filterType = new FilterTypesConfig();
 
 
     @Expose
     @ConfigOption(name = "Player Messages", desc = "")
     @Accordion
+    // TODO move into own sub category
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
-
-    @Expose
-    @ConfigOption(name = "Player Chat Symbols", desc = "")
-    @Accordion
-    public ChatSymbols chatSymbols = new ChatSymbols();
 
     @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
