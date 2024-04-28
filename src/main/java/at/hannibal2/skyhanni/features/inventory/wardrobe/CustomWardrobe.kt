@@ -367,7 +367,7 @@ class CustomWardrobe {
             )
         }
 
-        return Renderable.verticalContainer(list, 1, RenderUtils.HorizontalAlignment.CENTER)
+        return Renderable.verticalContainer(list, 1, RenderUtils.HorizontalAlignment.RIGHT)
     }
 
     private fun createHoverableRenderable(
