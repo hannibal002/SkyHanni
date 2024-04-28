@@ -145,11 +145,11 @@ class CustomWardrobe {
             val startX = centerX - (totalWidth - playerWidth) / 2
             val playerY = startY + row * ((playerHeight + verticalSpacing) + 1)
 
-            for (i in 0 until playersInRow) {
-                val playerX = startX + i * ((playerWidth + horizontalSpacing) + 1)
+            for (playerIndex in 0 until playersInRow) {
+                val playerX = startX + playerIndex * ((playerWidth + horizontalSpacing) + 1)
                 var scale = playerWidth.toDouble()
 
-                val wardrobeSlot = list[maxPlayersPerRow * row + i]
+                val wardrobeSlot = list[maxPlayersPerRow * row + playerIndex]
 
                 val padding = 10
                 val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
@@ -164,18 +164,18 @@ class CustomWardrobe {
                     val hoverableSizes = MutableList(4) { height / 4 }
                     for (k in 0 until height % 4) hoverableSizes[k]++
 
-                    for (j in 0 until 4) {
-                        val stack = wardrobeSlot.getArmor()[j]?.copy()
+                    for (armorIndex in 0 until 4) {
+                        val stack = wardrobeSlot.getArmor()[armorIndex]?.copy()
                         if (stack == null) {
-                            loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[j]))
+                            loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
                         } else {
                             loreList.add(
                                 Renderable.hoverable(
                                     Renderable.hoverTips(
-                                        Renderable.placeholder(containerWidth, hoverableSizes[j]),
+                                        Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
                                         stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
                                     ),
-                                    Renderable.placeholder(containerWidth, hoverableSizes[j]),
+                                    Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
                                     bypassChecks = true
                                 )
                             )
