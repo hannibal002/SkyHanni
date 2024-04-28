@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -44,6 +45,11 @@ object ChocolateFactoryBarnManager {
 
     fun trySendBarnFullMessage() {
         if (!ChocolateFactoryAPI.isEnabled()) return
+
+        if (config.barnCapacityThreshold <= 0) {
+            return
+        }
+
         val profileStorage = profileStorage ?: return
 
         val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
@@ -56,15 +62,19 @@ object ChocolateFactoryBarnManager {
         if (profileStorage.maxRabbits == -1) {
             ChatUtils.clickableChat(
                 "Open your chocolate factory to see your barn's capacity status!",
-                "cf"
+                onClick = {
+                    HypixelCommands.chocolateFactory()
+                }
             )
             return
         }
 
         ChatUtils.clickableChat(
-            "§cYour barn is almost full! " +
-                "§7(${barnStatus()}). §cUpgrade it so they don't get crushed",
-            "cf"
+            message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) { "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed" }
+            else { "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"},
+            onClick = {
+                HypixelCommands.chocolateFactory()
+            }
         )
         SoundUtils.playBeepSound()
         lastBarnFullWarning = SimpleTimeMark.now()

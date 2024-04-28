@@ -62,18 +62,12 @@ object ErrorManager {
         throw exception
     }
 
-    fun command(array: Array<String>) {
-        if (array.size != 1) {
-            ChatUtils.userError("Use /shcopyerror <error id>")
-            return
-        }
-
-        val id = array[0]
+    private fun copyError(errorId: String) {
         val fullErrorMessage = KeyboardManager.isModifierKeyDown()
         val errorMessage = if (fullErrorMessage) {
-            fullErrorMessages[id]
+            fullErrorMessages[errorId]
         } else {
-            errorMessages[id]
+            errorMessages[errorId]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
         ChatUtils.chat(errorMessage?.let {
@@ -152,8 +146,10 @@ object ErrorManager {
 
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
-            "shcopyerror $randomId",
-            false
+            onClick = {
+                copyError(randomId)
+            },
+            prefix = false
         )
     }
 

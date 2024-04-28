@@ -35,6 +35,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sends the SkyBlock XP message from the action bar into the chat.
 + Rarity text to pet drop messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1136)
 + Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
++ Option to reorder or hide every part of a player chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Parts to move around: SkyBlock Level, Emblem, player name, guild rank, private island rank, crimson faction, iron man mode, bingo level and Private Island Guest.
+    + Player messages impacted by this: all chat, party, guild, private chat, /show.
+    + This might break hover/click on chat actions (Will be fixed later).
++ Hide Level Brackets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Hide the gray brackets in front of and behind the level numbers.
++ Level Color As Name. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
+    + Use the color of the SkyBlock level for the player color.
 
 #### Chat Filter
 
@@ -90,6 +98,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows kismet amount at the reroll button
 + SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
     + Warn shorty before a Shadow Assassin jumps to you in dungeons.
++ Notifications for architect on puzzle fail. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1197)
+    + Shows Title.
+    + Shows button in chat to retrieve from sack.
+    + Only works when having enough Architect First Drafts in the sack.
 
 </details>
 <details open><summary>
@@ -177,6 +189,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight options in /tab. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1175)
     + Green for enabled
     + Red for disabled
++ SBA style Enchant Parsing. - Vixid (https://github.com/hannibal002/SkyHanni/pull/654)
+    + Option to remove vanilla enchants in tooltip.
+    + Option to remove enchant descriptions.
+    + Option to change enchant formatting.
+    + Also parses tooltips from /show.
 
 </details>
 <details open><summary>
@@ -780,6 +797,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Change at what cold level the texture should appear.
 + Glacial Powder as stack size in the Fossil Excavator. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
 + Highlight own Golden/Diamond Goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
++ Click to get an Ascension Rope from sacks in the Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1542)
 
 </details>
 <details open><summary>
@@ -813,6 +831,21 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + New Year Cake Reminder. - hannibal2
 + Easter Egg Hunt 2024 waypoints. - Erymanthus + walker (https://github.com/hannibal002/SkyHanni/pull/1193)
 
+### Hoppity and Chocolate Factory
+
++ Hoppity rabbit collection stats summary. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1482)
++ Stuff for Chocolate Factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1434)
+    + Show info about your chocolate factory.
+    + Show which upgrades you can afford and which to buy.
+    + Notification to click on rabbit in the inventory.
+    + Notify you if you are close to having your rabbits crushed.
++ Chocolate Factory Menu Shortcut (Hoppity Menu Shortcut). - raven + martimavocado (https://github.com/hannibal002/SkyHanni/pull/1583)
++ Tooltip Move. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1581)
+    + Moves the tooltip away from the item you hover over while inside the Chocolate Factory.
++ Chocolate Factory Compact On Click. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1579)
++ Factory Chat Filters. - RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1574)
+    + Hide chocolate factory upgrade and employee promotion messages.
+
 </details>
 <details open><summary>
 
@@ -839,6 +872,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Calculate how many crops need to be farmed between different crop milestones.
 + /shcalccroptime. - CalMWolfs
     + Calculate how long you need to farm crops between different crop milestones.
++ /shupdate command. - Empa (https://github.com/hannibal002/SkyHanni/pull/1578)
+    + Can be used like `/shupdate <beta/full>` to download updates from a specific update stream.
 
 </details>
 <details open><summary>
@@ -885,6 +920,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Dojo Rank Display. - HiZe
     + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
       Crimson Isles.
++ Matriarch Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1385)
+    + Highlights the Heavy Pearls.
+    + Draws a line to the Heavy Pearls.
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -909,6 +947,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Dynamic Priority Box.
         + Change the order or disable dynamically rendered features (e.g. Slayer, Dungeon, Crop Milestone, Stacking
           Enchantment)
+    + AFK time. - NetheriteMiner
+    + SkyCrypt Button. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1526)
 + Server Restart Title
 + **City Project Features**
     + Show missing items to contribute inside the inventory
@@ -1034,7 +1074,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Working **Livid Finder** (should work 100% of the time). - hannibal2
     + Option to hide other/wrong/fake Livids (try this out and see if you really want this, it can be counter-productive
       in some cases).
-+ AFK time to Discord RPC. - NetheriteMiner
 + Option to change Hypixel Wiki to the fandom Wiki in more areas than just the /wiki command. - Erymanthus
     + E.g. inside the SkyBlock leveling guide.
 + Fixes Ghost Entities. - hannibal2 & nea & Thunderblade73
@@ -1077,11 +1116,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
 + Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
-+ Stuff for Chocolate Factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1434)
-    + Show info about your chocolate factory.
-    + Show which upgrades you can afford and which to buy.
-    + Notification to click on rabbit in the inventory.
-    + Notify you if you are close to having your rabbits crushed.
++ Allow party members to request allinvite to be turned on. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1464)
+    + Say !allinv in party chat for them to enable all invite.
++ Added Hide Far Entities. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1064)
+    + Can perhaps increase FPS for some users by 5% to 150%.
+    + Options to change the distance and number of mobs to always show.
+    + Option to disable in garden.
 
 </details>
 <details open><summary>
