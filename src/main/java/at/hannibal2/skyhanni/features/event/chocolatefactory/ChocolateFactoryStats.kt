@@ -2,10 +2,14 @@ package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -15,14 +19,27 @@ object ChocolateFactoryStats {
     private val config get() = ChocolateFactoryAPI.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
-    private var displayList = mutableListOf<String>()
+    private var displayList = mutableListOf<Renderable>()
+    private var displayText = mutableListOf<String>()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory && !ChocolateFactoryAPI.chocolateFactoryPaused) return
         if (!config.statsDisplay) return
 
-        config.position.renderStrings(displayList, posLabel = "Chocolate Factory Stats")
+        config.position.renderRenderables(listOf(Renderable.clickAndHover(
+            Renderable.verticalContainer(displayList),
+            tips = listOf("Copy to Clipboard :3"),
+            onClick = {
+                val titleHeader = displayText.indexOf("§6§lChocolate Factory Stats")
+                if (titleHeader != -1) {
+                    displayText[titleHeader] = "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats"
+                } else {
+                    displayText.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
+                }
+                ClipboardUtils.copyToClipboard(displayText.joinToString("\n") { it.removeColor() })
+            }
+        )), posLabel = "Chocolate Factory Stats")
     }
 
     fun updateDisplay() {
@@ -49,7 +66,7 @@ object ChocolateFactoryStats {
             "§6${timeUntilPrestige.format()}"
         }
 
-        displayList = formatList(buildList {
+        displayText = formatList(buildList {
             add("§6§lChocolate Factory Stats")
 
             add("§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
@@ -75,15 +92,16 @@ object ChocolateFactoryStats {
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
 
-        val firstElement = displayList.firstOrNull { it.isNotEmpty() } ?: return
+        val firstElement = displayText.firstOrNull { it.isNotEmpty() } ?: return
 
         if (ChocolateFactoryAPI.chocolateFactoryPaused) {
             val leftMargin = (firstElement.width() - "§f(§cPaused§f)".width()) / 2
             val spaceWidth = " ".width()
-            displayList.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")
+            displayText.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")
         } else {
-            displayList.add(0, "")
+            displayText.add(0, "")
         }
+        displayList = displayText.map(Renderable::string).toMutableList()
     }
 
     private fun formatList(list: List<String>): MutableList<String> {

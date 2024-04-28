@@ -106,4 +106,10 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
     public Position hoppityStatsPosition = new Position(163, 160, false, true);
+
+    @Expose
+    @ConfigOption(name = "Highlight Hoppity Shop", desc = "Highlight items that haven't been bought from the Hoppity shop yet!")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightHoppityShop = true;
 }
