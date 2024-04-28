@@ -6,9 +6,12 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -18,9 +21,13 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggLocator {
@@ -40,6 +47,7 @@ object HoppityEggLocator {
     private var ticksSinceLastParticleFound = -1
     private var lastGuessMade = SimpleTimeMark.farPast()
     private var eggLocationWeights = listOf<Double>()
+    private var armor = mapOf<Int, ItemStack>()
 
     var sharedEggLocation: LorenzVec? = null
     var currentEggType: HoppityEggType? = null
@@ -60,6 +68,24 @@ object HoppityEggLocator {
         drawLocations = false
         sharedEggLocation = null
         currentEggType = null
+    }
+
+    private fun hideNearbyPlayer(entity: EntityPlayer, location: LorenzVec) {
+        if (entity.distanceTo(location) < 4.0) {
+            GlStateManager.enableBlend()
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+            GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 255f)
+            val armorInventory = entity.getArmorInventory() ?: return
+
+            armor = buildMap {
+                for ((i, stack) in armorInventory.withIndex()) {
+                    stack?.let {
+                        this[i] = it.copy()
+                        armorInventory[i] = null
+                    }
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -104,6 +130,30 @@ object HoppityEggLocator {
                 seeThroughBlocks = true,
             )
             event.drawDynamicText(eggLocation.add(y = 1), "§aEgg", 1.5)
+        }
+    }
+
+    @SubscribeEvent
+    fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
+        if (!isEnabled()) return
+        if (config.playerOpacity == 255) return
+        if (event.entity !is EntityPlayer) return
+        if (event.entity.name == LorenzUtils.getPlayerName()) return
+
+        sharedEggLocation?.let { sharedEggLocation -> hideNearbyPlayer(event.entity, sharedEggLocation) }
+        possibleEggLocations.forEach { hideNearbyPlayer(event.entity, it) }
+    }
+
+    @SubscribeEvent
+    fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
+        if (!isEnabled()) return
+        if (config.playerOpacity == 255) return
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.disableBlend()
+        val armorInventory = event.entity.getArmorInventory() ?: return
+
+        for ((index, stack) in armor) { // restore armor after players leave the area
+            armorInventory[index] = stack
         }
     }
 
