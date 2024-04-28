@@ -29,7 +29,7 @@ object ChocolateFactoryStats {
 
         config.position.renderRenderables(listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(displayList),
-            tips = listOf("Copy to Clipboard :3"),
+            tips = listOf("§bCopy to Clipboard!"),
             onClick = {
                 val titleHeader = displayText.indexOf("§6§lChocolate Factory Stats")
                 if (titleHeader != -1) {
