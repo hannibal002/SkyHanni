@@ -219,7 +219,6 @@ object WardrobeAPI {
         }
     }
 
-
     class WardrobeData(
         @Expose val id: Int,
         @Expose var armor: MutableMap<Int, ItemStack?>,

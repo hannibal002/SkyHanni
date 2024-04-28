@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.createWardrobePriceLore
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentWardrobeSlot
@@ -30,9 +29,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
+import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.ItemStack
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -42,12 +45,10 @@ import kotlin.time.Duration.Companion.milliseconds
 class CustomWardrobe {
 
     private val config get() = SkyHanniMod.feature.inventory.customWardrobe
-    private var display = emptyList<Triple<Position, Renderable, Int?>>()
-    private var renderablesCache = emptyList<Triple<Position, Renderable, Int?>>()
-    private var tempToggleShowOverlay = true
-    private var onlyFavoriteToggle = false
 
-    private var itemPriceCache = mutableMapOf<String?, Double>()
+    private var display = emptyList<Triple<Position, Renderable, Int>>()
+    private var tempToggleShowOverlay = true
+
     private var fakePlayerCache = mutableMapOf<Int, EntityOtherPlayerMP>()
 
     private var hoveredSlot: Int? = null
@@ -55,10 +56,18 @@ class CustomWardrobe {
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
-        var list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
+        if (tempToggleShowOverlay) event.cancel()
+    }
 
-        if (!tempToggleShowOverlay) return
-        inCustomWardrobe = true
+    private fun update() {
+        fakePlayerCache = mutableMapOf()
+        display = createRenderables()
+    }
+
+    private fun createRenderables() = buildList {
+        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return@buildList
+
+        var list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
 
         var wardrobeWarning = false
         var wardrobeWarningText = ""
@@ -75,15 +84,14 @@ class CustomWardrobe {
                 wardrobeWarningText = "§cAll slots are empty :("
             }
         }
-        if (onlyFavoriteToggle) {
+        if (config.onlyFavorites) {
             list = list.filter { it.favorite || it.isCurrentSlot() }
             if (list.isEmpty()) {
                 wardrobeWarning = true
-                wardrobeWarningText = "§cDidnt set any favorites"
+                wardrobeWarningText = "§cDidn't set any favorites"
             }
         }
 
-        val gui = event.gui
         val centerX = gui.width / 2
         val centerY = gui.height / 2
         val totalPlayers = list.size
@@ -98,142 +106,90 @@ class CustomWardrobe {
 
         val startY = centerY + playerHeight - totalHeight / 2
 
+        addButtons(gui.width, gui.height, totalHeight).forEach { add(it) }
+
         if (wardrobeWarning) {
             val warningRenderable = Renderable.string(wardrobeWarningText)
             val warningPos = Position(centerX - (warningRenderable.width * 3) / 2, centerY - 70, 3f, true)
-            display = listOf()
-            display += Triple(warningPos, warningRenderable, 0)
-            display += addButtons(gui.width, gui.height, totalHeight)
-            event.cancel()
-            reset()
-            return
+            add(Triple(warningPos, warningRenderable, 0))
+            return@buildList
         }
 
-        if (renderablesCache.isEmpty()) {
-            renderablesCache += addButtons(gui.width, gui.height, totalHeight)
+        var slot = 0
+        for (row in 0 until rows) {
+            val playersInRow =
+                if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
+            val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * (horizontalSpacing + 1)
 
-            var slot = 0
-            for (row in 0 until rows) {
-                val playersInRow =
-                    if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
-                val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * (horizontalSpacing + 1)
+            val startX = centerX - (totalWidth - playerWidth) / 2
+            val playerY = startY + row * ((playerHeight + verticalSpacing) + 1)
 
-                val startX = centerX - (totalWidth - playerWidth) / 2
-                val playerY = startY + row * ((playerHeight + verticalSpacing) + 1)
+            for (i in 0 until playersInRow) {
+                val playerX = startX + i * ((playerWidth + horizontalSpacing) + 1)
+                var scale = playerWidth.toDouble()
 
-                for (i in 0 until playersInRow) {
-                    val playerX = startX + i * ((playerWidth + horizontalSpacing) + 1)
-                    var scale = playerWidth.toDouble()
+                val wardrobeSlot = list[slot]
 
-                    val wardrobeSlot = list[slot]
+                val fakePlayer = wardrobeSlot.getFakePlayer()
 
-                    val fakePlayer = wardrobeSlot.getFakePlayer()
+                fakePlayer.inventory.armorInventory =
+                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
-                    fakePlayer.inventory.armorInventory =
-                        wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+                val padding = 10
+                val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
+                val containerWidth = playerWidth + 2 * padding
+                val containerHeight = playerHeight + 2 * padding
 
-                    val padding = 10
-                    val pos = Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
-                    val containerWidth = playerWidth + 2 * padding
-                    val containerHeight = playerHeight + 2 * padding
+                val armorTooltipRenderable = {
+                    val loreList = mutableListOf<Renderable>()
+                    val height = containerHeight - 3
 
-                    val slotButtonsRenderable = {
-                        val buttonsList = mutableListOf<Renderable>()
+                    // this is needed to keep the total size of the renderable the same as the others
+                    val hoverableSizes = MutableList(4) { height / 4 }
+                    for (k in 0 until height % 4) hoverableSizes[k]++
 
-                        buttonsList.add(
-                            Renderable.clickable(
-                                Renderable.hoverable(
-                                    Renderable.string(
-                                        (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
-                                        1.5,
-                                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
-                                    ),
-                                    Renderable.string(
-                                        (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
-                                        1.5,
-                                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
-                                    )
-                                ),
-                                onClick = {
-                                    wardrobeSlot.favorite = !wardrobeSlot.favorite
-                                    reset()
-                                }
-                            )
-                        )
-
-                        buttonsList.add(
-                            if (wardrobeSlot.getArmor().any { it != null }) {
-                            val lore = createWardrobePriceLore(wardrobeSlot)
-                            Renderable.hoverTips(
-                                Renderable.string(
-                                    "§2$",
-                                    1.5,
-                                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                                    verticalAlign = RenderUtils.VerticalAlignment.CENTER
-                                ), lore
-                            )
+                    for (j in 0 until 4) {
+                        val stack = wardrobeSlot.getArmor()[j]?.copy()
+                        if (stack == null) {
+                            loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[j]))
                         } else {
-                            Renderable.placeholder(0, 0)
-                            }
-                        )
-                        Renderable.verticalContainer(
-                            buttonsList,
-                            spacing = 1,
-                            horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT
-                        )
-                    }
-
-                    val armorTooltipRenderable = {
-                        val loreList = mutableListOf<Renderable>()
-                        val height = containerHeight - 3
-
-                        // this is needed to keep the total size of the renderable the same as the others
-                        val hoverableSizes = MutableList(4) { height / 4 }
-                        for (k in 0 until height % 4) hoverableSizes[k]++
-
-                        for (j in 0 until 4) {
-                            val stack = wardrobeSlot.getArmor()[j]?.copy()
-                            if (stack == null) {
-                                loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[j]))
-                            } else {
-                                loreList.add(
-                                    Renderable.hoverable(
-                                        Renderable.hoverTips(
-                                            Renderable.placeholder(containerWidth, hoverableSizes[j]),
-                                            stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
-                                        ),
+                            loreList.add(
+                                Renderable.hoverable(
+                                    Renderable.hoverTips(
                                         Renderable.placeholder(containerWidth, hoverableSizes[j]),
-                                        bypassChecks = true
-                                    )
+                                        stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+                                    ),
+                                    Renderable.placeholder(containerWidth, hoverableSizes[j]),
+                                    bypassChecks = true
                                 )
-                            }
+                            )
                         }
-                        Renderable.verticalContainer(loreList, spacing = 1)
                     }
+                    Renderable.verticalContainer(loreList, spacing = 1)
+                }
 
-                    val renderable = createHoverableRenderable(
-                        armorTooltipRenderable.invoke(),
-                        topLayerRenderable = slotButtonsRenderable.invoke(),
-                        hoveredColor = getWardrobeSlotColor(wardrobeSlot),
-                        borderOutlineThickness = config.color.outlineThickness,
-                        borderOutlineBlur = config.color.outlineBlur,
-                        onClick = {
-                            clickWardrobeSlot(wardrobeSlot)
-                        },
-                        onHover = {
-                            hoveredSlot = wardrobeSlot.id
-                        }
-                    )
-                    renderablesCache += Triple(pos, renderable, wardrobeSlot.id)
+                val renderable = createHoverableRenderable(
+                    armorTooltipRenderable.invoke(),
+                    topLayerRenderable = addSlotHoverableButtons(wardrobeSlot),
+                    hoveredColor = getWardrobeSlotColor(wardrobeSlot),
+                    borderOutlineThickness = config.color.outlineThickness,
+                    borderOutlineBlur = config.color.outlineBlur,
+                    onClick = {
+                        clickWardrobeSlot(wardrobeSlot)
+                    },
+                    onHover = {
+                        hoveredSlot = wardrobeSlot.id
+                    }
+                )
+                add(Triple(pos, renderable, wardrobeSlot.id))
 
-                    val color = if (!wardrobeSlot.isInCurrentPage()) {
-                        scale *= 0.9
-                        Color.GRAY.withAlpha(100)
-                    } else null
+                val color = if (!wardrobeSlot.isInCurrentPage()) {
+                    scale *= 0.9
+                    Color.GRAY.withAlpha(100)
+                } else null
 
-                    renderablesCache += Triple(
+                add(
+                    Triple(
                         Position(playerX, playerY), Renderable.entity(
                             fakePlayer,
                             config.eyesFollowMouse,
@@ -241,30 +197,25 @@ class CustomWardrobe {
                             color = color
                         ), wardrobeSlot.id
                     )
-                    slot++
-                }
+                )
+                slot++
             }
         }
-        display = renderablesCache
-        event.cancel()
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runDelayed(500.milliseconds) {
             if (!inWardrobe()) {
-                inCustomWardrobe = false
-                tempToggleShowOverlay = true
-                itemPriceCache = mutableMapOf()
-                display = mutableListOf()
                 reset()
             }
         }
     }
 
     private fun reset() {
-        renderablesCache = mutableListOf()
-        fakePlayerCache = mutableMapOf()
+        inCustomWardrobe = false
+        tempToggleShowOverlay = true
+        display = mutableListOf()
     }
 
     private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
@@ -286,10 +237,8 @@ class CustomWardrobe {
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
-                    tempToggleShowOverlay = false
-                    inCustomWardrobe = false
                     reset()
-                    display = mutableListOf()
+                    tempToggleShowOverlay = false
                 }
             ),
             createHoverableRenderable(
@@ -301,33 +250,56 @@ class CustomWardrobe {
                         " §7only showing favorite armors",
                     )
                 ),
-                hoveredColor = if (onlyFavoriteToggle) Color.GREEN else Color.RED,
+                hoveredColor = if (config.onlyFavorites) Color.GREEN else Color.RED,
                 borderOutlineThickness = 2,
                 onClick = {
-                    onlyFavoriteToggle = !onlyFavoriteToggle
-                    reset()
+                    config.onlyFavorites = !config.onlyFavorites
+                    update()
                 }
             ),
             createHoverableRenderable(
                 Renderable.hoverTips(
-                    Renderable.placeholder(buttonWidth, buttonWidth),
+                    Renderable.itemStack(
+                        ItemStack(Items.arrow),
+                        (buttonWidth - 1.5) / 15.5,
+                        0
+                    ),
                     listOf("§aGo Back", " §7To SkyBlock Menu")
+                ),
+                Renderable.itemStack(
+                    ItemStack(Items.arrow),
+                    (buttonWidth - 1.5) / 15.5,
+                    0
                 ),
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
                     clickSlot(48, getWindowId() ?: -1)
+                    reset()
+                    currentPage = null
+                    fakePlayerCache = mutableMapOf()
                 }
             ),
             createHoverableRenderable(
                 Renderable.hoverTips(
-                    Renderable.placeholder(buttonWidth, buttonWidth),
+                    Renderable.itemStack(
+                        ItemStack(Blocks.barrier),
+                        (buttonWidth - 1.5) / 15.5,
+                        0
+                    ),
                     listOf("§cClose")
+                ),
+                Renderable.itemStack(
+                    ItemStack(Blocks.barrier),
+                    (buttonWidth - 1.5) / 15.5,
+                    0
                 ),
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
                     clickSlot(49, getWindowId() ?: -1)
+                    reset()
+                    fakePlayerCache = mutableMapOf()
                 }
             ),
         )
@@ -359,8 +331,55 @@ class CustomWardrobe {
             }
         }
 
+    private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
+        val list = mutableListOf<Renderable>()
+        list.add(
+            Renderable.clickable(
+                Renderable.hoverable(
+                    Renderable.string(
+                        (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
+                        1.5,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                    ),
+                    Renderable.string(
+                        (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
+                        1.5,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                    )
+                ),
+                onClick = {
+                    wardrobeSlot.favorite = !wardrobeSlot.favorite
+                    update()
+                }
+            )
+        )
+
+        if (config.estimatedValue) {
+            list.add(
+                if (wardrobeSlot.getArmor().any { it != null }) {
+                    val lore = createWardrobePriceLore(wardrobeSlot)
+                    Renderable.hoverTips(
+                        Renderable.string(
+                            "§2$",
+                            1.5,
+                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                            verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                        ), lore
+                    )
+                } else {
+                    Renderable.placeholder(0, 0)
+                }
+            )
+        }
+
+        return Renderable.verticalContainer(list, 1, RenderUtils.HorizontalAlignment.CENTER)
+    }
+
     private fun createHoverableRenderable(
         hoveredRenderable: Renderable,
+        unhoveredRenderable: Renderable = Renderable.placeholder(hoveredRenderable.width, hoveredRenderable.height),
         topLayerRenderable: Renderable = Renderable.placeholder(0, 0),
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
@@ -385,7 +404,7 @@ class CustomWardrobe {
                 blur = borderOutlineBlur
             ),
             Renderable.drawInsideRoundedRect(
-                Renderable.placeholder(hoveredRenderable.width, hoveredRenderable.height),
+                unhoveredRenderable,
                 unHoveredColor,
                 padding = 0
             ),
@@ -395,17 +414,15 @@ class CustomWardrobe {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!tempToggleShowOverlay) return
+
+        display.ifEmpty { update() }
+        if (display.isEmpty()) return
 
         for ((pos, renderable, _) in display.sortedBy { if (it.third == hoveredSlot) 1 else 0 }) {
             GlStateManager.color(1f, 1f, 1f, 1f)
             pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
         }
-    }
-
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!inWardrobe()) return
-        reset()
     }
 
     private fun clickWardrobeSlot(wardrobeSlot: WardrobeAPI.WardrobeSlot) {
@@ -426,17 +443,17 @@ class CustomWardrobe {
                 clickSlot(nextPageSlot, windowId)
             }
         }
-        reset()
+        update()
     }
 
     private fun getWardrobeSlotColor(wardrobeSlot: WardrobeAPI.WardrobeSlot): Color {
         val color = if (wardrobeSlot.isInCurrentPage()) {
             if (wardrobeSlot.isCurrentSlot()) config.color.equippedColor.toChromaColor()
-            else if (wardrobeSlot.favorite && !onlyFavoriteToggle) config.color.favoriteColor.toChromaColor()
+            else if (wardrobeSlot.favorite && !config.onlyFavorites) config.color.favoriteColor.toChromaColor()
             else config.color.samePageColor.toChromaColor()
         } else {
             if (wardrobeSlot.isCurrentSlot()) config.color.equippedColor.toChromaColor().darker()
-            else if (wardrobeSlot.favorite && !onlyFavoriteToggle) config.color.favoriteColor.toChromaColor().darker()
+            else if (wardrobeSlot.favorite && !config.onlyFavorites) config.color.favoriteColor.toChromaColor().darker()
             else config.color.otherPageColor.toChromaColor()
         }
         return Color(color.withAlpha(170), true)
