@@ -82,7 +82,7 @@ object UpdateManager {
             return
         }
         logger.log("Starting update check")
-        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val currentStream = config.updateStream.get()
         if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || isCurrentlyBeta())) {
             config.updateStream = Property.of(UpdateStream.BETA)
         }
@@ -103,7 +103,7 @@ object UpdateManager {
                         ChatUtils.chatAndOpenConfig(
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
-                            SkyHanniMod.feature.about::autoUpdates
+                            config::autoUpdates
                         )
                     }
                 } else if (forceDownload) {
