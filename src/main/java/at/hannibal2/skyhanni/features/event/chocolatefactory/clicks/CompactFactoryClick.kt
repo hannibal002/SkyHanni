@@ -24,7 +24,7 @@ object CompactFactoryClick {
         val itemStack = event.itemStack
         val lore = itemStack.getLore()
         if (!lore.any { it == "§7§eClick to uncover the meaning of life!" }) return
-        if (lastClick.passedSince() >= 1.seconds) return
+        if (lastClick.passedSince() >= 1.seconds && !config.compactOnClickAlways) return
         val list = mutableListOf<String>()
         list.add(itemStack.name)
         lore.getOrNull(5)?.let {
