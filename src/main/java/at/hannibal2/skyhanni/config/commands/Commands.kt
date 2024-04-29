@@ -601,7 +601,7 @@ object Commands {
             else -> currentStream
         }
 
-        if (updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || UpdateManager.isCurrentlyBeta())) {
+        if (updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
