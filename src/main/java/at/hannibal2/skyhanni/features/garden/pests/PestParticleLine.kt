@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
+// TODO remove this workaround once PestParticleWaypoint does work again
 class PestParticleLine {
 
     class ParticleLocation(val location: LorenzVec, val color: Color, val spawnTime: SimpleTimeMark)
