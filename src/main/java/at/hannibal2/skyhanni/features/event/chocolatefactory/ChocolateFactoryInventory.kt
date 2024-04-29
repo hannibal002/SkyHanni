@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object ChocolateFactoryInventory {
 
     private val config get() = ChocolateFactoryAPI.config
+    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.amount",
@@ -64,6 +65,19 @@ object ChocolateFactoryInventory {
             if (slot.slotIndex == ChocolateFactoryAPI.clickRabbitSlot) {
                 slot highlight LorenzColor.RED
             }
+            if (slot.slotIndex == ChocolateFactoryAPI.milestoneIndex) {
+                slot.stack?.getLore()?.matchFirst(unclaimedRewardsPattern) {
+                    slot highlight LorenzColor.RED
+                }
+            }
+            if (slot.slotIndex == ChocolateFactoryAPI.timeTowerIndex) {
+                if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+                    slot highlight LorenzColor.LIGHT_PURPLE
+                }
+                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
+                    slot highlight LorenzColor.RED
+                }
+            }
         }
     }
 
@@ -71,6 +85,7 @@ object ChocolateFactoryInventory {
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.showStackSizes) return
+        val profileStorage = profileStorage ?: return
 
         val item = event.stack
         val itemName = item.name.removeColor()
@@ -93,12 +108,11 @@ object ChocolateFactoryInventory {
         }
         if (slotNumber in ChocolateFactoryAPI.otherUpgradeSlots) {
             upgradeTierPattern.matchMatcher(itemName) {
-                event.stackTip = group("tier").romanToDecimal().toString()
-            }
-        }
-        if (slotNumber == ChocolateFactoryAPI.milestoneIndex) {
-            item.getLore().matchFirst(unclaimedRewardsPattern) {
-                event.stackTip = "§c!!!"
+                val level = group("tier").romanToDecimal()
+
+                if (slotNumber == ChocolateFactoryAPI.timeTowerIndex) profileStorage.timeTowerLevel = level
+
+                event.stackTip = level.toString()
             }
         }
     }
