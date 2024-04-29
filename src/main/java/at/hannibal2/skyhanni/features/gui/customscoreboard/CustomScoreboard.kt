@@ -241,7 +241,7 @@ class CustomScoreboard {
                 JsonPrimitive(HorizontalAlignment.DONT_ALIGN.name)
             }
         }
-        event.move(42, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
+        event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
             if (it.asBoolean) {
                 JsonPrimitive(RenderUtils.VerticalAlignment.CENTER.name)
             } else {
