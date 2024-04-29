@@ -132,13 +132,12 @@ object PestAPI {
             plot.pests = scoreboardPests - accurateAmount
             plot.isPestCountInaccurate = false
         } else if (accurateAmount + inaccurateAmount > scoreboardPests) { // when logic fails and we reach impossible pest counts
-            sendPestError(true)
             getInfestedPlots().forEach {
                 it.pests = 0
                 it.isPestCountInaccurate = true
             }
             if (loop > 0) fixPests(loop - 1)
-            else sendPestError(false)
+            else sendPestError()
         }
     }
 
@@ -282,13 +281,14 @@ object PestAPI {
         updatePests()
     }
 
-    private fun sendPestError(betaOnly: Boolean) {
+    private fun sendPestError() {
         ErrorManager.logErrorStateWithData(
             "Error getting pest count",
             "Impossible pest count",
             "scoreboardPests" to scoreboardPests,
             "plots" to getInfestedPlots().map { "id: ${it.id} pests: ${it.pests} isInaccurate: ${it.isPestCountInaccurate}" },
-            noStackTrace = true, betaOnly = betaOnly
+            noStackTrace = true,
+            betaOnly = true
         )
     }
 
