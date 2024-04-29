@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
@@ -19,27 +18,14 @@ object ChocolateFactoryStats {
     private val config get() = ChocolateFactoryAPI.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
-    private var displayList = mutableListOf<Renderable>()
-    private var displayText = mutableListOf<String>()
+    private var display = listOf<Renderable>()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory && !ChocolateFactoryAPI.chocolateFactoryPaused) return
         if (!config.statsDisplay) return
 
-        config.position.renderRenderables(listOf(Renderable.clickAndHover(
-            Renderable.verticalContainer(displayList),
-            tips = listOf("§bCopy to Clipboard!"),
-            onClick = {
-                val titleHeader = displayText.indexOf("§6§lChocolate Factory Stats")
-                if (titleHeader != -1) {
-                    displayText[titleHeader] = "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats"
-                } else {
-                    displayText.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
-                }
-                ClipboardUtils.copyToClipboard(displayText.joinToString("\n") { it.removeColor() })
-            }
-        )), posLabel = "Chocolate Factory Stats")
+        config.position.renderRenderables(display, posLabel = "Chocolate Factory Stats")
     }
 
     fun updateDisplay() {
@@ -66,7 +52,7 @@ object ChocolateFactoryStats {
             "§6${timeUntilPrestige.format()}"
         }
 
-        displayText = formatList(buildList {
+        val text = formatList(buildList {
             add("§6§lChocolate Factory Stats")
 
             add("§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
@@ -92,19 +78,36 @@ object ChocolateFactoryStats {
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
 
-        val firstElement = displayText.firstOrNull { it.isNotEmpty() } ?: return
 
-        if (ChocolateFactoryAPI.chocolateFactoryPaused) {
-            val leftMargin = (firstElement.width() - "§f(§cPaused§f)".width()) / 2
-            val spaceWidth = " ".width()
-            displayText.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")
-        } else {
-            displayText.add(0, "")
-        }
-        displayList = displayText.map(Renderable::string).toMutableList()
+        // TODO keep counting, we dont want pauses
+//         val firstElement = displayText.firstOrNull { it.isNotEmpty() } ?: return
+//
+//         if (ChocolateFactoryAPI.chocolateFactoryPaused) {
+//             val leftMargin = (firstElement.width() - "§f(§cPaused§f)".width()) / 2
+//             val spaceWidth = " ".width()
+//             displayText.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")
+//         } else {
+//             displayText.add(0, "")
+//         }
+//         displayList = displayText.map(Renderable::string).toMutableList()
+
+        display = listOf(Renderable.clickAndHover(
+            Renderable.verticalContainer(text.map(Renderable::string)),
+            tips = listOf("§bCopy to Clipboard!"),
+            onClick = {
+                val list = text.toMutableList()
+                val titleHeader = list.indexOf("§6§lChocolate Factory Stats")
+                if (titleHeader != -1) {
+                    list[titleHeader] = "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats"
+                } else {
+                    list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
+                }
+                ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
+            }
+        ))
     }
 
-    private fun formatList(list: List<String>): MutableList<String> {
+    private fun formatList(list: List<String>): List<String> {
         return config.statsDisplayList
             .filter { it.shouldDisplay() }
             .map { list[it.ordinal] }
