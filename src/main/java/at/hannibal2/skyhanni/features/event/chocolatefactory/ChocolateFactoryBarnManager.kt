@@ -71,8 +71,11 @@ object ChocolateFactoryBarnManager {
         }
 
         ChatUtils.clickableChat(
-            message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) { "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed" }
-            else { "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"},
+            message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) {
+                "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
+            } else {
+                "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
+            },
             onClick = {
                 HypixelCommands.chocolateFactory()
             }

@@ -185,7 +185,7 @@ class HoppityCollectionStats {
     private data class RabbitCollectionInfo(
         val rarity: RabbitCollectionRarity,
         val found: Boolean,
-        val duplicates: Int
+        val duplicates: Int,
     )
 
     // todo in future make the amount and multiplier work with mythic rabbits (can't until I have some)
@@ -193,7 +193,7 @@ class HoppityCollectionStats {
         val displayName: String,
         val chocolatePerSecond: Int,
         val chocolateMultiplier: Double,
-        val item: NEUInternalName
+        val item: NEUInternalName,
     ) {
         COMMON("§fCommon", 1, 0.002, "STAINED_GLASS".asInternalName()),
         UNCOMMON("§aUncommon", 2, 0.003, "STAINED_GLASS-5".asInternalName()),

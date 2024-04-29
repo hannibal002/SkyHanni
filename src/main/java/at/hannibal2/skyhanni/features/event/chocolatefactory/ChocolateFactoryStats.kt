@@ -78,7 +78,6 @@ object ChocolateFactoryStats {
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
 
-
         // TODO keep counting, we dont want pauses
 //         val firstElement = displayText.firstOrNull { it.isNotEmpty() } ?: return
 //
