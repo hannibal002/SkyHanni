@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.createWardrobePriceLore
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentWardrobeSlot
@@ -55,7 +56,6 @@ class CustomWardrobe {
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
         if (tempToggleShowOverlay) event.cancel()
-        update()
     }
 
     @SubscribeEvent
@@ -79,6 +79,12 @@ class CustomWardrobe {
                 reset()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+        if (!isEnabled()) return
+        update()
     }
 
 
@@ -233,10 +239,10 @@ class CustomWardrobe {
     }
 
     private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
-        val buttonWidth = 25
+        val buttonWidth = 24
         val centerX = screenWidth / 2
         val buttonY = screenHeight / 2 + playerHeight / 2 + 30
-        val padding = 10
+        val xOffset = 10
 
         val renderables = listOf(
             createHoverableRenderable(
@@ -297,16 +303,17 @@ class CustomWardrobe {
                 Renderable.hoverTips(
                     Renderable.itemStack(
                         ItemStack(Blocks.barrier),
-                        (buttonWidth - 1.5) / 15.5,
+                        1.0,
                         0
                     ),
                     listOf("§cClose")
                 ),
                 Renderable.itemStack(
                     ItemStack(Blocks.barrier),
-                    (buttonWidth - 1.5) / 15.5,
+                    1.0,
                     0
                 ),
+                padding = 23,
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
@@ -316,11 +323,11 @@ class CustomWardrobe {
             ),
         )
 
-        val totalWidth = renderables.sumOf { it.width } + (renderables.size - 1) * padding
+        val totalWidth = renderables.sumOf { it.width } + (renderables.size - 1) * xOffset
         val startX = centerX - totalWidth / 2
 
         for ((index, renderable) in renderables.withIndex()) {
-            add(Triple(Position(startX + index * (renderable.width + padding), buttonY), renderable, 0))
+            add(Triple(Position(startX + index * (renderable.width + xOffset), buttonY), renderable, 0))
         }
     }
 
@@ -374,6 +381,7 @@ class CustomWardrobe {
         hoveredRenderable: Renderable,
         unhoveredRenderable: Renderable = Renderable.placeholder(hoveredRenderable.width, hoveredRenderable.height),
         topLayerRenderable: Renderable = Renderable.placeholder(0, 0),
+        padding: Int = 0,
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
         borderOutlineThickness: Int,
@@ -390,16 +398,20 @@ class CustomWardrobe {
                     ), topLayerRenderable
                 ),
                 hoveredColor,
-                padding = 0,
+                padding = padding,
                 topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
                 bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
                 borderOutlineThickness = borderOutlineThickness,
-                blur = borderOutlineBlur
+                blur = borderOutlineBlur,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER
             ),
             Renderable.drawInsideRoundedRect(
                 unhoveredRenderable,
                 unHoveredColor,
-                padding = 0
+                padding = padding,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER
             ),
             onHover = { onHover() }
         )
