@@ -286,6 +286,7 @@ class CustomWardrobe {
                     Renderable.itemStack(
                         ItemStack(Items.arrow),
                         1.0,
+                        0,
                         0
                     ),
                     listOf("§aGo Back", " §7To SkyBlock Menu")
@@ -293,7 +294,8 @@ class CustomWardrobe {
                 Renderable.itemStack(
                     ItemStack(Items.arrow),
                     1.0,
-                    0
+                    0,
+                    0,
                 ),
                 padding = 3,
                 hoveredColor = Color.BLACK,
@@ -310,12 +312,14 @@ class CustomWardrobe {
                         ItemStack(Blocks.barrier),
                         1.0,
                         0,
+                        0,
                     ),
                     listOf("§cClose")
                 ),
                 Renderable.itemStack(
                     ItemStack(Blocks.barrier),
                     1.0,
+                    0,
                     0,
                 ),
                 padding = 3,
