@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class AlignmentConfig {
 
     @Expose
-    @ConfigOption(name = "Align Horizontally", desc = "Align the scoreboard on the horizontal axis.")
+    @ConfigOption(name = "Horizontal Alignment", desc = "Alignment for the scoreboard on the horizontal axis.")
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment horizontalAlignment = RenderUtils.HorizontalAlignment.RIGHT;
 
