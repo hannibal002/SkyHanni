@@ -281,16 +281,17 @@ class CustomWardrobe {
                 Renderable.hoverTips(
                     Renderable.itemStack(
                         ItemStack(Items.arrow),
-                        (buttonWidth - 1.5) / 15.5,
+                        1.0,
                         0
                     ),
                     listOf("§aGo Back", " §7To SkyBlock Menu")
                 ),
                 Renderable.itemStack(
                     ItemStack(Items.arrow),
-                    (buttonWidth - 1.5) / 15.5,
+                    1.0,
                     0
                 ),
+                padding = 3,
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
@@ -304,16 +305,16 @@ class CustomWardrobe {
                     Renderable.itemStack(
                         ItemStack(Blocks.barrier),
                         1.0,
-                        0
+                        0,
                     ),
                     listOf("§cClose")
                 ),
                 Renderable.itemStack(
                     ItemStack(Blocks.barrier),
                     1.0,
-                    0
+                    0,
                 ),
-                padding = 23,
+                padding = 3,
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
@@ -382,6 +383,8 @@ class CustomWardrobe {
         unhoveredRenderable: Renderable = Renderable.placeholder(hoveredRenderable.width, hoveredRenderable.height),
         topLayerRenderable: Renderable = Renderable.placeholder(0, 0),
         padding: Int = 0,
+        horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
         borderOutlineThickness: Int,
@@ -403,15 +406,15 @@ class CustomWardrobe {
                 bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
                 borderOutlineThickness = borderOutlineThickness,
                 blur = borderOutlineBlur,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                horizontalAlign = horizontalAlignment,
+                verticalAlign = verticalAlignment
             ),
             Renderable.drawInsideRoundedRect(
                 unhoveredRenderable,
                 unHoveredColor,
                 padding = padding,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                horizontalAlign = horizontalAlignment,
+                verticalAlign = verticalAlignment
             ),
             onHover = { onHover() }
         )
