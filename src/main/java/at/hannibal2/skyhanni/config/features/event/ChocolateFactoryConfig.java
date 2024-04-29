@@ -53,6 +53,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.EMPTY_2,
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
+        ChocolateFactoryStat.TIME_TOWER,
         ChocolateFactoryStat.LEADERBOARD_POS
     ));
 
@@ -62,7 +63,7 @@ public class ChocolateFactoryConfig {
     public boolean showStackSizes = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford.")
+    @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford. The upgrade with a star is the most optimal and the lightest colour of green is the most optimal you can afford.")
     @ConfigEditorBoolean
     public boolean highlightUpgrades = true;
 
@@ -81,7 +82,7 @@ public class ChocolateFactoryConfig {
         name = "Rabbit Crush Threshold",
         desc = "How close should you be to your barn capacity should you be before being warned about needing to upgrade it."
     )
-    @ConfigEditorSlider(minValue = 3, maxValue = 20, minStep = 1)
+    @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
 
     @Expose
@@ -91,10 +92,44 @@ public class ChocolateFactoryConfig {
     public boolean hoppityCollectionStats = true;
 
     @Expose
+    @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
+        "continuously warn when your time tower is full.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeTowerWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityMenuShortcut = true;
+
+    @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
     public Position position = new Position(183, 160, false, true);
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
     public Position hoppityStatsPosition = new Position(183, 160, false, true);
+
+    @Expose
+    @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactOnClick = true;
+
+    @Expose
+    @ConfigOption(name = "Always Compact", desc = "Always Compact the item toolip on the chocolate. Requires the above option to be enabled.")
+    @ConfigEditorBoolean
+    public boolean compactOnClickAlways = false;
+
+    @Expose
+    @ConfigOption(name = "Tooltip Move", desc = "Move Tooltip away from the item you hover over while inside the Chocolate Factory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean tooltipMove = false;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "tooltipMove")
+    public Position tooltipMovePosition = new Position(-380, 150, false, true);
 }

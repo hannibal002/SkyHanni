@@ -378,7 +378,7 @@ object ItemUtils {
         val name = itemStack?.name ?: error("Could not find item name for $this")
 
         // show enchanted book name
-        if (name.endsWith("Enchanted Book")) {
+        if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
             return itemStack.getLore()[0]
         }
         if (name.endsWith("Enchanted Book Bundle")) {

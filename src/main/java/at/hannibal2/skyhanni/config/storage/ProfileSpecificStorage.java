@@ -40,8 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ProfileSpecificStorage {
 
@@ -57,6 +55,15 @@ public class ProfileSpecificStorage {
 
         @Expose
         public int maxRabbits = -1;
+
+        @Expose
+        public long nextTimeTower = 0;
+
+        @Expose
+        public int currentTimeTowerUses = -1;
+
+        @Expose
+        public int maxTimeTowerUses = 3;
     }
 
     @Expose
@@ -434,10 +441,7 @@ public class ProfileSpecificStorage {
         public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
-        public List<DungeonStorage.DungeonRunInfo> runs = Stream.generate(DungeonStorage.DungeonRunInfo::new)
-            .limit(CroesusChestTracker.Companion.getMaxChests())
-            .collect(Collectors.toCollection(ArrayList::new));
-
+        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsList();
 
         public static class DungeonRunInfo {
 
