@@ -166,11 +166,13 @@ object WardrobeAPI {
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!inWardrobe()) return
 
+        var inWardrobe = false
         inventoryPattern.matchMatcher(event.inventoryName) {
             currentPage = group("currentPage").formatInt()
+            inWardrobe = true
         }
+        if (!inWardrobe) return
         if (currentPage == null) return
         var foundCurrentSlot = false
 
