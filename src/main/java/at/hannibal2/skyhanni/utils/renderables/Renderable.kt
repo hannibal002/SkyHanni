@@ -343,11 +343,12 @@ interface Renderable {
             item: ItemStack,
             scale: Double = NEUItems.itemFontSize,
             xSpacing: Int = 2,
+            ySpacing: Int = 1,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
         ) = object : Renderable {
-            override val width = (15.5 * scale + 1.5).toInt() + xSpacing
-            override val height = (15.5 * scale + 1.5).toInt()
+            override val width = (15.5 * scale + 0.5).toInt() + xSpacing
+            override val height = (15.5 * scale + 0.5).toInt() + ySpacing
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
