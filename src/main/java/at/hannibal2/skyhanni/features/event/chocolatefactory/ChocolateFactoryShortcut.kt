@@ -36,6 +36,7 @@ class ChocolateFactoryShortcut {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.inAnyIsland(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT)) return
         showItem = config.hoppityMenuShortcut && event.inventoryName == "SkyBlock Menu"
     }
