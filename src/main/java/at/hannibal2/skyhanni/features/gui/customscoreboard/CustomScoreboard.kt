@@ -234,7 +234,7 @@ class CustomScoreboard {
             newArray
         }
 
-        event.move(42, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
+        event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
             if (it.asBoolean) {
                 JsonPrimitive(HorizontalAlignment.RIGHT.name)
             } else {
