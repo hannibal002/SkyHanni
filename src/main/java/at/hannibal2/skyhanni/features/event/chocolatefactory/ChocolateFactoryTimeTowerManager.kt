@@ -31,7 +31,6 @@ object ChocolateFactoryTimeTowerManager {
         }
 
         if (ChocolateFactoryAPI.inChocolateFactory) return
-        val profileStorage = profileStorage ?: return
 
         val nextCharge = SimpleTimeMark(profileStorage.nextTimeTower)
 
