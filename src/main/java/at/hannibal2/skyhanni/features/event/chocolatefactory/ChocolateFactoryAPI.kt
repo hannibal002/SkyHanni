@@ -21,12 +21,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -78,6 +80,18 @@ object ChocolateFactoryAPI {
         "leaderboard.percentile",
         "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!"
     )
+    private val timeTowerAmountPattern by patternGroup.pattern(
+        "timetower.amount",
+        "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)"
+    )
+    private val timeTowerStatusPattern by patternGroup.pattern(
+        "timetower.status",
+        "§7Status: §.§l(?<status>INACTIVE|ACTIVE).*"
+    )
+    private val timeTowerRechargePattern by patternGroup.pattern(
+        "timetower.recharge",
+        "§7Next Charge: §a(?<duration>\\w+)"
+    )
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
@@ -88,6 +102,7 @@ object ChocolateFactoryAPI {
     private var prestigeIndex = 28
     var milestoneIndex = 53
     private var leaderboardIndex = 51
+    private var timeTowerIndex = 39
     var maxRabbits = 395
 
     var inChocolateFactory = false
@@ -100,6 +115,7 @@ object ChocolateFactoryAPI {
     var chocolateMultiplier = 1.0
     var leaderboardPosition: Int? = null
     var leaderboardPercentile: Double? = null
+    var timeTowerActive = false
 
     val upgradeableSlots: MutableSet<Int> = mutableSetOf()
     var bestUpgrade: Int? = null
@@ -125,14 +141,14 @@ object ChocolateFactoryAPI {
     }
 
     private fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
-        val profileStorage = profileStorage ?: return
-
         val infoItem = InventoryUtils.getItemAtSlotIndex(infoIndex) ?: return
         val prestigeItem = InventoryUtils.getItemAtSlotIndex(prestigeIndex) ?: return
         val productionInfoItem = InventoryUtils.getItemAtSlotIndex(productionInfoIndex) ?: return
         val leaderboardItem = InventoryUtils.getItemAtSlotIndex(leaderboardIndex) ?: return
+        val barnItem = InventoryUtils.getItemAtSlotIndex(barnIndex) ?: return
+        val timeTowerItem = InventoryUtils.getItemAtSlotIndex(timeTowerIndex) ?: return
 
-        processInfoItems(infoItem, prestigeItem, productionInfoItem, leaderboardItem)
+        processInfoItems(infoItem, prestigeItem, productionInfoItem, leaderboardItem, barnItem, timeTowerItem)
 
         bestUpgrade = null
         upgradeableSlots.clear()
@@ -148,15 +164,6 @@ object ChocolateFactoryAPI {
 
             val lore = item.getLore()
             val upgradeCost = lore.getUpgradeCost() ?: continue
-
-            if (slotIndex == barnIndex) {
-                lore.matchFirst(barnAmountPattern) {
-                    profileStorage.currentRabbits = group("rabbits").formatInt()
-                    profileStorage.maxRabbits = group("max").formatInt()
-
-                    ChocolateFactoryBarnManager.trySendBarnFullMessage()
-                }
-            }
 
             val canAfford = upgradeCost <= chocolateCurrent
             if (canAfford) upgradeableSlots.add(slotIndex)
@@ -182,11 +189,15 @@ object ChocolateFactoryAPI {
         prestigeItem: ItemStack,
         productionItem: ItemStack,
         leaderboardItem: ItemStack,
+        barnItem: ItemStack,
+        timeTowerItem: ItemStack,
     ) {
-        leaderboardPosition = null
-        leaderboardPercentile = null
+        val profileStorage = profileStorage ?: return
 
         chocolateMultiplier = 1.0
+        timeTowerActive = false
+        leaderboardPosition = null
+        leaderboardPercentile = null
 
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
             chocolateCurrent = group("amount").formatLong()
@@ -214,6 +225,29 @@ object ChocolateFactoryAPI {
             }
             leaderboardPercentilePattern.matchMatcher(line) {
                 leaderboardPercentile = group("percent").formatDouble()
+            }
+        }
+        barnItem.getLore().matchFirst(barnAmountPattern) {
+            profileStorage.currentRabbits = group("rabbits").formatInt()
+            profileStorage.maxRabbits = group("max").formatInt()
+            ChocolateFactoryBarnManager.trySendBarnFullMessage()
+        }
+        for (line in timeTowerItem.getLore()) {
+            timeTowerAmountPattern.matchMatcher(line) {
+                profileStorage.currentTimeTowerUses = group("uses").formatInt()
+                profileStorage.maxTimeTowerUses = group("max").formatInt()
+                ChocolateFactoryTimeTowerManager.checkTimeTowerWarning(true)
+            }
+            timeTowerStatusPattern.matchMatcher(line) {
+                timeTowerActive = group("status") == "ACTIVE"
+            }
+            timeTowerRechargePattern.matchMatcher(line) {
+                // todo in future fix this issue with TimeUtils.getDuration
+                val formattedGroup = group("duration").replace("h", "h ").replace("m", "m ")
+
+                val timeUntilTower = TimeUtils.getDuration(formattedGroup)
+                val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
+                profileStorage.nextTimeTower = nextTimeTower.toMillis()
             }
         }
 
@@ -250,6 +284,7 @@ object ChocolateFactoryAPI {
         prestigeIndex = data.prestigeIndex
         milestoneIndex = data.milestoneIndex
         leaderboardIndex = data.leaderboardIndex
+        timeTowerIndex = data.timeTowerIndex
         maxRabbits = data.maxRabbits
 
         val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")

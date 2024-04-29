@@ -130,6 +130,7 @@ import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBar
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryShortcut
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
@@ -629,6 +630,7 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryInventory)
         loadModule(ChocolateFactoryStats)
         loadModule(FactoryItemTooltipFeatures)
+        loadModule(ChocolateFactoryTimeTowerManager)
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)

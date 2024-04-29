@@ -53,6 +53,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.EMPTY_2,
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
+        ChocolateFactoryStat.TIME_TOWER,
         ChocolateFactoryStat.LEADERBOARD_POS
     ));
 
@@ -89,6 +90,13 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityCollectionStats = true;
+
+    @Expose
+    @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
+        "continuously warn when your time tower is full.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeTowerWarning = false;
 
     @Expose
     @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
