@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -23,8 +24,13 @@ object ChocolateFactoryTimeTowerManager {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (ChocolateFactoryAPI.inChocolateFactory) return
         val profileStorage = profileStorage ?: return
+
+        if (SimpleTimeMark(profileStorage.currentTimeTowerEnds).isInPast()) {
+            profileStorage.currentTimeTowerEnds = SimpleTimeMark.farPast().toMillis()
+        }
+
+        if (ChocolateFactoryAPI.inChocolateFactory) return
 
         val nextCharge = SimpleTimeMark(profileStorage.nextTimeTower)
 
@@ -82,7 +88,14 @@ object ChocolateFactoryTimeTowerManager {
         return profileStorage?.maxTimeTowerUses ?: 3
     }
 
-    private fun timeTowerFull() = currentCharges() >= maxCharges()
+    fun timeTowerFull() = currentCharges() >= maxCharges()
+
+    fun timeTowerActive() = profileStorage?.currentTimeTowerEnds != 0L
+
+    fun timeTowerActiveDuration(): Duration {
+        if (!timeTowerActive()) return Duration.ZERO
+        return SimpleTimeMark(profileStorage?.currentTimeTowerEnds ?: 0).timeUntil()
+    }
 
     @SubscribeEvent
     fun onProfileChange(event: ProfileJoinEvent) {

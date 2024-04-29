@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.features.event.chocolatefactory
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryStats {
 
     private val config get() = ChocolateFactoryAPI.config
+    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var displayList = listOf<String>()
 
@@ -20,31 +24,35 @@ object ChocolateFactoryStats {
     }
 
     fun updateDisplay() {
+        val profileStorage = profileStorage ?: return
+
         val perSecond = ChocolateFactoryAPI.chocolatePerSecond
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
         val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
         val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" } ?: ""
-        val timeTowerInfo = if (ChocolateFactoryAPI.timeTowerActive) {
+        val timeTowerInfo = if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
             "§d§lActive"
         } else {
             "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
         }
 
+        val timeUntilPrestige = ChocolateAmount.PRESTIGE.timeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
+
         displayList = formatList(buildList {
             add("§6§lChocolate Factory Stats")
 
-            add("§eCurrent Chocolate: §6${ChocolateFactoryAPI.chocolateCurrent.addSeparators()}")
-            add("§eThis Prestige: §6${ChocolateFactoryAPI.chocolateThisPrestige.addSeparators()}")
-            add("§eAll-time: §6${ChocolateFactoryAPI.chocolateAllTime.addSeparators()}")
+            add("§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
+            add("§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
+            add("§eAll-time: §6${ChocolateAmount.ALL_TIME.formatted}")
 
             add("§ePer Second: §6${perSecond.addSeparators()}")
             add("§ePer Minute: §6${perMinute.addSeparators()}")
             add("§ePer Hour: §6${perHour.addSeparators()}")
             add("§ePer Day: §6${perDay.addSeparators()}")
 
-            add("§eChocolate Multiplier: §6${ChocolateFactoryAPI.chocolateMultiplier}")
+            add("§eChocolate Multiplier: §6${profileStorage.chocolateMultiplier}")
             add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
             add("§ePosition: §7#§b$position $percentile")
@@ -54,6 +62,8 @@ object ChocolateFactoryStats {
             add("")
 
             add("§eTime Tower: §6$timeTowerInfo")
+            add("§eTime To Prestige: §6${timeUntilPrestige.format()}")
+            add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
     }
 
@@ -61,6 +71,18 @@ object ChocolateFactoryStats {
         return config.statsDisplayList
             .filter { it.shouldDisplay() }
             .map { list[it.ordinal] }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(42, "event.chocolateFactory.statsDisplayList") { element ->
+            val jsonArray = element.asJsonArray
+
+            jsonArray.add(JsonPrimitive("TIME_TOWER"))
+            jsonArray.add(JsonPrimitive("TIME_TO_PRESTIGE"))
+
+            jsonArray
+        }
     }
 
     enum class ChocolateFactoryStat(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
@@ -79,6 +101,8 @@ object ChocolateFactoryStats {
         EMPTY_2(""),
         EMPTY_3(""),
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
+        TIME_TO_PRESTIGE("§eTime To Prestige: §61d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        RAW_PER_SECOND("§eRaw Per Second: §62,136"),
         ;
 
         override fun toString(): String {
