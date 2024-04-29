@@ -40,7 +40,7 @@ class HoppityCollectionStats {
     )
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
-            "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
+        "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
     )
 
     private var display = emptyList<Renderable>()
