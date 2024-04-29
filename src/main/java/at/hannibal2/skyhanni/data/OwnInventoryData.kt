@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class OwnInventoryData {
 
@@ -46,9 +48,10 @@ class OwnInventoryData {
         if (packet is S2FPacketSetSlot) {
             val windowId = packet.func_149175_c()
             if (windowId == 0) {
+                val slot = packet.func_149173_d()
                 val item = packet.func_149174_e() ?: return
                 DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item).postAndCatch()
+                    OwnInventoryItemUpdateEvent(item, slot).postAndCatch()
                 }
             }
         }
@@ -105,7 +108,7 @@ class OwnInventoryData {
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds) { it == internalNameOrNull }
@@ -133,12 +136,10 @@ class OwnInventoryData {
     class IgnoredItem(val condition: (NEUInternalName) -> Boolean, val blockedUntil: SimpleTimeMark)
 
     private fun addItem(internalName: NEUInternalName, add: Int) {
-        val diffWorld = System.currentTimeMillis() - LorenzUtils.lastWorldSwitch
-        if (diffWorld < 3_000) return
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
         ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
         if (ignoredItemsUntil.any { it.condition(internalName) }) {
-//             println("ignored: $internalName")
             return
         }
 

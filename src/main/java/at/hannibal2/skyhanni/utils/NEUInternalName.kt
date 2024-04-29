@@ -19,7 +19,8 @@ class NEUInternalName private constructor(private val internalName: String) {
             return map.getOrPut(internalName) { NEUInternalName(internalName) }
         }
 
-        fun fromItemNameOrNull(itemName: String): NEUInternalName? = ItemNameResolver.getInternalNameOrNull(itemName)
+        fun fromItemNameOrNull(itemName: String): NEUInternalName? =
+            ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet"))
 
         fun fromItemName(itemName: String): NEUInternalName =
             fromItemNameOrNull(itemName) ?: ErrorManager.skyHanniError(

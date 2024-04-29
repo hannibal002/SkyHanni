@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -117,8 +117,7 @@ object DianaProfitTracker {
         }
         chatDugOutCoinsPattern.matchMatcher(message) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-            val coins = group("coins").formatNumber().toInt()
-            tracker.addCoins(coins)
+            tracker.addCoins(group("coins").formatInt())
             tryHide(event)
         }
 
@@ -150,8 +149,8 @@ object DianaProfitTracker {
         allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetdianaprofittracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled

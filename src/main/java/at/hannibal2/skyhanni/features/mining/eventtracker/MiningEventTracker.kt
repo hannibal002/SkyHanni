@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -47,7 +49,6 @@ class MiningEventTracker {
 
     private val defaultCooldown = 1.minutes
 
-    private var lastWorldSwitch = SimpleTimeMark.farPast()
     private var eventEndTime = SimpleTimeMark.farPast()
     private var lastSentEvent: MiningEventType? = null
 
@@ -55,7 +56,6 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        lastWorldSwitch = SimpleTimeMark.farPast()
         eventEndTime = SimpleTimeMark.farPast()
         lastSentEvent = null
     }
@@ -63,7 +63,7 @@ class MiningEventTracker {
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
         if (!LorenzUtils.inAdvancedMiningIsland()) return
-        if (lastWorldSwitch.passedSince() < 5.seconds) return
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         if (!eventEndTime.isInPast()) {
             return
         }
@@ -89,8 +89,7 @@ class MiningEventTracker {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!event.repeatSeconds(1)) return
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())) return
         if (!canRequestAt.isInPast()) return
@@ -171,6 +170,13 @@ class MiningEventTracker {
             canRequestAt = SimpleTimeMark.now() + miningEventData.data.updateIn.milliseconds
 
             MiningEventDisplay.updateData(miningEventData.data)
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(29, "mining.miningEvent.showType") { element ->
+            if (element.asString == "BOTH") JsonPrimitive("ALL") else element
         }
     }
 }

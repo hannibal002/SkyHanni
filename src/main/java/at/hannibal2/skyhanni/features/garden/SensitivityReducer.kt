@@ -77,7 +77,7 @@ object SensitivityReducer {
     }
 
     @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.reducingFactor.afterChange {
             reloadSensitivity()
         }
@@ -139,11 +139,11 @@ object SensitivityReducer {
 
         if (!LockMouseLook.lockedMouse) {
             storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
+            val newSens = doTheMath(storage.savedMouseloweredSensitivity)
+            gameSettings?.mouseSensitivity = newSens
         } else {
             storage.savedMouseloweredSensitivity = storage.savedMouselockedSensitivity
         }
-        val newSens = doTheMath(storage.savedMouseloweredSensitivity)
-        gameSettings?.mouseSensitivity = newSens
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
     }
 
@@ -161,7 +161,6 @@ object SensitivityReducer {
         isToggled = state
     }
 
-
     fun doTheMath(input: Float, reverse: Boolean = false): Float {
         val divisor = config.reducingFactor.get()
         return if (!reverse) ((input - LOCKED) / divisor) + LOCKED
@@ -169,7 +168,7 @@ object SensitivityReducer {
     }
 
     @SubscribeEvent
-    fun onLogin(event: HypixelJoinEvent) {
+    fun onHypixelJoin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
         val expectedLoweredSensitivity = doTheMath(gameSettings.mouseSensitivity, true)
         if (abs(storage.savedMouseloweredSensitivity - expectedLoweredSensitivity) <= 0.0001) {

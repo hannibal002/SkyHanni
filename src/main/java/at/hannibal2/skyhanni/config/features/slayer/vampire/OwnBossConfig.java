@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.slayer.vampire;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class OwnBossConfig {
 
@@ -31,10 +31,4 @@ public class OwnBossConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean twinClawsTitle = true;
-
-    @Expose
-    @ConfigOption(name = "Twinclaws Sound", desc = "Play a sound when Twinclaws is about to happen.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean twinClawsSound = true;
 }

@@ -11,14 +11,15 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -42,7 +43,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -101,21 +101,14 @@ object TrevorFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    init {
-        fixedRateTimer(name = "skyhanni-update-trapper", period = 1000L) {
-            if (onFarmingIsland() && config.trapperSolver) {
-                Minecraft.getMinecraft().addScheduledTask {
-                    try {
-                        updateTrapper()
-                        TrevorTracker.update()
-                        TrevorTracker.calculatePeltsPerHour()
-                        if (questActive) TrevorSolver.findMob()
-                    } catch (error: Throwable) {
-                        ErrorManager.logErrorWithData(error, "Encountered an error when updating the trapper solver")
-                    }
-                }
-            }
-        }
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!onFarmingIsland()) return
+        if (!config.trapperSolver) return
+        updateTrapper()
+        TrevorTracker.update()
+        TrevorTracker.calculatePeltsPerHour()
+        if (questActive) TrevorSolver.findMob()
     }
 
     @SubscribeEvent
@@ -182,7 +175,7 @@ object TrevorFeatures {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.trapperCooldownGui) return
         if (!onFarmingIsland()) return
 
@@ -302,7 +295,7 @@ object TrevorFeatures {
         }
 
         if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds && teleportBlock.passedSince() > 5.seconds) {
-            ChatUtils.sendCommandToServer("warp trapper")
+            HypixelCommands.warp("trapper")
             timeLastWarped = SimpleTimeMark.now()
         }
     }

@@ -63,7 +63,7 @@ interface RepoPattern : ReadOnlyProperty<Any?, Pattern> {
     val defaultPattern: String
 
     /**
-     * Key for this pattern. Used as an identifier when loading from the repo. Should be consistent accross versions.
+     * Key for this pattern. Used as an identifier when loading from the repo. Should be consistent across versions.
      */
     val key: String
 

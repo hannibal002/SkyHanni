@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FilterTypesConfig {
 
@@ -91,6 +91,12 @@ public class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean diana = false;
+
+    @Expose
+    @ConfigOption(name = "Factory Upgrade", desc = "Hide chocolate factory upgrade and employee promotion messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean factoryUpgrade = false;
 
     //TODO remove
     @Expose

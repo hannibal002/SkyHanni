@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -42,12 +43,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -78,10 +82,10 @@ object ItemDisplayOverlayFeatures {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        event.stackTip = getStackTip(event.stack)
+        event.stackTip = getStackTip(event.stack) ?: return
     }
 
-    private fun getStackTip(item: ItemStack): String {
+    private fun getStackTip(item: ItemStack): String? {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
@@ -116,7 +120,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
-            val year = item.getExtraAttributes()?.getInteger("new_years_cake")?.toString() ?: ""
+            val year = item.getNewYearCake()?.toString() ?: ""
             return "§b$year"
         }
 
@@ -166,7 +170,7 @@ object ItemDisplayOverlayFeatures {
                 val level = "" + text.romanToDecimalIfNecessary()
                 val skill = SkillType.getByNameOrNull(skillName) ?: return level
                 val skillInfo = SkillAPI.storage?.get(skill) ?: return level
-                return if (SkyHanniMod.feature.skillProgress.overflowConfig.enableInSkillMenuAsStackSize)
+                return if (SkillProgress.config.overflowConfig.enableInSkillMenuAsStackSize)
                     "" + skillInfo.overflowLevel else level
             }
         }
@@ -197,14 +201,12 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".asInternalName()) {
-            for (line in lore) {
-                harvestPattern.matchMatcher(line) {
-                    val amount = group("amount").toInt()
-                    return when {
-                        amount > 4 -> "§a$amount"
-                        amount > 2 -> "§e$amount"
-                        else -> "§c$amount"
-                    }
+            lore.matchFirst(harvestPattern) {
+                val amount = group("amount").toInt()
+                return when {
+                    amount > 4 -> "§a$amount"
+                    amount > 2 -> "§e$amount"
+                    else -> "§c$amount"
                 }
             }
         }
@@ -221,18 +223,16 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
-            for (line in lore) {
-                gardenVacuumPatterm.matchMatcher(line) {
-                    val pests = group("amount").formatLong()
-                    return if (config.vacuumBagCap) {
-                        if (pests > 39) "§640+" else "$pests"
-                    } else {
-                        when {
-                            pests < 40 -> "$pests"
-                            pests < 1_000 -> "§6$pests"
-                            pests < 100_000 -> "§c${pests / 1000}k"
-                            else -> "§c${pests / 100_000 / 10.0}m"
-                        }
+            lore.matchFirst(gardenVacuumPatterm) {
+                val pests = group("amount").formatLong()
+                return if (config.vacuumBagCap) {
+                    if (pests > 39) "§640+" else "$pests"
+                } else {
+                    when {
+                        pests < 40 -> "$pests"
+                        pests < 1_000 -> "§6$pests"
+                        pests < 100_000 -> "§c${pests / 1000}k"
+                        else -> "§c${pests / 100_000 / 10.0}m"
                     }
                 }
             }
@@ -252,15 +252,13 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
-            for (line in lore) {
-                bingoGoalRankPattern.matchMatcher(line) {
-                    val rank = group("rank").formatLong()
-                    if (rank < 10000) return "§6${NumberUtil.format(rank)}"
-                }
+            lore.matchFirst(bingoGoalRankPattern) {
+                val rank = group("rank").formatLong()
+                if (rank < 10000) return "§6${NumberUtil.format(rank)}"
             }
         }
 
-        return ""
+        return null
     }
 
     private fun isOwnVacuum(lore: List<String>) =
@@ -282,6 +280,19 @@ object ItemDisplayOverlayFeatures {
         event.transform(11, "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)
         }
+        event.transform(29, "inventory.itemNumberAsStackSize") { element ->
+            fixRemovedConfigElement(element)
+        }
+    }
+
+    private fun fixRemovedConfigElement(data: JsonElement): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        for (element in data.asJsonArray) {
+            if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
     }
 
     fun ItemNumberEntry.isSelected() = config.itemNumberAsStackSize.contains(this)

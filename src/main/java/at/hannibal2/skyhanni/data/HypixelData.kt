@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -44,7 +46,7 @@ class HypixelData {
         private val patternGroup = RepoPattern.group("data.hypixeldata")
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
-            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
         )
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
@@ -72,11 +74,24 @@ class HypixelData {
         )
         private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
             "scoreboard.visiting.amount",
-            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§.\\/(?<maxamount>\\d+)\\)"
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)"
         )
         private val guestPattern by patternGroup.pattern(
             "guesting.scoreboard",
             "SKYBLOCK GUEST"
+        )
+        private val scoreboardTitlePattern by patternGroup.pattern(
+            "scoreboard.title",
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+        )
+
+        /**
+         * REGEX-TEST:  §7⏣ §bVillage
+         * REGEX-TEST:  §5ф §dWizard Tower
+         */
+        private val skyblockAreaPattern by patternGroup.pattern(
+            "skyblock.area",
+            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
         )
 
         var hypixelLive = false
@@ -95,9 +110,10 @@ class HypixelData {
         var bingo = false
 
         var profileName = ""
-        var joinedWorld = 0L
+        var joinedWorld = SimpleTimeMark.farPast()
 
-        var skyBlockArea = "?"
+        var skyBlockArea: String? = null
+        var skyBlockAreaWithSymbol: String? = null
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -119,20 +135,19 @@ class HypixelData {
 
         fun checkCurrentServerId() {
             if (!LorenzUtils.inSkyBlock) return
+            if (serverId != null) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+            if (!TabListData.fullyLoaded) return
 
-            ScoreboardData.sidebarLinesFormatted.forEach {
-                serverIdScoreboardPattern.matchMatcher(it) {
-                    val serverType = if (group("servertype") == "M") "mega" else "mini"
-                    serverId = "$serverType${group("serverid")}"
-                    return
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+                val serverType = if (group("servertype") == "M") "mega" else "mini"
+                serverId = "$serverType${group("serverid")}"
+                return
             }
 
-            TabListData.getTabList().forEach {
-                serverIdTablistPattern.matchMatcher(it) {
-                    serverId = group("serverid")
-                    return
-                }
+            TabListData.getTabList().matchFirst(serverIdTablistPattern) {
+                serverId = group("serverid")
+                return
             }
 
             ErrorManager.logErrorWithData(
@@ -151,7 +166,7 @@ class HypixelData {
                 playerAmountGuestingPattern
             )
 
-            out@for (pattern in playerPatternList) {
+            out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
                     pattern.matchMatcher(line) {
                         amount += group("amount").toInt()
@@ -165,11 +180,10 @@ class HypixelData {
         }
 
         fun getMaxPlayersForCurrentServer(): Int {
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                scoreboardVisitingAmoutPattern.matchMatcher(line) {
-                    return group("maxamount").toInt()
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
+                return group("maxamount").toInt()
             }
+            if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) return 24
             return if (serverId?.startsWith("mega") == true) 80 else 26
         }
 
@@ -213,8 +227,10 @@ class HypixelData {
         inLimbo = false
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
-        joinedWorld = System.currentTimeMillis()
+        joinedWorld = SimpleTimeMark.now()
         serverId = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent
@@ -225,6 +241,8 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         locrawData = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent
@@ -248,16 +266,14 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
-                var newProfile = group("profile").lowercase()
-                // Hypixel shows the profile name reversed while in the Rift
-                if (RiftAPI.inRift()) newProfile = newProfile.reversed()
-                if (profileName == newProfile) return
-                profileName = newProfile
-                ProfileJoinEvent(newProfile).postAndCatch()
-                return
-            }
+        event.tabList.matchFirst(UtilsPatterns.tabListProfilePattern) {
+            var newProfile = group("profile").lowercase()
+
+            // Hypixel shows the profile name reversed while in the Rift
+            if (RiftAPI.inRift()) newProfile = newProfile.reversed()
+            if (profileName == newProfile) return
+            profileName = newProfile
+            ProfileJoinEvent(newProfile).postAndCatch()
         }
     }
 
@@ -269,7 +285,6 @@ class HypixelData {
             // So, as requested by Hannibal, use locraw from
             // NEU and have NEU send it.
             // Remove this when NEU dependency is removed
-            val currentTime = System.currentTimeMillis()
             if (LorenzUtils.onHypixel &&
                 locrawData == null &&
                 lastLocRaw.passedSince() > 15.seconds
@@ -282,12 +297,15 @@ class HypixelData {
             }
         }
 
-        if (event.isMod(2) && LorenzUtils.inSkyBlock) {
-            val originalLocation = ScoreboardData.sidebarLinesFormatted
-                .firstOrNull { it.startsWith(" §7⏣ ") || it.startsWith(" §5ф ") }
-                ?.substring(5)?.removeColor()
-                ?: "?"
-            skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+        if (LorenzUtils.inSkyBlock) {
+            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                skyblockAreaPattern.matchMatcher(line) {
+                    val originalLocation = group("area")
+                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    skyBlockAreaWithSymbol = line.trim()
+                    break@loop
+                }
+            }
 
             checkProfileName()
         }
@@ -314,15 +332,13 @@ class HypixelData {
         skyBlock = inSkyBlock
     }
 
-    private fun checkProfileName(): Boolean {
-        if (profileName.isEmpty()) {
-            val text = TabListData.getTabList().firstOrNull { it.contains("Profile:") } ?: return true
-            UtilsPatterns.tabListProfilePattern.matchMatcher(text) {
-                profileName = group("profile").lowercase()
-                ProfileJoinEvent(profileName).postAndCatch()
-            }
+    private fun checkProfileName() {
+        if (profileName.isNotEmpty()) return
+
+        TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
+            profileName = group("profile").lowercase()
+            ProfileJoinEvent(profileName).postAndCatch()
         }
-        return false
     }
 
     private fun checkHypixel() {
@@ -358,24 +374,22 @@ class HypixelData {
     }
 
     private fun checkIsland() {
-        var newIsland = ""
+        var foundIsland = ""
         TabListData.fullyLoaded = false
 
-        for (line in TabListData.getTabList()) {
-            islandNamePattern.matchMatcher(line) {
-                newIsland = group("island").removeColor()
-                TabListData.fullyLoaded = true
-            }
+        TabListData.getTabList().matchFirst(islandNamePattern) {
+            foundIsland = group("island").removeColor()
+            TabListData.fullyLoaded = true
         }
 
         // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
         val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-        val islandType = getIslandType(newIsland, guesting)
+        val islandType = getIslandType(foundIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
-                ChatUtils.debug("Unknown island detected: '$newIsland'")
-                loggerIslandChange.log("Unknown: '$newIsland'")
+                ChatUtils.debug("Unknown island detected: '$foundIsland'")
+                loggerIslandChange.log("Unknown: '$foundIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)
             }
@@ -399,7 +413,6 @@ class HypixelData {
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
-        return scoreboardTitle.contains("SKYBLOCK") ||
-            scoreboardTitle.contains("SKIBLOCK") // April 1st jokes are so funny
+        return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 }

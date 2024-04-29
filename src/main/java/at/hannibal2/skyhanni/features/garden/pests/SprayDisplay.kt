@@ -27,7 +27,7 @@ class SprayDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden() || !event.isMod(5)) return
+        if (!GardenAPI.inGarden() || !event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
             display = GardenPlotAPI.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
@@ -44,14 +44,14 @@ class SprayDisplay {
     }
 
     @SubscribeEvent
-    fun onJoin(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.expiryNotification || event.newIsland != IslandType.GARDEN) return
         sendExpiredPlotsToChat(true)
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(ignored: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden() || !config.displayEnabled) return
         val display = display ?: return
         config.displayPosition.renderString(display, posLabel = "Active Plot Spray Display")

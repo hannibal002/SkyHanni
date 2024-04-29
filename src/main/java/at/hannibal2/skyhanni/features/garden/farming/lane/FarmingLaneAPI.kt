@@ -26,6 +26,7 @@ object FarmingLaneAPI {
     @SubscribeEvent
     fun onCropClick(event: CropClickEvent) {
         val crop = event.crop
+        GardenAPI.hasFarmingToolInHand()
 
         val lanes = lanes ?: return
         val lane = lanes[crop]
@@ -40,7 +41,7 @@ object FarmingLaneAPI {
 
     private fun warnNoLane(crop: CropType?) {
         if (crop == null || currentLane != null) return
-        if (!GardenAPI.isCurrentlyFarming()) return
+        if (!GardenAPI.hasFarmingToolInHand()) return
         if (FarmingLaneCreator.detection) return
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
@@ -49,7 +50,9 @@ object FarmingLaneAPI {
 
         ChatUtils.clickableChat(
             "No ${crop.cropName} lane defined yet! Use §e/shlanedetection",
-            command = "shlanedetection"
+            onClick = {
+                FarmingLaneCreator.commandLaneDetection()
+            }
         )
     }
 

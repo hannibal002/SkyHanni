@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -33,6 +34,7 @@ object GardenPlotAPI {
         "name",
         "§.Plot §7- §b(?<name>.*)"
     )
+
     /**
      * REGEX-TEST: §aThe Barn
      */
@@ -40,6 +42,7 @@ object GardenPlotAPI {
         "barnname",
         "§.(?<name>The Barn)"
     )
+
     /**
      * REGEX-TEST: §7Cleanup: §b0% Completed
      */
@@ -47,6 +50,7 @@ object GardenPlotAPI {
         "uncleaned",
         "§7Cleanup: .* (?:§.)*Completed"
     )
+
     /**
      * REGEX-TEST: §aUnlocked Garden §r§aPlot §r§7- §r§b10§r§a!
      */
@@ -54,6 +58,7 @@ object GardenPlotAPI {
         "chat.unlock",
         "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
     )
+
     /**
      * REGEX-TEST: §aPlot §r§7- §r§b10 §r§ais now clean!
      */
@@ -64,6 +69,10 @@ object GardenPlotAPI {
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
+    )
+    private val portableWasherPattern by patternGroup.pattern(
+        "spray.cleared.portablewasher",
+        "§9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
     )
 
     var plots = listOf<Plot>()
@@ -111,7 +120,20 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false, false, false, true, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) {
+        PlotData(
+            id,
+            "$id",
+            0,
+            null,
+            null,
+            false,
+            false,
+            false,
+            true,
+            false,
+        )
+    }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -173,13 +195,23 @@ object GardenPlotAPI {
         }
     }
 
+    private fun Plot.removeSpray() {
+        getData()?.apply {
+            sprayType = null
+            sprayExpiryTime = SimpleTimeMark.now()
+            sprayHasNotified = true
+        }
+    }
+
     fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
+    fun closestCenterPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }?.middle
+
     fun Plot.sendTeleportTo() {
-        if (isBarn()) ChatUtils.sendCommandToServer("tptoplot barn")
-        else ChatUtils.sendCommandToServer("tptoplot $name")
+        if (isBarn()) HypixelCommands.teleportToPlot("barn")
+        else HypixelCommands.teleportToPlot(name)
         LockMouseLook.autoDisable()
     }
 
@@ -233,6 +265,14 @@ object GardenPlotAPI {
             val plotId = group("plot").toInt()
             val plot = getPlotByID(plotId)
             plot?.locked = false
+        }
+
+        portableWasherPattern.matchMatcher(event.message) {
+            for (plot in plots) {
+                if (plot.currentSpray != null) {
+                    plot.removeSpray()
+                }
+            }
         }
     }
 

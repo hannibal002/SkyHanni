@@ -2,11 +2,14 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -35,28 +38,28 @@ class TotemOfCorruption {
     private var display = emptyList<String>()
     private var totems: List<Totem> = emptyList()
 
-    private val group = RepoPattern.group("fishing.totemofcorruption")
-    private val totemNamePattern by group.pattern(
+    private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
+    private val totemNamePattern by patternGroup.pattern(
         "totemname",
         "§5§lTotem of Corruption"
     )
-    private val timeRemainingPattern by group.pattern(
+    private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining",
         "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s"
     )
-    private val ownerPattern by group.pattern(
+    private val ownerPattern by patternGroup.pattern(
         "owner",
         "§7Owner: §e(?<owner>.+)"
     )
 
     @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isOverlayEnabled() || display.isEmpty()) return
         config.position.renderStrings(display, posLabel = "Totem of Corruption")
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(2)) return
         if (!isOverlayEnabled()) return
 
@@ -80,6 +83,7 @@ class TotemOfCorruption {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEffectiveAreaEnabled()) return
+        if (totems.isEmpty()) return
 
         val color = config.color.toChromaColor()
         for (totem in totems) {
@@ -96,6 +100,20 @@ class TotemOfCorruption {
                 else -> return
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.showOverlay.onToggle {
+            display = emptyList()
+            totems = emptyList()
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        display = emptyList()
+        totems = emptyList()
     }
 
     private fun getTimeRemaining(totem: EntityArmorStand): Duration? =
@@ -115,7 +133,6 @@ class TotemOfCorruption {
                     group("owner")
                 }
             }
-
 
     private fun createDisplay() = buildList {
         val totem = getTotemToShow() ?: return@buildList
@@ -142,12 +159,12 @@ class TotemOfCorruption {
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }
 
-    private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay
+    private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay.get()
     private fun isHideParticlesEnabled() = LorenzUtils.inSkyBlock && config.hideParticles
     private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 
-class Totem(
+private class Totem(
     val location: LorenzVec,
     val timeRemaining: Duration,
     val ownerName: String,

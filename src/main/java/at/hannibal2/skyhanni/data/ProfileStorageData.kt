@@ -10,9 +10,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -51,11 +52,9 @@ object ProfileStorageData {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        for (line in event.tabList) {
-            UtilsPatterns.tabListProfilePattern.matchMatcher(line) {
-                noTabListTime = SimpleTimeMark.farPast()
-                return
-            }
+        event.tabList.matchFirst(UtilsPatterns.tabListProfilePattern) {
+            noTabListTime = SimpleTimeMark.farPast()
+            return
         }
 
         noTabListTime = SimpleTimeMark.now()
@@ -71,8 +70,11 @@ object ProfileStorageData {
             val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
             if (foundSkyBlockTabList) {
                 ChatUtils.clickableChat(
-                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget",
-                    command = "widget"
+                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
+                        "This is needed for the mod to function! And therefore this warning cannot be disabled",
+                    onClick = {
+                        HypixelCommands.widget()
+                    }
                 )
             } else {
                 ChatUtils.chat(

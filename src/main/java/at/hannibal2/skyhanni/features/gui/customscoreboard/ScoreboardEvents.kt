@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -10,11 +11,11 @@ import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.inDungeons
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
@@ -138,15 +139,21 @@ enum class ScoreboardEvents(
             "§7Damage Soaked:\n" +
             "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
     ),
+    RIFT(
+        ::getRiftLines,
+        { IslandType.THE_RIFT.isInIsland() },
+        "§7(All Rift Lines)"
+    ),
     ESSENCE(
         ::getEssenceLines,
         ::getEssenceShowWhen,
         "Dragon Essence: §d1,285"
     ),
-    EFFIGIES(
-        ::getEffigiesLines,
-        ::getEffigiesShowWhen,
-        "Effigies: §c⧯§c⧯⧯§7⧯§c⧯§c⧯"
+    QUEUE(
+        ::getQueueLines,
+        ::getQueueShowWhen,
+        "Queued: Glacite Mineshafts\n" +
+            "Position: §b#45 §fSince: §a00:00"
     ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
@@ -177,7 +184,7 @@ enum class ScoreboardEvents(
                     }
                 }
             } else {
-                add(eventsConfig.eventEntries.firstOrNull { it.showWhen() })
+                add(eventsConfig.eventEntries.firstOrNull { it.showWhen() && it.getLines().isNotEmpty() })
             }
         }
 
@@ -202,8 +209,8 @@ enum class ScoreboardEvents(
             MINING_EVENTS,
             DAMAGE,
             MAGMA_BOSS,
+            RIFT,
             ESSENCE,
-            EFFIGIES,
             ACTIVE_TABLIST_EVENTS
         )
     }
@@ -253,9 +260,7 @@ private fun getDungeonsLines() = listOf(
     getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
 }
 
-private fun getDungeonsShowWhen(): Boolean {
-    return IslandType.CATACOMBS.isInIsland() || inDungeons
-}
+private fun getDungeonsShowWhen(): Boolean = DungeonAPI.inDungeon()
 
 private fun getKuudraLines() = listOf(
     SbPattern.autoClosingPattern,
@@ -388,7 +393,8 @@ private fun getSpookyLines() = buildList {
     getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }?.let { add(it) } // Time
     add("§7Your Candy: ")
     add(
-        CustomScoreboardUtils.getTablistFooter()
+        TabListData.getFooter()
+            .removeResets()
             .split("\n")
             .firstOrNull { it.startsWith("§7Your Candy:") }
             ?.removePrefix("§7Your Candy:") ?: "§cCandy not found"
@@ -427,14 +433,6 @@ private fun getBroodmotherLines(): List<String> {
 
 private fun getBroodmotherShowWhen(): Boolean {
     return getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
-}
-
-private fun getOringoLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.travelingZooPattern.matches(it) })
-}
-
-private fun getOringoShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.travelingZooPattern.matches(it) }
 }
 
 private fun getMiningEventsLines() = buildList {
@@ -485,6 +483,16 @@ private fun getMiningEventsLines() = buildList {
         add(getSbLines().first { SbPattern.yourGoblinKillsPattern.matches(it) })
         add(getSbLines().first { SbPattern.remainingGoblinPattern.matches(it) })
     }
+
+    // Fortunate Freezing
+    if (getSbLines().any { SbPattern.fortunateFreezingBonusPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fortunateFreezingBonusPattern.matches(it) })
+    }
+
+    // Fossil Dust
+    if (getSbLines().any { SbPattern.fossilDustPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fossilDustPattern.matches(it) })
+    }
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
@@ -515,6 +523,22 @@ private fun getMagmaBossShowWhen(): Boolean {
     return SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 }
 
+private fun getRiftLines() = buildList {
+    if (SbPattern.riftHotdogTitlePattern.anyMatches(getSbLines())) {
+        add(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) })
+        add(getSbLines().first { SbPattern.timeLeftPattern.matches(it) })
+        add(getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
+    }
+
+    if (RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())) {
+        add(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
+    }
+
+    if (SbPattern.riftAveikxPattern.anyMatches(getSbLines())) {
+        addAll(getSbLines().filter { SbPattern.riftAveikxPattern.matches(it) })
+    }
+}
+
 private fun getEssenceLines(): List<String> {
     return listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
 }
@@ -523,12 +547,13 @@ private fun getEssenceShowWhen(): Boolean {
     return SbPattern.essencePattern.anyMatches(getSbLines())
 }
 
-private fun getEffigiesLines(): List<String> {
-    return listOf(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
+private fun getQueueLines(): List<String> {
+    return listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
 }
 
-private fun getEffigiesShowWhen(): Boolean {
-    return RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())
+private fun getQueueShowWhen(): Boolean {
+    return SbPattern.queuePattern.anyMatches(getSbLines())
 }
 
 private fun getRedstoneLines(): List<String> {

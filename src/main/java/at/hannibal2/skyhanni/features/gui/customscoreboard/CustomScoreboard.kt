@@ -13,6 +13,8 @@
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
 //  - more anchor points (alignment enums in renderutils)
+//  - 24h instead of 12h for skyblock time
+//  - only alert for lines that exist longer than 1s
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
@@ -29,6 +31,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -49,7 +53,7 @@ class CustomScoreboard {
         RenderBackground().renderBackground()
 
         val render =
-            if (!TabListData.fullyLoaded && config.displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
+            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
                 cache
             } else {
                 display
@@ -64,7 +68,6 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
-            val alignmentConfig = config.displayConfig.alignment
             if (alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
                 alignmentConfig.alignRight = false
                 alignmentConfig.alignCenterVertically = false
@@ -91,10 +94,15 @@ class CustomScoreboard {
 
     companion object {
         internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-        internal val displayConfig get() = config.displayConfig
-        internal val eventsConfig get() = displayConfig.eventsConfig
-        internal val informationFilteringConfig get() = config.informationFilteringConfig
-        internal val backgroundConfig get() = config.backgroundConfig
+        internal val displayConfig get() = config.display
+        internal val alignmentConfig get() = displayConfig.alignment
+        internal val arrowConfig get() = displayConfig.arrow
+        internal val eventsConfig get() = displayConfig.events
+        internal val mayorConfig get() = displayConfig.mayor
+        internal val partyConfig get() = displayConfig.party
+        internal val maxwellConfig get() = displayConfig.maxwell
+        internal val informationFilteringConfig get() = config.informationFiltering
+        internal val backgroundConfig get() = config.background
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
@@ -126,7 +134,7 @@ class CustomScoreboard {
     }
 
     private fun List<ScoreboardElementType>.removeEmptyLinesFromEdges(): List<ScoreboardElementType> {
-        if (config.informationFilteringConfig.hideEmptyLinesAtTopAndBottom) {
+        if (config.informationFiltering.hideEmptyLinesAtTopAndBottom) {
             return this
                 .dropWhile { it.first.isEmpty() }
                 .dropLastWhile { it.first.isEmpty() }
@@ -161,10 +169,67 @@ class CustomScoreboard {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isHideVanillaScoreboardEnabled() = isEnabled() && config.displayConfig.hideVanillaScoreboard
+    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(28, "gui.customscoreboard.displayConfig.showAllActiveEvents", "gui.customscoreboard.displayConfig.eventsConfig.showAllActiveEvents")
+        val prefix = "gui.customScoreboard"
+        val displayConfigPrefix = "$prefix.displayConfig"
+        val displayPrefix = "$prefix.display"
+
+        event.move(
+            28,
+            "$prefix.displayConfig.showAllActiveEvents",
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+        )
+
+        event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
+        event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
+        event.move(31, "$displayConfigPrefix.showMagicalPower", "$displayPrefix.maxwell.showMagicalPower")
+        event.move(31, "$displayConfigPrefix.compactTuning", "$displayPrefix.maxwell.compactTuning")
+        event.move(31, "$displayConfigPrefix.tuningAmount", "$displayPrefix.maxwell.tuningAmount")
+        event.move(31, "$displayConfigPrefix.hideVanillaScoreboard", "$displayPrefix.hideVanillaScoreboard")
+        event.move(31, "$displayConfigPrefix.displayNumbersFirst", "$displayPrefix.displayNumbersFirst")
+        event.move(31, "$displayConfigPrefix.showUnclaimedBits", "$displayPrefix.showUnclaimedBits")
+        event.move(31, "$displayConfigPrefix.showMaxIslandPlayers", "$displayPrefix.showMaxIslandPlayers")
+        event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
+        event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
+        event.move(
+            31,
+            "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
+            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+        )
+        // Categories
+        event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
+        event.move(31, "$displayConfigPrefix.titleAndFooter", "$displayPrefix.titleAndFooter")
+        event.move(31, "$prefix.backgroundConfig", "$prefix.background")
+        event.move(31, "$prefix.informationFilteringConfig", "$prefix.informationFiltering")
+        event.move(31, "$displayConfigPrefix.eventsConfig", "$displayPrefix.events")
+        event.move(31, "$prefix.mayorConfig", "$displayPrefix.mayor")
+        event.move(31, "$prefix.partyConfig", "$displayPrefix.party")
+
+        event.transform(37, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array
+        }
+        event.transform(40, "$displayPrefix.events.eventEntries") { element ->
+            val jsonArray = element.asJsonArray
+            val newArray = JsonArray()
+
+            for (jsonElement in jsonArray) {
+                val stringValue = jsonElement.asString
+                if (stringValue !in listOf("HOT_DOG_CONTEST", "EFFIGIES")) {
+                    newArray.add(jsonElement)
+                }
+            }
+
+            if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
+                newArray.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
+            }
+
+            newArray
+        }
+
     }
 }

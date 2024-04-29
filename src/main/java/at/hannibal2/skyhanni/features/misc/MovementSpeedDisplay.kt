@@ -22,11 +22,16 @@ class MovementSpeedDisplay {
     private val soulsandSpeeds = mutableListOf<Double>()
 
     companion object {
+        /**
+         * This speed value represents the movement speed in blocks per second.
+         * This has nothing to do with the speed stat.
+         */
         var speed = 0.0
         var usingSoulsandSpeed = false
     }
 
     init {
+        // TODO use LorenzTickEvent
         fixedRateTimer(name = "skyhanni-movement-speed-display", period = 250, initialDelay = 1_000) {
             checkSpeed()
         }

@@ -3,14 +3,18 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.IdentityHashMap
+import kotlin.time.Duration.Companion.seconds
 
 object GardenCustomKeybinds {
 
@@ -19,6 +23,7 @@ object GardenCustomKeybinds {
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()
     private var lastWindowOpenTime = 0L
+    private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
 
     init {
         map[mcSettings.keyBindAttack] = { config.attack }
@@ -31,7 +36,7 @@ object GardenCustomKeybinds {
         map[mcSettings.keyBindSneak] = { config.sneak }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
     private fun isActive(): Boolean {
         if (!isEnabled()) return false
@@ -46,6 +51,21 @@ object GardenCustomKeybinds {
 
         // TODO remove workaround
         if (System.currentTimeMillis() < lastWindowOpenTime + 300) return false
+
+        val areDuplicates = map.values
+            .map { it() }
+            .filter { it != Keyboard.KEY_NONE }
+            .let { values -> values.size != values.toSet().size }
+        if (areDuplicates) {
+            if (lastDuplicateKeybindsWarnTime.passedSince() > 30.seconds) {
+                ChatUtils.chatAndOpenConfig(
+                    "Duplicate Custom Keybinds aren't allowed!",
+                    GardenAPI.config::keyBind
+                )
+                lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
+            }
+            return false
+        }
 
         return true
     }

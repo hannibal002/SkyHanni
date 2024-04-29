@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,28 +34,17 @@ public class CustomScoreboardConfig {
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
     @Accordion
-    public DisplayConfig displayConfig = new DisplayConfig();
+    public DisplayConfig display = new DisplayConfig();
 
     @Expose
     @ConfigOption(name = "Background Options", desc = "")
     @Accordion
-    public BackgroundConfig backgroundConfig = new BackgroundConfig();
-
-    @Expose
-    @ConfigOption(name = "Party Options", desc = "")
-    @Accordion
-    public PartyConfig partyConfig = new PartyConfig();
-
-    @Expose
-    @ConfigOption(name = "Mayor Options", desc = "")
-    @Accordion
-    public MayorConfig mayorConfig = new MayorConfig();
+    public BackgroundConfig background = new BackgroundConfig();
 
     @Expose
     @ConfigOption(name = "Information Filtering", desc = "")
     @Accordion
-    public InformationFilteringConfig informationFilteringConfig = new InformationFilteringConfig();
-
+    public InformationFilteringConfig informationFiltering = new InformationFilteringConfig();
 
     @Expose
     @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")
@@ -62,5 +52,6 @@ public class CustomScoreboardConfig {
     public boolean unknownLinesWarning = true;
 
     @Expose
+    @ConfigLink(owner = CustomScoreboardConfig.class, field = "enabled")
     public Position position = new Position(10, 80, false, true);
 }

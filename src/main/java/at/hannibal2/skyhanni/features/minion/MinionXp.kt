@@ -28,7 +28,7 @@ import java.util.EnumMap
 
 class MinionXp {
 
-    private val config get() = SkyHanniMod.feature.minions
+    private val config get() = SkyHanniMod.feature.misc.minions
 
     private val xpItemMap: MutableMap<PrimitiveItemStack, String> = mutableMapOf()
     private val collectItemXpList: MutableList<String> = mutableListOf()
@@ -141,7 +141,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onItemTooltipEvent(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.xpDisplay) return
         when {
@@ -168,7 +168,7 @@ class MinionXp {
     }
 
     @SubscribeEvent
-    fun onIslandChangeEvent(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         minionStorages.clear()
         xpItemMap.clear()
         collectItemXpList.clear()

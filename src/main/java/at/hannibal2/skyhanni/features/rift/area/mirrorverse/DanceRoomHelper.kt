@@ -37,6 +37,7 @@ object DanceRoomHelper {
             if (instructions.isEmpty()) {
                 add("§cError fetching Dance Room Instructions!")
                 add("§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo")
+                // TODO make clickable
             }
             for ((lineIndex, line) in instructions.withIndex()) {
                 addLine(lineIndex, line)?.let { add(it) }
@@ -110,7 +111,7 @@ object DanceRoomHelper {
     }
 
     @SubscribeEvent
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() || !inRoom) return
         if ((event.soundName == "random.burp" && event.volume == 0.8f) || (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)) {
             index = 0

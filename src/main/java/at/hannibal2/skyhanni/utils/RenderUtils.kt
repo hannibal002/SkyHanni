@@ -7,13 +7,15 @@ import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
@@ -21,6 +23,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
@@ -32,6 +35,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
@@ -50,7 +54,11 @@ object RenderUtils {
         }
     }
 
-    enum class VerticalAlignment { TOP, CENTER, BOTTOM }
+    enum class VerticalAlignment {
+        TOP,
+        CENTER,
+        BOTTOM,
+    }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
@@ -61,22 +69,57 @@ object RenderUtils {
     }
 
     infix fun Slot.highlight(color: Color) {
-        GlStateManager.color(1f, 1f, 1f, 1f)
-        GlStateManager.pushAttrib()
-        GL11.glDisable(GL11.GL_LIGHTING)
-        GL11.glEnable(GL11.GL_DEPTH_TEST)
+        highlight(color, xDisplayPosition, yDisplayPosition)
+    }
+
+    infix fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
+        highlight(color.toColor())
+    }
+
+    infix fun RenderGuiItemOverlayEvent.highlight(color: Color) {
+        highlight(color, x, y)
+    }
+
+    fun highlight(color: Color, x: Int, y: Int) {
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
         GlStateManager.pushMatrix()
         // TODO don't use z
         GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(
-            this.xDisplayPosition,
-            this.yDisplayPosition,
-            this.xDisplayPosition + 16,
-            this.yDisplayPosition + 16,
-            color.rgb
-        )
+        Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
         GlStateManager.popMatrix()
-        GlStateManager.popAttrib()
+        GlStateManager.enableDepth()
+        GlStateManager.enableLighting()
+    }
+
+    infix fun Slot.drawBorder(color: LorenzColor) {
+        drawBorder(color.toColor())
+    }
+
+    infix fun Slot.drawBorder(color: Color) {
+        drawBorder(color, xDisplayPosition, yDisplayPosition)
+    }
+
+    infix fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
+        drawBorder(color.toColor())
+    }
+
+    infix fun RenderGuiItemOverlayEvent.drawBorder(color: Color) {
+        drawBorder(color, x, y)
+    }
+
+    fun drawBorder(color: Color, x: Int, y: Int) {
+        GlStateManager.disableLighting()
+        GlStateManager.disableDepth()
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        Gui.drawRect(x, y, x + 1, y + 16, color.rgb)
+        Gui.drawRect(x, y, x + 16, y + 1, color.rgb)
+        Gui.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
+        Gui.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
+        GlStateManager.popMatrix()
+        GlStateManager.enableDepth()
+        GlStateManager.enableLighting()
     }
 
     fun LorenzRenderWorldEvent.drawColor(
@@ -138,7 +181,8 @@ object RenderUtils {
 
     fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
 
-    fun AxisAlignedBB.expandBlock() = expand(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
+    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(n))
+    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(-n))
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -437,7 +481,7 @@ object RenderUtils {
         string: String?,
         offsetX: Int = 0,
         offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment
+        alignmentEnum: HorizontalAlignment,
     ): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
@@ -480,7 +524,7 @@ object RenderUtils {
     fun Position.renderStringsAlignedWidth(
         list: List<Pair<String, HorizontalAlignment>>,
         extraSpace: Int = 0,
-        posLabel: String
+        posLabel: String,
     ) {
         if (list.isEmpty()) return
 
@@ -526,7 +570,7 @@ object RenderUtils {
     fun Position.renderStringsAndItems(
         list: List<List<Any?>>,
         extraSpace: Int = 0,
-        itemScale: Double = 1.0,
+        itemScale: Double = NEUItems.itemFontSize,
         posLabel: String,
     ) {
         if (list.isEmpty()) return
@@ -554,13 +598,20 @@ object RenderUtils {
      * Accepts a single line to print.
      * This  line is a list of things to print. Can print String or ItemStack objects.
      */
-    fun Position.renderSingleLineWithItems(list: List<Any?>, itemScale: Double = 1.0, posLabel: String) {
+    fun Position.renderSingleLineWithItems(
+        list: List<Any?>,
+        posLabel: String,
+    ) {
         if (list.isEmpty()) return
-        val longestX = renderLine(list, 0, itemScale)
-        GuiEditManager.add(this, posLabel, longestX, 10)
+        renderRenderables(
+            listOf(
+                Renderable.horizontalContainer(
+                    list.mapNotNull { Renderable.fromAny(it) }
+                )), posLabel = posLabel)
+        // TODO Future write that better
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = 1.0): Int {
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         GlStateManager.translate(0f, offsetY.toFloat(), 0F)
@@ -578,13 +629,17 @@ object RenderUtils {
         return offsetX
     }
 
-    fun MutableList<Any>.addItemIcon(item: ItemStack, highlight: Boolean = false) {
+    fun MutableList<Any>.addItemIcon(
+        item: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize,
+    ) {
         try {
             if (highlight) {
                 // Hack to add enchant glint, like Hypixel does it
                 item.addEnchantment(Enchantment.protection, 0)
             }
-            add(item)
+            add(Renderable.itemStack(item, scale))
         } catch (e: NullPointerException) {
             ErrorManager.logErrorWithData(
                 e, "Add item icon to renderable list",
@@ -737,9 +792,11 @@ object RenderUtils {
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
 
-                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 =
+                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 =
+                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -798,9 +855,11 @@ object RenderUtils {
                 val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
                 val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 =
+                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 =
+                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -1147,6 +1206,69 @@ object RenderUtils {
         GlStateManager.disableBlend()
     }
 
+    fun WorldRenderer.pos(vec: LorenzVec) = this.pos(vec.x, vec.y, vec.z)
+
+    fun draw3DQuad(
+        middlePoint: LorenzVec,
+        sidePoint1: LorenzVec,
+        sidePoint2: LorenzVec,
+        c: Color,
+        partialTicks: Float = 0F,
+    ) = QuadDrawer.draw3D(partialTicks) {
+        draw(
+            middlePoint,
+            sidePoint1,
+            sidePoint2,
+            c
+        )
+    }
+
+    class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+        val worldRenderer = tessellator.worldRenderer
+        inline fun draw(
+            middlePoint: LorenzVec,
+            sidePoint1: LorenzVec,
+            sidePoint2: LorenzVec,
+            c: Color,
+        ) {
+            GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
+            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+            worldRenderer.pos(sidePoint1).endVertex()
+            worldRenderer.pos(middlePoint).endVertex()
+            worldRenderer.pos(sidePoint2).endVertex()
+            worldRenderer.pos(sidePoint1.add(sidePoint2).subtract(middlePoint)).endVertex()
+            tessellator.draw()
+        }
+
+        companion object {
+            inline fun draw3D(
+                partialTicks: Float = 0F,
+                crossinline quads: QuadDrawer.() -> Unit,
+            ) {
+
+                GlStateManager.enableBlend()
+                GlStateManager.disableLighting()
+                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+                GlStateManager.disableTexture2D()
+                GlStateManager.disableCull()
+
+                val tessellator = Tessellator.getInstance()
+
+                GlStateManager.pushMatrix()
+                RenderUtils.translate(getViewerPos(partialTicks).negated())
+                getViewerPos(partialTicks)
+
+                quads.invoke(QuadDrawer(Tessellator.getInstance()))
+
+                GlStateManager.popMatrix()
+
+                GlStateManager.enableTexture2D()
+                GlStateManager.enableCull()
+                GlStateManager.disableBlend()
+            }
+        }
+    }
+
     fun drawFilledBoundingBox_nea(
         aabb: AxisAlignedBB,
         c: Color,
@@ -1352,7 +1474,7 @@ object RenderUtils {
      *
      * @param color color of rect
      * @param radius the radius of the corners (default 10)
-     * @param smoothness how smooth the corners will appear (default 2). NOTE: This does very
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
      * It is best kept at its default.
      */
@@ -1372,9 +1494,115 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader("rounded_rect")
 
-        Gui.drawRect(x, y, x + width, y + height, color)
+        Gui.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
+    }
+
+    /**
+     * Method to draw the outline of a rounded rectangle with a color gradient. For a single color just pass
+     * in the color to both topColor and bottomColor.
+     *
+     * This is *not* a method that draws a rounded rectangle **with** an outline, rather, this draws **only** the outline.
+     *
+     * **NOTE:** The same notices given from [drawRoundRect] should be acknowledged with this method also.
+     *
+     * @param topColor color of the top of the outline
+     * @param bottomColor color of the bottom of the outline
+     * @param borderThickness the thickness of the border
+     * @param radius radius of the corners of the rectangle (default 10)
+     * @param blur the amount to blur the outline (default 0.7f)
+     */
+    fun drawRoundRectOutline(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        borderThickness: Int,
+        radius: Int = 10,
+        blur: Float = 0.7f,
+    ) {
+        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
+        val widthIn = width * scaledRes.scaleFactor
+        val heightIn = height * scaledRes.scaleFactor
+        val xIn = x * scaledRes.scaleFactor
+        val yIn = y * scaledRes.scaleFactor
+
+        val borderAdjustment = borderThickness / 2
+
+        RoundedRectangleOutlineShader.scaleFactor = scaledRes.scaleFactor.toFloat()
+        RoundedRectangleOutlineShader.radius = radius.toFloat()
+        RoundedRectangleOutlineShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedRectangleOutlineShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        RoundedRectangleOutlineShader.borderThickness = borderThickness.toFloat()
+        // The blur argument is a bit misleading, the greater the value the more sharp the edges of the
+        // outline will be and the smaller the value the blurrier. So we take the difference from 1
+        // so the shader can blur the edges accordingly. This is because a 'blurriness' option makes more sense
+        // to users than a 'sharpness' option in this context
+        RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
+
+        GlStateManager.pushMatrix()
+        ShaderManager.enableShader("rounded_rect_outline")
+
+        drawGradientRect(
+            x - borderAdjustment,
+            y - borderAdjustment,
+            x + width + borderAdjustment,
+            y + height + borderAdjustment,
+            topColor,
+            bottomColor
+        )
+
+        ShaderManager.disableShader()
+        GlStateManager.popMatrix()
+    }
+
+    fun drawGradientRect(
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        startColor: Int = -0xfeffff0,
+        endColor: Int = -0xfeffff0,
+    ) {
+        val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
+        val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
+        val startGreen = (startColor shr 8 and 255).toFloat() / 255.0f
+        val startBlue = (startColor and 255).toFloat() / 255.0f
+        val endAlpha = (endColor shr 24 and 255).toFloat() / 255.0f
+        val endRed = (endColor shr 16 and 255).toFloat() / 255.0f
+        val endGreen = (endColor shr 8 and 255).toFloat() / 255.0f
+        val endBlue = (endColor and 255).toFloat() / 255.0f
+        GlStateManager.disableTexture2D()
+        GlStateManager.enableBlend()
+        GlStateManager.disableAlpha()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.shadeModel(7425)
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
+        worldrenderer.pos(right.toDouble(), top.toDouble(), 0.0)
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldrenderer.pos(left.toDouble(), top.toDouble(), 0.0)
+            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
+        worldrenderer.pos(left.toDouble(), bottom.toDouble(), 0.0)
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
+        worldrenderer.pos(right.toDouble(), bottom.toDouble(), 0.0)
+            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
+        tessellator.draw()
+        GlStateManager.shadeModel(7424)
+        GlStateManager.disableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
+    }
+
+    // TODO move off of neu function
+    fun drawTexturedRect(x: Float, y: Float) {
+        with(ScaledResolution(Minecraft.getMinecraft())) {
+            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
+        }
     }
 }
