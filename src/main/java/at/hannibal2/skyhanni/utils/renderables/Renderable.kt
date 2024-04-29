@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -319,6 +320,7 @@ interface Renderable {
         fun doubleLayered(
             bottomLayer: Renderable,
             topLayer: Renderable,
+            blockBottomHover: Boolean = true,
         ) = object : Renderable {
             override val width = bottomLayer.width
             override val height = bottomLayer.height
@@ -327,7 +329,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
-                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y)) {
+                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     posX to posY
@@ -549,7 +551,7 @@ interface Renderable {
             override val verticalAlign = this@renderBounds.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, color.rgb)
+                Gui.drawRect(0, 0, width, height, color.withAlpha(100))
                 this@renderBounds.render(posX, posY)
             }
 
@@ -684,28 +686,44 @@ interface Renderable {
          * The x and y coordinates are the bottom middle of the renderable.
          * Don't ask me, ask Mojang.
          */
-        fun entity(
+        fun player(
             entity: EntityLivingBase,
             followMouse: Boolean = false,
             eyesX: Float = 0f,
             eyesY: Float = 0f,
-            scale: Int = 30,
+            width: Int = 50,
+            height: Int = 100,
+            entityScale: Int = 30,
+            padding: Int = 5,
             color: Int? = null,
-            condition: () -> Boolean = { true },
+            colorCondition: () -> Boolean = { true },
         ) = object : Renderable {
-            override val width = scale
-            override val height = scale * 2
+            override val width = width + 2 * padding
+            override val height = height + 2 * padding
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
 
             override fun render(posX: Int, posY: Int) {
-                if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, condition)
+                val playerWidth = entityScale
+                val playerHeight = entityScale * 2
+                val playerX = posX + width / 2 + padding
+                val playerY = posY + height / 2 + playerHeight / 2 + padding
+
+                if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, colorCondition)
                 val mouse = currentRenderPassMousePosition
                 val mouseXRelativeToPlayer =
-                    if (followMouse) (posX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
+                    if (followMouse) (playerX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
                 val mouseYRelativeToPlayer =
-                    if (followMouse) (posX - (mouse?.second ?: Utils.getMouseY()) - 1.62 * scale).toFloat() else eyesY
-                drawEntityOnScreen(posX, posY, scale, mouseXRelativeToPlayer, mouseYRelativeToPlayer, entity)
+                    if (followMouse) (playerY - (mouse?.second
+                        ?: Utils.getMouseY()) - 1.62 * entityScale).toFloat() else eyesY
+                drawEntityOnScreen(
+                    playerX,
+                    playerY,
+                    entityScale,
+                    mouseXRelativeToPlayer,
+                    mouseYRelativeToPlayer,
+                    entity
+                )
             }
         }
     }

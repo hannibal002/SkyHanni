@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.createWardrobePriceLore
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentWardrobeSlot
@@ -85,6 +86,12 @@ class CustomWardrobe {
         }
     }
 
+    @SubscribeEvent
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+        if (!isEnabled()) return
+        update()
+    }
+
 
     private fun update() {
         display = createRenderables()
@@ -140,7 +147,6 @@ class CustomWardrobe {
             add(Triple(warningPos, warningRenderable, 0))
             return@buildList
         }
-
         for (row in 0 until rows) {
             val playersInRow =
                 if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
@@ -202,7 +208,6 @@ class CustomWardrobe {
                         hoveredSlot = wardrobeSlot.id
                     }
                 )
-                add(Triple(playerBackgroundPosition, playerBackground, wardrobeSlot.id))
 
                 val fakePlayer = getFakePlayer()
 
@@ -214,18 +219,19 @@ class CustomWardrobe {
                     Color.GRAY.withAlpha(100)
                 } else null
 
-                add(
-                    Triple(
-                        Position(playerX, playerY),
-                        Renderable.entity(
-                            fakePlayer,
-                            config.eyesFollowMouse,
-                            scale = scale.toInt(),
-                            color = playerColor
-                        ),
-                        wardrobeSlot.id
-                    )
+                val playerRenderable = Renderable.player(
+                    fakePlayer,
+                    config.eyesFollowMouse,
+                    width = containerWidth,
+                    height = containerHeight,
+                    entityScale = scale.toInt(),
+                    padding = 0,
+                    color = playerColor,
                 )
+
+                val slotRenderable = Renderable.doubleLayered(playerBackground, playerRenderable, false)
+
+                add(Triple(playerBackgroundPosition, slotRenderable, wardrobeSlot.id))
             }
         }
     }
@@ -237,10 +243,10 @@ class CustomWardrobe {
     }
 
     private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
-        val buttonWidth = 25
+        val buttonWidth = 24
         val centerX = screenWidth / 2
         val buttonY = screenHeight / 2 + playerHeight / 2 + 30
-        val padding = 10
+        val xOffset = 10
 
         val renderables = listOf(
             createHoverableRenderable(
@@ -279,16 +285,19 @@ class CustomWardrobe {
                 Renderable.hoverTips(
                     Renderable.itemStack(
                         ItemStack(Items.arrow),
-                        (buttonWidth - 1.5) / 15.5,
+                        1.0,
+                        0,
                         0
                     ),
                     listOf("§aGo Back", " §7To SkyBlock Menu")
                 ),
                 Renderable.itemStack(
                     ItemStack(Items.arrow),
-                    (buttonWidth - 1.5) / 15.5,
-                    0
+                    1.0,
+                    0,
+                    0,
                 ),
+                padding = 3,
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
@@ -301,16 +310,19 @@ class CustomWardrobe {
                 Renderable.hoverTips(
                     Renderable.itemStack(
                         ItemStack(Blocks.barrier),
-                        (buttonWidth - 1.5) / 15.5,
-                        0
+                        1.0,
+                        0,
+                        0,
                     ),
                     listOf("§cClose")
                 ),
                 Renderable.itemStack(
                     ItemStack(Blocks.barrier),
-                    (buttonWidth - 1.5) / 15.5,
-                    0
+                    1.0,
+                    0,
+                    0,
                 ),
+                padding = 3,
                 hoveredColor = Color.BLACK,
                 borderOutlineThickness = 2,
                 onClick = {
@@ -320,11 +332,11 @@ class CustomWardrobe {
             ),
         )
 
-        val totalWidth = renderables.sumOf { it.width } + (renderables.size - 1) * padding
+        val totalWidth = renderables.sumOf { it.width } + (renderables.size - 1) * xOffset
         val startX = centerX - totalWidth / 2
 
         for ((index, renderable) in renderables.withIndex()) {
-            add(Triple(Position(startX + index * (renderable.width + padding), buttonY), renderable, 0))
+            add(Triple(Position(startX + index * (renderable.width + xOffset), buttonY), renderable, 0))
         }
     }
 
@@ -378,6 +390,9 @@ class CustomWardrobe {
         hoveredRenderable: Renderable,
         unhoveredRenderable: Renderable = Renderable.placeholder(hoveredRenderable.width, hoveredRenderable.height),
         topLayerRenderable: Renderable = Renderable.placeholder(0, 0),
+        padding: Int = 0,
+        horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
         borderOutlineThickness: Int,
@@ -394,16 +409,20 @@ class CustomWardrobe {
                     ), topLayerRenderable
                 ),
                 hoveredColor,
-                padding = 0,
+                padding = padding,
                 topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
                 bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
                 borderOutlineThickness = borderOutlineThickness,
-                blur = borderOutlineBlur
+                blur = borderOutlineBlur,
+                horizontalAlign = horizontalAlignment,
+                verticalAlign = verticalAlignment
             ),
             Renderable.drawInsideRoundedRect(
                 unhoveredRenderable,
                 unHoveredColor,
-                padding = 0
+                padding = padding,
+                horizontalAlign = horizontalAlignment,
+                verticalAlign = verticalAlignment
             ),
             onHover = { onHover() }
         )
