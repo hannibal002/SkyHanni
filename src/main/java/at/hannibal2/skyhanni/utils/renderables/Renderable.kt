@@ -320,6 +320,7 @@ interface Renderable {
         fun doubleLayered(
             bottomLayer: Renderable,
             topLayer: Renderable,
+            blockBottomHover: Boolean = true,
         ) = object : Renderable {
             override val width = bottomLayer.width
             override val height = bottomLayer.height
@@ -328,7 +329,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
-                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y)) {
+                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     posX to posY

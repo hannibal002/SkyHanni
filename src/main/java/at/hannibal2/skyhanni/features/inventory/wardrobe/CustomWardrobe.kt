@@ -24,12 +24,10 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -72,17 +70,6 @@ class CustomWardrobe {
             GlStateManager.color(1f, 1f, 1f, 1f)
             pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
         }
-
-        val player = getFakePlayer()
-        Position(10, 10).renderRenderables(
-            listOf(
-                Renderable.player(
-                    player,
-                    followMouse = true,
-                    entityScale = 30,
-                ).renderBounds()
-            ), posLabel = "test"
-        )
     }
 
     @SubscribeEvent
@@ -216,7 +203,6 @@ class CustomWardrobe {
                         hoveredSlot = wardrobeSlot.id
                     }
                 )
-                add(Triple(playerBackgroundPosition, playerBackground, wardrobeSlot.id))
 
                 val fakePlayer = getFakePlayer()
 
@@ -236,9 +222,11 @@ class CustomWardrobe {
                     entityScale = scale.toInt(),
                     padding = 0,
                     color = playerColor,
-                ).renderBounds(LorenzColor.GREEN.toColor())
+                )
 
-                add(Triple(playerBackgroundPosition, playerRenderable, wardrobeSlot.id))
+                val slotRenderable = Renderable.doubleLayered(playerBackground, playerRenderable, false)
+
+                add(Triple(playerBackgroundPosition, slotRenderable, wardrobeSlot.id))
             }
         }
     }
