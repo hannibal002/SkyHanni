@@ -24,10 +24,12 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -70,6 +72,17 @@ class CustomWardrobe {
             GlStateManager.color(1f, 1f, 1f, 1f)
             pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
         }
+
+        val player = getFakePlayer()
+        Position(10, 10).renderRenderables(
+            listOf(
+                Renderable.player(
+                    player,
+                    followMouse = true,
+                    entityScale = 30,
+                ).renderBounds()
+            ), posLabel = "test"
+        )
     }
 
     @SubscribeEvent
@@ -142,7 +155,6 @@ class CustomWardrobe {
             add(Triple(warningPos, warningRenderable, 0))
             return@buildList
         }
-
         for (row in 0 until rows) {
             val playersInRow =
                 if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
@@ -216,18 +228,17 @@ class CustomWardrobe {
                     Color.GRAY.withAlpha(100)
                 } else null
 
-                add(
-                    Triple(
-                        Position(playerX, playerY),
-                        Renderable.entity(
-                            fakePlayer,
-                            config.eyesFollowMouse,
-                            scale = scale.toInt(),
-                            color = playerColor
-                        ),
-                        wardrobeSlot.id
-                    )
-                )
+                val playerRenderable = Renderable.player(
+                    fakePlayer,
+                    config.eyesFollowMouse,
+                    width = containerWidth,
+                    height = containerHeight,
+                    entityScale = scale.toInt(),
+                    padding = 0,
+                    color = playerColor,
+                ).renderBounds(LorenzColor.GREEN.toColor())
+
+                add(Triple(playerBackgroundPosition, playerRenderable, wardrobeSlot.id))
             }
         }
     }
