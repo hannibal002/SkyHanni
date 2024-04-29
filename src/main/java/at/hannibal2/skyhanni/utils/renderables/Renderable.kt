@@ -622,26 +622,6 @@ interface Renderable {
             }
         }
 
-        fun paddingContainer(
-            renderable: Renderable,
-            leftPadding: Int = 0,
-            rightPadding: Int = 0,
-            topPadding: Int = 0,
-            bottomPadding: Int = 0,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = object : Renderable {
-            override val width = renderable.width + leftPadding + rightPadding
-            override val height = renderable.width + topPadding + bottomPadding
-
-            override val horizontalAlign = horizontalAlign
-            override val verticalAlign = verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                renderable.render(posX + leftPadding, posY + topPadding)
-            }
-        }
-
         fun drawInsideRoundedRect(
             input: Renderable,
             color: Color,
