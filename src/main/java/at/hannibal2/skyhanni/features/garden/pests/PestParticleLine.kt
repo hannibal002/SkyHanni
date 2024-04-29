@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -7,19 +8,21 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 // TODO remove this workaround once PestParticleWaypoint does work again
 class PestParticleLine {
+    private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
-    class ParticleLocation(val location: LorenzVec, val color: Color, val spawnTime: SimpleTimeMark)
+    class ParticleLocation(val location: LorenzVec, val spawnTime: SimpleTimeMark)
 
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
     private val locations = mutableListOf<MutableList<ParticleLocation>>()
@@ -40,21 +43,23 @@ class PestParticleLine {
         // TODO time in config
         if (lastPestTrackerUse.passedSince() > 5.seconds) return
 
-        if (event.type != EnumParticleTypes.REDSTONE) return
+        if (event.type.isAnyOf(EnumParticleTypes.ENCHANTMENT_TABLE, EnumParticleTypes.VILLAGER_ANGRY)) {
+            if (config.hideParticles) event.cancel()
+        }
+
+        if (event.type != EnumParticleTypes.VILLAGER_ANGRY) return
         val location = event.location
-        val (a, b, c) = event.offset.toDoubleArray().map { it.toFloat() }
-        val color = Color(a, b, c)
 
         // run in main thread to avoid concurrent errors
         DelayedRun.runNextTick {
-            getCurrentList(location).add(ParticleLocation(location, color, SimpleTimeMark.now()))
+            getCurrentList(location).add(ParticleLocation(location, SimpleTimeMark.now()))
         }
     }
 
     private fun getCurrentList(location: LorenzVec): MutableList<ParticleLocation> {
         locations.lastOrNull()?.let {
             val distance = it.last().location.distance(location)
-            if (distance < 2) {
+            if (distance < 4) {
                 return it
             }
         }
@@ -82,11 +87,11 @@ class PestParticleLine {
     }
 
     private fun draw(event: LorenzRenderWorldEvent, list: List<ParticleLocation>) {
+        val color = LorenzColor.YELLOW.toColor()
         for ((prev, next) in list.asSequence().zipWithNext()) {
             // TODO time in config
             if (next.spawnTime.passedSince() > 5.seconds) continue
             val location = next.location
-            val color = next.color
             event.draw3DLine_nea(
                 prev.location,
                 location,
@@ -98,11 +103,10 @@ class PestParticleLine {
             if (isVeryLast) {
                 val lastLocation = location.add(-0.5, -0.5, -0.5)
                 event.drawWaypointFilled(lastLocation, color, beacon = true)
-                event.drawDynamicText(lastLocation, "§cPest Guess", 1.3)
+                event.drawDynamicText(lastLocation, "§ePest Guess", 1.3)
             }
         }
     }
 
-    // TODO toggle
-    fun isEnabled() = GardenAPI.inGarden()
+    fun isEnabled() = GardenAPI.inGarden() && config.enabled
 }
