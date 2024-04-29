@@ -162,10 +162,7 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        displayConfig.hideVanillaScoreboard.onToggle {
-            if (!isHideVanillaScoreboardEnabled()) dirty = true
-        }
-        config.enabled.onToggle {
+        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
