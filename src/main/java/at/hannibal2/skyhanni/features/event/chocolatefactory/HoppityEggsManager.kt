@@ -99,7 +99,6 @@ object HoppityEggsManager {
         if (!config.showClaimedEggs) return
         if (ReminderUtils.isBusy()) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
-        if (!HoppityEggLocator.hasLocatorInInventory()) return
 
         val displayList = HoppityEggType.entries
             .filter { !it.isClaimed() }

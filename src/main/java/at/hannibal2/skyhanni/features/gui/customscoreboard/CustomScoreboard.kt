@@ -103,7 +103,6 @@ class CustomScoreboard {
         internal val maxwellConfig get() = displayConfig.maxwell
         internal val informationFilteringConfig get() = config.informationFiltering
         internal val backgroundConfig get() = config.background
-        internal val devConfig get() = SkyHanniMod.feature.dev
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
