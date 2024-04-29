@@ -140,6 +140,7 @@ object HoppityEggLocator {
 
         ticksSinceLastParticleFound = 0
         validParticleLocations.clear()
+        lastParticlePosition = null
     }
 
     private fun calculateEggPosition() {
