@@ -26,6 +26,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SoundUtils.createSound
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -55,7 +57,6 @@ class CustomWardrobe {
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
         if (tempToggleShowOverlay) event.cancel()
-        update()
     }
 
     @SubscribeEvent
@@ -63,7 +64,10 @@ class CustomWardrobe {
         if (!isEnabled()) return
         if (!tempToggleShowOverlay) return
 
-        display.ifEmpty { update() }
+        display.ifEmpty {
+            update()
+            createSound("skyhanni:moonlight", 1f).playSound()
+        }
         if (display.isEmpty()) return
 
         for ((pos, renderable, _) in display.sortedBy { if (it.third == hoveredSlot) 1 else 0 }) {

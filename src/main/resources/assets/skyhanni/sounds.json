@@ -7,5 +7,14 @@
                 "stream": false
             }
         ]
+    },
+    "moonlight": {
+        "category": "neutral",
+        "sounds": [
+            {
+                "name": "moonlight",
+                "stream": false
+            }
+        ]
     }
 }
