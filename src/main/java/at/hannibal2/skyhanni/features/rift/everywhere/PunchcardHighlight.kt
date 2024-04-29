@@ -16,31 +16,42 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class PunchcardHighlight {
     private val config get() = SkyHanniMod.feature.rift.punchcard
     private var lastRiftServer: String = ""
 
-    private val punchedPattern by RepoPattern.pattern(
-        "rift.punchcard.new",
+    private var listening = false
+
+    private val patternGroup = RepoPattern.group("rift.punchcard")
+    private val punchedPattern by patternGroup.pattern(
+        "new",
         "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
     )
-//     §5§lPUNCHCARD! §r§eYou punched §r§a[VIP] mcavaco§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
-//     §c§lAWKWARD! §r§cThis player has already been punched by you... somehow!
-//     §c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!
+    private val repeatPattern by patternGroup.pattern(
+        "repeat",
+        "§c§lAWKWARD! §r§cThis player has already been punched by you... somehow!"
+    )
+    private val limitPattern by patternGroup.pattern(
+        "limit",
+        "§c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!"
+    )
 
-    private val playerList: MutableSet<String> = mutableSetOf()
+    val playerList: MutableSet<String> = mutableSetOf()
 
     @SubscribeEvent
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
         if (!config.enabled.get()) return
-        if (!LorenzUtils.inSkyBlock) return
         if (!IslandType.THE_RIFT.isInIsland()) return
         val size = playerList.size
         if (size >= 20) return
@@ -51,21 +62,8 @@ class PunchcardHighlight {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!IslandType.THE_RIFT.isInIsland()) return
-        val matcher = punchedPattern.matcher(event.message)
-        if (matcher.find()) {
-            val name = matcher.group("name")
-            addPunch(name)
-            MobData.players.filter { it.name == name }.forEach {
-                RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onToggle(event: ConfigLoadEvent) {
-        config.enabled.onToggle{ toggleConfig() }
+        config.enabled.onToggle { toggleConfig() }
     }
 
     private fun toggleConfig() {
@@ -73,16 +71,20 @@ class PunchcardHighlight {
             MobData.players.forEach {
                 colorPlayer(it.baseEntity)
             }
-        } else clearList()
+        } else {
+            MobData.players.forEach {
+                RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
+            }
+        }
     }
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
-        DelayedRun.runDelayed(1500.milliseconds) {
+        DelayedRun.runDelayed(500.milliseconds) {
             if (IslandType.THE_RIFT.isInIsland() && HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
                 lastRiftServer = HypixelData.server
                 playerList.clear()
-                MobData.players.filter { it.name != LorenzUtils.getPlayerName() }.forEach {
+                MobData.players.forEach {
                     colorPlayer(it.baseEntity)
                 }
             }
@@ -94,24 +96,69 @@ class PunchcardHighlight {
         val alpha = when (config.color.toChromaColor().alpha) {
             0 -> 0
             255 -> 1
-            else -> 255-config.color.toChromaColor().alpha
+            else -> 255 - config.color.toChromaColor().alpha
         }
         val color = config.color.toChromaColor().withAlpha(alpha)
-        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isInIsland() && playerList.size < 20 }
+        RenderLivingEntityHelper.setEntityColor(
+            entity,
+            color
+        ) { IslandType.THE_RIFT.isInIsland() && playerList.size < 20 }
     }
 
     fun clearList() {
         playerList.clear()
+        playerQueue.clear()
         MobData.players.forEach {
             RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
         }
     }
 
+    var playerQueue = mutableListOf<String>()
+
     @SubscribeEvent
     fun onPunch(event: EntityClickEvent) {
-        if (!RiftAPI.inRift())
-        ChatUtils.chat("clicked on an entity!")
+        if (!RiftAPI.inRift()) return
+        if (!config.enabled.get()) return
+        val entity = event.clickedEntity
+        if (entity !is AbstractClientPlayer) return
+        if (entity.isNPC()) {
+            ChatUtils.chat("was npc oops")
+            return
+        }
+        val name = entity.name
+        if (name in playerList) return
+        playerQueue.add(name)
+        listening = true
+        ChatUtils.chat("listening")
+        DelayedRun.runDelayed(2.seconds) {
+            ChatUtils.chat("not listening")
+            listening = false
+        }
     }
 
-    private fun addPunch(playerName: String) { playerList.add(playerName) }
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!IslandType.THE_RIFT.isInIsland()) return
+        if (!listening) return
+        if (playerQueue.size == 0) return
+        val message = event.message
+        val queuedName = playerQueue[0]
+        punchedPattern.matchMatcher(message) {
+            val name = group("name")
+            if (queuedName == name) addPunch(name)
+            else println("help! '$name' '$queuedName'") //throw error
+            return
+        }
+        when {
+            limitPattern.matches(message) -> addPunch(queuedName)
+            repeatPattern.matches(message) -> addPunch(queuedName)
+        }
+    }
+
+    private fun addPunch(playerName: String) {
+        playerList.add(playerName)
+        val player = MobData.players.firstOrNull { it.name == playerName } ?: return
+        RenderLivingEntityHelper.removeEntityColor(player.baseEntity)
+        playerQueue.removeAt(0)
+    }
 }
