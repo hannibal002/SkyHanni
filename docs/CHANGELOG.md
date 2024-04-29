@@ -102,6 +102,12 @@
     + Shared waypoints for found eggs.
 + Added Bits Gained Chat Message. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1487)
 + Added Hoppity rabbit collection stats summary. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1482)
++ Added Chocolate Factory Menu Shortcut (Hoppity Menu Shortcut). - raven + martimavocado (https://github.com/hannibal002/SkyHanni/pull/1583)
++ Added Tooltip Move. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1581)
+    + Moves the tooltip away from the item you hover over while inside the Chocolate Factory.
++ Added Chocolate Factory Compact On Click. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1579)
++ Added Factory Chat Filters. - RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1574)
+    + Hide chocolate factory upgrade and employee promotion messages.
 
 #### Inventory Features
 
@@ -126,6 +132,8 @@
     + Options to change the distance and number of mobs to always show.
     + Option to disable in garden.
 + SkyCrypt button to Discord RPC. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1526)
++ Added `/shupdate` command. - Empa (https://github.com/hannibal002/SkyHanni/pull/1578)
+    + Can be used like `/shupdate <beta/full>` to download updates from a specific update stream.
 
 ### Improvements
 
@@ -224,6 +232,8 @@
 #### Event Improvements
 
 + Compressed the no power up line in the Jerry winter event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1355)
++ Improved description of Hoppity highlight updates. - rnghatesme (https://github.com/hannibal002/SkyHanni/pull/1580)
++ Added a way to disable the rabbit crush warning by setting the threshold to zero. - seraid (https://github.com/hannibal002/SkyHanni/pull/1575)
 
 #### Rift Improvements
 
@@ -293,6 +303,7 @@
 + Fixed /gfs error with 0 at the end. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1528)
 + Fixed Transfer Party Chat command. - nobaboy (https://github.com/hannibal002/SkyHanni/pull/1505)
 + Fixed aquamarine gemstones in queued gfs. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1545)
++ Fixed some guild chat messages having wrong format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1568)
 
 #### GUI Fixes
 
@@ -330,6 +341,7 @@
 + Fixed bazaar order cancel save to clipboard error again. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1474)
 + Fixed Bazaar Cancelled Buy Order Clipboard one last time. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1529)
 + Fixed tooltips disappearing with the Enchant Parsing feature. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1552)
++ Fixed tooltip on certain items when using Enchant Parsing. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1569)
 
 #### Rift Fixes
 
@@ -339,6 +351,15 @@
 
 + Fixed Paleontologist book not getting detected when excavate fossils. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1490)
 + Fixed cold overlay not resetting. - Empa (https://github.com/hannibal002/SkyHanni/pull/1540)
+
+#### Command Fixes
+
++ Fixed party invite tab completion not working for friends. - nea (https://github.com/hannibal002/SkyHanni/pull/1571)
++ Fixed error when running /gfs without amount. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1567)
+
+#### Config Fixes
+
++ Fixed show unclaimed eggs config option. - nopo (https://github.com/hannibal002/SkyHanni/pull/1572)
 
 #### Misc Fixes
 
@@ -366,6 +387,7 @@
 + Fixed Bits Gained Chat Messages being sent randomly. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1503)
 + Fixed discord profile level error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1548)
 + Fixed Profit Trackers showing no more than 2.1b coins. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1554)
++ Fixed error with other mods that include DiscordIPC and do not relocate. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1573)
 
 ### Technical Details
 
@@ -484,6 +506,9 @@
 + Moved drawGradientRect to RenderUtils. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1461)
 + Moved Discord RPC to ThatGravyBoat version on TeamResourceful maven. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1526)
 + Fixed a few small errors related to RenderLivingEvent. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1555)
++ Improved mixins for custom tab completion. - nea (https://github.com/hannibal002/SkyHanni/pull/1571)
+    + This should make SkyHanni more compatible with other mods doing the exact same mixin for tab completion.
+    + Also changed the mixin to use an event, allowing more decentralized tab completion changes.
 
 ### Removed Features
 

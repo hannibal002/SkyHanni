@@ -488,6 +488,11 @@ private fun getMiningEventsLines() = buildList {
     if (getSbLines().any { SbPattern.fortunateFreezingBonusPattern.matches(it) }) {
         add(getSbLines().first { SbPattern.fortunateFreezingBonusPattern.matches(it) })
     }
+
+    // Fossil Dust
+    if (getSbLines().any { SbPattern.fossilDustPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fossilDustPattern.matches(it) })
+    }
 }
 
 private fun getMiningEventsShowWhen(): Boolean {
