@@ -76,7 +76,8 @@ object UpdateManager {
         logger.log("Reset update state")
     }
 
-    fun checkUpdate(forceDownload: Boolean = false, updateStream: UpdateStream = config.updateStream.get()) {
+    fun checkUpdate(forceDownload: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
+        var updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
             logger.log("Trying to perform update check while another update is already in progress")
             return
@@ -85,6 +86,7 @@ object UpdateManager {
         val currentStream = config.updateStream.get()
         if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || isCurrentlyBeta())) {
             config.updateStream = Property.of(UpdateStream.BETA)
+            updateStream = UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream)
             .thenAcceptAsync({
