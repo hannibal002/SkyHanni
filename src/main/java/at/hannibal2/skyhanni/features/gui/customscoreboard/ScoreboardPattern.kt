@@ -235,6 +235,10 @@ object ScoreboardPattern {
         "fortunatefreezing.bonus",
         "Event Bonus: §6\\+\\d+☘"
     )
+    val fossilDustPattern by miningSb.pattern(
+        "fossildust",
+        "Fossil Dust: §f[\\d.,]+.*"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
