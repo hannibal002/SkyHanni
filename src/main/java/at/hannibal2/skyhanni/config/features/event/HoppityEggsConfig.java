@@ -22,7 +22,7 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Show Claimed Eggs", desc = "Displays which eggs have been found in the last SkyBlock day.")
+    @ConfigOption(name = "Show Unclaimed Eggs", desc = "Displays which eggs haven't been found in the last SkyBlock day.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;

@@ -15,7 +15,7 @@ public class CustomWardrobeConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "eyes look mose", desc = "")
+    @ConfigOption(name = "is lok mose", desc = "")
     @ConfigEditorBoolean
     public boolean eyesFollowMouse = true;
 
