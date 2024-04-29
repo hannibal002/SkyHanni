@@ -382,9 +382,12 @@ object SackAPI {
     fun NEUInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
     fun testSackAPI (args: Array<String>) {
-        if (args.size == 1 ) {
-            val amountInSacks = args[0].asInternalName().getAmountInSacksOrNull()
-            ChatUtils.chat("Amount of ${args[0]} in sacks: $amountInSacks")
+        if (args.size == 1) {
+            if (sackListInternalNames.contains(args[0].uppercase())) {
+                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].asInternalName())}")
+            } else {
+                ChatUtils.userError("That item isn't a valid sack item.")
+            }
         }
         else ChatUtils.userError("/shtestsackapi <internal name>")
     }
