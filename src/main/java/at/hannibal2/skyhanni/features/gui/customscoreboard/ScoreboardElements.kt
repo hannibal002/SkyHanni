@@ -786,6 +786,7 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
             "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
+            "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
             noStackTrace = true,
             betaOnly = true,
         )

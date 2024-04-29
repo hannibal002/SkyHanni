@@ -165,13 +165,16 @@ class CustomScoreboard {
         displayConfig.hideVanillaScoreboard.onToggle {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
+        config.enabled.onToggle {
+            if (!isHideVanillaScoreboardEnabled()) dirty = true
+        }
     }
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
-            if (!config.enabled) {
+            if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
                 ScoreboardElement.entries.map { element ->
@@ -185,7 +188,7 @@ class CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent
