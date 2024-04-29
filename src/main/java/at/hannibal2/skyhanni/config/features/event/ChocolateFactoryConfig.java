@@ -133,4 +133,10 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "tooltipMove")
     public Position tooltipMovePosition = new Position(-380, 150, false, true);
+
+    @Expose
+    @ConfigOption(name = "Highlight Hoppity Shop", desc = "Highlight items that haven't been bought from the Hoppity shop yet.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightHoppityShop = true;
 }
