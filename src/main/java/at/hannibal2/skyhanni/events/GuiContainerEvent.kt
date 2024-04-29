@@ -57,6 +57,8 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slotId: Int,
         val clickedButton: Int,
         val clickType: Int,
+        // 0: normal, 1: shift, 2: hotbar, 3: middle, 4: drop
+        // TODO Change clickType to enum
     ) : GuiContainerEvent(gui, container) {
 
         fun makePickblock() {
