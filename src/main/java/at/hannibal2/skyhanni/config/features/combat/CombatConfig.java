@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.combat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
+import at.hannibal2.skyhanni.config.features.combat.endprotectortracker.EndstoneProtectorConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -18,6 +19,10 @@ public class CombatConfig {
     @Expose
     @Category(name = "Ghost Counter", desc = "Ghost counter settings")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
+
+    @Expose
+    @Category(name = "Endstone Protector Tracker", desc = "Endstone Protector settings")
+    public EndstoneProtectorConfig endstoneCounter = new EndstoneProtectorConfig();
 
     @Expose
     @ConfigOption(name = "Quiver", desc = "")
