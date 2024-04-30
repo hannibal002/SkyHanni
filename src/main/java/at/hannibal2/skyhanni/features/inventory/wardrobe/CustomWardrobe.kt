@@ -166,7 +166,11 @@ class CustomWardrobe {
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
 
         if (wardrobeWarning) {
-            val warningRenderable = Renderable.string(wardrobeWarningText)
+            val warningRenderable = Renderable.string(
+                wardrobeWarningText,
+                3 * (config.spacing.globalScale / 100.0),
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            )
             return warningRenderable
         } else {
             val rowsRenderables = mutableListOf<Renderable>()
