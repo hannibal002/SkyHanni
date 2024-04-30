@@ -52,7 +52,6 @@ class VisitorRewardWarning {
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         val stack = event.slot?.stack ?: return
-        if (event.clickType != 0) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
@@ -66,6 +65,8 @@ class VisitorRewardWarning {
             return
         }
 
+        // clicktypes 0, 2, 3, and 4 work for interacting with visitor, but not 1
+        if (event.clickTypeEnum == GuiContainerEvent.ClickType.NORMAL) return
         if (isRefuseSlot) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")
             return
