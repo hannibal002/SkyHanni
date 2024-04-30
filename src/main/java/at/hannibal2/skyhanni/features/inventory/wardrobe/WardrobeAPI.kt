@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -114,6 +115,10 @@ object WardrobeAPI {
 
     var currentPage: Int? = null
 
+    var lastWardrobeUpdate = SimpleTimeMark.farPast()
+
+    var i = 0
+
     init {
         val list = mutableListOf<WardrobeSlot>()
         val slotsPerPage = 9
@@ -177,20 +182,26 @@ object WardrobeAPI {
         var foundCurrentSlot = false
 
         val itemsList = event.inventoryItems
-        for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
-            slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
-            slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
-            slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
-            slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
-                currentWardrobeSlot = slot.id
-                foundCurrentSlot = true
+
+        lastWardrobeUpdate = SimpleTimeMark.now()
+        DelayedRun.runDelayed(500.milliseconds) {
+            if (lastWardrobeUpdate.passedSince() < 550.milliseconds) return@runDelayed
+
+            for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
+                slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
+                slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
+                slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
+                slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
+                if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
+                    currentWardrobeSlot = slot.id
+                    foundCurrentSlot = true
+                }
+                slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
+                if (slot.locked) wardrobeSlots.forEach { if (it.id > slot.id) it.locked = true }
             }
-            slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
-            if (slot.locked) wardrobeSlots.forEach { if (it.id > slot.id) it.locked = true }
+            if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage)
+                currentWardrobeSlot = null
         }
-        if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage)
-            currentWardrobeSlot = null
     }
 
     @SubscribeEvent
