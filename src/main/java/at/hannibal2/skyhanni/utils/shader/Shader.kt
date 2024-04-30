@@ -100,6 +100,12 @@ abstract class Shader(val vertex: String, val fragment: String) {
 
     fun disable() = ShaderHelper.glUseProgram(0)
 
+    /**
+     * @param uniformType Type of uniform, there should be a 1 to 1 equivalent to that in the shader file
+     * @param name The name of the uniform in the shader file. This should match exactly to the name given
+     * to the uniform in the shader file.
+     * @param uniformValuesSupplier The supplier that changes / sets the uniform's value
+     */
     fun <T> registerUniform(uniformType: Uniform.UniformType<T>, name: String, uniformValuesSupplier: Supplier<T>) {
         uniforms.add(Uniform(this, uniformType, name, uniformValuesSupplier))
     }

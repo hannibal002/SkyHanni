@@ -5,15 +5,36 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
 import java.util.Collections
+import java.util.Queue
 import java.util.WeakHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.ceil
 
 object CollectionUtils {
 
-    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+    inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
+        while (true)
+            action(this.poll() ?: break)
+        return this
+    }
+
+    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
+        for (i in 1..amount)
+            this.poll() ?: break
+        return this
+    }
+
+    inline fun <reified E, reified K, reified L : MutableCollection<K>>
+        Queue<E>.drainTo(list: L, action: (E) -> K): L {
+        while (true)
+            list.add(action(this.poll() ?: break))
+        return list
+    }
+
+    inline fun <reified E, reified L : MutableCollection<E>>
+        Queue<E>.drainTo(list: L): L {
         while (true)
             list.add(this.poll() ?: break)
+        return list
     }
 
     // Let garbage collector handle the removal of entries in this list
@@ -129,6 +150,9 @@ object CollectionUtils {
         return this
     }
 
+    operator fun IntRange.contains(range: IntRange): Boolean =
+        range.first in this && range.last in this
+
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }
@@ -143,13 +167,6 @@ object CollectionUtils {
 
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
         return toList().sorted().reversed().toMap()
-    }
-
-    inline fun <reified T> ConcurrentLinkedQueue<T>.drainForEach(action: (T) -> Unit) {
-        while (true) {
-            val value = this.poll() ?: break
-            action(value)
-        }
     }
 
     fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
@@ -281,5 +298,16 @@ object CollectionUtils {
             list.add(emptyList())
         }
         return list
+    }
+
+    inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
+        val destination = LinkedHashMap<R, V>()
+        for (element in this) {
+            val newKey = transform(element)
+            if (newKey != null) {
+                destination[newKey] = element.value
+            }
+        }
+        return destination
     }
 }

@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -97,6 +98,7 @@ object GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
+    private val greenThumb = "GREEN_THUMB;1".asInternalName()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -245,7 +247,7 @@ object GardenVisitorFeatures {
                         continue
                     }
                     if (items.isEmpty()) {
-                        list.add("§7(§fAny§7)")
+                        list.add(" §7(§fAny§7)")
                     } else {
                         for (item in items) {
                             list.add(NEUInternalName.fromItemName(item).getItemStack())
@@ -371,6 +373,10 @@ object GardenVisitorFeatures {
                 val copper = group("amount").formatInt()
                 val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
                 visitor.pricePerCopper = (totalPrice / copper).toInt()
+                visitor.totalPrice = totalPrice
+                // Estimate could be changed to most value per copper item, instead of green thumb
+                val estimatedCopperValue = greenThumb.getPrice() / 1500
+                visitor.totalReward = copper * estimatedCopperValue
                 val timePerCopper = (farmingTimeRequired / copper).format()
                 var copperLine = formattedLine
                 if (config.inventory.copperPrice) copperLine += " §7(§6$pricePerCopper §7per)"

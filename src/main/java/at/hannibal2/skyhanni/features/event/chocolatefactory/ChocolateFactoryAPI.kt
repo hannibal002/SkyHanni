@@ -4,13 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateAmount
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTimeTowerManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTooltip
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -21,12 +25,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -66,6 +72,10 @@ object ChocolateFactoryAPI {
         "prestige.level",
         "§6Chocolate Factory (?<prestige>[IVX]+)"
     )
+    private val chocolateForPrestigePattern by patternGroup.pattern(
+        "chocolate.forprestige",
+        "§7§cRequires (?<amount>\\w+) Chocolate this.*"
+    )
     private val clickMeRabbitPattern by patternGroup.pattern(
         "rabbit.clickme",
         "§e§lCLICK ME!"
@@ -78,6 +88,22 @@ object ChocolateFactoryAPI {
         "leaderboard.percentile",
         "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!"
     )
+    private val timeTowerAmountPattern by patternGroup.pattern(
+        "timetower.amount",
+        "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)"
+    )
+    private val timeTowerStatusPattern by patternGroup.pattern(
+        "timetower.status",
+        "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)"
+    )
+    private val timeTowerRechargePattern by patternGroup.pattern(
+        "timetower.recharge",
+        "§7Next Charge: §a(?<duration>\\w+)"
+    )
+    private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Hoppity|Chocolate Shop|Chocolate Factory Milestones"
+    )
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
@@ -85,21 +111,23 @@ object ChocolateFactoryAPI {
     var barnIndex = 34
     private var infoIndex = 13
     private var productionInfoIndex = 45
-    private var prestigeIndex = 28
+    var prestigeIndex = 28
     var milestoneIndex = 53
     private var leaderboardIndex = 51
+    var handCookieIndex = 38
+    var timeTowerIndex = 39
+    var shrineIndex = 41
+    var coachRabbitIndex = 42
     var maxRabbits = 395
 
     var inChocolateFactory = false
+    var chocolateFactoryPaused = false
 
-    var currentPrestige = 0
-    var chocolateCurrent = 0L
-    var chocolateAllTime = 0L
+    var currentPrestige = 1
     var chocolatePerSecond = 0.0
-    var chocolateThisPrestige = 0L
-    var chocolateMultiplier = 1.0
     var leaderboardPosition: Int? = null
     var leaderboardPercentile: Double? = null
+    var chocolateForPrestige = 150_000_000L
 
     val upgradeableSlots: MutableSet<Int> = mutableSetOf()
     var bestUpgrade: Int? = null
@@ -109,6 +137,12 @@ object ChocolateFactoryAPI {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+
+        if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
+            chocolateFactoryPaused = true
+            ChocolateFactoryStats.updateDisplay()
+            return
+        }
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
@@ -125,14 +159,14 @@ object ChocolateFactoryAPI {
     }
 
     private fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
-        val profileStorage = profileStorage ?: return
-
         val infoItem = InventoryUtils.getItemAtSlotIndex(infoIndex) ?: return
         val prestigeItem = InventoryUtils.getItemAtSlotIndex(prestigeIndex) ?: return
         val productionInfoItem = InventoryUtils.getItemAtSlotIndex(productionInfoIndex) ?: return
         val leaderboardItem = InventoryUtils.getItemAtSlotIndex(leaderboardIndex) ?: return
+        val barnItem = InventoryUtils.getItemAtSlotIndex(barnIndex) ?: return
+        val timeTowerItem = InventoryUtils.getItemAtSlotIndex(timeTowerIndex) ?: return
 
-        processInfoItems(infoItem, prestigeItem, productionInfoItem, leaderboardItem)
+        processInfoItems(infoItem, prestigeItem, productionInfoItem, leaderboardItem, barnItem, timeTowerItem)
 
         bestUpgrade = null
         upgradeableSlots.clear()
@@ -147,18 +181,9 @@ object ChocolateFactoryAPI {
             }
 
             val lore = item.getLore()
-            val upgradeCost = lore.getUpgradeCost() ?: continue
+            val upgradeCost = getChocolateUpgradeCost(lore) ?: continue
 
-            if (slotIndex == barnIndex) {
-                lore.matchFirst(barnAmountPattern) {
-                    profileStorage.currentRabbits = group("rabbits").formatInt()
-                    profileStorage.maxRabbits = group("max").formatInt()
-
-                    ChocolateFactoryBarnManager.trySendBarnFullMessage()
-                }
-            }
-
-            val canAfford = upgradeCost <= chocolateCurrent
+            val canAfford = upgradeCost <= ChocolateAmount.CURRENT.chocolate()
             if (canAfford) upgradeableSlots.add(slotIndex)
 
             if (slotIndex in rabbitSlots) {
@@ -182,31 +207,45 @@ object ChocolateFactoryAPI {
         prestigeItem: ItemStack,
         productionItem: ItemStack,
         leaderboardItem: ItemStack,
+        barnItem: ItemStack,
+        timeTowerItem: ItemStack,
     ) {
+        val profileStorage = profileStorage ?: return
+
         leaderboardPosition = null
         leaderboardPercentile = null
 
-        chocolateMultiplier = 1.0
-
         chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
-            chocolateCurrent = group("amount").formatLong()
+            profileStorage.currentChocolate = group("amount").formatLong()
         }
         for (line in chocolateItem.getLore()) {
             chocolatePerSecondPattern.matchMatcher(line) {
                 chocolatePerSecond = group("amount").formatDouble()
             }
             chocolateAllTimePattern.matchMatcher(line) {
-                chocolateAllTime = group("amount").formatLong()
+                profileStorage.chocolateAllTime = group("amount").formatLong()
             }
         }
         prestigeLevelPattern.matchMatcher(prestigeItem.name) {
             currentPrestige = group("prestige").romanToDecimal()
         }
-        prestigeItem.getLore().matchFirst(chocolateThisPrestigePattern) {
-            chocolateThisPrestige = group("amount").formatLong()
+        for (line in prestigeItem.getLore()) {
+            chocolateThisPrestigePattern.matchMatcher(line) {
+                profileStorage.chocolateThisPrestige = group("amount").formatLong()
+            }
+            chocolateForPrestigePattern.matchMatcher(line) {
+                chocolateForPrestige = group("amount").formatLong()
+            }
         }
         productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
-            chocolateMultiplier = group("amount").formatDouble()
+            val currentMultiplier = group("amount").formatDouble()
+            profileStorage.chocolateMultiplier = currentMultiplier
+
+            if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+                profileStorage.rawChocolateMultiplier = currentMultiplier - profileStorage.timeTowerLevel * 0.1
+            } else {
+                profileStorage.rawChocolateMultiplier = currentMultiplier
+            }
         }
         for (line in leaderboardItem.getLore()) {
             leaderboardPlacePattern.matchMatcher(line) {
@@ -216,6 +255,39 @@ object ChocolateFactoryAPI {
                 leaderboardPercentile = group("percent").formatDouble()
             }
         }
+        barnItem.getLore().matchFirst(barnAmountPattern) {
+            profileStorage.currentRabbits = group("rabbits").formatInt()
+            profileStorage.maxRabbits = group("max").formatInt()
+            ChocolateFactoryBarnManager.trySendBarnFullMessage()
+        }
+        for (line in timeTowerItem.getLore()) {
+            timeTowerAmountPattern.matchMatcher(line) {
+                profileStorage.currentTimeTowerUses = group("uses").formatInt()
+                profileStorage.maxTimeTowerUses = group("max").formatInt()
+                ChocolateFactoryTimeTowerManager.checkTimeTowerWarning(true)
+            }
+            timeTowerStatusPattern.matchMatcher(line) {
+                val activeTime = group("acitveTime")
+                if (activeTime.isNotEmpty()) {
+                    // todo in future fix this issue with TimeUtils.getDuration
+                    val formattedGroup = activeTime.replace("h", "h ").replace("m", "m ")
+
+                    val activeDuration = TimeUtils.getDuration(formattedGroup)
+                    val activeUntil = SimpleTimeMark.now() + activeDuration
+                    profileStorage.currentTimeTowerEnds = activeUntil.toMillis()
+                }
+            }
+            timeTowerRechargePattern.matchMatcher(line) {
+                // todo in future fix this issue with TimeUtils.getDuration
+                val formattedGroup = group("duration").replace("h", "h ").replace("m", "m ")
+
+                val timeUntilTower = TimeUtils.getDuration(formattedGroup)
+                val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
+                profileStorage.nextTimeTower = nextTimeTower.toMillis()
+            }
+        }
+        profileStorage.rawChocPerSecond = (chocolatePerSecond / profileStorage.chocolateMultiplier).toInt()
+        profileStorage.lastDataSave = SimpleTimeMark.now().toMillis()
 
         if (!config.statsDisplay) return
         ChocolateFactoryStats.updateDisplay()
@@ -233,6 +305,7 @@ object ChocolateFactoryAPI {
 
     private fun clearData() {
         inChocolateFactory = false
+        chocolateFactoryPaused = false
     }
 
     @SubscribeEvent
@@ -250,16 +323,17 @@ object ChocolateFactoryAPI {
         prestigeIndex = data.prestigeIndex
         milestoneIndex = data.milestoneIndex
         leaderboardIndex = data.leaderboardIndex
+        handCookieIndex = data.handCookieIndex
+        timeTowerIndex = data.timeTowerIndex
+        shrineIndex = data.shrineIndex
+        coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
 
-        val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
-        HOPPITY_EVENT_DISABLED = disabledFeatures.features["HOPPITY_EVENT_DISABLED"] ?: false
+        ChocolateFactoryTooltip.updateIgnoredSlots()
     }
 
-    private var HOPPITY_EVENT_DISABLED = false
-
-    private fun List<String>.getUpgradeCost(): Long? {
-        val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
+    fun getChocolateUpgradeCost(lore: List<String>): Long? {
+        val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
         }
@@ -267,6 +341,5 @@ object ChocolateFactoryAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING &&
-        (LorenzUtils.isOnAlphaServer || !HOPPITY_EVENT_DISABLED)
+    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
 }
