@@ -56,12 +56,13 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,
+        @Deprecated("old", ReplaceWith("clickTypeEnum"))
         val clickType: Int,
         val clickTypeEnum: ClickType? = ClickType.getTypeById(clickType),
     ) : GuiContainerEvent(gui, container) {
 
         fun makePickblock() {
-            if (this.clickedButton == 2 && this.clickType == 3) return
+            if (this.clickedButton == 2 && this.clickTypeEnum == ClickType.HOTBAR) return
             slot?.slotNumber?.let { slotNumber ->
                 Minecraft.getMinecraft().playerController.windowClick(
                     container.windowId, slotNumber, 2, 3, Minecraft.getMinecraft().thePlayer
