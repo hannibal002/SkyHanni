@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.bazaar
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-class BazaarApiResponse(
+class BazaarApiResponseJson(
     @Expose val success: Boolean,
     @Expose val cause: String,
     @Expose val lastUpdated: Long,

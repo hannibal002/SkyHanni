@@ -45,7 +45,7 @@ object HypixelBazaarFetcher {
         nextFetchIsManual = false
         try {
             val jsonResponse = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(URL) }.asJsonObject
-            val response = ConfigManager.gson.fromJson<BazaarApiResponse>(jsonResponse)
+            val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)
                 failedAttempts = 0
