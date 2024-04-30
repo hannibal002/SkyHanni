@@ -21,9 +21,9 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ChocolateShopPrice {
+    private val config get() = ChocolateFactoryAPI.config.chocolateShopPrice
 
     private var display = emptyList<Renderable>()
-    private val config get() = ChocolateFactoryAPI.config.chocolateShopPrice
 
     private val menuNamePattern by RepoPattern.pattern(
         "chocolatefactory.inventory.title",

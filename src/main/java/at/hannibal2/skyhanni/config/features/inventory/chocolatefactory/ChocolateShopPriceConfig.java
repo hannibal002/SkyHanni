@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ChocolateShopPriceConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show chocolatae to coin prices inside the Chocolate Shop inventory.")
+    @ConfigOption(name = "Enabled", desc = "Show chocolate to coin prices inside the Chocolate Shop inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
