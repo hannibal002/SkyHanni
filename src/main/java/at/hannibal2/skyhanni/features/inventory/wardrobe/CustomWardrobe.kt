@@ -77,10 +77,18 @@ class CustomWardrobe {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         val fullRenderable = Renderable.drawInsideRoundedRect(
-            Renderable.verticalContainer(
-                listOf(renderable, button),
-                config.spacing.buttonSlotsVerticalSpacing,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            Renderable.doubleLayered(
+                Renderable.verticalContainer(
+                    listOf(renderable, button),
+                    config.spacing.buttonSlotsVerticalSpacing,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                ),
+                Renderable.string(
+                    "§7SkyHanni",
+                    horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
+                    verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+                ),
+                blockBottomHover = false
             ),
             config.color.backgroundColor.toChromaColor(),
             padding = 10
