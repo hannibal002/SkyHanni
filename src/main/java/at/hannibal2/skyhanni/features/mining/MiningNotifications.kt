@@ -30,7 +30,7 @@ object MiningNotifications {
     }
 
     private val patternGroup = RepoPattern.group("mining.notifications")
-    private val mineshaftSpawn by patternGroup.pattern(
+    val mineshaftSpawn by patternGroup.pattern(
         "mineshaft.spawn",
         "§5§lWOW! §r§aYou found a §r§bGlacite Mineshaft §r§aportal!"
     )

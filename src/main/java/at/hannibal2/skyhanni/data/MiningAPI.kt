@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.OreType
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.init.Blocks
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
@@ -117,6 +119,8 @@ object MiningAPI {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         val position = event.location - LorenzVec(0.5, 0.5, 0.5)
+        if (allowedSoundNames.none { it == event.soundName } && event.soundName != "random.orb") return
+        println("Name: ${event.soundName}, Pitch: ${event.pitch}, Pos: ${position.toCleanStringWithSeparators()}, Volume: ${event.volume}")
         if (soundsList.isEmpty() && event.pitch == 0.7936508f) {
             if (allowedSoundNames.none { it == event.soundName }) return
             soundsList.add(Sound(event.soundName, position, event.pitch, event.volume, SimpleTimeMark.now()))
@@ -130,6 +134,7 @@ object MiningAPI {
     fun onTick(event: LorenzTickEvent) {
         if (!inCustomMiningIsland()) return
 
+        // if somehow you take more than 20 seconds to mine a single block, congrats
         recentMinedBlocksMap.removeIf { it.time.passedSince() > 20.seconds }
         surroundingHardStone.removeIf { it.time.passedSince() > 20.seconds }
         soundsList.removeIf { it.time.passedSince() > 500.milliseconds }
@@ -144,10 +149,15 @@ object MiningAPI {
             recentMinedBlocksMap.removeIf { it.time < block.time }
             removeNotAdjacentHardstoneBlocks()
             soundsList.clear()
-            if (blockAmount == 0) return
+            if (blockAmount == 0) {
+                ChatUtils.debug("Mined 0 blocks? empa you stupid check logs")
+                return
+            }
             if (blockAmount == 1) {
                 CompactUpdateEvent(1, block.ore ).postAndCatch()
                 return
+            } else {
+                CompactUpdateEvent(blockAmount, block.ore).postAndCatch()
             }
         }
     }
@@ -155,6 +165,7 @@ object MiningAPI {
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
+        if (event.newState != Blocks.air) return
         println("old: ${event.old} new: ${event.new} loc: ${event.location}")
     }
 
@@ -204,7 +215,7 @@ object MiningAPI {
             val offsetLoc = position.toBlockPos().offset(direction).toLorenzVec()
             val ore = OreBlock.getByStateOrNull(offsetLoc.getBlockStateAt())
             if (ore?.oreType == OreType.HARD_STONE && surroundingHardStone.none { it.position == offsetLoc } ) {
-                println("hardstone found in $offsetLoc")
+                //println("hardstone found in $offsetLoc")
                 surroundingHardStone.add(MinedBlock(ore, offsetLoc, SimpleTimeMark.now()))
             }
         }
