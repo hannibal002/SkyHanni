@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.event;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -81,10 +81,16 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
-        desc = "How close should you be to your barn capacity should you be before being warned about needing to upgrade it."
+        desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
+
+    @Expose
+    @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean extraTooltipStats = true;
 
     @Expose
     @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")

@@ -88,6 +88,9 @@ public class ProfileSpecificStorage {
         public int currentTimeTowerUses = -1;
 
         @Expose
+        public int timeTowerCooldown = 8;
+
+        @Expose
         public int maxTimeTowerUses = 3;
 
         @Expose
