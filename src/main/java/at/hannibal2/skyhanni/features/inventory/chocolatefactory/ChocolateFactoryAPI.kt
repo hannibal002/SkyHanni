@@ -97,7 +97,7 @@ object ChocolateFactoryAPI {
     )
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
-        "Hoppity|Chocolate Shop|Chocolate Factory Milestones"
+        "Hoppity|Chocolate Factory Milestones"
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -176,7 +176,7 @@ object ChocolateFactoryAPI {
             }
 
             val lore = item.getLore()
-            val upgradeCost = getChocolateUpgradeCost(lore) ?: continue
+            val upgradeCost = getChocolateBuyCost(lore) ?: continue
 
             val canAfford = upgradeCost <= ChocolateAmount.CURRENT.chocolate()
             if (canAfford) upgradeableSlots.add(slotIndex)
@@ -351,7 +351,7 @@ object ChocolateFactoryAPI {
         event.move(43, "$old.hoppityStatsPosition", "$new.hoppityStatsPosition")
     }
 
-    fun getChocolateUpgradeCost(lore: List<String>): Long? {
+    fun getChocolateBuyCost(lore: List<String>): Long? {
         val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()

@@ -31,7 +31,7 @@ object ChocolateFactoryTooltip {
         if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
         if (slotIndex !in ChocolateFactoryAPI.otherUpgradeSlots && slotIndex !in ChocolateFactoryAPI.rabbitSlots) return
 
-        val upgradeCost = ChocolateFactoryAPI.getChocolateUpgradeCost(event.toolTip) ?: return
+        val upgradeCost = ChocolateFactoryAPI.getChocolateBuyCost(event.toolTip) ?: return
 
         event.toolTip.add("§8§m-----------------")
         val timeToUpgrade = ChocolateAmount.CURRENT.formattedTimeUntilGoal(upgradeCost)
