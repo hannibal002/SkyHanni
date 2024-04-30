@@ -350,10 +350,10 @@ private fun getWinterLines() = buildList {
 }
 
 private fun getWinterShowWhen(): Boolean = getSbLines().any {
-        ScoreboardPattern.winterEventStartPattern.matches(it)
-            || (ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
-            || ScoreboardPattern.winterWavePattern.matches(it)
-    }
+    ScoreboardPattern.winterEventStartPattern.matches(it)
+        || (ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
+        || ScoreboardPattern.winterWavePattern.matches(it)
+}
 
 private fun getSpookyLines() = buildList {
     getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }?.let { add(it) } // Time
