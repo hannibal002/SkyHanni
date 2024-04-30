@@ -70,7 +70,11 @@ class CraftableItemList {
         display = if (lines.isEmpty()) {
             listOf(Renderable.string("§7No Items to craft"))
         } else {
-            pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
+            val list = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
+            listOf(
+                Renderable.string("§7Recipes: ${list.size}"),
+                Renderable.scrollList(list, height = 10),
+            )
         }
     }
 
