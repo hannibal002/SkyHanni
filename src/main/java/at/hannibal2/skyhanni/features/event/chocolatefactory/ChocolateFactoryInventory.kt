@@ -121,8 +121,10 @@ object ChocolateFactoryInventory {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         val slot = event.slot ?: return
+        val slotNumber = slot.slotNumber
         if (!config.useMiddleClick) return
-        if (slot.slotNumber in ChocolateFactoryAPI.noPickblockSlots) return
+        if (slotNumber in ChocolateFactoryAPI.noPickblockSlots &&
+            (slotNumber != ChocolateFactoryAPI.timeTowerIndex || event.clickedButton == 1)) return
 
         event.makePickblock()
     }
