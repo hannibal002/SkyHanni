@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.TabCompletionEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -17,11 +18,11 @@ object WarpTabComplete {
         warps = data.warpCommands
     }
 
-    fun handleTabComplete(command: String): List<String>? {
-        if (!isEnabled()) return null
-        if (command != "warp") return null
-
-        return warps
+    @SubscribeEvent
+    fun onTabComplete(event: TabCompletionEvent) {
+        if (event.isCommand("warp")) {
+            event.addSuggestions(warps)
+        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.warps
