@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.event.ChocolateFactoryConfig
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
@@ -10,11 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateAmount
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryStats
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTimeTowerManager
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTooltip
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -39,8 +35,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryAPI {
-
-    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.event.chocolateFactory
+    val config get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
@@ -330,6 +325,30 @@ object ChocolateFactoryAPI {
         maxRabbits = data.maxRabbits
 
         ChocolateFactoryTooltip.updateIgnoredSlots()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val old = "event.chocolateFactory"
+        val new = "inventory.chocolateFactory"
+        event.move(43, "$old.enabled", "$new.enabled")
+        event.move(43, "$old.statsDisplay", "$new.statsDisplay")
+        event.move(43, "$old.statsDisplayList", "$new.statsDisplayList")
+        event.move(43, "$old.showStackSizes", "$new.showStackSizes")
+        event.move(43, "$old.highlightUpgrades", "$new.highlightUpgrades")
+        event.move(43, "$old.useMiddleClick", "$new.useMiddleClick")
+        event.move(43, "$old.rabbitWarning", "$new.rabbitWarning")
+        event.move(43, "$old.barnCapacityThreshold", "$new.barnCapacityThreshold")
+        event.move(43, "$old.extraTooltipStats", "$new.extraTooltipStats")
+        event.move(43, "$old.timeTowerWarning", "$new.timeTowerWarning")
+        event.move(43, "$old.position", "$new.position")
+        event.move(43, "$old.compactOnClick", "$new.compactOnClick")
+        event.move(43, "$old.compactOnClickAlways", "$new.compactOnClickAlways")
+        event.move(43, "$old.tooltipMove", "$new.tooltipMove")
+        event.move(43, "$old.tooltipMovePosition", "$new.tooltipMovePosition")
+        event.move(43, "$old.hoppityMenuShortcut", "$new.hoppityMenuShortcut")
+        event.move(43, "$old.hoppityCollectionStats", "$new.hoppityCollectionStats")
+        event.move(43, "$old.hoppityStatsPosition", "$new.hoppityStatsPosition")
     }
 
     fun getChocolateUpgradeCost(lore: List<String>): Long? {

@@ -49,6 +49,10 @@ public class InventoryConfig {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
+    @Category(name = "Chocolate Factory", desc = "The chocolate factory")
+    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();

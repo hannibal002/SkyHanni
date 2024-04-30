@@ -1,10 +1,8 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.menu
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators

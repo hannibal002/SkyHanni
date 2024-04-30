@@ -1,11 +1,13 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity
+package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -20,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggsManager {
 
-    private val config get() = ChocolateFactoryAPI.config.hoppityEggs
+    val config get() = SkyHanniMod.feature.event.hoppityEggs
 
     private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
@@ -114,5 +116,15 @@ object HoppityEggsManager {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         HoppityEggType.checkClaimed()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            43,
+            "event.chocolateFactory.highlightHoppityShop",
+            "event.chocolateFactory.hoppityEggs.highlightHoppityShop"
+        )
+        event.move(43, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 }
