@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -12,7 +13,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.fromJson
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,25 +29,24 @@ object HypixelBazaarFetcher {
     private var failedAttepmts = 0
     private var nextFetchIsManual = false
 
-    init {
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!canFetch()) return
+        if (failedAttepmts >= maxFailedAttepmts) return
         SkyHanniMod.coroutineScope.launch {
-            while (true) {
-                if (!canFetch()) continue
-                if (failedAttepmts == maxFailedAttepmts) continue
-                fetchAndProcessBazaarData()
-            }
+            fetchAndProcessBazaarData()
         }
     }
 
-    private fun fetchAndProcessBazaarData() {
-        println("fetchAndProcessBazaarData")
+    private suspend fun fetchAndProcessBazaarData() {
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
 
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
+        println("fetchAndProcessBazaarData $fetchType")
         nextFetchIsManual = false
 
         try {
-            val jsonResponse = APIUtil.getJSONResponse(url)
+            val jsonResponse = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
             val response = ConfigManager.gson.fromJson<BazaarApiResponse>(jsonResponse)
             if (response.success) {
                 latestProductInformation = response.products

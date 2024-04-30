@@ -43,6 +43,11 @@ object APIUtil {
             )
             .useSystemProperties()
 
+    /**
+     * TODO
+     * make suspend
+     * use withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+     */
     fun getJSONResponse(urlString: String, silentError: Boolean = false) =
         getJSONResponseAsElement(urlString, silentError) as JsonObject
 
