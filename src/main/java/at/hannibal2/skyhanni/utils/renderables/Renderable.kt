@@ -665,8 +665,8 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
                 RenderUtils.drawRoundRectOutline(
-                    posX,
-                    posY,
+                    0,
+                    0,
                     width,
                     height,
                     topOutlineColor,
