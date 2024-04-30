@@ -301,8 +301,8 @@ class CustomWardrobe {
         val editButton = createLabeledButton(
             "§bEdit",
             onClick = {
-                tempToggleShowOverlay = false
                 reset()
+                tempToggleShowOverlay = false
             }
         )
 
