@@ -268,6 +268,7 @@ object ChocolateFactoryAPI {
                     val activeDuration = TimeUtils.getDuration(formattedGroup)
                     val activeUntil = SimpleTimeMark.now() + activeDuration
                     profileStorage.currentTimeTowerEnds = activeUntil.toMillis()
+                    profileStorage.lastTimeTowerEnds = activeUntil.toMillis()
                 }
             }
             timeTowerRechargePattern.matchMatcher(line) {
