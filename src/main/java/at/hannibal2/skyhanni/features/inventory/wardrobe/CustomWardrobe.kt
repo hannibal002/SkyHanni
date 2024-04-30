@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -179,7 +178,7 @@ class CustomWardrobe {
             val warningRenderable = Renderable.string(
                 wardrobeWarningText,
                 3 * (config.spacing.globalScale / 100.0),
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                horizontalAlign = HorizontalAlignment.CENTER
             )
             return warningRenderable
         } else {
