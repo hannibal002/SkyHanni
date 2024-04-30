@@ -1,8 +1,10 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory.menu
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -121,8 +123,10 @@ object ChocolateFactoryInventory {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         val slot = event.slot ?: return
+        val slotNumber = slot.slotNumber
         if (!config.useMiddleClick) return
-        if (slot.slotNumber in ChocolateFactoryAPI.noPickblockSlots) return
+        if (slotNumber in ChocolateFactoryAPI.noPickblockSlots &&
+            (slotNumber != ChocolateFactoryAPI.timeTowerIndex || event.clickedButton == 1)) return
 
         event.makePickblock()
     }
