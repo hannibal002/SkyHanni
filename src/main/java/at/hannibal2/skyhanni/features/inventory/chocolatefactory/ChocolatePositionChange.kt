@@ -8,12 +8,14 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 object ChocolatePositionChange {
 
     private val config get() = ChocolateFactoryAPI.config
-
-    private var lastTime: SimpleTimeMark? = null
-    private var lastPosition = -1
-    private var lastLeaderboard: String? = null
+    private val storage get() = ChocolateFactoryAPI.profileStorage?.positionChange
 
     fun update(position: Int?, leaderboard: String) {
+        val storage = storage ?: return
+        val lastTime = storage.lastTime?.let { SimpleTimeMark(it) }
+        val lastPosition = storage.lastPosition
+        val lastLeaderboard = storage.lastLeaderboard
+
         if (lastLeaderboard == leaderboard) return
 
         lastLeaderboard?.let { lastLb ->
@@ -32,10 +34,10 @@ object ChocolatePositionChange {
             }
         }
 
-        lastTime = SimpleTimeMark.now()
-        lastLeaderboard = leaderboard
+        storage.lastTime = SimpleTimeMark.now().toMillis()
+        storage.lastLeaderboard = leaderboard
         position?.let {
-            lastPosition = it
+            storage.lastPosition = it
         }
     }
 }
