@@ -99,7 +99,7 @@ class ChocolateShopPrice {
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eCoins per million chocolate§f:"))
-        newList.add(Renderable.string("§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}"))
+        newList.add(Renderable.string("§eChocolate avaliable: §6${ChocolateAmount.CURRENT.formatted}"))
         newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         display = newList
     }
