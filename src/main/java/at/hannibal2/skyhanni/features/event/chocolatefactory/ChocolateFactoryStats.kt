@@ -51,7 +51,7 @@ object ChocolateFactoryStats {
 
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
 
-        val text = formatList(buildMap {
+        val map = buildMap {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory Stats")
 
             put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
@@ -78,7 +78,8 @@ object ChocolateFactoryStats {
                 ChocolateFactoryStat.RAW_PER_SECOND,
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}"
             )
-        })
+        }
+        val text = config.statsDisplayList.mapNotNull { map[it] }
 
         display = listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(text.map(Renderable::string)),
@@ -95,9 +96,6 @@ object ChocolateFactoryStats {
             }
         ))
     }
-
-    private fun formatList(list: Map<ChocolateFactoryStat, String>): List<String> =
-        config.statsDisplayList.mapNotNull { list[it] }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
