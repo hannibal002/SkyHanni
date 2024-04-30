@@ -813,10 +813,6 @@ interface Renderable {
             }
         }
 
-        /**
-         * The x and y coordinates are the bottom middle of the renderable.
-         * Don't ask me, ask Mojang.
-         */
         fun player(
             entity: EntityLivingBase,
             followMouse: Boolean = false,
