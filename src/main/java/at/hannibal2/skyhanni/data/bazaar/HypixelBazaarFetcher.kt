@@ -23,12 +23,12 @@ import kotlin.time.Duration.Companion.seconds
 
 // https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
 object HypixelBazaarFetcher {
-    private val url = "https://api.hypixel.net/v2/skyblock/bazaar"
-    private val hiddenFailedAttempts = 3
+    private const val URL = "https://api.hypixel.net/v2/skyblock/bazaar"
+    private const val HIDDEN_FAILED_ATTEMPTS = 3
 
     var latestProductInformation = mapOf<NEUInternalName, BazaarData>()
     private var nextFetchTime = SimpleTimeMark.farPast()
-    private var failedAttepmts = 0
+    private var failedAttempts = 0
     private var nextFetchIsManual = false
 
     @SubscribeEvent
@@ -44,11 +44,11 @@ object HypixelBazaarFetcher {
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+            val jsonResponse = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(URL) }.asJsonObject
             val response = ConfigManager.gson.fromJson<BazaarApiResponse>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)
-                failedAttepmts = 0
+                failedAttempts = 0
             } else {
                 onError(fetchType, Exception("success=false, cause=${response.cause}"))
             }
@@ -73,10 +73,10 @@ object HypixelBazaarFetcher {
 
     private fun onError(fetchType: String, e: Exception) {
         val userMessage = "Failed fetching bazaar price data from hypixel"
-        failedAttepmts++
-        if (failedAttepmts <= hiddenFailedAttempts) {
+        failedAttempts++
+        if (failedAttempts <= HIDDEN_FAILED_ATTEMPTS) {
             nextFetchTime = SimpleTimeMark.now() + 15.seconds
-            ChatUtils.debug("$userMessage. (errorMessage=${e.message}, failedAttepmts=$failedAttepmts, $fetchType")
+            ChatUtils.debug("$userMessage. (errorMessage=${e.message}, failedAttepmts=$failedAttempts, $fetchType")
             e.printStackTrace()
         } else {
             nextFetchTime = SimpleTimeMark.now() + 15.minutes
@@ -84,13 +84,13 @@ object HypixelBazaarFetcher {
                 e,
                 userMessage,
                 "fetchType" to fetchType,
-                "failedAttepmts" to failedAttepmts,
+                "failedAttepmts" to failedAttempts,
             )
         }
     }
 
     fun fetchNow() {
-        failedAttepmts = 0
+        failedAttempts = 0
         nextFetchIsManual = true
         nextFetchTime = SimpleTimeMark.now()
         ChatUtils.chat("Manually updating the bazaar prices right now..")
