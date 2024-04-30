@@ -176,7 +176,7 @@ object ChocolateFactoryAPI {
             }
 
             val lore = item.getLore()
-            val upgradeCost = lore.getChocolateUpgradeCost() ?: continue
+            val upgradeCost = getChocolateUpgradeCost(lore) ?: continue
 
             val canAfford = upgradeCost <= ChocolateAmount.CURRENT.chocolate()
             if (canAfford) upgradeableSlots.add(slotIndex)
@@ -323,10 +323,12 @@ object ChocolateFactoryAPI {
         shrineIndex = data.shrineIndex
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
+
+        ChocolateFactoryTooltip.updateIgnoredSlots()
     }
 
-    fun List<String>.getChocolateUpgradeCost(): Long? {
-        val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
+    fun getChocolateUpgradeCost(lore: List<String>): Long? {
+        val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
         }

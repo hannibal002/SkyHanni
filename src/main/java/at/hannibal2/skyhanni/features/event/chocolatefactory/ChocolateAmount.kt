@@ -57,31 +57,5 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
             val perSecond = ChocolateFactoryAPI.chocolatePerSecond
             return (perSecond * secondsSinceUpdate).toLong()
         }
-
-        fun averageChocPerSecond(
-            baseMultiplierIncrease: Double = 0.0,
-            rawPerSecondIncrease: Int = 0,
-            timeTowerLevelIncrease: Int = 0,
-        ): Double {
-            val profileStorage = profileStorage ?: return 0.0
-
-            val baseMultiplier = profileStorage.chocolateMultiplier + baseMultiplierIncrease
-            val rawPerSecond = profileStorage.rawChocPerSecond + rawPerSecondIncrease
-            val timeTowerLevel = profileStorage.timeTowerLevel + timeTowerLevelIncrease
-
-            val timeTowerCooldown = profileStorage.timeTowerCooldown
-
-            val basePerSecond = rawPerSecond * baseMultiplier
-            val towerCalc = (rawPerSecond * timeTowerLevel * .1) / timeTowerCooldown
-
-            return basePerSecond + towerCalc
-        }
-
-        fun chocPerTimeTower(): Int {
-            val profileStorage = profileStorage ?: return 0
-            val amountPerSecond = profileStorage.rawChocPerSecond * profileStorage.timeTowerLevel * .1
-            val amountPerHour = amountPerSecond * 60 * 60
-            return amountPerHour.toInt()
-        }
     }
 }
