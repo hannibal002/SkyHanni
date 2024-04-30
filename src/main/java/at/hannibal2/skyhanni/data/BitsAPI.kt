@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -67,8 +66,13 @@ object BitsAPI {
     private val bitsChatGroup = bitsDataGroup.group("chat")
 
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
-        "famerankup",
+        "rankup.bits",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
+    )
+
+    private val fameRankUpPattern by bitsChatGroup.pattern(
+        "rankup.rank",
+        "[§\\w\\s]+FAME RANK UP (?:§.)+(?<rank>.*)"
     )
 
     private val boosterCookieAte by bitsChatGroup.pattern(
@@ -148,10 +152,10 @@ object BitsAPI {
                 if (amount == bits) return
 
                 if (amount > bits) {
-                    bitsAvailable -= amount - bits
-                    ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
+                    val difference = amount - bits
+                    bitsAvailable -= difference
                     bits = amount
-                    sendBitsGainEvent()
+                    sendBitsGainEvent(difference)
                 } else {
                     bits = amount
                     sendBitsSpentEvent()
@@ -169,6 +173,21 @@ object BitsAPI {
             val amount = group("amount").formatInt()
             bitsAvailable += amount
             sendBitsAvailableGainedEvent()
+
+            return
+        }
+
+        fameRankUpPattern.matchMatcher(message) {
+            val rank = group("rank")
+
+            currentFameRank = getFameRankByNameOrNull(rank)
+                ?: return ErrorManager.logErrorWithData(
+                    FameRankNotFoundException(rank),
+                    "FameRank $rank not found",
+                    "Rank" to rank,
+                    "Message" to message,
+                    "FameRanks" to FameRanks.fameRanks
+                )
 
             return
         }
@@ -205,6 +224,11 @@ object BitsAPI {
                 if (bitsAvailable != amount) {
                     bitsAvailable = amount
                     sendBitsAvailableGainedEvent()
+
+                    val difference = bits - bitsAvailable
+                    if (difference > 0) {
+                        bits += difference
+                    }
                 }
             }
             lore.matchFirst(cookieDurationPattern) {
@@ -282,7 +306,7 @@ object BitsAPI {
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
-    private fun sendBitsGainEvent() = BitsUpdateEvent.BitsGain(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsGainEvent(difference: Int) = BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
     private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
     private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
 

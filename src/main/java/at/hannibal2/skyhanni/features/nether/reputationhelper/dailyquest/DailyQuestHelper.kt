@@ -175,19 +175,20 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
-        if (quests.any {
-                it.state == QuestState.READY_TO_COLLECT ||
-                it.state == QuestState.NOT_ACCEPTED ||
-                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
-            val location = when (reputationHelper.factionType) {
-                FactionType.BARBARIAN -> townBoardBarbarian
-                FactionType.MAGE -> townBoardMage
+        if (!quests.any { it.needsTownBoardLocation() }) return
+        val location = when (reputationHelper.factionType) {
+            FactionType.BARBARIAN -> townBoardBarbarian
+            FactionType.MAGE -> townBoardMage
 
-                FactionType.NONE -> return
-            }
-            event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(location, "Town Board", 1.5)
+            FactionType.NONE -> return
         }
+        event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+        event.drawDynamicText(location, "Town Board", 1.5)
+    }
+
+    private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
+        state == QuestState.READY_TO_COLLECT || state == QuestState.NOT_ACCEPTED ||
+            (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
     fun render(display: MutableList<List<Any>>) {

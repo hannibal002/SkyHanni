@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
@@ -21,6 +22,29 @@ object ItemNameResolver {
 
         resolveEnchantmentByName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it) }
+        }
+        if (itemName.endsWith("gemstone", ignoreCase = true)) {
+            val split = lowercase.split(" ")
+            if (split.size == 3) {
+                val gemstoneQuery = "${
+                    when (split[1]) {
+                        "jade", "peridot", "citrine" -> '☘'
+                        "amethyst" -> '❈'
+                        "ruby" -> '❤'
+                        "amber" -> '⸕'
+                        "opal" -> '❂'
+                        "topaz" -> '✧'
+                        "onyx" -> '☠'
+                        "sapphire" -> '✎'
+                        "aquamarine" -> 'α'
+                        "jasper" -> '❁'
+                        else -> ' '
+                    }
+                } ${split.joinToString("_").allLettersFirstUppercase()}"
+                ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, true)?.let {
+                    return itemNameCache.getOrPut(lowercase) { it.asInternalName() }
+                }
+            }
         }
 
         val internalName = when (itemName) {

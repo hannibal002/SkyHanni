@@ -217,6 +217,7 @@ object LorenzUtils {
         }
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
         getName: (T) -> String,
@@ -226,6 +227,7 @@ object LorenzUtils {
         add(buildSelector<T>(prefix, getName, isCurrent, onChange))
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
@@ -248,6 +250,7 @@ object LorenzUtils {
         }
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun MutableList<List<Any>>.addButton(
         prefix: String,
         getName: String,
@@ -330,6 +333,8 @@ object LorenzUtils {
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
+
+    inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
 
     // TODO move to val by lazy
     fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true

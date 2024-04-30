@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServe
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.devConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.maxwellConfig
@@ -250,9 +251,7 @@ enum class ScoreboardElement(
     ),
     ;
 
-    override fun toString(): String {
-        return configLine
-    }
+    override fun toString() = configLine
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf("<hidden>" to HorizontalAlignment.LEFT)
 
@@ -309,14 +308,16 @@ enum class ScoreboardElement(
     }
 }
 
-private fun getTitleDisplayPair() = if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-    listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-} else {
-    listOf(
-        displayConfig.titleAndFooter.customTitle.get().toString()
-            .replace("&", "§") to displayConfig.titleAndFooter.alignTitleAndFooter
-    )
-}
+private fun getTitleDisplayPair(): List<ScoreboardElementType> =
+    if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
+        listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+    } else {
+        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
+            .replace("&", "§")
+            .split("\\n")
+            .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+        ).flatten()
+    }
 
 private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
@@ -447,11 +448,11 @@ private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
-    val cold = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.coldPattern, "cold")
+    val cold = -getCold()
 
     return listOf(
         when {
-            informationFilteringConfig.hideEmptyLines && cold == "0" -> "<hidden>"
+            informationFilteringConfig.hideEmptyLines && cold == 0 -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
             else -> "Cold: §b$cold❄"
         } to HorizontalAlignment.LEFT
@@ -524,14 +525,10 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
-    val lobbyCode = HypixelData.serverId ?: "<hidden>"
-    return listOf(
-        if (lobbyCode == "<hidden>") {
-            "<hidden>"
-        } else {
-            "§8$lobbyCode"
-        } to HorizontalAlignment.LEFT
-    )
+    val lobbyCode = HypixelData.serverId
+    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
+    val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: "<hidden>"
+    return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
 }
 
 private fun getPowerDisplayPair() = listOf(
@@ -620,11 +617,11 @@ private fun getObjectiveDisplayPair() = buildList {
 private fun getObjectiveShowWhen(): Boolean =
     ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
-private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
-    (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,
-    (" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT),
-    (" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
-)
+private fun getSlayerDisplayPair(): List<ScoreboardElementType> = buildList {
+    add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT)
+    add(" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT)
+    add(" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
+}
 
 private fun getSlayerShowWhen() =
     if (informationFilteringConfig.hideIrrelevantLines) SlayerAPI.isInCorrectArea else true
@@ -768,16 +765,18 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     }
 }
 
-private fun getFooterDisplayPair() = listOf(
-    displayConfig.titleAndFooter.customFooter.get().toString()
-        .replace("&", "§") to displayConfig.titleAndFooter.alignTitleAndFooter
-)
+private fun getFooterDisplayPair(): List<ScoreboardElementType> =
+    listOf(displayConfig.titleAndFooter.customFooter.get().toString()
+        .replace("&", "§")
+        .split("\\n")
+        .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+    ).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
     val size = unknownLines.size
-    if (amountOfUnknownLines != size && devConfig.unknownLinesWarning) {
+    if (amountOfUnknownLines != size && config.unknownLinesWarning) {
         val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
         ErrorManager.logErrorWithData(
             CustomScoreboardUtils.UndetectedScoreboardLines(message),
@@ -785,7 +784,9 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
             "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
+            "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
             noStackTrace = true,
+            betaOnly = true,
         )
         amountOfUnknownLines = size
     }

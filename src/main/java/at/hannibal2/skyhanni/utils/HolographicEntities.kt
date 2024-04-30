@@ -41,7 +41,6 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.passive.EntityWolf
 import org.lwjgl.opengl.GL11
 
-
 /**
  * Utility for creating fake entities without an associated world in order to avoid contaminating the world state.
  */
@@ -136,7 +135,6 @@ object HolographicEntities {
     val cow = HolographicBase(EntityCow(null))
     val pig = HolographicBase(EntityPig(null))
     val giant = HolographicBase(EntityGiantZombie(null))
-
 
     private fun interpolateRotation(last: Float, next: Float, progress: Float): Float {
         var direction: Float = next - last

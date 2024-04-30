@@ -21,16 +21,19 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -102,7 +105,6 @@ class CustomScoreboard {
         internal val maxwellConfig get() = displayConfig.maxwell
         internal val informationFilteringConfig get() = config.informationFiltering
         internal val backgroundConfig get() = config.background
-        internal val devConfig get() = SkyHanniMod.feature.dev
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
@@ -142,11 +144,26 @@ class CustomScoreboard {
         return this
     }
 
+    private var dirty = false
+
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
-            GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
+            if (isHideVanillaScoreboardEnabled()) {
+                GuiIngameForge.renderObjective = false
+            }
+            if (dirty) {
+                GuiIngameForge.renderObjective = true
+                dirty = false
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+            if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
 
@@ -154,7 +171,7 @@ class CustomScoreboard {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
-            if (!config.enabled) {
+            if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
                 ScoreboardElement.entries.map { element ->
@@ -168,20 +185,20 @@ class CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val prefix = "gui.customScoreboard"
         val displayConfigPrefix = "$prefix.displayConfig"
         val displayPrefix = "$prefix.display"
-        event.move(28, "$prefix.displayConfig.showAllActiveEvents", "$prefix.displayConfig.eventsConfig.showAllActiveEvents")
-        event.transform(30, "$prefix.displayConfig.eventsConfig.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.HOT_DOG_CONTEST.name))
-            array
-        }
+
+        event.move(
+            28,
+            "$prefix.displayConfig.showAllActiveEvents",
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+        )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
         event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
@@ -194,7 +211,11 @@ class CustomScoreboard {
         event.move(31, "$displayConfigPrefix.showMaxIslandPlayers", "$displayPrefix.showMaxIslandPlayers")
         event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
         event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
-        event.move(31, "$displayConfigPrefix.cacheScoreboardOnIslandSwitch", "$displayPrefix.cacheScoreboardOnIslandSwitch")
+        event.move(
+            31,
+            "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
+            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+        )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
         event.move(31, "$displayConfigPrefix.titleAndFooter", "$displayPrefix.titleAndFooter")
@@ -203,5 +224,29 @@ class CustomScoreboard {
         event.move(31, "$displayConfigPrefix.eventsConfig", "$displayPrefix.events")
         event.move(31, "$prefix.mayorConfig", "$displayPrefix.mayor")
         event.move(31, "$prefix.partyConfig", "$displayPrefix.party")
+
+        event.transform(37, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array
+        }
+        event.transform(40, "$displayPrefix.events.eventEntries") { element ->
+            val jsonArray = element.asJsonArray
+            val newArray = JsonArray()
+
+            for (jsonElement in jsonArray) {
+                val stringValue = jsonElement.asString
+                if (stringValue !in listOf("HOT_DOG_CONTEST", "EFFIGIES")) {
+                    newArray.add(jsonElement)
+                }
+            }
+
+            if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
+                newArray.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
+            }
+
+            newArray
+        }
+
     }
 }
