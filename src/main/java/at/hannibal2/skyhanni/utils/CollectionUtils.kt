@@ -148,6 +148,9 @@ object CollectionUtils {
         return this
     }
 
+    operator fun IntRange.contains(range: IntRange): Boolean =
+        range.first in this && range.last in this
+
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }

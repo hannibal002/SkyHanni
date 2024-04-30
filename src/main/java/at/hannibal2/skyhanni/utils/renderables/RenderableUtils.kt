@@ -35,12 +35,14 @@ internal object RenderableUtils {
         HorizontalAlignment.LEFT -> 0
         HorizontalAlignment.CENTER -> (xSpace - renderable.width) / 2
         HorizontalAlignment.RIGHT -> xSpace - renderable.width
+        else -> 0
     }
 
     private fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int) = when (renderable.verticalAlign) {
         VerticalAlignment.TOP -> 0
         VerticalAlignment.CENTER -> (ySpace - renderable.height) / 2
         VerticalAlignment.BOTTOM -> ySpace - renderable.height
+        else -> 0
     }
 
     fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
