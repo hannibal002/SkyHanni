@@ -130,10 +130,12 @@ import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBar
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryShortcut
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsShared
+import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityNpc
 import at.hannibal2.skyhanni.features.event.chocolatefactory.clicks.FactoryItemTooltipFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -226,6 +228,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighlighting
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
+import at.hannibal2.skyhanni.features.garden.pests.PestParticleLine
 import at.hannibal2.skyhanni.features.garden.pests.PestParticleWaypoint
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.PestSpawn
@@ -460,7 +463,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.15",
+    version = "0.25.Beta.16",
 )
 class SkyHanniMod {
 
@@ -629,6 +632,8 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryInventory)
         loadModule(ChocolateFactoryStats)
         loadModule(FactoryItemTooltipFeatures)
+        loadModule(ChocolateFactoryTimeTowerManager)
+        loadModule(HoppityNpc)
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
@@ -859,6 +864,7 @@ class SkyHanniMod {
         loadModule(PestFinder())
         loadModule(PestParticleWaypoint())
         loadModule(StereoHarmonyDisplay())
+        loadModule(PestParticleLine())
         loadModule(SprayFeatures())
         loadModule(DojoRankDisplay())
         loadModule(SprayDisplay())

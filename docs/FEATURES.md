@@ -845,6 +845,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Chocolate Factory Compact On Click. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1579)
 + Factory Chat Filters. - RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1574)
     + Hide chocolate factory upgrade and employee promotion messages.
++ Copy Chocolate Factory Stats to clipboard. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
++ Highlight unbought items in Hoppity shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
++ Added time tower status to the chocolate factory stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1506)
+    + Also can notify you when you get a new charge or your charges are full.
 
 </details>
 <details open><summary>

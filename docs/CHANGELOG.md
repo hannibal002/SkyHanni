@@ -108,6 +108,10 @@
 + Added Chocolate Factory Compact On Click. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1579)
 + Added Factory Chat Filters. - RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1574)
     + Hide chocolate factory upgrade and employee promotion messages.
++ Copy Chocolate Factory Stats to clipboard. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
++ Highlight unbought items in Hoppity shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
++ Added time tower status to the chocolate factory stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1506)
+    + Also can notify you when you get a new charge or your charges are full.
 
 #### Inventory Features
 
@@ -154,6 +158,7 @@
 + Added support for showing overflow garden levels outside the Garden Level Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1325)
 + Added options to toggle overflow garden levels and overflow level up messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1325)
 + Added an option to disable custom garden key binds while on the barn plot. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1559)
++ Added option to block accepting/refusing visitors depending on coin loss. - Albin (https://github.com/hannibal002/SkyHanni/pull/1502)
 
 #### Diana Improvements
 
@@ -219,6 +224,7 @@
     + Do not remove the rank for YouTubers in chat.
 + Added option Same Chat Color. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
     + All players, also those with ranks, write with the same, white chat color.
++ Enchant Parsing support for other mods' chat tooltips. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1589)
 
 #### Combat Improvements
 
@@ -234,6 +240,10 @@
 + Compressed the no power up line in the Jerry winter event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1355)
 + Improved description of Hoppity highlight updates. - rnghatesme (https://github.com/hannibal002/SkyHanni/pull/1580)
 + Added a way to disable the rabbit crush warning by setting the threshold to zero. - seraid (https://github.com/hannibal002/SkyHanni/pull/1575)
++ Improved various Hoppity features. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
++ Show an estimation of when you will prestige based on your chocolate/second. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1514)
++ Removed the Hoppity Menu Shortcut in The Rift, Kuudra, Catacombs and Mineshafts. - raven (https://github.com/hannibal002/SkyHanni/pull/1585)
+    + You cannot use the chocolate factory in these areas, resulting in the button being removed.
 
 #### Rift Improvements
 
@@ -290,6 +300,7 @@
 + Fixed an error message with pest particles. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1551)
 + Fixed error message with GFS and super crafting pets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1553)
 + Fixed pest count error being shown. - Empa (https://github.com/hannibal002/SkyHanni/pull/1563)
++ Fixed pest count logic not having necessary delay. - Empa (https://github.com/hannibal002/SkyHanni/pull/1591)
 
 #### Chat Fixes
 
@@ -325,6 +336,7 @@
 + Fixed Maxwell Power not updating when unlocking a new power. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1520)
 + Fixed Custom Scoreboard not detection M7 dragons during Derpy. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1561)
 + Fixed space in visitor shopping list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1549)
++ Fixed missing Fossil Dust line in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1586)
 
 #### Dungeon Fixes
 
@@ -361,6 +373,10 @@
 
 + Fixed show unclaimed eggs config option. - nopo (https://github.com/hannibal002/SkyHanni/pull/1572)
 
+#### Event Fixes
+
++ Fixed a typo in the Barn Warning message. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1584)
+
 #### Misc Fixes
 
 + Fixed tick event being called twice a tick. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
@@ -388,6 +404,7 @@
 + Fixed discord profile level error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1548)
 + Fixed Profit Trackers showing no more than 2.1b coins. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1554)
 + Fixed error with other mods that include DiscordIPC and do not relocate. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1573)
++ Fixed updater downloading the wrong version. - Empa (https://github.com/hannibal002/SkyHanni/pull/1590)
 
 ### Technical Details
 
@@ -509,6 +526,7 @@
 + Improved mixins for custom tab completion. - nea (https://github.com/hannibal002/SkyHanni/pull/1571)
     + This should make SkyHanni more compatible with other mods doing the exact same mixin for tab completion.
     + Also changed the mixin to use an event, allowing more decentralized tab completion changes.
++ Changes how some of the chocolate factory data is stored and accessed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1514)
 
 ### Removed Features
 

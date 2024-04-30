@@ -18,6 +18,7 @@ import net.minecraft.inventory.Slot
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.absoluteValue
 
 class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
@@ -25,7 +26,6 @@ class VisitorRewardWarning {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!VisitorAPI.inInventory) return
-        if (!config.preventRefusing && !config.preventRefusingCopper && !config.preventAcceptingCopper) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val refuseOfferSlot = event.gui.inventorySlots.getSlot(REFUSE_SLOT)
@@ -94,29 +94,54 @@ class VisitorRewardWarning {
         if (!blockReason.blockRefusing && !isAcceptSlot) return
 
         if (visitor.blockedLore.isEmpty()) {
-            val copiedTooltip = event.toolTip.toList()
-            val blockedToolTip = mutableListOf<String>()
-
-            for (line in copiedTooltip) {
-                if (line.contains("§aAccept Offer§r")) {
-                    blockedToolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
-                } else if (line.contains("§cRefuse Offer§r")) {
-                    blockedToolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
-                } else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
-                    blockedToolTip.add("§8" + line.removeColor())
-                }
-            }
-            blockedToolTip.add("")
-            val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
-            blockedToolTip.add(
-                if (blockReason == VisitorBlockReason.CHEAP_COPPER || blockReason == VisitorBlockReason.EXPENSIVE_COPPER)
-                    "${blockReason.description} §7(§6$pricePerCopper §7per)" else blockReason.description
-            )
-            blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
-
-            visitor.blockedLore = blockedToolTip
+            updateBlockedLore(event.toolTip.toList(), visitor, blockReason)
         }
         event.toolTip.clear()
         event.toolTip.addAll(visitor.blockedLore)
+    }
+
+    private fun updateBlockedLore(
+        copiedTooltip: List<String>,
+        visitor: VisitorAPI.Visitor,
+        blockReason: VisitorBlockReason,
+    ) {
+        val blockedToolTip = mutableListOf<String>()
+        for (line in copiedTooltip) {
+            if (line.contains("§aAccept Offer§r")) {
+                blockedToolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
+            } else if (line.contains("§cRefuse Offer§r")) {
+                blockedToolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
+            } else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
+                blockedToolTip.add("§8" + line.removeColor())
+            }
+        }
+
+        blockedToolTip.add("")
+        val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
+        // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
+        val loss = visitor.totalPrice!! - visitor.totalReward!!
+        val formattedLoss = NumberUtil.format(loss.absoluteValue)
+        blockedToolTip.add(blockReason(blockReason, pricePerCopper, loss, formattedLoss))
+        blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
+
+        visitor.blockedLore = blockedToolTip
+    }
+
+    private fun blockReason(
+        blockReason: VisitorBlockReason,
+        pricePerCopper: String?,
+        loss: Double,
+        formattedLoss: String,
+    ) = when (blockReason) {
+        VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER ->
+            "${blockReason.description} §7(§6$pricePerCopper §7per)"
+
+        VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS ->
+            if (loss > 0)
+                "${blockReason.description} §7(§6$formattedLoss §7selling §9Green Thumb I§7)"
+            else
+                "§7(§6$formattedLoss §7profit §7selling §9Green Thumb I§7)"
+
+        else -> blockReason.description
     }
 }
