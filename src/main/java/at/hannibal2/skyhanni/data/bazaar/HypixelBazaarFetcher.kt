@@ -65,7 +65,7 @@ object HypixelBazaarFetcher {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in in the ingame bazaar).
             // Should only include Enchants
             if (LorenzUtils.debug)
-                println("jani moment: $key/$internalName")
+                println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
         internalName to BazaarData(internalName.itemName, sellOfferPrice, insantBuyPrice, product)
