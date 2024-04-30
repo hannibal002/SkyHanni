@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -594,7 +595,7 @@ interface Renderable {
             list: List<Renderable>,
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
-            velocity: Double = 2.5,
+            velocity: Double = 2.0,
             button: Int? = null,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
@@ -604,7 +605,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            private val virtualHeight = list.maxOf { it.height }
+            private val virtualHeight = list.sumOf { it.height }
 
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
@@ -623,11 +624,19 @@ interface Renderable {
 
                 var renderY = 0
                 var virtualY = 0
+                var found = false
                 list.forEach {
-                    if (virtualY in scroll.asInt()..end) {
+                    if ((virtualY..virtualY + it.height) in scroll.asInt()..end) {
                         it.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, it.height.toFloat(), 0f)
                         renderY += it.height
+                        found = true
+                    } else if (found) {
+                        found = false
+                        if (renderY + it.height <= height) {
+                            it.renderXAligned(posX, posY + renderY, width)
+                        }
+                        return@forEach
                     }
                     virtualY += it.height
                 }
@@ -639,7 +648,7 @@ interface Renderable {
             content: List<List<Renderable?>>,
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
-            velocity: Double = 2.5,
+            velocity: Double = 2.0,
             button: Int? = null,
             xPadding: Int = 1,
             yPadding: Int = 0,
