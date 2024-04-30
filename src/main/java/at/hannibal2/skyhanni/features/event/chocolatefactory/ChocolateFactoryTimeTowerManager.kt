@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,8 +38,7 @@ object ChocolateFactoryTimeTowerManager {
         if (nextCharge.isInPast() && !nextCharge.isFarPast() && currentCharges() < maxCharges()) {
             profileStorage.currentTimeTowerUses++
 
-            // todo in future once have Einstein rabbit account for that
-            val nextTimeTower = SimpleTimeMark(profileStorage.nextTimeTower) + 8.hours
+            val nextTimeTower = SimpleTimeMark(profileStorage.nextTimeTower) + (profileStorage.timeTowerCooldown).hours
             profileStorage.nextTimeTower = nextTimeTower.toMillis()
 
             if (!config.timeTowerWarning) return
@@ -90,11 +90,20 @@ object ChocolateFactoryTimeTowerManager {
 
     fun timeTowerFull() = currentCharges() >= maxCharges()
 
-    fun timeTowerActive() = profileStorage?.currentTimeTowerEnds != 0L
+    fun timeTowerActive(): Boolean {
+        val currentTime = profileStorage?.lastDataSave ?: 0
+        val endTime = profileStorage?.currentTimeTowerEnds ?: 0
+
+        return endTime > currentTime
+    }
 
     fun timeTowerActiveDuration(): Duration {
         if (!timeTowerActive()) return Duration.ZERO
-        return SimpleTimeMark(profileStorage?.currentTimeTowerEnds ?: 0).timeUntil()
+        val currentTime = profileStorage?.lastDataSave ?: 0
+        val endTime = profileStorage?.currentTimeTowerEnds ?: 0
+
+        val duration = endTime - currentTime
+        return duration.milliseconds
     }
 
     @SubscribeEvent

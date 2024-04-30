@@ -2,16 +2,15 @@ package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
 
 object ChocolateFactoryStats {
 
@@ -19,6 +18,13 @@ object ChocolateFactoryStats {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var display = listOf<Renderable>()
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
+        updateDisplay()
+    }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -43,14 +49,7 @@ object ChocolateFactoryStats {
             "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
         }
 
-        val timeUntilPrestige = ChocolateAmount.PRESTIGE.timeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
-
-        // todo once TimeUtils.formatDuration() is no longer used add custom formatting for infinite
-        val prestigeEstimate = if (timeUntilPrestige == Duration.INFINITE) {
-            "§cNever"
-        } else {
-            "§6${timeUntilPrestige.format()}"
-        }
+        val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
 
         val text = formatList(buildList {
             add("§6§lChocolate Factory Stats")
@@ -77,18 +76,6 @@ object ChocolateFactoryStats {
             add("§eTime To Prestige: $prestigeEstimate")
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
-
-        // TODO keep counting, we dont want pauses
-//         val firstElement = displayText.firstOrNull { it.isNotEmpty() } ?: return
-//
-//         if (ChocolateFactoryAPI.chocolateFactoryPaused) {
-//             val leftMargin = (firstElement.width() - "§f(§cPaused§f)".width()) / 2
-//             val spaceWidth = " ".width()
-//             displayText.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")
-//         } else {
-//             displayText.add(0, "")
-//         }
-//         displayList = displayText.map(Renderable::string).toMutableList()
 
         display = listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(text.map(Renderable::string)),

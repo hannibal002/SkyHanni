@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -107,10 +106,13 @@ object ChocolateFactoryAPI {
     var barnIndex = 34
     private var infoIndex = 13
     private var productionInfoIndex = 45
-    private var prestigeIndex = 28
+    var prestigeIndex = 28
     var milestoneIndex = 53
     private var leaderboardIndex = 51
+    var handCookieIndex = 38
     var timeTowerIndex = 39
+    var shrineIndex = 41
+    var coachRabbitIndex = 42
     var maxRabbits = 395
 
     var inChocolateFactory = false
@@ -174,7 +176,7 @@ object ChocolateFactoryAPI {
             }
 
             val lore = item.getLore()
-            val upgradeCost = lore.getUpgradeCost() ?: continue
+            val upgradeCost = getChocolateUpgradeCost(lore) ?: continue
 
             val canAfford = upgradeCost <= ChocolateAmount.CURRENT.chocolate()
             if (canAfford) upgradeableSlots.add(slotIndex)
@@ -316,14 +318,17 @@ object ChocolateFactoryAPI {
         prestigeIndex = data.prestigeIndex
         milestoneIndex = data.milestoneIndex
         leaderboardIndex = data.leaderboardIndex
+        handCookieIndex = data.handCookieIndex
         timeTowerIndex = data.timeTowerIndex
+        shrineIndex = data.shrineIndex
+        coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
 
-        val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
+        ChocolateFactoryTooltip.updateIgnoredSlots()
     }
 
-    private fun List<String>.getUpgradeCost(): Long? {
-        val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
+    fun getChocolateUpgradeCost(lore: List<String>): Long? {
+        val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
         }

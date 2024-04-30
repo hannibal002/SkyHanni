@@ -87,6 +87,12 @@ public class ChocolateFactoryConfig {
     public int barnCapacityThreshold = 6;
 
     @Expose
+    @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean extraTooltipStats = true;
+
+    @Expose
     @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
     @ConfigEditorBoolean
     @FeatureToggle

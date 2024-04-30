@@ -80,6 +80,11 @@ class HoppityCollectionStats {
             }
 
             val rarity = rabbitRarity ?: continue
+
+            if (itemName == "§dEinstein" && found) {
+                ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
+            }
+
             val duplicates = duplicatesFound.coerceAtLeast(0)
             loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
         }
