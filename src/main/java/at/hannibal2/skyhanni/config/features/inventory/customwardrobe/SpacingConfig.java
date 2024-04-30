@@ -7,6 +7,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class SpacingConfig {
 
     @Expose
+    @ConfigOption(name = "globl skal", desc = "")
+    @ConfigEditorSlider(
+        minValue = 30,
+        maxValue = 200,
+        minStep = 1
+    )
+    public int globalScale = 100;
+
+    @Expose
     @ConfigOption(name = "bordr thicc", desc = "")
     @ConfigEditorSlider(
         minValue = 1,

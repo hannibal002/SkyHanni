@@ -17,9 +17,11 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSl
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isEmpty
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.locked
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
@@ -42,6 +44,7 @@ import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
+import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
 class CustomWardrobe {
@@ -74,13 +77,31 @@ class CustomWardrobe {
         val button = buttonsRenderable ?: return
 
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
-        val pos = Position((gui.width - renderable.width) / 2, (gui.height - renderable.height) / 2)
 
         val fullRenderable = Renderable.verticalContainer(
             listOf(renderable, button),
             config.spacing.buttonVerticalSpacing,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         )
+
+        // change global wardrobe scale if its taller or wider than the screen
+        if (fullRenderable.width > gui.width || fullRenderable.height > gui.height) {
+            if (config.spacing.globalScale <= 1) return
+            val newScale = (config.spacing.globalScale * (0.9 / max(
+                fullRenderable.width.toDouble() / gui.width,
+                fullRenderable.height.toDouble() / gui.height
+            ))).toInt()
+            config.spacing.globalScale = newScale
+            ChatUtils.clickableUserError(
+                "Auto-set your Global Scale in custom wardrobe, as it was too tall/wide",
+                onClick = { config::spacing.jumpToEditor() }
+            )
+            update()
+            return
+        }
+
+        val (width, height) = fullRenderable.width to fullRenderable.height
+        val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
 
         pos.renderRenderables(listOf(fullRenderable), posLabel = "Wardrobe Overlay", addToGuiManager = false)
     }
@@ -134,9 +155,11 @@ class CustomWardrobe {
 
         val totalPlayers = list.size
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow
-        val containerWidth = config.spacing.slotWidth
-        val containerHeight = config.spacing.slotHeight
-        val playerWidth = containerWidth * (config.spacing.playerScale.toDouble() / 100)
+        val containerWidth = (config.spacing.slotWidth * (config.spacing.globalScale / 100.0)).toInt()
+        val containerHeight = (config.spacing.slotHeight * (config.spacing.globalScale / 100.0)).toInt()
+        val playerWidth = (containerWidth * config.spacing.playerScale) / 100.0
+        val horizontalSpacing = (config.spacing.horizontalSpacing * (config.spacing.globalScale / 100.0)).toInt()
+        val verticalSpacing = (config.spacing.verticalSpacing * (config.spacing.globalScale / 100.0)).toInt()
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
 
@@ -225,12 +248,12 @@ class CustomWardrobe {
                     slotsRenderables.add(slotRenderable)
                 }
 
-                val rowRenderable = Renderable.horizontalContainer(slotsRenderables, config.spacing.horizontalSpacing)
+                val rowRenderable = Renderable.horizontalContainer(slotsRenderables, horizontalSpacing)
 
                 rowsRenderables.add(rowRenderable)
             }
 
-            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, config.spacing.verticalSpacing)
+            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, verticalSpacing)
 
             return allSlotsRenderable
         }
@@ -240,10 +263,12 @@ class CustomWardrobe {
         inCustomWardrobe = false
         tempToggleShowOverlay = true
         display = mutableListOf()
+        displayRenderable = null
+        buttonsRenderable = null
     }
 
     private fun addButtons(): Renderable {
-        val buttonWidth = config.spacing.buttonSize
+        val buttonWidth = (config.spacing.buttonSize * (config.spacing.globalScale / 100.0)).toInt()
 
         val buttonsList = listOf(
             createHoverableRenderable(
@@ -331,7 +356,7 @@ class CustomWardrobe {
 
         val buttonsRenderable = Renderable.horizontalContainer(
             buttonsList,
-            config.spacing.buttonHorizontalSpacing,
+            (config.spacing.buttonHorizontalSpacing * (config.spacing.globalScale / 100.0)).toInt(),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         )
         return buttonsRenderable
