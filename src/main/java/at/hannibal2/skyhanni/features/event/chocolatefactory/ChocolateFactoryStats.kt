@@ -51,30 +51,33 @@ object ChocolateFactoryStats {
 
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
 
-        val text = formatList(buildList {
-            add("§6§lChocolate Factory Stats")
+        val text = formatList(buildMap {
+            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory Stats")
 
-            add("§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
-            add("§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
-            add("§eAll-time: §6${ChocolateAmount.ALL_TIME.formatted}")
+            put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
+            put(ChocolateFactoryStat.THIS_PRESTIGE, "§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
+            put(ChocolateFactoryStat.ALL_TIME, "§eAll-time: §6${ChocolateAmount.ALL_TIME.formatted}")
 
-            add("§ePer Second: §6${perSecond.addSeparators()}")
-            add("§ePer Minute: §6${perMinute.addSeparators()}")
-            add("§ePer Hour: §6${perHour.addSeparators()}")
-            add("§ePer Day: §6${perDay.addSeparators()}")
+            put(ChocolateFactoryStat.PER_SECOND, "§ePer Second: §6${perSecond.addSeparators()}")
+            put(ChocolateFactoryStat.PER_MINUTE, "§ePer Minute: §6${perMinute.addSeparators()}")
+            put(ChocolateFactoryStat.PER_HOUR, "§ePer Hour: §6${perHour.addSeparators()}")
+            put(ChocolateFactoryStat.PER_DAY, "§ePer Day: §6${perDay.addSeparators()}")
 
-            add("§eChocolate Multiplier: §6${profileStorage.chocolateMultiplier}")
-            add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
+            put(ChocolateFactoryStat.MULTIPLIER, "§eChocolate Multiplier: §6${profileStorage.chocolateMultiplier}")
+            put(ChocolateFactoryStat.BARN, "§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
-            add("§ePosition: §7#§b$position $percentile")
+            put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §7#§b$position $percentile")
 
-            add("")
-            add("")
-            add("")
+            put(ChocolateFactoryStat.EMPTY, "")
+            put(ChocolateFactoryStat.EMPTY_2, "")
+            put(ChocolateFactoryStat.EMPTY_3, "")
 
-            add("§eTime Tower: §6$timeTowerInfo")
-            add("§eTime To Prestige: $prestigeEstimate")
-            add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
+            put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
+            put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
+            put(
+                ChocolateFactoryStat.RAW_PER_SECOND,
+                "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}"
+            )
         })
 
         display = listOf(Renderable.clickAndHover(
@@ -93,12 +96,8 @@ object ChocolateFactoryStats {
         ))
     }
 
-    private fun formatList(list: List<String>): List<String> {
-        return config.statsDisplayList
-            .filter { it.shouldDisplay() }
-            .map { list[it.ordinal] }
-            .toMutableList()
-    }
+    private fun formatList(list: Map<ChocolateFactoryStat, String>): List<String> =
+        config.statsDisplayList.mapNotNull { list[it] }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
