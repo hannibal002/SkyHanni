@@ -212,15 +212,11 @@ interface Renderable {
                             GlStateManager.pushMatrix()
                             GlStateManager.translate(0F, 0F, 400F)
 
-                            RenderLineTooltips.drawHoveringText(
-                                posX = posX,
-                                posY = posY,
+                            RenderableTooltips.setTooltipForRender(
                                 tips = tipsRender,
                                 stack = stack,
                                 borderColor = color,
                                 snapsToTopIfToLong = snapsToTopIfToLong,
-                                mouseX = currentRenderPassMousePosition?.first ?: Utils.getMouseX(),
-                                mouseY = currentRenderPassMousePosition?.second ?: Utils.getMouseY(),
                             )
                             GlStateManager.popMatrix()
                         }
