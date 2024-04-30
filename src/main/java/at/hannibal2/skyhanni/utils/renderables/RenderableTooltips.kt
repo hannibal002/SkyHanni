@@ -5,54 +5,66 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.moulberry.notenoughupdates.util.Utils
-import java.awt.Color
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
+import java.awt.Color
 
-object RenderLineTooltips {
+object RenderableTooltips {
 
-    fun drawHoveringText(
-        posX: Int, posY: Int,
+    private var tooltip: DeferredTooltip? = null
+
+    @SubscribeEvent
+    fun onPostRenderTick(event: RenderTickEvent) {
+        if (event.phase == TickEvent.Phase.START) {
+            tooltip = null
+        } else if (event.phase == TickEvent.Phase.END) {
+            drawHoveringText()
+        }
+    }
+
+    fun setTooltipForRender(
         tips: List<Renderable>,
         stack: ItemStack? = null,
         borderColor: LorenzColor? = null,
         snapsToTopIfToLong: Boolean = true,
-        mouseX: Int = Utils.getMouseX(),
-        mouseY: Int = Utils.getMouseY(),
     ) {
+        tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong)
+    }
+
+    private fun drawHoveringText() {
+        val tooltip = tooltip ?: return
+        val tips = tooltip.tips
         if (tips.isEmpty()) return
 
-        val (xTranslate, yTranslate, _) = RenderUtils.absoluteTranslation
-
-        val x = mouseX - posX + 12
-        val y = mouseY - posY - if (tips.size > 1) 2 else -7
-        val color: Char = borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1)
-        ?: 'f'
-        val colourInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(color)
-        val borderColorStart = Color(colourInt).darker().rgb and 0x00FFFFFF or (200 shl 24)
+        val x = Utils.getMouseX() + 12
+        val y = Utils.getMouseY() - if (tips.size > 1) 2 else -7
+        val borderColorStart = Color(tooltip.getBorderColor()).darker().rgb and 0x00FFFFFF or (200 shl 24)
         val scaled = ScaledResolution(Minecraft.getMinecraft())
 
         val tooltipTextWidth = tips.maxOf { it.width }
         val tooltipHeight = tips.sumOf { it.height }
 
         val tooltipY = when {
-            y + yTranslate < 16 -> -yTranslate + 4 // Limit Top
-            y + yTranslate + tooltipHeight > scaled.scaledHeight -> {
-                if (snapsToTopIfToLong && tooltipHeight + 8 > scaled.scaledHeight)
-                    -yTranslate + 4 // Snap to Top if to Long
+            y < 16 -> 4 // Limit Top
+            y + tooltipHeight > scaled.scaledHeight -> {
+                if (tooltip.snapsToTopIfToLong && tooltipHeight + 8 > scaled.scaledHeight)
+                    4 // Snap to Top if to Long
                 else
-                    scaled.scaledHeight - tooltipHeight - 4 - yTranslate // Limit Bottom
+                    scaled.scaledHeight - tooltipHeight - 4 // Limit Bottom
             }
 
             else -> {
                 y - 12 // normal
             }
         }
-        val tooltipX = if (x + tooltipTextWidth + 4 + xTranslate > scaled.scaledWidth) {
-            scaled.scaledWidth - tooltipTextWidth - 4 - xTranslate // Limit Right
+        val tooltipX = if (x + tooltipTextWidth + 4 > scaled.scaledWidth) {
+            scaled.scaledWidth - tooltipTextWidth - 4 // Limit Right
         } else {
             x // normal
         }
@@ -144,5 +156,19 @@ object RenderLineTooltips {
         RenderHelper.enableStandardItemLighting()
         GlStateManager.enableRescaleNormal()
         GlStateManager.disableLighting()
+    }
+}
+
+private data class DeferredTooltip(
+    val tips: List<Renderable>,
+    val stack: ItemStack? = null,
+    val borderColor: LorenzColor? = null,
+    val snapsToTopIfToLong: Boolean = true,
+) {
+
+    fun getBorderColor(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getColorCode(
+            borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1) ?: 'f'
+        )
     }
 }
