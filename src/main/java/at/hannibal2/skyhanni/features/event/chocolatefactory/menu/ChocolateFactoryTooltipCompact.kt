@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object ChocolateFactoryTooltipCompact {
@@ -43,7 +42,7 @@ object ChocolateFactoryTooltipCompact {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (config.tooltipMove) {
-            if (lastHover.passedSince() < 300.milliseconds) {
+            if (lastHover.passedSince() < 1.seconds) {
                 config.tooltipMovePosition.renderStrings(tooltipToHover, posLabel = "Tooltip Move")
             }
         }
