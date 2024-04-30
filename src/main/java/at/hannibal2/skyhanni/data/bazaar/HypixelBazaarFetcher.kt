@@ -42,7 +42,6 @@ object HypixelBazaarFetcher {
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
 
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
-        println("fetchAndProcessBazaarData $fetchType")
         nextFetchIsManual = false
 
         try {
@@ -75,8 +74,10 @@ object HypixelBazaarFetcher {
     }
 
     fun fetchNow() {
+        failedAttepmts = 0
         nextFetchIsManual = true
         nextFetchTime = SimpleTimeMark.now()
+        ChatUtils.chat("Manually updating the bazaar prices right now..")
     }
 
     private fun canFetch() = LorenzUtils.onHypixel && nextFetchTime.isInPast()
