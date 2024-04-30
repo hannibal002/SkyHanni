@@ -125,7 +125,8 @@ object NEUItems {
         for (rawInternalName in allNeuRepoItems().keys) {
             val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
             val internalName = rawInternalName.asInternalName()
-            map[name] = internalName
+            val storedName = name.removePrefix("[lvl 1➡100] ")
+            map[storedName] = internalName
             allInternalNames.add(internalName)
         }
         return map
@@ -321,7 +322,7 @@ object NEUItems {
         }
     }
 
-    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { allIngredients() }
 
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
@@ -348,4 +349,6 @@ object NEUItems {
         val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
         return manager.jsonToStack(jsonObject, false)
     }
+
+    fun NeuRecipe.allIngredients(): Set<Ingredient> = ingredients
 }

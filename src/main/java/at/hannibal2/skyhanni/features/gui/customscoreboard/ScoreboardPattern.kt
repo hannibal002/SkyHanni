@@ -94,7 +94,7 @@ object ScoreboardPattern {
     private val dungeonSb = scoreboardGroup.group("dungeon")
     val m7dragonsPattern by dungeonSb.pattern(
         "m7dragons",
-        "^(§cNo Alive Dragons|§8- (§.)+[\\w\\s]+Dragon§a \\w+§.❤)$"
+        "^(§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+§.❤)$"
     )
     val keysPattern by dungeonSb.pattern(
         "keys",
@@ -234,6 +234,10 @@ object ScoreboardPattern {
     val fortunateFreezingBonusPattern by miningSb.pattern(
         "fortunatefreezing.bonus",
         "Event Bonus: §6\\+\\d+☘"
+    )
+    val fossilDustPattern by miningSb.pattern(
+        "fossildust",
+        "Fossil Dust: §f[\\d.,]+.*"
     )
 
     // combat

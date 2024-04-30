@@ -56,6 +56,45 @@ public class ProfileSpecificStorage {
 
         @Expose
         public int maxRabbits = -1;
+
+        @Expose
+        public long currentChocolate = 0;
+
+        @Expose
+        public long chocolateThisPrestige = 0;
+
+        @Expose
+        public long chocolateAllTime = 0;
+
+        @Expose
+        public int rawChocPerSecond = 0;
+
+        @Expose
+        public double chocolateMultiplier = 1.0;
+
+        @Expose
+        public double rawChocolateMultiplier = 1.0;
+
+        @Expose
+        public int timeTowerLevel = 0;
+
+        @Expose
+        public long currentTimeTowerEnds = 0;
+
+        @Expose
+        public long nextTimeTower = 0;
+
+        @Expose
+        public int currentTimeTowerUses = -1;
+
+        @Expose
+        public int timeTowerCooldown = 8;
+
+        @Expose
+        public int maxTimeTowerUses = 3;
+
+        @Expose
+        public long lastDataSave = 0;
     }
 
     @Expose
