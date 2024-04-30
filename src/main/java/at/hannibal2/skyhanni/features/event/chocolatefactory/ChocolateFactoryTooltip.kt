@@ -11,14 +11,15 @@ object ChocolateFactoryTooltip {
 
     private val config get() = ChocolateFactoryAPI.config
 
-    private val ignoredSlotIndexes = mutableListOf<Int>()
+    private var ignoredSlotIndexes = listOf<Int>()
 
     fun updateIgnoredSlots() {
-        ignoredSlotIndexes.clear()
-        ignoredSlotIndexes.add(ChocolateFactoryAPI.prestigeIndex)
-        ignoredSlotIndexes.add(ChocolateFactoryAPI.handCookieIndex)
-        ignoredSlotIndexes.add(ChocolateFactoryAPI.shrineIndex)
-        ignoredSlotIndexes.add(ChocolateFactoryAPI.barnIndex)
+        ignoredSlotIndexes = listOf(
+            ChocolateFactoryAPI.prestigeIndex,
+            ChocolateFactoryAPI.handCookieIndex,
+            ChocolateFactoryAPI.shrineIndex,
+            ChocolateFactoryAPI.barnIndex,
+        )
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
