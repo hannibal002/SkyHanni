@@ -39,18 +39,18 @@ object HypixelBazaarFetcher {
 
     private suspend fun fetchAndProcessBazaarData() {
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
-
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
-
         try {
             val jsonResponse = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
             val response = ConfigManager.gson.fromJson<BazaarApiResponse>(jsonResponse)
             if (response.success) {
                 latestProductInformation = response.products
                     .mapKeys { NEUItems.transHypixelNameToInternalName(it.key) }
+                failedAttepmts = 0
+            } else {
+                onError(fetchType, Exception("response has success = false"))
             }
-            failedAttepmts = 0
         } catch (e: Exception) {
             onError(fetchType, e)
         }
