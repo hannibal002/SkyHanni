@@ -41,8 +41,13 @@ object ChocolateFactoryStats {
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
-        val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
+
+        val position = ChocolateFactoryAPI.leaderboardPosition
+        val positionText = position?.addSeparators() ?: "???"
         val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" } ?: ""
+        val leaderboard = "§b#$positionText $percentile"
+        ChocolatePositionChange.update(position, leaderboard)
+
         val timeTowerInfo = if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
             "§d§lActive"
         } else {
@@ -66,7 +71,7 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.MULTIPLIER, "§eChocolate Multiplier: §6${profileStorage.chocolateMultiplier}")
             put(ChocolateFactoryStat.BARN, "§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
-            put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §7#§b$position $percentile")
+            put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §7$leaderboard")
 
             put(ChocolateFactoryStat.EMPTY, "")
             put(ChocolateFactoryStat.EMPTY_2, "")
