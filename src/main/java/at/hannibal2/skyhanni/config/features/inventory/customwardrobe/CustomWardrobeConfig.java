@@ -38,4 +38,9 @@ public class CustomWardrobeConfig {
     @ConfigOption(name = "colr", desc = "")
     @Accordion
     public ColorConfig color = new ColorConfig();
+
+    @Expose
+    @ConfigOption(name = "spac", desc = "")
+    @Accordion
+    public SpacingConfig spacing = new SpacingConfig();
 }

@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.init.Blocks
@@ -50,6 +49,8 @@ class CustomWardrobe {
     private val config get() = SkyHanniMod.feature.inventory.customWardrobe
 
     private var display = emptyList<Triple<Position, Renderable, Int>>()
+    private var displayRenderable: Renderable? = null
+    private var buttonsRenderable: Renderable? = null
     private var tempToggleShowOverlay = true
 
     private var hoveredSlot: Int? = null
@@ -65,16 +66,23 @@ class CustomWardrobe {
         if (!isEnabled()) return
         if (!tempToggleShowOverlay) return
 
-        display.ifEmpty {
+        if (displayRenderable == null) {
             update()
             createSound("skyhanni:moonlight", 1f).playSound()
         }
-        if (display.isEmpty()) return
+        val renderable = displayRenderable ?: return
+        val button = buttonsRenderable ?: return
 
-        for ((pos, renderable, _) in display.sortedBy { if (it.third == hoveredSlot) 1 else 0 }) {
-            GlStateManager.color(1f, 1f, 1f, 1f)
-            pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay", addToGuiManager = false)
-        }
+        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+        val pos = Position((gui.width - renderable.width) / 2, (gui.height - renderable.height) / 2)
+
+        val fullRenderable = Renderable.verticalContainer(
+            listOf(renderable, button),
+            config.spacing.buttonVerticalSpacing,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        )
+
+        pos.renderRenderables(listOf(fullRenderable), posLabel = "Wardrobe Overlay", addToGuiManager = false)
     }
 
     @SubscribeEvent
@@ -94,12 +102,11 @@ class CustomWardrobe {
 
 
     private fun update() {
-        display = createRenderables()
+        displayRenderable = createRenderables()
+        buttonsRenderable = addButtons()
     }
 
-    private fun createRenderables() = buildList {
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return@buildList
-
+    private fun createRenderables(): Renderable {
         var list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
 
         var wardrobeWarning = false
@@ -125,114 +132,107 @@ class CustomWardrobe {
             }
         }
 
-        val centerX = gui.width / 2
-        val centerY = gui.height / 2
         val totalPlayers = list.size
-        val maxPlayersPerRow = 9
-        val playerWidth = 50
-        val playerHeight = 2 * playerWidth
-        val horizontalSpacing = 20
-        val verticalSpacing = 20
+        val maxPlayersPerRow = config.spacing.maxPlayersPerRow
+        val containerWidth = config.spacing.slotWidth
+        val containerHeight = config.spacing.slotHeight
+        val playerWidth = containerWidth * (config.spacing.playerScale.toDouble() / 100)
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
-        val totalHeight = rows * playerHeight + (rows - 1) * (verticalSpacing + 1)
-
-        val startY = centerY + playerHeight - totalHeight / 2
-
-        addAll(addButtons(gui.width, gui.height, totalHeight))
 
         if (wardrobeWarning) {
             val warningRenderable = Renderable.string(wardrobeWarningText)
-            val warningPos = Position(centerX - (warningRenderable.width * 3) / 2, centerY - 70, 3f, true)
-            add(Triple(warningPos, warningRenderable, 0))
-            return@buildList
-        }
-        for (row in 0 until rows) {
-            val playersInRow =
-                if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
-            val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * (horizontalSpacing + 1)
+            return warningRenderable
+        } else {
+            val rowsRenderables = mutableListOf<Renderable>()
 
-            val startX = centerX - (totalWidth - playerWidth) / 2
-            val playerY = startY + row * ((playerHeight + verticalSpacing) + 1)
+            for (row in 0 until rows) {
+                val playersInRow =
+                    if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
 
-            for (playerIndex in 0 until playersInRow) {
-                val playerX = startX + playerIndex * ((playerWidth + horizontalSpacing) + 1)
-                var scale = playerWidth.toDouble()
+                val slotsRenderables = mutableListOf<Renderable>()
 
-                val wardrobeSlot = list[maxPlayersPerRow * row + playerIndex]
+                for (playerIndex in 0 until playersInRow) {
+                    var scale = playerWidth
 
-                val padding = 10
-                val containerWidth = playerWidth + 2 * padding
-                val containerHeight = playerHeight + 2 * padding
+                    val wardrobeSlot = list[maxPlayersPerRow * row + playerIndex]
 
-                val armorTooltipRenderable = {
-                    val loreList = mutableListOf<Renderable>()
-                    val height = containerHeight - 3
 
-                    // This is needed to keep the total size of the renderable the same as the others
-                    val hoverableSizes = MutableList(4) { height / 4 }
-                    for (k in 0 until height % 4) hoverableSizes[k]++
+                    val armorTooltipRenderable = {
+                        val loreList = mutableListOf<Renderable>()
+                        val height = containerHeight - 3
 
-                    for (armorIndex in 0 until 4) {
-                        val stack = wardrobeSlot.getArmor()[armorIndex]?.copy()
-                        if (stack == null) {
-                            loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
-                        } else {
-                            loreList.add(
-                                Renderable.hoverable(
-                                    Renderable.hoverTips(
+                        // This is needed to keep the total size of the renderable the same as the others
+                        val hoverableSizes = MutableList(4) { height / 4 }
+                        for (k in 0 until height % 4) hoverableSizes[k]++
+
+                        for (armorIndex in 0 until 4) {
+                            val stack = wardrobeSlot.getArmor()[armorIndex]?.copy()
+                            if (stack == null) {
+                                loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
+                            } else {
+                                loreList.add(
+                                    Renderable.hoverable(
+                                        Renderable.hoverTips(
+                                            Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
+                                            stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+                                        ),
                                         Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                                        stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
-                                    ),
-                                    Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                                    bypassChecks = true
+                                        bypassChecks = true
+                                    )
                                 )
-                            )
+                            }
                         }
+                        Renderable.verticalContainer(loreList, spacing = 1)
                     }
-                    Renderable.verticalContainer(loreList, spacing = 1)
+
+                    val playerBackground = createHoverableRenderable(
+                        armorTooltipRenderable.invoke(),
+                        topLayerRenderable = addSlotHoverableButtons(wardrobeSlot),
+                        hoveredColor = getWardrobeSlotColor(wardrobeSlot),
+                        borderOutlineThickness = config.spacing.outlineThickness,
+                        borderOutlineBlur = config.spacing.outlineBlur,
+                        onClick = {
+                            clickWardrobeSlot(wardrobeSlot)
+                        },
+                        onHover = {
+                            hoveredSlot = wardrobeSlot.id
+                        }
+                    )
+
+                    val fakePlayer = getFakePlayer()
+
+                    fakePlayer.inventory.armorInventory =
+                        wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+
+                    val playerColor = if (!wardrobeSlot.isInCurrentPage()) {
+                        scale *= 0.9
+                        Color.GRAY.withAlpha(100)
+                    } else null
+
+                    val playerRenderable = Renderable.player(
+                        fakePlayer,
+                        config.eyesFollowMouse,
+                        width = containerWidth,
+                        height = containerHeight,
+                        entityScale = scale.toInt(),
+                        padding = 0,
+                        color = playerColor,
+                    )
+
+                    val slotRenderable = Renderable.doubleLayered(playerBackground, playerRenderable, false)
+
+                    slotsRenderables.add(slotRenderable)
                 }
 
-                val playerBackgroundPosition =
-                    Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
-                val playerBackground = createHoverableRenderable(
-                    armorTooltipRenderable.invoke(),
-                    topLayerRenderable = addSlotHoverableButtons(wardrobeSlot),
-                    hoveredColor = getWardrobeSlotColor(wardrobeSlot),
-                    borderOutlineThickness = config.color.outlineThickness,
-                    borderOutlineBlur = config.color.outlineBlur,
-                    onClick = {
-                        clickWardrobeSlot(wardrobeSlot)
-                    },
-                    onHover = {
-                        hoveredSlot = wardrobeSlot.id
-                    }
-                )
+                val rowRenderable = Renderable.horizontalContainer(slotsRenderables, config.spacing.horizontalSpacing)
 
-                val fakePlayer = getFakePlayer()
-
-                fakePlayer.inventory.armorInventory =
-                    wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
-
-                val playerColor = if (!wardrobeSlot.isInCurrentPage()) {
-                    scale *= 0.9
-                    Color.GRAY.withAlpha(100)
-                } else null
-
-                val playerRenderable = Renderable.player(
-                    fakePlayer,
-                    config.eyesFollowMouse,
-                    width = containerWidth,
-                    height = containerHeight,
-                    entityScale = scale.toInt(),
-                    padding = 0,
-                    color = playerColor,
-                )
-
-                val slotRenderable = Renderable.doubleLayered(playerBackground, playerRenderable, false)
-
-                add(Triple(playerBackgroundPosition, slotRenderable, wardrobeSlot.id))
+                rowsRenderables.add(rowRenderable)
             }
+
+            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, config.spacing.verticalSpacing)
+
+            return allSlotsRenderable
         }
     }
 
@@ -242,13 +242,10 @@ class CustomWardrobe {
         display = mutableListOf()
     }
 
-    private fun addButtons(screenWidth: Int, screenHeight: Int, playerHeight: Int) = buildList {
-        val buttonWidth = 24
-        val centerX = screenWidth / 2
-        val buttonY = screenHeight / 2 + playerHeight / 2 + 30
-        val xOffset = 10
+    private fun addButtons(): Renderable {
+        val buttonWidth = config.spacing.buttonSize
 
-        val renderables = listOf(
+        val buttonsList = listOf(
             createHoverableRenderable(
                 Renderable.hoverTips(
                     Renderable.placeholder(buttonWidth, buttonWidth),
@@ -332,12 +329,12 @@ class CustomWardrobe {
             ),
         )
 
-        val totalWidth = renderables.sumOf { it.width } + (renderables.size - 1) * xOffset
-        val startX = centerX - totalWidth / 2
-
-        for ((index, renderable) in renderables.withIndex()) {
-            add(Triple(Position(startX + index * (renderable.width + xOffset), buttonY), renderable, 0))
-        }
+        val buttonsRenderable = Renderable.horizontalContainer(
+            buttonsList,
+            config.spacing.buttonHorizontalSpacing,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        )
+        return buttonsRenderable
     }
 
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
@@ -391,12 +388,12 @@ class CustomWardrobe {
         unhoveredRenderable: Renderable = Renderable.placeholder(hoveredRenderable.width, hoveredRenderable.height),
         topLayerRenderable: Renderable = Renderable.placeholder(0, 0),
         padding: Int = 0,
-        horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-        verticalAlignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
+        horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
+        verticalAlignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
         borderOutlineThickness: Int,
-        borderOutlineBlur: Float = 0f,
+        borderOutlineBlur: Float = 0.5f,
         onClick: () -> Unit,
         onHover: () -> Unit = {},
     ): Renderable =
