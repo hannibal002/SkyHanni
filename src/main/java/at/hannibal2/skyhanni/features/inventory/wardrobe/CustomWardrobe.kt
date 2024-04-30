@@ -82,7 +82,7 @@ class CustomWardrobe {
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         )
 
-        pos.renderRenderables(listOf(fullRenderable), posLabel = "Wardrobe Overlay")
+        pos.renderRenderables(listOf(fullRenderable), posLabel = "Wardrobe Overlay", addToGuiManager = false)
     }
 
     @SubscribeEvent
