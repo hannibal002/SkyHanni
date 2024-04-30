@@ -57,8 +57,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slotId: Int,
         val clickedButton: Int,
         val clickType: Int,
-        // 0: normal, 1: shift, 2: hotbar, 3: middle, 4: drop
-        // TODO Change clickType to enum
+        val clickTypeEnum: ClickType? = ClickType.getTypeById(clickType),
     ) : GuiContainerEvent(gui, container) {
 
         fun makePickblock() {
@@ -69,6 +68,19 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
                 )
                 isCanceled = true
             }
+        }
+    }
+
+    enum class ClickType(val id: Int) {
+        NORMAL(1),
+        SHIFT(2),
+        HOTBAR(3),
+        MIDDLE(4),
+        DROP(5),
+        ;
+
+        companion object {
+            fun getTypeById(id: Int) = entries.firstOrNull { it.id == id }
         }
     }
 }
