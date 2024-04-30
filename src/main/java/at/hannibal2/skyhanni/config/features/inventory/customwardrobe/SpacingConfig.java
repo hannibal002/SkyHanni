@@ -94,7 +94,7 @@ public class SpacingConfig {
         maxValue = 40,
         minStep = 1
     )
-    public int buttonVerticalSpacing = 10;
+    public int buttonSlotsVerticalSpacing = 10;
 
     @Expose
     @ConfigOption(name = "how wide between button!", desc = "")
@@ -106,12 +106,30 @@ public class SpacingConfig {
     public int buttonHorizontalSpacing = 10;
 
     @Expose
-    @ConfigOption(name = "how big button?", desc = "")
+    @ConfigOption(name = "how tall between button!", desc = "")
+    @ConfigEditorSlider(
+        minValue = 1,
+        maxValue = 40,
+        minStep = 1
+    )
+    public int buttonVerticalSpacing = 10;
+
+    @Expose
+    @ConfigOption(name = "how thicc button?", desc = "")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 60,
         minStep = 1
     )
-    public int buttonSize = 22;
+    public int buttonWidth = 50;
+
+    @Expose
+    @ConfigOption(name = "how tal button?", desc = "")
+    @ConfigEditorSlider(
+        minValue = 1,
+        maxValue = 60,
+        minStep = 1
+    )
+    public int buttonHeight = 20;
 
 }
