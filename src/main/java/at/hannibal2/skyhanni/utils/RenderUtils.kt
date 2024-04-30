@@ -47,7 +47,7 @@ object RenderUtils {
         LEFT("Left"),
         CENTER("Center"),
         RIGHT("Right"),
-        DONT_ALIGN("Don't Align")
+        DONT_ALIGN("Don't Align"),
         ;
 
         override fun toString() = value

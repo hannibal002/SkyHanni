@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
@@ -69,12 +69,14 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
-            if (alignmentConfig.horizontalAlignment != HorizontalAlignment.DONT_ALIGN
-                || alignmentConfig.verticalAlignment != RenderUtils.VerticalAlignment.DONT_ALIGN
-            ) {
-                alignmentConfig.horizontalAlignment = HorizontalAlignment.DONT_ALIGN
-                alignmentConfig.verticalAlignment = RenderUtils.VerticalAlignment.DONT_ALIGN
-                ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+            with(alignmentConfig) {
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
+                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                ) {
+                    horizontalAlignment = HorizontalAlignment.DONT_ALIGN
+                    verticalAlignment = VerticalAlignment.DONT_ALIGN
+                    ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+                }
             }
         }
     }
@@ -235,18 +237,22 @@ class CustomScoreboard {
         }
 
         event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
-            if (it.asBoolean) {
-                JsonPrimitive(HorizontalAlignment.RIGHT.name)
-            } else {
-                JsonPrimitive(HorizontalAlignment.DONT_ALIGN.name)
-            }
+            JsonPrimitive(
+                if (it.asBoolean) {
+                    HorizontalAlignment.RIGHT.name
+                } else {
+                    HorizontalAlignment.DONT_ALIGN.name
+                }
+            )
         }
         event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
-            if (it.asBoolean) {
-                JsonPrimitive(RenderUtils.VerticalAlignment.CENTER.name)
-            } else {
-                JsonPrimitive(RenderUtils.VerticalAlignment.DONT_ALIGN.name)
-            }
+            JsonPrimitive(
+                if (it.asBoolean) {
+                    VerticalAlignment.CENTER.name
+                } else {
+                    VerticalAlignment.DONT_ALIGN.name
+                }
+            )
         }
     }
 }
