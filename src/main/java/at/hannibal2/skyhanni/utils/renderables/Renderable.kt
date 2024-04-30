@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -587,6 +588,136 @@ interface Renderable {
                     GlStateManager.translate(0f, (it.height + spacing).toFloat(), 0f)
                 }
                 GlStateManager.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
+            }
+        }
+
+        fun scrollList(
+            list: List<Renderable>,
+            height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
+            velocity: Double = 2.0,
+            button: Int? = null,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = list.maxOf { it.width }
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val virtualHeight = list.sumOf { it.height }
+
+            private val scroll = ScrollInput.Companion.Vertical(
+                scrollValue,
+                0,
+                virtualHeight - height,
+                velocity,
+                button
+            )
+
+            private val end get() = scroll.asInt() + height
+
+            override fun render(posX: Int, posY: Int) {
+                scroll.update(
+                    isHovered(posX, posY)
+                )
+
+                var renderY = 0
+                var virtualY = 0
+                var found = false
+                list.forEach {
+                    if ((virtualY..virtualY + it.height) in scroll.asInt()..end) {
+                        it.renderXAligned(posX, posY + renderY, width)
+                        GlStateManager.translate(0f, it.height.toFloat(), 0f)
+                        renderY += it.height
+                        found = true
+                    } else if (found) {
+                        found = false
+                        if (renderY + it.height <= height) {
+                            it.renderXAligned(posX, posY + renderY, width)
+                        }
+                        return@forEach
+                    }
+                    virtualY += it.height
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+            }
+        }
+
+        fun scrollTable(
+            content: List<List<Renderable?>>,
+            height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
+            velocity: Double = 2.0,
+            button: Int? = null,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            hasHeader: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+
+            override val width = xOffsets.last() - xPadding
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val virtualHeight = yOffsets.last() - yPadding
+
+            private val end get() = scroll.asInt() + height - yPadding - 1
+
+            private val scroll = ScrollInput.Companion.Vertical(
+                scrollValue,
+                if (hasHeader) yOffsets[1] else 0,
+                virtualHeight - height,
+                velocity,
+                button
+            )
+
+            override fun render(posX: Int, posY: Int) {
+                scroll.update(
+                    isHovered(posX, posY)
+                )
+
+                var renderY = 0
+                if (hasHeader) {
+                    content[0].forEachIndexed { index, renderable ->
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + renderY,
+                            xOffsets[index + 1] - xOffsets[index],
+                            yOffsets[1]
+                        )
+                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                    }
+                    val yShift = yOffsets[1] - yOffsets[0]
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+                val range =
+                    yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }
+                        .takeIf { it > 0 }
+                        ?: yOffsets.size) - 1
+                for (rowIndex in range) {
+                    content[rowIndex].forEachIndexed { index, renderable ->
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + renderY,
+                            xOffsets[index + 1] - xOffsets[index],
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                        )
+                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                    }
+                    val yShift = yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 

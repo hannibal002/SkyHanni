@@ -21,13 +21,16 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
@@ -68,10 +71,14 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
-            if (alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
-                alignmentConfig.alignRight = false
-                alignmentConfig.alignCenterVertically = false
-                ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+            with(alignmentConfig) {
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
+                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                ) {
+                    horizontalAlignment = HorizontalAlignment.DONT_ALIGN
+                    verticalAlignment = VerticalAlignment.DONT_ALIGN
+                    ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+                }
             }
         }
     }
@@ -142,11 +149,26 @@ class CustomScoreboard {
         return this
     }
 
+    private var dirty = false
+
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
-            GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
+            if (isHideVanillaScoreboardEnabled()) {
+                GuiIngameForge.renderObjective = false
+            }
+            if (dirty) {
+                GuiIngameForge.renderObjective = true
+                dirty = false
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+            if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
 
@@ -154,7 +176,7 @@ class CustomScoreboard {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
-            if (!config.enabled) {
+            if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
                 ScoreboardElement.entries.map { element ->
@@ -168,8 +190,8 @@ class CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -231,5 +253,23 @@ class CustomScoreboard {
             newArray
         }
 
+        event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
+            JsonPrimitive(
+                if (it.asBoolean) {
+                    HorizontalAlignment.RIGHT.name
+                } else {
+                    HorizontalAlignment.DONT_ALIGN.name
+                }
+            )
+        }
+        event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
+            JsonPrimitive(
+                if (it.asBoolean) {
+                    VerticalAlignment.CENTER.name
+                } else {
+                    VerticalAlignment.DONT_ALIGN.name
+                }
+            )
+        }
     }
 }
