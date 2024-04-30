@@ -255,7 +255,11 @@ class CustomWardrobe {
                 rowsRenderables.add(rowRenderable)
             }
 
-            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, verticalSpacing)
+            val allSlotsRenderable = Renderable.verticalContainer(
+                rowsRenderables,
+                verticalSpacing,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            )
 
             return allSlotsRenderable
         }
