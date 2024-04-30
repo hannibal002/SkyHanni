@@ -581,11 +581,19 @@ interface Renderable {
 
                 var renderY = 0
                 var virtualY = 0
+                var found = false
                 list.forEach {
                     if ((virtualY..virtualY + it.height) in scroll.asInt()..end) {
                         it.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, it.height.toFloat(), 0f)
                         renderY += it.height
+                        found = true
+                    } else if (found) {
+                        found = false
+                        if (renderY + it.height <= height) {
+                            it.renderXAligned(posX, posY + renderY, width)
+                        }
+                        return@forEach
                     }
                     virtualY += it.height
                 }
