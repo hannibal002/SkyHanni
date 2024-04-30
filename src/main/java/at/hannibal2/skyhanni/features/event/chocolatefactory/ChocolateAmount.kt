@@ -13,7 +13,7 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
     ALL_TIME({ profileStorage?.chocolateAllTime ?: 0 }),
     ;
 
-    val formatted get(): String = chocolate().addSeparators()
+    val formatted get(): String = (chocolate() + chocolateSinceUpdate()).addSeparators()
 
     fun formattedTimeUntilGoal(goal: Long): String {
         val time = timeUntilGoal(goal)
@@ -49,6 +49,15 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
     }
 
     companion object {
+        fun chocolateSinceUpdate(): Long {
+            val lastUpdate = SimpleTimeMark(profileStorage?.lastDataSave ?: return 0)
+            val currentTime = SimpleTimeMark.now()
+            val secondsSinceUpdate = (currentTime - lastUpdate).inWholeSeconds
+
+            val perSecond = ChocolateFactoryAPI.chocolatePerSecond
+            return (perSecond * secondsSinceUpdate).toLong()
+        }
+
         fun averageChocPerSecond(
             baseMultiplierIncrease: Double = 0.0,
             rawPerSecondIncrease: Int = 0,

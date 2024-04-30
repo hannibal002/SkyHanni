@@ -103,7 +103,6 @@ object ChocolateFactoryTimeTowerManager {
         val endTime = profileStorage?.currentTimeTowerEnds ?: 0
 
         val duration = endTime - currentTime
-
         return duration.milliseconds
     }
 

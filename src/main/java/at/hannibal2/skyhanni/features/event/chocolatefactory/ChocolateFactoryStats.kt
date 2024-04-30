@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -17,6 +18,13 @@ object ChocolateFactoryStats {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var display = listOf<Renderable>()
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
+        updateDisplay()
+    }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -68,8 +76,6 @@ object ChocolateFactoryStats {
             add("§eTime To Prestige: $prestigeEstimate")
             add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
         })
-
-        // TODO keep counting, we dont want pauses
 
         display = listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(text.map(Renderable::string)),
