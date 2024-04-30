@@ -19,9 +19,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
 object HypixelBazaarFetcher {
     private val url = "https://api.hypixel.net/v2/skyblock/bazaar"
-    private val maxFailedAttepmts = 3
+    private val hiddenFailedAttempts = 3
 
     private var latestProductInformation = mapOf<NEUInternalName, BazaarProduct>()
     private var nextFetchTime = SimpleTimeMark.farPast()
@@ -31,7 +32,6 @@ object HypixelBazaarFetcher {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!canFetch()) return
-        if (failedAttepmts >= maxFailedAttepmts) return
         SkyHanniMod.coroutineScope.launch {
             fetchAndProcessBazaarData()
         }
@@ -49,7 +49,7 @@ object HypixelBazaarFetcher {
                     .mapKeys { NEUItems.transHypixelNameToInternalName(it.key) }
                 failedAttepmts = 0
             } else {
-                onError(fetchType, Exception("response has success = false"))
+                onError(fetchType, Exception("success=false, cause=${response.cause}"))
             }
         } catch (e: Exception) {
             onError(fetchType, e)
@@ -57,20 +57,19 @@ object HypixelBazaarFetcher {
     }
 
     private fun onError(fetchType: String, e: Exception) {
+        val userMessage = "Failed fetching bazaar price data from hypixel"
         failedAttepmts++
-        if (failedAttepmts <= maxFailedAttepmts) {
-            ChatUtils.debug(
-                "Error fetching bazaar price data $fetchType from hypixel: ${e.message} " +
-                    "(failedAttepmts=$failedAttepmts)"
-            )
-            e.printStackTrace()
+        if (failedAttepmts <= hiddenFailedAttempts) {
             nextFetchTime = SimpleTimeMark.now() + 15.seconds
+            ChatUtils.debug("$userMessage. (errorMessage=${e.message}, failedAttepmts=$failedAttepmts, $fetchType")
+            e.printStackTrace()
         } else {
+            nextFetchTime = SimpleTimeMark.now() + 15.minutes
             ErrorManager.logErrorWithData(
                 e,
-                message = "Error fetching bazaar price data from hypixel after $failedAttepmts attempts",
+                userMessage,
                 "fetchType" to fetchType,
-                betaOnly = true
+                "failedAttepmts" to failedAttepmts,
             )
         }
     }
@@ -87,6 +86,8 @@ object HypixelBazaarFetcher {
     class BazaarApiResponse(
         @Expose
         val success: Boolean,
+        @Expose
+        val cause: String,
         @Expose
         val lastUpdated: Long,
         @Expose
