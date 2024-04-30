@@ -7,6 +7,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ColorConfig {
 
     @Expose
+    @ConfigOption(name = "bg colr", desc = "")
+    @ConfigEditorColour
+    public String backgroundColor = "0:127:0:0:0";
+
+    @Expose
     @ConfigOption(name = "equip colr", desc = "")
     @ConfigEditorColour
     public String equippedColor = "0:127:85:255:85";

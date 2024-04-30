@@ -76,10 +76,14 @@ class CustomWardrobe {
 
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
-        val fullRenderable = Renderable.verticalContainer(
-            listOf(renderable, button),
-            config.spacing.buttonSlotsVerticalSpacing,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        val fullRenderable = Renderable.drawInsideRoundedRect(
+            Renderable.verticalContainer(
+                listOf(renderable, button),
+                config.spacing.buttonSlotsVerticalSpacing,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            ),
+            config.color.backgroundColor.toChromaColor(),
+            padding = 10
         )
 
         // change global wardrobe scale if its taller or wider than the screen
