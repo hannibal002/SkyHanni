@@ -30,13 +30,13 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
 
         val baseMultiplier = profileStorage.rawChocolateMultiplier
-        val baseChocolatePerSecond = profileStorage.rawChocPerSecond
+        val rawChocolatePerSecond = profileStorage.rawChocPerSecond
         val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
 
         var needed = goal - chocolate()
         val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
 
-        val timeTowerChocPerSecond = baseChocolatePerSecond * timeTowerMultiplier
+        val timeTowerChocPerSecond = rawChocolatePerSecond * timeTowerMultiplier
 
         val secondsAtRate = needed / timeTowerChocPerSecond
         if (secondsAtRate < secondsUntilTowerExpires) {
@@ -44,7 +44,35 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         }
 
         needed -= (secondsUntilTowerExpires * timeTowerChocPerSecond).toLong()
-        val chocPerSecond = baseChocolatePerSecond * baseMultiplier
-        return (needed / chocPerSecond + secondsUntilTowerExpires).seconds - updatedAgo.seconds
+        val basePerSecond = rawChocolatePerSecond * baseMultiplier
+        return (needed / basePerSecond + secondsUntilTowerExpires).seconds - updatedAgo.seconds
+    }
+
+    companion object {
+        fun averageChocPerSecond(
+            baseMultiplierIncrease: Double = 0.0,
+            rawPerSecondIncrease: Int = 0,
+            timeTowerLevelIncrease: Int = 0,
+        ): Double {
+            val profileStorage = profileStorage ?: return 0.0
+
+            val baseMultiplier = profileStorage.chocolateMultiplier + baseMultiplierIncrease
+            val rawPerSecond = profileStorage.rawChocPerSecond + rawPerSecondIncrease
+            val timeTowerLevel = profileStorage.timeTowerLevel + timeTowerLevelIncrease
+
+            val timeTowerCooldown = profileStorage.timeTowerCooldown
+
+            val basePerSecond = rawPerSecond * baseMultiplier
+            val towerCalc = (rawPerSecond * timeTowerLevel * .1) / timeTowerCooldown
+
+            return basePerSecond + towerCalc
+        }
+
+        fun chocPerTimeTower(): Int {
+            val profileStorage = profileStorage ?: return 0
+            val amountPerSecond = profileStorage.rawChocPerSecond * profileStorage.timeTowerLevel * .1
+            val amountPerHour = amountPerSecond * 60 * 60
+            return amountPerHour.toInt()
+        }
     }
 }
