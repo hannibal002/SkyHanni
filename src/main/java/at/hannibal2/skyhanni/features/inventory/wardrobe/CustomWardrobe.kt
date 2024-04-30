@@ -31,8 +31,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SoundUtils.createSound
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -70,7 +68,6 @@ class CustomWardrobe {
 
         if (displayRenderable == null) {
             update()
-            createSound("skyhanni:moonlight", 1f).playSound()
         }
         val renderable = displayRenderable ?: return
         val button = buttonsRenderable ?: return
