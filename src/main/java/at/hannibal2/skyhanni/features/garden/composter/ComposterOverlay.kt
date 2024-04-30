@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
@@ -516,14 +515,13 @@ object ComposterOverlay {
             return
         }
 
-
         HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
         val havingInTotal = havingInInventory + havingInSacks
         if (itemsNeeded >= havingInTotal) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
-                ChatUtils.clickableChat( // TODO Add this as a seperate feature, and then don't send any msg if the feature is disabled
+                ChatUtils.clickableChat( // TODO Add this as a separate feature, and then don't send any msg if the feature is disabled
                     "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     onClick = {
                         HypixelCommands.bazaar(itemName.removeColor())
