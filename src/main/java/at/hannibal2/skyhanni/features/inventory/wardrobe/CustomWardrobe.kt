@@ -29,6 +29,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -81,12 +83,12 @@ class CustomWardrobe {
                 Renderable.verticalContainer(
                     listOf(renderable, button),
                     config.spacing.buttonSlotsVerticalSpacing,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                    horizontalAlign = HorizontalAlignment.CENTER
                 ),
                 Renderable.string(
                     "§7SkyHanni",
-                    horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
-                    verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+                    horizontalAlign = HorizontalAlignment.RIGHT,
+                    verticalAlign = VerticalAlignment.BOTTOM
                 ),
                 blockBottomHover = false
             ),
@@ -270,7 +272,7 @@ class CustomWardrobe {
             val allSlotsRenderable = Renderable.verticalContainer(
                 rowsRenderables,
                 verticalSpacing,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                horizontalAlign = HorizontalAlignment.CENTER
             )
 
             return allSlotsRenderable
@@ -329,14 +331,14 @@ class CustomWardrobe {
         val row = Renderable.horizontalContainer(
             listOf(backButton, exitButton, onlyFavoriteButton),
             horizontalSpacing,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            horizontalAlign = HorizontalAlignment.CENTER,
         )
 
         val total = Renderable.verticalContainer(
             listOf(row, editButton),
             verticalSpacing,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER
+            horizontalAlign = HorizontalAlignment.CENTER,
+            verticalAlign = VerticalAlignment.CENTER
         )
 
         return total
@@ -350,14 +352,14 @@ class CustomWardrobe {
                     Renderable.string(
                         (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
                         1.5,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                        horizontalAlign = HorizontalAlignment.CENTER,
+                        verticalAlign = VerticalAlignment.CENTER
                     ),
                     Renderable.string(
                         (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
                         1.5,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                        horizontalAlign = HorizontalAlignment.CENTER,
+                        verticalAlign = VerticalAlignment.CENTER
                     )
                 ),
                 onClick = {
@@ -375,8 +377,8 @@ class CustomWardrobe {
                         Renderable.string(
                             "§2$",
                             1.5,
-                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                            verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                            horizontalAlign = HorizontalAlignment.CENTER,
+                            verticalAlign = VerticalAlignment.CENTER
                         ), lore
                     )
                 } else {
@@ -385,7 +387,7 @@ class CustomWardrobe {
             )
         }
 
-        return Renderable.verticalContainer(list, 1, RenderUtils.HorizontalAlignment.RIGHT)
+        return Renderable.verticalContainer(list, 1, HorizontalAlignment.RIGHT)
     }
 
     private fun createLabeledButton(
@@ -405,8 +407,8 @@ class CustomWardrobe {
                     ),
                     Renderable.string(
                         text,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                        horizontalAlign = HorizontalAlignment.CENTER,
+                        verticalAlign = VerticalAlignment.CENTER
                     ),
                     false,
                 ),
@@ -416,20 +418,20 @@ class CustomWardrobe {
                 bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
                 borderOutlineThickness = 2,
                 blur = 0.5f,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                horizontalAlign = HorizontalAlignment.CENTER
             ),
             Renderable.drawInsideRoundedRect(
                 Renderable.doubleLayered(
                     Renderable.placeholder(buttonWidth, buttonHeight),
                     Renderable.string(
                         text,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                        horizontalAlign = HorizontalAlignment.CENTER,
+                        verticalAlign = VerticalAlignment.CENTER
                     ),
                 ),
                 color.darker(0.57),
                 padding = 0,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                horizontalAlign = HorizontalAlignment.CENTER
             )
         )
 
@@ -441,8 +443,8 @@ class CustomWardrobe {
         unhoveredRenderable: Renderable = Renderable.placeholder(hoveredRenderable.width, hoveredRenderable.height),
         topLayerRenderable: Renderable = Renderable.placeholder(0, 0),
         padding: Int = 0,
-        horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
-        verticalAlignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+        horizontalAlignment: HorizontalAlignment = HorizontalAlignment.CENTER,
+        verticalAlignment: VerticalAlignment = VerticalAlignment.CENTER,
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
         borderOutlineThickness: Int,
