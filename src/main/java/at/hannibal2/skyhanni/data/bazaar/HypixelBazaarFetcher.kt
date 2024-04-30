@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.fromJson
-import com.google.gson.annotations.Expose
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,9 +62,9 @@ object HypixelBazaarFetcher {
         val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
         val insantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
         if (internalName.getItemStackOrNull() == null) {
-            // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in in the ingame bazaar)
+            // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in in the ingame bazaar). Should only include Enchants
             if (LorenzUtils.getPlayerUuid() == "8a9f184148e948edb14f76a124e6c9df" || LorenzUtils.debug)
-                println("jani moment: $internalName/$key")
+            println("jani moment: $key/$internalName")
             return@mapNotNull null
         }
         internalName to BazaarData(internalName.itemName, sellOfferPrice, insantBuyPrice, product)
@@ -97,16 +96,4 @@ object HypixelBazaarFetcher {
     }
 
     private fun canFetch() = LorenzUtils.onHypixel && nextFetchTime.isInPast()
-
-    class BazaarApiResponse(
-        @Expose
-        val success: Boolean,
-        @Expose
-        val cause: String,
-        @Expose
-        val lastUpdated: Long,
-        @Expose
-        val products: Map<String, BazaarProduct>,
-    )
-
 }
