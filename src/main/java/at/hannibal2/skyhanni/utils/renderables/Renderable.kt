@@ -706,16 +706,18 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 val playerWidth = entityScale
                 val playerHeight = entityScale * 2
-                val playerX = posX + width / 2 + padding
-                val playerY = posY + height / 2 + playerHeight / 2 + padding
+                val playerX = width / 2 + padding
+                val playerY = height / 2 + playerHeight / 2 + padding
 
+                GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, colorCondition)
                 val mouse = currentRenderPassMousePosition
                 val mouseXRelativeToPlayer =
-                    if (followMouse) (playerX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
+                    if (followMouse) (posX + playerX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
                 val mouseYRelativeToPlayer =
-                    if (followMouse) (playerY - (mouse?.second
+                    if (followMouse) (posY + playerY - (mouse?.second
                         ?: Utils.getMouseY()) - 1.62 * entityScale).toFloat() else eyesY
+                GlStateManager.translate(0f, 0f, 500f)
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -724,6 +726,7 @@ interface Renderable {
                     mouseYRelativeToPlayer,
                     entity
                 )
+                GlStateManager.translate(0f, 0f, -500f)
             }
         }
     }
