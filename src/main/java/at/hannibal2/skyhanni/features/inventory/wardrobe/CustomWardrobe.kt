@@ -78,7 +78,7 @@ class CustomWardrobe {
 
         val fullRenderable = Renderable.verticalContainer(
             listOf(renderable, button),
-            20,
+            config.spacing.buttonVerticalSpacing,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         )
 
@@ -106,9 +106,7 @@ class CustomWardrobe {
         buttonsRenderable = addButtons()
     }
 
-    private fun createRenderables(): Renderable? {
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return null
-
+    private fun createRenderables(): Renderable {
         var list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
 
         var wardrobeWarning = false
@@ -134,52 +132,31 @@ class CustomWardrobe {
             }
         }
 
-        val centerX = gui.width / 2
-        val centerY = gui.height / 2
         val totalPlayers = list.size
-        val maxPlayersPerRow = 9
-        val playerWidth = 50
-        val playerHeight = 2 * playerWidth
-        val horizontalSpacing = 20
-        val verticalSpacing = 20
+        val maxPlayersPerRow = config.spacing.maxPlayersPerRow
+        val containerWidth = config.spacing.slotWidth
+        val containerHeight = config.spacing.slotHeight
+        val playerWidth = containerWidth * (config.spacing.playerScale.toDouble() / 100)
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
-        val totalHeight = rows * playerHeight + (rows - 1) * (verticalSpacing + 1)
-
-        val startY = centerY + playerHeight - totalHeight / 2
-
-        //addAll(addButtons(gui.width, gui.height, totalHeight))
-
-        val wardrobeRenderables = mutableListOf<Renderable>()
 
         if (wardrobeWarning) {
             val warningRenderable = Renderable.string(wardrobeWarningText)
-            //val warningPos = Position(centerX - (warningRenderable.width * 3) / 2, centerY - 70, 3f, true)
-            //add(Triple(warningPos, warningRenderable, 0))
             return warningRenderable
-            //wardrobeRenderables.add(warningRenderable)
         } else {
             val rowsRenderables = mutableListOf<Renderable>()
 
             for (row in 0 until rows) {
                 val playersInRow =
                     if (row != rows - 1 || totalPlayers % maxPlayersPerRow == 0) maxPlayersPerRow else totalPlayers % maxPlayersPerRow
-                val totalWidth = playersInRow * playerWidth + (playersInRow - 1) * (horizontalSpacing + 1)
-
-                val startX = centerX - (totalWidth - playerWidth) / 2
-                val playerY = startY + row * ((playerHeight + verticalSpacing) + 1)
 
                 val slotsRenderables = mutableListOf<Renderable>()
 
                 for (playerIndex in 0 until playersInRow) {
-                    val playerX = startX + playerIndex * ((playerWidth + horizontalSpacing) + 1)
-                    var scale = playerWidth.toDouble()
+                    var scale = playerWidth
 
                     val wardrobeSlot = list[maxPlayersPerRow * row + playerIndex]
 
-                    val padding = 10
-                    val containerWidth = playerWidth + 2 * padding
-                    val containerHeight = playerHeight + 2 * padding
 
                     val armorTooltipRenderable = {
                         val loreList = mutableListOf<Renderable>()
@@ -209,14 +186,12 @@ class CustomWardrobe {
                         Renderable.verticalContainer(loreList, spacing = 1)
                     }
 
-                    val playerBackgroundPosition =
-                        Position(playerX - padding - playerWidth / 2, playerY - playerHeight - padding)
                     val playerBackground = createHoverableRenderable(
                         armorTooltipRenderable.invoke(),
                         topLayerRenderable = addSlotHoverableButtons(wardrobeSlot),
                         hoveredColor = getWardrobeSlotColor(wardrobeSlot),
-                        borderOutlineThickness = config.color.outlineThickness,
-                        borderOutlineBlur = config.color.outlineBlur,
+                        borderOutlineThickness = config.spacing.outlineThickness,
+                        borderOutlineBlur = config.spacing.outlineBlur,
                         onClick = {
                             clickWardrobeSlot(wardrobeSlot)
                         },
@@ -245,36 +220,20 @@ class CustomWardrobe {
                         color = playerColor,
                     )
 
-                    /*add(Triple(playerBackgroundPosition, playerBackground, wardrobeSlot.id))
-                add(Triple(playerBackgroundPosition, playerBackground, wardrobeSlot.id))*/
-
                     val slotRenderable = Renderable.doubleLayered(playerBackground, playerRenderable, false)
 
-                    //add(Triple(playerBackgroundPosition, slotRenderable, wardrobeSlot.id))
                     slotsRenderables.add(slotRenderable)
                 }
 
-                val rowRenderable = Renderable.horizontalContainer(slotsRenderables, 1)
+                val rowRenderable = Renderable.horizontalContainer(slotsRenderables, config.spacing.horizontalSpacing)
 
                 rowsRenderables.add(rowRenderable)
             }
 
-            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, 1)
+            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, config.spacing.verticalSpacing)
 
             return allSlotsRenderable
         }
-
-        /*wardrobeRenderables.add(addButtons())
-
-        val wardrobeRenderable = Renderable.verticalContainer(
-            wardrobeRenderables,
-            20,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-        )
-
-        return wardrobeRenderable
-        */
-        //add(Triple(Position(0,0), wardrobeRenderable, 0))
     }
 
     private fun reset() {
@@ -284,8 +243,7 @@ class CustomWardrobe {
     }
 
     private fun addButtons(): Renderable {
-        val buttonWidth = 24
-        val xOffset = 10
+        val buttonWidth = config.spacing.buttonSize
 
         val buttonsList = listOf(
             createHoverableRenderable(
@@ -373,7 +331,7 @@ class CustomWardrobe {
 
         val buttonsRenderable = Renderable.horizontalContainer(
             buttonsList,
-            xOffset,
+            config.spacing.buttonHorizontalSpacing,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         )
         return buttonsRenderable
@@ -435,7 +393,7 @@ class CustomWardrobe {
         hoveredColor: Color,
         unHoveredColor: Color = hoveredColor,
         borderOutlineThickness: Int,
-        borderOutlineBlur: Float = 0f,
+        borderOutlineBlur: Float = 0.5f,
         onClick: () -> Unit,
         onHover: () -> Unit = {},
     ): Renderable =

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.inventory.customwardrobe;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ColorConfig {
@@ -36,24 +35,5 @@ public class ColorConfig {
     @ConfigOption(name = "botm bordr colr", desc = "")
     @ConfigEditorColour
     public String bottomBorderColor = "0:255:255:0:0";
-
-    @Expose
-    @ConfigOption(name = "bordr thicc", desc = "")
-    @ConfigEditorSlider(
-        minValue = 1,
-        maxValue = 15,
-        minStep = 1
-    )
-    public int outlineThickness = 5;
-
-    @Expose
-    @ConfigOption(name = "bordr blrrr", desc = "")
-    @ConfigEditorSlider(
-        minValue = 0f,
-        maxValue = 1f,
-        minStep = 0.1f
-    )
-    public float outlineBlur = 0.5f;
-
 
 }
