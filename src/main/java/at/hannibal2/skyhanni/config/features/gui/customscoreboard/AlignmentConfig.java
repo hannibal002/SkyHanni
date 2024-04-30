@@ -13,7 +13,7 @@ public class AlignmentConfig {
     public RenderUtils.HorizontalAlignment horizontalAlignment = RenderUtils.HorizontalAlignment.RIGHT;
 
     @Expose
-    @ConfigOption(name = "Vertical Alignment", desc = "Alignment for the scoreboard on the vertical axis."
+    @ConfigOption(name = "Vertical Alignment", desc = "Alignment for the scoreboard on the vertical axis.")
     @ConfigEditorDropdown
     public RenderUtils.VerticalAlignment verticalAlignment = RenderUtils.VerticalAlignment.CENTER;
 }
