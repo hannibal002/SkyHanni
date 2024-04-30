@@ -17,9 +17,12 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isCurrentSl
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isEmpty
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.isInCurrentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.locked
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
@@ -35,13 +38,11 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
+import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
 class CustomWardrobe {
@@ -74,13 +75,31 @@ class CustomWardrobe {
         val button = buttonsRenderable ?: return
 
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
-        val pos = Position((gui.width - renderable.width) / 2, (gui.height - renderable.height) / 2)
 
         val fullRenderable = Renderable.verticalContainer(
             listOf(renderable, button),
-            config.spacing.buttonVerticalSpacing,
+            config.spacing.buttonSlotsVerticalSpacing,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         )
+
+        // change global wardrobe scale if its taller or wider than the screen
+        if (fullRenderable.width > gui.width || fullRenderable.height > gui.height) {
+            if (config.spacing.globalScale <= 1) return
+            val newScale = (config.spacing.globalScale * (0.9 / max(
+                fullRenderable.width.toDouble() / gui.width,
+                fullRenderable.height.toDouble() / gui.height
+            ))).toInt()
+            config.spacing.globalScale = newScale
+            ChatUtils.clickableUserError(
+                "Auto-set your Global Scale in custom wardrobe, as it was too tall/wide",
+                onClick = { config::spacing.jumpToEditor() }
+            )
+            update()
+            return
+        }
+
+        val (width, height) = fullRenderable.width to fullRenderable.height
+        val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
 
         pos.renderRenderables(listOf(fullRenderable), posLabel = "Wardrobe Overlay", addToGuiManager = false)
     }
@@ -134,9 +153,11 @@ class CustomWardrobe {
 
         val totalPlayers = list.size
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow
-        val containerWidth = config.spacing.slotWidth
-        val containerHeight = config.spacing.slotHeight
-        val playerWidth = containerWidth * (config.spacing.playerScale.toDouble() / 100)
+        val containerWidth = (config.spacing.slotWidth * (config.spacing.globalScale / 100.0)).toInt()
+        val containerHeight = (config.spacing.slotHeight * (config.spacing.globalScale / 100.0)).toInt()
+        val playerWidth = (containerWidth * config.spacing.playerScale) / 100.0
+        val horizontalSpacing = (config.spacing.horizontalSpacing * (config.spacing.globalScale / 100.0)).toInt()
+        val verticalSpacing = (config.spacing.verticalSpacing * (config.spacing.globalScale / 100.0)).toInt()
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
 
@@ -225,12 +246,12 @@ class CustomWardrobe {
                     slotsRenderables.add(slotRenderable)
                 }
 
-                val rowRenderable = Renderable.horizontalContainer(slotsRenderables, config.spacing.horizontalSpacing)
+                val rowRenderable = Renderable.horizontalContainer(slotsRenderables, horizontalSpacing)
 
                 rowsRenderables.add(rowRenderable)
             }
 
-            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, config.spacing.verticalSpacing)
+            val allSlotsRenderable = Renderable.verticalContainer(rowsRenderables, verticalSpacing)
 
             return allSlotsRenderable
         }
@@ -240,101 +261,65 @@ class CustomWardrobe {
         inCustomWardrobe = false
         tempToggleShowOverlay = true
         display = mutableListOf()
+        displayRenderable = null
+        buttonsRenderable = null
     }
 
     private fun addButtons(): Renderable {
-        val buttonWidth = config.spacing.buttonSize
+        val horizontalSpacing = (config.spacing.buttonHorizontalSpacing * (config.spacing.globalScale / 100.0)).toInt()
+        val verticalSpacing = (config.spacing.buttonVerticalSpacing * (config.spacing.globalScale / 100.0)).toInt()
 
-        val buttonsList = listOf(
-            createHoverableRenderable(
-                Renderable.hoverTips(
-                    Renderable.placeholder(buttonWidth, buttonWidth),
-                    listOf(
-                        "§aToggle Wardrobe Overlay for one time",
-                        " §7This will hide the overlay",
-                        " §7until you open the wardrobe again",
-                    )
-                ),
-                hoveredColor = Color.BLACK,
-                borderOutlineThickness = 2,
-                onClick = {
-                    reset()
-                    tempToggleShowOverlay = false
-                }
-            ),
-            createHoverableRenderable(
-                Renderable.hoverTips(
-                    Renderable.placeholder(buttonWidth, buttonWidth),
-                    listOf(
-                        "§aToggle Only Favorite",
-                        " §7This will allow you to toggle",
-                        " §7only showing favorite armors",
-                    )
-                ),
-                hoveredColor = if (config.onlyFavorites) Color.GREEN else Color.RED,
-                borderOutlineThickness = 2,
-                onClick = {
-                    config.onlyFavorites = !config.onlyFavorites
-                    update()
-                }
-            ),
-            createHoverableRenderable(
-                Renderable.hoverTips(
-                    Renderable.itemStack(
-                        ItemStack(Items.arrow),
-                        1.0,
-                        0,
-                        0
-                    ),
-                    listOf("§aGo Back", " §7To SkyBlock Menu")
-                ),
-                Renderable.itemStack(
-                    ItemStack(Items.arrow),
-                    1.0,
-                    0,
-                    0,
-                ),
-                padding = 3,
-                hoveredColor = Color.BLACK,
-                borderOutlineThickness = 2,
-                onClick = {
-                    clickSlot(48, getWindowId() ?: -1)
-                    reset()
-                    currentPage = null
-                }
-            ),
-            createHoverableRenderable(
-                Renderable.hoverTips(
-                    Renderable.itemStack(
-                        ItemStack(Blocks.barrier),
-                        1.0,
-                        0,
-                        0,
-                    ),
-                    listOf("§cClose")
-                ),
-                Renderable.itemStack(
-                    ItemStack(Blocks.barrier),
-                    1.0,
-                    0,
-                    0,
-                ),
-                padding = 3,
-                hoveredColor = Color.BLACK,
-                borderOutlineThickness = 2,
-                onClick = {
-                    clickSlot(49, getWindowId() ?: -1)
-                    reset()
-                }
-            ),
+        val backButton = createLabeledButton(
+            "§aBack",
+            onClick = {
+                clickSlot(48, getWindowId() ?: -1)
+                reset()
+                currentPage = null
+            }
+        )
+        val exitButton = createLabeledButton(
+            "§cClose",
+            onClick = {
+                clickSlot(49, getWindowId() ?: -1)
+                reset()
+                currentPage = null
+            }
         )
 
-        val buttonsRenderable = Renderable.horizontalContainer(
-            buttonsList,
-            config.spacing.buttonHorizontalSpacing,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        val greenColor = Color(85, 255, 85, 200)
+        val redColor = Color(255, 85, 85, 200)
+
+        val onlyFavoriteButton = createLabeledButton(
+            "§eFavorite",
+            color = if (config.onlyFavorites) greenColor else redColor,
+            onClick = {
+                config.onlyFavorites = !config.onlyFavorites
+                update()
+            }
         )
-        return buttonsRenderable
+
+        val editButton = createLabeledButton(
+            "§bEdit",
+            onClick = {
+                tempToggleShowOverlay = false
+                reset()
+            }
+        )
+
+        val row = Renderable.horizontalContainer(
+            listOf(backButton, exitButton, onlyFavoriteButton),
+            horizontalSpacing,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        )
+
+        val total = Renderable.verticalContainer(
+            listOf(row, editButton),
+            verticalSpacing,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER
+        )
+
+        return total
     }
 
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
@@ -381,6 +366,54 @@ class CustomWardrobe {
         }
 
         return Renderable.verticalContainer(list, 1, RenderUtils.HorizontalAlignment.RIGHT)
+    }
+
+    private fun createLabeledButton(
+        text: String,
+        color: Color = Color(130, 130, 130, 200),
+        onClick: () -> Unit
+    ): Renderable {
+        val buttonWidth = (config.spacing.buttonWidth * (config.spacing.globalScale / 100.0)).toInt()
+        val buttonHeight = (config.spacing.buttonHeight * (config.spacing.globalScale / 100.0)).toInt()
+
+        val renderable = Renderable.hoverable(
+            Renderable.drawInsideRoundedRectWithOutline(
+                Renderable.doubleLayered(
+                    Renderable.clickable(
+                        Renderable.placeholder(buttonWidth, buttonHeight),
+                        onClick
+                    ),
+                    Renderable.string(
+                        text,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                    ),
+                    false,
+                ),
+                color,
+                padding = 0,
+                topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
+                bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
+                borderOutlineThickness = 2,
+                blur = 0.5f,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            ),
+            Renderable.drawInsideRoundedRect(
+                Renderable.doubleLayered(
+                    Renderable.placeholder(buttonWidth, buttonHeight),
+                    Renderable.string(
+                        text,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                    ),
+                ),
+                color.darker(0.57),
+                padding = 0,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            )
+        )
+
+        return renderable
     }
 
     private fun createHoverableRenderable(
