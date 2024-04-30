@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.width
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -20,11 +21,13 @@ object StringUtils {
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
     private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
     fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
+    fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
@@ -106,6 +109,13 @@ object StringUtils {
         return null
     }
 
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.find()) consumer(it) }
+        }
+        return null
+    }
+
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
         return if (split.size > 1) {
@@ -118,6 +128,7 @@ object StringUtils {
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
         } else {
@@ -308,4 +319,59 @@ object StringUtils {
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun replaceIfNeeded(
+        original: IChatComponent,
+        newText: String,
+    ): ChatComponentText? {
+        val foundCommands = mutableListOf<IChatComponent>()
+
+        addComponent(foundCommands, original)
+        for (sibling in original.siblings) {
+            addComponent(foundCommands, sibling)
+        }
+
+        val size = foundCommands.size
+        if (size > 1) {
+            return null
+        }
+
+        val originalClean = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val newTextClean = LorenzUtils.stripVanillaMessage(newText)
+        if (originalClean == newTextClean) return null
+
+        val text = ChatComponentText(newText)
+        if (size == 1) {
+            val chatStyle = foundCommands[0].chatStyle
+            text.chatStyle.chatClickEvent = chatStyle.chatClickEvent
+            text.chatStyle.chatHoverEvent = chatStyle.chatHoverEvent
+        }
+
+        return text
+    }
+
+    private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
+        val clickEvent = message.chatStyle.chatClickEvent
+        if (clickEvent != null) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+                return
+            }
+            foundCommands.add(message)
+        }
+    }
+
+    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
+        var text = this
+        while (true) {
+            val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
+            if (newText == text) {
+                return text
+            }
+            text = newText
+        }
+    }
+
+    fun String.width(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    }
 }

@@ -84,7 +84,7 @@ object SlayerProfitTracker {
     private val ItemTrackerData.TrackedItem.timesDropped get() = timesGained
 
     private fun addSlayerCosts(price: Double) {
-        require(price < 0) {"slayer costs can not be positve"}
+        require(price < 0) { "slayer costs can not be positve" }
         getTracker()?.modify {
             it.slayerSpawnCost += price.toInt()
         }
@@ -249,6 +249,6 @@ object SlayerProfitTracker {
             return
         }
 
-        getTracker()?.resetCommand(args, "shclearslayerprofits")
+        getTracker()?.resetCommand()
     }
 }

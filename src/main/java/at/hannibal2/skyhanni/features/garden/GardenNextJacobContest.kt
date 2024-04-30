@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -185,12 +187,7 @@ object GardenNextJacobContest {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
-
-        val backItem = event.inventoryItems[48] ?: return
-        if (backItem.name != "§aGo Back") return
-        val lore = backItem.getLore()
-        if (lore.size != 1) return
-        if (lore[0] != "§7To Calendar and Events") return
+        if (!monthPattern.matches(event.inventoryName)) return
 
         inCalendar = true
 
@@ -250,7 +247,9 @@ object GardenNextJacobContest {
                 } else {
                     ChatUtils.clickableChat(
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
-                        "shsendcontests"
+                        onClick = {
+                            shareContests()
+                        }
                     )
                 }
             }
@@ -293,22 +292,18 @@ object GardenNextJacobContest {
         }
     }
 
-    fun shareContestConfirmed(array: Array<String>) {
-        if (array.size == 1) {
-            if (array[0] == "enable") {
-                config.shareAutomatically = ShareContestsEntry.AUTO
-                SkyHanniMod.feature.storage.contestSendingAsked = true
-                ChatUtils.chat("§2Enabled automatic sharing of future contests!")
-            }
-            return
-        }
+    private fun shareContests() {
         if (contests.size == MAX_CONTESTS_PER_YEAR) {
             sendContests()
         }
         if (!SkyHanniMod.feature.storage.contestSendingAsked && config.shareAutomatically == ShareContestsEntry.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to automatically share future contests!",
-                "shsendcontests enable"
+                onClick = {
+                    config.shareAutomatically = ShareContestsEntry.AUTO
+                    SkyHanniMod.feature.storage.contestSendingAsked = true
+                    ChatUtils.chat("§2Enabled automatic sharing of future contests!")
+                }
             )
         }
     }
@@ -392,7 +387,7 @@ object GardenNextJacobContest {
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            list.addCropIcon(crop, highlight = (crop == boostedCrop))
+            list.addCropIcon(crop, 1.0, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
         if (!activeContest) {
@@ -562,7 +557,9 @@ object GardenNextJacobContest {
                 }
             } else {
                 ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
-                ChatUtils.clickableChat("Click here to open your calendar!", "calendar")
+                ChatUtils.clickableChat("Click here to open your calendar!", onClick = {
+                    HypixelCommands.calendar()
+                })
             }
 
             if (newContests.count() == MAX_CONTESTS_PER_YEAR) {

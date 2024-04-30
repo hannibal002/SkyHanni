@@ -307,5 +307,9 @@ object GardenVisitorDropStatistics {
 }
 
 enum class VisitorRarity {
-    UNCOMMON, RARE, LEGENDARY, MYTHIC, SPECIAL,
+    UNCOMMON,
+    RARE,
+    LEGENDARY,
+    MYTHIC,
+    SPECIAL,
 }

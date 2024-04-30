@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class TotemOfCorruptionConfig {
 
@@ -18,7 +19,7 @@ public class TotemOfCorruptionConfig {
         "\n§cThis needs to be enabled for the other options to work.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showOverlay = true;
+    public Property<Boolean> showOverlay = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Distance Threshold", desc = "The minimum distance to the Totem of Corruption for the overlay." +
@@ -34,7 +35,7 @@ public class TotemOfCorruptionConfig {
 
     @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area (16 blocks) of the Totem of Corruption.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public OutlineType outlineType = OutlineType.FILLED;
 
     public enum OutlineType {

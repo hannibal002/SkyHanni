@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.6"
+version = "0.25.Beta.16"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -41,15 +41,17 @@ sourceSets.main {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://repo.spongepowered.org/maven/")
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-    maven("https://jitpack.io") {
+    maven("https://repo.spongepowered.org/maven/") // mixin
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
         content {
             includeGroupByRegex("com\\.github\\..*")
         }
     }
-    maven("https://repo.nea.moe/releases")
-    maven("https://maven.notenoughupdates.org/releases")
+    maven("https://repo.nea.moe/releases") // libautoupdate
+    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
+    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
+    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -78,7 +80,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
+    shadowImpl("com.jagrosh:DiscordIPC:0.5") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
@@ -104,23 +106,28 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    // Apr 23, 2024, 6:08 PM GMT+2
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/commit/faf22b5dd9
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
 
     shadowModImpl(libs.moulconfig)
-    shadowImpl(libs.libautoupdate)
+    shadowImpl(libs.libautoupdate) {
+        exclude(module = "gson")
+    }
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(libs.hotswapagentforge)
 
-//    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
+
+    implementation("net.hypixel:mod-api:0.3.1")
 }
 configurations.getByName("minecraftNamed").dependencies.forEach {
     shot.applyTo(it as HasConfigurableAttributes<*>)
@@ -223,7 +230,6 @@ tasks.withType(Jar::class) {
     }
 }
 
-
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
     from(tasks.shadowJar)
@@ -243,6 +249,7 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
+    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")

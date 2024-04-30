@@ -94,7 +94,7 @@ object ScoreboardPattern {
     private val dungeonSb = scoreboardGroup.group("dungeon")
     val m7dragonsPattern by dungeonSb.pattern(
         "m7dragons",
-        "^(§cNo Alive Dragons|§8- (§.)+[\\w\\s]+Dragon§a \\w+§.❤)$"
+        "^(§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+§.❤)$"
     )
     val keysPattern by dungeonSb.pattern(
         "keys",
@@ -227,6 +227,18 @@ object ScoreboardPattern {
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$"
     )
+    val mineshaftNotStartedPattern by miningSb.pattern(
+        "mineshaft.notstarted",
+        "(?:§.)*Not started.*"
+    )
+    val fortunateFreezingBonusPattern by miningSb.pattern(
+        "fortunatefreezing.bonus",
+        "Event Bonus: §6\\+\\d+☘"
+    )
+    val fossilDustPattern by miningSb.pattern(
+        "fossildust",
+        "Fossil Dust: §f[\\d.,]+.*"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
@@ -321,6 +333,14 @@ object ScoreboardPattern {
         "objective",
         "^(§.)*(Objective|Quest).*"
     )
+    val queuePattern by miscSb.pattern(
+        "queued",
+        "Queued:.*"
+    )
+    val queuePositionPattern by miscSb.pattern(
+        "queueposition",
+        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
+    )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
     val thirdObjectiveLinePattern by miscSb.pattern(
@@ -391,7 +411,10 @@ object ScoreboardPattern {
         "hotdogeaten",
         "^Eaten: §.\\d+\\/\\d+$"
     )
-
+    val riftAveikxPattern by riftSb.pattern(
+        "aveikx",
+        "Time spent sitting|with Ävaeìkx: .*"
+    )
 
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
@@ -422,13 +445,5 @@ object ScoreboardPattern {
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
-    )
-    val boosterCookieEffectsWidgetPattern by tablistGroup.pattern(
-        "boostereffects",
-        "\\s*(?:§.)*Cookie Buff(?:§.)*: (?:§r)*(?<time>.*)"
-    )
-    val cookieNotActivePattern by tablistGroup.pattern(
-        "cookienotactive",
-        "((?:§.)*Not active.*)|(§c§lINACTIVE)"
     )
 }

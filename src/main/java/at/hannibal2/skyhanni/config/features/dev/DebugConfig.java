@@ -136,6 +136,7 @@ public class DebugConfig {
     @ConfigEditorBoolean
     public boolean neverFunnyTime = false;
 
+    // Does not have a config element!
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
 }
