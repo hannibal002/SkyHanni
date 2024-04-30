@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.isVanillaItem
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -57,8 +58,8 @@ class CraftableItemList {
                 if (neededItems.isEmpty()) continue
                 val amount = canCraftAmount(neededItems, avaliableMaterial)
                 if (amount > 0) {
-                    pricePer[internalName] = pricePer(neededItems)
-                    lines[internalName] = Renderable.clickAndHover("§8x$amount ${internalName.itemName}",
+                    pricePer[internalName] = pricePer(neededItems) * amount
+                    lines[internalName] = Renderable.clickAndHover("§8x${amount.addSeparators()} ${internalName.itemName}",
                         tips = listOf("Click to craft ${internalName.itemName}!"),
                         onClick = {
                             ChatUtils.sendCommandToServer("recipe ${internalName.asString()}")
@@ -72,8 +73,8 @@ class CraftableItemList {
         } else {
             val list = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
             listOf(
-                Renderable.string("§7Recipes: ${list.size}"),
-                Renderable.scrollList(list, height = 10),
+                Renderable.string("§7Recipes: ${list.size} total"),
+                Renderable.scrollList(list, height = 120),
             )
         }
     }
