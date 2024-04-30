@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TitleData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager
 import at.hannibal2.skyhanni.data.hypixel.chat.PlayerNameFormatter
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
@@ -536,6 +537,7 @@ class SkyHanniMod {
         loadModule(ChromaManager)
         loadModule(ContributorManager)
         loadModule(TabComplete)
+        loadModule(HypixelBazaarFetcher)
 
         // APIs
         loadModule(BazaarApi())
