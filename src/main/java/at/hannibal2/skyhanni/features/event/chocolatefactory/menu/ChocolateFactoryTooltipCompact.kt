@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.clicks
+package at.hannibal2.skyhanni.features.event.chocolatefactory.menu
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-object FactoryItemTooltipFeatures {
+object ChocolateFactoryTooltipCompact {
     private val config get() = ChocolateFactoryAPI.config
 
     private var lastClick = SimpleTimeMark.farPast()

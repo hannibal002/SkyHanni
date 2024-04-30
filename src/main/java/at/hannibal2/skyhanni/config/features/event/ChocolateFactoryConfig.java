@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.event;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;

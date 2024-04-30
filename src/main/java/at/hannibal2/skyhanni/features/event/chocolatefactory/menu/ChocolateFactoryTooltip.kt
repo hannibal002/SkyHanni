@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.event.chocolatefactory.menu
 
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI.profileStorage
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators

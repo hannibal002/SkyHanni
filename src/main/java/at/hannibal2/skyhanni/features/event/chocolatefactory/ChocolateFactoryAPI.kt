@@ -10,6 +10,11 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateAmount
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTimeTowerManager
+import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTooltip
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
