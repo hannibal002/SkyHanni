@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.chocolatefactory
 import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI.profileStorage
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -14,7 +15,16 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
     val formatted get(): String = chocolate().addSeparators()
 
-    fun timeUntilGoal(goal: Long): Duration {
+    fun formattedTimeUntilGoal(goal: Long): String {
+        val time = timeUntilGoal(goal)
+        return when {
+            time.isInfinite() -> "§cNever"
+            time.isNegative() -> "§aNow"
+            else -> "§6${time.format()}"
+        }
+    }
+
+    private fun timeUntilGoal(goal: Long): Duration {
         val profileStorage = ChocolateFactoryAPI.profileStorage ?: return Duration.ZERO
 
         val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds

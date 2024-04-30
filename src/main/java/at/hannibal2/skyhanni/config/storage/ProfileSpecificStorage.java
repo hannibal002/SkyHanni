@@ -81,9 +81,6 @@ public class ProfileSpecificStorage {
         public long currentTimeTowerEnds = 0;
 
         @Expose
-        public long lastTimeTowerEnds = 0;
-
-        @Expose
         public long nextTimeTower = 0;
 
         @Expose

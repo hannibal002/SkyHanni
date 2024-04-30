@@ -92,7 +92,7 @@ object ChocolateFactoryTimeTowerManager {
 
     fun timeTowerActive(): Boolean {
         val currentTime = profileStorage?.lastDataSave ?: 0
-        val endTime = profileStorage?.lastTimeTowerEnds ?: 0
+        val endTime = profileStorage?.currentTimeTowerEnds ?: 0
 
         return endTime > currentTime
     }
@@ -100,7 +100,7 @@ object ChocolateFactoryTimeTowerManager {
     fun timeTowerActiveDuration(): Duration {
         if (!timeTowerActive()) return Duration.ZERO
         val currentTime = profileStorage?.lastDataSave ?: 0
-        val endTime = profileStorage?.lastTimeTowerEnds ?: 0
+        val endTime = profileStorage?.currentTimeTowerEnds ?: 0
 
         val duration = endTime - currentTime
 
