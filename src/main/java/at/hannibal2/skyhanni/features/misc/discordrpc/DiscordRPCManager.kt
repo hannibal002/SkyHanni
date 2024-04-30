@@ -51,32 +51,12 @@ object DiscordRPCManager : IPCListener {
     fun start(fromCommand: Boolean = false) {
         coroutineScope.launch {
             try {
-                if (isActive()) {
-                    return@launch
-                }
+                if (isConnected()) return@launch
+
                 logger.info("Starting Discord RPC...")
                 startTimestamp = System.currentTimeMillis()
-                client = IPCClient(APPLICATION_ID).apply {
-                    setListener(DiscordRPCManager)
-
-                    try {
-                        connect()
-                        if (fromCommand) ChatUtils.chat(
-                            "Successfully started Rich Presence!",
-                            prefixColor = "§a"
-                        ) // confirm that /shrpcstart worked
-                    } catch (ex: Exception) {
-                        logger.warn("Failed to connect to RPC!", ex)
-                        ChatUtils.clickableChat(
-                            "Discord Rich Presence was unable to start! " +
-                                "This usually happens when you join SkyBlock when Discord is not started. " +
-                                "Please run /shrpcstart to retry once you have launched Discord.",
-                            onClick = {
-                                startCommand()
-                            }
-                        )
-                    }
-                }
+                client = IPCClient(APPLICATION_ID)
+                client?.setup(fromCommand)
             } catch (ex: Throwable) {
                 logger.warn("Discord RPC has thrown an unexpected error while trying to start...", ex)
             }
@@ -85,19 +65,41 @@ object DiscordRPCManager : IPCListener {
 
     private fun stop() {
         coroutineScope.launch {
-            if (isActive()) {
+            if (isConnected()) {
                 client?.close()
                 started = false
             }
         }
     }
 
-    private fun isActive() = client?.status == PipeStatus.CONNECTED
+    private fun IPCClient.setup(fromCommand: Boolean) {
+        setListener(DiscordRPCManager)
+
+        try {
+            connect()
+            if (!fromCommand) return
+
+            // confirm that /shrpcstart worked
+            ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
+        } catch (ex: Exception) {
+            logger.warn("Failed to connect to RPC!", ex)
+            ChatUtils.clickableChat(
+                    "Discord Rich Presence was unable to start! " +
+                            "This usually happens when you join SkyBlock when Discord is not started. " +
+                            "Please run /shrpcstart to retry once you have launched Discord.",
+                    onClick = {
+                        startCommand()
+                    }
+            )
+        }
+    }
+
+    private fun isConnected() = client?.status == PipeStatus.CONNECTED
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
-            if (isActive()) {
+            if (isConnected()) {
                 updatePresence()
             }
         }
@@ -137,7 +139,7 @@ object DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isActive()) return
+        if (!isConnected()) return
         if (event.repeatSeconds(5)) {
             updatePresence()
         }
@@ -186,12 +188,12 @@ object DiscordRPCManager : IPCListener {
     }
 
     fun startCommand() {
-        if (!config.enabled.get()) {
+        if (!isEnabled()) {
             ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
         }
 
-        if (isActive()) {
+        if (isConnected()) {
             ChatUtils.userError("Discord Rich Presence is already active!")
             return
         }
