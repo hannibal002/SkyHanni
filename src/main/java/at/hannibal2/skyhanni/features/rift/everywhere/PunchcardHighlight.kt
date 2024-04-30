@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -18,6 +20,10 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
+import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -53,6 +59,7 @@ class PunchcardHighlight {
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
         if (!config.enabled.get()) return
         if (!IslandType.THE_RIFT.isInIsland()) return
+        if (config.reverse.get()) return
         val size = playerList.size
         if (size >= 20) return
         val entity = event.mob
@@ -64,45 +71,58 @@ class PunchcardHighlight {
     @SubscribeEvent
     fun onToggle(event: ConfigLoadEvent) {
         config.enabled.onToggle { toggleConfig() }
+        config.compact.onToggle { display = drawDisplay() }
+        config.color.onToggle { reloadColors() }
+        config.reverse.onToggle {
+            display = drawDisplay()
+            reloadColors()
+        }
     }
 
     private fun toggleConfig() {
-        if (config.enabled.get()) {
+        if (config.enabled.get()) colorEveryone()
+        else colorEveryone(true)
+    }
+
+    private fun colorEveryone(remove: Boolean = false) {
+        if (!remove) {
             MobData.players.forEach {
                 colorPlayer(it.baseEntity)
             }
         } else {
             MobData.players.forEach {
-                RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
+                colorPlayer(it.baseEntity, true)
             }
         }
     }
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
-        DelayedRun.runDelayed(500.milliseconds) {
+        display = drawDisplay()
+        DelayedRun.runDelayed(1500.milliseconds) {
             if (IslandType.THE_RIFT.isInIsland() && HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
                 lastRiftServer = HypixelData.server
                 playerList.clear()
-                MobData.players.forEach {
-                    colorPlayer(it.baseEntity)
-                }
+                if (!config.reverse.get()) colorEveryone()
             }
         }
     }
 
-    private fun colorPlayer(entity: EntityLivingBase) {
-        if (entity.name in playerList) return
-        val alpha = when (config.color.toChromaColor().alpha) {
+    private fun colorPlayer(entity: EntityLivingBase, remove: Boolean = false) {
+        if (remove) {
+            RenderLivingEntityHelper.removeEntityColor(entity)
+            return
+        }
+        val alpha = when (config.color.get().toChromaColor().alpha) {
             0 -> 0
             255 -> 1
-            else -> 255 - config.color.toChromaColor().alpha
+            else -> 255 - config.color.get().toChromaColor().alpha
         }
-        val color = config.color.toChromaColor().withAlpha(alpha)
+        val color = config.color.get().toChromaColor().withAlpha(alpha)
         RenderLivingEntityHelper.setEntityColor(
             entity,
             color
-        ) { IslandType.THE_RIFT.isInIsland() && playerList.size < 20 }
+        ) { IslandType.THE_RIFT.isInIsland() }
     }
 
     fun clearList() {
@@ -121,17 +141,14 @@ class PunchcardHighlight {
         if (!config.enabled.get()) return
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
-        if (entity.isNPC()) {
-            ChatUtils.chat("was npc oops")
-            return
-        }
+        if (entity.isNPC()) return
         val name = entity.name
-        if (name in playerList) return
+        if (name in playerList || name in playerQueue) return
+        ChatUtils.chat("added '$name' to queue")
         playerQueue.add(name)
         listening = true
-        ChatUtils.chat("listening")
-        DelayedRun.runDelayed(2.seconds) {
-            ChatUtils.chat("not listening")
+        DelayedRun.runDelayed(1.seconds) {
+            if (name in playerQueue) playerQueue.remove(name)
             listening = false
         }
     }
@@ -146,7 +163,13 @@ class PunchcardHighlight {
         punchedPattern.matchMatcher(message) {
             val name = group("name")
             if (queuedName == name) addPunch(name)
-            else println("help! '$name' '$queuedName'") //throw error
+            else ErrorManager.logErrorStateWithData(
+                "Error finding punched player", "queuedName and capturedName were different",
+                "queuedName" to queuedName,
+                "capturedName" to name,
+                noStackTrace = true,
+                betaOnly = true
+            )
             return
         }
         when {
@@ -157,8 +180,45 @@ class PunchcardHighlight {
 
     private fun addPunch(playerName: String) {
         playerList.add(playerName)
+        playerQueue.remove(playerName)
         val player = MobData.players.firstOrNull { it.name == playerName } ?: return
-        RenderLivingEntityHelper.removeEntityColor(player.baseEntity)
-        playerQueue.removeAt(0)
+        if (!config.reverse.get()) colorPlayer(player.baseEntity, true)
+        else colorPlayer(player.baseEntity)
+        display = drawDisplay()
+    }
+
+    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
+    private var display = mutableListOf<Any>()
+
+    @SubscribeEvent
+    fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.gui) return
+        if (!RiftAPI.inRift()) return
+        config.position.renderSingleLineWithItems(display, "Punchcard Overlay")
+    }
+
+    private fun drawDisplay(): MutableList<Any> {
+        return mutableListOf<Any>().apply {
+            addItemIcon(displayIcon)
+            if (!config.compact.get()) add("Punchcard Artifact: ")
+
+            val amount = if (!config.reverse.get()) playerList.size
+                        else 20 - playerList.size
+            add("§d$amount")
+        }
+    }
+
+    private fun reloadColors() {
+        colorEveryone(true)
+        val reverse = config.reverse.get()
+        if (reverse) {
+            MobData.players.filter { it.name in playerList }.forEach {
+                colorPlayer(it.baseEntity)
+            }
+        } else {
+            MobData.players.filter { it.name !in playerList }.forEach {
+                colorPlayer(it.baseEntity)
+            }
+        }
     }
 }
