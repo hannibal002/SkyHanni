@@ -347,6 +347,11 @@ class ChatFilter {
         "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
         "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
+    private val factoryUpgradePatterns = listOf(
+        "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
+        "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!".toPattern(),
+        "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern()
+    )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
         "§aYou received §r§f1 §r§aWishing Compass§r§a.",
@@ -380,6 +385,7 @@ class ChatFilter {
         "powder_mining" to powderMiningPatterns,
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
+        "factory_upgrade" to factoryUpgradePatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -436,6 +442,7 @@ class ChatFilter {
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
         config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+        config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
 

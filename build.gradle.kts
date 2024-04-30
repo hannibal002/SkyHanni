@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.14"
+version = "0.25.Beta.17"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -80,7 +80,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5") {
+    shadowImpl("com.jagrosh:DiscordIPC:0.5.2") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
@@ -114,7 +114,9 @@ dependencies {
     }
 
     shadowModImpl(libs.moulconfig)
-    shadowImpl(libs.libautoupdate)
+    shadowImpl(libs.libautoupdate) {
+        exclude(module = "gson")
+    }
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(libs.hotswapagentforge)
 
@@ -247,6 +249,7 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
+    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
