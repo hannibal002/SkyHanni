@@ -73,7 +73,7 @@ class CustomWardrobe {
 
         for ((pos, renderable, _) in display.sortedBy { if (it.third == hoveredSlot) 1 else 0 }) {
             GlStateManager.color(1f, 1f, 1f, 1f)
-            pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay")
+            pos.renderRenderables(listOf(renderable), posLabel = "Wardrobe Overlay", addToGuiManager = false)
         }
     }
 
