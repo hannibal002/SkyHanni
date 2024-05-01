@@ -17,12 +17,13 @@ public class MixinContributorRendererEntityLiving<T extends EntityLivingBase> {
     private final RendererLivingEntityHook skyHanni$hook = new RendererLivingEntityHook();
 
     @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Ljava/lang/String;equals(Ljava/lang/Object;)Z", ordinal = 0))
-    private boolean rotateCorpse(String displayName, Object v2, T bat, float p_77043_2_, float p_77043_3_, float partialTicks) {
-        return skyHanni$hook.rotateCorpse(displayName, bat);
+    private boolean checkName(String displayName, Object v2, T bat, float p_77043_2_, float p_77043_3_, float partialTicks) {
+        return skyHanni$hook.isCoolPerson(displayName);
     }
 
     @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;isWearing(Lnet/minecraft/entity/player/EnumPlayerModelParts;)Z"))
-    private boolean rotateCorpse(EntityPlayer bat, EnumPlayerModelParts p_175148_1_) {
-        return skyHanni$hook.isWearing(bat, EnumPlayerModelParts.CAPE);
+    private boolean isWearing(EntityPlayer player, EnumPlayerModelParts p_175148_1_) {
+        skyHanni$hook.rotatePlayer(player);
+        return true;
     }
 }

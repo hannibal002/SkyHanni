@@ -107,7 +107,9 @@ class DeepCavernsGuide {
         if (parkourHelper == null) {
             ChatUtils.clickableChat(
                 "DeepCavernsParkour missing in SkyHanni Repo! Try /shupdaterepo to fix it!",
-                "shupdaterepo",
+                onClick = {
+                    SkyHanniMod.repo.updateRepo()
+                },
                 prefixColor = "§c"
             )
         }
