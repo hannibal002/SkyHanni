@@ -38,5 +38,5 @@ public class PunchcardConfig {
 
     @Expose
     @ConfigLink(owner = PunchcardConfig.class, field = "gui")
-    public Position position = new Position(1, 2);
+    public Position position = new Position(10, 27);
 }
