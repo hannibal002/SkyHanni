@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.registerTypeAdapter
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.fromJson
 import com.google.gson.GsonBuilder
@@ -113,7 +114,7 @@ private val localeGson = GsonBuilder().setPrettyPrinting()
             out.beginObject()
             it.neighbours.forEach { (node, weight) ->
                 val id = node.id.toString()
-                out.name(id).value(weight)
+                out.name(id).value(weight.round(2))
             }
             out.endObject()
             out.endObject()
