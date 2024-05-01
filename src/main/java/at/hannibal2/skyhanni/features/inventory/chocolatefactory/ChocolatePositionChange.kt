@@ -20,7 +20,7 @@ object ChocolatePositionChange {
         if (lastLeaderboard == leaderboard) return
 
         lastLeaderboard?.let { lastLb ->
-            var message = "$lastLb §c-> $leaderboard"
+            var message = "§e$lastLb §c-> §e$leaderboard"
             val change = lastPosition - position
             val color = if (change > 0) "§a+" else "§c"
             message += "\n §7Changed by $color${change.addSeparators()} spots"
