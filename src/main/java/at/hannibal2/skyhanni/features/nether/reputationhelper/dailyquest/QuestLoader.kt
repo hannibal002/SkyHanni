@@ -181,9 +181,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         if (quest !is MiniBossQuest) return
         val storedAmount = quest.needAmount
         if (storedAmount != 1) return
-        val pattern = "§7Kill the §c.+ §7miniboss §a(?<amount>\\d) §7times?!".toPattern()
         for (line in stack.getLore()) {
-            val realAmount = pattern.matchMatcher(line) {
+            val realAmount = dailyQuestHelper.minibossAmountPattern.matchMatcher(line) {
                 group("amount").toInt()
             } ?: continue
             if (storedAmount == realAmount) continue
