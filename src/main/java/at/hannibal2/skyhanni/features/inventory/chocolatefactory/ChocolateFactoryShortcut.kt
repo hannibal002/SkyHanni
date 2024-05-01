@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent

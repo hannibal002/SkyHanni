@@ -125,19 +125,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryShortcut
-import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityEggsManager
-import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityEggsShared
-import at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity.HoppityNpc
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryInventory
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryStats
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTimeTowerManager
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTooltip
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryTooltipCompact
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -148,6 +135,11 @@ import at.hannibal2.skyhanni.features.event.diana.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
@@ -276,6 +268,15 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderCl
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOpenPriceWebsite
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialsFromBazaar
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryShortcut
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTooltip
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTooltipCompact
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -442,6 +443,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -464,7 +466,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.16",
+    version = "0.25.Beta.17",
 )
 class SkyHanniMod {
 
@@ -572,6 +574,7 @@ class SkyHanniMod {
         loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
         loadModule(ChocolateFactoryAPI)
+        loadModule(RenderableTooltips)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -635,6 +638,7 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryTooltipCompact)
         loadModule(ChocolateFactoryTimeTowerManager)
         loadModule(ChocolateFactoryTooltip)
+        loadModule(ChocolateShopPrice)
         loadModule(HoppityNpc)
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
