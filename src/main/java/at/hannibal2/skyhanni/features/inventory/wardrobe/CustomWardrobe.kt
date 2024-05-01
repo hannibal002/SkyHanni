@@ -129,6 +129,12 @@ class CustomWardrobe {
         update()
     }
 
+    @SubscribeEvent
+    fun onWardrobeUpdate(event: WardrobeUpdateEvent) {
+        if (!isEnabled()) return
+        update()
+    }
+
 
     private fun update() {
         displayRenderable = createRenderables()

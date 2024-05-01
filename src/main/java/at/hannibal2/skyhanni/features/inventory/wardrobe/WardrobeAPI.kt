@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -182,6 +183,7 @@ object WardrobeAPI {
         var foundCurrentSlot = false
 
         val itemsList = event.inventoryItems
+        val oldData = wardrobeSlots.map { it.getData() }
 
         lastWardrobeUpdate = SimpleTimeMark.now()
         DelayedRun.runDelayed(500.milliseconds) {
@@ -201,6 +203,12 @@ object WardrobeAPI {
             }
             if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage)
                 currentWardrobeSlot = null
+
+            val newData = wardrobeSlots.map { it.getData() }
+            if (newData != oldData) {
+                WardrobeUpdateEvent(newData, oldData).postAndCatch()
+                ChatUtils.chat("UPDATEDDDD")
+            }
         }
     }
 
