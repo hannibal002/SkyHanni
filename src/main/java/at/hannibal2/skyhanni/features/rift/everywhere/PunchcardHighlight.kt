@@ -100,10 +100,10 @@ class PunchcardHighlight {
     fun onWorldSwitch(event: IslandChangeEvent) {
         display = drawDisplay()
         DelayedRun.runDelayed(1500.milliseconds) {
+            reloadColors()
             if (IslandType.THE_RIFT.isInIsland() && HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
                 lastRiftServer = HypixelData.server
                 playerList.clear()
-                if (!config.reverse.get()) colorEveryone()
             }
         }
     }

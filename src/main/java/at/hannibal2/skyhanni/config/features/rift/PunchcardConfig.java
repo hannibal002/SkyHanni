@@ -32,7 +32,7 @@ public class PunchcardConfig {
     public Property<Boolean> compact = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Inverse", desc = "Highlights only punched players, also has the overlay show the amount of remaining players to punch.")
+    @ConfigOption(name = "Only punched players", desc = "Highlights only punched players, also has the overlay show the amount of remaining players to punch.")
     @ConfigEditorBoolean
     public Property<Boolean> reverse = Property.of(false);
 
