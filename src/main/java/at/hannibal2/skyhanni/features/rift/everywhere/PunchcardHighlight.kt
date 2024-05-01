@@ -76,10 +76,8 @@ class PunchcardHighlight {
         config.enabled.onToggle { reloadColors() }
         config.compact.onToggle { display = drawDisplay() }
         config.color.onToggle { reloadColors() }
-        config.reverse.onToggle {
-            display = drawDisplay()
-            reloadColors()
-        }
+        config.reverseGUI.onToggle { display = drawDisplay() }
+        config.reverse.onToggle { reloadColors() }
     }
 
     @SubscribeEvent
@@ -182,7 +180,7 @@ class PunchcardHighlight {
             addItemIcon(displayIcon)
             if (!config.compact.get()) add("Punchcard Artifact: ")
 
-            val amount = if (!config.reverse.get()) playerList.size
+            val amount = if (!config.reverseGUI.get()) playerList.size
                         else 20 - playerList.size
             add("§d$amount")
         }

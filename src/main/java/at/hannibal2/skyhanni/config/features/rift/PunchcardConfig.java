@@ -32,7 +32,12 @@ public class PunchcardConfig {
     public Property<Boolean> compact = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Only punched players", desc = "Highlights only punched players, also has the overlay show the amount of remaining players to punch.")
+    @ConfigOption(name = "Countdown Overlay", desc = "Shows the amount of remaining players in the overlay.")
+    @ConfigEditorBoolean
+    public Property<Boolean> reverseGUI = Property.of(false);
+
+    @Expose
+    @ConfigOption(name = "Only punched players", desc = "Highlights only punched players instead.")
     @ConfigEditorBoolean
     public Property<Boolean> reverse = Property.of(false);
 
