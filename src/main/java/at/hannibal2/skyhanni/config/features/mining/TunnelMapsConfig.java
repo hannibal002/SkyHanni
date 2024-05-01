@@ -51,4 +51,9 @@ public class TunnelMapsConfig {
     @ConfigOption(name = "Compact Gemstone", desc = "Only shows the icon for gemstones in the selection list.")
     @ConfigEditorBoolean
     public Property<Boolean> compactGemstone = Property.of(false);
+
+    @Expose
+    @ConfigOption(name = "Exclude Fairy", desc = "Excludes the fairy soul spots from the selection list.")
+    @ConfigEditorBoolean
+    public Property<Boolean> excludeFairy = Property.of(false);
 }

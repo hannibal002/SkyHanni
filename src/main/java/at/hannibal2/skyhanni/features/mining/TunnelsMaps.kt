@@ -132,7 +132,8 @@ class TunnelsMaps {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
-            config.compactGemstone
+            config.compactGemstone,
+            config.excludeFairy
         ) {
             locationDisplay = generateLocationsDisplay()
         }
@@ -178,12 +179,12 @@ class TunnelsMaps {
                 )
             )
         )
-        add(Renderable.hoverable(Renderable.horizontalContainer(listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
-            val name = it.key.removePrefix("§dFairy Soul ")
-            Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
+        if (!config.excludeFairy.get()) {
+            add(Renderable.hoverable(Renderable.horizontalContainer(listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                val name = it.key.removePrefix("§dFairy Soul ")
+                Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
+            }), Renderable.string("§dFairy Souls")))
         }
-
-        ), Renderable.string("§dFairy Souls")))
         if (config.compactGemstone.get()) {
             add(
                 Renderable.table(
