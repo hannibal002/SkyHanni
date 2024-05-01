@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.TabCompletionEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,7 +34,7 @@ object PartyChatCommands {
             { config.transferCommand },
             requiresPartyLead = true,
             executable = {
-                ChatUtils.sendCommandToServer("party transfer ${it.cleanedAuthor}")
+                HypixelCommands.partyTransfer(it.cleanedAuthor)
             }
         ),
         PartyChatCommand(
@@ -42,7 +43,7 @@ object PartyChatCommands {
             requiresPartyLead = true,
             executable = {
                 lastWarp = SimpleTimeMark.now()
-                ChatUtils.sendCommandToServer("party warp")
+                HypixelCommands.partyWarp()
             }
         ),
         PartyChatCommand(
@@ -51,7 +52,7 @@ object PartyChatCommands {
             requiresPartyLead = true,
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
-                ChatUtils.sendCommandToServer("party settings allinvite")
+                HypixelCommands.partyAllInvite()
             }
         ),
     )
