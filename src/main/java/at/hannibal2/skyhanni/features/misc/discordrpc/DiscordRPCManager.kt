@@ -128,7 +128,7 @@ object DiscordRPCManager : IPCListener {
                 addButton(
                     RichPresenceButton(
                         "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
-                        "Open SkyCrypt Profile"
+                        "Open SkyCrypt"
                     )
                 )
             }
