@@ -1214,7 +1214,7 @@ object RenderUtils {
             listOf(
                 this.exactPlayerEyeLocation()
                     + Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks)
-                    .toLorenzVec()/* .rotateXZ(-Math.PI / 72.0) */.times(2).add(y = -3e-1)
+                    .toLorenzVec()/* .rotateXZ(-Math.PI / 72.0) */.times(2)
             )
         } else {
             emptyList()

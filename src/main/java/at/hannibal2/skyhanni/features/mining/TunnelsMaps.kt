@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 class TunnelsMaps {
@@ -202,8 +202,8 @@ class TunnelsMaps {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path?.takeIf { it.first.isNotEmpty() } ?: return
-        event.draw3DPathWithWaypoint(path.first, getPathColor(), 7, true, bezierPoint = 2.0)
-        event.drawDynamicText(path.first.last().position, "§e${path.second.round(1)}", 1.0, yOff = 9.5f)
+        event.draw3DPathWithWaypoint(path.first, getPathColor(), 4, true, bezierPoint = 2.0)
+        event.drawDynamicText(path.first.last().position, "§e${path.second.roundToInt()}m", 1.0, yOff = 10f)
     }
 
     private fun getPathColor(): Color = if (config.dynamicPathColour) {
