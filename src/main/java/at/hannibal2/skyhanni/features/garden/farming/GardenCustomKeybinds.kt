@@ -36,7 +36,7 @@ object GardenCustomKeybinds {
         map[mcSettings.keyBindSneak] = { config.sneak }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
     private fun isActive(): Boolean {
         if (!isEnabled()) return false

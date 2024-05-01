@@ -35,7 +35,7 @@ public class TotemOfCorruptionConfig {
 
     @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area (16 blocks) of the Totem of Corruption.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public OutlineType outlineType = OutlineType.FILLED;
 
     public enum OutlineType {

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
+import at.hannibal2.skyhanni.events.TabCompletionEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -72,26 +73,35 @@ object PartyChatCommands {
         }
     }
 
-    private val commandBeginChars = ".!?".toSet()
+    private val commandPrefixes = ".!?".toSet()
 
     @SubscribeEvent
     fun onPartyCommand(event: PartyChatEvent) {
-        if (event.message.firstOrNull() !in commandBeginChars)
-            return
+        if (event.message.firstOrNull() !in commandPrefixes) return
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
-        if (name == LorenzUtils.getPlayerName()) {
-            return
-        }
+
+        if (name == LorenzUtils.getPlayerName()) return
         if (!command.isEnabled()) return
-        if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) {
-            return
-        }
+        if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) return
         if (!isTrustedUser(name)) {
             ChatUtils.chat("§cIgnoring chat command from $name. Change your party chat command settings or /friend (best) them.")
             return
         }
         command.executable(event)
+    }
+
+    @SubscribeEvent
+    fun onTabComplete(event: TabCompletionEvent) {
+        if (PartyAPI.partyLeader == null) return
+        val prefix = event.fullText.firstOrNull() ?: return
+        if (prefix !in commandPrefixes) return
+
+        val commandText = event.fullText.substring(1)
+        indexedPartyChatCommands.keys
+            .filter { it.startsWith(commandText) }
+            .map { "$prefix$it" }
+            .forEach(event::addSuggestion)
     }
 }

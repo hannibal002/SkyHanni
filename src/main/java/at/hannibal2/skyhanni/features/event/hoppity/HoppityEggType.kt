@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.event.hoppity
 
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 
@@ -7,7 +7,7 @@ enum class HoppityEggType(
     val resetsAt: Int,
     private val mealColour: String,
     var lastResetDay: Int = -1,
-    private var claimed: Boolean = false
+    private var claimed: Boolean = false,
 ) {
     BREAKFAST("Breakfast", 7, "§a"),
     LUNCH("Lunch", 14, "§9"),

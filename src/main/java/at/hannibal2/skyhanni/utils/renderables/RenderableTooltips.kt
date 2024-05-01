@@ -9,52 +9,62 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 import java.awt.Color
 
-object RenderLineTooltips {
+object RenderableTooltips {
 
-    fun drawHoveringText(
-        posX: Int, posY: Int,
+    private var tooltip: DeferredTooltip? = null
+
+    @SubscribeEvent
+    fun onPostRenderTick(event: RenderTickEvent) {
+        if (event.phase == TickEvent.Phase.START) {
+            tooltip = null
+        } else if (event.phase == TickEvent.Phase.END) {
+            drawHoveringText()
+        }
+    }
+
+    fun setTooltipForRender(
         tips: List<Renderable>,
         stack: ItemStack? = null,
         borderColor: LorenzColor? = null,
         snapsToTopIfToLong: Boolean = true,
-        mouseX: Int = Utils.getMouseX(),
-        mouseY: Int = Utils.getMouseY(),
     ) {
+        tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong)
+    }
+
+    private fun drawHoveringText() {
+        val tooltip = tooltip ?: return
+        val tips = tooltip.tips
         if (tips.isEmpty()) return
 
-        val (xTranslate, yTranslate, _) = RenderUtils.absoluteTranslation
-
-        val x = mouseX - posX + 12
-        val y = mouseY - posY - if (tips.size > 1) 2 else -7
-        val color: Char = borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1)
-        ?: 'f'
-        val colourInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(color)
-        val borderColorStart = Color(colourInt).darker().rgb and 0x00FFFFFF or (200 shl 24)
+        val x = Utils.getMouseX() + 12
+        val y = Utils.getMouseY() - if (tips.size > 1) 2 else -7
+        val borderColorStart = Color(tooltip.getBorderColor()).darker().rgb and 0x00FFFFFF or (200 shl 24)
         val scaled = ScaledResolution(Minecraft.getMinecraft())
 
         val tooltipTextWidth = tips.maxOf { it.width }
         val tooltipHeight = tips.sumOf { it.height }
 
         val tooltipY = when {
-            y + yTranslate < 16 -> -yTranslate + 4 // Limit Top
-            y + yTranslate + tooltipHeight > scaled.scaledHeight -> {
-                if (snapsToTopIfToLong && tooltipHeight + 8 > scaled.scaledHeight)
-                    -yTranslate + 4 // Snap to Top if to Long
+            y < 16 -> 4 // Limit Top
+            y + tooltipHeight > scaled.scaledHeight -> {
+                if (tooltip.snapsToTopIfToLong && tooltipHeight + 8 > scaled.scaledHeight)
+                    4 // Snap to Top if to Long
                 else
-                    scaled.scaledHeight - tooltipHeight - 4 - yTranslate // Limit Bottom
+                    scaled.scaledHeight - tooltipHeight - 4 // Limit Bottom
             }
 
             else -> {
                 y - 12 // normal
             }
         }
-        val tooltipX = if (x + tooltipTextWidth + 4 + xTranslate > scaled.scaledWidth) {
-            scaled.scaledWidth - tooltipTextWidth - 4 - xTranslate // Limit Right
+        val tooltipX = if (x + tooltipTextWidth + 4 > scaled.scaledWidth) {
+            scaled.scaledWidth - tooltipTextWidth - 4 // Limit Right
         } else {
             x // normal
         }
@@ -66,38 +76,38 @@ object RenderLineTooltips {
         val zLevel = 300f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -4,
             right = tooltipTextWidth + 3,
             bottom = -3,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 3,
             right = tooltipTextWidth + 3,
             bottom = tooltipHeight + 4,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -3,
             right = tooltipTextWidth + 3,
             bottom = tooltipHeight + 3,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -4,
             top = -3,
             right = -3,
             bottom = tooltipHeight + 3,
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = tooltipTextWidth + 3,
             top = -3,
             right = tooltipTextWidth + 4,
             bottom = tooltipHeight + 3,
         )
         val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -3 + 1,
             right = -3 + 1,
@@ -105,7 +115,7 @@ object RenderLineTooltips {
             startColor = borderColorStart,
             endColor = borderColorEnd
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = tooltipTextWidth + 2,
             top = -3 + 1,
             right = tooltipTextWidth + 3,
@@ -113,7 +123,7 @@ object RenderLineTooltips {
             startColor = borderColorStart,
             endColor = borderColorEnd
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = -3,
             right = tooltipTextWidth + 3,
@@ -121,7 +131,7 @@ object RenderLineTooltips {
             startColor = borderColorStart,
             endColor = borderColorStart
         )
-        drawGradientRect(
+        RenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 2,
             right = tooltipTextWidth + 3,
@@ -147,43 +157,18 @@ object RenderLineTooltips {
         GlStateManager.enableRescaleNormal()
         GlStateManager.disableLighting()
     }
+}
 
-    private fun drawGradientRect(
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int,
-        startColor: Int = -0xfeffff0,
-        endColor: Int = -0xfeffff0,
-    ) {
-        val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
-        val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
-        val startGreen = (startColor shr 8 and 255).toFloat() / 255.0f
-        val startBlue = (startColor and 255).toFloat() / 255.0f
-        val endAlpha = (endColor shr 24 and 255).toFloat() / 255.0f
-        val endRed = (endColor shr 16 and 255).toFloat() / 255.0f
-        val endGreen = (endColor shr 8 and 255).toFloat() / 255.0f
-        val endBlue = (endColor and 255).toFloat() / 255.0f
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        GlStateManager.shadeModel(7425)
-        val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos(right.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        worldrenderer.pos(right.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        tessellator.draw()
-        GlStateManager.shadeModel(7424)
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
+private data class DeferredTooltip(
+    val tips: List<Renderable>,
+    val stack: ItemStack? = null,
+    val borderColor: LorenzColor? = null,
+    val snapsToTopIfToLong: Boolean = true,
+) {
+
+    fun getBorderColor(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getColorCode(
+            borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1) ?: 'f'
+        )
     }
 }
