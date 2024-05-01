@@ -112,6 +112,9 @@
 + Highlight unbought items in Hoppity shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
 + Added time tower status to the chocolate factory stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1506)
     + Also can notify you when you get a new charge or your charges are full.
++ Extra tooltip stats about upgrades for the chocolate factory. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1594)
+    + View these to know when to buy time tower or Coach Jackrabbit.
 
 #### Inventory Features
 
@@ -159,6 +162,9 @@
 + Added options to toggle overflow garden levels and overflow level up messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1325)
 + Added an option to disable custom garden key binds while on the barn plot. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1559)
 + Added option to block accepting/refusing visitors depending on coin loss. - Albin (https://github.com/hannibal002/SkyHanni/pull/1502)
++ Changed broken Pest Particle Waypoint to just show existing particles better, no guess. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1263)
+    + This is just a workaround until the pest location detection is working again.
 
 #### Diana Improvements
 
@@ -186,12 +192,16 @@
     + Customize border blur.
     + Customize top and bottom color (gradient).
 + Moved Unknown Lines warning option back into Custom Scoreboard Category. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1561)
++ Added more Alignment Options to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1566)
++ Allowed Custom Scoreboard Outline to also work on Background Images. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1566)
 
 #### Commands Improvements
 
 + Add /trade to tab completeable commands. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1354)
 + Improved gfs to have support for calculations in amount. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1493)
 + Cleanup the format for the /shcommand hover description. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1531)
++ Added autocomplete for party commands. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1598)
 
 #### Config Improvements
 
@@ -244,6 +254,8 @@
 + Show an estimation of when you will prestige based on your chocolate/second. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1514)
 + Removed the Hoppity Menu Shortcut in The Rift, Kuudra, Catacombs and Mineshafts. - raven (https://github.com/hannibal002/SkyHanni/pull/1585)
     + You cannot use the chocolate factory in these areas, resulting in the button being removed.
++ Live update chocolate amounts in other inventories related to the chocolate factory. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1594)
 
 #### Rift Improvements
 
@@ -301,6 +313,8 @@
 + Fixed error message with GFS and super crafting pets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1553)
 + Fixed pest count error being shown. - Empa (https://github.com/hannibal002/SkyHanni/pull/1563)
 + Fixed pest count logic not having necessary delay. - Empa (https://github.com/hannibal002/SkyHanni/pull/1591)
++ Fixed visitor reward warning only blocking normal clicks. -
+  Obsidian (https://github.com/hannibal002/SkyHanni/pull/1595)
 
 #### Chat Fixes
 
@@ -337,6 +351,8 @@
 + Fixed Custom Scoreboard not detection M7 dragons during Derpy. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1561)
 + Fixed space in visitor shopping list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1549)
 + Fixed missing Fossil Dust line in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1586)
++ Fixed SkyHanni showing the Vanilla Scoreboard when using Apec. - hannibal2,
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1592)
 
 #### Dungeon Fixes
 
@@ -354,6 +370,9 @@
 + Fixed Bazaar Cancelled Buy Order Clipboard one last time. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1529)
 + Fixed tooltips disappearing with the Enchant Parsing feature. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1552)
 + Fixed tooltip on certain items when using Enchant Parsing. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1569)
++ Fixed slot highlight showing over item tooltip. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1603)
++ Fixed middle-clicking not working on time tower. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1596)
+    + You can still right click to activate it.
 
 #### Rift Fixes
 
@@ -405,6 +424,8 @@
 + Fixed Profit Trackers showing no more than 2.1b coins. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1554)
 + Fixed error with other mods that include DiscordIPC and do not relocate. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1573)
 + Fixed updater downloading the wrong version. - Empa (https://github.com/hannibal002/SkyHanni/pull/1590)
++ Fixed some mob features not working with Skytils' ping display. - Thunderblade73 &
+  martimavocado (https://github.com/hannibal002/SkyHanni/pull/1605)
 
 ### Technical Details
 
@@ -527,6 +548,14 @@
     + This should make SkyHanni more compatible with other mods doing the exact same mixin for tab completion.
     + Also changed the mixin to use an event, allowing more decentralized tab completion changes.
 + Changes how some of the chocolate factory data is stored and accessed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1514)
++ Renderable tooltips are now deferred in end of RenderTick. -
+  ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1603)
+    + Tooltips should only be set in between RenderTickEvent start and RenderTickEvent end. i.e. screen render events.
++ Made DelayedRun return its SimpleTimeMark. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1570)
+    + This is useful as to not over extraneously run an operation when another is already queued.
++ Added scroll able logic for Renderables. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/886)
+    + Added elements: scrollList and scrollTable.
++ Cleanup Custom Scoreboard code. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1486)
 
 ### Removed Features
 

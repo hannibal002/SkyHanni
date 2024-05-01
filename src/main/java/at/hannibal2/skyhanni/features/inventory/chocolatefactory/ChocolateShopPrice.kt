@@ -3,55 +3,30 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ChocolateShopPrice {
+object ChocolateShopPrice {
     private val config get() = ChocolateFactoryAPI.config.chocolateShopPrice
 
     private var display = emptyList<Renderable>()
 
-    private val menuNamePattern by RepoPattern.pattern(
-        "chocolatefactory.inventory.title",
-        "^Chocolate Shop$"
+    private val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "shop.title",
+        "Chocolate Shop"
     )
 
-    companion object {
-        var inInventory = false
-    }
-
-    private fun ItemStack.loreCosts(): MutableList<NEUInternalName> {
-        var found = false
-        val list = mutableListOf<NEUInternalName>()
-        for (lines in getLore()) {
-            if (lines == "§7Cost") {
-                found = true
-                continue
-            }
-
-            if (!found) continue
-            if (lines.isEmpty()) return list
-
-            NEUInternalName.fromItemNameOrNull(lines)?.let {
-                list.add(it)
-            }
-        }
-        return list
-    }
+    var inInventory = false
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -69,9 +44,7 @@ class ChocolateShopPrice {
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
 
-            val profit = itemPrice
-
-            val factor = (profit / chocolate) * multiplier
+            val factor = (itemPrice / chocolate) * multiplier
             val perFormat = NumberUtil.format(factor)
 
             val itemName = item.itemName
@@ -99,7 +72,8 @@ class ChocolateShopPrice {
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eCoins per million chocolate§f:"))
-        newList.add(Renderable.string("§eChocolate avaliable: §6${ChocolateAmount.CURRENT.formatted}"))
+        // TODO update this value every second
+        newList.add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
         newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         display = newList
     }
@@ -120,5 +94,5 @@ class ChocolateShopPrice {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }

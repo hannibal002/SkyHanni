@@ -139,4 +139,5 @@ public class ChocolateFactoryConfig {
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
     public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
+
 }

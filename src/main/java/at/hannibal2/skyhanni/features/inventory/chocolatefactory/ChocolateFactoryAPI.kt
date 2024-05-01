@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
@@ -35,7 +36,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryAPI {
-    val config get() = SkyHanniMod.feature.inventory.chocolateFactory
+    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
@@ -331,24 +332,24 @@ object ChocolateFactoryAPI {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val old = "event.chocolateFactory"
         val new = "inventory.chocolateFactory"
-        event.move(43, "$old.enabled", "$new.enabled")
-        event.move(43, "$old.statsDisplay", "$new.statsDisplay")
-        event.move(43, "$old.statsDisplayList", "$new.statsDisplayList")
-        event.move(43, "$old.showStackSizes", "$new.showStackSizes")
-        event.move(43, "$old.highlightUpgrades", "$new.highlightUpgrades")
-        event.move(43, "$old.useMiddleClick", "$new.useMiddleClick")
-        event.move(43, "$old.rabbitWarning", "$new.rabbitWarning")
-        event.move(43, "$old.barnCapacityThreshold", "$new.barnCapacityThreshold")
-        event.move(43, "$old.extraTooltipStats", "$new.extraTooltipStats")
-        event.move(43, "$old.timeTowerWarning", "$new.timeTowerWarning")
-        event.move(43, "$old.position", "$new.position")
-        event.move(43, "$old.compactOnClick", "$new.compactOnClick")
-        event.move(43, "$old.compactOnClickAlways", "$new.compactOnClickAlways")
-        event.move(43, "$old.tooltipMove", "$new.tooltipMove")
-        event.move(43, "$old.tooltipMovePosition", "$new.tooltipMovePosition")
-        event.move(43, "$old.hoppityMenuShortcut", "$new.hoppityMenuShortcut")
-        event.move(43, "$old.hoppityCollectionStats", "$new.hoppityCollectionStats")
-        event.move(43, "$old.hoppityStatsPosition", "$new.hoppityStatsPosition")
+        event.move(44, "$old.enabled", "$new.enabled")
+        event.move(44, "$old.statsDisplay", "$new.statsDisplay")
+        event.move(44, "$old.statsDisplayList", "$new.statsDisplayList")
+        event.move(44, "$old.showStackSizes", "$new.showStackSizes")
+        event.move(44, "$old.highlightUpgrades", "$new.highlightUpgrades")
+        event.move(44, "$old.useMiddleClick", "$new.useMiddleClick")
+        event.move(44, "$old.rabbitWarning", "$new.rabbitWarning")
+        event.move(44, "$old.barnCapacityThreshold", "$new.barnCapacityThreshold")
+        event.move(44, "$old.extraTooltipStats", "$new.extraTooltipStats")
+        event.move(44, "$old.timeTowerWarning", "$new.timeTowerWarning")
+        event.move(44, "$old.position", "$new.position")
+        event.move(44, "$old.compactOnClick", "$new.compactOnClick")
+        event.move(44, "$old.compactOnClickAlways", "$new.compactOnClickAlways")
+        event.move(44, "$old.tooltipMove", "$new.tooltipMove")
+        event.move(44, "$old.tooltipMovePosition", "$new.tooltipMovePosition")
+        event.move(44, "$old.hoppityMenuShortcut", "$new.hoppityMenuShortcut")
+        event.move(44, "$old.hoppityCollectionStats", "$new.hoppityCollectionStats")
+        event.move(44, "$old.hoppityStatsPosition", "$new.hoppityStatsPosition")
     }
 
     fun getChocolateBuyCost(lore: List<String>): Long? {
