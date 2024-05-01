@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.event;
+package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -16,11 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ChocolateFactoryConfig {
-
-    @Expose
-    @ConfigOption(name = "Hoppity Eggs", desc = "")
-    @Accordion
-    public HoppityEggsConfig hoppityEggs = new HoppityEggsConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all chocolate factory features.")
@@ -45,6 +40,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.CURRENT,
         ChocolateFactoryStat.THIS_PRESTIGE,
         ChocolateFactoryStat.ALL_TIME,
+        ChocolateFactoryStat.TIME_TO_PRESTIGE,
         ChocolateFactoryStat.EMPTY,
         ChocolateFactoryStat.PER_SECOND,
         ChocolateFactoryStat.PER_MINUTE,
@@ -53,6 +49,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.EMPTY_2,
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
+        ChocolateFactoryStat.TIME_TOWER,
         ChocolateFactoryStat.LEADERBOARD_POS
     ));
 
@@ -79,24 +76,27 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
-        desc = "How close should you be to your barn capacity should you be before being warned about needing to upgrade it."
+        desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
 
     @Expose
-    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
+    @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean hoppityCollectionStats = true;
+    public boolean extraTooltipStats = true;
+
+    @Expose
+    @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
+        "continuously warn when your time tower is full.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeTowerWarning = false;
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
-    public Position position = new Position(183, 160, false, true);
-
-    @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
-    public Position hoppityStatsPosition = new Position(183, 160, false, true);
+    public Position position = new Position(163, 160, false, true);
 
     @Expose
     @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate.")
@@ -118,4 +118,35 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "tooltipMove")
     public Position tooltipMovePosition = new Position(-380, 150, false, true);
+
+    @Expose
+    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityCollectionStats = true;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
+    public Position hoppityStatsPosition = new Position(163, 160, false, true);
+
+    @Expose
+    @ConfigOption(name = "Leaderboard Change",
+        desc = "Show the change of your chocolate leaderboard over time in chat. " +
+            "This updates every time you first open the /cf menu on a new server."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean leaderboardChange = false;
+
+    @Expose
+    @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityMenuShortcut = true;
+
+    @Expose
+    @ConfigOption(name = "Chocolate Shop Price", desc = "")
+    @Accordion
+    public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
+
 }

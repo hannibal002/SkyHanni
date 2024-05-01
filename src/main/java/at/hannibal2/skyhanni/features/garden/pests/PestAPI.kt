@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -136,7 +137,11 @@ object PestAPI {
                 it.pests = 0
                 it.isPestCountInaccurate = true
             }
-            if (loop > 0) fixPests(loop - 1)
+            if (loop > 0) {
+                DelayedRun.runDelayed(2.seconds) {
+                    fixPests(loop - 1)
+                }
+            }
             else sendPestError()
         }
     }

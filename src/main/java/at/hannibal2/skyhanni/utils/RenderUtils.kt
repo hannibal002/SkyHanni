@@ -47,17 +47,20 @@ object RenderUtils {
         LEFT("Left"),
         CENTER("Center"),
         RIGHT("Right"),
+        DONT_ALIGN("Don't Align"),
         ;
 
-        override fun toString(): String {
-            return value
-        }
+        override fun toString() = value
     }
 
-    enum class VerticalAlignment {
-        TOP,
-        CENTER,
-        BOTTOM,
+    enum class VerticalAlignment(private val value: String) {
+        TOP("Top"),
+        CENTER("Center"),
+        BOTTOM("Bottom"),
+        DONT_ALIGN("Don't Align"),
+        ;
+
+        override fun toString() = value
     }
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
@@ -497,6 +500,7 @@ object RenderUtils {
             HorizontalAlignment.LEFT -> offsetX.toFloat()
             HorizontalAlignment.CENTER -> offsetX + width / 2f - strLen / 2f
             HorizontalAlignment.RIGHT -> offsetX + width - strLen.toFloat()
+            else -> offsetX.toFloat()
         }
         GL11.glTranslatef(x2, 0f, 0f)
         renderer.drawStringWithShadow(display, 0f, 0f, 0)
@@ -567,6 +571,7 @@ object RenderUtils {
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
+    @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderStringsAndItems(
         list: List<List<Any?>>,
         extraSpace: Int = 0,
@@ -598,6 +603,7 @@ object RenderUtils {
      * Accepts a single line to print.
      * This  line is a list of things to print. Can print String or ItemStack objects.
      */
+    @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderSingleLineWithItems(
         list: List<Any?>,
         posLabel: String,

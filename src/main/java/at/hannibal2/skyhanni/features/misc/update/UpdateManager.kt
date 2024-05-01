@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.About
+import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.JsonElement
 import io.github.moulberry.notenoughupdates.util.ApiUtil
 import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
+import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
@@ -75,15 +76,17 @@ object UpdateManager {
         logger.log("Reset update state")
     }
 
-    fun checkUpdate() {
+    fun checkUpdate(forceDownload: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
+        var updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
             logger.log("Trying to perform update check while another update is already in progress")
             return
         }
         logger.log("Starting update check")
-        var updateStream = config.updateStream.get()
-        if (updateStream == About.UpdateStream.RELEASES && isCurrentlyBeta()) {
-            updateStream = About.UpdateStream.BETA
+        val currentStream = config.updateStream.get()
+        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || isCurrentlyBeta())) {
+            config.updateStream = Property.of(UpdateStream.BETA)
+            updateStream = UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream)
             .thenAcceptAsync({
@@ -95,16 +98,18 @@ object UpdateManager {
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
-                    if (config.fullAutoUpdates) {
-                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now. ")
+                    if (config.fullAutoUpdates || forceDownload) {
+                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now.")
                         queueUpdate()
                     } else if (config.autoUpdates) {
                         ChatUtils.chatAndOpenConfig(
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
-                            SkyHanniMod.feature.about::autoUpdates
+                            config::autoUpdates
                         )
                     }
+                } else if (forceDownload) {
+                    ChatUtils.chat("§aSkyHanni didn't find a new update.")
                 }
             }, MinecraftExecutor.OnThread)
     }

@@ -56,17 +56,32 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,
+        @Deprecated("old", ReplaceWith("clickTypeEnum"))
         val clickType: Int,
+        val clickTypeEnum: ClickType? = ClickType.getTypeById(clickType),
     ) : GuiContainerEvent(gui, container) {
 
         fun makePickblock() {
-            if (this.clickedButton == 2 && this.clickType == 3) return
+            if (this.clickedButton == 2 && this.clickTypeEnum == ClickType.HOTBAR) return
             slot?.slotNumber?.let { slotNumber ->
                 Minecraft.getMinecraft().playerController.windowClick(
                     container.windowId, slotNumber, 2, 3, Minecraft.getMinecraft().thePlayer
                 )
                 isCanceled = true
             }
+        }
+    }
+
+    enum class ClickType(val id: Int) {
+        NORMAL(1),
+        SHIFT(2),
+        HOTBAR(3),
+        MIDDLE(4),
+        DROP(5),
+        ;
+
+        companion object {
+            fun getTypeById(id: Int) = entries.firstOrNull { it.id == id }
         }
     }
 }
