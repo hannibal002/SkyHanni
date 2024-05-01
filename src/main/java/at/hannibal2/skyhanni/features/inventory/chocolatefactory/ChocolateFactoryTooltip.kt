@@ -71,7 +71,7 @@ object ChocolateFactoryTooltip {
     ): Double {
         val profileStorage = profileStorage ?: return 0.0
 
-        val baseMultiplier = profileStorage.chocolateMultiplier + baseMultiplierIncrease
+        val baseMultiplier = profileStorage.rawChocolateMultiplier + baseMultiplierIncrease
         val rawPerSecond = profileStorage.rawChocPerSecond + rawPerSecondIncrease
         val timeTowerLevel = profileStorage.timeTowerLevel + timeTowerLevelIncrease
 
