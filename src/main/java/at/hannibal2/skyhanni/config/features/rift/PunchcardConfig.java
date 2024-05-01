@@ -22,17 +22,17 @@ public class PunchcardConfig {
     public Property<String> color = Property.of("0:163:122:11:143");
 
     @Expose
-    @ConfigOption(name = "enable gui", desc = "")
+    @ConfigOption(name = "Enable Overlay", desc = "Shows an overlay with the amount of punched players.")
     @ConfigEditorBoolean
     public boolean gui = true;
 
     @Expose
-    @ConfigOption(name = "comapct gui", desc = "")
+    @ConfigOption(name = "Compact Overlay", desc = "Compacts the overlay, requires it to be enabled.")
     @ConfigEditorBoolean
     public Property<Boolean> compact = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "reverse", desc = "")
+    @ConfigOption(name = "Inverse", desc = "Highlights only punched players, also has the overlay show the amount of remaining players to punch.")
     @ConfigEditorBoolean
     public Property<Boolean> reverse = Property.of(false);
 
