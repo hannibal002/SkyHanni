@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.width
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -374,5 +375,9 @@ object StringUtils {
             }
             text = newText
         }
+    }
+
+    fun String.width(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
     }
 }

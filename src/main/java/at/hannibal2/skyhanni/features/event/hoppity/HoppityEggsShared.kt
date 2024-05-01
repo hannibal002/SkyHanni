@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager.getEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -12,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityEggsShared {
 
-    private val config get() = ChocolateFactoryAPI.config.hoppityEggs
+    private val config get() = HoppityEggsManager.config
 
     /**
      * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453
