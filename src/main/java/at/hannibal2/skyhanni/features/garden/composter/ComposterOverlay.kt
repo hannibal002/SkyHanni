@@ -494,7 +494,8 @@ object ComposterOverlay {
             HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
-            val isDwarvenMineable = internalName.let { it.equals("VOLTA") || it.equals("OIL_BARREL") || it.equals("BIOFUEL") }
+            val isDwarvenMineable =
+                internalName.let { it.equals("VOLTA") || it.equals("OIL_BARREL") || it.equals("BIOFUEL") }
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
