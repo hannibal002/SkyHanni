@@ -15,18 +15,24 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.roundToInt
@@ -55,6 +61,8 @@ class TunnelsMaps {
     private var active: String = ""
 
     private lateinit var fairySouls: Map<String, GraphNode>
+    private lateinit var newGemstones: Map<String, List<GraphNode>>
+    private lateinit var oldGemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>
 
     private fun getNext(name: String = active): GraphNode? {
@@ -68,8 +76,9 @@ class TunnelsMaps {
 
         val offCooldown = list.filter { cooldowns[it]?.isInPast() != false }
         val goodOnes = offCooldown.filter { it.position.distanceSqToPlayer() > 400.0 }
-        val best = goodOnes.minByOrNull { graph.findShortestDistance(closed, it) }
-            ?: list.minBy { cooldowns[it] ?: SimpleTimeMark.farPast() }
+        val best = goodOnes.minByOrNull { graph.findShortestDistance(closed, it) } ?: list.minBy {
+            cooldowns[it] ?: SimpleTimeMark.farPast()
+        }
 
         cooldowns[best] = 25.0.seconds.fromNow()
         goalReached = false
@@ -81,15 +90,36 @@ class TunnelsMaps {
         return list.size > 1
     }
 
+    private val oldGemstonePattern by RepoPattern.pattern(
+        "mining.tunnels.maps.gem.old", ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*"
+    )
+    private val newGemstonePattern by RepoPattern.pattern(
+        "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*"
+    )
+
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
-        campfire = graph.first { it.name?.contains("Campfire") ?: false }
-        fairySouls = possibleLocations.filter { it.key.contains("Fairy") }.mapValues { it.value.first() }
-        normalLocations = possibleLocations.filterNot { fairySouls.contains(it.key) && campfire.name != it.key }
+        val fairy = mutableMapOf<String, GraphNode>()
+        val oldGemstone = mutableMapOf<String, List<GraphNode>>()
+        val newGemstone = mutableMapOf<String, List<GraphNode>>()
+        val other = mutableMapOf<String, List<GraphNode>>()
+        possibleLocations.forEach { (key, value) ->
+            when {
+                key.contains("Campfire") -> campfire = value.first()
+                key.contains("Fairy") -> fairy[key] = value.first()
+                newGemstonePattern.matches(key) -> newGemstone[key] = value
+                oldGemstonePattern.matches(key) -> oldGemstone[key] = value
+                else -> other[key] = value
+            }
+        }
+        fairySouls = fairy
+        this.newGemstones = newGemstone
+        this.oldGemstones = oldGemstone
+        normalLocations = other
     }
 
     @SubscribeEvent
@@ -119,36 +149,51 @@ class TunnelsMaps {
             add(Renderable.string("§6Loactions:"))
             add(
                 Renderable.multiClickAndHover(
-                    campfire.name!!,
-                    listOf(
-                        "§eLeft Click to set active",
-                        "§eRight Click for override"
-                    ),
-                    click = mapOf(
-                        0 to guiSetActive(campfire.name!!),
-                        1 to ::campfireOverride
+                    campfire.name!!, listOf(
+                        "§eLeft Click to set active", "§eRight Click for override"
+                    ), click = mapOf(
+                        0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride
                     )
                 )
             )
-            add(
-                Renderable.hoverable(
-                    Renderable.horizontalContainer(
-                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
-                            val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
-                        }
+            add(Renderable.hoverable(Renderable.horizontalContainer(listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                val name = it.key.removePrefix("§dFairy Soul ")
+                Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
+            }
 
-                    ),
-                    Renderable.string("§dFairy Souls")
+            ), Renderable.string("§dFairy Souls")))
+            if (config.compactGemstone) {
+                add(
+                    Renderable.table(
+                        listOf(
+                            newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName)
+                        )
+                    )
                 )
-            )
-
+            } else {
+                addAll(newGemstones.map {
+                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                })
+                addAll(oldGemstones.map {
+                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                })
+            }
             addAll(normalLocations.map {
                 Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
             })
         }
         config.position.renderRenderables(display, posLabel = "TunnelsMaps")
     }
+
+    private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
+        Renderable.string((it.key.getFirstColorCode()?.let { "§$it" } ?: "") + ("ROUGH_".plus(
+            it.key.removeColor().removeSuffix("stone")
+        ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()),
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        ),
+        tips = listOf(it.key),
+        onClick = guiSetActive(it.key),
+    )
 
     private fun campfireOverride() {
         goalReached = false
@@ -238,10 +283,7 @@ class TunnelsMaps {
     }
 
     val areas = setOf(
-        "Glacite Tunnels",
-        "Dwarven Base Camp",
-        "Glacite Lake",
-        "Fossil Research Center"
+        "Glacite Tunnels", "Dwarven Base Camp", "Glacite Lake", "Fossil Research Center"
     )
 
     private fun isEnabled() =

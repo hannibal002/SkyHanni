@@ -45,4 +45,9 @@ public class TunnelMapsConfig {
     @ConfigOption(name = "Path Colour", desc = "The colour for the paths, if the dynamic colour option is turned off.")
     @ConfigEditorColour
     public String pathColour = "0:255:0:255:0";
+
+    @Expose
+    @ConfigOption(name = "Compact Gemstone", desc = "Only shows the icon for gemstones in the selection list.")
+    @ConfigEditorBoolean
+    public boolean compactGemstone = false;
 }
