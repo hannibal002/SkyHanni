@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class TunnelMapsConfig {
@@ -49,5 +50,5 @@ public class TunnelMapsConfig {
     @Expose
     @ConfigOption(name = "Compact Gemstone", desc = "Only shows the icon for gemstones in the selection list.")
     @ConfigEditorBoolean
-    public boolean compactGemstone = false;
+    public Property<Boolean> compactGemstone = Property.of(false);
 }

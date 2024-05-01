@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestDistance
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -15,6 +16,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -64,6 +67,8 @@ class TunnelsMaps {
     private lateinit var newGemstones: Map<String, List<GraphNode>>
     private lateinit var oldGemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>
+
+    private var locationDisplay: List<Renderable> = emptyList()
 
     private fun getNext(name: String = active): GraphNode? {
         fairySouls[name]?.let {
@@ -120,6 +125,18 @@ class TunnelsMaps {
         this.newGemstones = newGemstone
         this.oldGemstones = oldGemstone
         normalLocations = other
+        DelayedRun.runNextTick { // Needs to be delayed since the config may not be loaded
+            locationDisplay = generateLocationsDisplay()
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        onToggle(
+            config.compactGemstone
+        ) {
+            locationDisplay = generateLocationsDisplay()
+        }
     }
 
     @SubscribeEvent
@@ -146,43 +163,47 @@ class TunnelsMaps {
                 add(Renderable.string(""))
                 add(Renderable.string(""))
             }
-            add(Renderable.string("§6Loactions:"))
+            addAll(locationDisplay)
+        }
+        config.position.renderRenderables(display, posLabel = "TunnelsMaps")
+    }
+
+    private fun generateLocationsDisplay() = buildList {
+        add(Renderable.string("§6Loactions:"))
+        add(
+            Renderable.multiClickAndHover(
+                campfire.name!!, listOf(
+                    "§eLeft Click to set active", "§eRight Click for override"
+                ), click = mapOf(
+                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride
+                )
+            )
+        )
+        add(Renderable.hoverable(Renderable.horizontalContainer(listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+            val name = it.key.removePrefix("§dFairy Soul ")
+            Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
+        }
+
+        ), Renderable.string("§dFairy Souls")))
+        if (config.compactGemstone.get()) {
             add(
-                Renderable.multiClickAndHover(
-                    campfire.name!!, listOf(
-                        "§eLeft Click to set active", "§eRight Click for override"
-                    ), click = mapOf(
-                        0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride
+                Renderable.table(
+                    listOf(
+                        newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName)
                     )
                 )
             )
-            add(Renderable.hoverable(Renderable.horizontalContainer(listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
-                val name = it.key.removePrefix("§dFairy Soul ")
-                Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
-            }
-
-            ), Renderable.string("§dFairy Souls")))
-            if (config.compactGemstone) {
-                add(
-                    Renderable.table(
-                        listOf(
-                            newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName)
-                        )
-                    )
-                )
-            } else {
-                addAll(newGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-                })
-                addAll(oldGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-                })
-            }
-            addAll(normalLocations.map {
+        } else {
+            addAll(newGemstones.map {
+                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+            })
+            addAll(oldGemstones.map {
                 Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
             })
         }
-        config.position.renderRenderables(display, posLabel = "TunnelsMaps")
+        addAll(normalLocations.map {
+            Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+        })
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
