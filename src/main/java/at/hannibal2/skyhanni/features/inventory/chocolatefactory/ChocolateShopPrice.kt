@@ -73,6 +73,7 @@ object ChocolateShopPrice {
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eCoins per million chocolate§f:"))
         // TODO update this value every second
+        // TODO add time until can afford
         newList.add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
         newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         display = newList
