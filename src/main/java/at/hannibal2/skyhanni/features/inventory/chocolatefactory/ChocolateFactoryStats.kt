@@ -1,17 +1,16 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration
 
 object ChocolateFactoryStats {
 
@@ -19,6 +18,13 @@ object ChocolateFactoryStats {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var display = listOf<Renderable>()
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
+        updateDisplay()
+    }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -35,60 +41,50 @@ object ChocolateFactoryStats {
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
-        val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
+
+        val position = ChocolateFactoryAPI.leaderboardPosition
+        val positionText = position?.addSeparators() ?: "???"
         val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" } ?: ""
+        val leaderboard = "#$positionText $percentile"
+        ChocolatePositionChange.update(position, leaderboard)
+
         val timeTowerInfo = if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
             "§d§lActive"
         } else {
             "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
         }
 
-        val timeUntilPrestige = ChocolateAmount.PRESTIGE.timeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
+        val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
 
-        // todo once TimeUtils.formatDuration() is no longer used add custom formatting for infinite
-        val prestigeEstimate = if (timeUntilPrestige == Duration.INFINITE) {
-            "§cNever"
-        } else {
-            "§6${timeUntilPrestige.format()}"
+        val map = buildMap {
+            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory Stats")
+
+            put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
+            put(ChocolateFactoryStat.THIS_PRESTIGE, "§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
+            put(ChocolateFactoryStat.ALL_TIME, "§eAll-time: §6${ChocolateAmount.ALL_TIME.formatted}")
+
+            put(ChocolateFactoryStat.PER_SECOND, "§ePer Second: §6${perSecond.addSeparators()}")
+            put(ChocolateFactoryStat.PER_MINUTE, "§ePer Minute: §6${perMinute.addSeparators()}")
+            put(ChocolateFactoryStat.PER_HOUR, "§ePer Hour: §6${perHour.addSeparators()}")
+            put(ChocolateFactoryStat.PER_DAY, "§ePer Day: §6${perDay.addSeparators()}")
+
+            put(ChocolateFactoryStat.MULTIPLIER, "§eChocolate Multiplier: §6${profileStorage.chocolateMultiplier}")
+            put(ChocolateFactoryStat.BARN, "§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
+
+            put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §b$leaderboard")
+
+            put(ChocolateFactoryStat.EMPTY, "")
+            put(ChocolateFactoryStat.EMPTY_2, "")
+            put(ChocolateFactoryStat.EMPTY_3, "")
+
+            put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
+            put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
+            put(
+                ChocolateFactoryStat.RAW_PER_SECOND,
+                "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}"
+            )
         }
-
-        val text = formatList(buildList {
-            add("§6§lChocolate Factory Stats")
-
-            add("§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
-            add("§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
-            add("§eAll-time: §6${ChocolateAmount.ALL_TIME.formatted}")
-
-            add("§ePer Second: §6${perSecond.addSeparators()}")
-            add("§ePer Minute: §6${perMinute.addSeparators()}")
-            add("§ePer Hour: §6${perHour.addSeparators()}")
-            add("§ePer Day: §6${perDay.addSeparators()}")
-
-            add("§eChocolate Multiplier: §6${profileStorage.chocolateMultiplier}")
-            add("§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
-
-            add("§ePosition: §7#§b$position $percentile")
-
-            add("")
-            add("")
-            add("")
-
-            add("§eTime Tower: §6$timeTowerInfo")
-            add("§eTime To Prestige: $prestigeEstimate")
-            add("§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}")
-        })
-
-        // TODO keep counting, we dont want pauses
-//         val firstElement = displayText.firstOrNull { it.isNotEmpty() } ?: return
-//
-//         if (ChocolateFactoryAPI.chocolateFactoryPaused) {
-//             val leftMargin = (firstElement.width() - "§f(§cPaused§f)".width()) / 2
-//             val spaceWidth = " ".width()
-//             displayText.add(0, "${" ".repeat(leftMargin / spaceWidth)}§f(§cPaused§f)")
-//         } else {
-//             displayText.add(0, "")
-//         }
-//         displayList = displayText.map(Renderable::string).toMutableList()
+        val text = config.statsDisplayList.mapNotNull { map[it] }
 
         display = listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(text.map(Renderable::string)),
@@ -104,13 +100,6 @@ object ChocolateFactoryStats {
                 ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
             }
         ))
-    }
-
-    private fun formatList(list: List<String>): List<String> {
-        return config.statsDisplayList
-            .filter { it.shouldDisplay() }
-            .map { list[it.ordinal] }
-            .toMutableList()
     }
 
     @SubscribeEvent
@@ -136,7 +125,7 @@ object ChocolateFactoryStats {
         PER_DAY("§ePer Day: §6326,654,208"),
         MULTIPLIER("§eChocolate Multiplier: §61.77"),
         BARN("§eBarn: §6171/190 Rabbits"),
-        LEADERBOARD_POS("§ePosition: §7#§b103 §7Top §a0.87%"),
+        LEADERBOARD_POS("§ePosition: §b#103 §7Top §a0.87%"),
         EMPTY(""),
         EMPTY_2(""),
         EMPTY_3(""),

@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,6 +25,14 @@ object ChocolateFactoryBarnManager {
         "§7§lDUPLICATE RABBIT! §6\\+[\\d,]+ Chocolate"
     )
 
+    /**
+     * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
+     */
+    private val rabbitCrashedPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.duplicate",
+        "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6.+ Chocolate"
+    )
+
     var barnFull = false
     private var lastBarnFullWarning = SimpleTimeMark.farPast()
 
@@ -39,6 +48,10 @@ object ChocolateFactoryBarnManager {
         }
 
         rabbitDuplicatePattern.matchMatcher(event.message) {
+            HoppityEggsManager.shareWaypointPrompt()
+        }
+
+        rabbitCrashedPattern.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
         }
     }

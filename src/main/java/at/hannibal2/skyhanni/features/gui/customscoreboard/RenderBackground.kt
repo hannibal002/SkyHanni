@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 
 class RenderBackground {
+
     fun renderBackground() {
         val alignmentConfig = CustomScoreboard.alignmentConfig
         val backgroundConfig = CustomScoreboard.backgroundConfig
@@ -28,29 +29,12 @@ class RenderBackground {
         val elementWidth = position.getDummySize().x
         val elementHeight = position.getDummySize().y
 
-        val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
-        val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
-
         // Update the position to the alignment options
         if (
-            alignmentConfig.alignRight
-            || alignmentConfig.alignCenterVertically
+            alignmentConfig.horizontalAlignment != RenderUtils.HorizontalAlignment.DONT_ALIGN
+            || alignmentConfig.verticalAlignment != RenderUtils.VerticalAlignment.DONT_ALIGN
         ) {
-            var newX = if (alignmentConfig.alignRight) scaledWidth - elementWidth - (border * 2) else x
-            val newY = if (alignmentConfig.alignCenterVertically) scaledHeight / 2 - elementHeight / 2 else y
-
-            if (outlineConfig.enabled) {
-                newX -= outlineConfig.thickness / 2
-            }
-
-            position.set(
-                Position(
-                    newX,
-                    newY,
-                    position.getScale(),
-                    position.isCenter
-                )
-            )
+            position.set(updatePosition(position))
         }
 
         if (GuiEditManager.isInGui()) return
@@ -82,23 +66,76 @@ class RenderBackground {
                     backgroundConfig.color.toChromaColor().rgb,
                     backgroundConfig.roundedCornerSmoothness
                 )
-                if (outlineConfig.enabled) {
-                    RenderUtils.drawRoundRectOutline(
-                        x - border,
-                        y - border,
-                        elementWidth + border * 3,
-                        elementHeight + border * 2,
-                        outlineConfig.colorTop.toChromaColor().rgb,
-                        outlineConfig.colorBottom.toChromaColor().rgb,
-                        outlineConfig.thickness,
-                        backgroundConfig.roundedCornerSmoothness,
-                        outlineConfig.blur
-                    )
-                }
+            }
+            if (outlineConfig.enabled) {
+                RenderUtils.drawRoundRectOutline(
+                    x - border,
+                    y - border,
+                    elementWidth + border * 3,
+                    elementHeight + border * 2,
+                    outlineConfig.colorTop.toChromaColor().rgb,
+                    outlineConfig.colorBottom.toChromaColor().rgb,
+                    outlineConfig.thickness,
+                    backgroundConfig.roundedCornerSmoothness,
+                    outlineConfig.blur
+                )
             }
         }
         GL11.glDepthMask(true)
         GlStateManager.popMatrix()
         GlStateManager.popAttrib()
+    }
+
+    private fun updatePosition(position: Position): Position {
+        val alignmentConfig = CustomScoreboard.alignmentConfig
+        val backgroundConfig = CustomScoreboard.backgroundConfig
+        val outlineConfig = backgroundConfig.outline
+        val border = backgroundConfig.borderSize
+
+        val x = position.getAbsX()
+        val y = position.getAbsY()
+
+        val elementWidth = position.getDummySize().x
+        val elementHeight = position.getDummySize().y
+
+        val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+        val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+
+
+        var newX = when (alignmentConfig.horizontalAlignment) {
+            RenderUtils.HorizontalAlignment.LEFT -> border
+            RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - (elementWidth + border * 3) / 2
+            RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - (elementWidth + border * 2)
+            else -> x
+        }
+
+        var newY = when (alignmentConfig.verticalAlignment) {
+            RenderUtils.VerticalAlignment.TOP -> border
+            RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - (elementHeight + border * 2) / 2
+            RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - border
+            else -> y
+        }
+
+        if (outlineConfig.enabled) {
+            val thickness = outlineConfig.thickness
+            if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.RIGHT) {
+                newX -= thickness / 2
+            } else if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.LEFT) {
+                newX += thickness / 2
+            }
+
+            if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.TOP) {
+                newY += thickness / 2
+            } else if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.BOTTOM) {
+                newY -= thickness / 2
+            }
+        }
+
+        return Position(
+            newX,
+            newY,
+            position.getScale(),
+            position.isCenter
+        )
     }
 }

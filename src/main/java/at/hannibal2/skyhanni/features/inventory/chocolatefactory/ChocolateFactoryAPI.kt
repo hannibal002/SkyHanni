@@ -1,16 +1,17 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.event.ChocolateFactoryConfig
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -36,7 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryAPI {
 
-    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.event.chocolateFactory
+    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
@@ -98,7 +99,7 @@ object ChocolateFactoryAPI {
     )
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
-        "Hoppity|Chocolate Shop|Chocolate Factory Milestones"
+        "Hoppity|Chocolate Factory Milestones"
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -107,10 +108,13 @@ object ChocolateFactoryAPI {
     var barnIndex = 34
     private var infoIndex = 13
     private var productionInfoIndex = 45
-    private var prestigeIndex = 28
+    var prestigeIndex = 28
     var milestoneIndex = 53
     private var leaderboardIndex = 51
+    var handCookieIndex = 38
     var timeTowerIndex = 39
+    var shrineIndex = 41
+    var coachRabbitIndex = 42
     var maxRabbits = 395
 
     var inChocolateFactory = false
@@ -174,7 +178,7 @@ object ChocolateFactoryAPI {
             }
 
             val lore = item.getLore()
-            val upgradeCost = lore.getUpgradeCost() ?: continue
+            val upgradeCost = getChocolateBuyCost(lore) ?: continue
 
             val canAfford = upgradeCost <= ChocolateAmount.CURRENT.chocolate()
             if (canAfford) upgradeableSlots.add(slotIndex)
@@ -316,14 +320,41 @@ object ChocolateFactoryAPI {
         prestigeIndex = data.prestigeIndex
         milestoneIndex = data.milestoneIndex
         leaderboardIndex = data.leaderboardIndex
+        handCookieIndex = data.handCookieIndex
         timeTowerIndex = data.timeTowerIndex
+        shrineIndex = data.shrineIndex
+        coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
 
-        val disabledFeatures = event.getConstant<DisabledFeaturesJson>("DisabledFeatures")
+        ChocolateFactoryTooltip.updateIgnoredSlots()
     }
 
-    private fun List<String>.getUpgradeCost(): Long? {
-        val nextLine = this.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val old = "event.chocolateFactory"
+        val new = "inventory.chocolateFactory"
+        event.move(44, "$old.enabled", "$new.enabled")
+        event.move(44, "$old.statsDisplay", "$new.statsDisplay")
+        event.move(44, "$old.statsDisplayList", "$new.statsDisplayList")
+        event.move(44, "$old.showStackSizes", "$new.showStackSizes")
+        event.move(44, "$old.highlightUpgrades", "$new.highlightUpgrades")
+        event.move(44, "$old.useMiddleClick", "$new.useMiddleClick")
+        event.move(44, "$old.rabbitWarning", "$new.rabbitWarning")
+        event.move(44, "$old.barnCapacityThreshold", "$new.barnCapacityThreshold")
+        event.move(44, "$old.extraTooltipStats", "$new.extraTooltipStats")
+        event.move(44, "$old.timeTowerWarning", "$new.timeTowerWarning")
+        event.move(44, "$old.position", "$new.position")
+        event.move(44, "$old.compactOnClick", "$new.compactOnClick")
+        event.move(44, "$old.compactOnClickAlways", "$new.compactOnClickAlways")
+        event.move(44, "$old.tooltipMove", "$new.tooltipMove")
+        event.move(44, "$old.tooltipMovePosition", "$new.tooltipMovePosition")
+        event.move(44, "$old.hoppityMenuShortcut", "$new.hoppityMenuShortcut")
+        event.move(44, "$old.hoppityCollectionStats", "$new.hoppityCollectionStats")
+        event.move(44, "$old.hoppityStatsPosition", "$new.hoppityStatsPosition")
+    }
+
+    fun getChocolateBuyCost(lore: List<String>): Long? {
+        val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
         }
