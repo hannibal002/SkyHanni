@@ -130,6 +130,15 @@ public class ChocolateFactoryConfig {
     public Position hoppityStatsPosition = new Position(163, 160, false, true);
 
     @Expose
+    @ConfigOption(name = "Leaderboard Change",
+        desc = "Show the change of your chocolate leaderboard over time in chat. " +
+            "This updates every time you first open the /cf menu on a new server."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean leaderboardChange = false;
+
+    @Expose
     @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
     @ConfigEditorBoolean
     @FeatureToggle
