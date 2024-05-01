@@ -84,7 +84,7 @@ class TunnelsMaps {
             cooldowns[it] ?: SimpleTimeMark.farPast()
         }
 
-        cooldowns[best] = 25.0.seconds.fromNow()
+        cooldowns[best] = 60.0.seconds.fromNow()
         goalReached = false
         return best
     }
