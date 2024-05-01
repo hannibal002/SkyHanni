@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestDistance
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
+import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -21,7 +21,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -46,7 +48,7 @@ class TunnelsMaps {
         }
 
     private var closedNote: GraphNode? = null
-    private var path: Graph? = null
+    private var path: Pair<Graph, Double>? = null
 
     private var possibleLocations = mapOf<String, List<GraphNode>>()
     private val cooldowns = mutableMapOf<GraphNode, SimpleTimeMark>()
@@ -79,7 +81,7 @@ class TunnelsMaps {
         return list.size > 1
     }
 
-    @SubscribeEvent // TODO lift up all nodes from the ground
+    @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
@@ -167,19 +169,22 @@ class TunnelsMaps {
         val closest = closedNote ?: return
         val goal = goal ?: return
         if (closest == prevClosed && goal == prevGoal) return
-        val path = graph.findShortestPathAsGraph(closest, goal)
+        val (path, distance) = graph.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
+
+        val playerPosition = LocationUtils.playerLocation()
+        val nodeDistance = first?.let { playerPosition.distance(it.position) } ?: 0.0
         if (first != null && second != null) {
-            val playerPosition = LocationUtils.playerLocation()
             val direct = playerPosition.distance(second.position)
-            val around = playerPosition.distance(first.position) + first.neighbours[second]!!
+            val firstPath = first.neighbours[second] ?: 0.0
+            val around = nodeDistance + firstPath
             if (direct < around) {
-                this.path = Graph(path.drop(1))
+                this.path = Graph(path.drop(1)) to (distance - firstPath + direct)
                 return
             }
         }
-        this.path = path
+        this.path = path to (distance + nodeDistance)
     }
 
     private fun checkGoalReached(): Boolean {
@@ -196,8 +201,9 @@ class TunnelsMaps {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        val path = path ?: return
-        event.draw3DPathWithWaypoint(path, getPathColor(), 7, true, bezierPoint = 2.0)
+        val path = path?.takeIf { it.first.isNotEmpty() } ?: return
+        event.draw3DPathWithWaypoint(path.first, getPathColor(), 7, true, bezierPoint = 2.0)
+        event.drawDynamicText(path.first.last().position, "§e${path.second.round(1)}", 1.0, yOff = 9.5f)
     }
 
     private fun getPathColor(): Color = if (config.dynamicPathColour) {
