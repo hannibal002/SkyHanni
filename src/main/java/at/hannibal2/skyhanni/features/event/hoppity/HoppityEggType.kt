@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import kotlin.time.Duration
 
 enum class HoppityEggType(
     val mealName: String,
@@ -14,6 +16,15 @@ enum class HoppityEggType(
     DINNER("Dinner", 21, "§6"),
     ;
 
+    fun timeUntil(): Duration {
+        val hour = SkyBlockTime.now().hour
+        if (hour >= resetsAt) {
+            return SkyBlockTime.now().copy(day = SkyBlockTime.now().day + 1, hour = resetsAt, minute = 0, second = 0)
+                .asTimeMark().timeUntil()
+        }
+        return SkyBlockTime.now().copy(hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
+    }
+
     fun markClaimed() {
         claimed = true
     }
@@ -23,7 +34,7 @@ enum class HoppityEggType(
     }
 
     fun isClaimed() = claimed
-    val formattedName by lazy { "$mealColour$mealName" }
+    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColour}$mealName:$mealColour"
 
     companion object {
         fun allFound() = entries.forEach { it.markClaimed() }
