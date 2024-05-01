@@ -18,4 +18,6 @@ public interface AccessorGuiContainer {
     @Accessor("guiTop")
     int getGuiTop();
 
+    @Invoker("drawGuiContainerBackgroundLayer")
+    void invokeDrawGuiContainerBackgroundLayer_skyhanni(float f, int i, int mouseY);
 }
