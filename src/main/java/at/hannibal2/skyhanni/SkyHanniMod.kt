@@ -126,16 +126,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonsRaceGuide
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
 import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryInventory
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryStats
-import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggPlayerOpacityChanger
-import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsManager
-import at.hannibal2.skyhanni.features.event.chocolatefactory.HoppityEggsShared
-import at.hannibal2.skyhanni.features.event.chocolatefactory.clicks.FactoryItemTooltipFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -148,6 +138,7 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggPlayerOpacityChanger
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc

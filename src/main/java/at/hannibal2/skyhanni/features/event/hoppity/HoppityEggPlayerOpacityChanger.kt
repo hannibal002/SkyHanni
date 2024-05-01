@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 object HoppityEggPlayerOpacityChanger {
-    private val config get() = ChocolateFactoryAPI.config.hoppityEggs
+    private val config get() = HoppityEggsManager.config
     private var armor = mapOf<Int, ItemStack>()
 
     private fun hideNearbyPlayer(entity: EntityPlayer, location: LorenzVec) {
@@ -34,13 +35,12 @@ object HoppityEggPlayerOpacityChanger {
         }
     }
 
-
     @SubscribeEvent
     fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         if (!isEnabled()) return
         if (event.entity !is EntityPlayer) return
         if (event.entity.name == LorenzUtils.getPlayerName()) return
-        HoppityEggLocator.sharedEggLocation?.let { sharedEggLocation -> hideNearbyPlayer(event.entity, sharedEggLocation) }
+        HoppityEggLocator.sharedEggLocation?.let { hideNearbyPlayer(event.entity, it) }
         HoppityEggLocator.possibleEggLocations.forEach { hideNearbyPlayer(event.entity, it) }
     }
 
