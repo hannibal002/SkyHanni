@@ -201,13 +201,13 @@ class HoppityCollectionStats {
         val chocolateMultiplier: Double,
         val item: NEUInternalName,
     ) {
+        TOTAL("§cTotal", 0, 0.0, "STAINED_GLASS-14".asInternalName()),
         COMMON("§fCommon", 1, 0.002, "STAINED_GLASS".asInternalName()),
         UNCOMMON("§aUncommon", 2, 0.003, "STAINED_GLASS-5".asInternalName()),
         RARE("§9Rare", 4, 0.004, "STAINED_GLASS-11".asInternalName()),
         EPIC("§5Epic", 10, 0.005, "STAINED_GLASS-10".asInternalName()),
         LEGENDARY("§6Legendary", 0, 0.02, "STAINED_GLASS-1".asInternalName()),
         MYTHIC("§dMythic", 0, 0.0, "STAINED_GLASS-6".asInternalName()),
-        TOTAL("§cTotal", 0, 0.0, "STAINED_GLASS-14".asInternalName()),
         ;
 
         companion object {
