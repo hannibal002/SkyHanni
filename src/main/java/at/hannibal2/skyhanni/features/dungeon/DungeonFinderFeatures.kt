@@ -243,7 +243,9 @@ class DungeonFinderFeatures {
                     group("className")
                 }
             }
-            if (memberLevels.any { (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel }) {
+            if ((memberLevels.any {
+                    (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel
+                }) && config.markBelowClassLevel != 0) {
                 map[slot] = LorenzColor.YELLOW
                 continue
             }
