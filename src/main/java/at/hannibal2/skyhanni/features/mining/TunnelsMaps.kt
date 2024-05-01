@@ -80,8 +80,7 @@ class TunnelsMaps {
         val list = possibleLocations[name] ?: return null
 
         val offCooldown = list.filter { cooldowns[it]?.isInPast() != false }
-        val goodOnes = offCooldown.filter { it.position.distanceSqToPlayer() > 400.0 }
-        val best = goodOnes.minByOrNull { graph.findShortestDistance(closed, it) } ?: list.minBy {
+        val best = offCooldown.minByOrNull { graph.findShortestDistance(closed, it) } ?: list.minBy {
             cooldowns[it] ?: SimpleTimeMark.farPast()
         }
 
