@@ -84,7 +84,7 @@ object ChocolateFactoryStats {
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}"
             )
         }
-        val text = config.statsDisplayList.mapNotNull { map[it] }
+        val text = config.statsDisplayList.filter { it.shouldDisplay() }.mapNotNull { map[it] }
 
         display = listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(text.map(Renderable::string)),
