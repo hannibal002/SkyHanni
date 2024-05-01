@@ -131,6 +131,8 @@ object VisitorAPI {
     ) {
         var offersAccepted: Int? = null
         var pricePerCopper: Int? = null
+        var totalPrice: Double? = null
+        var totalReward: Double? = null
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
@@ -195,11 +197,16 @@ object VisitorAPI {
 
     fun Visitor.blockReason(): VisitorBlockReason? = with(config.rewardWarning) {
         val pricePerCopper = pricePerCopper ?: error("pricePerCopper is null")
+        val totalPrice = totalPrice ?: error("totalPrice is null")
+        val totalReward = totalReward ?: error("totalReward is null")
+        val loss = totalPrice - totalReward;
         return when {
             preventRefusing && hasReward() != null -> VisitorBlockReason.RARE_REWARD
             preventRefusingNew && offersAccepted == 0 -> VisitorBlockReason.NEVER_ACCEPTED
             preventRefusingCopper && pricePerCopper <= coinsPerCopperPrice -> VisitorBlockReason.CHEAP_COPPER
             preventAcceptingCopper && pricePerCopper > coinsPerCopperPrice -> VisitorBlockReason.EXPENSIVE_COPPER
+            preventRefusingLowLoss && loss <= coinsLossThreshold -> VisitorBlockReason.LOW_LOSS
+            preventAcceptingHighLoss && loss > coinsLossThreshold -> VisitorBlockReason.HIGH_LOSS
 
             else -> null
         }
@@ -209,6 +216,8 @@ object VisitorAPI {
         NEVER_ACCEPTED("§cNever accepted", true),
         RARE_REWARD("§aRare visitor reward found", true),
         CHEAP_COPPER("§aCheap copper", true),
-        EXPENSIVE_COPPER("§cExpensive copper", false)
+        EXPENSIVE_COPPER("§cExpensive copper", false),
+        LOW_LOSS("§cLow Loss", true),
+        HIGH_LOSS("§aHigh Loss", false)
     }
 }
