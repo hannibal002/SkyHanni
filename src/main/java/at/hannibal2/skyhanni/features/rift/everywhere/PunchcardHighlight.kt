@@ -115,7 +115,7 @@ class PunchcardHighlight {
         playerList.clear()
         playerQueue.clear()
         MobData.players.forEach {
-            RenderLivingEntityHelper.removeEntityColor(it.baseEntity)
+            colorPlayer(it.baseEntity, true)
         }
     }
 
