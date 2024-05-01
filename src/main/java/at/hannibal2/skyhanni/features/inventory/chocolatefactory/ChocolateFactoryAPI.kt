@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
@@ -35,7 +36,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryAPI {
-    val config get() = SkyHanniMod.feature.inventory.chocolateFactory
+    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
@@ -97,7 +98,7 @@ object ChocolateFactoryAPI {
     )
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
-        "Hoppity|Chocolate Shop|Chocolate Factory Milestones"
+        "Hoppity|Chocolate Factory Milestones"
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -176,7 +177,7 @@ object ChocolateFactoryAPI {
             }
 
             val lore = item.getLore()
-            val upgradeCost = getChocolateUpgradeCost(lore) ?: continue
+            val upgradeCost = getChocolateBuyCost(lore) ?: continue
 
             val canAfford = upgradeCost <= ChocolateAmount.CURRENT.chocolate()
             if (canAfford) upgradeableSlots.add(slotIndex)
@@ -351,7 +352,7 @@ object ChocolateFactoryAPI {
         event.move(44, "$old.hoppityStatsPosition", "$new.hoppityStatsPosition")
     }
 
-    fun getChocolateUpgradeCost(lore: List<String>): Long? {
+    fun getChocolateBuyCost(lore: List<String>): Long? {
         val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
