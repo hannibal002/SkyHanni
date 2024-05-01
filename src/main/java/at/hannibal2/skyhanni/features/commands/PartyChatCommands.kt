@@ -15,6 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 object PartyChatCommands {
 
     private val config get() = SkyHanniMod.feature.misc.partyCommands
+    private val storage get() = SkyHanniMod.feature.storage
 
     data class PartyChatCommand(
         val names: List<String>,
@@ -76,7 +77,7 @@ object PartyChatCommands {
     private val commandPrefixes = ".!?".toSet()
 
     private fun isBlockedUser(name: String): Boolean {
-        return config.blacklistedUsers.any { it.equals(name, ignoreCase = true) }
+        return storage.blacklistedUsers.any { it.equals(name, ignoreCase = true) }
     }
 
     @SubscribeEvent
@@ -162,7 +163,7 @@ object PartyChatCommands {
             "clear" -> {
                 ChatUtils.clickableChat("Are you sure you want to do this? Click here to confirm.",
                     onClick = {
-                        config.blacklistedUsers.clear()
+                        storage.blacklistedUsers.clear()
                         ChatUtils.chat("Cleared your ignored players list!")
                     })
             }
@@ -172,18 +173,18 @@ object PartyChatCommands {
     }
 
     private fun blacklistModify(player: String) {
-        if (player !in config.blacklistedUsers) {
+        if (player !in storage.blacklistedUsers) {
             ChatUtils.chat("§cNow ignoring §b$player§e!")
-            config.blacklistedUsers.add(player)
+            storage.blacklistedUsers.add(player)
             return
         }
         ChatUtils.chat("§aStopped ignoring §b$player§e!")
-        config.blacklistedUsers.remove(player)
+        storage.blacklistedUsers.remove(player)
         return
     }
 
     private fun blacklistView() {
-        val blacklist = config.blacklistedUsers
+        val blacklist = storage.blacklistedUsers
         if (blacklist.size <= 0) {
             ChatUtils.chat("Your ignored players list is empty!")
             return

@@ -6,9 +6,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PartyCommandsConfig {
 
     @Expose
@@ -53,7 +50,4 @@ public class PartyCommandsConfig {
     @ConfigEditorBoolean
     @ConfigOption(name = "Show reminder", desc = "Shows a reminder when an unauthorized player tries to run a command.")
     public boolean showIgnoredReminder = true;
-
-    @Expose
-    public List<String> blacklistedUsers = new ArrayList<>();
 }
