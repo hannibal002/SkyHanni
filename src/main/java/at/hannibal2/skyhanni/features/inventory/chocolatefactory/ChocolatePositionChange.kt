@@ -11,6 +11,7 @@ object ChocolatePositionChange {
     private val storage get() = ChocolateFactoryAPI.profileStorage?.positionChange
 
     fun update(position: Int?, leaderboard: String) {
+        position ?: return
         val storage = storage ?: return
         val lastTime = storage.lastTime?.let { SimpleTimeMark(it) }
         val lastPosition = storage.lastPosition
@@ -20,24 +21,20 @@ object ChocolatePositionChange {
 
         lastLeaderboard?.let { lastLb ->
             var message = "$lastLb §c-> $leaderboard"
-            position?.let { pos ->
-                val change = lastPosition - pos
-                println()
-                val color = if (change > 0) "§a+" else "§c"
-                message += "\n §7Changed by $color${change.addSeparators()} spots"
-            }
+            val change = lastPosition - position
+            val color = if (change > 0) "§a+" else "§c"
+            message += "\n §7Changed by $color${change.addSeparators()} spots"
+
             lastTime?.let {
                 message += " §7in §b${it.passedSince().format(maxUnits = 2)}"
             }
-            if (config.leaderboardChange) {
+            if (config.leaderboardChange && lastPosition != -1) {
                 ChatUtils.chat(" \n §6Chocolate Leaderboard Change: §7(SkyHanni)\n $message\n ", prefix = false)
             }
         }
 
         storage.lastTime = SimpleTimeMark.now().toMillis()
         storage.lastLeaderboard = leaderboard
-        position?.let {
-            storage.lastPosition = it
-        }
+        storage.lastPosition = position
     }
 }

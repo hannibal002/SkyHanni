@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -25,15 +26,15 @@ import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.It
 public class InventoryConfig {
 
     @Expose
-    @Category(name = "Skyblock Guide", desc = "")
+    @Category(name = "Skyblock Guide", desc = "Helps finding stuff to do in SkyBlock.")
     public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
 
     @Expose
-    @Category(name = "Auction House", desc = "")
+    @Category(name = "Auction House", desc = "Be smart when buying or selling expensive items in the Auctions House.")
     public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
     @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
+    @Category(name = "Bazaar", desc = "Be smart when buying or selling many items in the Bazaar.")
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
@@ -41,7 +42,7 @@ public class InventoryConfig {
     public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose
-    @Category(name = "Helpers", desc = "Settings for Helpers")
+    @Category(name = "Helpers", desc = "Some smaller Helper settings.")
     public HelperConfig helper = new HelperConfig();
 
     @Expose
@@ -49,11 +50,11 @@ public class InventoryConfig {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
-    @Category(name = "Chocolate Factory", desc = "The chocolate factory")
+    @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @Expose
-    @ConfigOption(name = "Not Clickable Items", desc = "")
+    @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 

@@ -1,9 +1,10 @@
-package at.hannibal2.skyhanni.config.features.inventory;
+package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -142,4 +143,10 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityMenuShortcut = true;
+
+    @Expose
+    @ConfigOption(name = "Chocolate Shop Price", desc = "")
+    @Accordion
+    public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
+
 }
