@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
-import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -305,14 +304,11 @@ class SkyHanniDebugsAndTests {
         }
 
         fun whereAmI() {
-            PunchcardHighlight().playerList.clear()
-            PunchcardHighlight().playerQueue.clear()
-            ChatUtils.chat("cleared!")
-//             if (LorenzUtils.inSkyBlock) {
-//                 ChatUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
-//                 return
-//             }
-//             ChatUtils.chat("§eYou are not in Skyblock.")
+            if (LorenzUtils.inSkyBlock) {
+                ChatUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+                return
+            }
+            ChatUtils.chat("§eYou are not in Skyblock.")
         }
 
         private var lastManualContestDataUpdate = SimpleTimeMark.farPast()

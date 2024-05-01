@@ -53,7 +53,10 @@ class PunchcardHighlight {
         "§c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!"
     )
 
-    val playerList: MutableSet<String> = mutableSetOf()
+    private val playerList: MutableSet<String> = mutableSetOf()
+
+    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
+    private var display = mutableListOf<Any>()
 
     @SubscribeEvent
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
@@ -186,9 +189,6 @@ class PunchcardHighlight {
         else colorPlayer(player.baseEntity)
         display = drawDisplay()
     }
-
-    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
-    private var display = mutableListOf<Any>()
 
     @SubscribeEvent
     fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
