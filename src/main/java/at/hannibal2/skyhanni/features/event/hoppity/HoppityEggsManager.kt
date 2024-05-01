@@ -121,10 +121,10 @@ object HoppityEggsManager {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
-            43,
+            44,
             "event.chocolateFactory.highlightHoppityShop",
             "event.chocolateFactory.hoppityEggs.highlightHoppityShop"
         )
-        event.move(43, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
+        event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 }
