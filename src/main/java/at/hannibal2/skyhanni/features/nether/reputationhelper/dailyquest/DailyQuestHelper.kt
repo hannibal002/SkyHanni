@@ -55,10 +55,14 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     val quests = mutableListOf<Quest>()
     var greatSpook = false
 
-
+    /**
+     * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
+     * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
+     * REGEX-TEST: §7miniboss §a1 §7time!
+     */
     val minibossAmountPattern by RepoPattern.pattern(
         "crimson.reputationhelper.quest.minibossamount",
-        "(§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
     )
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
