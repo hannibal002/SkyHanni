@@ -84,9 +84,7 @@ object GraphEditor {
         if (!isEnabled()) return
         config.infoDisplay.renderStrings(
             buildList {
-                if (!inEditMode) {
-                    add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
-                }
+                add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
                 if (!inEditMode && !inTextMode) {
                     add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
                     add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
@@ -166,9 +164,13 @@ object GraphEditor {
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
-        if (!inEditMode && config.exitKey.isKeyClicked()) {
+        if (config.exitKey.isKeyClicked()) {
             if (inTextMode) {
                 inTextMode = false
+                return
+            }
+            if (inEditMode) {
+                inEditMode = false
                 return
             }
             config.enabled = false
