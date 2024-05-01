@@ -1,10 +1,9 @@
-package at.hannibal2.skyhanni.config.features.event;
+package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.event.chocolatefactory.menu.ChocolateFactoryStats.ChocolateFactoryStat;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -16,11 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ChocolateFactoryConfig {
-
-    @Expose
-    @ConfigOption(name = "Hoppity Eggs", desc = "")
-    @Accordion
-    public HoppityEggsConfig hoppityEggs = new HoppityEggsConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all chocolate factory features.")
@@ -93,12 +87,6 @@ public class ChocolateFactoryConfig {
     public boolean extraTooltipStats = true;
 
     @Expose
-    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hoppityCollectionStats = true;
-
-    @Expose
     @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
@@ -106,18 +94,8 @@ public class ChocolateFactoryConfig {
     public boolean timeTowerWarning = false;
 
     @Expose
-    @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hoppityMenuShortcut = true;
-
-    @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
     public Position position = new Position(163, 160, false, true);
-
-    @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
-    public Position hoppityStatsPosition = new Position(163, 160, false, true);
 
     @Expose
     @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate.")
@@ -141,8 +119,18 @@ public class ChocolateFactoryConfig {
     public Position tooltipMovePosition = new Position(-380, 150, false, true);
 
     @Expose
-    @ConfigOption(name = "Highlight Hoppity Shop", desc = "Highlight items that haven't been bought from the Hoppity shop yet.")
+    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean highlightHoppityShop = true;
+    public boolean hoppityCollectionStats = true;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hoppityCollectionStats")
+    public Position hoppityStatsPosition = new Position(163, 160, false, true);
+
+    @Expose
+    @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityMenuShortcut = true;
 }
