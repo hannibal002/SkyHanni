@@ -41,10 +41,10 @@ object EndstoneProtector {
     private var golemPos: LorenzVec = LorenzVec()
     private var seenSpawnMessage = false
     private var golemDiedRecently = false
-    private var rose = false;
-    private var endstone = false;
-    private var fragment = false;
-    private var fourthDrop = false;
+    private var rose = false
+    private var endstone = false
+    private var fragment = false
+    private var fourthDrop = false
 
     private val patternGroup = RepoPattern.group("combat.endstoneprotectortracker")
     private val stagePattern by patternGroup.pattern(
@@ -346,6 +346,7 @@ object EndstoneProtector {
             golemPos = LorenzVec(0, 0, 0)
             shouldCountdown = false
             seenSpawnMessage = true
+            resetDrops()
         }
         deadPattern.matchMatcher(event.message) {
             sendStats(SimpleTimeMark.now().minus(golemFightTime).inWholeTicks)
@@ -404,6 +405,7 @@ object EndstoneProtector {
         golemDiedRecently = false
         shouldCountdown = false
         countdownStart = SimpleTimeMark.farPast()
+        resetDrops()
     }
 
     private fun stage5alert() {
@@ -420,6 +422,13 @@ object EndstoneProtector {
         if (!config.dropAlert) return
         LorenzUtils.sendTitle(item, 2.seconds)
         SoundUtils.playBeepSound()
+    }
+
+    private fun resetDrops() {
+        rose = false
+        endstone = false
+        fragment = false
+        fourthDrop = false
     }
 
     fun isEnabled() = IslandType.THE_END.isInIsland() && (config.enabled || config.enabledGUI)
