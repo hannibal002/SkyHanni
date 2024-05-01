@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.width
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -335,7 +336,9 @@ object StringUtils {
             return null
         }
 
-        if (LorenzUtils.stripVanillaMessage(original.formattedText) == newText) return null
+        val originalClean = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val newTextClean = LorenzUtils.stripVanillaMessage(newText)
+        if (originalClean == newTextClean) return null
 
         val text = ChatComponentText(newText)
         if (size == 1) {
@@ -366,5 +369,9 @@ object StringUtils {
             }
             text = newText
         }
+    }
+
+    fun String.width(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
     }
 }

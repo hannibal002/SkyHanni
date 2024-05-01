@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -25,13 +26,18 @@ class JoinCrystalHollows {
         if (message == "§cYou do not have an active Crystal Hollows pass!") {
             lastWrongPassTime = System.currentTimeMillis()
             if (!IslandType.DWARVEN_MINES.isInIsland()) {
-                ChatUtils.clickableChat("Click here to warp to Dwarven Mines!", "warp mines")
+                ChatUtils.clickableChat("Click here to warp to Dwarven Mines!",
+                    onClick = {
+                        HypixelCommands.warp("mines")
+                    })
             } else {
                 ChatUtils.chat("Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
             }
         }
         if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!" && inTime()) {
-            ChatUtils.clickableChat("Click here to warp to Crystal Hollows!", "warp ch")
+            ChatUtils.clickableChat("Click here to warp to Crystal Hollows!", onClick = {
+                HypixelCommands.warp("ch")
+            })
         }
     }
 

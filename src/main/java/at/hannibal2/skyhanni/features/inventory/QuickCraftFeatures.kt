@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -56,7 +56,7 @@ class QuickCraftFeatures {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
         if (event.gui !is GuiChest) return
@@ -66,8 +66,7 @@ class QuickCraftFeatures {
             if (inventoryType.ignoreSlot(slot.slotNumber)) continue
             if (stack.name == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
-                val color = LorenzColor.DARK_GRAY.addOpacity(180)
-                stack.background = color.rgb
+                slot highlight LorenzColor.DARK_GRAY.addOpacity(180)
             }
         }
     }

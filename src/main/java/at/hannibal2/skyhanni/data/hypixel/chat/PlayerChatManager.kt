@@ -56,10 +56,11 @@ class PlayerChatManager {
      * REGEX-TEST: §2Guild > §6⚔ §6[MVP§3++§6] RealBacklight§f: §r!warp
      * REGEX-TEST: §2Guild > §b[MVP§3+§b] Eisengolem§f: §r!pt
      * REGEX-TEST: §2Guild > §b[MVP§d+§b] zunoff §e[VET]§f: §rwas löuft
+     * REGEX-TEST: §2Guild > §7stinkywinkyowo §6[O]§f: §rraven____ > hi
      */
     private val guildPattern by patternGroup.pattern(
         "guild",
-        "§2Guild > (?<author>§.+?)(?<guildRank> §e\\[\\w*])?§f: §r(?<message>.*)"
+        "§2Guild > (?<author>§.+?)(?<guildRank> §.\\[\\w*])?§f: §r(?<message>.*)"
     )
 
     /**
@@ -110,9 +111,6 @@ class PlayerChatManager {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val chatComponent = event.chatComponent
-        globalPattern.matchMatcher(event.message) {
-            if (isGlobalChat(event)) return
-        }
         partyPattern.matchMatcher(event.message) {
             val author = group("author")
             val message = group("message")
@@ -143,6 +141,10 @@ class PlayerChatManager {
             // for consistency
             val message = "§7$action §r$itemName"
             PlayerShowItemChatEvent(levelColor, level, author, message, action, itemName, chatComponent).postChat(event)
+            return
+        }
+        globalPattern.matchMatcher(event.message) {
+            if (isGlobalChat(event)) return
         }
 
         sendSystemMessage(event)
@@ -150,11 +152,6 @@ class PlayerChatManager {
 
     private fun Matcher.isGlobalChat(event: LorenzChatEvent): Boolean {
         var author = group("author")
-        // TODO move into regex
-        val isGuild = author.startsWith("§2Guild >")
-        val isParty = author.startsWith("§9Party")
-        if (isGuild || isParty) return false
-
         val message = LorenzUtils.stripVanillaMessage(group("message"))
         if (author.contains("[NPC]")) {
             NpcChatEvent(author, message.removePrefix("§f"), event.chatComponent).postChat(event)

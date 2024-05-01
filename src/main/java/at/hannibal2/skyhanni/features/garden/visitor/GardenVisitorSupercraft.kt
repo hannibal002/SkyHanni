@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -50,15 +52,28 @@ class GardenVisitorSupercraft {
         val visitor = event.visitor
         visitor.offer?.offerItem ?: return
         for ((internalName, amount) in visitor.shoppingList) {
-            if (isSupercraftEnabled) getSupercraftForSacks(internalName, amount)
+            if (isSupercraftEnabled) {
+                try {
+                    getSupercraftForSacks(internalName, amount)
+                } catch (e: NoSuchElementException) {
+                    ErrorManager.logErrorWithData(
+                        e,
+                        "Failed to calculate supercraft recipes for visitor",
+                        "internalName" to internalName,
+                        "amount" to amount,
+                        "visitor" to visitor.visitorName,
+                        "visitor.offer?.offerItem" to visitor.offer?.offerItem,
+                    )
+                }
+            }
         }
     }
 
-    fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
+    private fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .first { !it.ingredients.first().internalItemId.contains("PEST") }
-            .ingredients
+            .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
+            ?.allIngredients() ?: return
         val ingredientReqs = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
             val key = ingredient.internalItemId
