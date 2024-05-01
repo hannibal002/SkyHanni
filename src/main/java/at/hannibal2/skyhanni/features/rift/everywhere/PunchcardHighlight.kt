@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -54,6 +53,7 @@ class PunchcardHighlight {
     )
 
     private val playerList: MutableSet<String> = mutableSetOf()
+    private var playerQueue = mutableListOf<String>()
 
     private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
     private var display = mutableListOf<Any>()
@@ -73,29 +73,12 @@ class PunchcardHighlight {
 
     @SubscribeEvent
     fun onToggle(event: ConfigLoadEvent) {
-        config.enabled.onToggle { toggleConfig() }
+        config.enabled.onToggle { reloadColors() }
         config.compact.onToggle { display = drawDisplay() }
         config.color.onToggle { reloadColors() }
         config.reverse.onToggle {
             display = drawDisplay()
             reloadColors()
-        }
-    }
-
-    private fun toggleConfig() {
-        if (config.enabled.get()) colorEveryone()
-        else colorEveryone(true)
-    }
-
-    private fun colorEveryone(remove: Boolean = false) {
-        if (!remove) {
-            MobData.players.forEach {
-                colorPlayer(it.baseEntity)
-            }
-        } else {
-            MobData.players.forEach {
-                colorPlayer(it.baseEntity, true)
-            }
         }
     }
 
@@ -136,8 +119,6 @@ class PunchcardHighlight {
         }
     }
 
-    var playerQueue = mutableListOf<String>()
-
     @SubscribeEvent
     fun onPunch(event: EntityClickEvent) {
         if (!RiftAPI.inRift()) return
@@ -147,7 +128,6 @@ class PunchcardHighlight {
         if (entity.isNPC()) return
         val name = entity.name
         if (name in playerList || name in playerQueue) return
-        ChatUtils.chat("added '$name' to queue")
         playerQueue.add(name)
         listening = true
         DelayedRun.runDelayed(1.seconds) {
@@ -209,7 +189,10 @@ class PunchcardHighlight {
     }
 
     private fun reloadColors() {
-        colorEveryone(true)
+        MobData.players.forEach {
+            colorPlayer(it.baseEntity, true)
+        }
+        if (!config.enabled.get()) return
         val reverse = config.reverse.get()
         if (reverse) {
             MobData.players.filter { it.name in playerList }.forEach {
