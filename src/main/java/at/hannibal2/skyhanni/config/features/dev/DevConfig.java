@@ -44,12 +44,6 @@ public class DevConfig {
     @ConfigEditorBoolean
     public boolean worldEdit = false;
 
-    @Expose
-    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard." +
-        "\nCustom Scoreboard debug option")
-    @ConfigEditorBoolean
-    public boolean unknownLinesWarning = false;
-
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
     @Expose
