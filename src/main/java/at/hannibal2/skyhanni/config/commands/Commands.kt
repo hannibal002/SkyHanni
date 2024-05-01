@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
@@ -398,6 +399,10 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
+        registerCommand(
+            "shtestsackapi",
+            "Get the amount of an item in sacks according to internal feature SackAPI"
+        ) { SackAPI.testSackAPI(it) }
     }
 
     private fun developersCodingHelp() {
