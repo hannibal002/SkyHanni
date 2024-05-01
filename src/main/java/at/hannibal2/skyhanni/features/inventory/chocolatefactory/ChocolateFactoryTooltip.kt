@@ -1,8 +1,7 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.menu
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI.profileStorage
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.profileStorage
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -32,7 +31,7 @@ object ChocolateFactoryTooltip {
         if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
         if (slotIndex !in ChocolateFactoryAPI.otherUpgradeSlots && slotIndex !in ChocolateFactoryAPI.rabbitSlots) return
 
-        val upgradeCost = ChocolateFactoryAPI.getChocolateUpgradeCost(event.toolTip) ?: return
+        val upgradeCost = ChocolateFactoryAPI.getChocolateBuyCost(event.toolTip) ?: return
 
         event.toolTip.add("§8§m-----------------")
         val timeToUpgrade = ChocolateAmount.CURRENT.formattedTimeUntilGoal(upgradeCost)
