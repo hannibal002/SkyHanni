@@ -17,12 +17,12 @@ enum class HoppityEggType(
     ;
 
     fun timeUntil(): Duration {
-        val hour = SkyBlockTime.now().hour
-        if (hour >= resetsAt) {
-            return SkyBlockTime.now().copy(day = SkyBlockTime.now().day + 1, hour = resetsAt, minute = 0, second = 0)
+        val now = SkyBlockTime.now()
+        if (now.hour >= resetsAt) {
+            return now.copy(day = now.day + 1, hour = resetsAt, minute = 0, second = 0)
                 .asTimeMark().timeUntil()
         }
-        return SkyBlockTime.now().copy(hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
+        return now.copy(hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
     }
 
     fun markClaimed() {
