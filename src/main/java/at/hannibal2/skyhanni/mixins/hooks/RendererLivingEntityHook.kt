@@ -41,7 +41,6 @@ object RendererLivingEntityHook {
      */
     @JvmStatic
     fun rotatePlayer(player: EntityPlayer) {
-        if (!config.rotateContributors) return
         if (!LorenzUtils.inSkyBlock) return
         if (!config.rotateContributors && !LorenzUtils.isAprilFoolsDay) return
         val name = player.name ?: return
