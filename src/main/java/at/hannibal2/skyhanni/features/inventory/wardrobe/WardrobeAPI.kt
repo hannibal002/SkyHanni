@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -116,10 +115,6 @@ object WardrobeAPI {
         }
 
     var currentPage: Int? = null
-
-    var lastWardrobeUpdate = SimpleTimeMark.farPast()
-
-    var i = 0
 
     init {
         val list = mutableListOf<WardrobeSlot>()

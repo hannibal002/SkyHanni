@@ -84,7 +84,11 @@ class CustomWardrobe {
                         verticalAlign = VerticalAlignment.BOTTOM,
                         scale = 1.0 * (config.spacing.globalScale / 100.0)
                     ),
-                    onClick = { config::spacing.jumpToEditor() }
+                    onClick = {
+                        config::spacing.jumpToEditor()
+                        reset()
+                        currentPage = null
+                    }
                 ),
                 blockBottomHover = false
             ),
