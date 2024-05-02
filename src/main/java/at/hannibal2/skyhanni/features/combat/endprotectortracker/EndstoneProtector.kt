@@ -30,12 +30,11 @@ import kotlin.time.DurationUnit
 object EndstoneProtector {
 
     val config get() = SkyHanniMod.feature.combat.endstoneCounter
-    private var guiDisplay = ""
     private var countdownStart: SimpleTimeMark = SimpleTimeMark.farPast()
     private var shouldCountdown = false
     val storage get() = ProfileStorageData.profileSpecific?.endstoneProtectorTracker
     private var inNest = false
-    private var stage: Int = 0
+    private var stage: Stages = Stages.Resting
     private var golemDead = true
     private var golemFightTime: SimpleTimeMark = SimpleTimeMark.farPast()
     private var golemPos: LorenzVec = LorenzVec()
@@ -76,6 +75,15 @@ object EndstoneProtector {
         formatDisplay(
             drawDisplay(it)
         )
+    }
+
+    private enum class Stages(val y: Int) {
+        Resting(0),
+        Dormant(5),
+        Agitated(6),
+        Disturbed(7),
+        Awakening(8),
+        Summoned(9),
     }
 
     class Data : TrackerData() {
@@ -130,9 +138,9 @@ object EndstoneProtector {
         if (!isEnabled()) return
         if (config.enabledCountdown && shouldCountdown)
             config.guiposition.renderString(countdownStart.plus(20.seconds).timeUntil()
-                .toString(DurationUnit.SECONDS, 2), 0, 10, posLabel = "Endstone Protector Stage Display")
+                .toString(DurationUnit.SECONDS, 2), 0, 10, posLabel = "Endstone Protector Spawn Countdown")
 
-        if (config.enabledGUI) config.guiposition.renderString(guiDisplay, posLabel = "Endstone Protector Stage Display")
+        if (config.enabledGUI) config.guiposition.renderString("§eStage§6: §b${stage.ordinal}", posLabel = "Endstone Protector Stage Display")
         if (config.onlyOnNest && !inNest) return
         tracker.renderDisplay(config.position)
     }
@@ -178,11 +186,9 @@ object EndstoneProtector {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         inNest = LorenzUtils.skyBlockArea == "Dragon's Nest"
-        if (inNest && config.showLocation && golemDead && stage != 0 && golemPos == LorenzVec(0, 0, 0)) scanLocation()
+        if (inNest && config.showLocation && golemDead && stage != Stages.Resting && golemPos.isZero()) scanLocation()
         if (golemDiedRecently) {
-            if (event.repeatSeconds(5)) {
-                golemDiedRecently = false
-            }
+            if (event.repeatSeconds(5)) golemDiedRecently = false
             if (!rose || !endstone || !fragment || !fourthDrop) checkForLoot()
         }
     }
@@ -248,50 +254,14 @@ object EndstoneProtector {
     }
 
     private fun scanLocation() {
-        when(stage) {
-            1 -> {
-                checkForGolem(5)
-            }
-            2 -> {
-                checkForGolem(6)
-            }
-            3 -> {
-                checkForGolem(7)
-            }
-            4 -> {
-                checkForGolem(8)
-            }
-            5 -> {
-                checkForGolem(9)
-            }
-        }
-    }
-
-    private fun checkForGolem(y: Int) {
+        val y = stage.y
         val positions = listOf(
             LorenzVec(-649, y, -219),
-            LorenzVec(-649, y - 1, -219),
-            LorenzVec(-649, y + 1, -219),
-
             LorenzVec(-644, y, -269),
-            LorenzVec(-644, y - 1, -269),
-            LorenzVec(-644, y + 1, -269),
-
             LorenzVec(-689, y, -273),
-            LorenzVec(-689, y - 1, -273),
-            LorenzVec(-689, y + 1, -273),
-
             LorenzVec(-727, y, -284),
-            LorenzVec(-727, y - 1, -284),
-            LorenzVec(-727, y + 1, -284),
-
             LorenzVec(-639, y, -328),
-            LorenzVec(-639, y - 1, -328),
-            LorenzVec(-639, y + 1, -328),
-
             LorenzVec(-678, y, -332),
-            LorenzVec(-678, y - 1, -332),
-            LorenzVec(-678, y + 1, -332)
         )
 
         for (pos in positions) {
@@ -305,12 +275,12 @@ object EndstoneProtector {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (config.showLocation && inNest && golemPos != LorenzVec(0,0,0)) {
-            if (config.showOnlyIfStage4or5 && (stage == 5 || stage == 4)) {
+        if (config.showLocation && inNest && !golemPos.isZero()) {
+            if (config.showOnlyIfStage4or5 && (stage == Stages.Summoned || stage == Stages.Awakening)) {
                 event.drawDynamicText(golemPos, "GOLEM", 1.0)
                 return
             }
-            if (stage != 0) {
+            if (stage != Stages.Resting) {
                 event.drawDynamicText(golemPos, "GOLEM", 1.0)
             }
         }
@@ -323,15 +293,15 @@ object EndstoneProtector {
             stagePattern.matchMatcher(line) {
                 val tabStage = group("stage")
                 stage = when(tabStage) {
-                    "Resting" -> 0
-                    "Dormant" -> 1
-                    "Agitated" -> 2
-                    "Disturbed" -> 3
-                    "Awakening" -> 4
-                    "Summoned" -> 5
-                    else -> {0}
+                    "Resting" -> Stages.Resting
+                    "Dormant" -> Stages.Dormant
+                    "Agitated" -> Stages.Agitated
+                    "Disturbed" -> Stages.Disturbed
+                    "Awakening" -> Stages.Awakening
+                    "Summoned" -> Stages.Summoned
+                    else -> {Stages.Resting}
                 }
-            }.let { guiDisplay = "§eStage§6: §b$stage" }
+            }
         }
     }
 
@@ -343,68 +313,61 @@ object EndstoneProtector {
         alivePattern.matchMatcher(event.message) {
             golemDead = false
             golemFightTime = SimpleTimeMark.now()
-            golemPos = LorenzVec(0, 0, 0)
-            shouldCountdown = false
             seenSpawnMessage = true
+            shouldCountdown = false
             resetDrops()
         }
         deadPattern.matchMatcher(event.message) {
             sendStats(SimpleTimeMark.now().minus(golemFightTime).inWholeTicks)
-            stage = 0
-            golemPos = LorenzVec(0, 0, 0)
-            golemDiedRecently = true
-            tracker.modify { storage -> run {
-                storage.sinceLastLegGolem += 1
-                storage.sinceLastEpicGolem += 1
-                storage.sinceLastTierBoost += 1
-            } }
+            stage = Stages.Resting
+            golemPos = LorenzVec()
         }
         stage5Pattern.matchMatcher(event.message) {
-            stage = 5
+            stage = Stages.Summoned
             shouldCountdown = true
             countdownStart = SimpleTimeMark.now()
             if (config.stage5Alert) stage5alert()
         }
         stageChangePattern.matchMatcher(event.message) {
-            if (config.stage4Alert && stage == 4) stage4alert()
+            if (config.stage4Alert && stage == Stages.Awakening) stage4alert()
         }
         damagePattern.matchMatcher(event.message) {
             dmg = group("damage").replaceAll(",", "").toInt()
-            println(dmg)
+
+            if (dmg > 0 && !golemDead) {
+                tracker.modify { storage -> run { storage.totalKilled += 1 } }
+                tracker.modify { storage -> run {
+                    storage.sinceLastLegGolem += 1
+                    storage.sinceLastEpicGolem += 1
+                    storage.sinceLastTierBoost += 1
+                } }
+                golemDiedRecently = true
+                golemDead = true
+            }
         }
     }
 
     private fun sendStats(time: Int) {
         DelayedRun.runNextTick {
-            if (config.showFightTime) {
-                if (seenSpawnMessage) {
-                    ChatUtils.chat("Golem Fight Took: §f${time.div(20)} Seconds")
-                    seenSpawnMessage = false
-                }
-                else ChatUtils.chat("Golem Fight Took unknown amount of time.")
+            if (seenSpawnMessage) {
+                if (config.showFightTime) ChatUtils.chat("Golem Fight Took: §f${time.div(20)} Seconds")
+                if (config.showFightDPS) ChatUtils.chat("DPS: §f${dmg.div(time.div(20)).addSeparators()}")
+                seenSpawnMessage = false
             }
-            if (config.showFightDPS) {
-                ChatUtils.chat("DPS: §f${dmg.div(time.div(20)).addSeparators()}")
-                golemFightTime = SimpleTimeMark.farPast()
-            }
-            if (dmg != 0 && !golemDead) {
-                tracker.modify { storage -> run { storage.totalKilled += 1 } }
-                golemDead = true
-            }
+            else ChatUtils.chat("Unknown Golem Spawn Time.")
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         inNest = false
-        stage = 0
-        golemPos = LorenzVec(0, 0, 0)
+        stage = Stages.Resting
+        golemPos = LorenzVec()
         golemDead = true
         golemFightTime = SimpleTimeMark.farPast()
         seenSpawnMessage = false
         golemDiedRecently = false
         shouldCountdown = false
-        countdownStart = SimpleTimeMark.farPast()
         resetDrops()
     }
 

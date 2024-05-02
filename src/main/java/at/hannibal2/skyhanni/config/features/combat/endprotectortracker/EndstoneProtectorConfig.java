@@ -22,16 +22,16 @@ public class EndstoneProtectorConfig {
     public boolean enabledGUI = true;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the Endstone Protector counter.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean enabled = true;
-
-    @Expose
     @ConfigOption(name = "Countdown", desc = "Enable Countdown Display under Stage Display when Protector about to spawn.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabledCountdown = true;
+
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Enable the Endstone Protector counter.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enabled = true;
 
     @Expose
     @ConfigOption(
