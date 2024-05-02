@@ -161,6 +161,7 @@ object ChocolateFactoryAPI {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        factoryUpgrades.clear()
         if (!inChocolateFactory) return
 
         updateInventoryItems(event.inventoryItems)
