@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -20,7 +21,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.Item
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -65,15 +65,17 @@ object HarpFeatures {
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
     @SubscribeEvent
-    fun onGui(event: GuiScreenEvent) {
+    fun onGui(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
-        val chest = event.gui as? GuiChest ?: return
+        val chest = event.guiContainer as? GuiChest ?: return
 
         for ((index, key) in KeyIterable.withIndex()) {
             if (!key.isKeyHeld()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
+
+            event.cancel()
 
             Minecraft.getMinecraft().playerController.windowClick(
                 chest.inventorySlots.windowId,

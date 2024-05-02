@@ -36,6 +36,8 @@ object ChocolateFactoryKeybinds {
             if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
 
+            event.cancel()
+
             Minecraft.getMinecraft().playerController.windowClick(
                 chest.inventorySlots.windowId,
                 29 + index,
