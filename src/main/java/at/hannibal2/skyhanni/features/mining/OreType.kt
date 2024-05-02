@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.features.mining
 
 enum class OreType(
     val oreName: String,
+    val shaftMultiplier: Int = 0,
 ) {
-    MITHRIL("Mithril"),
-    TITANIUM("Titanium"),
+    MITHRIL("Mithril", 2),
+    TITANIUM("Titanium", 8),
     COBBLESTONE("Cobblestone"),
     COAL("Coal"),
     IRON("Coal"),
@@ -23,9 +24,9 @@ enum class OreType(
     END_STONE("End Stone"),
     OBSIDIAN("Obsidian"),
     HARD_STONE("Hard Stone"),
-    GEMSTONE("Gemstone"),
-    UMBER("Umber"),
-    TUNGSTEN("Tungsten"),
-    GLACITE("Glacite"),
+    GEMSTONE("Gemstone", 2),
+    UMBER("Umber", 2),
+    TUNGSTEN("Tungsten", 2),
+    GLACITE("Glacite", 2),
     ;
 }

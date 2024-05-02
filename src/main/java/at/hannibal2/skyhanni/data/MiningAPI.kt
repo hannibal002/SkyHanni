@@ -8,12 +8,10 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.mining.CompactUpdateEvent
+import at.hannibal2.skyhanni.events.mining.CustomBlockMineEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
-import at.hannibal2.skyhanni.features.mining.OreType
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -23,20 +21,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
-import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
-import kotlin.math.ceil
-import kotlin.math.truncate
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
-    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels")
+    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Glacite Lake")
     val coldReset by group.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7."
@@ -46,18 +40,13 @@ object MiningAPI {
         "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)"
     )
 
-    class MinedBlock(val ore: OreBlock, var position: LorenzVec, val time: SimpleTimeMark)
-    class Sound(
-        val soundName: String,
-        val location: LorenzVec,
-        val pitch: Float,
-        val volume: Float,
-        val time: SimpleTimeMark
-    )
+    class MinedBlock(val ore: OreBlock, var position: LorenzVec, var confirmed: Boolean, val time: SimpleTimeMark)
+
+    var isBeingMined = false
+    var lastSound = SimpleTimeMark.farPast()
 
     private var recentMinedBlocksMap = mutableListOf<MinedBlock>()
-    private var surroundingHardStone = mutableListOf<MinedBlock>()
-    private var soundsList = mutableListOf<Sound>()
+    private var surroundingMinedBlocks = mutableListOf<MinedBlock>()
     private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth")
 
     private var cold = 0
@@ -104,11 +93,7 @@ object MiningAPI {
         if (recentMinedBlocksMap.any { it.position == position }) return
         val blockState = event.getBlockState
         val ore = OreBlock.getByStateOrNull(blockState) ?: return
-        recentMinedBlocksMap.add(MinedBlock(ore, position, SimpleTimeMark.now()))
-        storeAdjacentHardstoneBlocks(position)
-        surroundingHardStone.forEach {
-            println(it.position)
-        }
+        recentMinedBlocksMap.add(MinedBlock(ore, position, false, SimpleTimeMark.now()))
     }
 
     @SubscribeEvent
@@ -129,15 +114,20 @@ object MiningAPI {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
-        val position = event.location - LorenzVec(0.5, 0.5, 0.5)
         if (allowedSoundNames.none { it == event.soundName } && event.soundName != "random.orb") return
-        println("Name: ${event.soundName}, Pitch: ${event.pitch}, Pos: ${position.toCleanStringWithSeparators()}, Volume: ${event.volume}")
-        if (soundsList.isEmpty() && event.pitch == 0.7936508f) {
+        if (!isBeingMined && event.pitch == 0.7936508f) {
             if (allowedSoundNames.none { it == event.soundName }) return
-            soundsList.add(Sound(event.soundName, position, event.pitch, event.volume, SimpleTimeMark.now()))
-        } else if (soundsList.isNotEmpty() && event.soundName == "random.orb" && event.volume == 0.5f) {
-            if (soundsList.last().time.passedSince() > 100.milliseconds) return
-            soundsList.add(Sound(event.soundName, position, event.pitch, event.volume, SimpleTimeMark.now()))
+            recentMinedBlocksMap.firstOrNull { it.position == event.location - LorenzVec(0.5, 0.5, 0.5) }?.confirmed =
+                true
+            isBeingMined = true
+            lastSound = SimpleTimeMark.now()
+            return
+        } else if (isBeingMined && event.soundName == "random.orb" && event.volume == 0.5f) {
+            if (lastSound.passedSince() > 100.milliseconds) return
+            if (!surroundingMinedBlocks.last().confirmed) {
+                surroundingMinedBlocks.last().confirmed = true
+                lastSound = SimpleTimeMark.now()
+            }
         }
     }
 
@@ -147,37 +137,31 @@ object MiningAPI {
 
         // if somehow you take more than 20 seconds to mine a single block, congrats
         recentMinedBlocksMap.removeIf { it.time.passedSince() > 20.seconds }
-        surroundingHardStone.removeIf { it.time.passedSince() > 20.seconds }
-        soundsList.removeIf { it.time.passedSince() > 500.milliseconds }
+        surroundingMinedBlocks.removeIf { it.time.passedSince() > 20.seconds }
 
-        val firstSound = soundsList.firstOrNull() ?: return
+        if (lastSound.passedSince() < 200.milliseconds) return
+        isBeingMined = false
+        val originalBlock = recentMinedBlocksMap.firstOrNull { it.confirmed } ?: return
 
-        if (soundsList.last().time.passedSince() > 200.milliseconds) {
-            val blockAmount = soundsList.count { it.soundName == "random.orb" }
-            val block = recentMinedBlocksMap.firstOrNull { it.position == firstSound.location } ?: return
+        val blocksMinedMap = surroundingMinedBlocks
+            .filter { it.confirmed }
+            .groupBy({ it.ore }, { 1 })
+            .mapValues { it.value.size }
 
-            val adjacentHardstone = block.position.getAdjacentHardstoneNumber()
-            recentMinedBlocksMap.removeIf { it.time < block.time }
-            removeNotAdjacentHardstoneBlocks()
-            soundsList.clear()
-            if (blockAmount == 0) {
-                ChatUtils.debug("Mined 0 blocks? empa you stupid check logs")
-                return
-            }
-            if (blockAmount == 1) {
-                CompactUpdateEvent(1, block.ore ).postAndCatch()
-                return
-            } else {
-                CompactUpdateEvent(blockAmount, block.ore).postAndCatch()
-            }
-        }
+        CustomBlockMineEvent(originalBlock.ore, blocksMinedMap).postAndCatch()
+
+        surroundingMinedBlocks = mutableListOf()
+        recentMinedBlocksMap.removeIf { it.time.passedSince() >= originalBlock.time.passedSince() }
+        lastSound = SimpleTimeMark.farPast()
     }
 
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
-        if (event.newState != Blocks.air) return
-        println("old: ${event.old} new: ${event.new} loc: ${event.location}")
+        if (event.newState.block != Blocks.air) return
+        if (event.location.distanceToPlayer() > 7) return
+        val ore = OreBlock.getByStateOrNull(event.oldState) ?: return
+        surroundingMinedBlocks.add(MinedBlock(ore, event.location, false, SimpleTimeMark.now()))
     }
 
     @SubscribeEvent
@@ -185,8 +169,7 @@ object MiningAPI {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
         recentMinedBlocksMap = mutableListOf()
-        surroundingHardStone = mutableListOf()
-        soundsList = mutableListOf()
+        surroundingMinedBlocks = mutableListOf()
     }
 
     private fun updateCold(newCold: Int) {
@@ -195,49 +178,5 @@ object MiningAPI {
         lastColdUpdate = SimpleTimeMark.now()
         ColdUpdateEvent(newCold).postAndCatch()
         cold = newCold
-    }
-
-    private fun hasEpicOrAboveScathaPet(): Boolean {
-        val pet = PetAPI.currentPet ?: return false
-        return (!pet.startsWith("§9") && pet.contains("Scatha"))
-    }
-
-    private fun getMinMaxHardstoneMole(): Triple<Int, Int, Double> {
-        if (!HotmData.MOLE.enabled) return Triple(0, 0, 0.0)
-        val value = HotmData.MOLE.getReward().getValue(HotmReward.AVERAGE_BLOCK_BREAKS)
-        return Triple(ceil(value).toInt(), truncate(value).toInt(), value % 1)
-    }
-
-    private fun geMaxBlocksEfficientMiner(): Int {
-        if (!HotmData.EFFICIENT_MINER.enabled) return 0
-        val level = HotmData.EFFICIENT_MINER.activeLevel
-        return ceil((0.5 * level) + 0.5).toInt()
-    }
-
-    private fun LorenzVec.getAdjacentHardstoneNumber(): Int {
-        return EnumFacing.entries.count { direction ->
-            val offsetLoc = this.toBlockPos().offset(direction).toLorenzVec()
-            surroundingHardStone.any { it.position == offsetLoc }
-        }.coerceIn(0..2)
-    }
-
-    private fun storeAdjacentHardstoneBlocks(position: LorenzVec) {
-        EnumFacing.entries.forEach { direction ->
-            val offsetLoc = position.toBlockPos().offset(direction).toLorenzVec()
-            val ore = OreBlock.getByStateOrNull(offsetLoc.getBlockStateAt())
-            if (ore?.oreType == OreType.HARD_STONE && surroundingHardStone.none { it.position == offsetLoc } ) {
-                //println("hardstone found in $offsetLoc")
-                surroundingHardStone.add(MinedBlock(ore, offsetLoc, SimpleTimeMark.now()))
-            }
-        }
-    }
-
-    private fun removeNotAdjacentHardstoneBlocks() {
-        surroundingHardStone.filter { hardstone ->
-            EnumFacing.entries.any { direction ->
-                val offsetLoc = hardstone.position.toBlockPos().offset(direction).toLorenzVec()
-                recentMinedBlocksMap.any { it.position == offsetLoc }
-            }
-        }
     }
 }

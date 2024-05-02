@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MiningConfig {
@@ -58,10 +60,14 @@ public class MiningConfig {
     public boolean highlightCommissionMobs = false;
 
     @Expose
-    @ConfigOption(name = "Blocks Since Mineshaft", desc = "")
+    @ConfigOption(name = "Mineshaft Odds Display", desc = "")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean blocksSinceMineshaft = true;
+    public boolean mineshaftOddsDisplay = true;
+
+    @Expose
+    @ConfigLink(owner = MiningConfig.class, field = "mineshaftOddsDisplay")
+    public Position mineshaftOddsDisplayPosition = new Position(-330, -15, false, true);
 
 
     @Expose

@@ -1,59 +1,70 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.mining.CompactUpdateEvent
+import at.hannibal2.skyhanni.events.mining.CustomBlockMineEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object BlocksSinceMineshaftDisplay {
-    private val config get() = SkyHanniMod.feature.mining.blocksSinceMineshaft
+    private val config get() = SkyHanniMod.feature.mining
 
-    private var hardstoneBlocks = 0L
-    private var hardstoneBlocksNoMole = 0L
+    var minedBlocks = mutableMapOf<OreType, Int>()
 
-    @SubscribeEvent
-    fun onCompactUpdate(event: CompactUpdateEvent) {
-        if (!isEnabled()) return
-        ChatUtils.debug("Mined ${event.amount} ${event.block.blockName}")
-        if (event.block.oreType == OreType.HARD_STONE) {
-            hardstoneBlocks += event.amount
-            hardstoneBlocksNoMole++
-        }
-    }
+    const val MAX_COUNTER = 2000
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onCustomBlockMine(event: CustomBlockMineEvent) {
         if (!isEnabled()) return
-        Position(10, 10).renderStrings(
-            listOf(
-                "Hardstone mined: $hardstoneBlocks",
-                "Without Mole: $hardstoneBlocksNoMole"
-            ), posLabel = "shaft test"
-        )
+        val oreType = event.originalBlock.oreType ?: return
+        if (oreType == OreType.HARD_STONE) return
+        minedBlocks.addOrPut(oreType, 1)
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
-            ChatUtils.chat("Hardstone mined: $hardstoneBlocks")
-            ChatUtils.chat("Without Mole: $hardstoneBlocksNoMole")
+            val resultList = mutableListOf<String>()
+            resultList.add("Counter: ${calculateCounter()}/$MAX_COUNTER")
+            resultList.add("Blocks mined:")
+            minedBlocks.forEach {
+                resultList.add("    ${it.key.oreName}: ${it.value}")
+            }
+            val string = resultList.joinToString("\n")
+            OSUtils.copyToClipboard(string)
+            ChatUtils.chat("Copied shaft spawn info to clipboard!")
             resetShaftBlocks()
         }
     }
 
-    fun resetShaftBlocks() {
-        hardstoneBlocks = 0
-        hardstoneBlocksNoMole = 0
+    fun calculateCounter(): Int {
+        if (minedBlocks.isEmpty()) return 0
+        var counter = 0
+        minedBlocks.forEach { counter += it.key.shaftMultiplier * it.value }
+        return counter
     }
 
     @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!MiningAPI.inGlacialTunnels()) return
+        val renderable = Renderable.string(
+            "Mineshaft Counter: ${calculateCounter()}/$MAX_COUNTER"
+        )
+        config.mineshaftOddsDisplayPosition.renderRenderables(listOf(renderable), posLabel = "Mineshaft Counter")
 
-    fun isEnabled() = MiningAPI.inGlacialTunnels() && config
+    }
+
+    fun resetShaftBlocks() {
+        minedBlocks = mutableMapOf()
+    }
+
+    fun isEnabled() = MiningAPI.inGlacialTunnels() && config.mineshaftOddsDisplay
 }
