@@ -40,6 +40,12 @@ object WardrobeAPI {
         "§7Slot \\d+: §aEquipped"
     )
 
+    private const val FIRST_SLOT = 36
+    private const val FIRST_HELMET_SLOT = 0
+    private const val FIRST_CHESTPLATE_SLOT = 9
+    private const val FIRST_LEGGINGS_SLOT = 18
+    private const val FIRST_BOOTS_SLOT = 27
+
     var wardrobeSlots = listOf<WardrobeSlot>()
     var inCustomWardrobe = false
 
@@ -51,60 +57,61 @@ object WardrobeAPI {
         val chestplateSlot: Int,
         val leggingsSlot: Int,
         val bootsSlot: Int,
-    )
+    ) {
+        fun getData() = storage?.wardrobeData?.getOrPut(id) {
+            WardrobeData(
+                id,
+                (1..4).associateWith { null }.toMutableMap(),
+                locked = true,
+                favorite = false,
+            )
+        }
 
-    private fun WardrobeSlot.getData() = storage?.wardrobeData?.getOrPut(id) {
-        WardrobeData(
-            id,
-            (1..4).associateWith { null }.toMutableMap(),
-            locked = true,
-            favorite = false,
-        )
+        var helmet: ItemStack?
+            get() = getData()?.armor?.get(1)
+            set(value) {
+                getData()?.armor?.set(1, value)
+            }
+
+        var chestplate: ItemStack?
+            get() = getData()?.armor?.get(2)
+            set(value) {
+                getData()?.armor?.set(2, value)
+            }
+
+        var leggings: ItemStack?
+            get() = getData()?.armor?.get(3)
+            set(value) {
+                getData()?.armor?.set(3, value)
+            }
+
+        var boots: ItemStack?
+            get() = getData()?.armor?.get(4)
+            set(value) {
+                getData()?.armor?.set(4, value)
+            }
+
+        var locked: Boolean
+            get() = getData()?.locked ?: true
+            set(value) {
+                getData()?.locked = value
+            }
+
+        var favorite: Boolean
+            get() = getData()?.favorite ?: false
+            set(value) {
+                getData()?.favorite = value
+            }
+
+        fun getArmor() = (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
+
+        fun isEmpty(): Boolean = getArmor().all { it == null }
+
+        fun isCurrentSlot() = getData()?.id == currentWardrobeSlot
+
+        fun isInCurrentPage() = (currentPage == null && page == 1) || (page == currentPage)
     }
 
-    var WardrobeSlot.helmet: ItemStack?
-        get() = getData()?.armor?.get(1)
-        set(value) {
-            getData()?.armor?.set(1, value)
-        }
-
-    var WardrobeSlot.chestplate: ItemStack?
-        get() = getData()?.armor?.get(2)
-        set(value) {
-            getData()?.armor?.set(2, value)
-        }
-
-    var WardrobeSlot.leggings: ItemStack?
-        get() = getData()?.armor?.get(3)
-        set(value) {
-            getData()?.armor?.set(3, value)
-        }
-
-    var WardrobeSlot.boots: ItemStack?
-        get() = getData()?.armor?.get(4)
-        set(value) {
-            getData()?.armor?.set(4, value)
-        }
-
-    fun WardrobeSlot.getArmor() = (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
-
-    fun WardrobeSlot.isEmpty(): Boolean = getArmor().all { it == null }
-
-    var WardrobeSlot.locked: Boolean
-        get() = getData()?.locked ?: true
-        set(value) {
-            getData()?.locked = value
-        }
-
-    var WardrobeSlot.favorite: Boolean
-        get() = getData()?.favorite ?: false
-        set(value) {
-            getData()?.favorite = value
-        }
-
-    fun WardrobeSlot.isCurrentSlot() = getData()?.id == currentWardrobeSlot
-
-    fun WardrobeSlot.isInCurrentPage() = (currentPage == null && page == 1) || (page == currentPage)
 
     var currentWardrobeSlot: Int?
         get() = storage?.currentWardrobeSlot
@@ -119,21 +126,15 @@ object WardrobeAPI {
         val slotsPerPage = 9
         val maxPages = 2
 
-        val firstSlot = 36
-        val firstHelmetSlot = 0
-        val firstChestplateSlot = 9
-        val firstLeggingsSlot = 18
-        val firstBootsSlot = 27
-
         var id = 0
 
         for (page in 1..maxPages) {
             for (slot in 0 until slotsPerPage) {
-                val inventorySlot = firstSlot + slot
-                val helmetSlot = firstHelmetSlot + slot
-                val chestplateSlot = firstChestplateSlot + slot
-                val leggingsSlot = firstLeggingsSlot + slot
-                val bootsSlot = firstBootsSlot + slot
+                val inventorySlot = FIRST_SLOT + slot
+                val helmetSlot = FIRST_HELMET_SLOT + slot
+                val chestplateSlot = FIRST_CHESTPLATE_SLOT + slot
+                val leggingsSlot = FIRST_LEGGINGS_SLOT + slot
+                val bootsSlot = FIRST_BOOTS_SLOT + slot
                 list.add(WardrobeSlot(id, page, inventorySlot, helmetSlot, chestplateSlot, leggingsSlot, bootsSlot))
                 id++
             }
@@ -227,27 +228,21 @@ object WardrobeAPI {
     fun onDebugCollect(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
-            add("Current wardrobe slot: $currentWardrobeSlot")
             wardrobeSlots.forEach { slot ->
+                val slotInfo = buildString {
+                    append("Slot ${slot.id}")
+                    if (slot.favorite) append(" - Favorite: true")
+                }
                 if (slot.locked) {
-                    add(
-                        "Slot ${slot.id} is locked" +
-                            if (slot.favorite) " - Favorite: true" else ""
-                    )
+                    add("$slotInfo is locked")
                 } else if (slot.isEmpty()) {
-                    add(
-                        "Slot ${slot.id} is empty" +
-                            if (slot.favorite) " - Favorite: true" else ""
-                    )
+                    add("$slotInfo is empty")
                 } else {
-                    add(
-                        "Slot ${slot.id}" +
-                            if (slot.favorite) " - Favorite: true" else ""
-                    )
-                    if (slot.helmet != null) add("   Helmet: ${slot.helmet?.name}")
-                    if (slot.chestplate != null) add("   Chestplate: ${slot.chestplate?.name}")
-                    if (slot.leggings != null) add("   Leggings: ${slot.leggings?.name}")
-                    if (slot.boots != null) add("   Boots: ${slot.boots?.name}")
+                    add(slotInfo)
+                    slot.helmet?.let { add("   Helmet: ${it.name}") }
+                    slot.chestplate?.let { add("   Chestplate: ${it.name}") }
+                    slot.leggings?.let { add("   Leggings: ${it.name}") }
+                    slot.boots?.let { add("   Boots: ${it.name}") }
                 }
             }
         }
