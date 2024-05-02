@@ -271,6 +271,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialsFromBazaar
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryBarnManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryInventory
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryShortcut
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats
@@ -633,6 +634,7 @@ class SkyHanniMod {
         loadModule(SkyblockXPInChat())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
+        loadModule(ChocolateFactoryDataLoader)
         loadModule(ChocolateFactoryBarnManager)
         loadModule(ChocolateFactoryShortcut())
         loadModule(ChocolateFactoryInventory)

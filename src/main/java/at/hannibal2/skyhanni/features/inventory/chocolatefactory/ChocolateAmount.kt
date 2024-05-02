@@ -24,7 +24,7 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         }
     }
 
-    private fun timeUntilGoal(goal: Long): Duration {
+    fun timeUntilGoal(goal: Long): Duration {
         val profileStorage = ChocolateFactoryAPI.profileStorage ?: return Duration.ZERO
 
         val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
@@ -32,6 +32,8 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         val baseMultiplier = profileStorage.rawChocolateMultiplier
         val rawChocolatePerSecond = profileStorage.rawChocPerSecond
         val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
+
+        if (rawChocolatePerSecond == 0) return Duration.INFINITE
 
         var needed = goal - chocolate()
         val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
@@ -56,6 +58,25 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
             val perSecond = ChocolateFactoryAPI.chocolatePerSecond
             return (perSecond * secondsSinceUpdate).toLong()
+        }
+
+        fun averageChocPerSecond(
+            baseMultiplierIncrease: Double = 0.0,
+            rawPerSecondIncrease: Int = 0,
+            timeTowerLevelIncrease: Int = 0,
+        ): Double {
+            val profileStorage = profileStorage ?: return 0.0
+
+            val baseMultiplier = profileStorage.rawChocolateMultiplier + baseMultiplierIncrease
+            val rawPerSecond = profileStorage.rawChocPerSecond + rawPerSecondIncrease
+            val timeTowerLevel = profileStorage.timeTowerLevel + timeTowerLevelIncrease
+
+            val timeTowerCooldown = profileStorage.timeTowerCooldown
+
+            val basePerSecond = rawPerSecond * baseMultiplier
+            val towerCalc = (rawPerSecond * timeTowerLevel * .1) / timeTowerCooldown
+
+            return basePerSecond + towerCalc
         }
     }
 }
