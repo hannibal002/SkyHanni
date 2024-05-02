@@ -409,8 +409,9 @@ object Commands {
             "shsimulateworldchange",
             "Triggers the LorenzWorldChangeEvent."
         ) { LorenzWorldChangeEvent().postAndCatch() }
+        registerCommand(
             "shtestsackapi",
-            "Get the amount of an item in sacks according to internal feature SackAPI"
+            "Get sack data from the internal SackAPI Feature."
         ) { SackAPI.testSackAPI(it) }
     }
 
