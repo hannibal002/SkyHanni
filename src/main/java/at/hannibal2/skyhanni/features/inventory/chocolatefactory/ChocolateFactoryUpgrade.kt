@@ -12,7 +12,7 @@ data class ChocolateFactoryUpgrade(
     val isPrestige: Boolean = false,
 ) {
     private var chocolateAmountType = ChocolateAmount.CURRENT
-    var isMaxed = price == null
+    val isMaxed = price == null
     var canAffordAt: SimpleTimeMark? = null
 
     init {

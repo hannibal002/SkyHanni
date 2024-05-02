@@ -119,6 +119,8 @@ object ChocolateFactoryDataLoader {
     fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
         val profileStorage = profileStorage ?: return
 
+        ChocolateFactoryAPI.factoryUpgrades.clear()
+
         val chocolateItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.infoIndex) ?: return
         val prestigeItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.prestigeIndex) ?: return
         val productionInfoItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.productionInfoIndex) ?: return
@@ -133,7 +135,6 @@ object ChocolateFactoryDataLoader {
         processBarnItem(barnItem)
         processTimeTowerItem(timeTowerItem)
 
-        ChocolateFactoryAPI.factoryUpgrades.clear()
 
         profileStorage.rawChocPerSecond =
             (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier).toInt()
@@ -266,6 +267,7 @@ object ChocolateFactoryDataLoader {
     }
 
     private fun processItem(item: ItemStack, slotIndex: Int) {
+        if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
         if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
             SoundUtils.playBeepSound()
             ChocolateFactoryAPI.clickRabbitSlot = slotIndex
