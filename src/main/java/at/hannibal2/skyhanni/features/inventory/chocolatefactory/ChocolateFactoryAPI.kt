@@ -6,34 +6,19 @@ import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.Chocolat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyblockSeason
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryAPI {
@@ -42,88 +27,24 @@ object ChocolateFactoryAPI {
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
-    private val chocolateAmountPattern by patternGroup.pattern(
+    val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
         "(?<amount>[\\d,]+) Chocolate"
-    )
-    private val chocolatePerSecondPattern by patternGroup.pattern(
-        "chocolate.persecond",
-        "§6(?<amount>[\\d.,]+) §8per second"
-    )
-    private val chocolateAllTimePattern by patternGroup.pattern(
-        "chocolate.alltime",
-        "§7All-time Chocolate: §6(?<amount>[\\d,]+)"
-    )
-    private val chocolateThisPrestigePattern by patternGroup.pattern(
-        "chocolate.thisprestige",
-        "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)"
-    )
-    private val chocolateMultiplierPattern by patternGroup.pattern(
-        "chocolate.multiplier",
-        "§7Total Multiplier: §6(?<amount>[\\d.]+)x"
-    )
-    private val barnAmountPattern by patternGroup.pattern(
-        "barn.amount",
-        "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits"
-    )
-    private val prestigeLevelPattern by patternGroup.pattern(
-        "prestige.level",
-        "§6Chocolate Factory (?<prestige>[IVX]+)"
-    )
-    private val chocolateForPrestigePattern by patternGroup.pattern(
-        "chocolate.forprestige",
-        "§7§cRequires (?<amount>\\w+) Chocolate this.*"
-    )
-    private val clickMeRabbitPattern by patternGroup.pattern(
-        "rabbit.clickme",
-        "§e§lCLICK ME!"
-    )
-    private val leaderboardPlacePattern by patternGroup.pattern(
-        "leaderboard.place",
-        "§7You are §8#§b(?<position>[\\d,]+)"
-    )
-    private val leaderboardPercentilePattern by patternGroup.pattern(
-        "leaderboard.percentile",
-        "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!"
-    )
-    private val timeTowerAmountPattern by patternGroup.pattern(
-        "timetower.amount",
-        "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)"
-    )
-    private val timeTowerStatusPattern by patternGroup.pattern(
-        "timetower.status",
-        "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)"
-    )
-    private val timeTowerRechargePattern by patternGroup.pattern(
-        "timetower.recharge",
-        "§7Next Charge: §a(?<duration>\\w+)"
     )
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
         "Hoppity|Chocolate Factory Milestones"
-    )
-    private val rabbitAmountPattern by patternGroup.pattern(
-        "rabbit.amount",
-        "Rabbit \\S+ - \\[(?<amount>\\d+)].*"
-    )
-    private val upgradeTierPattern by patternGroup.pattern(
-        "upgradetier",
-        ".*\\s(?<tier>[IVXLC]+)"
-    )
-    private val unemployedRabbitPattern by patternGroup.pattern(
-        "rabbit.unemployed",
-        "Rabbit \\w+ - Unemployed"
     )
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
     var noPickblockSlots = setOf<Int>()
     var barnIndex = 34
-    private var infoIndex = 13
-    private var productionInfoIndex = 45
+    var infoIndex = 13
+    var productionInfoIndex = 45
     var prestigeIndex = 28
     var milestoneIndex = 53
-    private var leaderboardIndex = 51
+    var leaderboardIndex = 51
     var handCookieIndex = 38
     var timeTowerIndex = 39
     var shrineIndex = 41
@@ -159,228 +80,8 @@ object ChocolateFactoryAPI {
 
         factoryUpgrades.clear()
         DelayedRun.runNextTick {
-            updateInventoryItems(event.inventoryItems)
+            ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
         }
-    }
-
-    @SubscribeEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!inChocolateFactory) return
-
-        updateInventoryItems(event.inventoryItems)
-    }
-
-    private fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
-        val profileStorage = profileStorage ?: return
-
-        val infoItem = InventoryUtils.getItemAtSlotIndex(infoIndex) ?: return
-        val prestigeItem = InventoryUtils.getItemAtSlotIndex(prestigeIndex) ?: return
-        val productionInfoItem = InventoryUtils.getItemAtSlotIndex(productionInfoIndex) ?: return
-        val leaderboardItem = InventoryUtils.getItemAtSlotIndex(leaderboardIndex) ?: return
-        val barnItem = InventoryUtils.getItemAtSlotIndex(barnIndex) ?: return
-        val timeTowerItem = InventoryUtils.getItemAtSlotIndex(timeTowerIndex) ?: return
-
-        factoryUpgrades.clear()
-
-        processInfoItems(infoItem, prestigeItem, productionInfoItem, leaderboardItem, barnItem, timeTowerItem)
-        clickRabbitSlot = null
-
-        for ((slotIndex, item) in inventory) {
-            if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
-                SoundUtils.playBeepSound()
-                clickRabbitSlot = slotIndex
-            }
-
-            if (slotIndex !in otherUpgradeSlots && slotIndex !in rabbitSlots) continue
-
-            val itemName = item.name.removeColor()
-            val lore = item.getLore()
-            val upgradeCost = getChocolateBuyCost(lore)
-
-            val averageChocolate = ChocolateAmount.averageChocPerSecond().round(2)
-            val isMaxed = upgradeCost == null
-
-            var isRabbit = false
-            var level: Int? = null
-            var newAverageChocolate: Double? = null
-
-            when (slotIndex) {
-                in rabbitSlots -> {
-                    level = rabbitAmountPattern.matchMatcher(itemName) {
-                        group("amount").formatInt()
-                    } ?: run {
-                        unemployedRabbitPattern.matchMatcher(itemName) {
-                            0
-                        }
-                    } ?: continue
-                    isRabbit = true
-
-                    if (isMaxed) {
-                        val rabbitUpgradeItem = ChocolateFactoryUpgrade(slotIndex, level, null, isRabbit = true)
-                        factoryUpgrades.add(rabbitUpgradeItem)
-                        continue
-                    }
-
-                    val chocolateIncrease = rabbitSlots[slotIndex] ?: 0
-                    newAverageChocolate = ChocolateAmount.averageChocPerSecond(rawPerSecondIncrease = chocolateIncrease)
-                }
-
-                in otherUpgradeSlots -> {
-                    level = upgradeTierPattern.matchMatcher(itemName) {
-                        group("tier").romanToDecimal()
-                    } ?: continue
-
-                    if (slotIndex == timeTowerIndex) profileStorage.timeTowerLevel = level
-
-                    if (isMaxed) {
-                        val otherUpgrade = ChocolateFactoryUpgrade(slotIndex, level, null)
-                        factoryUpgrades.add(otherUpgrade)
-                        continue
-                    }
-
-                    newAverageChocolate = when (slotIndex) {
-                        timeTowerIndex -> ChocolateAmount.averageChocPerSecond(timeTowerLevelIncrease = 1)
-                        coachRabbitIndex -> ChocolateAmount.averageChocPerSecond(baseMultiplierIncrease = 0.01)
-                        else -> {
-                            val otherUpgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost)
-                            factoryUpgrades.add(otherUpgrade)
-                            continue
-                        }
-                    }
-                }
-            }
-            if (level == null || newAverageChocolate == null || upgradeCost == null) continue
-
-            val extra = (newAverageChocolate - averageChocolate).round(2)
-            val effectiveCost = (upgradeCost / extra).round(2)
-
-            val upgrade =
-                ChocolateFactoryUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
-            factoryUpgrades.add(upgrade)
-        }
-
-        val notMaxed = factoryUpgrades.filter { !it.isMaxed }
-
-        val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
-        profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt?.toMillis() ?: 0
-        bestPossibleSlot = bestUpgrade?.getValidUpgradeIndex() ?: -1
-
-        val affordAbleUpgrade = notMaxed.filter { it.canAfford() }.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
-        bestAffordableSlot = affordAbleUpgrade?.getValidUpgradeIndex() ?: -1
-    }
-
-    private fun processInfoItems(
-        chocolateItem: ItemStack,
-        prestigeItem: ItemStack,
-        productionItem: ItemStack,
-        leaderboardItem: ItemStack,
-        barnItem: ItemStack,
-        timeTowerItem: ItemStack,
-    ) {
-        val profileStorage = profileStorage ?: return
-
-        leaderboardPosition = null
-        leaderboardPercentile = null
-
-        chocolateAmountPattern.matchMatcher(chocolateItem.name.removeColor()) {
-            profileStorage.currentChocolate = group("amount").formatLong()
-        }
-        for (line in chocolateItem.getLore()) {
-            chocolatePerSecondPattern.matchMatcher(line) {
-                chocolatePerSecond = group("amount").formatDouble()
-            }
-            chocolateAllTimePattern.matchMatcher(line) {
-                profileStorage.chocolateAllTime = group("amount").formatLong()
-            }
-        }
-        prestigeLevelPattern.matchMatcher(prestigeItem.name) {
-            currentPrestige = group("prestige").romanToDecimal()
-        }
-        var prestigeCost: Long? = null
-        for (line in prestigeItem.getLore()) {
-            chocolateThisPrestigePattern.matchMatcher(line) {
-                profileStorage.chocolateThisPrestige = group("amount").formatLong()
-            }
-            chocolateForPrestigePattern.matchMatcher(line) {
-                chocolateForPrestige = group("amount").formatLong()
-                prestigeCost = chocolateForPrestige
-            }
-
-        }
-        val prestigeUpgrade = ChocolateFactoryUpgrade(prestigeIndex, currentPrestige, prestigeCost, isPrestige = true)
-        factoryUpgrades.add(prestigeUpgrade)
-        productionItem.getLore().matchFirst(chocolateMultiplierPattern) {
-            val currentMultiplier = group("amount").formatDouble()
-            profileStorage.chocolateMultiplier = currentMultiplier
-
-            if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
-                profileStorage.rawChocolateMultiplier = currentMultiplier - profileStorage.timeTowerLevel * 0.1
-            } else {
-                profileStorage.rawChocolateMultiplier = currentMultiplier
-            }
-        }
-        for (line in leaderboardItem.getLore()) {
-            leaderboardPlacePattern.matchMatcher(line) {
-                leaderboardPosition = group("position").formatInt()
-            }
-            leaderboardPercentilePattern.matchMatcher(line) {
-                leaderboardPercentile = group("percent").formatDouble()
-            }
-        }
-        barnItem.getLore().matchFirst(barnAmountPattern) {
-            profileStorage.currentRabbits = group("rabbits").formatInt()
-            profileStorage.maxRabbits = group("max").formatInt()
-            ChocolateFactoryBarnManager.trySendBarnFullMessage()
-        }
-        for (line in timeTowerItem.getLore()) {
-            timeTowerAmountPattern.matchMatcher(line) {
-                profileStorage.currentTimeTowerUses = group("uses").formatInt()
-                profileStorage.maxTimeTowerUses = group("max").formatInt()
-                ChocolateFactoryTimeTowerManager.checkTimeTowerWarning(true)
-            }
-            timeTowerStatusPattern.matchMatcher(line) {
-                val activeTime = group("acitveTime")
-                if (activeTime.isNotEmpty()) {
-                    // todo in future fix this issue with TimeUtils.getDuration
-                    val formattedGroup = activeTime.replace("h", "h ").replace("m", "m ")
-
-                    val activeDuration = TimeUtils.getDuration(formattedGroup)
-                    val activeUntil = SimpleTimeMark.now() + activeDuration
-                    profileStorage.currentTimeTowerEnds = activeUntil.toMillis()
-                }
-            }
-            timeTowerRechargePattern.matchMatcher(line) {
-                // todo in future fix this issue with TimeUtils.getDuration
-                val formattedGroup = group("duration").replace("h", "h ").replace("m", "m ")
-
-                val timeUntilTower = TimeUtils.getDuration(formattedGroup)
-                val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
-                profileStorage.nextTimeTower = nextTimeTower.toMillis()
-            }
-        }
-        profileStorage.rawChocPerSecond = (chocolatePerSecond / profileStorage.chocolateMultiplier).toInt()
-        profileStorage.lastDataSave = SimpleTimeMark.now().toMillis()
-
-        if (!config.statsDisplay) return
-        ChocolateFactoryStats.updateDisplay()
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        clearData()
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        clearData()
-    }
-
-    private fun clearData() {
-        inChocolateFactory = false
-        chocolateFactoryPaused = false
-        factoryUpgrades.clear()
-        bestAffordableSlot = -1
-        bestPossibleSlot = -1
     }
 
     @SubscribeEvent

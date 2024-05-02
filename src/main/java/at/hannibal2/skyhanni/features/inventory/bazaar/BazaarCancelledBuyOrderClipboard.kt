@@ -53,6 +53,12 @@ class BazaarCancelledBuyOrderClipboard {
             latestAmount = group("amount").formatInt()
             return
         }
+
+        // nothing to cancel
+        if (lore.firstOrNull() == "§7Cannot cancel order while there are") {
+            return
+        }
+
         ErrorManager.logErrorStateWithData(
             "BazaarCancelledBuyOrderClipboard error",
             "lastAmountPattern can not find latestAmount",
