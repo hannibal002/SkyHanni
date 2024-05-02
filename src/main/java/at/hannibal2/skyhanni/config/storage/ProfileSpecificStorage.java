@@ -96,6 +96,9 @@ public class ProfileSpecificStorage {
         public long bestUpgradeAvailableAt = 0;
 
         @Expose
+        public long bestUpgradeCost = 0;
+
+        @Expose
         public long lastDataSave = 0;
 
         @Expose
