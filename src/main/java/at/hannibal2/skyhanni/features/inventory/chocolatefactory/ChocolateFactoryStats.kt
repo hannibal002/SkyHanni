@@ -55,7 +55,14 @@ object ChocolateFactoryStats {
         }
 
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
-        val chocolateUntilPrestige = ChocolateFactoryAPI.chocolateForPrestige - ChocolateAmount.PRESTIGE.chocolate()
+        val chocolateUntilPrestigeCalculation =
+            ChocolateFactoryAPI.chocolateForPrestige - ChocolateAmount.PRESTIGE.chocolate()
+
+        var chocolateUntilPrestige = "§6${chocolateUntilPrestigeCalculation.addSeparators()}"
+
+        if (chocolateUntilPrestigeCalculation <= 0) {
+            chocolateUntilPrestige = "§aPrestige Avaliable"
+        }
 
         val map = buildMap {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory Stats")
@@ -86,7 +93,7 @@ object ChocolateFactoryStats {
             )
             put(
                 ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
-                "§eChocolate To Prestige: §6${chocolateUntilPrestige.addSeparators()}"
+                "§eChocolate To Prestige: $chocolateUntilPrestige"
             )
         }
         val text = config.statsDisplayList.filter { it.shouldDisplay() }.mapNotNull { map[it] }
@@ -137,7 +144,7 @@ object ChocolateFactoryStats {
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
         TIME_TO_PRESTIGE("§eTime To Prestige: §61d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
-        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851")
+        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
         ;
 
         override fun toString(): String {
