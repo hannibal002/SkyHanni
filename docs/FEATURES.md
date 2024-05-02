@@ -102,6 +102,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows Title.
     + Shows button in chat to retrieve from sack.
     + Only works when having enough Architect First Drafts in the sack.
++ Dungeon hub race waypoints. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
+    + Only works for Nothing; No return races.
 
 </details>
 <details open><summary>
@@ -849,6 +851,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight unbought items in Hoppity shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
 + Added time tower status to the chocolate factory stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1506)
     + Also can notify you when you get a new charge or your charges are full.
++ Extra tooltip stats about upgrades for the chocolate factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1594)
+    + View these to know when to buy time tower or Coach Jackrabbit.
++ Chocolate Leaderboard Change. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1602)
+    + Show the change of your chocolate leaderboard over time in chat.
+    + This updates every time you first open the /cf menu on a new server.
++ Chocolate Shop Price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1601)
+    + Show chocolate to coin prices inside the Chocolate Shop inventory.
 
 </details>
 <details open><summary>
@@ -878,6 +887,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Calculate how long you need to farm crops between different crop milestones.
 + /shupdate command. - Empa (https://github.com/hannibal002/SkyHanni/pull/1578)
     + Can be used like `/shupdate <beta/full>` to download updates from a specific update stream.
++ /shignore. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1469)
+    + This lets you block users from running party commands.
 
 </details>
 <details open><summary>
@@ -1126,6 +1137,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can perhaps increase FPS for some users by 5% to 150%.
     + Options to change the distance and number of mobs to always show.
     + Option to disable in garden.
++ Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
 
 </details>
 <details open><summary>
