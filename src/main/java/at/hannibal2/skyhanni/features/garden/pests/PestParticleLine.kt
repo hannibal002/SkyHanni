@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -72,7 +73,7 @@ class PestParticleLine {
         return newList
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         // TODO time in config

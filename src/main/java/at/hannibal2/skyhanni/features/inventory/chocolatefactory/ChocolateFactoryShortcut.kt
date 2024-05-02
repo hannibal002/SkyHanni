@@ -5,12 +5,10 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,10 +21,11 @@ class ChocolateFactoryShortcut {
     private var lastClick = SimpleTimeMark.farPast()
 
     private val item by lazy {
-        val neuItem = "COOKIE".asInternalName().getItemStack()
-        Utils.createItemStack(
-            neuItem.item,
-            "§6Open Chocolate Factory",
+        ItemUtils.createSkull(
+            displayName = "§6Open Chocolate Factory",
+            uuid = "d7ac85e6-bd40-359e-a2c5-86082959309e",
+            value = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvO" +
+                "WE4MTUzOThlN2RhODliMWJjMDhmNjQ2Y2FmYzhlN2I4MTNkYTBiZTBlZWMwY2NlNmQzZWZmNTIwNzgwMTAyNiJ9fX0=",
             "§8(From SkyHanni)",
             "",
             "§7Click here to run",
