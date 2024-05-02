@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
@@ -149,6 +150,7 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
+
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
@@ -167,8 +169,13 @@ object NEUItems {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
-        val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
-        if (result != -1.0) return result
+
+        getBazaarData()?.let {
+            return if (useSellingPrice) it.sellOfferPrice else it.instantBuyPrice
+        }
+
+        val result = manager.auctionManager.getLowestBin(asString())
+        if (result != -1L) return result.toDouble()
 
         if (equals("JACK_O_LANTERN")) {
             return "PUMPKIN".asInternalName().getPrice(useSellingPrice) + 1

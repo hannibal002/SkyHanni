@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
@@ -1461,6 +1462,24 @@ object RenderUtils {
     }
 
     fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float,
+    ) {
+        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+    }
+
+    fun GuiContainerEvent.ForegroundDrawnEvent.drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float,
+    ) {
+        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+    }
+
+    private fun drawSlotText(
         xPos: Int,
         yPos: Int,
         text: String,

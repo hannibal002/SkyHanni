@@ -85,6 +85,8 @@ object LorenzUtils {
             return result
         }
 
+    val debug: Boolean = onHypixel && SkyHanniMod.feature.dev.debug.enabled
+
     private var previousApril = false
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
