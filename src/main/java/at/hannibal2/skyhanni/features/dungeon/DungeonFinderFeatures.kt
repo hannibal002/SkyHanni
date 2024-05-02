@@ -243,9 +243,12 @@ class DungeonFinderFeatures {
                     group("className")
                 }
             }
-            if (memberLevels.any { (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel }) {
-                map[slot] = LorenzColor.YELLOW
-                continue
+            if (config.markBelowClassLevel != 0) {
+                val hasLowLevelMembers = memberLevels.any { (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel }
+                if (hasLowLevelMembers) {
+                    map[slot] = LorenzColor.YELLOW
+                    continue
+                }
             }
 
             if (config.markMissingClass && memberClasses.none { it == selectedClass }) {
