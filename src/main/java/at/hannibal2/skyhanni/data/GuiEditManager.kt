@@ -17,6 +17,7 @@ import io.github.moulberry.notenoughupdates.itemeditor.GuiElementTextField
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
@@ -88,7 +89,11 @@ class GuiEditManager {
 
         @JvmStatic
         fun openGuiPositionEditor(hotkeyReminder: Boolean) {
-            SkyHanniMod.screenToOpen = GuiPositionEditor(latestPositions.values.toList(), 2)
+            SkyHanniMod.screenToOpen = GuiPositionEditor(
+                latestPositions.values.toList(),
+                2,
+                Minecraft.getMinecraft().currentScreen as? GuiContainer
+            )
             if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
                 lastHotkeyReminded = SimpleTimeMark.now()
                 ChatUtils.chat(

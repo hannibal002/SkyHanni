@@ -84,12 +84,12 @@ object DiscordRPCManager : IPCListener {
         } catch (ex: Exception) {
             logger.warn("Failed to connect to RPC!", ex)
             ChatUtils.clickableChat(
-                    "Discord Rich Presence was unable to start! " +
+                "Discord Rich Presence was unable to start! " +
                             "This usually happens when you join SkyBlock when Discord is not started. " +
                             "Please run /shrpcstart to retry once you have launched Discord.",
-                    onClick = {
-                        startCommand()
-                    }
+                onClick = {
+                    startCommand()
+                }
             )
         }
     }
@@ -125,10 +125,12 @@ object DiscordRPCManager : IPCListener {
             setLargeImage(discordIconKey, location)
 
             if (config.showSkyCryptButton.get()) {
-                addButton(RichPresenceButton(
-                    "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
-                    "Open SkyCrypt Profile"
-                ))
+                addButton(
+                    RichPresenceButton(
+                        "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
+                        "Open SkyCrypt"
+                    )
+                )
             }
         }.build())
     }

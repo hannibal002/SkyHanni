@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.hoppity
+package at.hannibal2.skyhanni.features.event.hoppity
 
 import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 
