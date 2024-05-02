@@ -9,33 +9,33 @@ import org.lwjgl.input.Keyboard;
 
 public class ChocolateFactoryKeybindsConfig {
     @Expose
-    @ConfigOption(name = "Keybinds On", desc = "Turns the keybinds on or off")
+    @ConfigOption(name = "Enabled", desc = "In the Chocolate Factory, press buttons with your number row on the keyboard to upgrade the rabbits.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean chocolateFactoryKeybinds = false;
+    public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Key 1", desc = "Key for Rabbit Bro")
+    @ConfigOption(name = "Key 1", desc = "Key for Rabbit Bro.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_1)
     public int key1 = Keyboard.KEY_1;
 
     @Expose
-    @ConfigOption(name = "Key 2", desc = "Key for Rabbit Cousin")
+    @ConfigOption(name = "Key 2", desc = "Key for Rabbit Cousin.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_2)
     public int key2 = Keyboard.KEY_2;
 
     @Expose
-    @ConfigOption(name = "Key 3", desc = "Key for Rabbit Sis")
+    @ConfigOption(name = "Key 3", desc = "Key for Rabbit Sis.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_3)
     public int key3 = Keyboard.KEY_3;
 
     @Expose
-    @ConfigOption(name = "Key 4", desc = "Key for Rabbit Daddy")
+    @ConfigOption(name = "Key 4", desc = "Key for Rabbit Daddy.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_4)
     public int key4 = Keyboard.KEY_4;
 
     @Expose
-    @ConfigOption(name = "Key 5", desc = "Key for Rabbit Granny")
+    @ConfigOption(name = "Key 5", desc = "Key for Rabbit Granny.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_5)
     public int key5 = Keyboard.KEY_5;
 }

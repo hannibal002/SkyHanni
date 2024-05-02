@@ -10,13 +10,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 object ChocolateFactoryKeybinds {
-    private val config get() = ChocolateFactoryAPI.config.chocolateFactoryKeybindsConfig
+    private val config get() = ChocolateFactoryAPI.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.chocolateFactoryKeybinds) return
+        if (!config.enabled) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
         val chest = event.guiContainer as? GuiChest ?: return

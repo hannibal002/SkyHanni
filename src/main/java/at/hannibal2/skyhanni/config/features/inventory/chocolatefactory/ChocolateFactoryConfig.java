@@ -157,6 +157,6 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(name = "Chocolate Factory Keybinds", desc = "")
     @Accordion
-    public ChocolateFactoryKeybindsConfig chocolateFactoryKeybindsConfig = new ChocolateFactoryKeybindsConfig();
+    public ChocolateFactoryKeybindsConfig keybinds = new ChocolateFactoryKeybindsConfig();
 
 }
