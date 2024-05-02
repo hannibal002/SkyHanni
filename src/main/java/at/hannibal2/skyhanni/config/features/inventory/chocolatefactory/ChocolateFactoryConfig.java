@@ -154,4 +154,9 @@ public class ChocolateFactoryConfig {
     @Accordion
     public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
 
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Keybinds", desc = "")
+    @Accordion
+    public ChocolateFactoryKeybindsConfig keybinds = new ChocolateFactoryKeybindsConfig();
+
 }

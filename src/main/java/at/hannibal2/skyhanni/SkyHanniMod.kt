@@ -273,6 +273,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryInventory
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryKeybinds
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryShortcut
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
@@ -643,6 +644,7 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryTooltipCompact)
         loadModule(ChocolateFactoryTimeTowerManager)
         loadModule(ChocolateFactoryTooltip)
+        loadModule(ChocolateFactoryKeybinds)
         loadModule(ChocolateShopPrice)
         loadModule(ChocolateFactoryUpgradeWarning)
         loadModule(HoppityNpc)
