@@ -33,6 +33,8 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         val rawChocolatePerSecond = profileStorage.rawChocPerSecond
         val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
 
+        if (rawChocolatePerSecond == 0) return Duration.INFINITE
+
         var needed = goal - chocolate()
         val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
 

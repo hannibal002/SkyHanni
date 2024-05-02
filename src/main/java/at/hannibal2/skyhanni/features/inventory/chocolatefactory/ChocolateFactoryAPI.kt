@@ -110,6 +110,10 @@ object ChocolateFactoryAPI {
         "upgradetier",
         ".*\\s(?<tier>[IVXLC]+)"
     )
+    private val unemployedRabbitPattern by patternGroup.pattern(
+        "rabbit.unemployed",
+        "Rabbit \\w+ - Unemployed"
+    )
 
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
@@ -161,7 +165,6 @@ object ChocolateFactoryAPI {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        factoryUpgrades.clear()
         if (!inChocolateFactory) return
 
         updateInventoryItems(event.inventoryItems)
@@ -176,6 +179,8 @@ object ChocolateFactoryAPI {
         val leaderboardItem = InventoryUtils.getItemAtSlotIndex(leaderboardIndex) ?: return
         val barnItem = InventoryUtils.getItemAtSlotIndex(barnIndex) ?: return
         val timeTowerItem = InventoryUtils.getItemAtSlotIndex(timeTowerIndex) ?: return
+
+        factoryUpgrades.clear()
 
         processInfoItems(infoItem, prestigeItem, productionInfoItem, leaderboardItem, barnItem, timeTowerItem)
         clickRabbitSlot = null
@@ -203,8 +208,11 @@ object ChocolateFactoryAPI {
                 in rabbitSlots -> {
                     level = rabbitAmountPattern.matchMatcher(itemName) {
                         group("amount").formatInt()
+                    } ?: run {
+                        unemployedRabbitPattern.matchMatcher(itemName) {
+                            0
+                        }
                     } ?: continue
-
                     isRabbit = true
 
                     if (isMaxed) {
@@ -222,7 +230,7 @@ object ChocolateFactoryAPI {
                         group("tier").romanToDecimal()
                     } ?: continue
 
-                    if (slotIndex == timeTowerIndex) profileStorage?.timeTowerLevel = level
+                    if (slotIndex == timeTowerIndex) profileStorage.timeTowerLevel = level
 
                     if (isMaxed) {
                         val otherUpgrade = ChocolateFactoryUpgrade(slotIndex, level, null)
