@@ -34,17 +34,6 @@ object HarpFeatures {
 
     private const val closeButtonSlot = 40
 
-    private object KeyIterable : Iterable<Int> {
-
-        override fun iterator() = object : Iterator<Int> {
-            private var currentIndex = 0
-
-            override fun hasNext() = currentIndex < 7
-
-            override fun next() = getKey(currentIndex++) ?: throw NoSuchElementException("currentIndex: $currentIndex")
-        }
-    }
-
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
     private val patternGroup = RepoPattern.group("harp")
@@ -71,7 +60,8 @@ object HarpFeatures {
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         val chest = event.guiContainer as? GuiChest ?: return
 
-        for ((index, key) in KeyIterable.withIndex()) {
+        for (index in 0..7) {
+            val key = getKey(index) ?: error("no key for index $index")
             if (!key.isKeyHeld()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
 
@@ -89,7 +79,7 @@ object HarpFeatures {
         }
     }
 
-    fun getKey(index: Int) = when (index) {
+    private fun getKey(index: Int) = when (index) {
         0 -> config.harpKeybinds.key1
         1 -> config.harpKeybinds.key2
         2 -> config.harpKeybinds.key3

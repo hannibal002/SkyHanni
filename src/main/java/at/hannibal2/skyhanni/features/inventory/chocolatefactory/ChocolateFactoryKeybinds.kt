@@ -13,17 +13,6 @@ object ChocolateFactoryKeybinds {
     private val config get() = ChocolateFactoryAPI.config.chocolateFactoryKeybindsConfig
     private var lastClick = SimpleTimeMark.farPast()
 
-    private object KeyIterable : Iterable<Int> {
-
-        override fun iterator() = object : Iterator<Int> {
-            private var currentIndex = 0
-
-            override fun hasNext() = currentIndex < 5
-
-            override fun next() = getKey(currentIndex++) ?: throw NoSuchElementException("currentIndex: $currentIndex")
-        }
-    }
-
     @SubscribeEvent
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -32,7 +21,8 @@ object ChocolateFactoryKeybinds {
 
         val chest = event.guiContainer as? GuiChest ?: return
 
-        for ((index, key) in KeyIterable.withIndex()) {
+        for (index in 0..7) {
+            val key = getKey(index) ?: error("no key for index $index")
             if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
             lastClick = SimpleTimeMark.now()
@@ -50,7 +40,7 @@ object ChocolateFactoryKeybinds {
         }
     }
 
-    fun getKey(index: Int) = when (index) {
+    private fun getKey(index: Int) = when (index) {
         0 -> config.key1
         1 -> config.key2
         2 -> config.key3
