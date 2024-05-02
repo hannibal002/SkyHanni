@@ -21,10 +21,6 @@ object ChocolateFactoryTooltip {
 
         val upgradeInfo = ChocolateFactoryAPI.factoryUpgrades.find { it.slotIndex == slotIndex } ?: return
 
-        if (slotIndex == ChocolateFactoryAPI.prestigeIndex) {
-            println(upgradeInfo)
-        }
-
         if (slotIndex == ChocolateFactoryAPI.timeTowerIndex && upgradeInfo.isMaxed) {
             event.toolTip.add("§8§m-----------------")
             event.toolTip.add("§7One charge will give: §6${chocPerTimeTower().addSeparators()}")
