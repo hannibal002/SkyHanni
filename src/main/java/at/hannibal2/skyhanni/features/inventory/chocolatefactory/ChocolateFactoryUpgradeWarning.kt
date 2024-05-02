@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.minutes
 
 object ChocolateFactoryUpgradeWarning {
 
@@ -35,7 +35,8 @@ object ChocolateFactoryUpgradeWarning {
         if (!ChocolateFactoryAPI.isEnabled()) return
         if (!config.upgradeWarning) return
         if (ReminderUtils.isBusy()) return
-        if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.toDouble().minutes) return
+        if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.minutes) return
+        lastUpgradeWarning = SimpleTimeMark.now()
 
         ChatUtils.clickableChat(
             "You have a Chocolate factory upgrade available to purchase!",
@@ -47,7 +48,6 @@ object ChocolateFactoryUpgradeWarning {
             SoundUtils.playBeepSound()
         }
 
-        lastUpgradeWarning = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
