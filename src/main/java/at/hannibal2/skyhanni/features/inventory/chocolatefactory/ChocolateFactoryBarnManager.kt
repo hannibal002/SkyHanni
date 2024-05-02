@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,6 +25,14 @@ object ChocolateFactoryBarnManager {
         "§7§lDUPLICATE RABBIT! §6\\+[\\d,]+ Chocolate"
     )
 
+    /**
+     * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
+     */
+    private val rabbitCrashedPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.crushed",
+        "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6.+ Chocolate"
+    )
+
     var barnFull = false
     private var lastBarnFullWarning = SimpleTimeMark.farPast()
 
@@ -41,15 +50,25 @@ object ChocolateFactoryBarnManager {
         rabbitDuplicatePattern.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
         }
+
+        rabbitCrashedPattern.matchMatcher(event.message) {
+            HoppityEggsManager.shareWaypointPrompt()
+        }
     }
 
     fun trySendBarnFullMessage() {
         if (!ChocolateFactoryAPI.isEnabled()) return
+
+        if (config.barnCapacityThreshold <= 0) {
+            return
+        }
+
         val profileStorage = profileStorage ?: return
 
+        if (profileStorage.maxRabbits >= ChocolateFactoryAPI.maxRabbits) return
+
         val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
-        barnFull =
-            remainingSpace <= config.barnCapacityThreshold && profileStorage.maxRabbits < ChocolateFactoryAPI.maxRabbits
+        barnFull = remainingSpace <= config.barnCapacityThreshold
         if (!barnFull) return
 
         if (lastBarnFullWarning.passedSince() < 30.seconds) return
@@ -65,7 +84,11 @@ object ChocolateFactoryBarnManager {
         }
 
         ChatUtils.clickableChat(
-            "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed",
+            message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) {
+                "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
+            } else {
+                "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
+            },
             onClick = {
                 HypixelCommands.chocolateFactory()
             }

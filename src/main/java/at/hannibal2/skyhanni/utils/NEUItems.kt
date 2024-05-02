@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.TypeAdapter
@@ -123,8 +122,19 @@ object NEUItems {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
-            val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
+            var name = manager.createItem(rawInternalName).displayName.lowercase()
             val internalName = rawInternalName.asInternalName()
+
+            // TODO remove one of them once neu is consistent
+            name = name.removePrefix("§f§f§7[lvl 1➡100] ")
+            name = name.removePrefix("§7[lvl 1➡100] ")
+
+            if (name.contains("[lvl 1➡100]")) {
+                if (LorenzUtils.isInDevEnvironment()) {
+                    error("wrong name: '$name'")
+                }
+                println("wrong name: '$name'")
+            }
             map[name] = internalName
             allInternalNames.add(internalName)
         }
@@ -321,7 +331,7 @@ object NEUItems {
         }
     }
 
-    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { allIngredients() }
 
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
@@ -348,4 +358,6 @@ object NEUItems {
         val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
         return manager.jsonToStack(jsonObject, false)
     }
+
+    fun NeuRecipe.allIngredients(): Set<Ingredient> = ingredients
 }
