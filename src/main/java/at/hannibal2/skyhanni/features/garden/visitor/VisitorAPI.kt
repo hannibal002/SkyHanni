@@ -217,7 +217,7 @@ object VisitorAPI {
         RARE_REWARD("§aRare visitor reward found", true),
         CHEAP_COPPER("§aCheap copper", true),
         EXPENSIVE_COPPER("§cExpensive copper", false),
-        LOW_LOSS("§cLow Loss", true),
-        HIGH_LOSS("§aHigh Loss", false)
+        LOW_LOSS("§aLow Loss", true),
+        HIGH_LOSS("§cHigh Loss", false)
     }
 }

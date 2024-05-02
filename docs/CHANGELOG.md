@@ -53,6 +53,8 @@
     + Shows Title.
     + Shows button in chat to retrieve from sack.
     + Only works when having enough Architect First Drafts in the sack.
++ Added dungeon hub race waypoints. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
+    + Only works for Nothing; No return races.
 
 #### Rift Features
 
@@ -114,6 +116,11 @@
     + Also can notify you when you get a new charge or your charges are full.
 + Extra tooltip stats about upgrades for the chocolate factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1594)
     + View these to know when to buy time tower or Coach Jackrabbit.
++ Added Chocolate Leaderboard Change. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1602)
+    + Show the change of your chocolate leaderboard over time in chat.
+    + This updates every time you first open the /cf menu on a new server.
++ Added Chocolate Shop Price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1601)
+    + Show chocolate to coin prices inside the Chocolate Shop inventory.
 
 #### Inventory Features
 
@@ -140,6 +147,9 @@
 + SkyCrypt button to Discord RPC. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1526)
 + Added `/shupdate` command. - Empa (https://github.com/hannibal002/SkyHanni/pull/1578)
     + Can be used like `/shupdate <beta/full>` to download updates from a specific update stream.
++ Added Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
++ Added /shignore. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1469)
+    + This lets you block users from running party commands.
 
 ### Improvements
 
@@ -252,14 +262,14 @@
 + Removed the Hoppity Menu Shortcut in The Rift, Kuudra, Catacombs and Mineshafts. - raven (https://github.com/hannibal002/SkyHanni/pull/1585)
     + You cannot use the chocolate factory in these areas, resulting in the button being removed.
 + Live update chocolate amounts in other inventories related to the chocolate factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1594)
++ Added ranking percentage to Hoppity Display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1501)
++ Split up Chocolate Factory and Hoppity in the config. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1599)
+    + Factory is now under category inventory.
+    + Hoppity is now alone.
 
 #### Rift Improvements
 
 + Made the vermins in the Vermin Tracker match the order shown in Kat's menu. - Luna (https://github.com/hannibal002/SkyHanni/pull/1459)
-
-#### Event Improvements
-
-+ Added ranking percentage to Hoppity Display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1501)
 
 #### Dungeon Improvements
 
@@ -274,6 +284,7 @@
 + Added support to right-click in GUI editor to open config for all remaining GUI elements. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1455)
 + Fixed another memory leak. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1491)
 + Don't send some reminders while in dark auction. - seraid (https://github.com/hannibal002/SkyHanni/pull/1533)
++ Added descriptions for missing config categories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1600)
 
 ### Fixes
 
@@ -310,6 +321,7 @@
 + Fixed pest count error being shown. - Empa (https://github.com/hannibal002/SkyHanni/pull/1563)
 + Fixed pest count logic not having necessary delay. - Empa (https://github.com/hannibal002/SkyHanni/pull/1591)
 + Fixed visitor reward warning only blocking normal clicks. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1595)
++ Fixed Visitor's logbook stats display showing while guesting. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1635)
 
 #### Chat Fixes
 
@@ -347,6 +359,10 @@
 + Fixed space in visitor shopping list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1549)
 + Fixed missing Fossil Dust line in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1586)
 + Fixed SkyHanni showing the Vanilla Scoreboard when using Apec. - hannibal2, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1592)
++ Fixed Magical Power not setting to zero when the mod can't find the magical power line. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1632)
++ Fixed crash on Unix with Discord Rich Presence. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1611)
++ Made some lines in Discord Rich Presence shorter. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1613)
+    + This should help avoid overflowing the SkyCrypt profiles button.
 
 #### Dungeon Fixes
 
@@ -381,6 +397,7 @@
 
 + Fixed party invite tab completion not working for friends. - nea (https://github.com/hannibal002/SkyHanni/pull/1571)
 + Fixed error when running /gfs without amount. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1567)
++ Fixed out of item messages in Composter GfS. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1398)
 
 #### Config Fixes
 
@@ -389,6 +406,8 @@
 #### Event Fixes
 
 + Fixed a typo in the Barn Warning message. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1584)
++ Fixed not sharing location when barn full. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1608)
++ Fixed Chocolate Factory Move Tooltip flickering when clicking quickly. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1604)
 
 #### Misc Fixes
 
@@ -548,6 +567,9 @@
 + Added scroll able logic for Renderables. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/886)
     + Added elements: scrollList and scrollTable.
 + Cleanup Custom Scoreboard code. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1486)
++ Cleanup HoppityCollectionStats to improve readability. - walker (https://github.com/hannibal002/SkyHanni/pull/1562)
++ Added NamedParkourJson. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
++ Added a `/shtestsackapi` debug command. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1398)
 
 ### Removed Features
 
