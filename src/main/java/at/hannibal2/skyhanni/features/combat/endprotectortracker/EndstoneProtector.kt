@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.replaceAll
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
@@ -18,11 +19,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -207,45 +206,44 @@ object EndstoneProtector {
             when (name) {
                 "§9Endstone Rose" -> {
                     if (rose) return
-                    tracker.modify { storage -> run { storage.endstoneRoses += amount } }
+                    tracker.modify { storage -> storage.endstoneRoses += amount }
                     rose = true
-
                 }
                 "§aEnchanted End Stone" -> {
                     if (endstone) return
-                    tracker.modify { storage -> run { storage.enchEndstones += amount } }
+                    tracker.modify { storage -> storage.enchEndstones += amount }
                     endstone = true
                 }
                 "§5Crystal Fragment" -> {
                     if (fragment) return
-                    tracker.modify { storage -> run { storage.crystalFragments += amount } }
+                    tracker.modify { storage -> storage.crystalFragments += amount }
                     fragment = true
                 }
                 "§7[Lvl 1] §5Golem" -> {
                     if (fourthDrop) return
-                    tracker.modify { storage -> run {
+                    tracker.modify { storage ->
                         storage.epicGolems += amount
                         storage.sinceLastEpicGolem = 0
                         dropAlert("§5GOLEM")
-                    } }
+                    }
                     fourthDrop = true
                 }
                 "§7[Lvl 1] §6Golem" -> {
                     if (fourthDrop) return
-                    tracker.modify { storage -> run {
+                    tracker.modify { storage ->
                         storage.legGolems += amount
                         storage.sinceLastLegGolem = 0
                         dropAlert("§6GOLEM")
-                    } }
+                    }
                     fourthDrop = true
                 }
                 "§6Tier Boost Core" -> {
                     if (fourthDrop) return
-                    tracker.modify { storage -> run {
+                    tracker.modify { storage ->
                         storage.tierboosts += amount
                         storage.sinceLastTierBoost = 0
                         dropAlert("§6TIER BOOST")
-                    } }
+                    }
                     fourthDrop = true
                 }
                 else -> {}
@@ -335,12 +333,12 @@ object EndstoneProtector {
             dmg = group("damage").replaceAll(",", "").toInt()
 
             if (dmg > 0 && !golemDead) {
-                tracker.modify { storage -> run { storage.totalKilled += 1 } }
-                tracker.modify { storage -> run {
+                tracker.modify { storage ->
+                    storage.totalKilled += 1
                     storage.sinceLastLegGolem += 1
                     storage.sinceLastEpicGolem += 1
                     storage.sinceLastTierBoost += 1
-                } }
+                }
                 golemDiedRecently = true
                 golemDead = true
             }
@@ -373,12 +371,12 @@ object EndstoneProtector {
 
     private fun stage5alert() {
         LorenzUtils.sendTitle("§4STAGE 5", 2.seconds)
-        Utils.playSound(ResourceLocation("random.anvil_land"), false)
+        SoundUtils.createSound("random.anvil_land", 1f).playSound()
     }
 
     private fun stage4alert() {
         LorenzUtils.sendTitle("§cSTAGE 4", 2.seconds)
-        Utils.playSound(ResourceLocation("mob.irongolem.hit"), false)
+        SoundUtils.createSound("mob.irongolem.hit", 1f).playSound()
     }
 
     private fun dropAlert(item: String) {
