@@ -568,6 +568,20 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
+    fun Position.renderRenderable(
+        renderable: Renderable,
+        posLabel: String,
+        addToGuiManager: Boolean = true,
+    ) {
+        GlStateManager.pushMatrix()
+        val (x, y) = transform()
+        Renderable.withMousePosition(x, y) {
+            renderable.renderXAligned(0, 0, renderable.width)
+        }
+        GlStateManager.popMatrix()
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, 0)
+    }
+
     /**
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.

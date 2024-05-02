@@ -48,23 +48,19 @@ class CustomWardrobe {
 
     private val config get() = SkyHanniMod.feature.inventory.customWardrobe
 
-    private var display = emptyList<Triple<Position, Renderable, Int>>()
     private var displayRenderable: Renderable? = null
     private var buttonsRenderable: Renderable? = null
-    private var tempToggleShowOverlay = true
-
-    private var hoveredSlot: Int? = null
+    private var editMode = false
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled()) return
-        if (tempToggleShowOverlay) event.cancel()
+        event.cancel()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!tempToggleShowOverlay) return
 
         if (displayRenderable == null) {
             update()
@@ -81,10 +77,14 @@ class CustomWardrobe {
                     config.spacing.buttonSlotsVerticalSpacing,
                     horizontalAlign = HorizontalAlignment.CENTER
                 ),
-                Renderable.string(
-                    "§7SkyHanni",
-                    horizontalAlign = HorizontalAlignment.RIGHT,
-                    verticalAlign = VerticalAlignment.BOTTOM
+                Renderable.clickable(
+                    Renderable.string(
+                        "§7SkyHanni",
+                        horizontalAlign = HorizontalAlignment.RIGHT,
+                        verticalAlign = VerticalAlignment.BOTTOM,
+                        scale = 1.0 * (config.spacing.globalScale / 100.0)
+                    ),
+                    onClick = { config::spacing.jumpToEditor() }
                 ),
                 blockBottomHover = false
             ),
@@ -101,7 +101,7 @@ class CustomWardrobe {
             ))).toInt()
             config.spacing.globalScale = newScale
             ChatUtils.clickableUserError(
-                "Auto-set your Global Scale in custom wardrobe, as it was too tall/wide",
+                "Auto-set your Global Scale in custom wardrobe, as it was too tall/wide.",
                 onClick = { config::spacing.jumpToEditor() }
             )
             update()
@@ -111,7 +111,8 @@ class CustomWardrobe {
         val (width, height) = fullRenderable.width to fullRenderable.height
         val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
 
-        pos.renderRenderables(listOf(fullRenderable), posLabel = "Wardrobe Overlay", addToGuiManager = false)
+        pos.renderRenderables(listOf(fullRenderable), posLabel = "Custom Wardrobe", addToGuiManager = false)
+        //pos.renderRenderable(fullRenderable, posLabel = "Wardrobe Overlay", addToGuiManager = false)
     }
 
     @SubscribeEvent
@@ -142,29 +143,24 @@ class CustomWardrobe {
     }
 
     private fun createRenderables(): Renderable {
-        var list = WardrobeAPI.wardrobeSlots.filter { !it.locked }
+        var list = WardrobeAPI.wardrobeSlots
 
-        var wardrobeWarning = false
-        var wardrobeWarningText = ""
+        var wardrobeWarning = ""
 
-        if (list.isEmpty()) {
-            wardrobeWarning = true
-            wardrobeWarningText = "§cYour wardrobe is empty :("
+        if (list.isEmpty()) wardrobeWarning = "§cYour wardrobe is empty :("
+
+        if (config.hideLockedSlots) {
+            list = list.filter { !it.locked }
+            if (list.isEmpty()) wardrobeWarning = "§cAll your slots are locked? Somehow"
         }
 
         if (config.hideEmptySlots) {
             list = list.filter { !it.isEmpty() }
-            if (list.isEmpty()) {
-                wardrobeWarning = true
-                wardrobeWarningText = "§cAll slots are empty :("
-            }
+            if (list.isEmpty()) wardrobeWarning = "§cAll slots are empty :("
         }
         if (config.onlyFavorites) {
             list = list.filter { it.favorite || it.isCurrentSlot() }
-            if (list.isEmpty()) {
-                wardrobeWarning = true
-                wardrobeWarningText = "§cDidn't set any favorites"
-            }
+            if (list.isEmpty()) wardrobeWarning = "§cDidn't set any favorites"
         }
 
         val totalPlayers = list.size
@@ -174,13 +170,14 @@ class CustomWardrobe {
         val playerWidth = (containerWidth * config.spacing.playerScale) / 100.0
         val horizontalSpacing = (config.spacing.horizontalSpacing * (config.spacing.globalScale / 100.0)).toInt()
         val verticalSpacing = (config.spacing.verticalSpacing * (config.spacing.globalScale / 100.0)).toInt()
+        val wardrobeWarningScale = 3.0 * (config.spacing.globalScale / 100.0)
 
         val rows = ceil(totalPlayers.toDouble() / maxPlayersPerRow).toInt()
 
-        if (wardrobeWarning) {
+        if (wardrobeWarning.isNotEmpty()) {
             val warningRenderable = Renderable.string(
-                wardrobeWarningText,
-                3 * (config.spacing.globalScale / 100.0),
+                wardrobeWarning,
+                wardrobeWarningScale,
                 horizontalAlign = HorizontalAlignment.CENTER
             )
             return warningRenderable
@@ -235,9 +232,6 @@ class CustomWardrobe {
                         borderOutlineBlur = config.spacing.outlineBlur,
                         onClick = {
                             clickWardrobeSlot(wardrobeSlot)
-                        },
-                        onHover = {
-                            hoveredSlot = wardrobeSlot.id
                         }
                     )
 
@@ -283,8 +277,7 @@ class CustomWardrobe {
 
     private fun reset() {
         inCustomWardrobe = false
-        tempToggleShowOverlay = true
-        display = mutableListOf()
+        editMode = false
         displayRenderable = null
         buttonsRenderable = null
     }
@@ -315,7 +308,7 @@ class CustomWardrobe {
 
         val onlyFavoriteButton = createLabeledButton(
             "§eFavorite",
-            color = if (config.onlyFavorites) greenColor else redColor,
+            hoveredColor = if (config.onlyFavorites) greenColor else redColor,
             onClick = {
                 config.onlyFavorites = !config.onlyFavorites
                 update()
@@ -326,7 +319,7 @@ class CustomWardrobe {
             "§bEdit",
             onClick = {
                 reset()
-                tempToggleShowOverlay = false
+                editMode = true
             }
         )
 
@@ -348,18 +341,19 @@ class CustomWardrobe {
 
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
         val list = mutableListOf<Renderable>()
+        val textScale = 1.5 * (config.spacing.globalScale / 100.0)
         list.add(
             Renderable.clickable(
                 Renderable.hoverable(
                     Renderable.string(
                         (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
-                        1.5,
+                        scale = textScale,
                         horizontalAlign = HorizontalAlignment.CENTER,
                         verticalAlign = VerticalAlignment.CENTER
                     ),
                     Renderable.string(
                         (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
-                        1.5,
+                        scale = textScale,
                         horizontalAlign = HorizontalAlignment.CENTER,
                         verticalAlign = VerticalAlignment.CENTER
                     )
@@ -371,21 +365,17 @@ class CustomWardrobe {
             )
         )
 
-        if (config.estimatedValue) {
+        if (config.estimatedValue && !wardrobeSlot.isEmpty()) {
+            val lore = createWardrobePriceLore(wardrobeSlot)
             list.add(
-                if (wardrobeSlot.getArmor().any { it != null }) {
-                    val lore = createWardrobePriceLore(wardrobeSlot)
-                    Renderable.hoverTips(
-                        Renderable.string(
-                            "§2$",
-                            1.5,
-                            horizontalAlign = HorizontalAlignment.CENTER,
-                            verticalAlign = VerticalAlignment.CENTER
-                        ), lore
-                    )
-                } else {
-                    Renderable.placeholder(0, 0)
-                }
+                Renderable.hoverTips(
+                    Renderable.string(
+                        "§2$",
+                        scale = textScale,
+                        horizontalAlign = HorizontalAlignment.CENTER,
+                        verticalAlign = VerticalAlignment.CENTER
+                    ), lore
+                )
             )
         }
 
@@ -394,11 +384,13 @@ class CustomWardrobe {
 
     private fun createLabeledButton(
         text: String,
-        color: Color = Color(130, 130, 130, 200),
+        hoveredColor: Color = Color(130, 130, 130, 200),
+        unhoveredColor: Color = hoveredColor.darker(0.57),
         onClick: () -> Unit
     ): Renderable {
         val buttonWidth = (config.spacing.buttonWidth * (config.spacing.globalScale / 100.0)).toInt()
         val buttonHeight = (config.spacing.buttonHeight * (config.spacing.globalScale / 100.0)).toInt()
+        val textScale = 1.0 * (config.spacing.globalScale / 100.0)
 
         val renderable = Renderable.hoverable(
             Renderable.drawInsideRoundedRectWithOutline(
@@ -410,16 +402,16 @@ class CustomWardrobe {
                     Renderable.string(
                         text,
                         horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER
+                        verticalAlign = VerticalAlignment.CENTER,
+                        scale = textScale
                     ),
                     false,
                 ),
-                color,
+                hoveredColor,
                 padding = 0,
                 topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
                 bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
                 borderOutlineThickness = 2,
-                blur = 0.5f,
                 horizontalAlign = HorizontalAlignment.CENTER
             ),
             Renderable.drawInsideRoundedRect(
@@ -428,10 +420,11 @@ class CustomWardrobe {
                     Renderable.string(
                         text,
                         horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER
+                        verticalAlign = VerticalAlignment.CENTER,
+                        scale = textScale
                     ),
                 ),
-                color.darker(0.57),
+                unhoveredColor.darker(0.57),
                 padding = 0,
                 horizontalAlign = HorizontalAlignment.CENTER
             )
@@ -533,5 +526,5 @@ class CustomWardrobe {
         return Color(color.withAlpha(170), true)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe() && !editMode
 }

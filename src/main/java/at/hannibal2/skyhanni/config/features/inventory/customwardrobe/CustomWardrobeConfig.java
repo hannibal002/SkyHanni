@@ -9,38 +9,40 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CustomWardrobeConfig {
 
     @Expose
-    @ConfigOption(name = "enble", desc = "")
+    @ConfigOption(name = "Enable", desc = "Enables the Custom Wardrobe GUI.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "is lok mose", desc = "")
+    @ConfigOption(name = "Follow mouse", desc = "Players follow the movement of the mouse.")
     @ConfigEditorBoolean
     public boolean eyesFollowMouse = true;
 
     @Expose
-    @ConfigOption(name = "no emty", desc = "")
+    @ConfigOption(name = "Hide Empty Slots", desc = "Hides wardrobe slots with no armor.")
     @ConfigEditorBoolean
     public boolean hideEmptySlots = false;
 
     @Expose
-    @ConfigOption(name = "onli favs", desc = "")
+    @ConfigOption(name = "Hide Locked Slots", desc = "Hides locked wardrobe slots.")
     @ConfigEditorBoolean
+    public boolean hideLockedSlots = false;
+
     public boolean onlyFavorites = false;
 
     @Expose
-    @ConfigOption(name = "estimdtaded valu", desc = "")
+    @ConfigOption(name = "Estimated Value", desc = "Show a §2$ §7sign you can hover to see the wardrobe slot value.")
     @ConfigEditorBoolean
     public boolean estimatedValue = true;
 
     @Expose
-    @ConfigOption(name = "colr", desc = "")
+    @ConfigOption(name = "Colors", desc = "Change the color settings.")
     @Accordion
     public ColorConfig color = new ColorConfig();
 
     @Expose
-    @ConfigOption(name = "spac", desc = "")
+    @ConfigOption(name = "Spacing", desc = "")
     @Accordion
     public SpacingConfig spacing = new SpacingConfig();
 }

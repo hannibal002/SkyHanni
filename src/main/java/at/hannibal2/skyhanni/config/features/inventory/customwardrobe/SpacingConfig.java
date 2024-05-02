@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class SpacingConfig {
 
     @Expose
-    @ConfigOption(name = "globl skal", desc = "")
+    @ConfigOption(name = "Global Scale", desc = "Controls the scale of the entirety of the wardrobe.")
     @ConfigEditorSlider(
         minValue = 30,
         maxValue = 200,
@@ -16,7 +16,7 @@ public class SpacingConfig {
     public int globalScale = 100;
 
     @Expose
-    @ConfigOption(name = "bordr thicc", desc = "")
+    @ConfigOption(name = "Outline Thickness", desc = "How thick the outline of the hovered slot is.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 15,
@@ -25,7 +25,7 @@ public class SpacingConfig {
     public int outlineThickness = 5;
 
     @Expose
-    @ConfigOption(name = "bordr blrrr", desc = "")
+    @ConfigOption(name = "Outline Blur", desc = "Amount of blur of the outline.")
     @ConfigEditorSlider(
         minValue = 0f,
         maxValue = 1f,
@@ -34,7 +34,7 @@ public class SpacingConfig {
     public float outlineBlur = 0.5f;
 
     @Expose
-    @ConfigOption(name = "slot widt", desc = "")
+    @ConfigOption(name = "Slot Width", desc = "Width of the wardrobe slots.")
     @ConfigEditorSlider(
         minValue = 30,
         maxValue = 100,
@@ -43,7 +43,7 @@ public class SpacingConfig {
     public int slotWidth = 75;
 
     @Expose
-    @ConfigOption(name = "slot haiiight", desc = "")
+    @ConfigOption(name = "Slot Height", desc = "Height of the wardrobe slots.")
     @ConfigEditorSlider(
         minValue = 60,
         maxValue = 200,
@@ -52,7 +52,7 @@ public class SpacingConfig {
     public int slotHeight = 140;
 
     @Expose
-    @ConfigOption(name = "people big or nuhuh", desc = "")
+    @ConfigOption(name = "Player Scale", desc = "Scale of the players.")
     @ConfigEditorSlider(
         minValue = 0,
         maxValue = 100,
@@ -61,7 +61,7 @@ public class SpacingConfig {
     public int playerScale = 75;
 
     @Expose
-    @ConfigOption(name = "no mor people in ma row >:(", desc = "")
+    @ConfigOption(name = "Slots per Row", desc = "Max amount of wardrobe slots per row.")
     @ConfigEditorSlider(
         minValue = 5,
         maxValue = 18,
@@ -70,7 +70,7 @@ public class SpacingConfig {
     public int maxPlayersPerRow = 9;
 
     @Expose
-    @ConfigOption(name = "how wide bwetween pweopole", desc = "")
+    @ConfigOption(name = "Slots Horizontal Spacing", desc = "How much space horizontally between wardrobe slots.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 20,
@@ -79,7 +79,7 @@ public class SpacingConfig {
     public int horizontalSpacing = 3;
 
     @Expose
-    @ConfigOption(name = "how tall bwetween pweopole", desc = "")
+    @ConfigOption(name = "Slots Vertical Spacing", desc = "How much space vertically between wardrobe slots.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 20,
@@ -88,7 +88,7 @@ public class SpacingConfig {
     public int verticalSpacing = 3;
 
     @Expose
-    @ConfigOption(name = "how tall between people and button!", desc = "")
+    @ConfigOption(name = "Slots & Buttons Spacing", desc = "How much vertical space there is between wardrobe slots and the buttons.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 40,
@@ -97,7 +97,7 @@ public class SpacingConfig {
     public int buttonSlotsVerticalSpacing = 10;
 
     @Expose
-    @ConfigOption(name = "how wide between button!", desc = "")
+    @ConfigOption(name = "Button Horizontal Spacing", desc = "How much space horizontally between buttons.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 40,
@@ -106,7 +106,7 @@ public class SpacingConfig {
     public int buttonHorizontalSpacing = 10;
 
     @Expose
-    @ConfigOption(name = "how tall between button!", desc = "")
+    @ConfigOption(name = "Button Vertical Spacing", desc = "How much space vertically between buttons.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 40,
@@ -115,7 +115,7 @@ public class SpacingConfig {
     public int buttonVerticalSpacing = 10;
 
     @Expose
-    @ConfigOption(name = "how thicc button?", desc = "")
+    @ConfigOption(name = "Button Width", desc = "Width of the buttons.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 60,
@@ -124,7 +124,7 @@ public class SpacingConfig {
     public int buttonWidth = 50;
 
     @Expose
-    @ConfigOption(name = "how tal button?", desc = "")
+    @ConfigOption(name = "Button Height", desc = "Height of the buttons.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 60,
