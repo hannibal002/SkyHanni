@@ -33,7 +33,7 @@ object BlocksSinceMineshaftDisplay {
         if (!isEnabled()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val resultList = mutableListOf<String>()
-            resultList.add("Counter: ${calculateCounter()}/$MAX_COUNTER")
+            resultList.add("Mineshaft Pity Counter: ${calculateCounter()}/$MAX_COUNTER")
             resultList.add("Blocks mined:")
             minedBlocks.forEach {
                 resultList.add("    ${it.key.oreName}: ${it.value}")
@@ -54,11 +54,11 @@ object BlocksSinceMineshaftDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!MiningAPI.inGlacialTunnels()) return
+        if (!isEnabled()) return
         val renderable = Renderable.string(
-            "Mineshaft Counter: ${calculateCounter()}/$MAX_COUNTER"
+            "Mineshaft Pity Counter: ${calculateCounter()}/$MAX_COUNTER"
         )
-        config.mineshaftOddsDisplayPosition.renderRenderables(listOf(renderable), posLabel = "Mineshaft Counter")
+        config.mineshaftOddsDisplayPosition.renderRenderables(listOf(renderable), posLabel = "Mineshaft Pity Counter")
 
     }
 
