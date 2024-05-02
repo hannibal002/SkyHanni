@@ -17,6 +17,8 @@ object ChocolateFactoryUpgradeWarning {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastUpgradeWarning = SimpleTimeMark.farPast()
+    private var lastUpgradeSlot = -1
+    private var lastUpgradeLevel = 0
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -35,8 +37,6 @@ object ChocolateFactoryUpgradeWarning {
         if (ReminderUtils.isBusy()) return
         if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.times(60).toInt().seconds) return
 
-
-
         ChatUtils.clickableChat(
             "You have a Chocolate factory upgrade available to purchase!",
             onClick = {
@@ -53,5 +53,13 @@ object ChocolateFactoryUpgradeWarning {
     @SubscribeEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         lastUpgradeWarning = SimpleTimeMark.farPast()
+    }
+
+    fun checkUpgradeChange(slot: Int, level: Int) {
+        if (slot != lastUpgradeSlot || level != lastUpgradeLevel) {
+            lastUpgradeWarning = SimpleTimeMark.farPast()
+            lastUpgradeSlot = slot
+            lastUpgradeLevel = level
+        }
     }
 }
