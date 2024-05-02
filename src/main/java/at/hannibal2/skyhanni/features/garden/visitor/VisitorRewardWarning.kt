@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.REFUSE_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorBlockReason
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -19,6 +21,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.seconds
 
 class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
@@ -65,14 +68,17 @@ class VisitorRewardWarning {
             return
         }
 
-        // clicktypes 0, 2, 3, and 4 work for interacting with visitor, but not 1
-        if (event.clickTypeEnum == GuiContainerEvent.ClickType.NORMAL) return
+        // all but shift clicktypes work for accepting visitor
+        if (event.clickTypeEnum == GuiContainerEvent.ClickType.SHIFT) return
         if (isRefuseSlot) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")
+            // fallback if tab list is disabled
+            DelayedRun.runDelayed(10.seconds) {
+                VisitorAPI.removeVisitor(visitor.visitorName)
+            }
             return
         }
-        if (isAcceptSlot) {
-            if (stack.name != "§eClick to give!") return
+        if (isAcceptSlot && stack.getLore().contains("§eClick to give!")) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }
@@ -120,27 +126,24 @@ class VisitorRewardWarning {
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
         val formattedLoss = NumberUtil.format(loss.absoluteValue)
-        blockedToolTip.add(blockReason(blockReason, pricePerCopper, loss, formattedLoss))
+        blockedToolTip.add(blockDescription(blockReason, pricePerCopper, loss, formattedLoss))
         blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
 
         visitor.blockedLore = blockedToolTip
     }
 
-    private fun blockReason(
+    private fun blockDescription(
         blockReason: VisitorBlockReason,
         pricePerCopper: String?,
         loss: Double,
         formattedLoss: String,
-    ) = when (blockReason) {
+    ) = blockReason.description + when (blockReason) {
         VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER ->
-            "${blockReason.description} §7(§6$pricePerCopper §7per)"
+            " §7(§6$pricePerCopper §7per)"
 
         VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS ->
-            if (loss > 0)
-                "${blockReason.description} §7(§6$formattedLoss §7selling §9Green Thumb I§7)"
-            else
-                "§7(§6$formattedLoss §7profit §7selling §9Green Thumb I§7)"
+            " §7(§6$formattedLoss §7${if (loss > 0) "loss" else "profit"} selling §9Green Thumb I§7)"
 
-        else -> blockReason.description
+        else -> ""
     }
 }
