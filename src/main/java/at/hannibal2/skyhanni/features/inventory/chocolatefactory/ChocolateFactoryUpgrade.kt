@@ -22,7 +22,6 @@ data class ChocolateFactoryUpgrade(
         val canAffordIn = chocolateAmountType.timeUntilGoal(price ?: 0)
         canAffordAt = when {
             canAffordIn.isInfinite() -> SimpleTimeMark.farFuture()
-            canAffordIn.isNegative() -> SimpleTimeMark.farPast()
             else -> SimpleTimeMark.now() + canAffordIn
         }
     }
