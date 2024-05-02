@@ -21,7 +21,7 @@ object ChocolateFactoryKeybinds {
 
         val chest = event.guiContainer as? GuiChest ?: return
 
-        for (index in 0..7) {
+        for (index in 0..4) {
             val key = getKey(index) ?: error("no key for index $index")
             if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break

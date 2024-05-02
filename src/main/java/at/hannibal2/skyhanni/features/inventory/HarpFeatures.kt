@@ -60,7 +60,7 @@ object HarpFeatures {
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         val chest = event.guiContainer as? GuiChest ?: return
 
-        for (index in 0..7) {
+        for (index in 0..6) {
             val key = getKey(index) ?: error("no key for index $index")
             if (!key.isKeyHeld()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
