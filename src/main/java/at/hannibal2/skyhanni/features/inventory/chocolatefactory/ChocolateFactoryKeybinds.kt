@@ -35,6 +35,7 @@ object ChocolateFactoryKeybinds {
         for ((index, key) in KeyIterable.withIndex()) {
             if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
+            lastClick = SimpleTimeMark.now()
 
             event.cancel()
 
@@ -45,7 +46,6 @@ object ChocolateFactoryKeybinds {
                 3,
                 Minecraft.getMinecraft().thePlayer
             )
-            lastClick = SimpleTimeMark.now()
             break
         }
     }
