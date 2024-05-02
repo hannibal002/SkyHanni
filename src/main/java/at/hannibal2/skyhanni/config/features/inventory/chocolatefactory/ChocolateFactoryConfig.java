@@ -95,6 +95,11 @@ public class ChocolateFactoryConfig {
     public boolean timeTowerWarning = false;
 
     @Expose
+    @ConfigOption(name = "Upgrade Warnings", desc = "")
+    @Accordion
+    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
+
+    @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
     public Position position = new Position(163, 160, false, true);
 

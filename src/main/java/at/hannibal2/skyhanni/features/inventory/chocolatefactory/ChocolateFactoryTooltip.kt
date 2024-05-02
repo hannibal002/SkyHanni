@@ -17,7 +17,6 @@ object ChocolateFactoryTooltip {
         if (!config.extraTooltipStats) return
 
         val slotIndex = event.slot.slotNumber
-        if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
         if (slotIndex !in ChocolateFactoryAPI.otherUpgradeSlots && slotIndex !in ChocolateFactoryAPI.rabbitSlots) return
 
         val upgradeInfo = ChocolateFactoryAPI.factoryUpgrades.find { it.slotIndex == slotIndex } ?: return
@@ -31,6 +30,9 @@ object ChocolateFactoryTooltip {
 
         event.toolTip.add("§8§m-----------------")
         event.toolTip.add("§7Time until upgrade: §e${upgradeInfo.formattedTimeUntilGoal()}")
+
+        if (upgradeInfo.effectiveCost == null) return
+
         event.toolTip.add("§7Extra: §6${upgradeInfo.extraPerSecond?.round(2) ?: "N/A"} §7choc/s")
         event.toolTip.add("§7Effective Cost: §6${upgradeInfo.effectiveCost?.addSeparators() ?: "N/A"}")
 
