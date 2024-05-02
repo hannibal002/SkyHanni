@@ -50,7 +50,8 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
         ChocolateFactoryStat.TIME_TOWER,
-        ChocolateFactoryStat.LEADERBOARD_POS
+        ChocolateFactoryStat.LEADERBOARD_POS,
+        ChocolateFactoryStat.TIME_TO_BEST_UPGRADE
     ));
 
     @Expose
