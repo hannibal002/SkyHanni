@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -21,7 +20,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
 object WardrobeAPI {
@@ -200,7 +198,7 @@ object WardrobeAPI {
         }
 
         var foundCurrentSlot = false
-        val oldData = wardrobeSlots.map { it.getData() }
+
         for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
             slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
             slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
@@ -215,21 +213,6 @@ object WardrobeAPI {
         }
         if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage) {
             currentWardrobeSlot = null
-        }
-
-        val newData = wardrobeSlots.map { it.getData() }
-        val size = min(oldData.size, newData.size)
-
-        for (i in 0 until size) {
-            if (i != 0) println("")
-            println("Wardrobe Slot $i")
-            for (j in 1 until 5) {
-                println("    ${oldData[i]?.armor?.get(j)?.name} --> ${newData[i]?.armor?.get(j)?.name}")
-            }
-        }
-        if (newData != oldData) {
-            WardrobeUpdateEvent(newData, oldData).postAndCatch()
-            ChatUtils.chat("UPDATEDDDD")
         }
     }
 

@@ -85,7 +85,7 @@ class CustomWardrobe {
                         scale = 1.0 * (config.spacing.globalScale / 100.0)
                     ),
                     onClick = {
-                        config::spacing.jumpToEditor()
+                        config::enabled.jumpToEditor()
                         reset()
                         currentPage = null
                     }
@@ -129,12 +129,6 @@ class CustomWardrobe {
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
-        update()
-    }
-
-    @SubscribeEvent
-    fun onWardrobeUpdate(event: WardrobeUpdateEvent) {
         if (!isEnabled()) return
         update()
     }
