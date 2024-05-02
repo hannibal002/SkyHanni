@@ -7,10 +7,13 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestDistance
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
@@ -18,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -32,6 +36,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -100,6 +106,63 @@ class TunnelsMaps {
     private val newGemstonePattern by RepoPattern.pattern(
         "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*"
     )
+    private val commissionInvPattern by RepoPattern.pattern(
+        "mining.commission.inventory", "Commissions"
+    )
+    private val glacitePattern by RepoPattern.pattern(
+        "mining.commisson.reward.glacite",
+        "§7- §b\\d+ Glacite Powder"
+    )
+    private val collectorCommissionPattern by RepoPattern.pattern(
+        "mining.commisson.collector",
+        "§9(?<what>\\w+(?: \\w+)?) Collector"
+    )
+    private val glaciteGoalPattern by RepoPattern.pattern(
+        "mining.commisson.collector.glacite",
+        "Glacite"
+    )
+
+    private val translateTable = mutableMapOf<String, String>()
+
+    private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
+        possibleLocations.keys.first { it.uppercase().removeColor().contains(input.uppercase()) }
+    }
+
+    private var clickTranslate = mapOf<Int, String>()
+
+    @SubscribeEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (!isEnabled()) return
+        clickTranslate = mapOf()
+        if (!commissionInvPattern.matches(event.inventoryName)) return
+        clickTranslate = event.inventoryItems.mapNotNull { (slotId, item) ->
+            val lore = item.getLore()
+            if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
+            val type = lore.matchFirst(collectorCommissionPattern) {
+                group("what")
+            } ?: return@mapNotNull null
+            if (glaciteGoalPattern.matches(type)) return@mapNotNull null
+            slotId to getGenericName(type)
+        }.toMap()
+    }
+
+    @SubscribeEvent
+    fun onRenderItemTooltip(event: LorenzToolTipEvent) {
+        if (!isEnabled()) return
+        clickTranslate[event.slot.slotIndex]?.let {
+            event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
+        }
+    }
+
+    @SubscribeEvent
+    fun onGuiContainerSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isEnabled()) return
+        if (event.clickedButton != 1) return
+        clickTranslate[event.slotId]?.let {
+            active = it
+            goal = getNext()
+        }
+    }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -124,6 +187,7 @@ class TunnelsMaps {
         this.newGemstones = newGemstone
         this.oldGemstones = oldGemstone
         normalLocations = other
+        translateTable.clear()
         DelayedRun.runNextTick { // Needs to be delayed since the config may not be loaded
             locationDisplay = generateLocationsDisplay()
         }
