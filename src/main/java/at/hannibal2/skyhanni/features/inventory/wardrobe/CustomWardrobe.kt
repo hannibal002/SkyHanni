@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.scoreboard.ScorePlayerTeam
@@ -109,7 +110,9 @@ class CustomWardrobe {
         val (width, height) = fullRenderable.width to fullRenderable.height
         val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
 
+        GlStateManager.translate(0f, 0f, 100f)
         pos.renderRenderable(fullRenderable, posLabel = "Wardrobe Overlay", addToGuiManager = false)
+        GlStateManager.translate(0f, 0f, -100f)
     }
 
     @SubscribeEvent
