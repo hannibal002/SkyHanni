@@ -572,6 +572,7 @@ object RenderUtils {
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
+    @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderStringsAndItems(
         list: List<List<Any?>>,
         extraSpace: Int = 0,
@@ -603,6 +604,7 @@ object RenderUtils {
      * Accepts a single line to print.
      * This  line is a list of things to print. Can print String or ItemStack objects.
      */
+    @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderSingleLineWithItems(
         list: List<Any?>,
         posLabel: String,

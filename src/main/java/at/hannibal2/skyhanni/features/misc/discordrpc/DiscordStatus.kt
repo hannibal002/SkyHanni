@@ -71,7 +71,7 @@ private fun getCropMilestoneDisplay(): String {
     } ?: 100 // percentage to next milestone
 
     return if (tier != null) {
-        "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
+        "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops)"}"
     } else AutoStatus.CROP_MILESTONES.placeholderText
 }
 
