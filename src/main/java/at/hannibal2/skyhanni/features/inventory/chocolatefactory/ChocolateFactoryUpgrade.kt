@@ -38,6 +38,7 @@ data class ChocolateFactoryUpgrade(
 
     fun stackTip(): String {
         return when {
+            level == 0 -> ""
             isMaxed -> "§a✔"
 
             isRabbit -> when (level) {
