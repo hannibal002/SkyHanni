@@ -254,6 +254,7 @@ object ChocolateFactoryAPI {
         val notMaxed = factoryUpgrades.filter { !it.isMaxed }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
+        println(bestUpgrade)
         profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt?.toMillis() ?: 0
         bestPossibleSlot = bestUpgrade?.getValidUpgradeIndex() ?: -1
 
