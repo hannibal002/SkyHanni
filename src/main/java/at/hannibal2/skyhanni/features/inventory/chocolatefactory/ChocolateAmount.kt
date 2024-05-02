@@ -20,7 +20,7 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         return when {
             time.isInfinite() -> "§cNever"
             time.isNegative() -> "§aNow"
-            else -> "§6${time.format()}"
+            else -> "§b${time.format()}"
         }
     }
 
