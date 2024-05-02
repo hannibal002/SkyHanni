@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ContributorManager {
@@ -18,7 +19,9 @@ object ContributorManager {
 
     fun getTabListSuffix(username: String): String? = getContributor(username)?.suffix
 
-    fun canSpin(username: String): Boolean = getContributor(username)?.spinny ?: false
+    fun canSpin(username: String): Boolean =
+        if (config.dontFlipYourself && LorenzUtils.getPlayerName() == username) false
+        else getContributor(username)?.spinny ?: false
 
     private fun getContributor(username: String) =
         contributors[username.lowercase()]?.let { it.takeIf { it.isAllowed() } }

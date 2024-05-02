@@ -87,6 +87,14 @@ public class DevConfig {
 
     @Expose
     @ConfigOption(
+        name = "Don't Flip Yourself",
+        desc = "Don't render yourself as flipped if you're a contributor with spinny enabled."
+    )
+    @ConfigEditorBoolean
+    public boolean dontFlipYourself = false;
+
+    @Expose
+    @ConfigOption(
         name = "SBA Contributors",
         desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
     @ConfigEditorBoolean
