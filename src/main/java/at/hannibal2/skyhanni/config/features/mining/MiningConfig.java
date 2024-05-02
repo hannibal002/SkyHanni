@@ -50,6 +50,11 @@ public class MiningConfig {
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
 
     @Expose
+    @ConfigOption(name = "Mineshaft Pity Display", desc = "")
+    @Accordion
+    public MineshaftPityDisplay mineshaftPityDisplay = new MineshaftPityDisplay();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle

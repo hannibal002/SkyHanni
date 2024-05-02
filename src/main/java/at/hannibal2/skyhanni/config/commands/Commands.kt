@@ -48,8 +48,8 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
-import at.hannibal2.skyhanni.features.mining.BlocksSinceMineshaftDisplay
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -513,9 +513,9 @@ object Commands {
             "Add all ever found burrow locations from clipboard"
         ) { AllBurrowsList.addFromClipboard() }
         registerCommand(
-            "shresetshaftblocks",
-            "reset shaft blocks idk"
-        ) { BlocksSinceMineshaftDisplay.resetShaftBlocks() }
+            "shresetmineshaftcounter",
+            "Resets the mineshaft pity counter"
+        ) { MineshaftPityDisplay.resetCounter() }
     }
 
     private fun internalCommands() {
