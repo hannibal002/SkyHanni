@@ -46,6 +46,18 @@ object HypixelCommands {
         send("togglemusic")
     }
 
+    fun partyWarp() {
+        send("party warp")
+    }
+
+    fun partyTransfer(player: String) {
+        send("party transfer $player")
+    }
+
+    fun partyAllInvite() {
+        send("party settings allinvite")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function
