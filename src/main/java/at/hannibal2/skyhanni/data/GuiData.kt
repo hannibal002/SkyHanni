@@ -46,9 +46,7 @@ object GuiData {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
-            if (Minecraft.getMinecraft().currentScreen == null) {
                 preDrawEventCanceled = false
-            }
         }
     }
 
