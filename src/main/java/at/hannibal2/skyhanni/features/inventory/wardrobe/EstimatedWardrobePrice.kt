@@ -33,7 +33,6 @@ class EstimatedWardrobePrice {
         var index = 3
 
         tooltip.add(index++, "")
-        tooltip.add(index++, "§aEstimated Armor Value:")
         lore.forEach {
             tooltip.add(index++, it)
         }

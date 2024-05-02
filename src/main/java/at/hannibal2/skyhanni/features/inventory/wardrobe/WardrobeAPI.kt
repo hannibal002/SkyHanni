@@ -22,6 +22,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
 object WardrobeAPI {
@@ -59,7 +60,7 @@ object WardrobeAPI {
         WardrobeData(
             id,
             (1..4).associateWith { null }.toMutableMap(),
-            locked = false,
+            locked = true,
             favorite = false,
         )
     }
@@ -148,7 +149,7 @@ object WardrobeAPI {
     }
 
     private fun getWardrobeItem(itemStack: ItemStack?) =
-        if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item) null else itemStack
+        if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item || itemStack == null) null else itemStack
 
     private fun getWardrobeSlotFromId(id: Int?) = wardrobeSlots.find { it.id == currentWardrobeSlot }
 
@@ -180,35 +181,60 @@ object WardrobeAPI {
         }
         if (!inWardrobe) return
         if (currentPage == null) return
-        var foundCurrentSlot = false
 
         val itemsList = event.inventoryItems
-        val oldData = wardrobeSlots.map { it.getData() }
 
-        lastWardrobeUpdate = SimpleTimeMark.now()
-        DelayedRun.runDelayed(500.milliseconds) {
-            if (lastWardrobeUpdate.passedSince() < 550.milliseconds) return@runDelayed
+        val allGrayDye = wardrobeSlots.filter { it.isInCurrentPage() }.all {
+            itemsList[it.inventorySlot]?.itemDamage == EnumDyeColor.GRAY.dyeDamage
+        }
 
-            for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
-                slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
-                slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
-                slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
-                slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
-                if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
-                    currentWardrobeSlot = slot.id
-                    foundCurrentSlot = true
+        val allSlotsEmpty = wardrobeSlots.filter { it.isInCurrentPage() }.all {
+            getWardrobeItem(itemsList[it.helmetSlot]) == null && getWardrobeItem(itemsList[it.chestplateSlot]) == null &&
+                getWardrobeItem(itemsList[it.leggingsSlot]) == null && getWardrobeItem(itemsList[it.bootsSlot]) == null
+        }
+
+        if (allGrayDye) {
+            if (allSlotsEmpty) {
+                wardrobeSlots.filter { it.isInCurrentPage() }.forEach {
+                    it.helmet = null
+                    it.chestplate = null
+                    it.leggings = null
+                    it.boots = null
                 }
-                slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
-                if (slot.locked) wardrobeSlots.forEach { if (it.id > slot.id) it.locked = true }
-            }
-            if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage)
-                currentWardrobeSlot = null
+            } else return
+        }
 
-            val newData = wardrobeSlots.map { it.getData() }
-            if (newData != oldData) {
-                WardrobeUpdateEvent(newData, oldData).postAndCatch()
-                ChatUtils.chat("UPDATEDDDD")
+        var foundCurrentSlot = false
+        val oldData = wardrobeSlots.map { it.getData() }
+        for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
+            slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
+            slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
+            slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
+            slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
+                currentWardrobeSlot = slot.id
+                foundCurrentSlot = true
             }
+            slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
+            if (slot.locked) wardrobeSlots.forEach { if (it.id > slot.id) it.locked = true }
+        }
+        if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage) {
+            currentWardrobeSlot = null
+        }
+
+        val newData = wardrobeSlots.map { it.getData() }
+        val size = min(oldData.size, newData.size)
+
+        for (i in 0 until size) {
+            if (i != 0) println("")
+            println("Wardrobe Slot $i")
+            for (j in 1 until 5) {
+                println("    ${oldData[i]?.armor?.get(j)?.name} --> ${newData[i]?.armor?.get(j)?.name}")
+            }
+        }
+        if (newData != oldData) {
+            WardrobeUpdateEvent(newData, oldData).postAndCatch()
+            ChatUtils.chat("UPDATEDDDD")
         }
     }
 
@@ -226,15 +252,24 @@ object WardrobeAPI {
             add("Current wardrobe slot: $currentWardrobeSlot")
             wardrobeSlots.forEach { slot ->
                 if (slot.locked) {
-                    add("Slot ${slot.id} is locked")
+                    add(
+                        "Slot ${slot.id} is locked" +
+                            if (slot.favorite) " - Favorite: true" else ""
+                    )
+                } else if (slot.isEmpty()) {
+                    add(
+                        "Slot ${slot.id} is empty" +
+                            if (slot.favorite) " - Favorite: true" else ""
+                    )
                 } else {
                     add(
-                        "Slot ${slot.id} - " +
-                            "Helmet: ${slot.helmet?.name} - " +
-                            "Chestplate: ${slot.chestplate?.name} - " +
-                            "Leggings: ${slot.leggings?.name} - " +
-                            "Boots: ${slot.boots?.name}"
+                        "Slot ${slot.id}" +
+                            if (slot.favorite) " - Favorite: true" else ""
                     )
+                    if (slot.helmet != null) add("   Helmet: ${slot.helmet?.name}")
+                    if (slot.chestplate != null) add("   Chestplate: ${slot.chestplate?.name}")
+                    if (slot.leggings != null) add("   Leggings: ${slot.leggings?.name}")
+                    if (slot.boots != null) add("   Boots: ${slot.boots?.name}")
                 }
             }
         }
