@@ -29,7 +29,7 @@ object ChocolateFactoryBarnManager {
      * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
      */
     private val rabbitCrashedPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.duplicate",
+        "rabbit.crushed",
         "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6.+ Chocolate"
     )
 
