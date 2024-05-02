@@ -46,7 +46,7 @@ object GuiData {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
-                preDrawEventCanceled = false
+            preDrawEventCanceled = false
         }
     }
 
