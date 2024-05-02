@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
 object ChocolateFactoryUpgradeWarning {
 
@@ -35,7 +35,7 @@ object ChocolateFactoryUpgradeWarning {
         if (!ChocolateFactoryAPI.isEnabled()) return
         if (!config.upgradeWarning) return
         if (ReminderUtils.isBusy()) return
-        if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.times(60).toInt().seconds) return
+        if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.toDouble().minutes) return
 
         ChatUtils.clickableChat(
             "You have a Chocolate factory upgrade available to purchase!",
