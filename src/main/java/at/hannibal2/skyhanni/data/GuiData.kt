@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -46,7 +47,7 @@ object GuiData {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
-            if (Minecraft.getMinecraft().currentScreen == null) {
+            if (Minecraft.getMinecraft().currentScreen !is GuiChest) {
                 preDrawEventCanceled = false
             }
         }
