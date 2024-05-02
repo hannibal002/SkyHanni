@@ -95,6 +95,20 @@ public class ProfileSpecificStorage {
 
         @Expose
         public long lastDataSave = 0;
+
+        @Expose
+        public PositionChange positionChange = new PositionChange();
+
+        public static class PositionChange {
+            @Expose
+            public Long lastTime = null;
+
+            @Expose
+            public int lastPosition = -1;
+
+            @Expose
+            public String lastLeaderboard = null;
+        }
     }
 
     @Expose

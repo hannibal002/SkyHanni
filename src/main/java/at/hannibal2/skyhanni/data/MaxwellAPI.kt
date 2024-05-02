@@ -277,6 +277,9 @@ object MaxwellAPI {
                 return@matchMatcher
             }
         }
+
+        // If Magical Power isn't in the lore
+        magicalPower = 0
     }
 
     private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
