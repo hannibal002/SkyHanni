@@ -24,7 +24,7 @@ class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!VisitorAPI.inInventory) return
 
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
