@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object ChocolateFactoryUpgradeWarning {
 
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryAPI.config.chocolateUpgradeWarnings
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastUpgradeWarning = SimpleTimeMark.farPast()
@@ -24,7 +24,6 @@ object ChocolateFactoryUpgradeWarning {
         val profileStorage = profileStorage ?: return
 
         val upgradeAvailableAt = SimpleTimeMark(profileStorage.bestUpgradeAvailableAt)
-        println(upgradeAvailableAt)
         if (upgradeAvailableAt.isInPast() && !upgradeAvailableAt.isFarPast()) {
             checkUpgradeWarning()
         }
@@ -34,7 +33,9 @@ object ChocolateFactoryUpgradeWarning {
         if (!ChocolateFactoryAPI.isEnabled()) return
         if (!config.upgradeWarning) return
         if (ReminderUtils.isBusy()) return
-        if (lastUpgradeWarning.passedSince() < 1.minutes) return
+        if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.times(60).toInt().seconds) return
+
+
 
         ChatUtils.clickableChat(
             "You have a Chocolate factory upgrade available to purchase!",

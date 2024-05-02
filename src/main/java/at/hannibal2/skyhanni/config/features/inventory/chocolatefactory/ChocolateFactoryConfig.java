@@ -95,16 +95,9 @@ public class ChocolateFactoryConfig {
     public boolean timeTowerWarning = false;
 
     @Expose
-    @ConfigOption(name = "Upgrade Warning", desc = "Chat notification when you have an upgrade available to purchase.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean upgradeWarning = true;
-
-    @Expose
-    @ConfigOption(name = "Upgrade Warning Sound", desc = "Also plays a sound when an upgrade is available. " +
-        "§eUpgrade warning must be turned on.")
-    @ConfigEditorBoolean
-    public boolean upgradeWarningSound = false;
+    @ConfigOption(name = "Upgrade Warnings", desc = "")
+    @Accordion
+    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
