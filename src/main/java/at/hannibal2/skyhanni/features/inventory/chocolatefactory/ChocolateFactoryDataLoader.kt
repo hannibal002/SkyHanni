@@ -322,7 +322,7 @@ object ChocolateFactoryDataLoader {
 
                 newAverageChocolate = when (slotIndex) {
                     ChocolateFactoryAPI.timeTowerIndex -> ChocolateAmount.averageChocPerSecond(
-                        timeTowerLevelIncrease = 1
+                        includeTower = true
                     )
 
                     ChocolateFactoryAPI.coachRabbitIndex -> ChocolateAmount.averageChocPerSecond(
