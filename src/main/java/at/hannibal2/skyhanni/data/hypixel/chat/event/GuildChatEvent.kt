@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.utils.ComponentSpan
 import net.minecraft.util.IChatComponent
 
 
-
-
 class GuildChatEvent(
     author: ComponentSpan,
     message: ComponentSpan,

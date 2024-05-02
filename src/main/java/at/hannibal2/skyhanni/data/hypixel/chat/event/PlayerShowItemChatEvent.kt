@@ -11,5 +11,4 @@ class PlayerShowItemChatEvent(
     message: ComponentSpan,
     chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(author, message, chatComponent, blockedReason) {
-}
+) : AbstractChatEvent(author, message, chatComponent, blockedReason)

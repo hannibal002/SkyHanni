@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.utils.StringUtils
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatModifier {
@@ -21,8 +22,7 @@ class PlayerChatModifier {
     fun onChat(event: SystemMessageEvent) {
         val newMessage = cutMessage(event.chatComponent.formattedText)
 
-        // TODO apply formattings correctly
-//         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, newMessage) ?: return
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentText(newMessage)) ?: return
     }
 
     private fun cutMessage(input: String): String {

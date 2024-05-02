@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.width
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ChatStyle
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.UUID
@@ -321,46 +323,83 @@ object StringUtils {
     fun generateRandomId() = UUID.randomUUID().toString()
 
     fun replaceIfNeeded(
-        original: IChatComponent,
+        original: ChatComponentText,
         newText: String,
     ): ChatComponentText? {
-        return replaceIfNeeded(original, ChatComponentText(newText), applyFormat = true)
+        return replaceIfNeeded(original, ChatComponentText(newText))
     }
 
-    // TODO: rename and rework this function to be more narrow
-    fun replaceIfNeeded(
-        original: IChatComponent,
-        newText: ChatComponentText,
-        applyFormat: Boolean = false,
-    ): ChatComponentText? {
-        if (true) // TODO: remove after done debugging
-            return newText
-        val foundCommands = mutableListOf<IChatComponent>()
 
-        addComponent(foundCommands, original)
-        for (sibling in original.siblings) {
-            addComponent(foundCommands, sibling)
+    private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
+    fun enumChatFormattingByCode(char: Char): EnumChatFormatting? {
+        return colorMap[char]
+    }
+
+    fun doLookTheSame(left: IChatComponent, right: IChatComponent): Boolean {
+        class ChatIterator(var component: IChatComponent) {
+            var queue = mutableListOf<IChatComponent>()
+            var idx = 0
+            var colorOverride = ChatStyle()
+            fun next(): Pair<Char, ChatStyle>? {
+                while (true) {
+                    while (idx >= component.unformattedTextForChat.length) {
+                        component = queue.removeFirstOrNull() ?: return null
+                        queue.addAll(0, component.siblings)
+                        colorOverride = ChatStyle()
+                    }
+                    val char = component.unformattedTextForChat[idx++]
+                    if (char == '§' && idx < component.unformattedTextForChat.length) {
+                        val formattingChar = component.unformattedTextForChat[idx++]
+                        val formatting = enumChatFormattingByCode(formattingChar) ?: continue
+                        when (formatting) {
+                            EnumChatFormatting.OBFUSCATED -> {
+                                colorOverride.setObfuscated(true)
+                            }
+
+                            EnumChatFormatting.BOLD -> {
+                                colorOverride.setBold(true)
+                            }
+
+                            EnumChatFormatting.STRIKETHROUGH -> {
+                                colorOverride.setStrikethrough(true)
+                            }
+
+                            EnumChatFormatting.UNDERLINE -> {
+                                colorOverride.setUnderlined(true)
+                            }
+
+                            EnumChatFormatting.ITALIC -> {
+                                colorOverride.setItalic(true)
+                            }
+
+                            else -> {
+                                colorOverride = ChatStyle().setColor(formatting)
+                            }
+                        }
+                    } else {
+                        return Pair(char, colorOverride.setParentStyle(component.chatStyle))
+                    }
+                }
+            }
         }
 
-        val size = foundCommands.size
-        if (size > 1) {
-            return null
+        val leftIt = ChatIterator(left)
+        val rightIt = ChatIterator(right)
+        while (true) {
+            val leftChar = leftIt.next()
+            val rightChar = rightIt.next()
+            if (leftChar == null && rightChar == null) return true
+            if (leftChar != rightChar) return false
         }
+    }
 
-        val originalClean = LorenzUtils.stripVanillaMessage(original.formattedText)
-        val newTextClean = LorenzUtils.stripVanillaMessage(newText.formattedText)
-        if (originalClean == newTextClean) return null
 
+    fun <T : IChatComponent> replaceIfNeeded(
+        original: T,
+        newText: T,
+    ): T? {
+        if (doLookTheSame(original, newText)) return null
         return newText
-
-//         val text = ChatComponentText(newText)
-//         if (size == 1) {
-//             val chatStyle = foundCommands[0].chatStyle
-//             text.chatStyle.chatClickEvent = chatStyle.chatClickEvent
-//             text.chatStyle.chatHoverEvent = chatStyle.chatHoverEvent
-//         }
-//
-//         return text
     }
 
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {

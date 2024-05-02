@@ -163,7 +163,6 @@ class ComponentSpan internal constructor(
     /**
      * Slice this component span. This is equivalent to the [String.substring] operation on the [text][getText].
      */
-//     fun slice(start: Int = 0, end: Int = length - 1): ComponentSpan {
     fun slice(start: Int = 0, end: Int = length): ComponentSpan {
         require(0 <= start) { "start is bigger than 0: start=$start, cachedText=$cachedText" }
         require(start <= end) { "start is bigger than length: start=$start, length=$length, cachedText=$cachedText" }
