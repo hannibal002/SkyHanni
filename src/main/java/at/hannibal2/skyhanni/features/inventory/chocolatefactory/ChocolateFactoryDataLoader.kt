@@ -261,11 +261,11 @@ object ChocolateFactoryDataLoader {
         ChocolateFactoryAPI.clickRabbitSlot = null
 
         for ((slotIndex, item) in inventory) {
-            processInventory(item, slotIndex)
+            processItem(item, slotIndex)
         }
     }
 
-    private fun processInventory(item: ItemStack, slotIndex: Int) {
+    private fun processItem(item: ItemStack, slotIndex: Int) {
         if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
             SoundUtils.playBeepSound()
             ChocolateFactoryAPI.clickRabbitSlot = slotIndex
