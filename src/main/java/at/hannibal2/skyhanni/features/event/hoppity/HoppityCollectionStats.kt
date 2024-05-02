@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HoppityCollectionStats {
+object HoppityCollectionStats {
 
     private val config get() = ChocolateFactoryAPI.config
 
@@ -47,7 +47,7 @@ class HoppityCollectionStats {
     private var display = emptyList<Renderable>()
     private val loggedRabbits = mutableMapOf<String, RabbitCollectionInfo>()
     private var totalRabbits = 0
-    private var inInventory = false
+    var inInventory = false
     private var currentPage = 0
 
     @SubscribeEvent
