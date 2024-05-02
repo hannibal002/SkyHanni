@@ -182,11 +182,12 @@ class HypixelData {
             ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
                 return group("maxamount").toInt()
             }
-            val islandSpecific = mapOf(
-                IslandType.MINESHAFT to 4,
-                IslandType.CRYSTAL_HOLLOWS to 24
-            )
-            return islandSpecific[skyBlockIsland] ?: if (serverId?.startsWith("mega") == true) 80 else 26
+
+            return when (skyBlockIsland) {
+                IslandType.MINESHAFT -> 4
+                IslandType.CRYSTAL_HOLLOWS -> 24
+                else -> if (serverId?.startsWith("mega") == true) 80 else 26
+            }
         }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
