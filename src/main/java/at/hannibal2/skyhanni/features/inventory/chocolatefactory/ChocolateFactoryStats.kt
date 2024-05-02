@@ -152,9 +152,9 @@ object ChocolateFactoryStats {
         EMPTY_3(""),
         EMPTY_4(""),
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
-        TIME_TO_PRESTIGE("§eTime To Prestige: §61d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
-        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §b5,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
         TIME_TO_BEST_UPGRADE("§eBest Upgrade: §b 59m 4s"),
         ;
 
