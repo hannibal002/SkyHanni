@@ -16,10 +16,6 @@ public class MiningConfig {
     public MiningEventConfig miningEvent = new MiningEventConfig();
 
     @Expose
-    @Category(name = "HotM", desc = "Settings for Heart of the Mountain")
-    public HotmConfig hotmConfig = new HotmConfig();
-
-    @Expose
     @ConfigOption(name = "Powder Tracker", desc = "")
     @Accordion
     public PowderTrackerConfig powderTracker = new PowderTrackerConfig();
