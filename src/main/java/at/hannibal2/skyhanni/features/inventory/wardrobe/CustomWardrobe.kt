@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -111,8 +111,7 @@ class CustomWardrobe {
         val (width, height) = fullRenderable.width to fullRenderable.height
         val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
 
-        pos.renderRenderables(listOf(fullRenderable), posLabel = "Custom Wardrobe", addToGuiManager = false)
-        //pos.renderRenderable(fullRenderable, posLabel = "Wardrobe Overlay", addToGuiManager = false)
+        pos.renderRenderable(fullRenderable, posLabel = "Wardrobe Overlay", addToGuiManager = false)
     }
 
     @SubscribeEvent
