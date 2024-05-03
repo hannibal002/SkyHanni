@@ -228,14 +228,12 @@ object GardenCropMilestoneDisplay {
             Renderable.string("§7Percentage: §e$percentageFormat")
         }
 
-
         if (overflowConfig.chat) {
             if (currentTier >= 46 && currentTier == previousNext && nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
                 lastWarnedLevel = currentTier
             }
         }
-
 
         if (overflowConfig.chat) {
             if (currentTier >= 46 && currentTier == previousNext && nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
