@@ -298,9 +298,7 @@ object ChocolateFactoryDataLoader {
                 level = rabbitAmountPattern.matchMatcher(itemName) {
                     group("amount").formatInt()
                 } ?: run {
-                    unemployedRabbitPattern.matchMatcher(itemName) {
-                        0
-                    }
+                    if (unemployedRabbitPattern.matches(itemName)) 0 else null
                 } ?: return
                 isRabbit = true
 
