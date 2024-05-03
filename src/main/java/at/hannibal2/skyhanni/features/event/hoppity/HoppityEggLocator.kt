@@ -18,10 +18,12 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggLocator {
@@ -30,6 +32,8 @@ object HoppityEggLocator {
     private val locatorItem = "EGGLOCATOR".asInternalName()
 
     private var lastParticlePosition: LorenzVec? = null
+    private var lastParticlePositionForever: LorenzVec? = null
+    private var lastChange = SimpleTimeMark.farPast()
     private val validParticleLocations = mutableListOf<LorenzVec>()
 
     private var drawLocations = false
@@ -67,8 +71,22 @@ object HoppityEggLocator {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        event.draw3DLine(firstPos, secondPos, LorenzColor.RED.toColor(), 2, false)
-
+        val eyeLocation = event.exactPlayerEyeLocation()
+        lastParticlePositionForever?.let {
+            if (lastChange.passedSince() < 300.milliseconds) {
+                if (eyeLocation.distance(it) > 2) {
+                    event.drawWaypointFilled(
+                        it,
+                        LorenzColor.GREEN.toColor(),
+                        seeThroughBlocks = true,
+                    )
+                    event.drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
+                }
+                if (!drawLocations) {
+                    event.draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                }
+            }
+        }
         if (drawLocations) {
             for ((index, eggLocation) in possibleEggLocations.withIndex()) {
                 val eggLabel = "§aGuess #${index + 1}"
@@ -78,6 +96,7 @@ object HoppityEggLocator {
                     seeThroughBlocks = true,
                 )
                 event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
+                event.draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
             }
             return
         }
@@ -120,6 +139,8 @@ object HoppityEggLocator {
 
         val lastParticlePosition = lastParticlePosition ?: run {
             lastParticlePosition = event.location
+            lastParticlePositionForever = lastParticlePosition
+            lastChange = SimpleTimeMark.now()
             return
         }
         if (lastParticlePosition == event.location) {
