@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -34,6 +35,11 @@ public class HoppityEggsConfig {
     public boolean sharedWaypoints = true;
 
     @Expose
+    @ConfigOption(name = "Adjust player opacity", desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)")
+    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
+    public int playerOpacity = 40;
+
+    @Expose
     @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")
     public Position position = new Position(33, 72, false, true);
 
@@ -42,4 +48,10 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightHoppityShop = true;
+
+    @Expose
+    @ConfigOption(name = "Time in Chat", desc = "Show in chat when using Egglocator that show next hoppity event or next egg time.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeInChat = true;
 }

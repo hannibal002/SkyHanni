@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateShopPrice {
@@ -27,18 +29,31 @@ object ChocolateShopPrice {
     )
 
     var inInventory = false
+    var inventoryItems = emptyMap<Int, ItemStack>()
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (inInventory) {
+            update()
+        }
+    }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!menuNamePattern.matches(event.inventoryName)) return
 
-        val multiplier = 1.million
-
         inInventory = true
+        inventoryItems = event.inventoryItems
+        update()
+    }
+
+    private fun update() {
+        val multiplier = 1.million
         // TODO merge core with SkyMartCopperPrice into a utils
         val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
+        val inventoryItems = inventoryItems
+        for ((slot, item) in inventoryItems) {
             val lore = item.getLore()
             val chocolate = ChocolateFactoryAPI.getChocolateBuyCost(lore) ?: continue
             val internalName = item.getInternalName()
@@ -57,6 +72,11 @@ object ChocolateShopPrice {
 
                 add("")
                 add("§7Profit per million chocolate: §6${perFormat} ")
+
+                add("")
+                val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(chocolate)
+                add("§7Time until affordable: §6$formattedTimeUntilGoal ")
+
             }
             table.add(
                 DisplayTableEntry(
@@ -71,7 +91,7 @@ object ChocolateShopPrice {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eCoins per million chocolate§f:"))
+        newList.add(Renderable.string("§e§lCoins per million chocolate§f:"))
         // TODO update this value every second
         // TODO add time until can afford
         newList.add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
