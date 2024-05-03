@@ -63,4 +63,8 @@ object HypixelCommands {
         // TODO rename function
         ChatUtils.sendCommandToServer(command)
     }
+
+    fun allChat(message: String) {
+        send("ac $message")
+    }
 }
