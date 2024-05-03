@@ -34,7 +34,7 @@ object HoppityEggsShared {
             val eggLocation = LorenzVec(x, y, z)
 
             val meal = getEggType(event)
-            val note = groupOrNull("note")
+            val note = groupOrNull("note")?.removeColor()
 
             if (meal.isClaimed()) return
             if (!HoppityEggLocator.isValidEggLocation(eggLocation)) return
