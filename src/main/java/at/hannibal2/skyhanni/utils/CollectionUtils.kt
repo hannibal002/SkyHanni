@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.Queue
@@ -204,8 +205,16 @@ object CollectionUtils {
     }
 
     // TODO add internal name support, and caching
-    fun MutableList<Renderable>.addItemStack(itemStack: ItemStack) {
-        add(Renderable.itemStack(itemStack))
+    fun MutableList<Renderable>.addItemStack(
+        itemStack: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize,
+    ) {
+        if (highlight) {
+            // Hack to add enchant glint, like Hypixel does it
+            itemStack.addEnchantment(Enchantment.protection, 0)
+        }
+        add(Renderable.itemStack(itemStack, scale = scale))
     }
 
     fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {

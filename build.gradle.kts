@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.16"
+version = "0.25.Beta.19"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -80,7 +80,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5") {
+    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")

@@ -57,7 +57,7 @@ object UtilsPatterns {
     )
     val costLinePattern by patternGroup.pattern(
         "item.cost.line",
-        "(?:§5§o)?§7Cost"
+        "(?:§5§o)?§7Cost.*"
     )
 
     val timeAmountPattern by patternGroup.pattern(

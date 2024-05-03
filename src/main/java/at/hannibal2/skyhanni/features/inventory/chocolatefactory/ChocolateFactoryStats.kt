@@ -1,16 +1,15 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.menu
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -43,8 +42,13 @@ object ChocolateFactoryStats {
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
-        val position = ChocolateFactoryAPI.leaderboardPosition?.addSeparators() ?: "???"
+
+        val position = ChocolateFactoryAPI.leaderboardPosition
+        val positionText = position?.addSeparators() ?: "???"
         val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" } ?: ""
+        val leaderboard = "#$positionText $percentile"
+        ChocolatePositionChange.update(position, leaderboard)
+
         val timeTowerInfo = if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
             "§d§lActive"
         } else {
@@ -52,6 +56,16 @@ object ChocolateFactoryStats {
         }
 
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
+        val chocolateUntilPrestigeCalculation =
+            ChocolateFactoryAPI.chocolateForPrestige - ChocolateAmount.PRESTIGE.chocolate()
+
+        var chocolateUntilPrestige = "§6${chocolateUntilPrestigeCalculation.addSeparators()}"
+
+        if (chocolateUntilPrestigeCalculation <= 0) {
+            chocolateUntilPrestige = "§aPrestige Available"
+        }
+
+        val upgradeAvailableAt = ChocolateAmount.CURRENT.formattedTimeUntilGoal(profileStorage.bestUpgradeCost)
 
         val map = buildMap {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory Stats")
@@ -68,11 +82,12 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.MULTIPLIER, "§eChocolate Multiplier: §6${profileStorage.chocolateMultiplier}")
             put(ChocolateFactoryStat.BARN, "§eBarn: §6${ChocolateFactoryBarnManager.barnStatus()}")
 
-            put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §7#§b$position $percentile")
+            put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §b$leaderboard")
 
             put(ChocolateFactoryStat.EMPTY, "")
             put(ChocolateFactoryStat.EMPTY_2, "")
             put(ChocolateFactoryStat.EMPTY_3, "")
+            put(ChocolateFactoryStat.EMPTY_4, "")
 
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
@@ -80,8 +95,13 @@ object ChocolateFactoryStats {
                 ChocolateFactoryStat.RAW_PER_SECOND,
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}"
             )
+            put(
+                ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
+                "§eChocolate To Prestige: $chocolateUntilPrestige"
+            )
+            put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
         }
-        val text = config.statsDisplayList.mapNotNull { map[it] }
+        val text = config.statsDisplayList.filter { it.shouldDisplay() }.mapNotNull { map[it] }
 
         display = listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(text.map(Renderable::string)),
@@ -102,13 +122,17 @@ object ChocolateFactoryStats {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(42, "event.chocolateFactory.statsDisplayList") { element ->
-            val jsonArray = element.asJsonArray
-
-            jsonArray.add(JsonPrimitive("TIME_TOWER"))
-            jsonArray.add(JsonPrimitive("TIME_TO_PRESTIGE"))
-
-            jsonArray
+            addToDisplayList(element, "TIME_TOWER", "TIME_TO_PRESTIGE")
         }
+        event.transform(45, "inventory.chocolateFactory.statsDisplayList") { element ->
+            addToDisplayList(element, "TIME_TO_BEST_UPGRADE")
+        }
+    }
+
+    private fun addToDisplayList(element: JsonElement, vararg toAdd: String): JsonElement {
+        val jsonArray = element.asJsonArray
+        toAdd.forEach { jsonArray.add(JsonPrimitive(it)) }
+        return jsonArray
     }
 
     enum class ChocolateFactoryStat(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
@@ -122,13 +146,16 @@ object ChocolateFactoryStats {
         PER_DAY("§ePer Day: §6326,654,208"),
         MULTIPLIER("§eChocolate Multiplier: §61.77"),
         BARN("§eBarn: §6171/190 Rabbits"),
-        LEADERBOARD_POS("§ePosition: §7#§b103 §7Top §a0.87%"),
+        LEADERBOARD_POS("§ePosition: §b#103 §7Top §a0.87%"),
         EMPTY(""),
         EMPTY_2(""),
         EMPTY_3(""),
+        EMPTY_4(""),
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
-        TIME_TO_PRESTIGE("§eTime To Prestige: §61d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
+        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        TIME_TO_BEST_UPGRADE("§eBest Upgrade: §b 59m 4s"),
         ;
 
         override fun toString(): String {

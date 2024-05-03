@@ -1,7 +1,6 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.menu
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI.profileStorage
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.profileStorage
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -21,11 +20,11 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         return when {
             time.isInfinite() -> "§cNever"
             time.isNegative() -> "§aNow"
-            else -> "§6${time.format()}"
+            else -> "§b${time.format()}"
         }
     }
 
-    private fun timeUntilGoal(goal: Long): Duration {
+    fun timeUntilGoal(goal: Long): Duration {
         val profileStorage = ChocolateFactoryAPI.profileStorage ?: return Duration.ZERO
 
         val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
@@ -33,6 +32,8 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         val baseMultiplier = profileStorage.rawChocolateMultiplier
         val rawChocolatePerSecond = profileStorage.rawChocPerSecond
         val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
+
+        if (rawChocolatePerSecond == 0) return Duration.INFINITE
 
         var needed = goal - chocolate()
         val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
@@ -57,6 +58,41 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
             val perSecond = ChocolateFactoryAPI.chocolatePerSecond
             return (perSecond * secondsSinceUpdate).toLong()
+        }
+
+        fun averageChocPerSecond(
+            baseMultiplierIncrease: Double = 0.0,
+            rawPerSecondIncrease: Int = 0,
+            includeTower: Boolean = false,
+        ): Double {
+            val profileStorage = profileStorage ?: return 0.0
+
+            val baseMultiplier = profileStorage.rawChocolateMultiplier + baseMultiplierIncrease
+            val rawPerSecond = profileStorage.rawChocPerSecond + rawPerSecondIncrease
+
+            val timeTowerCooldown = profileStorage.timeTowerCooldown
+
+            val basePerSecond = rawPerSecond * baseMultiplier
+            if (!includeTower) return basePerSecond
+            val towerCalc = (rawPerSecond * .1) / timeTowerCooldown
+
+            return basePerSecond + towerCalc
+        }
+
+        fun addToAll(amount: Long) {
+            profileStorage?.let {
+                it.currentChocolate += amount
+                it.chocolateThisPrestige += amount
+                it.chocolateAllTime += amount
+                updateBestUpgrade(amount)
+            }
+        }
+
+        private fun updateBestUpgrade(price: Long) {
+            profileStorage?.let {
+                val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
+                it.bestUpgradeAvailableAt = canAffordAt.toMillis()
+            }
         }
     }
 }
