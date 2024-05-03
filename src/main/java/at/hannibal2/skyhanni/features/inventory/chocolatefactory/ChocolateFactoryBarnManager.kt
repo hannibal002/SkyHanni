@@ -1,9 +1,11 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -21,7 +23,15 @@ object ChocolateFactoryBarnManager {
     )
     private val rabbitDuplicatePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.duplicate",
-        "§7§lDUPLICATE RABBIT! §6\\+[\\d,]+ Chocolate"
+        "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate"
+    )
+
+    /**
+     * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
+     */
+    private val rabbitCrashedPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.crushed",
+        "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6\\+(?<amount>[\\d,]+) Chocolate"
     )
 
     var barnFull = false
@@ -40,6 +50,12 @@ object ChocolateFactoryBarnManager {
 
         rabbitDuplicatePattern.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
+            ChocolateAmount.addToAll(group("amount").formatLong())
+        }
+
+        rabbitCrashedPattern.matchMatcher(event.message) {
+            HoppityEggsManager.shareWaypointPrompt()
+            ChocolateAmount.addToAll(group("amount").formatLong())
         }
     }
 
@@ -71,8 +87,11 @@ object ChocolateFactoryBarnManager {
         }
 
         ChatUtils.clickableChat(
-            message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) { "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed" }
-            else { "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"},
+            message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) {
+                "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
+            } else {
+                "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
+            },
             onClick = {
                 HypixelCommands.chocolateFactory()
             }

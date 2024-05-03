@@ -1,9 +1,8 @@
-package at.hannibal2.skyhanni.features.event.chocolatefactory.clicks
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.event.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -11,10 +10,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-object FactoryItemTooltipFeatures {
+object ChocolateFactoryTooltipCompact {
     private val config get() = ChocolateFactoryAPI.config
 
     private var lastClick = SimpleTimeMark.farPast()
@@ -43,7 +41,7 @@ object FactoryItemTooltipFeatures {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (config.tooltipMove) {
-            if (lastHover.passedSince() < 300.milliseconds) {
+            if (lastHover.passedSince() < 1.seconds) {
                 config.tooltipMovePosition.renderStrings(tooltipToHover, posLabel = "Tooltip Move")
             }
         }
