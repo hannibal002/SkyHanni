@@ -61,6 +61,7 @@ object HoppityEggLocator {
         drawLocations = false
         sharedEggLocation = null
         currentEggType = null
+        lastParticlePosition = null
     }
 
     @SubscribeEvent
