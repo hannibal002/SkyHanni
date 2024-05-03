@@ -18,18 +18,17 @@ object HoppityEggPlayerOpacityChanger {
     private var armor = mapOf<Int, ItemStack>()
 
     private fun hideNearbyPlayer(entity: EntityPlayer, location: LorenzVec) {
-        if (entity.distanceTo(location) < 4.0) {
-            GlStateManager.enableBlend()
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-            GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 100f)
-            val armorInventory = entity.getArmorInventory() ?: return
+        if (entity.distanceTo(location) >= 4.0) return
+        GlStateManager.enableBlend()
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 100f)
+        val armorInventory = entity.getArmorInventory() ?: return
 
-            armor = buildMap {
-                for ((i, stack) in armorInventory.withIndex()) {
-                    stack?.let {
-                        this[i] = it.copy()
-                        armorInventory[i] = null
-                    }
+        armor = buildMap {
+            for ((i, stack) in armorInventory.withIndex()) {
+                stack?.let {
+                    this[i] = it.copy()
+                    armorInventory[i] = null
                 }
             }
         }
