@@ -70,7 +70,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
 
         fun updateDisplay() {
-            with(SkyHanniMod.screenToOpen) {
+            with(Minecraft.getMinecraft().currentScreen) {
                 if (this !is FFGuideGUI) return
                 this.refreshPage()
             }
