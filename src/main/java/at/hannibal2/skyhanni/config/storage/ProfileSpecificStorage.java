@@ -93,6 +93,12 @@ public class ProfileSpecificStorage {
         public int maxTimeTowerUses = 3;
 
         @Expose
+        public long bestUpgradeAvailableAt = 0;
+
+        @Expose
+        public long bestUpgradeCost = 0;
+
+        @Expose
         public long lastDataSave = 0;
 
         @Expose

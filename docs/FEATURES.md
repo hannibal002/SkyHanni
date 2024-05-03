@@ -858,6 +858,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + This updates every time you first open the /cf menu on a new server.
 + Chocolate Shop Price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1601)
     + Show chocolate to coin prices inside the Chocolate Shop inventory.
++ Keybinds for Chocolate Factory. - seraid (https://github.com/hannibal002/SkyHanni/pull/1644)
++ Warning when Chocolate Factory upgrade is available. - seraid (https://github.com/hannibal002/SkyHanni/pull/1642)
++ Amount of chocolate until next prestige to stats display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1638)
 
 </details>
 <details open><summary>

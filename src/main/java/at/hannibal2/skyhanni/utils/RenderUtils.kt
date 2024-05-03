@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
@@ -65,7 +66,8 @@ object RenderUtils {
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
-    private val matrixBuffer = GLAllocation.createDirectFloatBuffer(16);
+    private val matrixBuffer = GLAllocation.createDirectFloatBuffer(16)
+    private val colourBuffer = GLAllocation.createDirectFloatBuffer(16)
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -1451,6 +1453,24 @@ object RenderUtils {
         text: String,
         scale: Float,
     ) {
+        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+    }
+
+    fun GuiContainerEvent.ForegroundDrawnEvent.drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float,
+    ) {
+        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+    }
+
+    private fun drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float,
+    ) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.disableLighting()
@@ -1610,5 +1630,12 @@ object RenderUtils {
         with(ScaledResolution(Minecraft.getMinecraft())) {
             Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
         }
+    }
+
+    fun getAlpha(): Float {
+        colourBuffer.clear()
+        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colourBuffer)
+        if (colourBuffer.limit() < 4) return 1f
+        return colourBuffer.get(3)
     }
 }
