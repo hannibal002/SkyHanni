@@ -37,17 +37,16 @@ object ChocolateFactoryUpgradeWarning {
         if (ReminderUtils.isBusy()) return
         if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.minutes) return
         lastUpgradeWarning = SimpleTimeMark.now()
-
+        if (config.upgradeWarningSound) {
+            SoundUtils.playBeepSound()
+        }
+        if (ChocolateFactoryAPI.inChocolateFactory) return
         ChatUtils.clickableChat(
             "You have a Chocolate factory upgrade available to purchase!",
             onClick = {
                 HypixelCommands.chocolateFactory()
             }
         )
-        if (config.upgradeWarningSound) {
-            SoundUtils.playBeepSound()
-        }
-
     }
 
     @SubscribeEvent
@@ -57,7 +56,7 @@ object ChocolateFactoryUpgradeWarning {
 
     fun checkUpgradeChange(slot: Int, level: Int) {
         if (slot != lastUpgradeSlot || level != lastUpgradeLevel) {
-            lastUpgradeWarning = SimpleTimeMark.farPast()
+            lastUpgradeWarning = SimpleTimeMark.now()
             lastUpgradeSlot = slot
             lastUpgradeLevel = level
         }

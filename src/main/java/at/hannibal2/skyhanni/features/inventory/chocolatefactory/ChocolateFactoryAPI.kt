@@ -62,7 +62,7 @@ object ChocolateFactoryAPI {
 
     var clickRabbitSlot: Int? = null
 
-    val factoryUpgrades = mutableListOf<ChocolateFactoryUpgrade>()
+    var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
@@ -78,7 +78,7 @@ object ChocolateFactoryAPI {
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
-        factoryUpgrades.clear()
+        factoryUpgrades = emptyList()
         DelayedRun.runNextTick {
             ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
         }

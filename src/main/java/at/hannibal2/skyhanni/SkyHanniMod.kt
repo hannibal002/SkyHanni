@@ -140,6 +140,7 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggPlayerOpacityChanger
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc
@@ -217,6 +218,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
+import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryTooltipOverflow
 import at.hannibal2.skyhanni.features.garden.inventory.LogBookStats
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice
@@ -658,6 +660,7 @@ class SkyHanniMod {
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
+        loadModule(HoppityEggPlayerOpacityChanger)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
@@ -901,6 +904,7 @@ class SkyHanniMod {
         loadModule(VerminTracker)
         loadModule(VerminHighlighter())
         loadModule(SkillProgress)
+        loadModule(GardenInventoryTooltipOverflow())
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())

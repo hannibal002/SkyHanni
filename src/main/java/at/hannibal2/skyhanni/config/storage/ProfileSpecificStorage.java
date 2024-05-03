@@ -363,6 +363,9 @@ public class ProfileSpecificStorage {
         public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
 
         @Expose
+        public Map<CropType, Integer> customGoalMilestone = new HashMap<>();
+
+        @Expose
         public PestProfitTracker.Data pestProfitTracker = new PestProfitTracker.Data();
 
         @Expose

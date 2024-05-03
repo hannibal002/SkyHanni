@@ -156,7 +156,7 @@ object ChatUtils {
         val fullCommand = "/" + command.removePrefix("/")
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eClick here!"))
 
         return text
     }

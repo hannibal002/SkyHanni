@@ -63,20 +63,36 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         fun averageChocPerSecond(
             baseMultiplierIncrease: Double = 0.0,
             rawPerSecondIncrease: Int = 0,
-            timeTowerLevelIncrease: Int = 0,
+            includeTower: Boolean = false,
         ): Double {
             val profileStorage = profileStorage ?: return 0.0
 
             val baseMultiplier = profileStorage.rawChocolateMultiplier + baseMultiplierIncrease
             val rawPerSecond = profileStorage.rawChocPerSecond + rawPerSecondIncrease
-            val timeTowerLevel = profileStorage.timeTowerLevel + timeTowerLevelIncrease
 
             val timeTowerCooldown = profileStorage.timeTowerCooldown
 
             val basePerSecond = rawPerSecond * baseMultiplier
-            val towerCalc = (rawPerSecond * timeTowerLevel * .1) / timeTowerCooldown
+            if (!includeTower) return basePerSecond
+            val towerCalc = (rawPerSecond * .1) / timeTowerCooldown
 
             return basePerSecond + towerCalc
+        }
+
+        fun addToAll(amount: Long) {
+            profileStorage?.let {
+                it.currentChocolate += amount
+                it.chocolateThisPrestige += amount
+                it.chocolateAllTime += amount
+                updateBestUpgrade(amount)
+            }
+        }
+
+        private fun updateBestUpgrade(price: Long) {
+            profileStorage?.let {
+                val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
+                it.bestUpgradeAvailableAt = canAffordAt.toMillis()
+            }
         }
     }
 }
