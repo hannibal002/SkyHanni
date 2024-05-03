@@ -139,6 +139,7 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     //TODO rename to runHypixelCommand
+    @Deprecated("Use clickableChat with onClick or use HypixelCommands", ReplaceWith(""))
     fun clickableChat(message: String, command: String, prefix: Boolean = true, prefixColor: String = "§e") {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         val fullMessage = msgPrefix + message
@@ -146,12 +147,12 @@ object ChatUtils {
         internalChat(createClickableChat(fullMessage, command))
     }
 
-    fun createClickableChat(message: String, command: String): ChatComponentText {
+    private fun createClickableChat(message: String, command: String): ChatComponentText {
         val text = ChatComponentText(message)
         val fullCommand = "/" + command.removePrefix("/")
         text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, fullCommand)
         text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute $fullCommand"))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eClick here!"))
 
         return text
     }
@@ -171,7 +172,7 @@ object ChatUtils {
         onClick: () -> Any,
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
-        prefixColor: String = "§e"
+        prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         ChatClickActionManager.oneTimeClick(msgPrefix + message, onClick, expireAt)
@@ -290,6 +291,7 @@ object ChatUtils {
         sendQueue.add(message)
     }
 
+    @Deprecated("use HypixelCommands instead", ReplaceWith(""))
     fun sendCommandToServer(command: String) {
         if (command.startsWith("/")) {
             debug("Sending wrong command to server? ($command)")

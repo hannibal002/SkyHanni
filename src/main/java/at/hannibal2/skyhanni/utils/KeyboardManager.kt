@@ -49,9 +49,11 @@ object KeyboardManager {
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
     @SubscribeEvent
-    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        GuiKeyPressEvent(guiScreen).postAndCatch()
+        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+            event.isCanceled = true
+        }
     }
 
     @SubscribeEvent

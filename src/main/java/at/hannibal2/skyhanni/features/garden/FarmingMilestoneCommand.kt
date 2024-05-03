@@ -59,12 +59,12 @@ object FarmingMilestoneCommand {
         val storage = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone ?: return
 
         if (crop == null) {
-            ChatUtils.userError("No crop type entered")
+            ChatUtils.userError("No crop type entered.")
             return
         }
 
         val enteredCrop = CropType.getByName(crop) ?: run {
-            ChatUtils.userError("Invalid crop type entered")
+            ChatUtils.userError("Invalid crop type entered.")
             return
         }
 
@@ -80,7 +80,7 @@ object FarmingMilestoneCommand {
             return
         }
         storage[enteredCrop] = targetLevel
-        ChatUtils.chat("Custom goal milestone for §b${enteredCrop.cropName} §eset to §b$targetLevel")
+        ChatUtils.chat("Custom goal milestone for §b${enteredCrop.cropName} §eset to §b$targetLevel.")
     }
 
     fun onComplete(strings: Array<String>): List<String> {

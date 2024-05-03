@@ -6,23 +6,37 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = RendererLivingEntity.class, priority = 500)
 public class MixinContributorRendererEntityLiving<T extends EntityLivingBase> {
 
-    @Unique
-    private final RendererLivingEntityHook skyHanni$hook = new RendererLivingEntityHook();
-
-    @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Ljava/lang/String;equals(Ljava/lang/Object;)Z", ordinal = 0))
-    private boolean rotateCorpse(String displayName, Object v2, T bat, float p_77043_2_, float p_77043_3_, float partialTicks) {
-        return skyHanni$hook.rotateCorpse(displayName, bat);
+    @ModifyVariable(
+        method = "rotateCorpse",
+        at = @At(value = "INVOKE", target = "Ljava/lang/String;equals(Ljava/lang/Object;)Z", ordinal = 0, shift = At.Shift.BEFORE)
+    )
+    private String checkNameForUpsideDown(String displayName) {
+        if (RendererLivingEntityHook.shouldBeUpsideDown(displayName))
+            return "Grumm";
+        return displayName;
     }
 
-    @Redirect(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;isWearing(Lnet/minecraft/entity/player/EnumPlayerModelParts;)Z"))
-    private boolean rotateCorpse(EntityPlayer bat, EnumPlayerModelParts p_175148_1_) {
-        return skyHanni$hook.isWearing(bat, EnumPlayerModelParts.CAPE);
+    @Redirect(
+        method = "rotateCorpse",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;isWearing(Lnet/minecraft/entity/player/EnumPlayerModelParts;)Z"))
+    private boolean alwaysMarkAsHavingCape(EntityPlayer instance, EnumPlayerModelParts p_175148_1_) {
+        // Always returning true here ensures maximal compatibility with other mods. This will no longer block other mods from implementing this same mixin.
+        return true;
+    }
+
+    @Inject(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/EnumChatFormatting;getTextWithoutFormattingCodes(Ljava/lang/String;)Ljava/lang/String;", shift = At.Shift.AFTER))
+    private void rotateThePlayer(T bat, float p_77043_2_, float p_77043_3_, float partialTicks, CallbackInfo ci) {
+        if (bat instanceof EntityPlayer) {
+            RendererLivingEntityHook.rotatePlayer((EntityPlayer) bat);
+        }
     }
 }
