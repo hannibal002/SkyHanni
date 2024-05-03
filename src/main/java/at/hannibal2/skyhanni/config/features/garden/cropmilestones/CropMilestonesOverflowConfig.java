@@ -17,7 +17,7 @@ public class CropMilestonesOverflowConfig {
     public boolean bestCropTime = false;
 
     @Expose
-    @ConfigOption(name = "Inventory", desc = "Overflow as stack size in crop milestones inventory. (will change milestones avg too.")
+    @ConfigOption(name = "Inventory", desc = "Overflow as stack size in crop milestones inventory. Will also change milestones avg.")
     @ConfigEditorBoolean
     public boolean inventoryStackSize = false;
 
