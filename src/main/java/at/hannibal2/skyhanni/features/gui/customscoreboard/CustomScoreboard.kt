@@ -26,8 +26,10 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -39,6 +41,7 @@ import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
@@ -169,6 +172,13 @@ class CustomScoreboard {
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        runDelayed(2.seconds) {
+            if (!LorenzUtils.inSkyBlock) dirty = true
         }
     }
 

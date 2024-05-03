@@ -82,7 +82,7 @@ object MaxwellAPI {
     )
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
-        "§7Total: §6(?<mp>\\d+) Magical Power"
+        "§7Total: §6(?<mp>[\\d.,]+) Magical Power"
     )
     private val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
