@@ -14,8 +14,11 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -40,6 +43,10 @@ object HoppityEggsManager {
         "egg.alreadycollected",
         "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!"
     )
+    private val hoppityEventNotOn by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.notevent",
+        "§cThis only works during Hoppity's Hunt!"
+    )
 
     private var lastMeal: HoppityEggType? = null
 
@@ -57,19 +64,35 @@ object HoppityEggsManager {
             val meal = getEggType(event)
             meal.markClaimed()
             lastMeal = meal
+            return
         }
 
         noEggsLeftPattern.matchMatcher(event.message) {
             HoppityEggType.allFound()
+
+            val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
+            event.chatComponent.appendText("\n§eNext egg available in §b${nextEgg.timeUntil().format()}")
             return
         }
 
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
             getEggType(event).markClaimed()
+            val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
+            event.chatComponent.appendText("\n§eNext egg available in §b${nextEgg.timeUntil().format()}")
+            return
         }
 
         eggSpawnedPattern.matchMatcher(event.message) {
             getEggType(event).markSpawned()
+            return
+        }
+
+        hoppityEventNotOn.matchMatcher(event.message) {
+            val currentYear = SkyBlockTime.now().year
+            val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
+
+            event.chatComponent.appendText("\n§eNext Hoppity's Hunt in §b${timeUntil.format()}")
+            return
         }
     }
 
@@ -104,8 +127,7 @@ object HoppityEggsManager {
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
 
         val displayList = HoppityEggType.entries
-            .filter { !it.isClaimed() }
-            .map { "§7 - ${it.formattedName}" }
+            .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
             .toMutableList()
         displayList.add(0, "§bUnfound Eggs:")
         if (displayList.size == 1) return
@@ -127,4 +149,6 @@ object HoppityEggsManager {
         )
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
+
+
 }
