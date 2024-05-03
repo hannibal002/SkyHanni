@@ -1,15 +1,19 @@
 package at.hannibal2.skyhanni.data.hypixel.chat.event
 
+import at.hannibal2.skyhanni.utils.ComponentSpan
 import net.minecraft.util.IChatComponent
 
 class PlayerAllChatEvent(
-    val levelColor: String?,
-    val level: Int?,
-    val privateIslandRank: String? = null,
-    val isAGuest: Boolean,
-    author: String,
-    val chatColor: String?,
-    message: String,
+    val levelComponent: ComponentSpan?,
+    val privateIslandRank: ComponentSpan?,
+    val privateIslandGuest: ComponentSpan?,
+    val chatColor: String,
+    authorComponent: ComponentSpan,
+    messageComponent: ComponentSpan,
     chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(author, message, chatComponent, blockedReason)
+) : AbstractChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
+    val levelColor = levelComponent?.sampleStyleAtStart()?.color
+    val level by lazy { levelComponent?.getText()?.toInt() }
+    val isAGuest by lazy { privateIslandGuest != null }
+}

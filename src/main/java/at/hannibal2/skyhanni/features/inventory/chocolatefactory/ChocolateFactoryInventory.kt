@@ -44,7 +44,8 @@ object ChocolateFactoryInventory {
             if (slot.stack == null) continue
             val slotIndex = slot.slotNumber
 
-            ChocolateFactoryAPI.factoryUpgrades.find { it.slotIndex == slotIndex }?.let { upgrade ->
+            val currentUpdates = ChocolateFactoryAPI.factoryUpgrades
+            currentUpdates.find { it.slotIndex == slotIndex }?.let { upgrade ->
                 if (upgrade.canAfford()) {
                     slot highlight LorenzColor.GREEN.addOpacity(75)
                 }
