@@ -29,6 +29,12 @@ public class HoppityEggsConfig {
     public boolean showClaimedEggs = false;
 
     @Expose
+    @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDuringContest = false;
+
+    @Expose
     @ConfigOption(name = "Shared Hoppity Waypoints", desc = "Enable being able to share and receive egg waypoints in your lobby.")
     @ConfigEditorBoolean
     @FeatureToggle

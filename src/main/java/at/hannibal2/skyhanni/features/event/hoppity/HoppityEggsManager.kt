@@ -132,7 +132,7 @@ object HoppityEggsManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showClaimedEggs) return
-        if (ReminderUtils.isBusy()) return
+        if (ReminderUtils.isBusy(config.showDuringContest)) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
 
         val displayList = HoppityEggType.entries
