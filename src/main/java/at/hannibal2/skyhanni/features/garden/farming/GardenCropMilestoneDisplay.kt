@@ -159,16 +159,14 @@ object GardenCropMilestoneDisplay {
         val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
         nextTier = if (useCustomGoal) customTargetLevel else nextTier
 
-        lineMap[1] = Renderable.horizontalContainer(
-            buildList {
-                addCropIconRenderable(crop)
-                if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
-                    addString("§7" + crop.cropName + " §eMAXED")
-                } else {
-                    addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
-                }
+        lineMap[1] = Renderable.horizontalContainer(buildList {
+            addCropIconRenderable(crop)
+            if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
+                addString("§7" + crop.cropName + " §eMAXED")
+            } else {
+                addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
             }
-        )
+        })
 
         val allowOverflowOrCustom = overflowDisplay || useCustomGoal
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflowOrCustom)
@@ -229,14 +227,16 @@ object GardenCropMilestoneDisplay {
         }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext && nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
+            if (currentTier >= 46 && currentTier == previousNext &&
+                nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
                 lastWarnedLevel = currentTier
             }
         }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext && nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
+            if (currentTier >= 46 && currentTier == previousNext &&
+                nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
                 lastWarnedLevel = currentTier
             }
