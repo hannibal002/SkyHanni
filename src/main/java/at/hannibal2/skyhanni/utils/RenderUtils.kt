@@ -637,6 +637,7 @@ object RenderUtils {
         return offsetX
     }
 
+    @Deprecated("use renderable item list", ReplaceWith(""))
     fun MutableList<Any>.addItemIcon(
         item: ItemStack,
         highlight: Boolean = false,
