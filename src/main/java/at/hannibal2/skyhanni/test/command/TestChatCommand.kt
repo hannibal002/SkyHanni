@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import kotlinx.coroutines.launch
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 
 object TestChatCommand {
 
@@ -16,36 +17,34 @@ object TestChatCommand {
             return
         }
 
-        val last = args.last()
-        if (last == "-clipboard") {
-            SkyHanniMod.coroutineScope.launch {
-                OSUtils.readFromClipboard()?.let {
-                    test(it)
-                } ?: run {
-                    ChatUtils.userError("Clipboard does not contain a string!")
-                }
-            }
-            return
+        SkyHanniMod.coroutineScope.launch {
+            val mutArgs = args.toMutableList()
+            val isComplex = mutArgs.remove("-complex")
+            val isClipboard = mutArgs.remove("-clipboard")
+            val isHidden = mutArgs.remove("-s")
+            val text = if (isClipboard) {
+                OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard does not contain a string!")
+            } else mutArgs.joinToString(" ")
+            val component =
+                if (isComplex) IChatComponent.Serializer.jsonToComponent(text)
+                else ChatComponentText(text.replace("&", "§"))
+            if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
+            test(component)
         }
-        val hidden = last == "-s"
-        var rawMessage = args.toList().joinToString(" ")
-        if (!hidden) ChatUtils.chat("Testing message: §7$rawMessage", prefixColor = "§a")
-        if (hidden) rawMessage = rawMessage.replace(" -s", "")
-        test(rawMessage.replace("&", "§"))
     }
 
-    private fun test(message: String) {
-        val event = LorenzChatEvent(message, ChatComponentText(message))
+    private fun test(componentText: IChatComponent) {
+        val event = LorenzChatEvent(LorenzUtils.stripVanillaMessage(componentText.formattedText), componentText)
         event.postAndCatch()
 
         if (event.blockedReason != "") {
             ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
         } else {
-            val finalMessage = event.chatComponent.formattedText
-            if (LorenzUtils.stripVanillaMessage(finalMessage) != LorenzUtils.stripVanillaMessage(message)) {
+            val finalMessage = event.chatComponent
+            if (LorenzUtils.stripVanillaMessage(finalMessage.formattedText) != LorenzUtils.stripVanillaMessage(componentText.formattedText)) {
                 ChatUtils.chat("§eChat modified!")
             }
-            ChatUtils.chat(finalMessage, false)
+            ChatUtils.chatComponent(finalMessage)
         }
     }
 }
