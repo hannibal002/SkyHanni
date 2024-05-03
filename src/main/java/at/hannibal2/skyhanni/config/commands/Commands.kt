@@ -13,11 +13,13 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
@@ -316,6 +318,10 @@ object Commands {
             "shlanedetection",
             "Detect a farming lane in garden"
         ) { FarmingLaneCreator.commandLaneDetection() }
+        registerCommand(
+            "shignore",
+            "Add/Remove a user from your"
+        ) { PartyChatCommands.blacklist(it) }
     }
 
     private fun usersBugFix() {
@@ -384,6 +390,10 @@ object Commands {
             "shupdate",
             "Updates the mod to the specified update stream."
         ) { forceUpdate(it) }
+        registerCommand(
+            "shUpdateBazaarPrices",
+            "Forcefully updating the bazaar prices right now."
+        ) { HypixelBazaarFetcher.fetchNow() }
     }
 
     private fun developersDebugFeatures() {
@@ -627,8 +637,9 @@ object Commands {
         }
     }
 
-    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
-        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+    private fun registerCommand(rawName: String, description: String, function: (Array<String>) -> Unit) {
+        val name = rawName.lowercase()
+        if (commands.any { it.name == name }) {
             error("The command '$name is already registered!'")
         }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
