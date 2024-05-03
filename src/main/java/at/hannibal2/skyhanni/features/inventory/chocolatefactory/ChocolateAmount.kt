@@ -78,5 +78,21 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
             return basePerSecond + towerCalc
         }
+
+        fun addToAll(amount: Long) {
+            profileStorage?.let {
+                it.currentChocolate += amount
+                it.chocolateThisPrestige += amount
+                it.chocolateAllTime += amount
+                updateBestUpgrade(amount)
+            }
+        }
+
+        private fun updateBestUpgrade(price: Long) {
+            profileStorage?.let {
+                val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
+                it.bestUpgradeAvailableAt = canAffordAt.toMillis()
+            }
+        }
     }
 }
