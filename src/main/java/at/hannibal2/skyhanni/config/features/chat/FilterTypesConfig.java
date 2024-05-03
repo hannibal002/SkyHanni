@@ -92,6 +92,12 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean diana = false;
 
+    @Expose
+    @ConfigOption(name = "Factory Upgrade", desc = "Hide chocolate factory upgrade and employee promotion messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean factoryUpgrade = false;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")

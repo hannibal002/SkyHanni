@@ -4,19 +4,25 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -53,6 +59,7 @@ import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
@@ -74,6 +81,7 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
@@ -285,6 +293,14 @@ object Commands {
             FarmingMilestoneCommand::onComplete
         )
         registerCommand0(
+            "shcropgoal",
+            "Define a custom milestone goal for a crop.",
+            {
+            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
@@ -302,6 +318,10 @@ object Commands {
             "shlanedetection",
             "Detect a farming lane in garden"
         ) { FarmingLaneCreator.commandLaneDetection() }
+        registerCommand(
+            "shignore",
+            "Add/Remove a user from your"
+        ) { PartyChatCommands.blacklist(it) }
     }
 
     private fun usersBugFix() {
@@ -359,9 +379,21 @@ object Commands {
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
+            "shclearksimet",
+            "Cleares the saved values of the applied kismet feathers in Croesus"
+        ) { CroesusChestTracker.resetChest() }
+        registerCommand(
             "shkingfix",
             "Reseting the local King Talisman Helper offset."
         ) { KingTalismanHelper.kingFix() }
+        registerCommand(
+            "shupdate",
+            "Updates the mod to the specified update stream."
+        ) { forceUpdate(it) }
+        registerCommand(
+            "shUpdateBazaarPrices",
+            "Forcefully updating the bazaar prices right now."
+        ) { HypixelBazaarFetcher.fetchNow() }
     }
 
     private fun developersDebugFeatures() {
@@ -386,6 +418,10 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
+        registerCommand(
+            "shtestsackapi",
+            "Get the amount of an item in sacks according to internal feature SackAPI"
+        ) { SackAPI.testSackAPI(it) }
     }
 
     private fun developersCodingHelp() {
@@ -523,11 +559,11 @@ object Commands {
             val hoverText = buildList {
                 add("§e/$name")
                 if (command.description.isNotEmpty()) {
-                    add(" §7${command.description}")
+                    addDescription(command.description)
                 }
                 add("")
                 add("$color${category.categoryName}")
-                add("  §7${category.description}")
+                addDescription(category.description)
             }
 
             val commandInfo = ChatUtils.createHoverableChat("$color/$name", hoverText, "/$name", false)
@@ -537,6 +573,21 @@ object Commands {
         }
         components.add(ChatComponentText("\n "))
         ChatUtils.multiComponentMessage(components)
+    }
+
+    private fun MutableList<String>.addDescription(description: String) {
+        val lines = description.splitLines(200).removeSuffix("§r").replace("§r", "§7").addOptionalDot()
+        for (line in lines.split("\n")) {
+            add("  §7${line}")
+        }
+    }
+
+    private fun String.addOptionalDot(): String {
+        if (endsWith(".")) return this
+        if (endsWith("?")) return this
+        if (endsWith("!")) return this
+
+        return "$this."
     }
 
     @JvmStatic
@@ -565,8 +616,30 @@ object Commands {
         storage.outdatedItems.clear()
     }
 
-    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
-        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+    private fun forceUpdate(args: Array<String>) {
+        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val arg = args.firstOrNull() ?: "current"
+        val updateStream = when {
+            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            else -> currentStream
+        }
+
+        if (updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())) {
+            ChatUtils.clickableChat(
+                "Are you sure you want to switch to beta? These versions may be less stable.",
+                onClick = {
+                    UpdateManager.checkUpdate(true, updateStream)
+                }
+            )
+        } else {
+            UpdateManager.checkUpdate(true, updateStream)
+        }
+    }
+
+    private fun registerCommand(rawName: String, description: String, function: (Array<String>) -> Unit) {
+        val name = rawName.lowercase()
+        if (commands.any { it.name == name }) {
             error("The command '$name is already registered!'")
         }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
@@ -583,7 +656,11 @@ object Commands {
             name,
             createCommand(function),
             object : SimpleCommand.TabCompleteRunnable {
-                override fun tabComplete(sender: ICommandSender?, args: Array<String>?, pos: BlockPos?): List<String> {
+                override fun tabComplete(
+                    sender: ICommandSender?,
+                    args: Array<String>?,
+                    pos: BlockPos?,
+                ): List<String> {
                     return autoComplete(args ?: emptyArray())
                 }
             }

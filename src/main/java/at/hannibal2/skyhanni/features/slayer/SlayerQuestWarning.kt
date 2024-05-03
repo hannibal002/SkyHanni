@@ -146,7 +146,7 @@ class SlayerQuestWarning {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!(LorenzUtils.inSkyBlock)) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {

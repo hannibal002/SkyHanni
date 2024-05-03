@@ -25,7 +25,7 @@ open class Enchant : Comparable<Enchant> {
 
     open fun getFormat(level: Int): String {
         val config = SkyHanniMod.feature.inventory.enchantParsing
-
+        // TODO change color to string (support for bold)
         if (level >= maxLevel) return config.perfectEnchantColor.get().getChatColor()
         if (level > goodLevel) return config.greatEnchantColor.get().getChatColor()
         if (level == goodLevel) return config.goodEnchantColor.get().getChatColor()
