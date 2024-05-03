@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
@@ -105,11 +106,15 @@ object ChatUtils {
         }
     }
 
+    fun chatComponent(message: IChatComponent) {
+        internalChat(message)
+    }
+
     private fun internalChat(message: String): Boolean {
         return internalChat(ChatComponentText(message))
     }
 
-    private fun internalChat(message: ChatComponentText): Boolean {
+    private fun internalChat(message: IChatComponent): Boolean {
         val formattedMessage = message.formattedText
         log.log(formattedMessage)
 
