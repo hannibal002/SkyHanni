@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
@@ -91,16 +92,10 @@ object LorenzUtils {
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
+    // TODO move to string utils
+    @Deprecated("outdated", ReplaceWith("originalMessage.stripHypixelMessage()"))
     fun stripVanillaMessage(originalMessage: String): String {
-        var message = originalMessage
-
-        while (message.startsWith("§r")) {
-            message = message.substring(2)
-        }
-        while (message.endsWith("§r")) {
-            message = message.substring(0, message.length - 2)
-        }
-        return message
+        return originalMessage.stripHypixelMessage()
     }
 
     fun Double.round(decimals: Int): Double {
