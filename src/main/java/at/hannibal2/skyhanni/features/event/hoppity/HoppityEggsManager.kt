@@ -72,7 +72,7 @@ object HoppityEggsManager {
 
             if (config.timeInChat) {
                 val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}")
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -82,7 +82,7 @@ object HoppityEggsManager {
             getEggType(event).markClaimed()
             if (config.timeInChat) {
                 val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}")
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -98,7 +98,7 @@ object HoppityEggsManager {
 
             if (config.timeInChat) {
                 val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt not active. Next Hoppity's Hunt event in §b${timeUntil.format()}")
+                ChatUtils.chat("§eHoppity's Hunt not active. Next Hoppity's Hunt event in §b${timeUntil.format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
