@@ -129,6 +129,7 @@ object LorenzUtils {
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
+    // TODO create extenstion function
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
