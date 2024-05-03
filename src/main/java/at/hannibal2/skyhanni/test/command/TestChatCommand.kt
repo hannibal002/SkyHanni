@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
-import kotlinx.coroutines.launch
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 
@@ -17,16 +16,23 @@ object TestChatCommand {
             return
         }
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchCoroutine {
             val mutArgs = args.toMutableList()
             val isComplex = mutArgs.remove("-complex")
             val isClipboard = mutArgs.remove("-clipboard")
             val isHidden = mutArgs.remove("-s")
             val text = if (isClipboard) {
-                OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard does not contain a string!")
+                OSUtils.readFromClipboard()
+                    ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
             } else mutArgs.joinToString(" ")
             val component =
-                if (isComplex) IChatComponent.Serializer.jsonToComponent(text)
+                if (isComplex)
+                    try {
+                        IChatComponent.Serializer.jsonToComponent(text)
+                    } catch (ex: Exception) {
+                        ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
+                        return@launchCoroutine
+                    }
                 else ChatComponentText(text.replace("&", "§"))
             if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
             test(component)
@@ -41,7 +47,9 @@ object TestChatCommand {
             ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
         } else {
             val finalMessage = event.chatComponent
-            if (LorenzUtils.stripVanillaMessage(finalMessage.formattedText) != LorenzUtils.stripVanillaMessage(componentText.formattedText)) {
+            if (LorenzUtils.stripVanillaMessage(finalMessage.formattedText) != LorenzUtils.stripVanillaMessage(
+                    componentText.formattedText)
+            ) {
                 ChatUtils.chat("§eChat modified!")
             }
             ChatUtils.chatComponent(finalMessage)
