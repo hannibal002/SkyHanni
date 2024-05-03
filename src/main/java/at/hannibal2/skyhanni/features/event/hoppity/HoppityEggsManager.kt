@@ -70,15 +70,21 @@ object HoppityEggsManager {
         noEggsLeftPattern.matchMatcher(event.message) {
             HoppityEggType.allFound()
 
-            val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
-            event.chatComponent.appendText("\n§eNext egg available in §b${nextEgg.timeUntil().format()}")
+            if (config.timeInChat) {
+                val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}")
+                event.blockedReason = "hoppity_egg"
+            }
             return
         }
 
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
             getEggType(event).markClaimed()
-            val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
-            event.chatComponent.appendText("\n§eNext egg available in §b${nextEgg.timeUntil().format()}")
+            if (config.timeInChat) {
+                val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}")
+                event.blockedReason = "hoppity_egg"
+            }
             return
         }
 
@@ -89,9 +95,12 @@ object HoppityEggsManager {
 
         hoppityEventNotOn.matchMatcher(event.message) {
             val currentYear = SkyBlockTime.now().year
-            val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
 
-            event.chatComponent.appendText("\n§eNext Hoppity's Hunt in §b${timeUntil.format()}")
+            if (config.timeInChat) {
+                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
+                ChatUtils.chat("§eHoppity's Hunt not active. Next Hoppity's Hunt event in §b${timeUntil.format()}")
+                event.blockedReason = "hoppity_egg"
+            }
             return
         }
     }
@@ -149,6 +158,5 @@ object HoppityEggsManager {
         )
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
-
 
 }
