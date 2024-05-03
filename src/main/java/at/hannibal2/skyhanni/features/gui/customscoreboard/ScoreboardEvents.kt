@@ -158,12 +158,12 @@ enum class ScoreboardEvents(
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
         ::getActiveEventShowWhen,
-        "§dHoppity's Hunt\n §fEnds in: §e26h"
+        "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h"
     ),
     STARTING_SOON_TABLIST_EVENTS(
         ::getSoonEventLine,
         ::getSoonEventShowWhen,
-        "§6Mining Fiesta\n §fStarts in: §e52min"
+        "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
     ),
     REDSTONE(
         ::getRedstoneLines,
