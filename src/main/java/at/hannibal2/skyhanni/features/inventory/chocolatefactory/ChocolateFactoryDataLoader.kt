@@ -90,6 +90,7 @@ object ChocolateFactoryDataLoader {
         "rabbit.unemployed",
         "Rabbit \\w+ - Unemployed"
     )
+
     // todo get coach jackrabbit when prestige 4
     private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "other.upgrade",
@@ -317,9 +318,7 @@ object ChocolateFactoryDataLoader {
                 level = upgradeTierPattern.matchMatcher(itemName) {
                     group("tier").romanToDecimal()
                 } ?: run {
-                    otherUpgradePattern.matchMatcher(itemName) {
-                        0
-                    }
+                    if (otherUpgradePattern.matches(itemName)) 0 else null
                 } ?: return
 
                 if (slotIndex == ChocolateFactoryAPI.timeTowerIndex) this.profileStorage?.timeTowerLevel = level
@@ -361,8 +360,8 @@ object ChocolateFactoryDataLoader {
         val profileStorage = profileStorage ?: return
 
         // removing time tower here as people like to determine when to buy it themselves
-        val notMaxed =
-            ChocolateFactoryAPI.factoryUpgrades.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex }
+        val notMaxed = ChocolateFactoryAPI.factoryUpgrades
+            .filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt?.toMillis() ?: 0
