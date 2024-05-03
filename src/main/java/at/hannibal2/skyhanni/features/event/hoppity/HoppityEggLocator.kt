@@ -25,7 +25,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object HoppityEggLocator {
-
     private val config get() = HoppityEggsManager.config
 
     private val locatorItem = "EGGLOCATOR".asInternalName()
@@ -36,13 +35,13 @@ object HoppityEggLocator {
     private var drawLocations = false
     private var firstPos = LorenzVec()
     private var secondPos = LorenzVec()
-    private var possibleEggLocations = listOf<LorenzVec>()
 
     private var ticksSinceLastParticleFound = -1
     private var lastGuessMade = SimpleTimeMark.farPast()
     private var eggLocationWeights = listOf<Double>()
 
     var sharedEggLocation: LorenzVec? = null
+    var possibleEggLocations = listOf<LorenzVec>()
     var currentEggType: HoppityEggType? = null
 
     var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
