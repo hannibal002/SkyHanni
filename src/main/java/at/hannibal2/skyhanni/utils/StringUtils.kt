@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils.width
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -321,14 +320,6 @@ object StringUtils {
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
-
-    fun replaceIfNeeded(
-        original: ChatComponentText,
-        newText: String,
-    ): ChatComponentText? {
-        return replaceIfNeeded(original, ChatComponentText(newText))
-    }
-
 
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
     fun enumChatFormattingByCode(char: Char): EnumChatFormatting? {

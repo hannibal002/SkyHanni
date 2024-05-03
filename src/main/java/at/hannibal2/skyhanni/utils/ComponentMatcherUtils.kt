@@ -31,6 +31,19 @@ object ComponentMatcherUtils {
         )
     }
 
+    fun ComponentSpan.replace(pattern: Pattern, replacement: ComponentMatcher.() -> IChatComponent): ChatComponentText {
+        val matcher = pattern.matcher(getText())
+        val elements = ChatComponentText("")
+        var lastIndex = 0
+        while (matcher.find()) {
+            elements.appendSibling(slice(lastIndex, matcher.start()).intoComponent())
+            elements.appendSibling(replacement(ComponentMatcher(matcher, this)))
+            lastIndex = matcher.end()
+        }
+        elements.appendSibling(slice(lastIndex, length).intoComponent())
+        return elements
+    }
+
     /**
      * Create a styled matcher, analogous to [Pattern.matcher], but while preserving [ChatStyle].
      */

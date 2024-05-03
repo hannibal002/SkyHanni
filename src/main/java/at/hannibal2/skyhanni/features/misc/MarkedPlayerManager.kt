@@ -9,12 +9,17 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.replace
+import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
 class MarkedPlayerManager {
     companion object {
@@ -88,6 +93,20 @@ class MarkedPlayerManager {
             var text = string
             for (markedPlayer in playerNamesToMark) {
                 text = text.replace(markedPlayer, "$color$markedPlayer§r")
+            }
+            return text
+        }
+
+        fun replaceInChat(string: ComponentSpan): ComponentSpan {
+            if (!config.highlightInChat) return string
+
+            val color = config.chatColor.getChatColor()
+            var text = string
+            for (markedPlayer in playerNamesToMark) {
+                text = text.replace(markedPlayer.toPattern(Pattern.LITERAL)) {
+                    ChatComponentText(color)
+                        .appendSibling(group().intoComponent())
+                }.intoSpan()
             }
             return text
         }
