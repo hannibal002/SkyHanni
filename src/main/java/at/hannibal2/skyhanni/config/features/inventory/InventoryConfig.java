@@ -228,4 +228,10 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Middle Click in Trade", desc = "Makes normal clicks to middle clicks in your inventory whilst in trade menu to sell stuff quickly. (Useful in dungeons)")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean middleClickInTrade = false;
 }
