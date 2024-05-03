@@ -54,8 +54,7 @@ object HoppityEggsShared {
         val y = closestEgg.y.toInt()
         val z = closestEgg.z.toInt()
 
-        val message = "[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)"
-        HypixelCommands.allChat("ac $message")
+        HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && config.sharedWaypoints

@@ -58,13 +58,13 @@ object HypixelCommands {
         send("party settings allinvite")
     }
 
+    fun allChat(message: String) {
+        send("ac $message")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function
         ChatUtils.sendCommandToServer(command)
-    }
-
-    fun allChat(message: String) {
-        send("ac $message")
     }
 }
