@@ -91,6 +91,12 @@ object ChocolateFactoryDataLoader {
         "Rabbit \\w+ - Unemployed"
     )
 
+    // todo get coach jackrabbit when prestige 4
+    private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "other.upgrade",
+        "Rabbit Shrine"
+    )
+
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
@@ -126,14 +132,14 @@ object ChocolateFactoryDataLoader {
         val barnItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.barnIndex) ?: return
         val timeTowerItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.timeTowerIndex) ?: return
 
+        ChocolateFactoryAPI.factoryUpgrades.clear()
+
         processChocolateItem(chocolateItem)
         processPrestigeItem(prestigeItem)
         processProductionItem(productionInfoItem)
         processLeaderboardItem(leaderboardItem)
         processBarnItem(barnItem)
         processTimeTowerItem(timeTowerItem)
-
-        ChocolateFactoryAPI.factoryUpgrades.clear()
 
         profileStorage.rawChocPerSecond =
             (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier).toInt()
@@ -244,6 +250,8 @@ object ChocolateFactoryDataLoader {
                     val activeDuration = TimeUtils.getDuration(formattedGroup)
                     val activeUntil = SimpleTimeMark.now() + activeDuration
                     profileStorage.currentTimeTowerEnds = activeUntil.toMillis()
+                } else {
+                    profileStorage.currentTimeTowerEnds = 0
                 }
             }
             timeTowerRechargePattern.matchMatcher(line) {
@@ -266,6 +274,7 @@ object ChocolateFactoryDataLoader {
     }
 
     private fun processItem(item: ItemStack, slotIndex: Int) {
+        if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
         if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
             SoundUtils.playBeepSound()
             ChocolateFactoryAPI.clickRabbitSlot = slotIndex
@@ -289,9 +298,7 @@ object ChocolateFactoryDataLoader {
                 level = rabbitAmountPattern.matchMatcher(itemName) {
                     group("amount").formatInt()
                 } ?: run {
-                    unemployedRabbitPattern.matchMatcher(itemName) {
-                        0
-                    }
+                    if (unemployedRabbitPattern.matches(itemName)) 0 else null
                 } ?: return
                 isRabbit = true
 
@@ -308,6 +315,8 @@ object ChocolateFactoryDataLoader {
             in ChocolateFactoryAPI.otherUpgradeSlots -> {
                 level = upgradeTierPattern.matchMatcher(itemName) {
                     group("tier").romanToDecimal()
+                } ?: run {
+                    if (otherUpgradePattern.matches(itemName)) 0 else null
                 } ?: return
 
                 if (slotIndex == ChocolateFactoryAPI.timeTowerIndex) this.profileStorage?.timeTowerLevel = level
@@ -320,7 +329,7 @@ object ChocolateFactoryDataLoader {
 
                 newAverageChocolate = when (slotIndex) {
                     ChocolateFactoryAPI.timeTowerIndex -> ChocolateAmount.averageChocPerSecond(
-                        timeTowerLevelIncrease = 1
+                        includeTower = true
                     )
 
                     ChocolateFactoryAPI.coachRabbitIndex -> ChocolateAmount.averageChocPerSecond(
@@ -348,7 +357,9 @@ object ChocolateFactoryDataLoader {
     private fun findBestUpgrades() {
         val profileStorage = profileStorage ?: return
 
-        val notMaxed = ChocolateFactoryAPI.factoryUpgrades.filter { !it.isMaxed }
+        // removing time tower here as people like to determine when to buy it themselves
+        val notMaxed = ChocolateFactoryAPI.factoryUpgrades
+            .filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt?.toMillis() ?: 0
