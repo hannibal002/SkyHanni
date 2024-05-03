@@ -351,7 +351,7 @@ object ChocolateFactoryDataLoader {
     private fun findBestUpgrades() {
         val profileStorage = profileStorage ?: return
 
-        // also remove time tower here
+        // removing time tower here as people like to determine when to buy it themselves
         val notMaxed =
             ChocolateFactoryAPI.factoryUpgrades.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex }
 
