@@ -57,7 +57,7 @@ object ChocolateFactoryUpgradeWarning {
 
     fun checkUpgradeChange(slot: Int, level: Int) {
         if (slot != lastUpgradeSlot || level != lastUpgradeLevel) {
-            lastUpgradeWarning = SimpleTimeMark.farPast()
+            lastUpgradeWarning = SimpleTimeMark.now()
             lastUpgradeSlot = slot
             lastUpgradeLevel = level
         }
