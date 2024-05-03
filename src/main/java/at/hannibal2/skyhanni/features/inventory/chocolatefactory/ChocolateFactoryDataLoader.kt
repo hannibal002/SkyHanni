@@ -91,6 +91,12 @@ object ChocolateFactoryDataLoader {
         "Rabbit \\w+ - Unemployed"
     )
 
+    // todo get coach jackrabbit when prestige 4
+    private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "other.upgrade",
+        "Rabbit Shrine"
+    )
+
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
@@ -311,6 +317,10 @@ object ChocolateFactoryDataLoader {
             in ChocolateFactoryAPI.otherUpgradeSlots -> {
                 level = upgradeTierPattern.matchMatcher(itemName) {
                     group("tier").romanToDecimal()
+                } ?: run {
+                    otherUpgradePattern.matchMatcher(itemName) {
+                        0
+                    }
                 } ?: return
 
                 if (slotIndex == ChocolateFactoryAPI.timeTowerIndex) this.profileStorage?.timeTowerLevel = level
