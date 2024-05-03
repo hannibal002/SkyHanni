@@ -343,9 +343,9 @@ object StringUtils {
             fun next(): Pair<Char, ChatStyle>? {
                 while (true) {
                     while (idx >= component.unformattedTextForChat.length) {
-                        component = queue.removeFirstOrNull() ?: return null
                         queue.addAll(0, component.siblings)
                         colorOverride = ChatStyle()
+                        component = queue.removeFirstOrNull() ?: return null
                     }
                     val char = component.unformattedTextForChat[idx++]
                     if (char == '§' && idx < component.unformattedTextForChat.length) {
