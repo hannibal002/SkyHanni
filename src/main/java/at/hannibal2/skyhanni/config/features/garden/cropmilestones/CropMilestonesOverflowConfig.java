@@ -7,32 +7,32 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CropMilestonesOverflowConfig {
 
     @Expose
-    @ConfigOption(name = "Crop Milestone Display", desc = "Overflow in Crop Milestone display.")
+    @ConfigOption(name = "Crop Milestone Display", desc = "Show overflow levels in Crop Milestone display.")
     @ConfigEditorBoolean
     public boolean cropMilestoneDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Best Crop Time", desc = "Overflow in Best Crop Time Display.")
+    @ConfigOption(name = "Best Crop Time", desc = "Show overflow levels in Best Crop Time Display.")
     @ConfigEditorBoolean
     public boolean bestCropTime = false;
 
     @Expose
-    @ConfigOption(name = "Inventory", desc = "Overflow as stack size in crop milestones inventory. Will also change milestones avg.")
+    @ConfigOption(name = "Inventory", desc = "Show overflow levels as stack size in the Crop Milestones inventory (will also change milestone average).")
     @ConfigEditorBoolean
     public boolean inventoryStackSize = false;
 
     @Expose
-    @ConfigOption(name = "Tooltip", desc = "Show overflow level progress in the item tooltip on the garden crop milestones inventory.")
+    @ConfigOption(name = "Tooltip", desc = "Show overflow level progress in the item tooltip in the Crop Milestones inventory.")
     @ConfigEditorBoolean
     public boolean inventoryTooltip = false;
 
     @Expose
-    @ConfigOption(name = "Discord RPC", desc = "Overflow in discord RPC milestones display.")
+    @ConfigOption(name = "Discord RPC", desc = "Show overflow levels in the Discord RPC milestone display.")
     @ConfigEditorBoolean
     public boolean discordRPC = false;
 
     @Expose
-    @ConfigOption(name = "Chat", desc = "Send chat message when gaining overflow level.")
+    @ConfigOption(name = "Chat", desc = "Send a chat message when gaining an overflow milestone level.")
     @ConfigEditorBoolean
     public boolean chat = false;
 }
