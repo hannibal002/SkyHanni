@@ -4,6 +4,7 @@ enum class FFTypes {
     TOTAL,
     BASE,
     REFORGE,
+    GEMSTONE,
     ABILITY,
     GREEN_THUMB,
     BASE_FF,

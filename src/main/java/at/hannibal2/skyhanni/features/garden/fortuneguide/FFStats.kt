@@ -93,6 +93,7 @@ object FFStats {
         cropPage[FortuneStats.TURBO] = Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
         cropPage[FortuneStats.DEDICATION] = Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0)
         cropPage[FortuneStats.CULTIVATING] = Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 20.0)
+        cropPage[FortuneStats.GEMSTONE] = Pair(FarmingFortuneDisplay.gemstoneFortune, 20.0)
 
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
@@ -160,6 +161,7 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
+        out[FFTypes.GEMSTONE] = FarmingFortuneDisplay.gemstoneFortune
         out[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
         out[FFTypes.TOTAL] = out.values.sum()
     }

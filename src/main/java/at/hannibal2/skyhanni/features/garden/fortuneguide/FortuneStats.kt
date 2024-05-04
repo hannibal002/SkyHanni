@@ -11,6 +11,7 @@ enum class FortuneStats(val label: String, val tooltip: String) {
     CROP_UPGRADE("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n§2You get 5☘ per level"),
     BASE_TOOL("§2Base tool fortune", "§7§2Crop specific fortune from your tool"),
     REFORGE("§2Tool reforge", "§7§2Fortune from reforging your tool"),
+    GEMSTONE("§2Tool gemstone", "§7§2Fortune from gemstones on your tool"),
     FFD("§2Farming for Dummies", "§7§2Fortune for each applied book\n§2You get 1☘ per applied book"),
     COUNTER("§2Logarithmic Counter", "§7§2Fortune from increasing crop counter\n§2You get 16☘ per digit - 4"),
     COLLECTION("§2Collection Analyst", "§7§2Fortune from increasing crop collection\n§2You get 8☘ per digit - 4"),

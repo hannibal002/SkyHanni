@@ -21,8 +21,10 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -83,6 +85,7 @@ object FarmingFortuneDisplay {
 
     var displayedFortune = 0.0
     var reforgeFortune = 0.0
+    var gemstoneFortune = 0.0
     var itemBaseFortune = 0.0
     var greenThumbFortune = 0.0
 
@@ -354,6 +357,19 @@ object FarmingFortuneDisplay {
             greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
                 displayedFortune - reforgeFortune - itemBaseFortune
             } else 0.0
+        }
+
+        for (gemstone in tool.getGemstones() ?: emptyList()) {
+            gemstoneFortune = 1.0
+            if (gemstone.type == SkyBlockItemModifierUtils.GemstoneType.PERIDOT) {
+                gemstoneFortune = when (gemstone.quality) {
+                    SkyBlockItemModifierUtils.GemstoneQuality.ROUGH -> 3.0
+                    SkyBlockItemModifierUtils.GemstoneQuality.FLAWED -> 4.0
+                    SkyBlockItemModifierUtils.GemstoneQuality.FINE -> 6.0
+                    SkyBlockItemModifierUtils.GemstoneQuality.FLAWLESS -> 8.0
+                    SkyBlockItemModifierUtils.GemstoneQuality.PERFECT -> 10.0
+                }
+            }
         }
     }
 
