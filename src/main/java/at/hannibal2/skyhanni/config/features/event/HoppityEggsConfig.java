@@ -17,10 +17,23 @@ public class HoppityEggsConfig {
     public boolean waypoints = true;
 
     @Expose
+    @ConfigOption(name = "Waypoint Line", desc = "Draw a line from your eyes to the Hoppity's Hunt Waypoint.")
+    @ConfigEditorBoolean
+    public boolean drawLine = true;
+
+    @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +
         "Only works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
     public boolean showAllWaypoints = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Show With Egglocator",
+        desc = "Show all possible egg waypoints for the current lobby even with an Egglocator in your inventory."
+    )
+    @ConfigEditorBoolean
+    public boolean showWithEgglocator = false;
 
     @Expose
     @ConfigOption(name = "Show Unclaimed Eggs", desc = "Displays which eggs haven't been found in the last SkyBlock day.")

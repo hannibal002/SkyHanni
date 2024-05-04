@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
@@ -67,8 +68,6 @@ object HoppityEggLocator {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        event.draw3DLine(firstPos, secondPos, LorenzColor.RED.toColor(), 2, false)
-
         if (drawLocations) {
             for ((index, eggLocation) in possibleEggLocations.withIndex()) {
                 val eggLabel = "§aGuess #${index + 1}"
@@ -78,6 +77,13 @@ object HoppityEggLocator {
                     seeThroughBlocks = true,
                 )
                 event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
+                if (config.drawLine) event.draw3DLine(
+                    event.exactPlayerEyeLocation(),
+                    eggLocation.add(0.5, 0.5, 0.5),
+                    LorenzColor.GREEN.toColor(),
+                    2,
+                    false
+                )
             }
             return
         }
@@ -94,7 +100,7 @@ object HoppityEggLocator {
         }
 
         if (!config.showAllWaypoints) return
-        if (hasLocatorInInventory()) return
+        if (hasLocatorInInventory() && !config.showWithEgglocator) return
         if (!HoppityEggType.eggsRemaining()) return
 
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
