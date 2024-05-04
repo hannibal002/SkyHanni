@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -10,10 +11,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -41,27 +43,25 @@ class BazaarApi {
 
         var currentlyOpenedProduct: NEUInternalName? = null
 
-        fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
-            holder.getData(this)
-        } else null
+        fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
 
         fun NEUInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
             ErrorManager.skyHanniError(
-                "Can not find bazaar data for internal name",
+                "Can not find bazaar data for $itemName",
                 "internal name" to this
             )
         }
 
         fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
-        fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
+        fun NEUInternalName.isBazaarItem() = getBazaarData() != null
 
         fun searchForBazaarItem(displayName: String, amount: Int = -1) {
             if (!LorenzUtils.inSkyBlock) return
             if (NEUItems.neuHasFocus()) return
             if (LorenzUtils.noTradeMode) return
             if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
-            ChatUtils.sendCommandToServer("bz ${displayName.removeColor()}")
+            HypixelCommands.bazaar(displayName.removeColor())
             if (amount != -1) OSUtils.copyToClipboard(amount.toString())
             currentSearchedItem = displayName.removeColor()
         }
