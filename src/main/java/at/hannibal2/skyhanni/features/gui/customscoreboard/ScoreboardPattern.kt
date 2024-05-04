@@ -446,4 +446,8 @@ object ScoreboardPattern {
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
     )
+    val eventTimeStartsPattern by tablistGroup.pattern(
+        "eventtimestarts",
+        "^\\s+Starts In: §r§e(?<time>.*)$"
+    )
 }
