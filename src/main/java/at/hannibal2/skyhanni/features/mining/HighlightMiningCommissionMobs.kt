@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -54,7 +54,10 @@ class HighlightMiningCommissionMobs {
         val entities = EntityUtils.getEntities<EntityLivingBase>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.YELLOW.toColor().withAlpha(127))
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                    entity,
+                    LorenzColor.YELLOW.toColor().withAlpha(127)
+                )
                 { isEnabled() && type in active }
             }
         }
@@ -82,7 +85,10 @@ class HighlightMiningCommissionMobs {
         val entity = event.entity
         for (type in active) {
             if (type.isMob(entity)) {
-                RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.YELLOW.toColor().withAlpha(127))
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                    entity,
+                    LorenzColor.YELLOW.toColor().withAlpha(127)
+                )
                 { isEnabled() && type in active }
             }
         }

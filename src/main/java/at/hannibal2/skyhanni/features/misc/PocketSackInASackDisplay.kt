@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -11,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PocketSackInASackDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.pocketSackInASack
+    private val config get() = SkyHanniMod.feature.inventory.pocketSackInASack
     private val maxedStitched = 3
 
     @SubscribeEvent
@@ -50,5 +51,10 @@ class PocketSackInASackDisplay {
                 return
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(31, "misc.pocketSackInASack", "inventory.pocketSackInASack")
     }
 }

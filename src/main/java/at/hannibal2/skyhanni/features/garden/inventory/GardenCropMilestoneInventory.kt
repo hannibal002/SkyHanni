@@ -29,7 +29,8 @@ class GardenCropMilestoneInventory {
         val tiers = mutableListOf<Double>()
         for (cropType in CropType.entries) {
             val counter = cropType.getCounter()
-            val tier = GardenCropMilestones.getTierForCropCount(counter, cropType)
+            val allowOverflow = config.cropMilestones.overflow.inventoryStackSize
+            val tier = GardenCropMilestones.getTierForCropCount(counter, cropType, allowOverflow)
             tiers.add(tier.toDouble())
         }
         average = (tiers.sum() / CropType.entries.size).round(2)
@@ -53,7 +54,7 @@ class GardenCropMilestoneInventory {
     }
 
     @SubscribeEvent
-    fun onItemTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 

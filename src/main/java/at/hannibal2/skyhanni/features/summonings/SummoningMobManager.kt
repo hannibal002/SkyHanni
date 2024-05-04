@@ -6,11 +6,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -114,6 +113,7 @@ class SummoningMobManager {
                     .distance(playerLocation) < 10 && it.ticksExisted < 2
             }.forEach {
                 summoningMobs[it] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+                it.setColor(LorenzColor.GREEN)
                 updateData()
                 if (summoningMobs.size == summoningsSpawned) {
                     searchMobs = false
@@ -133,6 +133,7 @@ class SummoningMobManager {
             val name = summoningMob.name
             if (currentHealth == 0) {
                 summoningMobs.remove(entityLiving)
+                entityLiving.setColor(null)
                 ChatUtils.chat("Your Summoning Mob just §cdied!")
                 continue
             }
@@ -179,24 +180,8 @@ class SummoningMobManager {
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
 
-        event.isCanceled = entity in summoningMobNametags
-    }
-
-    @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (config.summoningMobColored) {
-            val entity = event.entity
-            if (entity is EntityLiving && entity in summoningMobs.keys) {
-                event.color = LorenzColor.GREEN.toColor().withAlpha(127)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        val entity = event.entity
-        if (config.summoningMobColored && entity in summoningMobs.keys) {
-            event.shouldReset = true
+        if (entity in summoningMobNametags) {
+            event.cancel()
         }
     }
 
@@ -222,4 +207,15 @@ class SummoningMobManager {
         var name: String = "",
         var lastDisplayName: String = "",
     )
+
+    private infix fun EntityLivingBase.setColor(color: LorenzColor?) {
+        if (color != null) {
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                this,
+                color.toColor().withAlpha(127),
+            ) { isEnabled() && config.summoningMobColored }
+        } else {
+            RenderLivingEntityHelper.removeCustomRender(this)
+        }
+    }
 }

@@ -3,27 +3,34 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFrom
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.matchAll
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -56,10 +63,25 @@ object SackAPI {
     var isTrophySack = false
     private var sackRarity: TrophyRarity? = null
 
+    /**
+     * TODO merge all 3 lists into one:
+     *
+     * move item name (currently key) into AbstractSackItem
+     * work with instance check
+     * add custom function for render behaviour.
+     * have only one render display function
+     */
+    //
     val sackItem = mutableMapOf<String, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
+
+    var sackListInternalNames = emptySet<String>()
+        private set
+
+    var sackListNames = emptySet<String>()
+        private set
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -99,100 +121,103 @@ object SackAPI {
             else null
     }
 
-    private fun NEUInternalName.sackPrice(stored: String) = when (sackDisplayConfig.priceFrom) {
-        PriceFrom.BAZAAR -> (getPrice(true) * stored.formatLong()).toLong()
-            .let { if (it < 0) 0L else it }
-
-        PriceFrom.NPC -> try {
-            val npcPrice = getNpcPriceOrNull() ?: 0.0
-            (npcPrice * stored.formatLong()).toLong()
-        } catch (e: Exception) {
-            0L
+    private fun NEUInternalName.sackPrice(stored: Int): Long {
+        return when (sackDisplayConfig.priceFrom) {
+            PriceFrom.BAZAAR -> (getPrice() * stored).toLong().coerceAtLeast(0)
+            PriceFrom.NPC -> (getNpcPriceOrNull() ?: 0.0).toLong() * stored
+            else -> 0L
         }
-
-        else -> 0L
     }
 
     fun getSacksData(savingSacks: Boolean) {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
-        for ((_, stack) in stackList) {
+        for ((slot, stack) in stackList) {
             val name = stack.name
             val lore = stack.getLore()
-            val gem = SackGemstone()
-            val rune = SackRune()
-            val item = SackOtherItem()
-            loop@ for (line in lore) {
-                if (isGemstoneSack) {
-                    gemstonePattern.matchMatcher(line) {
-                        val rarity = group("gemrarity")
-                        val stored = group("stored")
-                        gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
-                        if (gemstoneMap.containsKey(name.removeColor())) {
-                            val internalName = "${rarity.uppercase()}_${
-                                name.uppercase().split(" ")[0].removeColor()
-                            }_GEM".asInternalName()
 
-                            when (rarity) {
-                                "Rough" -> {
-                                    gem.rough = stored
-                                    gem.roughPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
-                                }
+            if (isGemstoneSack) {
+                val gem = SackGemstone()
+                lore.matchAll(gemstonePattern) {
+                    val rarity = group("gemrarity")
+                    val stored = group("stored").formatInt()
+                    gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
+                    if (gemstoneMap.containsKey(name.removeColor())) {
+                        val internalName = "${rarity.uppercase()}_${
+                            name.uppercase().split(" ")[0].removeColor()
+                        }_GEM".asInternalName()
 
-                                "Flawed" -> {
-                                    gem.flawed = stored
-                                    gem.flawedPrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
-                                }
+                        gem.slot = slot
 
-                                "Fine" -> {
-                                    gem.fine = stored
-                                    gem.finePrice = internalName.sackPrice(stored)
-                                    if (savingSacks) setSackItem(internalName, stored.formatLong())
-                                }
+                        when (rarity) {
+                            "Rough" -> {
+                                gem.rough = stored
+                                gem.stored += (stored * 1)
+                                gem.roughPrice = internalName.sackPrice(stored)
+                                gem.price += gem.roughPrice
+                                if (savingSacks) setSackItem(internalName, stored)
                             }
-                            gemstoneItem[name] = gem
+
+                            "Flawed" -> {
+                                gem.flawed = stored
+                                gem.stored += (stored * 80)
+                                gem.flawedPrice = internalName.sackPrice(stored)
+                                gem.price += gem.flawedPrice
+                                if (savingSacks) setSackItem(internalName, stored)
+                            }
+
+                            "Fine" -> {
+                                gem.fine = stored
+                                gem.stored += (stored * 80 * 80)
+                                gem.finePrice = internalName.sackPrice(stored)
+                                gem.price += gem.finePrice
+                                if (savingSacks) setSackItem(internalName, stored)
+                                gemstoneItem[name] = gem
+                            }
                         }
                     }
-                } else {
+                }
+            } else if (isRuneSack) {
+                val rune = SackRune()
+                for (line in lore) {
                     numPattern.matchMatcher(line) {
-                        val stored = group("stored")
-                        val internalName = stack.getInternalName()
-                        item.internalName = internalName
-                        item.colorCode = group("color")
-                        item.stored = stored
-                        item.total = group("total")
+                        val level = group("level").romanToDecimal()
+                        val stored = group("stored").formatInt()
+                        rune.stack = stack
+                        rune.stored += stored
 
-                        if (savingSacks) setSackItem(item.internalName, item.stored.formatLong())
-                        item.price = if (isTrophySack) {
-                            val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
-                            val filletValue = filletPerTrophy * stored.formatLong()
-                            item.magmaFish = filletValue
-                            "MAGMA_FISH".asInternalName().sackPrice(filletValue.toString())
-                        } else {
-                            internalName.sackPrice(stored).coerceAtLeast(0)
-                        }
-
-
-                        if (isRuneSack) {
-                            val level = group("level")
-                            rune.stack = stack
-                            if (level == "I") {
-                                rune.lvl1 = stored
-                                continue@loop
-                            }
-                            if (level == "II") {
-                                rune.lvl2 = stored
-                                continue@loop
-                            }
-                            if (level == "III") {
+                        when (level) {
+                            1 -> rune.lvl1 = stored
+                            2 -> rune.lvl2 = stored
+                            3 -> {
+                                rune.slot = slot
                                 rune.lvl3 = stored
+                                runeItem[name] = rune
                             }
-                            runeItem.put(name, rune)
-                        } else {
-                            sackItem.put(name, item)
                         }
                     }
+                }
+            } else {
+                // normal sack
+                lore.matchFirst(numPattern) {
+                    val item = SackOtherItem()
+                    val stored = group("stored").formatInt()
+                    val internalName = stack.getInternalName()
+                    item.internalName = internalName
+                    item.colorCode = group("color")
+                    item.stored = group("stored").formatInt()
+                    item.total = group("total").formatInt()
+
+                    if (savingSacks) setSackItem(item.internalName, item.stored)
+                    item.price = if (isTrophySack) {
+                        val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
+                        val filletValue = filletPerTrophy * stored
+                        item.magmaFish = filletValue
+                        "MAGMA_FISH".asInternalName().sackPrice(filletValue)
+                    } else {
+                        internalName.sackPrice(stored).coerceAtLeast(0)
+                    }
+                    item.slot = slot
+                    sackItem[name] = item
                 }
             }
         }
@@ -243,6 +268,21 @@ object SackAPI {
         }
     }
 
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
+        val uniqueSackItems = mutableSetOf<NEUInternalName>()
+
+        sacksData.values.forEach { sackInfo ->
+            sackInfo.contents.forEach { content ->
+                uniqueSackItems.add(content)
+            }
+        }
+
+        sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
+        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
+    }
+
     private fun updateSacks(changes: SackChangeEvent) {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
 
@@ -261,7 +301,7 @@ object SackAPI {
             if (sackData.containsKey(item.key)) {
                 val oldData = sackData[item.key]
                 var newAmount = oldData!!.amount + item.value
-                var changed = (newAmount - oldData.amount).toInt()
+                var changed = (newAmount - oldData.amount)
                 if (newAmount < 0) {
                     newAmount = 0
                     changed = 0
@@ -270,7 +310,7 @@ object SackAPI {
             } else {
                 val newAmount = if (item.value > 0) item.value else 0
                 sackData =
-                    sackData.editCopy { this[item.key] = SackItem(newAmount.toLong(), newAmount, SackStatus.OUTDATED) }
+                    sackData.editCopy { this[item.key] = SackItem(newAmount, newAmount, SackStatus.OUTDATED) }
             }
         }
 
@@ -284,7 +324,7 @@ object SackAPI {
         saveSackData()
     }
 
-    private fun setSackItem(item: NEUInternalName, amount: Long) {
+    private fun setSackItem(item: NEUInternalName, amount: Int) {
         sackData = sackData.editCopy { this[item] = SackItem(amount, 0, SackStatus.CORRECT) }
     }
 
@@ -308,33 +348,52 @@ object SackAPI {
 
     data class SackGemstone(
         var internalName: NEUInternalName = NEUInternalName.NONE,
-        var rough: String = "0",
-        var flawed: String = "0",
-        var fine: String = "0",
+        var rough: Int = 0,
+        var flawed: Int = 0,
+        var fine: Int = 0,
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-    )
+    ) : AbstractSackItem()
 
     data class SackRune(
         var stack: ItemStack? = null,
-        var lvl1: String = "0",
-        var lvl2: String = "0",
-        var lvl3: String = "0",
-    )
+        var lvl1: Int = 0,
+        var lvl2: Int = 0,
+        var lvl3: Int = 0,
+    ) : AbstractSackItem()
 
     data class SackOtherItem(
         var internalName: NEUInternalName = NEUInternalName.NONE,
         var colorCode: String = "",
-        var stored: String = "0",
-        var total: String = "0",
+        var total: Int = 0,
+        var magmaFish: Int = 0,
+    ) : AbstractSackItem()
+
+    abstract class AbstractSackItem(
+        var stored: Int = 0,
         var price: Long = 0,
-        var magmaFish: Long = 0,
+        var slot: Int = -1,
     )
+
+    fun NEUInternalName.getAmountInSacksOrNull(): Int? =
+        fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
+
+    fun NEUInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
+
+    fun testSackAPI(args: Array<String>) {
+        if (args.size == 1) {
+            if (sackListInternalNames.contains(args[0].uppercase())) {
+                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].asInternalName())}")
+            } else {
+                ChatUtils.userError("That item isn't a valid sack item.")
+            }
+        } else ChatUtils.userError("/shtestsackapi <internal name>")
+    }
 }
 
 data class SackItem(
-    @Expose val amount: Long,
+    @Expose val amount: Int,
     @Expose val lastChange: Int,
     @Expose private val status: SackStatus?,
 ) {
@@ -343,6 +402,7 @@ data class SackItem(
     fun statusIsCorrectOrAlright() = getStatus().let { it == SackStatus.CORRECT || it == SackStatus.ALRIGHT }
 }
 
+// TODO repo
 private val gemstoneMap = mapOf(
     "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
     "Amber Gemstones" to "ROUGH_AMBER_GEM".asInternalName(),
@@ -352,6 +412,10 @@ private val gemstoneMap = mapOf(
     "Jasper Gemstones" to "ROUGH_JASPER_GEM".asInternalName(),
     "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
     "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
+    "Onyx Gemstones" to "ROUGH_ONYX_GEM".asInternalName(),
+    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".asInternalName(),
+    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".asInternalName(),
+    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".asInternalName(),
 )
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks

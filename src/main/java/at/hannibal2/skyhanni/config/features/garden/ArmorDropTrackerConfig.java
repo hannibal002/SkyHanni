@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArmorDropTrackerConfig {
     @Expose
@@ -20,5 +21,6 @@ public class ArmorDropTrackerConfig {
     public boolean hideChat = false;
 
     @Expose
+    @ConfigLink(owner = ArmorDropTrackerConfig.class, field = "enabled")
     public Position pos = new Position(16, -232, false, true);
 }

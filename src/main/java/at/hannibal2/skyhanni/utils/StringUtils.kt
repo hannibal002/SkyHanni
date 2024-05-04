@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ChatStyle
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.UUID
@@ -20,11 +22,13 @@ object StringUtils {
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
     private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
     fun String.removeResets(): String = resetPattern.matcher(this).replaceAll("")
     fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
+    fun String.removeNonAscii(): String = asciiPattern.matcher(this).replaceAll("")
 
     fun String.firstLetterUppercase(): String {
         if (isEmpty()) return this
@@ -91,16 +95,27 @@ object StringUtils {
         return cleanedString.toString()
     }
 
-    fun UUID.toDashlessUUID(): String {
-        return toString().replace("-", "")
-    }
-
+    fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
+
+    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.matches()) return consumer(it) }
+        }
+        return null
+    }
+
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.find()) consumer(it) }
+        }
+        return null
+    }
 
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
@@ -114,6 +129,7 @@ object StringUtils {
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
+                // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
         } else {
@@ -181,18 +197,18 @@ object StringUtils {
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
-    fun createCommaSeparatedList(list: List<String>, delimiterColor: String = ""): String {
-        if (list.isEmpty()) return ""
-        if (list.size == 1) return list[0]
-        if (list.size == 2) return "${list[0]}$delimiterColor and ${list[1]}"
-        val lastIndex = list.size - 1
-        val allButLast = list.subList(0, lastIndex).joinToString("$delimiterColor, ")
-        return "$allButLast$delimiterColor, and ${list[lastIndex]}"
+    fun List<String>.createCommaSeparatedList(delimiterColor: String = ""): String {
+        if (this.isEmpty()) return ""
+        if (this.size == 1) return this[0]
+        if (this.size == 2) return "${this[0]}$delimiterColor and ${this[1]}"
+        val lastIndex = this.size - 1
+        val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
+        return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
-        var str = if (number == 1) singular else pluralForm
+        var str = if (number == 1 || number == -1) singular else pluralForm
         if (withNumber) str = "${number.addSeparators()} $str"
         return str
     }
@@ -261,15 +277,9 @@ object StringUtils {
         return chatComponent
     }
 
-    fun String.getPlayerNameFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("username")
-    }
+    fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
-    fun String.getPlayerNameAndRankFromChatMessage(): String? {
-        val matcher = matchPlayerChatMessage(this) ?: return null
-        return matcher.group("rankedName")
-    }
+    fun String.getPlayerNameAndRankFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("rankedName")
 
     private fun matchPlayerChatMessage(string: String): Matcher? {
         var username = ""
@@ -305,7 +315,148 @@ object StringUtils {
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
 
-    fun String.isRoman(): Boolean {
-        return UtilsPatterns.isRomanPattern.matches(this)
+    fun String.isRoman(): Boolean = UtilsPatterns.isRomanPattern.matches(this)
+
+    fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
+
+    fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun replaceIfNeeded(
+        original: ChatComponentText,
+        newText: String,
+    ): ChatComponentText? {
+        return replaceIfNeeded(original, ChatComponentText(newText))
+    }
+
+
+    private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
+    fun enumChatFormattingByCode(char: Char): EnumChatFormatting? {
+        return colorMap[char]
+    }
+
+    fun doLookTheSame(left: IChatComponent, right: IChatComponent): Boolean {
+        class ChatIterator(var component: IChatComponent) {
+            var queue = mutableListOf<IChatComponent>()
+            var idx = 0
+            var colorOverride = ChatStyle()
+            fun next(): Pair<Char, ChatStyle>? {
+                while (true) {
+                    while (idx >= component.unformattedTextForChat.length) {
+                        queue.addAll(0, component.siblings)
+                        colorOverride = ChatStyle()
+                        component = queue.removeFirstOrNull() ?: return null
+                    }
+                    val char = component.unformattedTextForChat[idx++]
+                    if (char == '§' && idx < component.unformattedTextForChat.length) {
+                        val formattingChar = component.unformattedTextForChat[idx++]
+                        val formatting = enumChatFormattingByCode(formattingChar) ?: continue
+                        when (formatting) {
+                            EnumChatFormatting.OBFUSCATED -> {
+                                colorOverride.setObfuscated(true)
+                            }
+
+                            EnumChatFormatting.BOLD -> {
+                                colorOverride.setBold(true)
+                            }
+
+                            EnumChatFormatting.STRIKETHROUGH -> {
+                                colorOverride.setStrikethrough(true)
+                            }
+
+                            EnumChatFormatting.UNDERLINE -> {
+                                colorOverride.setUnderlined(true)
+                            }
+
+                            EnumChatFormatting.ITALIC -> {
+                                colorOverride.setItalic(true)
+                            }
+
+                            else -> {
+                                colorOverride = ChatStyle().setColor(formatting)
+                            }
+                        }
+                    } else {
+                        return Pair(char, colorOverride.setParentStyle(component.chatStyle))
+                    }
+                }
+            }
+        }
+
+        val leftIt = ChatIterator(left)
+        val rightIt = ChatIterator(right)
+        while (true) {
+            val leftChar = leftIt.next()
+            val rightChar = rightIt.next()
+            if (leftChar == null && rightChar == null) return true
+            if (leftChar != rightChar) return false
+        }
+    }
+
+
+    fun <T : IChatComponent> replaceIfNeeded(
+        original: T,
+        newText: T,
+    ): T? {
+        if (doLookTheSame(original, newText)) return null
+        return newText
+    }
+
+    private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
+        val clickEvent = message.chatStyle.chatClickEvent
+        if (clickEvent != null) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+                return
+            }
+            foundCommands.add(message)
+        }
+    }
+
+    fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
+        var text = this
+        while (true) {
+            val newText = text.replace(oldValue, newValue, ignoreCase = ignoreCase)
+            if (newText == text) {
+                return text
+            }
+            text = newText
+        }
+    }
+
+    /**
+     * Removes starting and ending reset formattings that dont sever a benefit at all.
+     */
+    fun String.stripHypixelMessage(): String {
+        var message = this
+
+        while (message.startsWith("§r")) {
+            message = message.substring(2)
+        }
+        while (message.endsWith("§r")) {
+            message = message.substring(0, message.length - 2)
+        }
+        return message
+    }
+
+    fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
+        val text = ChatComponentText(this)
+        text.chatStyle = original.sampleStyleAtStart()
+        return text
+    }
+
+    fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
+        val text = ChatComponentText(this)
+        text.chatStyle = original.chatStyle
+        return text
+    }
+
+    fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
+
+    fun IChatComponent.cleanPlayerName(displayName: Boolean = false): IChatComponent =
+        formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
+
+    fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
+
+    fun String.width(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
     }
 }

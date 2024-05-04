@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -48,15 +47,13 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
-import io.github.moulberry.notenoughupdates.util.Constants
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
 object EstimatedItemValueCalculator {
 
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
         ::addReforgeStone,
@@ -167,30 +164,23 @@ object EstimatedItemValueCalculator {
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
-        for ((rawInternalName, values) in Constants.REFORGESTONES.entrySet()) {
-            val stoneJson = values.asJsonObject
-            val reforgeName = stoneJson.get("reforgeName").asString
-            if (rawReforgeName == reforgeName.lowercase() || rawReforgeName == rawInternalName.lowercase()) {
-                val internalName = rawInternalName.asInternalName()
-                val reforgeStonePrice = internalName.getPrice()
-                val reforgeStoneName = internalName.itemName
+        val reforge = EstimatedItemValue.reforges.values.firstOrNull {
+            rawReforgeName == it.reforgeName.lowercase() || rawReforgeName == it.internalName.asString().lowercase()
+        } ?: return 0.0
+        val internalName = reforge.internalName.asString().asInternalName()
+        val reforgeStonePrice = internalName.getPrice()
+        val reforgeStoneName = internalName.itemName
+        val applyCost = getReforgeStoneApplyCost(stack, reforge.reforgeCosts, internalName) ?: return 0.0
 
-                val reforgeCosts = stoneJson.get("reforgeCosts").asJsonObject
-                val applyCost = getReforgeStoneApplyCost(stack, reforgeCosts, internalName) ?: return 0.0
-
-                list.add("§7Reforge: §9$reforgeName")
-                list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
-                list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
-                return reforgeStonePrice + applyCost
-            }
-        }
-
-        return 0.0
+        list.add("§7Reforge: §9${reforge.reforgeName}")
+        list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
+        list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
+        return reforgeStonePrice + applyCost
     }
 
     private fun getReforgeStoneApplyCost(
         stack: ItemStack,
-        reforgeCosts: JsonObject,
+        reforgeCosts: Map<LorenzRarity, Long>,
         reforgeStone: NEUInternalName,
     ): Int? {
         var itemRarity = stack.getItemRarityOrNull() ?: return null
@@ -214,24 +204,19 @@ object EstimatedItemValueCalculator {
                 itemRarity = oneBelow
             }
         }
-        val rarityName = itemRarity.name
-        if (!reforgeCosts.has(rarityName)) {
-            val reforgesFound = reforgeCosts.entrySet().map { it.key }
+
+        return reforgeCosts[itemRarity]?.toInt() ?: run {
             ErrorManager.logErrorStateWithData(
                 "Could not calculate reforge cost for item ${stack.name}",
                 "Item not in NEU repo reforge cost",
-                "rarityName" to rarityName,
                 "reforgeCosts" to reforgeCosts,
                 "itemRarity" to itemRarity,
-                "reforgesFound" to reforgesFound,
                 "internal name" to stack.getInternalName(),
                 "item name" to stack.name,
                 "reforgeStone" to reforgeStone,
             )
-            return null
+            null
         }
-
-        return reforgeCosts[rarityName].asInt
     }
 
     private fun addRecomb(stack: ItemStack, list: MutableList<String>): Double {
@@ -481,10 +466,7 @@ object EstimatedItemValueCalculator {
         return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
     }
 
-    private fun NEUInternalName.getNameOrRepoError(): String? {
-        val stack = getItemStackOrNull() ?: return null
-        return stack.nameWithEnchantment ?: "§cItem Name Error"
-    }
+    private fun NEUInternalName.getNameOrRepoError(): String? = getItemStackOrNull()?.itemName
 
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
@@ -546,6 +528,7 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
+        //todo use repo
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
         val onlyTierOnePrices =
             listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
@@ -684,7 +667,7 @@ object EstimatedItemValueCalculator {
                 totalPrice += if (ingredient.isCoins) {
                     ingredient.count
                 } else {
-                    getPrice(ingredient.internalItemId) * ingredient.count
+                    ingredient.internalItemId.asInternalName().getPrice() * ingredient.count
                 }
             }
 

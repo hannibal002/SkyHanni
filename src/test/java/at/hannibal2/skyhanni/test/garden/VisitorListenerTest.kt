@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -34,11 +35,11 @@ class VisitorListenerTest {
         listener.onTabListUpdate(
             TabListUpdateEvent(
                 mutableListOf(
-                    "§b§lVisitors:",
-                    "§cSpaceman",
-                    "§cGrandma Wolf",
+                    "§b§lVisitors: §r§f(3)",
+                    " §r§cSpaceman",
+                    " §r§6Madame Eleanor Q. Goldsworth III §r§fCarrot §r§c333 C §r§3107k FXP §r§275 GXP",
+                    " §r§fJacob",
                     "ThePlayerName",
-                    "Jacob",
                     "",
                 )
             )
@@ -46,7 +47,7 @@ class VisitorListenerTest {
 
         verify { VisitorAPI.addVisitor("§fJacob") }
         verify { VisitorAPI.addVisitor("§cSpaceman") }
-        verify { VisitorAPI.addVisitor("§cGrandma Wolf") }
+        verify { VisitorAPI.addVisitor("§6Madame Eleanor Q. Goldsworth III") }
     }
 
     @Test
@@ -57,7 +58,7 @@ class VisitorListenerTest {
 
         listener.onTabListUpdate(
             TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
+                mutableListOf("§b§lVisitors: §r§f(0)", "")
             )
         )
 
@@ -70,11 +71,11 @@ class VisitorListenerTest {
             mockk { every { visitorName } returns "§fJacob" },
         )
 
-        every { LorenzUtils.lastWorldSwitch } returns System.currentTimeMillis()
+        every { LorenzUtils.lastWorldSwitch } returns SimpleTimeMark.now()
 
         listener.onTabListUpdate(
             TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
+                mutableListOf("§b§lVisitors: §r§f(0)", "")
             )
         )
 

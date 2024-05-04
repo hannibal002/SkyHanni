@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
-import at.hannibal2.skyhanni.config.Storage.PlayerSpecific.BingoSession
+import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
@@ -72,6 +72,8 @@ object BingoAPI {
 
     fun getRankFromScoreboard(text: String) = if (detectionPattern.matches(text)) getRank(text) else null
 
+    fun getIconFromScoreboard(text: String) = getRankFromScoreboard(text)?.let { getIcon(it) }
+
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value
 
     fun getIcon(searchRank: Int) = ranks.entries.find { it.value == searchRank }?.key
@@ -104,4 +106,13 @@ object BingoAPI {
 
         else -> "§c"
     } + LorenzUtils.formatPercentage(percentage)
+
+    fun getBingoIcon(rank: Int): String {
+        val rankIcon = getIcon(rank) ?: ""
+        return if (rank != -1) {
+            "$rankIcon $rank"
+        } else {
+            rankIcon
+        }
+    }
 }

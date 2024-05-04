@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.rift.area.stillgorechateau;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class EffigiesConfig {
 
@@ -21,7 +21,7 @@ public class EffigiesConfig {
     public boolean respawningSoon = false;
 
     @Expose
-    @ConfigOption(name = "Respawning Time", desc = "Time before effigies respawn to show.")
+    @ConfigOption(name = "Respawning Time", desc = "Time in minutes before effigies respawn to show.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 15,

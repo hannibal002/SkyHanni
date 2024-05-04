@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeStoneJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import com.google.gson.reflect.TypeToken
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -38,11 +37,12 @@ import kotlin.math.roundToLong
 
 object EstimatedItemValue {
 
-    private val config get() = SkyHanniMod.feature.misc.estimatedItemValues
+    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var reforges = mapOf<NEUInternalName, NeuReforgeStoneJson>()
     var bookBundleAmount = mapOf<String, Int>()
     private var currentlyShowing = false
 
@@ -50,14 +50,10 @@ object EstimatedItemValue {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.getConstant("gemstonecosts") ?: run {
-            ErrorManager.skyHanniError("Gemstone Slot Unlock Costs failed to load from neu repo!")
-        }
-
-        gemstoneUnlockCosts = ConfigManager.gson.fromJson(
-            data,
-            object : TypeToken<HashMap<NEUInternalName, HashMap<String, List<String>>>>() {}.type
-        )
+        gemstoneUnlockCosts =
+            event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+        reforges =
+            event.readConstant<Map<NEUInternalName, NeuReforgeStoneJson>>("reforgestones")
     }
 
     @SubscribeEvent
@@ -67,7 +63,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: ItemHoverEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
 
@@ -89,7 +85,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @SubscribeEvent
-    fun onRenderOverlayGui(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
 
@@ -101,7 +97,7 @@ object EstimatedItemValue {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         tryRendering()
     }
 
@@ -235,5 +231,7 @@ object EstimatedItemValue {
         event.move(3, "misc.estimatedIemValueEnchantmentsCap", "misc.estimatedItemValues.enchantmentsCap")
         event.move(3, "misc.estimatedIemValueExactPrice", "misc.estimatedItemValues.exactPrice")
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
+
+        event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
     }
 }

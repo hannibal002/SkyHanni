@@ -4,13 +4,14 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,11 @@ public class CropMilestonesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean progress = true;
+
+    @Expose
+    @ConfigOption(name = "Overflow", desc = "")
+    @Accordion
+    public CropMilestonesOverflowConfig overflow = new CropMilestonesOverflowConfig();
 
     @Expose
     @ConfigOption(
@@ -158,6 +164,7 @@ public class CropMilestonesConfig {
     public int blocksBrokenResetTime = 5;
 
     @Expose
+    @ConfigLink(owner = CropMilestonesConfig.class, field = "progress")
     public Position progressDisplayPos = new Position(-400, -200, false, true);
 
     @Expose

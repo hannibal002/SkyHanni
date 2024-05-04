@@ -43,6 +43,11 @@ object APIUtil {
             )
             .useSystemProperties()
 
+    /**
+     * TODO
+     * make suspend
+     * use withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+     */
     fun getJSONResponse(urlString: String, silentError: Boolean = false) =
         getJSONResponseAsElement(urlString, silentError) as JsonObject
 
@@ -68,7 +73,9 @@ object APIUtil {
                             if (showApiErrors && apiName == "Hypixel API") {
                                 ChatUtils.clickableChat(
                                     "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
-                                    "shtogglehypixelapierrors"
+                                    onClick = {
+                                        toggleApiErrorMessages()
+                                    }
                                 )
                             }
                             ErrorManager.logErrorWithData(

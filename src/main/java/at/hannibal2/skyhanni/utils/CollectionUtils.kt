@@ -1,14 +1,39 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.enchantment.Enchantment
+import net.minecraft.item.ItemStack
 import java.util.Collections
+import java.util.Queue
 import java.util.WeakHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 
 object CollectionUtils {
 
-    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+    inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
+        while (true)
+            action(this.poll() ?: break)
+        return this
+    }
+
+    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
+        for (i in 1..amount)
+            this.poll() ?: break
+        return this
+    }
+
+    inline fun <reified E, reified K, reified L : MutableCollection<K>>
+        Queue<E>.drainTo(list: L, action: (E) -> K): L {
+        while (true)
+            list.add(action(this.poll() ?: break))
+        return list
+    }
+
+    inline fun <reified E, reified L : MutableCollection<E>>
+        Queue<E>.drainTo(list: L): L {
         while (true)
             list.add(this.poll() ?: break)
+        return list
     }
 
     // Let garbage collector handle the removal of entries in this list
@@ -51,6 +76,9 @@ object CollectionUtils {
     fun <K> MutableMap<K, Double>.addOrPut(key: K, number: Double): Double =
         this.merge(key, number, Double::plus)!! // Never returns null since "plus" can't return null
 
+    fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
+        this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
     fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
 
@@ -81,6 +109,30 @@ object CollectionUtils {
         return null
     }
 
+    fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
+
+    fun List<String>.removeNextAfter(after: (String) -> Boolean, skip: Int = 1): List<String> {
+        val newList = mutableListOf<String>()
+        var missing = -1
+        for (line in this) {
+            if (after(line)) {
+                missing = skip - 1
+                continue
+            }
+            if (missing == 0) {
+                missing--
+                continue
+            }
+            if (missing != -1) {
+                missing--
+            }
+            newList.add(line)
+        }
+        return newList
+    }
+
+    fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
+
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()
 
@@ -97,6 +149,9 @@ object CollectionUtils {
         return this
     }
 
+    operator fun IntRange.contains(range: IntRange): Boolean =
+        range.first in this && range.last in this
+
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }
@@ -111,5 +166,123 @@ object CollectionUtils {
 
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
         return toList().sorted().reversed().toMap()
+    }
+
+    fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
+        with(iterator()) {
+            while (hasNext()) {
+                val next = next()
+                yield(next)
+                if (!predicate(next)) break
+            }
+        }
+    }
+
+    /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
+    inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
+        this.remove(newValue)
+        this.add(newValue)
+        true
+    } else false
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? =
+        takeIf { null !in this } as? Iterable<T>
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
+        takeIf { null !in this } as? List<T>
+
+    // TODO add cache
+    fun MutableList<Renderable>.addString(
+        text: String,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+    }
+
+    // TODO add internal name support, and caching
+    fun MutableList<Renderable>.addItemStack(
+        itemStack: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize,
+    ) {
+        if (highlight) {
+            // Hack to add enchant glint, like Hypixel does it
+            itemStack.addEnchantment(Enchantment.protection, 0)
+        }
+        add(Renderable.itemStack(itemStack, scale = scale))
+    }
+
+    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+        addItemStack(internalName.getItemStack())
+    }
+
+    inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) {
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) = buildList {
+        addString(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                addString("§a[$display]")
+            } else {
+                addString("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                addString("§e]")
+            }
+            addString(" ")
+        }
+    }
+
+    inline fun MutableList<Renderable>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                ChatUtils.lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(Renderable.horizontalContainer(buildList {
+            addString(prefix)
+            addString("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            addString("§a]")
+        }))
+    }
+
+    inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
+        val destination = LinkedHashMap<R, V>()
+        for (element in this) {
+            val newKey = transform(element)
+            if (newKey != null) {
+                destination[newKey] = element.value
+            }
+        }
+        return destination
     }
 }

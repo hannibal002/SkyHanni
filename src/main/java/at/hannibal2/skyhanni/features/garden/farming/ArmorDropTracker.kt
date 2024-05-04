@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson.DropInfo
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -51,6 +51,7 @@ object ArmorDropTracker {
         var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
     }
 
+    // Todo use repo pattern
     enum class ArmorDropType(val dropName: String, val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
         SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
@@ -93,6 +94,7 @@ object ArmorDropTracker {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
         if (!hasArmor) return
+        if (!GardenAPI.hasFarmingToolInHand()) return
 
         tracker.renderDisplay(config.pos)
     }
@@ -105,13 +107,11 @@ object ArmorDropTracker {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
 
-        if (event.isMod(30)) {
-            checkArmor()
-        }
+        checkArmor()
     }
 
     private fun checkArmor() {
@@ -166,7 +166,7 @@ object ArmorDropTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetarmordroptracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

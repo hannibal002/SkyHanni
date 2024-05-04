@@ -59,7 +59,7 @@ class RiftMotesOrb {
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         motesPattern.matchMatcher(event.message) {
             motesOrbs.minByOrNull { it.location.distanceToPlayer() }?.let {
                 it.pickedUp = true

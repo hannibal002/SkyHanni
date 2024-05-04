@@ -5,9 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -51,6 +50,7 @@ class ChatFilter {
         // hypixel tournament notifications
         "§r§e§6§lHYPIXEL§e is hosting a §b§lBED WARS DOUBLES§e tournament!",
         "§r§e§6§lHYPIXEL BED WARS DOUBLES§e tournament is live!",
+        "§r§e§6§lHYPIXEL§e is hosting a §b§lTNT RUN§e tournament!",
 
         // other
         "§aYou are still radiating with §bGenerosity§r§a!"
@@ -270,6 +270,9 @@ class ChatFilter {
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
     )
 
+    /**
+     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25☘ Carrot Fortune §fduring the contest!
+     */
     private val anitaFortunePattern by RepoPattern.pattern(
         "chat.jacobevent.accessory",
         "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!"
@@ -326,6 +329,11 @@ class ChatFilter {
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
         "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence§r§a.".toPattern(),
     )
+
+    private val fireSalePattern by RepoPattern.pattern(
+        "chat.firesale",
+        "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*"
+    )
     private val fireSalePatterns = listOf(
         "§c♨ §eFire Sales for .* §eare starting soon!".toPattern(),
         "§c\\s*♨ .* (?:Skin|Rune|Dye) §e(?:for a limited time )?\\(.* §eleft\\)(?:§c|!)".toPattern(),
@@ -333,6 +341,16 @@ class ChatFilter {
         "§c♨ §eA Fire Sale for .* §eis starting soon!".toPattern(),
         "§c♨ §r§eFire Sales? for .* §r§eended!".toPattern(),
         "§c {3}♨ §eAnd \\d+ more!".toPattern(),
+    )
+    private val eventPatterns = listOf(
+        "§f +§r§7You are now §r§.Event Level §r§.*§r§7!".toPattern(),
+        "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
+        "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
+    )
+    private val factoryUpgradePatterns = listOf(
+        "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
+        "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!".toPattern(),
+        "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern()
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
@@ -346,6 +364,9 @@ class ChatFilter {
     private val fireSaleMessages = listOf(
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA",
         "§c♨ §eSelling multiple items for a limited time!",
+    )
+    private val eventMessage = listOf(
+        "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -363,6 +384,8 @@ class ChatFilter {
         "winter_gift" to winterGiftPatterns,
         "powder_mining" to powderMiningPatterns,
         "fire_sale" to fireSalePatterns,
+        "event" to eventPatterns,
+        "factory_upgrade" to factoryUpgradePatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -380,6 +403,7 @@ class ChatFilter {
         "annoying_spam" to annoyingSpamMessages,
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
+        "event" to eventMessage,
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
@@ -405,7 +429,7 @@ class ChatFilter {
      */
     private fun block(message: String): String = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
-        config.empty && isEmpty(message) -> "empty"
+        config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
         config.welcome && message.isPresent("welcome") -> "welcome"
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
@@ -416,19 +440,14 @@ class ChatFilter {
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
-        config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
+        config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
+        config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+        config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
 
         else -> ""
     }
-
-    /**
-     * Checks if the message is an empty message
-     * @param message The message to check
-     * @return True if the message is empty
-     */
-    private fun isEmpty(message: String) = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     private var othersMsg = ""
 

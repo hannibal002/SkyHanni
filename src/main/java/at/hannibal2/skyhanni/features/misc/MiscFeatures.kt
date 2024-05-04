@@ -24,7 +24,7 @@ class MiscFeatures {
     }
 
     @SubscribeEvent
-    fun onHypExplosions(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.misc.hideExplosions) return
 

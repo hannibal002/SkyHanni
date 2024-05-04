@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -20,17 +22,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PatcherSendCoordinates {
 
+    private val config get() = SkyHanniMod.feature.misc.patcherCoordsWaypoint
     private val patcherBeacon = mutableListOf<PatcherBeacon>()
     private val logger = LorenzLogger("misc/patchercoords")
 
+    /**
+     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4
+     */
     private val coordinatePattern by RepoPattern.pattern(
         "misc.patchercoords.coords",
         "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>.*)"
     )
 
     @SubscribeEvent
-    fun onPatcherCoordinates(event: LorenzChatEvent) {
-        if (!SkyHanniMod.feature.misc.patcherSendCoordWaypoint) return
+    fun onChat(event: LorenzChatEvent) {
+        if (!config.enabled) return
 
         val message = event.message.removeColor()
         coordinatePattern.matchMatcher(message) {
@@ -41,7 +47,7 @@ class PatcherSendCoordinates {
             val end = group("z")
             val z = if (end.contains(" ")) {
                 val split = end.split(" ")
-                val extra = split.drop(1).joinToString(" ")
+                val extra = split.drop(1).joinToString(" ").take(50)
                 description += " $extra"
 
                 split.first().toFloat()
@@ -53,12 +59,12 @@ class PatcherSendCoordinates {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if (!SkyHanniMod.feature.misc.patcherSendCoordWaypoint) return
+        if (!config.enabled) return
 
         for (beacon in patcherBeacon) {
             val location = beacon.location
             event.drawColor(location, LorenzColor.DARK_GREEN, alpha = 1f)
-            event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), true, true)
+            event.drawWaypointFilled(location, config.color.toChromaColor(), true, true)
             event.drawString(location.add(0.5, 0.5, 0.5), beacon.name, true, LorenzColor.DARK_BLUE.toColor())
         }
     }
@@ -72,7 +78,7 @@ class PatcherSendCoordinates {
         patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + 5 && location.distanceIgnoreY(it.location) < 5 }
 
         // removed patcher beacon after time!
-        patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + 60 }
+        patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + config.duration }
     }
 
     @SubscribeEvent
@@ -82,4 +88,9 @@ class PatcherSendCoordinates {
     }
 
     data class PatcherBeacon(val location: LorenzVec, val name: String, val time: Long)
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(39, "misc.patcherSendCoordWaypoint", "misc.patcherCoordsWaypoint.enabled")
+    }
 }

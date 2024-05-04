@@ -54,7 +54,7 @@ object LimboTimeTracker {
     }
 
     @SubscribeEvent
-    fun catchPlaytime(event: MessageSendToServerEvent) {
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.message.startsWith("/playtime") && inLimbo) {
             event.isCanceled
             printStats(true)
@@ -117,7 +117,10 @@ object LimboTimeTracker {
             userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).round(2)
             if (onFire) userLuck *= FIRE_MULTIPLIER
             ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-            ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            if (oldPB != 0.seconds) {
+                ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            }
+
         } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
         if (userLuck > oldLuck) {
             if (onFire) {
@@ -147,13 +150,21 @@ object LimboTimeTracker {
             val currentPB = storage?.personalBest ?: 0
             val userLuck = storage?.userLuck ?: 0f
             val limboPB: Int = if (currentPB < timeInLimbo) timeInLimbo else currentPB
-            ChatUtils.chat("§fYour current PB is §e${limboPB.seconds}§f, granting you §a+${userLuck.round(2)}✴ §fSkyHanni User Luck!")
-            ChatUtils.chat("§fYou have §e${playtime.seconds} §fof playtime!")
+            var luckString = tryTruncateFloat(userLuck.round(2))
+            if (userLuck > 0) luckString = "+$luckString"
+            var firstMessage =
+                "§fYour current PB is §e${limboPB.seconds}§f, granting you §a$luckString✴ SkyHanni User Luck§f!"
+            val secondMessage = "§fYou have §e${playtime.seconds} §fof playtime!"
+            if (userLuck == Float.POSITIVE_INFINITY || userLuck == Float.NEGATIVE_INFINITY) {
+                firstMessage = "$firstMessage §Zwhat"
+            }
+            ChatUtils.chat(firstMessage)
+            ChatUtils.chat(secondMessage)
         }
     }
 
     @SubscribeEvent
-    fun onDebugCollect(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Limbo")
         if (!inLimbo) {
             event.addIrrelevant("not in limbo")
@@ -173,7 +184,7 @@ object LimboTimeTracker {
     }
 
     @SubscribeEvent
-    fun onLogin(event: HypixelJoinEvent) {
+    fun onHypixelJoin(event: HypixelJoinEvent) {
         if (!doMigrate) return
         if (unmigratedPB != 0) {
             ChatUtils.debug("Migrating limbo personalBest")
@@ -189,4 +200,10 @@ object LimboTimeTracker {
     }
 
     fun isEnabled() = config.showTimeInLimbo
+
+    private fun tryTruncateFloat(input: Float): String {
+        val string = input.toString()
+        return if (string.endsWith(".0")) return string.dropLast(2)
+        else string
+    }
 }
