@@ -14,7 +14,10 @@ class MiddleClickInTrade {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!config) return
+        if (!config || !inTradeMenu) return
+        if(event.slot == null) return
+        // only allow clicks in inventory and rebuy slots
+        if(event.slotId < 49) return
         event.makePickblock()
     }
 
