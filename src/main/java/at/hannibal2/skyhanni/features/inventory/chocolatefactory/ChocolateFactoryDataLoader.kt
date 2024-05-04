@@ -143,7 +143,7 @@ object ChocolateFactoryDataLoader {
         processTimeTowerItem(timeTowerItem)
 
         profileStorage.rawChocPerSecond =
-            (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier).toInt()
+            (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
         profileStorage.lastDataSave = SimpleTimeMark.now().toMillis()
 
         ChocolateFactoryStats.updateDisplay()
