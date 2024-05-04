@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -29,7 +30,7 @@ object ContributorManager {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        addSuffixToNametag(Minecraft.getMinecraft().thePlayer)
+        if (event.newIsland != IslandType.NONE) addSuffixToNametag(Minecraft.getMinecraft().thePlayer)
     }
 
     private fun addSuffixToNametag(entity: EntityLivingBase) {
