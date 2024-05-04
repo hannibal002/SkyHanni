@@ -52,6 +52,7 @@ enum class HoppityEggType(
                 eggType.lastResetDay = currentSbDay
                 if (HoppityEggLocator.currentEggType == eggType) {
                     HoppityEggLocator.currentEggType = null
+                    HoppityEggLocator.currentEggNote = null
                     HoppityEggLocator.sharedEggLocation = null
                 }
             }

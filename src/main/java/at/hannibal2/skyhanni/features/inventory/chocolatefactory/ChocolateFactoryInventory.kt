@@ -92,7 +92,11 @@ object ChocolateFactoryInventory {
         val slotNumber = slot.slotNumber
         if (!config.useMiddleClick) return
         if (slotNumber in ChocolateFactoryAPI.noPickblockSlots &&
-            (slotNumber != ChocolateFactoryAPI.timeTowerIndex || event.clickedButton == 1)) return
+            (slotNumber != ChocolateFactoryAPI.timeTowerIndex || event.clickedButton == 1)
+        ) return
+
+        // this would break ChocolateFactoryKeybinds otherwise
+        if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) return
 
         event.makePickblock()
     }

@@ -216,6 +216,7 @@
 + Maxed upgrades in Chocolate Factory now show a checkmark. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1641)
 + Hide many garden GUIs while inside any Chocolate Factory menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1648)
 + Changed Chocolate Factory shortcut icon. - seraid (https://github.com/hannibal002/SkyHanni/pull/1640)
++ Added incoming tab list event to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1666)
 
 #### Commands Improvements
 
@@ -286,6 +287,12 @@
     + No longer recommends the time tower upgrade, as it can lead to inefficiencies.
 + Added time until the next Hoppity egg. - seraid (https://github.com/hannibal002/SkyHanni/pull/1625)
 + Displays time until the best chocolate upgrade is available. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1654)
++ Show a line to Hoppity guess point. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1669)
++ Sharing the name of the rabbit hunt egg note in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1675)
++ Added option to show the Hoppity Unclaimed Eggs display during a farming contest. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1670)
++ Added Duplicate Rabbit Time. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1671)
+    + Show the production time of chocolate gained from duplicate rabbits.
++ Improved the description of the Time in Chat feature (Hoppity Event). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1679)
 
 #### Rift Improvements
 
@@ -297,6 +304,10 @@
 + Added a way to disable marking low-level parties in dungeon finder by setting it to 0. - seraid (https://github.com/hannibal002/SkyHanni/pull/1626)
 
 #### Misc Improvements
+
+#### Fishing Improvements
+
++ Fixed a typo in the fishing profit tracker. - raven (https://github.com/hannibal002/SkyHanni/pull/1678)
 
 + Improved mod performance. - CalMWolfs, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1342)
 + Added option to toggle No Bits Warning sound. - Empa (https://github.com/hannibal002/SkyHanni/pull/1425)
@@ -364,6 +375,7 @@
 + Fixed Transfer Party Chat command. - nobaboy (https://github.com/hannibal002/SkyHanni/pull/1505)
 + Fixed aquamarine gemstones in queued gfs. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1545)
 + Fixed some guild chat messages having wrong format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1568)
++ Fixed chat click and hover functionality. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1680)
 
 #### GUI Fixes
 
@@ -394,6 +406,8 @@
 + Fixed wrong max lobby size in Custom Scoreboard size while in Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1651)
 + Fixed Magical Power always being 0. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1646)
 + Fixed chroma not being affected by alpha. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1660)
++ Fixed an issue where Magical Power in Maxwell was sometimes not detected. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1674)
++ Fixed the Vanilla Scoreboard not reappearing after leaving SkyBlock. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1673)
 
 #### Dungeon Fixes
 
@@ -484,6 +498,7 @@
 + Fixed some mob features not working with Skytils' ping display. - Thunderblade73 & martimavocado (https://github.com/hannibal002/SkyHanni/pull/1605)
 + Fixed overly frequent bazaar price error messages. - hannnibal2 (https://github.com/hannibal002/SkyHanni/pull/1597)
 + Fixed overly long description for Patcher send coordinates waypoints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1631)
++ Fixed the low quiver warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1629)
 
 ### Technical Details
 
