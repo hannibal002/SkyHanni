@@ -166,6 +166,8 @@ object TimeUtils {
 
     val Long.ticks get() = (this * 50).milliseconds
     val Int.ticks get() = (this * 50).milliseconds
+
+    val Float.minutes get() = toDouble().minutes
 }
 
 private const val FACTOR_SECONDS = 1000L

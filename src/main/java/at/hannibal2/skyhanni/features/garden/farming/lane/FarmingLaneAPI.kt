@@ -26,7 +26,7 @@ object FarmingLaneAPI {
     @SubscribeEvent
     fun onCropClick(event: CropClickEvent) {
         val crop = event.crop
-        GardenAPI.hasFarmingToolInHand()
+        if (!GardenAPI.hasFarmingToolInHand()) return
 
         val lanes = lanes ?: return
         val lane = lanes[crop]

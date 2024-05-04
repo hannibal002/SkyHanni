@@ -82,7 +82,7 @@ object MaxwellAPI {
     )
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
-        "§7Total: §6(?<mp>\\d+) Magical Power"
+        "§7Total: §6(?<mp>[\\d.,]+) Magical Power"
     )
     private val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
@@ -245,6 +245,7 @@ object MaxwellAPI {
     }
 
     private fun processStack(stack: ItemStack) {
+        var foundMagicalPower = false
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {
                 ChatUtils.chat("Seems like you don't have the Requirement for the Accessory Bag yet, setting power to No Power and magical power to 0.")
@@ -261,7 +262,7 @@ object MaxwellAPI {
 
                 val mp = group("mp")
                 magicalPower = mp.formatInt()
-                return@matchMatcher
+                foundMagicalPower = true
             }
 
             inventoryPowerPattern.matchMatcher(line) {
@@ -274,12 +275,11 @@ object MaxwellAPI {
                         "lore" to stack.getLore(),
                         noStackTrace = true
                     )
-                return@matchMatcher
             }
         }
 
         // If Magical Power isn't in the lore
-        magicalPower = 0
+        if (!foundMagicalPower) magicalPower = 0
     }
 
     private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
