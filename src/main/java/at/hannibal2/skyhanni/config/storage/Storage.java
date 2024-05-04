@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.storage;
 
+import at.hannibal2.skyhanni.features.misc.reminders.Reminder;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
@@ -50,4 +51,16 @@ public class Storage {
 
     @Expose
     public List<String> blacklistedUsers = new ArrayList<>();
+
+    @Expose
+    public ReminderData reminderData = new ReminderData();
+
+    public static class ReminderData {
+
+        @Expose
+        public List<Reminder> reminders = new ArrayList<>();
+
+        @Expose
+        public int currentReminderId = 0;
+    }
 }

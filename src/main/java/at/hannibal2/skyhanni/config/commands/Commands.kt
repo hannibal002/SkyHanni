@@ -6,9 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatClickActionManager
-import at.hannibal2.skyhanni.config.features.misc.reminders.ReminderManager
+import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI

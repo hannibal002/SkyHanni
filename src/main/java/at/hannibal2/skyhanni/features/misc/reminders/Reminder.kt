@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc.reminders
+package at.hannibal2.skyhanni.features.misc.reminders
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
