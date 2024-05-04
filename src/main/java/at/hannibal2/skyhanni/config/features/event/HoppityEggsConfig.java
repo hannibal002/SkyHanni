@@ -50,7 +50,7 @@ public class HoppityEggsConfig {
     public boolean highlightHoppityShop = true;
 
     @Expose
-    @ConfigOption(name = "Time in Chat", desc = "Show in chat when using Egglocator that show next hoppity event or next egg time.")
+    @ConfigOption(name = "Time in Chat", desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeInChat = true;
