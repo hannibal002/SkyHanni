@@ -37,6 +37,11 @@ public class CropMilestonesConfig {
     public boolean progress = true;
 
     @Expose
+    @ConfigOption(name = "Overflow", desc = "")
+    @Accordion
+    public CropMilestonesOverflowConfig overflow = new CropMilestonesOverflowConfig();
+
+    @Expose
     @ConfigOption(
         name = "Warn When Close",
         desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
