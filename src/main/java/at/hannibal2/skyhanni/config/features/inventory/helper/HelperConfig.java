@@ -36,7 +36,7 @@ public class HelperConfig {
         public boolean showNumbers = false;
 
         @Expose
-        @ConfigOption(name = "Hide Tooltip", desc = "Hide the tooltip while in the Harp.")
+        @ConfigOption(name = "Hide Tooltip", desc = "Hides the item tooltips while in the Harp.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideMelodyTooltip = false;
