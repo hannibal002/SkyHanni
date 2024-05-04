@@ -189,6 +189,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
             ChatUtils.debug("Wrong amount detected! realAmount: $realAmount, storedAmount: $storedAmount")
             val newQuest = MiniBossQuest(quest.miniBoss, quest.state, realAmount)
+            newQuest.haveAmount = quest.haveAmount
             DelayedRun.runNextTick {
                 dailyQuestHelper.quests.remove(quest)
                 dailyQuestHelper.quests.add(newQuest)
