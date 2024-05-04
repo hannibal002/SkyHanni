@@ -8,8 +8,8 @@ import java.util.regex.Pattern
 class RepoPatternImpl(
     override val defaultPattern: String,
     override val key: String,
+    override val parent: RepoPatternKeyOwner? = null,
 ) : RepoPattern() {
-
 
     override var wasOverridden = false
     override var value: Pattern = Pattern.compile(defaultPattern)

@@ -2,7 +2,11 @@ package at.hannibal2.skyhanni.utils.repopatterns
 
 import java.util.regex.Pattern
 
-class RepoPatternListImpl(fallback: List<String>, override val key: String) : RepoPatternList() {
+class RepoPatternListImpl(
+    fallback: List<String>,
+    override val key: String,
+    override val parent: RepoPatternKeyOwner? = null,
+) : RepoPatternList() {
     override var isLoadedRemotely: Boolean = false
     override var wasOverridden: Boolean = false
     override val defaultPattern: List<String> = fallback

@@ -78,7 +78,7 @@ object RepoPatternManager {
      * Check that the [owner] has exclusive right to the specified [key], and locks out other code parts from ever
      * using that [key] again. Thread safe.
      */
-    fun checkExclusivity(owner: RepoPatternKeyOwner, key: String) {
+    fun checkExclusivity(owner: RepoPatternKeyOwner, key: String, parentKeyHolder: RepoPatternKeyOwner?) {
         synchronized(exclusivity) {
             run {
                 val previousOwner = exclusivity[key]
@@ -90,15 +90,24 @@ object RepoPatternManager {
                 }
             }
             run {
-                val parent = key.substringBeforeLastOrNull(".") ?: return
-                val previousParentOwner = exclusivity[parent]
-                if (previousParentOwner != null && !previousParentOwner.shared) {
-                    if (!config.tolerateDuplicateUsage)
-                        crash("Non unique access to array regex at \"$parent\". First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
-                } else {
-                    exclusivity[parent] = owner.copy(shared = true)
+                var parent = key
+                var previousParentOwnerMutable: RepoPatternKeyOwner? = null
+                while (previousParentOwnerMutable == null && parent.isNotEmpty()) {
+                    parent = parent.substringBeforeLastOrNull(".") ?: return
+                    previousParentOwnerMutable = exclusivity[parent]
+                }
+                val previousParentOwner = previousParentOwnerMutable
+                if (previousParentOwner != null && previousParentOwner != parentKeyHolder) {
+                    if (!config.tolerateDuplicateUsage) crash(
+                        "Non unique access to array regex at \"$parent\"." +
+                            " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +
+                            " tried to use at ${owner.ownerClass} / ${owner.property}" +
+                            if (parentKeyHolder != null) "with parentKeyHolder ${parentKeyHolder.ownerClass} / ${parentKeyHolder.property}"
+                            else ""
+                    )
                 }
             }
+
         }
     }
 
@@ -221,7 +230,7 @@ object RepoPatternManager {
         }
     }
 
-    fun of(key: String, fallback: String): RepoPattern {
+    fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {
         verifyKeyShape(key)
         if (wasPreinitialized && !config.tolerateLateRegistration) {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
@@ -232,7 +241,11 @@ object RepoPatternManager {
         return RepoPatternImpl(fallback, key).also { usedKeys[key] = it }
     }
 
-    fun ofList(key: String, fallbacks: Array<out String>): RepoPatternList {
+    fun ofList(
+        key: String,
+        fallbacks: Array<out String>,
+        parentKeyHolder: RepoPatternKeyOwner? = null,
+    ): RepoPatternList {
         verifyKeyShape(key)
         if (wasPreinitialized && !config.tolerateLateRegistration) {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")

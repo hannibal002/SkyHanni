@@ -157,4 +157,46 @@ object RepoPatternTest {
         RepoPatternManager.inTestDuplicateUsage = true
     }
 
+    @Test
+    fun testExclusivityForExclusiveGroup() {
+        RepoPatternManager.inTestDuplicateUsage = false
+
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup("testonly.group.a")
+            val group2 by RepoPattern.exclusiveGroup("testonly.group.a")
+            group1
+            group2
+        }
+
+        assertDoesNotThrow {
+            val group1 by RepoPattern.exclusiveGroup("testonly.group.b")
+            val group2 by RepoPattern.exclusiveGroup("testonly.group.c")
+            group1
+            group2
+        }
+
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup("testonly.group.d")
+            val pattern1 by RepoPattern.pattern("testonly.group.d", "")
+            group1
+            pattern1
+        }
+
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup("testonly.group.e")
+            val pattern1 by RepoPattern.pattern("testonly.group.e.a", "")
+            group1
+            pattern1
+        }
+
+        assertDoesNotThrow {
+            val group1 by RepoPattern.exclusiveGroup("testonly.group.f")
+            val pattern1 by RepoPattern.pattern("f.a", "")
+            group1
+            pattern1
+        }
+
+        RepoPatternManager.inTestDuplicateUsage = true
+    }
+
 }

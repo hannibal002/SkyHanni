@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.repopatterns
 import at.hannibal2.skyhanni.SkyHanniMod
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
-import kotlin.reflect.KProperty
 
 /**
  * RepoPattern is our innovative tool to cope with the fucking game updates Hypixel deems to be important enough to brick
@@ -97,6 +96,13 @@ sealed class RepoPattern : CommonPatternInfo<String, Pattern>() {
          */
         fun group(prefix: String): RepoPatternGroup {
             return RepoPatternGroup(prefix)
+        }
+
+        /**
+         * Obtains a [RepoPatternExclusiveGroup] which functions like a [RepoPatternGroup] but the key namespace can only be used via this object.
+         */
+        fun exclusiveGroup(prefix: String): RepoPatternExclusiveGroupInfo {
+            return RepoPatternExclusiveGroupInfo(prefix, null)
         }
     }
 }
