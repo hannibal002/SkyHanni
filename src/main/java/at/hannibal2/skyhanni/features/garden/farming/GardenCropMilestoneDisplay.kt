@@ -151,7 +151,7 @@ object GardenCropMilestoneDisplay {
         lineMap[MilestoneTextEntry.TITLE] = Renderable.string("§6Crop Milestones")
 
         val customTargetLevel = storage?.get(crop) ?: 0
-        val overflowDisplay = overflowConfig.display
+        val overflowDisplay = overflowConfig.cropMilestoneDisplay
         val allowOverflow = overflowDisplay || (customTargetLevel != 0)
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow)
         var nextTier = if (config.bestShowMaxedNeeded.get() && currentTier <= 46) 46 else currentTier + 1
@@ -161,7 +161,7 @@ object GardenCropMilestoneDisplay {
 
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontalContainer(buildList {
             addCropIconRenderable(crop)
-            if (crop.isMaxed() && !overflowDisplay) {
+            if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
                 addString("§7" + crop.cropName + " §eMAXED")
             } else {
                 addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
@@ -179,7 +179,7 @@ object GardenCropMilestoneDisplay {
             Pair(have, need)
         }
 
-        lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxed() && !overflowDisplay) {
+        lineMap[MilestoneTextEntry.NUMBER_OUT_OF_TOTAL] = if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
             val haveFormat = counter.addSeparators()
             Renderable.string("§7Counter: §e$haveFormat")
         } else {
@@ -194,7 +194,7 @@ object GardenCropMilestoneDisplay {
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
-            if (!crop.isMaxed() || overflowDisplay) {
+            if (!crop.isMaxed(overflowDisplay) || overflowDisplay) {
                 val missing = need - have
                 val missingTimeSeconds = missing / farmingFortuneSpeed
                 val millis = missingTimeSeconds * 1000
@@ -220,15 +220,25 @@ object GardenCropMilestoneDisplay {
         }
 
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
-        lineMap[MilestoneTextEntry.PERCENTAGE] = if (crop.isMaxed() && !overflowDisplay) {
+        lineMap[MilestoneTextEntry.PERCENTAGE] = if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
             Renderable.string("§7Percentage: §e100%")
         } else {
             Renderable.string("§7Percentage: §e$percentageFormat")
         }
 
+        if (overflowConfig.chat) {
+            if (currentTier >= 46 && currentTier == previousNext &&
+                nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
+            ) {
+                GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
+                lastWarnedLevel = currentTier
+            }
+        }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext && nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier) {
+            if (currentTier >= 46 && currentTier == previousNext &&
+                nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
+            ) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
                 lastWarnedLevel = currentTier
             }
@@ -270,8 +280,8 @@ object GardenCropMilestoneDisplay {
 
     private fun addMushroomCowData() {
         val mushroom = CropType.MUSHROOM
-        val allowOverflow = overflowConfig.display
-        if (mushroom.isMaxed() && !allowOverflow) {
+        val allowOverflow = overflowConfig.cropMilestoneDisplay
+        if (mushroom.isMaxed(allowOverflow)) {
             mushroomCowPerkDisplay = listOf(
                 Renderable.string("§6Mooshroom Cow Perk"),
                 Renderable.string("§eMushroom crop is maxed!"),
@@ -346,17 +356,23 @@ object GardenCropMilestoneDisplay {
         event.move(3, "garden.cropMilestoneMushroomPetPerkText", "garden.cropMilestones.mushroomPetPerk.text")
         event.move(3, "garden.cropMilestoneMushroomPetPerkPos", "garden.cropMilestones.mushroomPetPerk.pos")
         event.move(
-            11, "garden.cropMilestones.highestTimeFormat", "garden.cropMilestones.highestTimeFormat"
+            11,
+            "garden.cropMilestones.highestTimeFormat",
+            "garden.cropMilestones.highestTimeFormat"
         ) { element ->
             ConfigUtils.migrateIntToEnum(element, TimeFormatEntry::class.java)
         }
         event.move(
-            11, "garden.cropMilestones.text", "garden.cropMilestones.text"
+            11,
+            "garden.cropMilestones.text",
+            "garden.cropMilestones.text"
         ) { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, MilestoneTextEntry::class.java)
         }
         event.move(
-            11, "garden.cropMilestones.mushroomPetPerk.text", "garden.cropMilestones.mushroomPetPerk.text"
+            11,
+            "garden.cropMilestones.mushroomPetPerk.text",
+            "garden.cropMilestones.mushroomPetPerk.text"
         ) { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, MushroomTextEntry::class.java)
         }
