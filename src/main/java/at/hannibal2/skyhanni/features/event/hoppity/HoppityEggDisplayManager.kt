@@ -15,11 +15,16 @@ object HoppityEggDisplayManager {
     private val config get() = HoppityEggsManager.config
     private var shouldHidePlayer: Boolean = false
 
+    private fun canChangeOpacity(entity: EntityLivingBase): Boolean {
+        if (!HoppityEggLocator.isEnabled()) return false
+        if (entity !is EntityPlayer) return false
+        if (entity == LorenzUtils.getPlayer()) return false
+        return true
+    }
+
     @SubscribeEvent
     fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
-        if (!HoppityEggLocator.isEnabled()) return
-        if (event.entity !is EntityPlayer) return
-        if (event.entity == LorenzUtils.getPlayer()) return
+        if (!canChangeOpacity(event.entity)) return
         if (config.playerOpacity < 100) return
 
         shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { event.entity.distanceTo(it) < 4.0 }
@@ -35,8 +40,7 @@ object HoppityEggDisplayManager {
 
     @SubscribeEvent
     fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
-        if (!HoppityEggLocator.isEnabled()) return
-        if (event.entity !is EntityPlayer) return
+        if (!canChangeOpacity(event.entity)) return
 
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.disableBlend()
@@ -44,8 +48,7 @@ object HoppityEggDisplayManager {
 
     @SubscribeEvent
     fun onRenderPlayerLayers(event: EntityRenderLayersEvent.Pre<EntityLivingBase>) {
-        if (!HoppityEggLocator.isEnabled()) return
-        if (event.entity !is EntityPlayer) return
+        if (!canChangeOpacity(event.entity)) return
         if (!shouldHidePlayer) return
         event.cancel()
     }
