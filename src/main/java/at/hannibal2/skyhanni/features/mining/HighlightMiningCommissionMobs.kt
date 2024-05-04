@@ -43,6 +43,8 @@ class HighlightMiningCommissionMobs {
             it is EntitySlime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000))
         }),
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
+
+        // new commissions
         ;
     }
 
