@@ -43,6 +43,7 @@ object HoppityEggLocator {
     var sharedEggLocation: LorenzVec? = null
     var possibleEggLocations = listOf<LorenzVec>()
     var currentEggType: HoppityEggType? = null
+    var currentEggNote: String? = null
 
     var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
 
@@ -60,6 +61,7 @@ object HoppityEggLocator {
         drawLocations = false
         sharedEggLocation = null
         currentEggType = null
+        currentEggNote = null
         lastParticlePosition = null
     }
 
@@ -241,6 +243,7 @@ object HoppityEggLocator {
             add("Draw Locations: $drawLocations")
             add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
             add("Current Egg Type: ${currentEggType ?: "None"}")
+            add("Current Egg Note: ${currentEggNote ?: "None"}")
         }
     }
 }

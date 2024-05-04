@@ -27,9 +27,14 @@ object HoppityEggsManager {
 
     val config get() = SkyHanniMod.feature.event.hoppityEggs
 
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
+     */
     private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg.*"
+        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -49,10 +54,12 @@ object HoppityEggsManager {
     )
 
     private var lastMeal: HoppityEggType? = null
+    private var lastNote: String? = null
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastMeal = null
+        lastNote = null
     }
 
     @SubscribeEvent
@@ -62,8 +69,10 @@ object HoppityEggsManager {
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
+            val note = group("note")
             meal.markClaimed()
             lastMeal = meal
+            lastNote = note
             return
         }
 
@@ -116,13 +125,15 @@ object HoppityEggsManager {
     fun shareWaypointPrompt() {
         if (!config.sharedWaypoints) return
         val meal = lastMeal ?: return
+        val note = lastNote ?: return
         lastMeal = null
+        lastNote = null
 
         val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
-                onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal) },
+                onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) },
                 expireAt = 30.seconds.fromNow()
             )
         }
