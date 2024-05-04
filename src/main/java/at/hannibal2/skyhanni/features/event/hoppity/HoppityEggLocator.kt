@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -116,7 +117,7 @@ object HoppityEggLocator {
         }
 
         if (!config.showAllWaypoints) return
-        if (hasLocatorInInventory()) return
+        if (hasLocatorInHotbar()) return
         if (!HoppityEggType.eggsRemaining()) return
 
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
@@ -137,8 +138,7 @@ object HoppityEggLocator {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!hasLocatorInInventory()) return
-        if (GardenAPI.inGarden()) return
+        if (!hasLocatorInHotbar()) return
         if (!event.isVillagerParticle() && !event.isEnchantmentParticle()) return
 
         val lastParticlePosition = lastParticlePosition ?: run {
@@ -231,13 +231,13 @@ object HoppityEggLocator {
     private fun ReceiveParticleEvent.isEnchantmentParticle() =
         type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints
-        && ChocolateFactoryAPI.isHoppityEvent()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden()
+        && !ReminderUtils.isBusy(true) && ChocolateFactoryAPI.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
-    fun hasLocatorInInventory() = RecalculatingValue(1.seconds) {
-        LorenzUtils.inSkyBlock && InventoryUtils.getItemsInOwnInventory().any { it.isLocatorItem }
+    fun hasLocatorInHotbar() = RecalculatingValue(1.seconds) {
+        LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
     }.getValue()
 
     private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
