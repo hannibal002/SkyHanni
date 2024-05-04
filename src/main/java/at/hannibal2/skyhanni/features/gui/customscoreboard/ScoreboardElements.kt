@@ -17,8 +17,10 @@ import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLines.handleCustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.customlineConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.maxwellConfig
@@ -248,6 +250,11 @@ enum class ScoreboardElement(
         ::getEmptyLineDisplayPair,
         { true },
         ""
+    ),
+    CUSTOM_LINE1(
+        { getCustomLineDisplayPair(customlineConfig.customLine1.toString()) },
+        { true },
+        "Your custom line 1"
     ),
     ;
 
@@ -799,4 +806,8 @@ private fun getExtraShowWhen(): Boolean {
         amountOfUnknownLines = 0
     }
     return unknownLines.isNotEmpty()
+}
+
+private fun getCustomLineDisplayPair(customLine: String): List<ScoreboardElementType> {
+    return customLine.handleCustomLine().map { it to HorizontalAlignment.LEFT }
 }

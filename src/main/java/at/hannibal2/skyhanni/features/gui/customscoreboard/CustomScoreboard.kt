@@ -2,10 +2,9 @@
 // TODO LIST
 // V2 RELEASE
 //  - Soulflow API
-//  - Bank API (actually maybe not, I like the current design)
+//  - Bank API
 //  - beacon power
 //  - skyblock level
-//  - more bg options (round, blurr, outline)
 //  - countdown events like fishing festival + fiesta when its not on tablist
 //  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
 //  - Rng meter display
@@ -107,6 +106,7 @@ class CustomScoreboard {
         internal val displayConfig get() = config.display
         internal val alignmentConfig get() = displayConfig.alignment
         internal val arrowConfig get() = displayConfig.arrow
+        internal val customlineConfig get() = displayConfig.customLines
         internal val eventsConfig get() = displayConfig.events
         internal val mayorConfig get() = displayConfig.mayor
         internal val partyConfig get() = displayConfig.party

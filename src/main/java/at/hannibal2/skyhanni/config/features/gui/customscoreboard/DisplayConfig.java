@@ -22,6 +22,11 @@ public class DisplayConfig {
     public ArrowConfig arrow = new ArrowConfig();
 
     @Expose
+    @ConfigOption(name = "Custom Lines", desc = "")
+    @Accordion
+    public CustomLinesConfig customLines = new CustomLinesConfig();
+
+    @Expose
     @ConfigOption(name = "Events Options", desc = "")
     @Accordion
     public EventsConfig events = new EventsConfig();
