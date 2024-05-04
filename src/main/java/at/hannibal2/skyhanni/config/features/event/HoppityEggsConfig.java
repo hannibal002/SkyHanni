@@ -47,7 +47,7 @@ public class HoppityEggsConfig {
 
     @Expose
     @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")
-    public Position position = new Position(33, 72, false, true);
+    public Position position = new Position(200, 120, false, true);
 
     @Expose
     @ConfigOption(name = "Highlight Hoppity Shop", desc = "Highlight items that haven't been bought from the Hoppity shop yet.")
