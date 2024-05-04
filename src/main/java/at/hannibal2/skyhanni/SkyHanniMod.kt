@@ -519,6 +519,7 @@ class SkyHanniMod {
         loadModule(VisitorListener())
         loadModule(VisitorRewardWarning())
         loadModule(OwnInventoryData())
+        loadModule(ScreenData)
         loadModule(HighlightVisitorsOutsideOfGarden())
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
@@ -554,7 +555,6 @@ class SkyHanniMod {
         loadModule(ContributorManager)
         loadModule(TabComplete)
         loadModule(HypixelBazaarFetcher)
-        loadModule(ScreenData)
 
         // APIs
         loadModule(BazaarApi())
