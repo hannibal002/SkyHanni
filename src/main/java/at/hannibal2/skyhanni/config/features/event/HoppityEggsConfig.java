@@ -29,6 +29,12 @@ public class HoppityEggsConfig {
     public boolean showClaimedEggs = false;
 
     @Expose
+    @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDuringContest = false;
+
+    @Expose
     @ConfigOption(name = "Shared Hoppity Waypoints", desc = "Enable being able to share and receive egg waypoints in your lobby.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -41,7 +47,7 @@ public class HoppityEggsConfig {
 
     @Expose
     @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")
-    public Position position = new Position(33, 72, false, true);
+    public Position position = new Position(200, 120, false, true);
 
     @Expose
     @ConfigOption(name = "Highlight Hoppity Shop", desc = "Highlight items that haven't been bought from the Hoppity shop yet.")
@@ -50,7 +56,7 @@ public class HoppityEggsConfig {
     public boolean highlightHoppityShop = true;
 
     @Expose
-    @ConfigOption(name = "Time in Chat", desc = "Show in chat when using Egglocator that show next hoppity event or next egg time.")
+    @ConfigOption(name = "Time in Chat", desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeInChat = true;

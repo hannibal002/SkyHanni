@@ -150,7 +150,6 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
@@ -184,8 +183,11 @@ object NEUItems {
             // 6.8 for some players
             return 7.0 // NPC price
         }
-        return getNpcPriceOrNull()
+
+        return getNpcPriceOrNull() ?: getRawCraftCostOrNull()
     }
+
+    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())

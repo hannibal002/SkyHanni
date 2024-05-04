@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils.width
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.util.ChatComponentText
@@ -209,7 +208,7 @@ object StringUtils {
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
-        var str = if (number == 1) singular else pluralForm
+        var str = if (number == 1 || number == -1) singular else pluralForm
         if (withNumber) str = "${number.addSeparators()} $str"
         return str
     }
