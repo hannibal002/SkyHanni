@@ -147,6 +147,13 @@ object RepoPatternTest {
             pattern3
         }
 
+        assertDoesNotThrow {
+            val pattern1 by RepoPattern.list("testonly.j", "")
+            val pattern2 by RepoPattern.pattern("testonly.j.1.2", "")
+            pattern1
+            pattern2
+        }
+
         RepoPatternManager.inTestDuplicateUsage = true
     }
 
