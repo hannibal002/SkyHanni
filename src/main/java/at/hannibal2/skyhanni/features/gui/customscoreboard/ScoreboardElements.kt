@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLines.handleCustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.getChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLines.handleCustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
@@ -31,6 +31,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Comp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.partyConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsAvailable
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
@@ -38,6 +40,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurse
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
@@ -345,7 +348,7 @@ private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
 
 private fun getPurseDisplayPair(): List<ScoreboardElementType> {
-    var purse = PurseAPI.currentPurse.formatNum()
+    var purse = getPurse()
 
     val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.coinsPattern, "earned")
 
@@ -365,7 +368,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
 private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getMotesDisplayPair(): List<ScoreboardElementType> {
-    val motes = getMotes().formatNum()
+    val motes = getMotes()
 
     return listOf(
         when {
@@ -393,11 +396,11 @@ private fun getBankDisplayPair(): List<ScoreboardElementType> {
 private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBitsDisplayPair(): List<ScoreboardElementType> {
-    val bits = BitsAPI.bits.coerceAtLeast(0).formatNum()
+    val bits = getBits()
     val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {
         "§cOpen Sbmenu§b"
     } else {
-        BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
+        getBitsAvailable()
     }
 
     return listOf(
@@ -412,7 +415,7 @@ private fun getBitsDisplayPair(): List<ScoreboardElementType> {
 private fun getBitsShowWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 
 private fun getCopperDisplayPair(): List<ScoreboardElementType> {
-    val copper = getCopper().formatNum()
+    val copper = getCopper()
 
     return listOf(
         when {
@@ -470,7 +473,7 @@ private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
-    val northStars = getNorthStars().formatNum()
+    val northStars = getNorthStars()
 
     return listOf(
         when {
