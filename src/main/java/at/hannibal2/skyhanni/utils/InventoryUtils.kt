@@ -39,9 +39,13 @@ object InventoryUtils {
     fun getWindowId() = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 
     fun getItemsInOwnInventory() =
-        Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.filterNotNull() ?: emptyList()
+        getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
 
-    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
+
+    // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
+    fun getItemsInHotbar() =
+        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
 
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
