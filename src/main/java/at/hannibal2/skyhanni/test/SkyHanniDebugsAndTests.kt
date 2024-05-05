@@ -517,14 +517,14 @@ class SkyHanniDebugsAndTests {
             }
 
             if (debugConfig.raytracedOreblock) {
-                val pos = BlockUtils.getBlockLookingAt()
-                val name = pos?.let {
-                    OreBlock.getByStateOrNull(it.getBlockStateAt())?.name
-                } ?: "None"
-                config.debugOrePos.renderString(
-                    "Looking at: $name (${pos?.toCleanStringWithSeparators()})",
-                    posLabel = "OreBlock"
-                )
+                BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
+                    OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
+                        config.debugOrePos.renderString(
+                            "Looking at: ${ore.blockName} (${pos.toCleanStringWithSeparators()})",
+                            posLabel = "OreBlock"
+                        )
+                    }
+                }
             }
         }
 

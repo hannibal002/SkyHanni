@@ -212,7 +212,7 @@ enum class OreBlock(
         "Hard Stone (Glacial)",
         "HARD_STONE",
         OreType.HARD_STONE,
-        listOf(Blocks.stone),
+        listOf(Blocks.stone, Blocks.wool),
         ::isHardstoneGlacite,
         inGlacite = true
     ),
@@ -447,7 +447,8 @@ private fun isHardStoneHollows(state: IBlockState, a: EnumDyeColor? = null): Boo
 }
 
 private fun isHardstoneGlacite(state: IBlockState, a: EnumDyeColor? = null): Boolean {
-    return (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE)
+    return ((state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) &&
+        state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY)
 }
 
 private fun isRedSand(state: IBlockState, a: EnumDyeColor? = null): Boolean {
