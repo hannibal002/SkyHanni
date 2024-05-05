@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -51,7 +52,9 @@ class EntityMovementData {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!warpingPattern.matches(event.message)) return
-        LorenzWarpEvent().postAndCatch()
+        DelayedRun.runNextTick {
+            LorenzWarpEvent().postAndCatch()
+        }
     }
 
     @SubscribeEvent
