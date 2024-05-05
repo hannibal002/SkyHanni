@@ -100,6 +100,7 @@ class DragonInfoUtils {
     fun onStart(event: DungeonM7Phase5Start) {
         if (inPhase5) return
         ChatUtils.debug("Starting Phase5")
+        currentRunInfo.clear()
         inPhase5 = true
     }
 
@@ -107,8 +108,7 @@ class DragonInfoUtils {
     @SubscribeEvent
     fun onEnd(event: DungeonCompleteEvent) {
         M7DragonInfo.clearSpawned()
-        debugOutput[currentRun] = currentRunInfo
-        currentRunInfo.clear()
+        debugOutput.add(currentRunInfo)
         currentRun += 1
         if (inPhase5) inPhase5 = false
     }
@@ -153,7 +153,6 @@ class DragonInfoUtils {
         }
 
         currentRunInfo.add(string)
-        println(string)
     }
 
     private fun logSpawn(mob: Mob, matchedType: M7DragonInfo?) {
@@ -166,7 +165,6 @@ class DragonInfoUtils {
             ", did not match"
         }
         currentRunInfo.add(string)
-        println(string)
     }
 
     private fun logKill(mob: Mob, matchedType: M7DragonInfo?) {
@@ -181,7 +179,6 @@ class DragonInfoUtils {
             ", did not match"
         }
         currentRunInfo.add(string)
-        println(string)
     }
 
     fun copyDebug() {
