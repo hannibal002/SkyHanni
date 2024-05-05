@@ -23,6 +23,11 @@ public class PartyCommandsConfig {
     @ConfigOption(name = "Party Warp", desc = "Automatically warp the party if someone types §b!warp")
     public boolean warpCommand = false;
 
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "Party All Invite", desc = "Automatically turn on allinvite if someone types §b!allinv")
+    public boolean allInviteCommand = false;
+
     public enum TrustedUser {
         BEST_FRIENDS("Best Friends"),
         FRIENDS("Friends"),
@@ -41,4 +46,8 @@ public class PartyCommandsConfig {
         }
     }
 
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "Show reminder", desc = "Shows a reminder when an unauthorized player tries to run a command.")
+    public boolean showIgnoredReminder = true;
 }

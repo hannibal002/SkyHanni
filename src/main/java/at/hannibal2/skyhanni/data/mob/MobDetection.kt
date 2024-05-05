@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -26,9 +27,9 @@ import net.minecraft.entity.monster.EntityCreeper
 import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
-import net.minecraft.network.play.server.S37PacketStatistics
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -68,6 +69,7 @@ class MobDetection {
         MobFilter.wokeSleepingGolemPattern
         MobFilter.jerryPattern
         MobFilter.jerryMagmaCubePattern
+        MobUtils.defaultArmorStandName
     }
 
     private fun mobDetectionReset() {
@@ -312,7 +314,7 @@ class MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S37PacketStatistics -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
+            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
             {
                 shouldClear.set(true)
                 allEntitiesViaPacketId.clear()

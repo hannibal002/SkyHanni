@@ -125,7 +125,7 @@ object FishingProfitTracker {
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Times fished: §e${fishedCount.addSeparators()}",
-                listOf("§7You catched §e${fishedCount.addSeparators()} §7times something.")
+                listOf("§7You've reeled in §e${fishedCount.addSeparators()} §7catches.")
             )
         )
 
@@ -237,8 +237,8 @@ object FishingProfitTracker {
         tracker.firstUpdate()
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetfishingtracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight

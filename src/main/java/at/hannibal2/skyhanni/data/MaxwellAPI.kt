@@ -52,9 +52,13 @@ object MaxwellAPI {
     private var powers = mutableListOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
-    private val chatPowerpattern by patternGroup.pattern(
+    private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
         "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!"
+    )
+    private val chatPowerUnlockedPattern by patternGroup.pattern(
+        "chat.power.unlocked",
+        "§eYour selected power was set to (?:§r)*§a(?<power>.*)(?:§r)*§e!"
     )
     private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
@@ -78,7 +82,7 @@ object MaxwellAPI {
     )
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
-        "§7Total: §6(?<mp>\\d+) Magical Power"
+        "§7Total: §6(?<mp>[\\d.,]+) Magical Power"
     )
     private val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
@@ -120,23 +124,26 @@ object MaxwellAPI {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
-        chatPowerpattern.matchMatcher(message) {
-            val power = group("power")
-            currentPower = getPowerByNameOrNull(power)
-                ?: return ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: $power"),
-                    "Unknown power: $power",
-                    "power" to power,
-                    "message" to message
-                )
-        }
+        chatPowerPattern.tryReadPower(message)
+        chatPowerUnlockedPattern.tryReadPower(message)
         tuningAutoAssignedPattern.matchMatcher(event.message) {
-            if (tunings?.isNotEmpty() == true) {
-                val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
-                if (tuningsInScoreboard) {
-                    ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
-                }
+            if (tunings.isNullOrEmpty()) return
+            val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
+            if (tuningsInScoreboard) {
+                ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
             }
+        }
+    }
+
+    private fun Pattern.tryReadPower(message: String) {
+        matchMatcher(message) {
+            val power = group("power")
+            currentPower = getPowerByNameOrNull(power) ?: return ErrorManager.logErrorWithData(
+                UnknownMaxwellPower("Unknown power: $power"),
+                "Unknown power: $power",
+                "power" to power,
+                "message" to message
+            )
         }
     }
 
@@ -238,6 +245,7 @@ object MaxwellAPI {
     }
 
     private fun processStack(stack: ItemStack) {
+        var foundMagicalPower = false
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {
                 ChatUtils.chat("Seems like you don't have the Requirement for the Accessory Bag yet, setting power to No Power and magical power to 0.")
@@ -254,7 +262,7 @@ object MaxwellAPI {
 
                 val mp = group("mp")
                 magicalPower = mp.formatInt()
-                return@matchMatcher
+                foundMagicalPower = true
             }
 
             inventoryPowerPattern.matchMatcher(line) {
@@ -267,9 +275,11 @@ object MaxwellAPI {
                         "lore" to stack.getLore(),
                         noStackTrace = true
                     )
-                return@matchMatcher
             }
         }
+
+        // If Magical Power isn't in the lore
+        if (!foundMagicalPower) magicalPower = 0
     }
 
     private fun getPowerByNameOrNull(name: String) = powers.find { it == name }

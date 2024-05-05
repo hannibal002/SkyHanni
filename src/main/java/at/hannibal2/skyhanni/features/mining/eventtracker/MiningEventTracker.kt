@@ -38,6 +38,7 @@ class MiningEventTracker {
         "bossbar.active",
         "§e§lEVENT (?<event>.+) §e§lACTIVE IN (?<area>.+) §e§lfor §a§l(?<time>\\S+)§r"
     )
+    // TODO add test messages
     private val eventStartedPattern by patternGroup.pattern(
         "started",
         "(?:§.)*\\s+(?:§.)+§l(?<event>.+) STARTED!"
@@ -98,6 +99,9 @@ class MiningEventTracker {
     }
 
     private fun sendData(eventName: String, time: String?) {
+        // TODO fix this via regex
+        if (eventName == "SLAYER QUEST") return
+
         val eventType = MiningEventType.fromEventName(eventName) ?: run {
             if (!config.enabled) return
             ErrorManager.logErrorWithData(
