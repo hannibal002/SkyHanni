@@ -23,6 +23,11 @@ public class TunnelMapsConfig {
     public Position position = new Position(20, 20);
 
     @Expose
+    @ConfigOption(name = "Auto Commission", desc = "Takes the first collector commission as target when opening the commissions inventory, also works when completing commissions.")
+    @ConfigEditorBoolean
+    public boolean autoCommission = false;
+
+    @Expose
     @ConfigOption(name = "Campfire Hotkey", desc = "Hotkey to warp to the campfire, if the travel scroll is not unlocked shows a path to the campfire.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int campfireKey = Keyboard.KEY_NONE;

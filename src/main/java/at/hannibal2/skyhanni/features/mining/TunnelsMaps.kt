@@ -157,6 +157,11 @@ class TunnelsMaps {
                 slotId to getGenericName(type)
             }
         }.toMap()
+        if (config.autoCommission) {
+            clickTranslate.values.firstOrNull()?.let {
+                setActiveAndGoal(it)
+            }
+        }
     }
 
     @SubscribeEvent
@@ -172,8 +177,7 @@ class TunnelsMaps {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
-            active = it
-            goal = getNext()
+            setActiveAndGoal(it)
         }
     }
 
@@ -298,9 +302,13 @@ class TunnelsMaps {
         goal = campfire
     }
 
-    private fun guiSetActive(it: String): () -> Unit = {
+    private fun setActiveAndGoal(it: String) {
         active = it
         goal = getNext()
+    }
+
+    private fun guiSetActive(it: String): () -> Unit = {
+        setActiveAndGoal(it)
     }
 
     @SubscribeEvent
