@@ -131,10 +131,12 @@ class DragonInfoUtils {
         event.addData("Apex: ${M7DragonInfo.APEX.status}, ${M7DragonInfo.APEX.status.id}")
         event.addData("Ice: ${M7DragonInfo.ICE.status}, ${M7DragonInfo.ICE.status.id}")
         event.addData("Soul: ${M7DragonInfo.SOUL.status}, ${M7DragonInfo.SOUL.status.id}")
+        event.addData("runCount: ${debugOutput.size}")
+        event.addData("currentRunInfo: ${currentRunInfo.size}")
     }
 
     private var debugOutput = arrayOf(mutableListOf<String>())
-    private val currentRunInfo = mutableListOf<String>()
+    private var currentRunInfo = mutableListOf<String>()
 
     private fun logParticle(particle: S2APacketParticles, matchedType: M7DragonInfo?) {
         val x = particle.xCoordinate
@@ -155,7 +157,7 @@ class DragonInfoUtils {
     private fun logSpawn(mob: Mob, matchedType: M7DragonInfo?) {
         val location = mob.baseEntity.position.toLorenzVec()
 
-        var string = "[Spawn] $location"
+        var string = "[Spawn] $location, ${mob.baseEntity.entityId}"
         string += if (matchedType != null) {
             ", matched $matchedType"
         } else {
@@ -167,7 +169,7 @@ class DragonInfoUtils {
     private fun logKill(mob: Mob, matchedType: M7DragonInfo?) {
         val location = mob.baseEntity.position.toLorenzVec()
 
-        var string = "[Death] $location"
+        var string = "[Death] $location, ${mob.baseEntity.entityId}"
         string += if (matchedType != null) {
             ", matched $matchedType"
         } else {
@@ -183,6 +185,6 @@ class DragonInfoUtils {
             finalString += runInfo.joinToString { "\n" }
         }
         OSUtils.copyToClipboard(finalString)
-        ChatUtils.chat("copied debug info to clipboard")
+        ChatUtils.chat("copied debug info to clipboard, ${debugOutput.size}")
     }
 }
