@@ -7,4 +7,5 @@ data class RepoPatternKeyOwner(
     val property: KProperty<*>?,
     val shares: Boolean,
     val parent: RepoPatternKeyOwner?,
+    val transient: Boolean = false,
 )

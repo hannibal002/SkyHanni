@@ -83,7 +83,7 @@ object RepoPatternManager {
         synchronized(exclusivity) {
             run {
                 val previousOwner = exclusivity[key]
-                if (previousOwner != owner && previousOwner != null) {
+                if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
                     if (!config.tolerateDuplicateUsage)
                         crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
                 } else {
@@ -91,11 +91,15 @@ object RepoPatternManager {
                 }
             }
             run {
+                val transient = owner.copy(shares = true, transient = true)
                 var parent = key
                 var previousParentOwnerMutable: RepoPatternKeyOwner? = null
                 while (previousParentOwnerMutable == null && parent.isNotEmpty()) {
                     parent = parent.substringBeforeLastOrNull(".") ?: return
                     previousParentOwnerMutable = exclusivity[parent]
+                    previousParentOwnerMutable ?: run {
+                        exclusivity[parent] = transient
+                    }
                 }
                 val previousParentOwner = previousParentOwnerMutable
 
@@ -118,16 +122,12 @@ object RepoPatternManager {
      * using that [key] prefix again without permission of the [owner]. Thread safe.
      */
     fun checkNameSpaceExclusivity(owner: RepoPatternKeyOwner, key: String) {
-        val keyWithDot = "$key."
         synchronized(exclusivity) {
-            val preRegistered = exclusivity.filter { it.key.startsWith(keyWithDot) && it.value.parent != owner }
-            if (preRegistered.isNotEmpty()) {
+            val preRegistered = exclusivity[key]
+            if (preRegistered != null) {
                 if (!config.tolerateDuplicateUsage) crash(
                     "Non unique access to array regex at \"$key\"." +
-                        " First obtained by ${
-                            preRegistered.map { "${it.key} / ${it.value.ownerClass} / ${it.value.property}" }
-                                .joinToString { ", " }
-                        }," +
+                        " First obtained by ${preRegistered.ownerClass} / ${preRegistered.property}," +
                         " tried to use at ${owner.ownerClass} / ${owner.property}"
                 )
             }
