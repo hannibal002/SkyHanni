@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import kotlinx.coroutines.runBlocking
@@ -77,11 +78,11 @@ class TextInput {
             }
             val tcarriage = carriage
 
-            if (Keyboard.KEY_LEFT.isKeyClicked()) {
+            if (Keyboard.KEY_LEFT.isKeyHeld()) {
                 carriage = tcarriage?.moveCarriageLeft() ?: (textBox.length - 1)
                 return
             }
-            if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+            if (Keyboard.KEY_RIGHT.isKeyHeld()) {
                 carriage = when {
                     tcarriage == null -> null
                     (tcarriage >= textBox.length - 1) -> null

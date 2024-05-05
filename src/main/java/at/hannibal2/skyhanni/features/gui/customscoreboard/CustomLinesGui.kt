@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
@@ -26,15 +26,14 @@ open class CustomLinesGui : GuiScreen() {
         set(value) {
             field = value
             if (value) {
+                textBox.textBox = CustomScoreboard.customlineConfig.customLine1
                 textBox.makeActive()
             } else {
                 textBox.disable()
             }
         }
 
-    private val textBox = TextInput().apply {
-        textBox = "haiii"
-    }
+    private val textBox = TextInput()
 
     companion object {
         fun isInGui() = Minecraft.getMinecraft().currentScreen is CustomLinesGui
@@ -76,24 +75,23 @@ open class CustomLinesGui : GuiScreen() {
 
         val position = Position(windowWidth / 2 - guiWidth / 2, windowHeight / 2 - guiHeight / 2)
 
-        position.renderRenderables(
-            listOf(getDisplay()),
-            posLabel = "a"
+        position.renderRenderable(
+            getDisplay(),
+            posLabel = "CustomLinesGui",
+            addToGuiManager = false
         )
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isInGui()) return
+        if (!isInGui()) {
+            inTextMode = false
+            return
+        }
 
         if (inTextMode) {
             textBox.handle()
-            val text = textBox.finalText()
-            if (text.isEmpty()) {
-                //activeNode?.name = null
-            } else {
-                //activeNode?.name = text
-            }
+            CustomScoreboard.customlineConfig.customLine1 = textBox.finalText()
         }
     }
 }
