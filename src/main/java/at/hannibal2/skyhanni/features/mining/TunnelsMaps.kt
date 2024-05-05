@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestDistance
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -43,6 +44,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.roundToInt
@@ -422,12 +424,22 @@ class TunnelsMaps {
         }
     }
 
+    @SubscribeEvent
+    fun onEntityMove(event: EntityMoveEvent) {
+        if (event.entity != Minecraft.getMinecraft().thePlayer) return
+        if (!isEnabled()) return
+        if (event.distance < 65.0) return
+        if (goal != null) {
+            goal = getNext()
+        }
+    }
+
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
     private fun nextSpotKey(event: LorenzKeyPressEvent) {
         if (event.keyCode != config.nextSpotHotkey) return
         if (!nextSpotDelay.isInPast()) return
-        nextSpotDelay = 1.0.seconds.fromNow()
+        nextSpotDelay = 0.5.seconds.fromNow()
         goal = getNext()
     }
 
