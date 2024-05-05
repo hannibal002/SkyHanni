@@ -131,4 +131,43 @@ object KeyboardManager {
     }
 
     fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)
+
+    object WasdInputMatrix : Iterable<KeyBinding> {
+        operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {
+            w, a, s, d, up, down -> true
+            else -> false
+        }
+
+        val w get() = Minecraft.getMinecraft().gameSettings.keyBindForward!!
+        val a get() = Minecraft.getMinecraft().gameSettings.keyBindLeft!!
+        val s get() = Minecraft.getMinecraft().gameSettings.keyBindBack!!
+        val d get() = Minecraft.getMinecraft().gameSettings.keyBindRight!!
+
+        val up get() = Minecraft.getMinecraft().gameSettings.keyBindJump!!
+        val down get() = Minecraft.getMinecraft().gameSettings.keyBindSneak!!
+
+        override fun iterator(): Iterator<KeyBinding> =
+            object : Iterator<KeyBinding> {
+
+                var current = w
+
+                override fun hasNext(): Boolean =
+                    current != down
+
+                override fun next(): KeyBinding {
+                    return current.also {
+                        current = when (it) {
+                            w -> a
+                            a -> s
+                            s -> d
+                            d -> up
+                            up -> down
+                            else -> throw java.lang.IndexOutOfBoundsException()
+                        }
+                    }
+                }
+
+            }
+
+    }
 }

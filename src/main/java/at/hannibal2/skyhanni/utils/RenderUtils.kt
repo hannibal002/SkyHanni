@@ -1394,7 +1394,6 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.draw3DLine_nea(
         p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
     ) {
-        GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
         val render = Minecraft.getMinecraft().renderViewEntity
@@ -1429,7 +1428,7 @@ object RenderUtils {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
-        GlStateManager.enableDepth()
+        GlStateManager.enableCull()
     }
 
     fun chromaColor(
