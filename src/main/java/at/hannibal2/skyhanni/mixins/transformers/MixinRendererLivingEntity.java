@@ -6,7 +6,6 @@ import net.minecraft.entity.EntityLivingBase;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
 @Mixin(RendererLivingEntity.class)
 public class MixinRendererLivingEntity {
 

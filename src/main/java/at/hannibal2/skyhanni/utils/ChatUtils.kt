@@ -64,8 +64,12 @@ object ChatUtils {
      *
      * @see USER_ERROR_PREFIX
      */
-    fun clickableUserError(message: String, command: String) {
-        internalChat(createClickableChat(USER_ERROR_PREFIX + message, command))
+    fun clickableUserError(
+        message: String,
+        onClick: () -> Any,
+        expireAt: SimpleTimeMark = SimpleTimeMark.farFuture()
+    ) {
+        ChatClickActionManager.oneTimeClick(USER_ERROR_PREFIX + message, onClick, expireAt)
     }
 
     /**

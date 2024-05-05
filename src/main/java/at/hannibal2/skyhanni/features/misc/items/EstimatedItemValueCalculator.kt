@@ -92,6 +92,10 @@ object EstimatedItemValueCalculator {
         ::addEnchantments
     )
 
+    fun calculate(stack: ItemStack): Pair<Double, Double> {
+        return calculate(stack, mutableListOf())
+    }
+
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
         val totalPrice = additionalCostFunctions.fold(basePrice) { total, function -> total + function(stack, list) }

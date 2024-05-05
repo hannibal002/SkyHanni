@@ -288,6 +288,9 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
+import at.hannibal2.skyhanni.features.inventory.wardrobe.EstimatedWardrobePrice
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
 import at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbilityCooldown
@@ -356,7 +359,6 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser
 import at.hannibal2.skyhanni.features.misc.limbo.LimboPlaytime
@@ -589,6 +591,7 @@ class SkyHanniMod {
         loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
         loadModule(ChocolateFactoryAPI)
+        loadModule(WardrobeAPI)
         loadModule(RenderableTooltips)
 
         // features
@@ -921,6 +924,7 @@ class SkyHanniMod {
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
         loadModule(CustomLinesGui())
+        loadModule(CustomWardrobe())
 
         init()
 
