@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -49,6 +48,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLinesGui
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -530,6 +530,7 @@ object Commands {
     private fun internalCommands() {
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
+        registerCommand("shcustomlines", "Opens the config list for modifying custom lines") { openCustomLines() }
     }
 
     private fun shortenedCommands() {
@@ -611,6 +612,15 @@ object Commands {
         } else {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
+        }
+    }
+
+    @JvmStatic
+    fun openCustomLines() {
+        if (!LorenzUtils.onHypixel) {
+            ChatUtils.userError("You need to join Hypixel to use this feature!")
+        } else {
+            SkyHanniMod.screenToOpen = CustomLinesGui()
         }
     }
 
