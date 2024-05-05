@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -126,16 +127,16 @@ class DragonInfoUtils {
             return
         }
 
+        event.addData("runCount: ${debugOutput.size}")
+        event.addData("currentRunInfo: ${currentRunInfo.size}")
         event.addData("Power: ${M7DragonInfo.POWER.status}, ${M7DragonInfo.POWER.status.id}")
         event.addData("Flame: ${M7DragonInfo.FLAME.status}, ${M7DragonInfo.FLAME.status.id}")
         event.addData("Apex: ${M7DragonInfo.APEX.status}, ${M7DragonInfo.APEX.status.id}")
         event.addData("Ice: ${M7DragonInfo.ICE.status}, ${M7DragonInfo.ICE.status.id}")
         event.addData("Soul: ${M7DragonInfo.SOUL.status}, ${M7DragonInfo.SOUL.status.id}")
-        event.addData("runCount: ${debugOutput.size}")
-        event.addData("currentRunInfo: ${currentRunInfo.size}")
     }
 
-    private var debugOutput = arrayOf(mutableListOf<String>())
+    private var debugOutput = mutableListOf<MutableList<String>>()
     private var currentRunInfo = mutableListOf<String>()
 
     private fun logParticle(particle: S2APacketParticles, matchedType: M7DragonInfo?) {
@@ -152,6 +153,7 @@ class DragonInfoUtils {
         }
 
         currentRunInfo.add(string)
+        println(string)
     }
 
     private fun logSpawn(mob: Mob, matchedType: M7DragonInfo?) {
@@ -164,18 +166,22 @@ class DragonInfoUtils {
             ", did not match"
         }
         currentRunInfo.add(string)
+        println(string)
     }
 
     private fun logKill(mob: Mob, matchedType: M7DragonInfo?) {
         val location = mob.baseEntity.position.toLorenzVec()
 
-        var string = "[Death] $location, ${mob.baseEntity.entityId}"
+        val baseEntity = mob.baseEntity
+        baseEntity as EntityDragon
+        var string = "[Death] $location, ${baseEntity.entityId}, ${baseEntity.animTime}"
         string += if (matchedType != null) {
             ", matched $matchedType"
         } else {
             ", did not match"
         }
         currentRunInfo.add(string)
+        println(string)
     }
 
     fun copyDebug() {
