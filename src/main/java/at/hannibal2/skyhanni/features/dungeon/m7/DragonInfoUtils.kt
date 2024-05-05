@@ -26,7 +26,7 @@ class DragonInfoUtils {
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         ChatUtils.debug("a dragon spawned at ${location.toCleanString()}")
-        M7DragonInfo.entries.filter { it.dragonLocation.spawnLocation == location && it != M7DragonInfo.NONE }.forEach {
+        M7DragonInfo.entries.filter { it.dragonLocation.spawnLocation == location }.forEach {
             ChatUtils.debug("Spawned Dragon ${it.name}, id: ${event.mob.baseEntity.entityId}")
             M7DragonChangeEvent(it, M7SpawnedStatus.ALIVE).postAndCatch()
             it.status = M7SpawnedStatus.ALIVE
@@ -41,7 +41,7 @@ class DragonInfoUtils {
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
-        M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId && it != M7DragonInfo.NONE }.forEach {
+        M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId }.forEach {
             if (it.dragonLocation.deathBox.isInside(location)) {
                 ChatUtils.debug("Killed Dragon ${it.name}, inside box, id: ${event.mob.baseEntity.entityId}")
                 it.status = M7SpawnedStatus.DEFEATED
@@ -71,7 +71,7 @@ class DragonInfoUtils {
             particle.xCoordinate % 1 != 0.0 ||
             particle.yCoordinate % 1 != 0.0 ||
             particle.zCoordinate % 1 != 0.0) return
-        M7DragonInfo.entries.filter { it.status == M7SpawnedStatus.UNDEFEATED && it != M7DragonInfo.NONE}.forEach {
+        M7DragonInfo.entries.filter { it.status == M7SpawnedStatus.UNDEFEATED }.forEach {
             if (it.dragonLocation.particleBox.isInside(event.packet.toLorenzVec())) {
                 it.status = M7SpawnedStatus.SPAWNING
                 ChatUtils.debug("${it.name} is now spawning")

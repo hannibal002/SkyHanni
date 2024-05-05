@@ -46,13 +46,6 @@ enum class M7DragonInfo(
         intArrayOf(4, 5),
         M7DragonLocation.SOUL,
         LorenzColor.LIGHT_PURPLE.chatColorCode
-    ),
-    NONE(
-        "None",
-        false,
-        intArrayOf(0, 0),
-        M7DragonLocation.NONE,
-        LorenzColor.CHROMA.chatColorCode
     );
 
     companion object {
@@ -101,10 +94,5 @@ enum class M7DragonLocation(
         AxisAlignedBB(53.0, 15.0, 59.0, 122.0, 22.0, 128.0),
         AxisAlignedBB(45.5, 13.0, 113.5, 68.5, 23.0, 136.5),
         LorenzVec(56.0, 14.0, 125.0)
-    ),
-    NONE(
-        AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-        AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-        LorenzVec(0.0, 0.0, 0.0)
     );
 }
