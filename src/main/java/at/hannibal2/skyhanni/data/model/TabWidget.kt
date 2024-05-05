@@ -26,7 +26,7 @@ private val repoGroup = RepoPattern.group("tab.widget.enum")
  * The class facilitates access to the lines associated with each widget and triggers events when a widget undergoes changes or becomes invisible.
  */
 enum class TabWidget(
-    pattern0: String
+    pattern0: String,
 ) {
     PLAYER_LIST(
         // language=RegExp
@@ -299,7 +299,11 @@ enum class TabWidget(
     DUNGEON_STATS_LINE(
         // language=RegExp
         "(?:§.)*Dungeon Stats"
-    )
+    ),
+    FROZEN_CORPSES(
+        // language=RegExp
+        "§b§lFrozen Corpses:"
+    ),
 
     ;
 
