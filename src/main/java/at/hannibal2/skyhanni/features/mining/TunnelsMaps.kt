@@ -380,8 +380,24 @@ class TunnelsMaps {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path?.takeIf { it.first.isNotEmpty() } ?: return
-        event.draw3DPathWithWaypoint(path.first, getPathColor(), 4, true, bezierPoint = 2.0)
-        event.drawDynamicText(path.first.last().position, "§e${path.second.roundToInt()}m", 1.0, yOff = 10f)
+        event.draw3DPathWithWaypoint(
+            path.first,
+            getPathColor(),
+            4,
+            true,
+            bezierPoint = 2.0,
+            textSize = config.textSize.toDouble()
+        )
+        event.drawDynamicText(
+            if (config.distanceFirst) {
+                path.first.first()
+            } else {
+                path.first.last()
+            }.position,
+            "§e${path.second.roundToInt()}m",
+            config.textSize.toDouble(),
+            yOff = 10f
+        )
     }
 
     private fun getPathColor(): Color = if (config.dynamicPathColour) {

@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
@@ -61,4 +62,14 @@ public class TunnelMapsConfig {
     @ConfigOption(name = "Exclude Fairy", desc = "Excludes the fairy soul spots from the selection list.")
     @ConfigEditorBoolean
     public Property<Boolean> excludeFairy = Property.of(false);
+
+    @Expose
+    @ConfigOption(name = "Text Size", desc = "Size of the waypoint texts.")
+    @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.5f, minStep = 0.1f)
+    public float textSize = 1.0f;
+
+    @Expose
+    @ConfigOption(name = "Distance First", desc = "Shows the distance at the first edge instead of the end.")
+    @ConfigEditorBoolean
+    public boolean distanceFirst = false;
 }

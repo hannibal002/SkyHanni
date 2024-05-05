@@ -1213,6 +1213,7 @@ object RenderUtils {
         lineWidth: Int,
         depth: Boolean,
         startAtEye: Boolean = true,
+        textSize: Double = 1.0,
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
@@ -1237,7 +1238,7 @@ object RenderUtils {
             )
         }
         path.filter { it.name?.isNotEmpty() == true }.forEach {
-            this.drawDynamicText(it.position, it.name!!, 1.0)
+            this.drawDynamicText(it.position, it.name!!, textSize)
         }
         val last = path.last()
         drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
