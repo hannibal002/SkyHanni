@@ -90,7 +90,9 @@ class TunnelsMaps {
         val best = offCooldown.minByOrNull { graph.findShortestDistance(closed, it) } ?: list.minBy {
             cooldowns[it] ?: SimpleTimeMark.farPast()
         }
-
+        if (cooldowns[best]?.isInPast() != false) {
+            cooldowns[best] = 5.0.seconds.fromNow()
+        }
         goalReached = false
         return best
     }
@@ -350,13 +352,20 @@ class TunnelsMaps {
 
     private fun checkGoalReached(): Boolean {
         if (goalReached) return true
-        val distance = goal?.position?.distanceSqToPlayer() ?: return false
-        goalReached = distance < 36.0
+        val goal = goal ?: return false
+        val distance = goal.position.distanceSqToPlayer()
+        goalReached = distance < if (goal == campfire) {
+            15.0 * 15.0
+        } else {
+            6.0 * 6.0
+        }
         if (goalReached) {
-            goal?.let {
-                cooldowns[it] = 60.0.seconds.fromNow()
+            if (goal == campfire && active != campfire.name) {
+                this.goal = getNext()
+            } else {
+                cooldowns[goal] = 60.0.seconds.fromNow()
+                clearPath()
             }
-            clearPath()
             return true
         }
         return false
