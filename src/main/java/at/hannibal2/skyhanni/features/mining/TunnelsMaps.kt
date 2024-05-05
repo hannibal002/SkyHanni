@@ -427,7 +427,9 @@ class TunnelsMaps {
     fun onLorenzWarp(event: LorenzWarpEvent) {
         if (!isEnabled()) return
         if (goal != null) {
-            goal = getNext()
+            DelayedRun.runNextTick {
+                goal = getNext()
+            }
         }
     }
 
