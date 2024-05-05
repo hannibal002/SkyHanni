@@ -384,7 +384,7 @@ class TunnelsMaps {
         event.draw3DPathWithWaypoint(
             path.first,
             getPathColor(),
-            4,
+            config.pathWidth.toInt(),
             true,
             bezierPoint = 2.0,
             textSize = config.textSize.toDouble()
