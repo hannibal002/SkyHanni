@@ -108,7 +108,8 @@ object MiningBlockColors {
 
         enabled = (IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea.equalsOneOf(
             "Glacite Tunnels",
-            "Glacite Lake"
+            "Glacite Lake",
+            "Glacite Mineshafts",
         )) || (IslandType.CRYSTAL_HOLLOWS.isInIsland())
     }
 
