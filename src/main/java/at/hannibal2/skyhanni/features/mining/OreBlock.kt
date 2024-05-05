@@ -398,14 +398,10 @@ enum class OreBlock(
     ;
 
     companion object {
-        fun getByStateOrNull(state: IBlockState): OreBlock? {
-            val list = OreBlock.entries.filter { ore ->
-                ore.inValidLocation() && ore.blocks
-                    .any { it.blockState.block == state.block }
-            }.filter { it.function(state, it.gemstoneColor) }
-            return if (list.size <= 1) list.firstOrNull()
-            else null
-        }
+        fun getByStateOrNull(state: IBlockState): OreBlock? = OreBlock.entries
+            .filter { it.isOre(state) }
+            .takeIf { it.size <= 1 }
+            ?.firstOrNull()
 
         private fun OreBlock.inValidLocation(): Boolean {
             return (this.inDwarvenMines && MiningAPI.inRegularDwarven() ||
@@ -416,6 +412,10 @@ enum class OreBlock(
                 this.inSpidersDen && IslandType.SPIDER_DEN.isInIsland())
         }
     }
+
+    private fun isOre(state: IBlockState): Boolean = inValidLocation() &&
+        blocks.any { it.blockState.block == state.block } &&
+        function(state, gemstoneColor)
 }
 
 private fun isLowTierMithril(state: IBlockState, a: EnumDyeColor? = null): Boolean {
