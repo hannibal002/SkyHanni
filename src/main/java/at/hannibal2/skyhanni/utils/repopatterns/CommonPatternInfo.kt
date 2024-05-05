@@ -38,7 +38,11 @@ sealed class CommonPatternInfo<R, C> : ReadOnlyProperty<Any?, C> {
         if (hasObtainedLock) return
         hasObtainedLock = true
         val owner = RepoPatternKeyOwner(thisRef?.javaClass, property, shares, parent)
-        RepoPatternManager.checkExclusivity(owner, key)
+        if (shares) {
+            RepoPatternManager.checkExclusivity(owner, key)
+        } else {
+            RepoPatternManager.checkNameSpaceExclusivity(owner, key)
+        }
     }
 
     abstract fun dump(): Map<String, String>

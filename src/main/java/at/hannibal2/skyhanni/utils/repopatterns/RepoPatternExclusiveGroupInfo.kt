@@ -28,6 +28,6 @@ class RepoPatternExclusiveGroupInfo internal constructor(val prefix: String, val
         if (hasObtainedLock) return
         hasObtainedLock = true
         val owner = RepoPatternKeyOwner(thisRef?.javaClass, property, false, parent)
-        RepoPatternManager.checkExclusivity(owner, prefix)
+        RepoPatternManager.checkNameSpaceExclusivity(owner, prefix)
     }
 }

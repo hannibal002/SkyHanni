@@ -113,6 +113,28 @@ object RepoPatternManager {
         }
     }
 
+    /**
+     * Check that the [owner] has exclusive right to the specified namespace and locks out other code parts from ever
+     * using that [key] prefix again without permission of the [owner]. Thread safe.
+     */
+    fun checkNameSpaceExclusivity(owner: RepoPatternKeyOwner, key: String) {
+        val keyWithDot = "$key."
+        synchronized(exclusivity) {
+            val preRegistered = exclusivity.filter { it.key.startsWith(keyWithDot) && it.value.parent != owner }
+            if (preRegistered.isNotEmpty()) {
+                if (!config.tolerateDuplicateUsage) crash(
+                    "Non unique access to array regex at \"$key\"." +
+                        " First obtained by ${
+                            preRegistered.map { "${it.key} / ${it.value.ownerClass} / ${it.value.property}" }
+                                .joinToString { ", " }
+                        }," +
+                        " tried to use at ${owner.ownerClass} / ${owner.property}"
+                )
+            }
+        }
+        checkExclusivity(owner, key)
+    }
+
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
