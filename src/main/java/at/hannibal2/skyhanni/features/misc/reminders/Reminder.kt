@@ -1,17 +1,33 @@
 package at.hannibal2.skyhanni.features.misc.reminders
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import com.google.gson.annotations.Expose
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import kotlin.time.Duration
 
 data class Reminder(
     @Expose var reason: String,
-    @Expose var remindAt: Long,
-    @Expose val id: Int
+    @Expose var remindAt: SimpleTimeMark,
+    @Expose var lastReminder: SimpleTimeMark = SimpleTimeMark.farPast()
 ) {
-    override fun toString(): String {
-        return "($id) reason: $reason in: ${timeUntil()}"
+
+    fun formatShort(): String {
+        val time = Instant.ofEpochMilli(remindAt.toMillis()).atZone(ZoneId.systemDefault())
+        val date = time.toLocalDate()
+        if (date.isEqual(LocalDate.now())) {
+            return time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+        }
+        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
     }
 
-    fun timeUntil() = SimpleTimeMark(remindAt).timeUntil().format()
+    fun formatFull(): String {
+        val dateTime = Instant.ofEpochMilli(remindAt.toMillis()).atZone(ZoneId.systemDefault())
+        return dateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT))
+    }
+
+    fun shouldRemind(interval: Duration) = remindAt.isInPast() && lastReminder.passedSince() >= interval
 }

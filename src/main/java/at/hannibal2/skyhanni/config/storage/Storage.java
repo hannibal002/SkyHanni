@@ -53,14 +53,5 @@ public class Storage {
     public List<String> blacklistedUsers = new ArrayList<>();
 
     @Expose
-    public ReminderData reminderData = new ReminderData();
-
-    public static class ReminderData {
-
-        @Expose
-        public List<Reminder> reminders = new ArrayList<>();
-
-        @Expose
-        public int currentReminderId = 0;
-    }
+    public Map<String, Reminder> reminders = new HashMap<>();
 }

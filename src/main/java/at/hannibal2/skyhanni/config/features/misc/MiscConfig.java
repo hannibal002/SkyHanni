@@ -108,6 +108,11 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
+    @ConfigOption(name = "Reminders", desc = "")
+    @Accordion
+    public RemindersConfig reminders = new RemindersConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();

@@ -1,34 +1,233 @@
 package at.hannibal2.skyhanni.features.misc.reminders
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.minutes
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
+import at.hannibal2.skyhanni.utils.chat.Text.center
+import at.hannibal2.skyhanni.utils.chat.Text.command
+import at.hannibal2.skyhanni.utils.chat.Text.fitToChat
+import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.chat.Text.style
+import at.hannibal2.skyhanni.utils.chat.Text.suggest
+import at.hannibal2.skyhanni.utils.chat.Text.wrap
+import net.minecraft.util.EnumChatFormatting
+import net.minecraft.util.IChatComponent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ReminderManager {
-    private val storage get() = SkyHanniMod.feature.storage.reminderData
 
-    private fun createReminder(reason: String, remindAt: Long) {
-        val reminder = Reminder(reason, remindAt, storage.currentReminderId + 1)
-        storage.currentReminderId += 1
-        storage.reminders.add(reminder)
+    private const val REMINDERS_PER_PAGE = 10
+
+    // Random numbers chosen, this will be used to delete the old list and action messages
+    private const val REMINDERS_LIST_ID = -546745
+    private const val REMINDERS_ACTION_ID = -546746
+
+    private val storage get() = SkyHanniMod.feature.storage.reminders
+    private val config get() = SkyHanniMod.feature.misc.reminders
+
+    private var listPage = 1
+
+    private fun newId(): String {
+        var id: String
+        do {
+            id = Base62.encode((Math.random() * Int.MAX_VALUE).toInt())
+        } while (storage.containsKey(id))
+        return id
     }
 
-    fun command(args: Array<String>) {
-        //todo remove temp thing
-        if (args.size == 1) {
-            if (args[0] == "print") storage.reminders.forEach { ChatUtils.chat(it.toString()) }
-            return
+    private fun getSortedReminders() = storage.entries.sortedBy { it.value.remindAt }
+
+    private fun sendMessage(message: String) = Text.join("§e[Reminder]", " ", message).send(REMINDERS_ACTION_ID)
+
+    private fun createDivider() = Text.HYPHEN.fitToChat().style {
+        setStrikethrough(true)
+        setColor(EnumChatFormatting.BLUE)
+    }
+
+    private fun parseReminder(text: String) = try {
+        TimeUtils.getDuration(text)
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun listReminders(page: Int) {
+        val reminders = getSortedReminders()
+        val maxPage = (reminders.size + REMINDERS_PER_PAGE - 1) / REMINDERS_PER_PAGE
+
+        listPage = page.coerceIn(1, maxPage)
+
+        val text: MutableList<IChatComponent> = mutableListOf()
+
+        text.add(createDivider())
+
+        text.add(Text.join(
+            if (listPage > 1) "§6§l<<".asComponent {
+                hover = "§eClick to view page ${listPage - 1}".asComponent()
+                command = "/shremind list ${listPage - 1}"
+            } else null,
+            " ",
+            "§6Reminders (Page $listPage of $maxPage)",
+            " ",
+            if (listPage < maxPage) "§6§l>>".asComponent {
+                hover = "§eClick to view page ${listPage + 1}".asComponent()
+                command = "/shremind list ${listPage + 1}"
+            } else null
+        ).center())
+
+        for (i in (listPage - 1) * REMINDERS_PER_PAGE until listPage * REMINDERS_PER_PAGE) {
+            if (i >= reminders.size) break
+            val (id, reminder) = reminders[i]
+
+            text.add(
+                Text.join(
+                    "§c✕".asComponent {
+                        hover = "§7Click to remove".asComponent()
+                        command = "/shremind remove -l $id"
+                    }.wrap("§8[", "§8]"),
+                    " ",
+                    "§e✎".asComponent {
+                        hover = "§7Click to start editing".asComponent()
+                        suggest = "/shremind edit -l $id ${reminder.reason} "
+                    }.wrap("§8[", "§8]"),
+                    " ",
+                    "§6${reminder.formatShort()}".asComponent {
+                        hover = "§7${reminder.formatFull()}".asComponent()
+                    }.wrap("§8[", "§8]"),
+                    " ",
+                    "§7${reminder.reason}"
+                )
+            )
         }
 
-        if (args.size < 2) {
-            ChatUtils.userError("/shremind [time] [reason]")
-            return
+        text.add(createDivider())
+
+        Text.join(*text.toTypedArray(), separator = Text.NEWLINE).send(REMINDERS_LIST_ID)
+    }
+
+    private fun createReminder(args: Array<String>) {
+        if (args.size < 2) return ChatUtils.userError("/shremind [time] [reminder]")
+
+        val time = parseReminder(args.first()) ?: return ChatUtils.userError("Invalid time format")
+        val reminder = args.drop(1).joinToString(" ")
+        val remindAt = SimpleTimeMark.now().plus(time)
+
+        storage[newId()] = Reminder(reminder, remindAt)
+        sendMessage("§6Reminder set for ${time.format()}")
+    }
+
+    private fun actionReminder(
+        args: List<String>,
+        command: String,
+        vararg arguments: String,
+        action: (List<String>, Reminder) -> String
+    ) {
+        val argumentText = arguments.joinToString(" ")
+        if (args.size < arguments.size) return ChatUtils.userError("/shremind $command $argumentText")
+
+        if (args.first() == "-l") {
+            if (args.size < arguments.size + 1) return ChatUtils.userError("/shremind $command -l $argumentText")
+            if (storage[args.drop(1).first()] == null) return ChatUtils.userError("Reminder not found")
+            action(args.drop(2), storage[args.drop(1).first()]!!).apply {
+                listReminders(listPage)
+                sendMessage(this)
+            }
+        } else if (storage[args.first()] == null) {
+            return ChatUtils.userError("Reminder not found")
+        } else {
+            sendMessage(action(args.drop(1), storage[args.first()]!!))
         }
+    }
 
-        val time = TimeUtils.getDuration(args.first())
-        val reason = args.drop(1).joinToString(" ")
-        val remindAt = time.inWholeMilliseconds + System.currentTimeMillis()
+    private fun removeReminder(args: List<String>) = actionReminder(
+        args,
+        "remove",
+        "[id]",
+    ) { _, reminder ->
+        storage.values.remove(reminder)
+        "§cReminder deleted."
+    }
 
-        createReminder(reason, remindAt)
+    private fun editReminder(args: List<String>) = actionReminder(
+        args,
+        "edit",
+        "[id]",
+        "[reminder]",
+    ) { arguments, reminder ->
+        reminder.reason = arguments.joinToString(" ")
+        "§6Reminder edited."
+    }
+
+    private fun moveReminder(args: List<String>) = actionReminder(
+        args,
+        "move",
+        "[id]",
+        "[time]",
+    ) { arguments, reminder ->
+        val time = parseReminder(arguments.first()) ?: return@actionReminder "§cInvalid time format!"
+        reminder.remindAt = SimpleTimeMark.now().plus(time)
+        "§6Reminder moved to ${time.format()}"
+    }
+
+    private fun help() {
+        createDivider().send()
+        "§6SkyHanni Reminder Commands:".asComponent().send()
+        "§e/shremind <time> <reminder> - §bCreates a new reminder".asComponent().send()
+        "§e/shremind list <page> - §bLists all reminders".asComponent().send()
+        "§e/shremind remove <id> - §bRemoves a reminder".asComponent().send()
+        "§e/shremind edit <id> <reminder> - §bEdits a reminder".asComponent().send()
+        "§e/shremind move <id> <time> - §bMoves a reminder".asComponent().send()
+        "§e/shremind help - §bShows this help message".asComponent().send()
+        createDivider().send()
+    }
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        for ((id, reminder) in getSortedReminders()) {
+            if (!reminder.shouldRemind(config.interval.minutes)) break
+            reminder.lastReminder = SimpleTimeMark.now()
+            var actionsComponent: IChatComponent? = null
+
+            if (!config.autoDeleteReminders) {
+                actionsComponent = Text.join(
+                    "§a✔".asComponent {
+                        hover = "§7Click to dismiss".asComponent()
+                        command = "/shremind remove $id"
+                    }.wrap("§8[", "§8]"),
+                    " ",
+                    "§e§l⟳".asComponent {
+                        hover = "§7Click to move".asComponent()
+                        suggest = "/shremind move $id 1m"
+                    }.wrap("§8[", "§8]")
+                )
+            } else {
+                storage.remove(id)
+            }
+
+            Text.join(
+                "§e[Reminder]".asComponent {
+                    hover = "§7Reminders by SkyHanni".asComponent()
+                },
+                " ",
+                actionsComponent,
+                " ",
+                "§6${reminder.reason}"
+            ).send()
+        }
+    }
+
+    fun command(args: Array<String>) = when (args.firstOrNull()) {
+        "list" -> listReminders(args.drop(1).firstOrNull()?.toIntOrNull() ?: 1)
+        "remove", "delete" -> removeReminder(args.drop(1))
+        "edit", "update" -> editReminder(args.drop(1))
+        "move" -> moveReminder(args.drop(1))
+        "help" -> help()
+        else -> createReminder(args)
     }
 }
