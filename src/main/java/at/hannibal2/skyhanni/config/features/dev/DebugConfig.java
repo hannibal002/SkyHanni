@@ -127,6 +127,11 @@ public class DebugConfig {
     public boolean currentAreaDebug = true;
 
     @Expose
+    @ConfigOption(name = "Oreblock Name", desc = "Show the OreBlock you are currently looking at")
+    @ConfigEditorBoolean
+    public boolean raytracedOreblock = true;
+
+    @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     public Property<Mayor> assumeMayor = Property.of(Mayor.DISABLED);

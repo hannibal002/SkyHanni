@@ -62,6 +62,9 @@ public class DevConfig {
     public Position debugItemPos = new Position(90, 70);
 
     @Expose
+    public Position debugOrePos = new Position(1, 200, false, true);
+
+    @Expose
     @ConfigOption(
         name = "Fancy Contributors",
         desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +

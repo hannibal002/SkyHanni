@@ -16,7 +16,10 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.BlockUtils
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -505,12 +508,26 @@ class SkyHanniDebugsAndTests {
             itemRenderDebug()
         }
 
-        if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
-            config.debugLocationPos.renderString(
-                "Current Area: ${HypixelData.skyBlockArea}",
-                posLabel = "SkyBlock Area (Debug)"
-            )
+        if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+            if (debugConfig.currentAreaDebug) {
+                config.debugLocationPos.renderString(
+                    "Current Area: ${HypixelData.skyBlockArea}",
+                    posLabel = "SkyBlock Area (Debug)"
+                )
+            }
+
+            if (debugConfig.raytracedOreblock) {
+                val pos = BlockUtils.getBlockLookingAt()
+                val name = pos?.let {
+                    OreBlock.getByStateOrNull(it.getBlockStateAt())?.name
+                } ?: "None"
+                config.debugOrePos.renderString(
+                    "Looking at: $name (${pos?.toCleanStringWithSeparators()})",
+                    posLabel = "OreBlock"
+                )
+            }
         }
+
 
         if (!debugConfig.enabled) return
 
