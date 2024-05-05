@@ -1,13 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.M7DragonChangeEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -127,13 +121,15 @@ class DragonInfoUtils {
             return
         }
 
-        event.addData("runCount: ${debugOutput.size}")
-        event.addData("currentRunInfo: ${currentRunInfo.size}")
-        event.addData("Power: ${M7DragonInfo.POWER.status}, ${M7DragonInfo.POWER.status.id}")
-        event.addData("Flame: ${M7DragonInfo.FLAME.status}, ${M7DragonInfo.FLAME.status.id}")
-        event.addData("Apex: ${M7DragonInfo.APEX.status}, ${M7DragonInfo.APEX.status.id}")
-        event.addData("Ice: ${M7DragonInfo.ICE.status}, ${M7DragonInfo.ICE.status.id}")
-        event.addData("Soul: ${M7DragonInfo.SOUL.status}, ${M7DragonInfo.SOUL.status.id}")
+        event.addData {
+            add("runCount: ${debugOutput.size}")
+            add("currentRunInfo: ${currentRunInfo.size}")
+            add("Power: ${M7DragonInfo.POWER.status}, ${M7DragonInfo.POWER.status.id}")
+            add("Flame: ${M7DragonInfo.FLAME.status}, ${M7DragonInfo.FLAME.status.id}")
+            add("Apex: ${M7DragonInfo.APEX.status}, ${M7DragonInfo.APEX.status.id}")
+            add("Ice: ${M7DragonInfo.ICE.status}, ${M7DragonInfo.ICE.status.id}")
+            add("Soul: ${M7DragonInfo.SOUL.status}, ${M7DragonInfo.SOUL.status.id}")
+        }
     }
 
     private var debugOutput = mutableListOf<MutableList<String>>()
