@@ -236,7 +236,15 @@ class TunnelsMaps {
                         goal = getNext()
                     }))
                 } else {
-                    add(Renderable.string("§6Active: §f$active"))
+                    add(
+                        Renderable.clickAndHover(
+                            Renderable.string("§6Active: §f$active"),
+                            listOf("§eClick to disable current Waypoint"),
+                            onClick = {
+                                goal = null
+                            }
+                        )
+                    )
                     if (hasNext()) {
                         add(Renderable.clickable(Renderable.string("§eNext Spot"), onClick = {
                             goal = getNext()
