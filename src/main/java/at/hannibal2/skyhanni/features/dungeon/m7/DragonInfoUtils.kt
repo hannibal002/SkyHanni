@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
@@ -25,13 +27,15 @@ class DragonInfoUtils {
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
-        ChatUtils.debug("a dragon spawned at ${location.toCleanString()}")
+        var matchedType: M7DragonInfo? = null
         M7DragonInfo.entries.filter { it.dragonLocation.spawnLocation == location }.forEach {
             ChatUtils.debug("Spawned Dragon ${it.name}, id: ${event.mob.baseEntity.entityId}")
             M7DragonChangeEvent(it, M7SpawnedStatus.ALIVE).postAndCatch()
             it.status = M7SpawnedStatus.ALIVE
             it.status.id = event.mob.baseEntity.entityId
+            matchedType = it
         }
+        logSpawn(event.mob, matchedType)
     }
 
     @SubscribeEvent
@@ -41,6 +45,7 @@ class DragonInfoUtils {
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
+        var matchedType: M7DragonInfo? = null
         M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId }.forEach {
             if (it.dragonLocation.deathBox.isInside(location)) {
                 ChatUtils.debug("Killed Dragon ${it.name}, inside box, id: ${event.mob.baseEntity.entityId}")
@@ -52,7 +57,9 @@ class DragonInfoUtils {
                 M7DragonChangeEvent(it, M7SpawnedStatus.UNDEFEATED).postAndCatch()
             }
             it.status.id = -1
+            matchedType = it
         }
+        logKill(event.mob, matchedType)
     }
 
     @SubscribeEvent
@@ -63,13 +70,16 @@ class DragonInfoUtils {
         val particle = event.packet
         if (!checkParticle(particle)) return
 
+        var matchedType: M7DragonInfo? = null
         M7DragonInfo.entries.filter { it.status == M7SpawnedStatus.UNDEFEATED }.forEach {
             if (it.dragonLocation.particleBox.isInside(event.packet.toLorenzVec())) {
                 it.status = M7SpawnedStatus.SPAWNING
                 ChatUtils.debug("${it.name} is now spawning")
                 M7DragonChangeEvent(it, M7SpawnedStatus.SPAWNING).postAndCatch()
+                matchedType = it
             }
         }
+        logParticle(particle, matchedType)
     }
 
     private fun checkParticle(particle: S2APacketParticles): Boolean {
@@ -92,9 +102,13 @@ class DragonInfoUtils {
         inPhase5 = true
     }
 
+    private var currentRun = 0
     @SubscribeEvent
     fun onEnd(event: DungeonCompleteEvent) {
         M7DragonInfo.clearSpawned()
+        debugOutput[currentRun] = currentRunInfo
+        currentRunInfo.clear()
+        currentRun += 1
         if (inPhase5) inPhase5 = false
     }
 
@@ -117,5 +131,58 @@ class DragonInfoUtils {
         event.addData("Apex: ${M7DragonInfo.APEX.status}, ${M7DragonInfo.APEX.status.id}")
         event.addData("Ice: ${M7DragonInfo.ICE.status}, ${M7DragonInfo.ICE.status.id}")
         event.addData("Soul: ${M7DragonInfo.SOUL.status}, ${M7DragonInfo.SOUL.status.id}")
+    }
+
+    private var debugOutput = arrayOf(mutableListOf<String>())
+    private val currentRunInfo = mutableListOf<String>()
+
+    private fun logParticle(particle: S2APacketParticles, matchedType: M7DragonInfo?) {
+        val x = particle.xCoordinate
+        val y = particle.yCoordinate
+        val z = particle.zCoordinate
+        val location = LorenzVec(x, y, z)
+
+        var string = "[Particle] $location"
+        string += if (matchedType != null) {
+            ", matched $matchedType"
+        } else {
+            ", did not match"
+        }
+
+        currentRunInfo.add(string)
+    }
+
+    private fun logSpawn(mob: Mob, matchedType: M7DragonInfo?) {
+        val location = mob.baseEntity.position.toLorenzVec()
+
+        var string = "[Spawn] $location"
+        string += if (matchedType != null) {
+            ", matched $matchedType"
+        } else {
+            ", did not match"
+        }
+        currentRunInfo.add(string)
+    }
+
+    private fun logKill(mob: Mob, matchedType: M7DragonInfo?) {
+        val location = mob.baseEntity.position.toLorenzVec()
+
+        var string = "[Death] $location"
+        string += if (matchedType != null) {
+            ", matched $matchedType"
+        } else {
+            ", did not match"
+        }
+        currentRunInfo.add(string)
+    }
+
+    fun copyDebug() {
+        var finalString = ""
+        debugOutput.forEachIndexed { index, runInfo ->
+            finalString += "---- run $index ----\n"
+            finalString += runInfo.joinToString { "\n" }
+        }
+        OSUtils.copyToClipboard(finalString)
+        ChatUtils.chat("copied debug info to clipboard")
     }
 }
