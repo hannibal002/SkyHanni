@@ -122,6 +122,10 @@ class TunnelsMaps {
         "mining.commisson.collector.invalid",
         "Glacite|Scrap"
     )
+    private val completedPattern by RepoPattern.pattern(
+        "mining.commisson.completed",
+        "§a§lCOMPLETED"
+    )
 
     private val translateTable = mutableMapOf<String, String>()
 
@@ -140,6 +144,7 @@ class TunnelsMaps {
         clickTranslate = event.inventoryItems.mapNotNull { (slotId, item) ->
             val lore = item.getLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
+            if (completedPattern.anyMatches(lore)) return@mapNotNull null
             val type = lore.matchFirst(collectorCommissionPattern) {
                 group("what")
             } ?: return@mapNotNull null
