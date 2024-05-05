@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsAvailable
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurse
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
 
 object CustomLines {
@@ -20,6 +22,13 @@ object CustomLines {
         Triple("%bits_available%", { getBitsAvailable() }, "Bits Available"),
         Triple("%island%", { HypixelData.skyBlockIsland.displayName }, "Island"),
         Triple("%area%", { HypixelData.skyBlockArea }, "Area"),
+        Triple("%date%", { SkyBlockTime.now().formatted(hoursAndMinutesElement = false, yearElement = false) }, "Date"),
+        Triple(
+            "%year%",
+            { SkyBlockTime.now().formatted(dayAndMonthElement = false, hoursAndMinutesElement = false) },
+            "Year"
+        ),
+        Triple("%time%", { SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false) }, "Time")
     )
 
     internal fun String.handleCustomLine(): List<String> {
