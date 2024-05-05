@@ -230,7 +230,7 @@ enum class OreBlock(
         "GOLD_INGOT",
         OreType.GOLD,
         listOf(Blocks.gold_block),
-        inCrystalHollows = true
+        inDwarvenMines = true, inCrystalHollows = true
     ),
     DWARVEN_EMERALD(
         "Dwarven Emerald",
