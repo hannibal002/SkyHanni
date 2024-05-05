@@ -61,16 +61,8 @@ class DragonInfoUtils {
         if (event.packet !is S2APacketParticles) return
 
         val particle = event.packet
-        if (particle.particleType != EnumParticleTypes.FLAME ||
-            particle.particleCount != 20 ||
-            particle.particleSpeed != 0.0f ||
-            particle.xOffset != 2.0f ||
-            particle.yOffset != 3.0f ||
-            particle.zOffset != 2.0f ||
-            !particle.isLongDistance ||
-            particle.xCoordinate % 1 != 0.0 ||
-            particle.yCoordinate % 1 != 0.0 ||
-            particle.zCoordinate % 1 != 0.0) return
+        if (!checkParticle(particle)) return
+
         M7DragonInfo.entries.filter { it.status == M7SpawnedStatus.UNDEFEATED }.forEach {
             if (it.dragonLocation.particleBox.isInside(event.packet.toLorenzVec())) {
                 it.status = M7SpawnedStatus.SPAWNING
@@ -78,6 +70,19 @@ class DragonInfoUtils {
                 M7DragonChangeEvent(it, M7SpawnedStatus.SPAWNING).postAndCatch()
             }
         }
+    }
+
+    private fun checkParticle(particle: S2APacketParticles): Boolean {
+        return (particle.particleType == EnumParticleTypes.FLAME ||
+            particle.particleCount == 20 ||
+            particle.particleSpeed == 0.0f ||
+            particle.xOffset == 2.0f ||
+            particle.yOffset == 3.0f ||
+            particle.zOffset == 2.0f ||
+            particle.isLongDistance ||
+            particle.xCoordinate % 1 == 0.0 ||
+            particle.yCoordinate % 1 == 0.0 ||
+            particle.zCoordinate % 1 == 0.0)
     }
 
     @SubscribeEvent
