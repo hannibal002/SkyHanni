@@ -125,6 +125,7 @@ class TunnelsMaps {
 
     private val translateTable = mutableMapOf<String, String>()
 
+    /** @return Errors with an empty String */
     private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
         possibleLocations.keys.firstOrNull() { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
     }
