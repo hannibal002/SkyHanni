@@ -152,6 +152,17 @@ object HarpFeatures {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        if (isHarpGui(InventoryUtils.openInventoryName())) {
+            if (config.keybinds) {
+                // needed to not send duplicate clicks via keybind feature
+                if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) {
+                    event.cancel()
+                    return
+                }
+            }
+        }
+
         if (!config.quickRestart) return
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.slotNumber != closeButtonSlot) return
