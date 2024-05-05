@@ -22,7 +22,7 @@ fun modifyGetModelFromBlockState(
     if (!LorenzUtils.inSkyBlock) return
 
     if (MiningBlockColors.enabled && MiningBlockColors.active) {
-        for (value in MiningBlockColors.GlaciteTunnelBlock.entries) {
+        for (value in MiningBlockColors.MiningBlock.entries) {
             if (value.onCheck(state)) {
                 returnState = value.onColor(state, value.highlight)
             }

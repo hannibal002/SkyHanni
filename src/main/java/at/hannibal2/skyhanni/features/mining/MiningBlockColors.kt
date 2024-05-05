@@ -68,6 +68,9 @@ object MiningBlockColors {
     val tungston_2 = Blocks.stone_stairs
     val tungston_3 = Blocks.clay
 
+    val mithril = Blocks.stained_hardened_clay
+    val mithril_2 = Blocks.wool
+    val mithril_3 = Blocks.prismarine
 
     private var oldSneakState = false
 
@@ -75,7 +78,7 @@ object MiningBlockColors {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (value in GlaciteTunnelBlock.entries) {
+        for (value in MiningBlock.entries) {
             val newValue = event.tabList.any { it.startsWith(value.tabList) && !it.contains("DONE") }
             if (value.highlight != newValue) {
                 value.highlight = newValue
@@ -103,18 +106,88 @@ object MiningBlockColors {
             }
         }
 
-        enabled = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea.equalsOneOf(
+        enabled = (IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea.equalsOneOf(
             "Glacite Tunnels",
             "Glacite Lake"
-        )
+        )) || (IslandType.CRYSTAL_HOLLOWS.isInIsland())
     }
 
-    enum class GlaciteTunnelBlock(
+    enum class MiningBlock(
         val tabList: String,
         val onCheck: (IBlockState) -> Boolean,
         val onColor: (IBlockState, Boolean) -> IBlockState,
         var highlight: Boolean = false,
     ) {
+        // Dwarven Mines
+        MITHRIL(
+            " §r§fMithril Everywhere:",
+            onCheck = { state ->
+                (state.block == mithril && state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.CYAN)) ||
+                    (state.block == mithril_2 && (state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.GRAY) ||
+                        state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIGHT_BLUE))) ||
+                    state.block == mithril_3
+            },
+            onColor = block()
+        ),
+
+        // Crystal Hollows
+        AMBER(
+            " §r§fAmber Gemstone Collector:",
+            onCheck = { state ->
+                (state.block == aquamarine || state.block == aquamarine_2) &&
+                    state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.ORANGE)
+            },
+            onColor = glass()
+        ),
+        TOPAZ(
+            " §r§fTopaz Gemstone Collector:",
+            onCheck = { state ->
+                (state.block == aquamarine || state.block == aquamarine_2) &&
+                    state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.YELLOW)
+            },
+            onColor = glass()
+        ),
+        AMETHYST(
+            " §r§fAmethyst Gemstone Collector:",
+            onCheck = { state ->
+                (state.block == aquamarine || state.block == aquamarine_2) &&
+                    state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.PURPLE)
+            },
+            onColor = glass()
+        ),
+        RUBY(
+            " §r§fRuby Gemstone Collector:",
+            onCheck = { state ->
+                (state.block == aquamarine || state.block == aquamarine_2) &&
+                    state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.RED)
+            },
+            onColor = glass()
+        ),
+        JADE(
+            " §r§fJade Gemstone Collector:",
+            onCheck = { state ->
+                (state.block == aquamarine || state.block == aquamarine_2) &&
+                    state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIME)
+            },
+            onColor = glass()
+        ),
+        SAPPHIRE(
+            " §r§fSapphire Gemstone Collector:",
+            onCheck = { state ->
+                (state.block == aquamarine || state.block == aquamarine_2) &&
+                    state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIGHT_BLUE)
+            },
+            onColor = glass()
+        ),
+        HARD_STONE(
+            " §r§fHardstone Miner: ",
+            onCheck = { state ->
+                state.block == glacite
+            },
+            onColor = block()
+        ),
+
+        // Glacite Tunnels
         GLACITE(
             " §r§fGlacite Collector: ",
             onCheck = { state ->
