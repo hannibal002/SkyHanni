@@ -14,6 +14,8 @@ sealed class CommonPatternInfo<R, C> : ReadOnlyProperty<Any?, C> {
 
     abstract val parent: RepoPatternKeyOwner?
 
+    abstract val shares: Boolean
+
     abstract val value: C
 
     /**
@@ -35,8 +37,8 @@ sealed class CommonPatternInfo<R, C> : ReadOnlyProperty<Any?, C> {
     private fun verifyLock(thisRef: Any?, property: KProperty<*>) {
         if (hasObtainedLock) return
         hasObtainedLock = true
-        val owner = RepoPatternKeyOwner(thisRef?.javaClass, property)
-        RepoPatternManager.checkExclusivity(owner, key, parent)
+        val owner = RepoPatternKeyOwner(thisRef?.javaClass, property, shares, parent)
+        RepoPatternManager.checkExclusivity(owner, key)
     }
 
     abstract fun dump(): Map<String, String>

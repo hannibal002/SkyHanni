@@ -78,7 +78,8 @@ object RepoPatternManager {
      * Check that the [owner] has exclusive right to the specified [key], and locks out other code parts from ever
      * using that [key] again. Thread safe.
      */
-    fun checkExclusivity(owner: RepoPatternKeyOwner, key: String, parentKeyHolder: RepoPatternKeyOwner?) {
+    fun checkExclusivity(owner: RepoPatternKeyOwner, key: String) {
+        val parentKeyHolder = owner.parent
         synchronized(exclusivity) {
             run {
                 val previousOwner = exclusivity[key]
@@ -97,7 +98,8 @@ object RepoPatternManager {
                     previousParentOwnerMutable = exclusivity[parent]
                 }
                 val previousParentOwner = previousParentOwnerMutable
-                if (previousParentOwner != null && previousParentOwner != parentKeyHolder) {
+
+                if (previousParentOwner != null && previousParentOwner != parentKeyHolder && !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)) {
                     if (!config.tolerateDuplicateUsage) crash(
                         "Non unique access to array regex at \"$parent\"." +
                             " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +
@@ -238,7 +240,7 @@ object RepoPatternManager {
         if (key in usedKeys) {
             usedKeys[key]?.hasObtainedLock = false
         }
-        return RepoPatternImpl(fallback, key).also { usedKeys[key] = it }
+        return RepoPatternImpl(fallback, key, parentKeyHolder).also { usedKeys[key] = it }
     }
 
     fun ofList(
@@ -256,7 +258,7 @@ object RepoPatternManager {
         StringUtils.subMapOfStringsStartingWith(key, usedKeys).forEach {
             it.value.hasObtainedLock = false
         }
-        return RepoPatternListImpl(fallbacks.toList(), key).also { usedKeys[key] = it }
+        return RepoPatternListImpl(fallbacks.toList(), key, parentKeyHolder).also { usedKeys[key] = it }
 
     }
 

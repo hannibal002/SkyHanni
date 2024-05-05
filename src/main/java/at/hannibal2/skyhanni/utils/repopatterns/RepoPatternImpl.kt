@@ -14,6 +14,7 @@ class RepoPatternImpl(
     override var wasOverridden = false
     override var value: Pattern = Pattern.compile(defaultPattern)
     override var isLoadedRemotely: Boolean = false
+    override val shares = true
     override fun dump(): Map<String, String> {
         return mapOf(key to defaultPattern)
     }

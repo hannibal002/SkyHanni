@@ -27,7 +27,7 @@ class RepoPatternExclusiveGroupInfo internal constructor(val prefix: String, val
     private fun verifyLock(thisRef: Any?, property: KProperty<*>) {
         if (hasObtainedLock) return
         hasObtainedLock = true
-        val owner = RepoPatternKeyOwner(thisRef?.javaClass, property)
-        RepoPatternManager.checkExclusivity(owner, prefix, parent)
+        val owner = RepoPatternKeyOwner(thisRef?.javaClass, property, false, parent)
+        RepoPatternManager.checkExclusivity(owner, prefix)
     }
 }

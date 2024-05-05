@@ -11,6 +11,7 @@ class RepoPatternListImpl(
     override var wasOverridden: Boolean = false
     override val defaultPattern: List<String> = fallback
     override var value: List<Pattern> = fallback.map(Pattern::compile)
+    override val shares = false
     override fun dump(): Map<String, String> {
         return defaultPattern.withIndex().associate { (key + "." + it.index) to it.value }
     }

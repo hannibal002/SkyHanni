@@ -9,11 +9,20 @@ import org.junit.jupiter.api.assertThrows
 
 object RepoPatternTest {
 
+    private val abc = generateSequence('a') { it + 1 }.take(26).joinToString("")
+
+    private var counter: Int = 0
+
+    private fun nextKey(): String = "testonly.${getChar(counter++)}"
+    private fun prevKey(n: Int = 0): String = "testonly.${getChar(counter - n - 1)}"
+
+    private fun getChar(count: Int): String = (if (count > 26) getChar(count / 26) else "") + abc[count % 26]
+
     @Test
     fun testRemoteLoad() {
         val simpleLocalePattern = "I'm a test value"
 
-        val simpleRepoPattern = RepoPattern.pattern("testonly.a", simpleLocalePattern)
+        val simpleRepoPattern = RepoPattern.pattern(this.nextKey(), simpleLocalePattern)
         val simplePattern by simpleRepoPattern
 
         val remoteValue = "I'm remote."
@@ -41,8 +50,14 @@ object RepoPatternTest {
         RepoPatternManager.inTestDuplicateUsage = false
 
         assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.pattern("testonly.b", "")
-            val pattern2 by RepoPattern.pattern("testonly.b", "")
+            val pattern1 by RepoPattern.pattern(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey(), "")
+            pattern1
+            pattern2
+        }
+        assertDoesNotThrow {
+            val pattern1 by RepoPattern.pattern(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey() + ".a", "")
             pattern1
             pattern2
         }
@@ -55,7 +70,7 @@ object RepoPatternTest {
         val simpleLocalePattern1 = "I'm a test value"
         val simpleLocalePattern2 = "I'm a test value 2"
 
-        val listPatterns = RepoPattern.list("testonly.list.a", simpleLocalePattern1, simpleLocalePattern2)
+        val listPatterns = RepoPattern.list(this.nextKey(), simpleLocalePattern1, simpleLocalePattern2)
         val list by listPatterns
 
         val remoteValue1 = "I'm remote."
@@ -111,47 +126,61 @@ object RepoPatternTest {
         RepoPatternManager.inTestDuplicateUsage = false
 
         assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.list("testonly.c", "")
-            val pattern2 by RepoPattern.list("testonly.c", "")
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.list(this.prevKey(), "")
             pattern1
             pattern2
         }
 
         assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.list("testonly.d", "")
-            val pattern2 by RepoPattern.pattern("testonly.d", "")
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey(), "")
             pattern1
             pattern2
         }
 
         assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.list("testonly.e", "")
-            val pattern2 by RepoPattern.pattern("testonly.e.1", "")
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey() + ".1", "")
             pattern1
             pattern2
         }
 
         assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.list("testonly.f", "")
-            val pattern2 by RepoPattern.pattern("testonly.f.a", "")
+            val pattern2 by RepoPattern.pattern(this.nextKey() + ".1", "")
+            val pattern1 by RepoPattern.list(this.prevKey(), "")
+            pattern2
+            pattern1
+        }
+
+        assertThrows<RuntimeException> {
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey() + ".a", "")
             pattern1
             pattern2
         }
 
         assertDoesNotThrow {
-            val pattern1 by RepoPattern.list("testonly.g", "")
-            val pattern2 by RepoPattern.list("testonly.h", "")
-            val pattern3 by RepoPattern.pattern("testonly.i", "")
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.list(this.nextKey(), "")
+            val pattern3 by RepoPattern.pattern(this.nextKey(), "")
             pattern1
             pattern2
             pattern3
         }
 
         assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.list("testonly.j", "")
-            val pattern2 by RepoPattern.pattern("testonly.j.1.2", "")
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey() + ".1.2", "")
             pattern1
             pattern2
+        }
+
+        assertThrows<RuntimeException> {
+            val pattern2 by RepoPattern.pattern(this.nextKey() + ".1.2", "")
+            val pattern1 by RepoPattern.list(this.prevKey(), "")
+            pattern2
+            pattern1
         }
 
         RepoPatternManager.inTestDuplicateUsage = true
@@ -162,38 +191,54 @@ object RepoPatternTest {
         RepoPatternManager.inTestDuplicateUsage = false
 
         assertThrows<RuntimeException> {
-            val group1 by RepoPattern.exclusiveGroup("testonly.group.a")
-            val group2 by RepoPattern.exclusiveGroup("testonly.group.a")
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val group2 by RepoPattern.exclusiveGroup(prevKey())
             group1
             group2
         }
 
         assertDoesNotThrow {
-            val group1 by RepoPattern.exclusiveGroup("testonly.group.b")
-            val group2 by RepoPattern.exclusiveGroup("testonly.group.c")
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val group2 by RepoPattern.exclusiveGroup(nextKey())
             group1
             group2
         }
 
         assertThrows<RuntimeException> {
-            val group1 by RepoPattern.exclusiveGroup("testonly.group.d")
-            val pattern1 by RepoPattern.pattern("testonly.group.d", "")
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val pattern1 by RepoPattern.pattern(prevKey(), "")
             group1
             pattern1
         }
 
         assertThrows<RuntimeException> {
-            val group1 by RepoPattern.exclusiveGroup("testonly.group.e")
-            val pattern1 by RepoPattern.pattern("testonly.group.e.a", "")
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val pattern1 by RepoPattern.pattern(prevKey() + ".a", "")
             group1
             pattern1
         }
 
         assertDoesNotThrow {
-            val group1 by RepoPattern.exclusiveGroup("testonly.group.f")
-            val pattern1 by RepoPattern.pattern("f.a", "")
+            val group1 by RepoPattern.exclusiveGroup(nextKey() + ".a.a")
+            val pattern1 by RepoPattern.pattern(prevKey() + ".a", "")
             group1
             pattern1
+        }
+
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val pattern1 by group1.pattern("a", "")
+            val pattern2 by RepoPattern.pattern(prevKey() + ".a.c", "")
+            group1
+            pattern1
+            pattern2
+        }
+
+        assertThrows<RuntimeException> {
+            val pattern2 by RepoPattern.pattern(nextKey() + ".a.c", "")
+            pattern2
+            val group1 by RepoPattern.exclusiveGroup(prevKey())
+            group1
         }
 
         RepoPatternManager.inTestDuplicateUsage = true
