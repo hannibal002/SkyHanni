@@ -15,6 +15,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 open class CustomLinesGui : GuiScreen() {
 
+    private val scaledResolution get() = ScaledResolution(Minecraft.getMinecraft())
+    private val windowWidth get() = scaledResolution.scaledWidth
+    private val windowHeight get() = scaledResolution.scaledHeight
+
+    private val guiWidth = (windowWidth / (3 / 4f)).toInt()
+    private val guiHeight = (windowHeight / (3 / 4f)).toInt()
+
     private var inTextMode = false
         set(value) {
             field = value
@@ -34,22 +41,21 @@ open class CustomLinesGui : GuiScreen() {
     }
 
     private fun getDisplay(): Renderable {
-        val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
-        val width = scaledResolution.scaledWidth - 40
-        val height = scaledResolution.scaledHeight - 40
 
         return Renderable.drawInsideRoundedRect(
-            Renderable.verticalContainer(
-                listOf(
-                    Renderable.placeholder(width, height),
-                    Renderable.string("Custom Lines"),
-                    Renderable.string("Textmode: $inTextMode"),
-                    Renderable.clickable(
-                        Renderable.string("Input: ${textBox.editText()}"),
-                        {
-                            inTextMode = !inTextMode
-                        },
-                        bypassChecks = true
+            Renderable.doubleLayered(
+                Renderable.placeholder(guiWidth, guiHeight),
+                Renderable.verticalContainer(
+                    listOf(
+                        Renderable.string("Custom Lines"),
+                        Renderable.string("Textmode: $inTextMode"),
+                        Renderable.clickable(
+                            Renderable.string("Input: ${textBox.editText()}"),
+                            {
+                                inTextMode = !inTextMode
+                            },
+                            bypassChecks = true
+                        )
                     )
                 )
             ),
@@ -64,7 +70,9 @@ open class CustomLinesGui : GuiScreen() {
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isInGui()) return
 
-        Position(20, 20).renderRenderables(
+        val position = Position(windowWidth / 2 - guiWidth / 2, windowHeight / 2 - guiHeight / 2)
+
+        position.renderRenderables(
             listOf(getDisplay()),
             posLabel = "a"
         )
