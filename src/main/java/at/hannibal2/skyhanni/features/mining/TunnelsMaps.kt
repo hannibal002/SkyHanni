@@ -239,9 +239,7 @@ class TunnelsMaps {
                         Renderable.clickAndHover(
                             Renderable.string("§6Active: §f$active"),
                             listOf("§eClick to disable current Waypoint"),
-                            onClick = {
-                                goal = null
-                            }
+                            onClick = ::clearPath
                         )
                     )
                     if (hasNext()) {
@@ -355,14 +353,18 @@ class TunnelsMaps {
         val distance = goal?.position?.distanceSqToPlayer() ?: return false
         goalReached = distance < 36.0
         if (goalReached) {
-            path = null
             goal?.let {
                 cooldowns[it] = 60.0.seconds.fromNow()
             }
-            goal = null
+            clearPath()
             return true
         }
         return false
+    }
+
+    private fun clearPath() {
+        path = null
+        goal = null
     }
 
     @SubscribeEvent
