@@ -13,7 +13,8 @@ object CustomLines {
         Triple("%x%", { Minecraft.getMinecraft().thePlayer.posX.round(2) }, "X-Coordinate"),
         Triple("%y%", { Minecraft.getMinecraft().thePlayer.posY.round(2) }, "Y-Coordinate"),
         Triple("%z%", { Minecraft.getMinecraft().thePlayer.posZ.round(2) }, "Z-Coordinate"),
-        Triple("%dir%", { Minecraft.getMinecraft().thePlayer.rotationYaw.round(2) }, "Direction"),
+        Triple("%yaw%", { normalizeYaw(Minecraft.getMinecraft().thePlayer.rotationYaw).round(2) }, "Direction"),
+        Triple("%pitch%", { Minecraft.getMinecraft().thePlayer.rotationPitch.round(2) }, "Pitch"),
         Triple("%purse%", { getPurse() }, "Purse"),
         Triple("%bits%", { getBits() }, "Bits"),
         Triple("%bits_available%", { getBitsAvailable() }, "Bits Available"),
@@ -31,5 +32,15 @@ object CustomLines {
             modifiedString = modifiedString.replace(placeholder, replacement.invoke().toString())
         }
         return modifiedString.split("\\n")
+    }
+
+    private fun normalizeYaw(yaw: Float): Float {
+        var result = yaw % 360
+        if (result > 180) {
+            result -= 360
+        } else if (result <= -180) {
+            result += 360
+        }
+        return result
     }
 }
