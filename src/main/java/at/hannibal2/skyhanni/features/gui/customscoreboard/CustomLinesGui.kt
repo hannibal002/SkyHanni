@@ -91,7 +91,7 @@ open class CustomLinesGui : GuiScreen() {
 
         if (inTextMode) {
             textBox.handle()
-            CustomScoreboard.customlineConfig.customLine1 = textBox.finalText()
+            CustomScoreboard.customlineConfig.customLine1 = textBox.finalText().replace("§", "&")
         }
     }
 }
