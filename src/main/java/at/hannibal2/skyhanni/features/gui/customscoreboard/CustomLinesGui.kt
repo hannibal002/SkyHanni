@@ -42,15 +42,19 @@ open class CustomLinesGui : GuiScreen() {
 
     private fun getDisplay(): Renderable {
 
+        val text = Renderable.string("Input: ${textBox.editText()}")
         return Renderable.drawInsideRoundedRect(
             Renderable.doubleLayered(
                 Renderable.placeholder(guiWidth, guiHeight),
                 Renderable.verticalContainer(
                     listOf(
                         Renderable.string("Custom Lines"),
-                        Renderable.string("Textmode: $inTextMode"),
                         Renderable.clickable(
-                            Renderable.string("Input: ${textBox.editText()}"),
+                            if (inTextMode) {
+                                Renderable.underlined(text)
+                            } else {
+                                text
+                            },
                             {
                                 inTextMode = !inTextMode
                             },
