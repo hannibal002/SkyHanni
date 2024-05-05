@@ -25,29 +25,9 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
     }
 
     fun timeUntilGoal(goal: Long): Duration {
-        val profileStorage = ChocolateFactoryAPI.profileStorage ?: return Duration.ZERO
-
+        val profileStorage = profileStorage ?: return Duration.ZERO
         val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
-
-        val baseMultiplier = profileStorage.rawChocolateMultiplier
-        val rawChocolatePerSecond = profileStorage.rawChocPerSecond
-        val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
-
-        if (rawChocolatePerSecond == 0) return Duration.INFINITE
-
-        var needed = goal - chocolate()
-        val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
-
-        val timeTowerChocPerSecond = rawChocolatePerSecond * timeTowerMultiplier
-
-        val secondsAtRate = needed / timeTowerChocPerSecond
-        if (secondsAtRate < secondsUntilTowerExpires) {
-            return secondsAtRate.seconds - updatedAgo.seconds
-        }
-
-        needed -= (secondsUntilTowerExpires * timeTowerChocPerSecond).toLong()
-        val basePerSecond = rawChocolatePerSecond * baseMultiplier
-        return (needed / basePerSecond + secondsUntilTowerExpires).seconds - updatedAgo.seconds
+        return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo.seconds
     }
 
     companion object {
@@ -63,20 +43,36 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
         fun averageChocPerSecond(
             baseMultiplierIncrease: Double = 0.0,
             rawPerSecondIncrease: Int = 0,
-            timeTowerLevelIncrease: Int = 0,
+            includeTower: Boolean = false,
         ): Double {
             val profileStorage = profileStorage ?: return 0.0
 
             val baseMultiplier = profileStorage.rawChocolateMultiplier + baseMultiplierIncrease
             val rawPerSecond = profileStorage.rawChocPerSecond + rawPerSecondIncrease
-            val timeTowerLevel = profileStorage.timeTowerLevel + timeTowerLevelIncrease
 
             val timeTowerCooldown = profileStorage.timeTowerCooldown
 
             val basePerSecond = rawPerSecond * baseMultiplier
-            val towerCalc = (rawPerSecond * timeTowerLevel * .1) / timeTowerCooldown
+            if (!includeTower) return basePerSecond
+            val towerCalc = (rawPerSecond * .1) / timeTowerCooldown
 
             return basePerSecond + towerCalc
+        }
+
+        fun addToAll(amount: Long) {
+            profileStorage?.let {
+                it.currentChocolate += amount
+                it.chocolateThisPrestige += amount
+                it.chocolateAllTime += amount
+                updateBestUpgrade(amount)
+            }
+        }
+
+        private fun updateBestUpgrade(price: Long) {
+            profileStorage?.let {
+                val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
+                it.bestUpgradeAvailableAt = canAffordAt.toMillis()
+            }
         }
     }
 }

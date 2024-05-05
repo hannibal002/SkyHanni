@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GardenCropUpgrades
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
@@ -139,6 +140,7 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggPlayerOpacityChanger
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc
@@ -216,6 +218,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.inventory.AnitaExtraFarmingFortune
 import at.hannibal2.skyhanni.features.garden.inventory.GardenCropMilestoneInventory
 import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryNumbers
+import at.hannibal2.skyhanni.features.garden.inventory.GardenInventoryTooltipOverflow
 import at.hannibal2.skyhanni.features.garden.inventory.LogBookStats
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice
@@ -437,6 +440,7 @@ import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -455,6 +459,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
@@ -472,7 +477,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.19",
+    version = "0.25.Beta.21",
 )
 class SkyHanniMod {
 
@@ -540,6 +545,7 @@ class SkyHanniMod {
         loadModule(TrackerManager)
         loadModule(ScoreboardPattern)
         loadModule(UtilsPatterns)
+        loadModule(GuiData)
         loadModule(BossbarData)
         loadModule(EntityUtils)
         loadModule(ChatUtils)
@@ -654,6 +660,7 @@ class SkyHanniMod {
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
+        loadModule(HoppityEggPlayerOpacityChanger)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
@@ -897,6 +904,7 @@ class SkyHanniMod {
         loadModule(VerminTracker)
         loadModule(VerminHighlighter())
         loadModule(SkillProgress)
+        loadModule(GardenInventoryTooltipOverflow())
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures())
@@ -961,6 +969,7 @@ class SkyHanniMod {
             screenTicks++
             if (screenTicks == 5) {
                 Minecraft.getMinecraft().thePlayer.closeScreen()
+                OtherInventoryData.close()
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
                 screenTicks = 0
                 screenToOpen = null
@@ -1000,6 +1009,16 @@ class SkyHanniMod {
         private var screenTicks = 0
         fun consoleLog(message: String) {
             logger.log(Level.INFO, message)
+        }
+
+        fun launchCoroutine(function: suspend () -> Unit) {
+            coroutineScope.launch {
+                try {
+                    function()
+                } catch (ex: Exception) {
+                    ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
+                }
+            }
         }
     }
 }

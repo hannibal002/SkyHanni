@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -20,6 +21,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object ChocolateFactoryAPI {
 
@@ -62,7 +65,7 @@ object ChocolateFactoryAPI {
 
     var clickRabbitSlot: Int? = null
 
-    val factoryUpgrades = mutableListOf<ChocolateFactoryUpgrade>()
+    var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
@@ -78,7 +81,7 @@ object ChocolateFactoryAPI {
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
-        factoryUpgrades.clear()
+        factoryUpgrades = emptyList()
         DelayedRun.runNextTick {
             ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
         }
@@ -142,4 +145,30 @@ object ChocolateFactoryAPI {
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
+
+    fun timeUntilNeed(goal: Long): Duration {
+        var needed = goal
+        val profileStorage = profileStorage ?: return Duration.ZERO
+
+        val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
+
+        val baseMultiplier = profileStorage.rawChocolateMultiplier
+        val rawChocolatePerSecond = profileStorage.rawChocPerSecond
+        val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
+
+        if (rawChocolatePerSecond == 0) return Duration.INFINITE
+
+        val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
+
+        val timeTowerChocPerSecond = rawChocolatePerSecond * timeTowerMultiplier
+
+        val secondsAtRate = needed / timeTowerChocPerSecond
+        if (secondsAtRate < secondsUntilTowerExpires) {
+            return secondsAtRate.seconds - updatedAgo.seconds
+        }
+
+        needed -= (secondsUntilTowerExpires * timeTowerChocPerSecond).toLong()
+        val basePerSecond = rawChocolatePerSecond * baseMultiplier
+        return (needed / basePerSecond + secondsUntilTowerExpires).seconds
+    }
 }

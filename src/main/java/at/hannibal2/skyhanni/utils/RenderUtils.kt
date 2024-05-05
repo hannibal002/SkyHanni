@@ -66,7 +66,8 @@ object RenderUtils {
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
-    private val matrixBuffer = GLAllocation.createDirectFloatBuffer(16);
+    private val matrixBuffer = GLAllocation.createDirectFloatBuffer(16)
+    private val colourBuffer = GLAllocation.createDirectFloatBuffer(16)
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -636,6 +637,7 @@ object RenderUtils {
         return offsetX
     }
 
+    @Deprecated("use renderable item list", ReplaceWith(""))
     fun MutableList<Any>.addItemIcon(
         item: ItemStack,
         highlight: Boolean = false,
@@ -1629,5 +1631,12 @@ object RenderUtils {
         with(ScaledResolution(Minecraft.getMinecraft())) {
             Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
         }
+    }
+
+    fun getAlpha(): Float {
+        colourBuffer.clear()
+        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colourBuffer)
+        if (colourBuffer.limit() < 4) return 1f
+        return colourBuffer.get(3)
     }
 }

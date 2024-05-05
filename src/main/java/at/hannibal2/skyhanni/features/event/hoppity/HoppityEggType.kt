@@ -11,9 +11,9 @@ enum class HoppityEggType(
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
 ) {
-    BREAKFAST("Breakfast", 7, "§a"),
+    BREAKFAST("Breakfast", 7, "§6"),
     LUNCH("Lunch", 14, "§9"),
-    DINNER("Dinner", 21, "§6"),
+    DINNER("Dinner", 21, "§a"),
     ;
 
     fun timeUntil(): Duration {
@@ -52,6 +52,7 @@ enum class HoppityEggType(
                 eggType.lastResetDay = currentSbDay
                 if (HoppityEggLocator.currentEggType == eggType) {
                     HoppityEggLocator.currentEggType = null
+                    HoppityEggLocator.currentEggNote = null
                     HoppityEggLocator.sharedEggLocation = null
                 }
             }

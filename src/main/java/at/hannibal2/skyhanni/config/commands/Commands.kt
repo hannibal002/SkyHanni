@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -289,6 +290,14 @@ object Commands {
             "Calculate how long you need to farm crops between different crop milestones.",
             {
                 FarmingMilestoneCommand.onCommand(it.getOrNull(0), it.getOrNull(1), it.getOrNull(2), true)
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
+            "shcropgoal",
+            "Define a custom milestone goal for a crop.",
+            {
+            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
             },
             FarmingMilestoneCommand::onComplete
         )

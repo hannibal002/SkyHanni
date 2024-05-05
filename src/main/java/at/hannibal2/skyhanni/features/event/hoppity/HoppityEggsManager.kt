@@ -27,9 +27,14 @@ object HoppityEggsManager {
 
     val config get() = SkyHanniMod.feature.event.hoppityEggs
 
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
+     */
     private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg.*"
+        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -49,10 +54,12 @@ object HoppityEggsManager {
     )
 
     private var lastMeal: HoppityEggType? = null
+    private var lastNote: String? = null
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastMeal = null
+        lastNote = null
     }
 
     @SubscribeEvent
@@ -62,8 +69,10 @@ object HoppityEggsManager {
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
+            val note = group("note")
             meal.markClaimed()
             lastMeal = meal
+            lastNote = note
             return
         }
 
@@ -72,7 +81,7 @@ object HoppityEggsManager {
 
             if (config.timeInChat) {
                 val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}")
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -82,7 +91,7 @@ object HoppityEggsManager {
             getEggType(event).markClaimed()
             if (config.timeInChat) {
                 val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
-                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}")
+                ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -98,7 +107,7 @@ object HoppityEggsManager {
 
             if (config.timeInChat) {
                 val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt not active. Next Hoppity's Hunt event in §b${timeUntil.format()}")
+                ChatUtils.chat("§eHoppity's Hunt not active. Next Hoppity's Hunt event in §b${timeUntil.format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -116,13 +125,15 @@ object HoppityEggsManager {
     fun shareWaypointPrompt() {
         if (!config.sharedWaypoints) return
         val meal = lastMeal ?: return
+        val note = lastNote ?: return
         lastMeal = null
+        lastNote = null
 
         val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
-                onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal) },
+                onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) },
                 expireAt = 30.seconds.fromNow()
             )
         }
@@ -132,7 +143,7 @@ object HoppityEggsManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showClaimedEggs) return
-        if (ReminderUtils.isBusy()) return
+        if (ReminderUtils.isBusy(config.showDuringContest)) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
 
         val displayList = HoppityEggType.entries
