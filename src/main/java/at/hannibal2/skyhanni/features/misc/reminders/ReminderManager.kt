@@ -61,7 +61,7 @@ object ReminderManager {
         val reminders = getSortedReminders()
         val maxPage = (reminders.size + REMINDERS_PER_PAGE - 1) / REMINDERS_PER_PAGE
 
-        listPage = page.coerceIn(1, maxPage)
+        listPage = page.coerceIn(0, maxPage)
 
         val text: MutableList<IChatComponent> = mutableListOf()
 
@@ -81,29 +81,35 @@ object ReminderManager {
             } else null
         ).center())
 
-        for (i in (listPage - 1) * REMINDERS_PER_PAGE until listPage * REMINDERS_PER_PAGE) {
-            if (i >= reminders.size) break
-            val (id, reminder) = reminders[i]
+        if (reminders.isNotEmpty()) {
+            for (i in (listPage - 1) * REMINDERS_PER_PAGE until listPage * REMINDERS_PER_PAGE) {
+                if (i >= reminders.size) break
+                val (id, reminder) = reminders[i]
 
-            text.add(
-                Text.join(
-                    "§c✕".asComponent {
-                        hover = "§7Click to remove".asComponent()
-                        command = "/shremind remove -l $id"
-                    }.wrap("§8[", "§8]"),
-                    " ",
-                    "§e✎".asComponent {
-                        hover = "§7Click to start editing".asComponent()
-                        suggest = "/shremind edit -l $id ${reminder.reason} "
-                    }.wrap("§8[", "§8]"),
-                    " ",
-                    "§6${reminder.formatShort()}".asComponent {
-                        hover = "§7${reminder.formatFull()}".asComponent()
-                    }.wrap("§8[", "§8]"),
-                    " ",
-                    "§7${reminder.reason}"
+                text.add(
+                    Text.join(
+                        "§c✕".asComponent {
+                            hover = "§7Click to remove".asComponent()
+                            command = "/shremind remove -l $id"
+                        }.wrap("§8[", "§8]"),
+                        " ",
+                        "§e✎".asComponent {
+                            hover = "§7Click to start editing".asComponent()
+                            suggest = "/shremind edit -l $id ${reminder.reason} "
+                        }.wrap("§8[", "§8]"),
+                        " ",
+                        "§6${reminder.formatShort()}".asComponent {
+                            hover = "§7${reminder.formatFull()}".asComponent()
+                        }.wrap("§8[", "§8]"),
+                        " ",
+                        "§7${reminder.reason}"
+                    )
                 )
-            )
+            }
+        } else {
+            text.add(Text.EMPTY)
+            text.add("§cNo reminders found.".asComponent().center())
+            text.add(Text.EMPTY)
         }
 
         text.add(createDivider())
@@ -196,6 +202,7 @@ object ReminderManager {
 
             if (!config.autoDeleteReminders) {
                 actionsComponent = Text.join(
+                    " ",
                     "§a✔".asComponent {
                         hover = "§7Click to dismiss".asComponent()
                         command = "/shremind remove $id"
@@ -214,7 +221,6 @@ object ReminderManager {
                 "§e[Reminder]".asComponent {
                     hover = "§7Reminders by SkyHanni".asComponent()
                 },
-                " ",
                 actionsComponent,
                 " ",
                 "§6${reminder.reason}"

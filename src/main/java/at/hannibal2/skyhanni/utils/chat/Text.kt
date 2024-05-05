@@ -11,6 +11,7 @@ object Text {
 
     val NEWLINE = "\n".asComponent()
     val HYPHEN = "-".asComponent()
+    val EMPTY = "".asComponent()
 
     fun join(vararg components: Any?, separator: IChatComponent? = null): IChatComponent {
         val result = ChatComponentText("")
