@@ -91,7 +91,6 @@ class TunnelsMaps {
             cooldowns[it] ?: SimpleTimeMark.farPast()
         }
 
-        cooldowns[best] = 60.0.seconds.fromNow()
         goalReached = false
         return best
     }
@@ -357,6 +356,10 @@ class TunnelsMaps {
         goalReached = distance < 36.0
         if (goalReached) {
             path = null
+            goal?.let {
+                cooldowns[it] = 60.0.seconds.fromNow()
+            }
+            goal = null
             return true
         }
         return false
