@@ -114,6 +114,7 @@ object MiningAPI {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
+        if (surroundingMinedBlocks.isEmpty()) return
         if (allowedSoundNames.none { it == event.soundName } && event.soundName != "random.orb") return
         if (!isBeingMined && event.pitch == 0.7936508f) {
             if (allowedSoundNames.none { it == event.soundName }) return
