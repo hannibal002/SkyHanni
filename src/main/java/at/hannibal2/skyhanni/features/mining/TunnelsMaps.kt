@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -117,15 +118,15 @@ class TunnelsMaps {
         "mining.commisson.collector",
         "§9(?<what>\\w+(?: \\w+)?) Collector"
     )
-    private val glaciteGoalPattern by RepoPattern.pattern(
-        "mining.commisson.collector.glacite",
-        "Glacite"
+    private val invalidGoalPattern by RepoPattern.pattern(
+        "mining.commisson.collector.invalid",
+        "Glacite|Scrap"
     )
 
     private val translateTable = mutableMapOf<String, String>()
 
     private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
-        possibleLocations.keys.first { it.uppercase().removeColor().contains(input.uppercase()) }
+        possibleLocations.keys.firstOrNull() { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
     }
 
     private var clickTranslate = mapOf<Int, String>()
@@ -141,8 +142,19 @@ class TunnelsMaps {
             val type = lore.matchFirst(collectorCommissionPattern) {
                 group("what")
             } ?: return@mapNotNull null
-            if (glaciteGoalPattern.matches(type)) return@mapNotNull null
-            slotId to getGenericName(type)
+            if (invalidGoalPattern.matches(type)) return@mapNotNull null
+            val mapName = getGenericName(type)
+            if (mapName.isEmpty()) {
+                ErrorManager.logErrorStateWithData(
+                    "Unknown Collection Commission: $type", "$type can't be found in the graph.",
+                    "type" to type,
+                    "graphNames" to possibleLocations.keys,
+                    "lore" to lore
+                )
+                null
+            } else {
+                slotId to getGenericName(type)
+            }
         }.toMap()
     }
 
