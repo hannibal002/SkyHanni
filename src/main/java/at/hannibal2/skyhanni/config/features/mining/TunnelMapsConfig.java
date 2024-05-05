@@ -69,7 +69,7 @@ public class TunnelMapsConfig {
     public float textSize = 1.0f;
 
     @Expose
-    @ConfigOption(name = "Distance First", desc = "Shows the distance at the first edge instead of the end.")
+    @ConfigOption(name = "Distance at First", desc = "Shows the distance at the first edge instead of the end.")
     @ConfigEditorBoolean
     public boolean distanceFirst = false;
 }
