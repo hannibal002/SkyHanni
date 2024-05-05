@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -87,20 +88,16 @@ object LorenzUtils {
             return result
         }
 
+    val debug: Boolean = onHypixel && SkyHanniMod.feature.dev.debug.enabled
+
     private var previousApril = false
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
+    // TODO move to string utils
+    @Deprecated("outdated", ReplaceWith("originalMessage.stripHypixelMessage()"))
     fun stripVanillaMessage(originalMessage: String): String {
-        var message = originalMessage
-
-        while (message.startsWith("§r")) {
-            message = message.substring(2)
-        }
-        while (message.endsWith("§r")) {
-            message = message.substring(0, message.length - 2)
-        }
-        return message
+        return originalMessage.stripHypixelMessage()
     }
 
     fun Double.round(decimals: Int): Double {
@@ -129,6 +126,7 @@ object LorenzUtils {
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
+    // TODO create extenstion function
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =

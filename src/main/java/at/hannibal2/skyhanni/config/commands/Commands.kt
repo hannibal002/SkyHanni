@@ -7,15 +7,19 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
@@ -290,6 +294,14 @@ object Commands {
             FarmingMilestoneCommand::onComplete
         )
         registerCommand0(
+            "shcropgoal",
+            "Define a custom milestone goal for a crop.",
+            {
+            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
@@ -307,6 +319,10 @@ object Commands {
             "shlanedetection",
             "Detect a farming lane in garden"
         ) { FarmingLaneCreator.commandLaneDetection() }
+        registerCommand(
+            "shignore",
+            "Add/Remove a user from your"
+        ) { PartyChatCommands.blacklist(it) }
     }
 
     private fun usersBugFix() {
@@ -375,6 +391,10 @@ object Commands {
             "shupdate",
             "Updates the mod to the specified update stream."
         ) { forceUpdate(it) }
+        registerCommand(
+            "shUpdateBazaarPrices",
+            "Forcefully updating the bazaar prices right now."
+        ) { HypixelBazaarFetcher.fetchNow() }
     }
 
     private fun developersDebugFeatures() {
@@ -399,6 +419,10 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
+        registerCommand(
+            "shtestsackapi",
+            "Get the amount of an item in sacks according to internal feature SackAPI"
+        ) { SackAPI.testSackAPI(it) }
     }
 
     private fun developersCodingHelp() {
@@ -618,8 +642,9 @@ object Commands {
         }
     }
 
-    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
-        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+    private fun registerCommand(rawName: String, description: String, function: (Array<String>) -> Unit) {
+        val name = rawName.lowercase()
+        if (commands.any { it.name == name }) {
             error("The command '$name is already registered!'")
         }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))

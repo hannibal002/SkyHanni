@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 object ChocolatePositionChange {
@@ -20,10 +21,10 @@ object ChocolatePositionChange {
         if (lastLeaderboard == leaderboard) return
 
         lastLeaderboard?.let { lastLb ->
-            var message = "$lastLb §c-> $leaderboard"
+            var message = "§b$lastLb §c-> §b$leaderboard"
             val change = lastPosition - position
             val color = if (change > 0) "§a+" else "§c"
-            message += "\n §7Changed by $color${change.addSeparators()} spots"
+            message += "\n §7Changed by $color${change.addSeparators()} ${StringUtils.pluralize(change, "spot")}"
 
             lastTime?.let {
                 message += " §7in §b${it.passedSince().format(maxUnits = 2)}"

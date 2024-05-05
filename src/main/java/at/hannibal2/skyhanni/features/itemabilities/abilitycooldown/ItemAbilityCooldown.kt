@@ -169,6 +169,10 @@ class ItemAbilityCooldown {
             event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
+            // Royal Pigeon
+            event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+                ItemAbility.ROYAL_PIGEON.sound()
+            }
         }
     }
 
