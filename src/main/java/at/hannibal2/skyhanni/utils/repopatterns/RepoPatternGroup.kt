@@ -32,6 +32,6 @@ open class RepoPatternGroup internal constructor(
      * Shortcut to [RepoPattern.exclusiveGroup] prefixed with [prefix].
      */
     fun exclusiveGroup(subgroup: String): RepoPatternExclusiveGroupInfo {
-        return RepoPatternExclusiveGroupInfo(prefix, parent)
+        return RepoPatternExclusiveGroupInfo("$prefix.$subgroup", parent)
     }
 }

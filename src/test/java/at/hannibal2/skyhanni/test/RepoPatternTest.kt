@@ -160,6 +160,13 @@ object RepoPatternTest {
             pattern2
         }
 
+        assertThrows<RuntimeException> {
+            val pattern2 by RepoPattern.pattern(this.nextKey() + ".a", "")
+            val pattern1 by RepoPattern.list(this.prevKey(), "")
+            pattern2
+            pattern1
+        }
+
         assertDoesNotThrow {
             val pattern1 by RepoPattern.list(this.nextKey(), "")
             val pattern2 by RepoPattern.list(this.nextKey(), "")
@@ -240,6 +247,25 @@ object RepoPatternTest {
             val group1 by RepoPattern.exclusiveGroup(prevKey())
             group1
         }
+
+        assertDoesNotThrow {
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val group2 by group1.exclusiveGroup("1")
+            val pattern1 by group2.pattern("a", "")
+            group1
+            group2
+            pattern1
+        }
+
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val group2 by group1.exclusiveGroup("1")
+            val pattern1 by group1.pattern("1", "")
+            group1
+            group2
+            pattern1
+        }
+
 
         RepoPatternManager.inTestDuplicateUsage = true
     }

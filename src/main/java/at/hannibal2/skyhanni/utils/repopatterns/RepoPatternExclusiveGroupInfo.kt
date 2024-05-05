@@ -10,6 +10,7 @@ class RepoPatternExclusiveGroupInfo internal constructor(val prefix: String, val
     ReadOnlyProperty<Any?, RepoPatternExclusiveGroup> {
 
     internal var hasObtainedLock = false
+    private lateinit var owner: RepoPatternKeyOwner
 
     init {
         RepoPatternManager.verifyKeyShape(prefix)
@@ -17,7 +18,7 @@ class RepoPatternExclusiveGroupInfo internal constructor(val prefix: String, val
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): RepoPatternExclusiveGroup {
         verifyLock(thisRef, property)
-        return RepoPatternExclusiveGroup(prefix, parent)
+        return RepoPatternExclusiveGroup(prefix, owner)
     }
 
     /**
@@ -27,7 +28,7 @@ class RepoPatternExclusiveGroupInfo internal constructor(val prefix: String, val
     private fun verifyLock(thisRef: Any?, property: KProperty<*>) {
         if (hasObtainedLock) return
         hasObtainedLock = true
-        val owner = RepoPatternKeyOwner(thisRef?.javaClass, property, false, parent)
+        owner = RepoPatternKeyOwner(thisRef?.javaClass, property, false, parent)
         RepoPatternManager.checkNameSpaceExclusivity(owner, prefix)
     }
 }
