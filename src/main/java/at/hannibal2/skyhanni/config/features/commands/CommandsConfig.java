@@ -42,4 +42,16 @@ public class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean viewRecipeLowerCase = true;
+
+    @Expose
+    @ConfigOption(name = "Reverse Party Transfer", desc = "Adds §e/rpt §7to transfer a party back to its previous leader.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean reversePartyTransfer = true;
+
+    @Expose
+    @ConfigOption(name = "Reverse Party Transfer Message", desc = "Allows transfer message to be clicked to transfer a party back to its previous leader if it has been transferred to you.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean reversePartyTransferMessage = false;
 }

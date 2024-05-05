@@ -534,6 +534,7 @@ object Commands {
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
         registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
+        registerCommand("rpt", "Transfer party to the previous leader") { PartyCommands.reverseTransfer() }
     }
 
     private fun commandHelp(args: Array<String>) {

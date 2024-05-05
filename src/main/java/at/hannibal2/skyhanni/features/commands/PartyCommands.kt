@@ -4,10 +4,20 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.PartyAPI.transferVoluntaryPattern
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PartyCommands {
@@ -63,6 +73,14 @@ object PartyCommands {
         ChatUtils.sendCommandToServer("party promote ${args[0]}")
     }
 
+    fun reverseTransfer() {
+        if (!config.reversePartyTransfer) return
+        if (PartyAPI.partyMembers.isEmpty()) return
+        PartyAPI.prevPartyLeader?.let {
+            HypixelCommands.partyTransfer(it)
+        }
+    }
+
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.partyKickReason) {
@@ -111,6 +129,28 @@ object PartyCommands {
         event.move(5, "commands.usePartyTransferAlias", "commands.shortCommands")
 
         event.move(31, "commands", "misc.commands")
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onChat(event: LorenzChatEvent) {
+        if (!config.reversePartyTransferMessage) return
+        val message = event.message.trimWhiteSpace().removeResets()
+        transferVoluntaryPattern.matchMatcher(message.removeColor()) {
+            val newLeader = group("newowner").cleanPlayerName().removeColor()
+            if (newLeader != LorenzUtils.getPlayerName()) return
+
+            PartyAPI.prevPartyLeader?.let {
+                event.blockedReason = "replacing"
+
+                ChatUtils.clickableChat(
+                    event.message,
+                    onClick = {
+                        HypixelCommands.partyTransfer(it)
+                    },
+                    prefix = false
+                )
+            }
+        }
     }
 }
 

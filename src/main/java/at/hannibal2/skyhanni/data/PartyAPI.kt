@@ -49,9 +49,9 @@ object PartyAPI {
         "others.transfer.leave",
         "The party was transferred to (?<newowner>.*) because (?<name>.*) left"
     )
-    private val transferVoluntaryPattern by patternGroup.pattern(
+    val transferVoluntaryPattern by patternGroup.pattern(
         "others.transfer.voluntary",
-        "The party was transferred to (?<newowner>.*) by .*"
+        "The party was transferred to (?<newowner>.*) by (?<name>.*)"
     )
     private val disbandedPattern by patternGroup.pattern(
         "others.disband",
@@ -81,6 +81,7 @@ object PartyAPI {
     val partyMembers = mutableListOf<String>()
 
     var partyLeader: String? = null
+    var prevPartyLeader: String? = null
 
     fun listMembers() {
         val size = partyMembers.size
@@ -144,14 +145,23 @@ object PartyAPI {
         otherLeftPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
+            if (name == prevPartyLeader) {
+                prevPartyLeader = null
+            }
         }
         otherKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
+            if (name == prevPartyLeader) {
+                prevPartyLeader = null
+            }
         }
         otherOfflineKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
+            if (name == prevPartyLeader) {
+                prevPartyLeader = null
+            }
         }
         otherDisconnectedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
@@ -164,6 +174,7 @@ object PartyAPI {
         }
         transferVoluntaryPattern.matchMatcher(message.removeColor()) {
             partyLeader = group("newowner").cleanPlayerName()
+            prevPartyLeader = group("name").cleanPlayerName()
         }
 
         // party disbanded
@@ -207,5 +218,6 @@ object PartyAPI {
     private fun partyLeft() {
         partyMembers.clear()
         partyLeader = null
+        prevPartyLeader = null
     }
 }
