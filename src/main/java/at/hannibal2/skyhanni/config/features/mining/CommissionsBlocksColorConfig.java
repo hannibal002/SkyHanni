@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CommissionsBlocksColorConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Change the color of ores on mining island depending on your active commissions.")
+    @ConfigOption(name = "Enabled", desc = "Change the color of ores on mining island depending on your active commissions. Gray out irrelevant ores.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
