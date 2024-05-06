@@ -415,6 +415,10 @@ object ScoreboardPattern {
         "aveikx",
         "Time spent sitting|with Ävaeìkx: .*"
     )
+    val riftHayEatenPattern by riftSb.pattern(
+        "hayeaten",
+        "^Hay Eaten: §.\\d+/\\d+$"
+    )
 
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
