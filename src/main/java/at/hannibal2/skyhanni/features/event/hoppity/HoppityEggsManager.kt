@@ -108,7 +108,7 @@ object HoppityEggsManager {
 
             if (config.timeInChat) {
                 val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt not active. Next Hoppity's Hunt event in §b${timeUntil.format()}§e.")
+                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
