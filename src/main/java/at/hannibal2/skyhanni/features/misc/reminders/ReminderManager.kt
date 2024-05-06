@@ -29,6 +29,7 @@ object ReminderManager {
     // Random numbers chosen, this will be used to delete the old list and action messages
     private const val REMINDERS_LIST_ID = -546745
     private const val REMINDERS_ACTION_ID = -546746
+    private const val REMINDERS_MESSAGE_ID = -546747
 
     private val storage get() = SkyHanniMod.feature.storage.reminders
     private val config get() = SkyHanniMod.feature.misc.reminders
@@ -197,6 +198,8 @@ object ReminderManager {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        val remindersToSend = mutableListOf<IChatComponent>()
+
         for ((id, reminder) in getSortedReminders()) {
             if (!reminder.shouldRemind(config.interval.minutes)) break
             reminder.lastReminder = SimpleTimeMark.now()
@@ -219,14 +222,19 @@ object ReminderManager {
                 storage.remove(id)
             }
 
-            Text.join(
+            remindersToSend.add(Text.join(
                 "§e[Reminder]".asComponent {
                     hover = "§7Reminders by SkyHanni".asComponent()
                 },
                 actionsComponent,
                 " ",
                 "§6${reminder.reason}"
-            ).send()
+            ))
+        }
+
+        if (remindersToSend.isNotEmpty()) {
+            val id = if (config.autoDeleteReminders) 0 else REMINDERS_MESSAGE_ID
+            Text.join(remindersToSend, separator = Text.NEWLINE).send(id)
         }
     }
 

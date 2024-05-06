@@ -12,7 +12,7 @@ public class RemindersConfig {
     public boolean autoDeleteReminders = false;
 
     @Expose
-    @ConfigOption(name = "Reminder Interval", desc = "The interval in which reminders are shown again, after they have been shown once.")
-    @ConfigEditorSlider(minValue = 1f, maxValue = 60f, minStep = 1f)
-    public float interval = 5;
+    @ConfigOption(name = "Reminder Interval", desc = "The interval in minutes in which reminders are shown again, after they have been shown once.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
+    public float interval = 5f;
 }

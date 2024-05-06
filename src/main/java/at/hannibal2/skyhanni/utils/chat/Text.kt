@@ -19,6 +19,7 @@ object Text {
             when (it) {
                 is IChatComponent -> result.appendSibling(it)
                 is String -> result.appendText(it)
+                is List<*> -> result.appendSibling(join(*it.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
                 else -> error("Unsupported type: ${it::class.simpleName}")
             }
