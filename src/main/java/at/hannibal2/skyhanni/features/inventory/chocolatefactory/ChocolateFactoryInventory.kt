@@ -22,8 +22,7 @@ object ChocolateFactoryInventory {
     @SubscribeEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.highlightUpgrades) return
-
+        if (!config.highlightBestUpgrade) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack == null) continue
@@ -38,7 +37,7 @@ object ChocolateFactoryInventory {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.highlightUpgrades) return
+        if (!config.highlightAffordableUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack == null) continue
