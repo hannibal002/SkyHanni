@@ -417,7 +417,7 @@ object ScoreboardPattern {
     )
     val riftHayEatenPattern by riftSb.pattern(
         "hayeaten",
-        "^Hay Eaten: §.\\d+/\\d+$"
+        "^Hay Eaten: §.[\\d,.]*/[\\d,.]*\$"
     )
 
     // Stats from the tablist
