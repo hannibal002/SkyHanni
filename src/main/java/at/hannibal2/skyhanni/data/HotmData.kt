@@ -402,6 +402,13 @@ enum class HotmData(
                 it.heartPattern
                 it.resetPattern
             }
+            HotmAPI.SkymallPerk.entries.forEach {
+                it.chatPattern
+                it.itemPattern
+            }
+            HotmAPI.MayhemPerk.entries.forEach {
+                it.chatPattern
+            }
         }
 
         private fun resetTree() = entries.forEach {
@@ -508,7 +515,15 @@ enum class HotmData(
                 }
                 skymallPattern.matchMatcher(lore[index]) {
                     val perk = group("perk")
-                    HotmAPI.skymall = SkymallPerk.entries.find { it.itemString == perk }
+                    HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read the skymall effect from the hotm tree",
+                            "no itemPattern matched",
+                            "lore" to lore,
+                            "perk" to perk
+                        )
+                        null
+                    }
                 }
             }
         }
@@ -558,14 +573,30 @@ enum class HotmData(
             }
             skymallPattern.matchMatcher(event.message) {
                 val perk = group("perk")
-                HotmAPI.skymall = SkymallPerk.entries.find { it.chat == perk }
+                HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.chatPattern.matches(perk) } ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from chat",
+                        "no chatPattern matched",
+                        "chat" to event.message,
+                        "perk" to perk
+                    )
+                    null
+                }
                 ChatUtils.debug("setting skymall to ${HotmAPI.skymall}")
                 return
             }
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")
-                    HotmAPI.mineshaftMayhem = MayhemPerk.entries.find { it.chat == perk }
+                    HotmAPI.mineshaftMayhem = MayhemPerk.entries.firstOrNull { it.chatPattern.matches(perk) } ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read the mayhem effect from chat",
+                            "no chatPattern matched",
+                            "chat" to event.message,
+                            "perk" to perk
+                        )
+                        null
+                    }
                     ChatUtils.debug("setting mineshaftMayhem to ${HotmAPI.mineshaftMayhem}")
                 }
             }

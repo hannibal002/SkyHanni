@@ -88,20 +88,26 @@ object HotmAPI {
 
     var mineshaftMayhem: MayhemPerk? = null
 
-    enum class SkymallPerk(val chat: String, val itemString: String) {
+    enum class SkymallPerk(chat: String, itemString: String) {
         MINING_SPEED("Gain §r§a+100 §r§6⸕ Mining Speed§r§f.", "Gain §a+100 §6⸕ Mining Speed§7."),
         MINING_FORTUNE("Gain §r§a+50 §r§6☘ Mining Fortune§r§f.", "Gain §a+50 §6☘ Mining Fortune§7."),
         EXTRA_POWDER("Gain §r§a+15% §r§fmore Powder while mining.", "Gain §a+15% §7more Powder while mining."),
         ABILITY_COOLDOWN("Reduce Pickaxe Ability cooldown by §r§a20%§r§f.", "Reduce Pickaxe Ability cooldown by"),
         GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins.", "§a10x §7chance to find Golden and"),
         TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a+15% §7more Powder while mining.")
+        ;
+
+        val chatPattern by RepoPattern.pattern("mining.hotm.skymall.chat.$name", chat)
+        val itemPattern by RepoPattern.pattern("mining.hotm.skymall.item.$name", itemString)
     }
 
-    enum class MayhemPerk(val chat: String) {
+    enum class MayhemPerk(chat: String) {
         SCRAP_CHANCE("Your §r§9Suspicious Scrap §r§7chance was buffed by your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_FORTUNE("You received a §r§a§r§6☘ Mining Fortune §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_SPEED("You received a §r§a§r§6⸕ Mining Speed §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
         COLD_RESISTANCE("You received a §r§a§r§b❄ Cold Resistance §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
-        ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!")
+        ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!");
+
+        val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.$name", chat)
     }
 }
