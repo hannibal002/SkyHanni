@@ -24,17 +24,26 @@ object TabListReader {
         "username",
         "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
     )
+    /**
+     * REGEX-TEST: §r§r§7You have a §r§cGod Potion §r§7active! §r§d12 Hours§r
+     */
     private val godPotPattern by patternGroup.pattern(
         "effects.godpot",
-        "You have a God Potion active! (?<timer>[\\w ]+)"
+        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r"
     )
+    /**
+     * REGEX-TEST: §r§r§a§lActive Effects§r
+     */
     private val activeEffectPattern by patternGroup.pattern(
         "effects.active",
         "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
+    /**
+     * REGEX-TEST: §r§r§7§r§7You have §r§e1 §r§7active effect. Use "§r§6/effects§r§7" to see it!§r
+     */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count",
-        "You have (?<effectCount>[0-9]+) active effect"
+        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect"
     )
     private val cookiePattern by patternGroup.pattern(
         "cookie",

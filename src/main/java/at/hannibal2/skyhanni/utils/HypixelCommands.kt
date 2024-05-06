@@ -66,6 +66,11 @@ object HypixelCommands {
         send("pc $message")
     }
 
+    fun showRng(major: String? = null, minor: String? = null) = when {
+        major == null || minor == null -> send("rng")
+        else -> send("rng $major $minor")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function
