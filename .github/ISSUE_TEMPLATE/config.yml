@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+    -   name: Support
+        url: https://discord.gg/skyhanni-997079228510117908
+        about: "Please ask for support in #support on the SkyHanni discord."
+    -   name: Bug Report
+        url: https://discord.gg/skyhanni-997079228510117908
+        about: "If you wish to report a bug please open a post in #bug-reports on the SkyHanni discord."
+    -   name: Suggestion
+        url: https://discord.gg/skyhanni-997079228510117908
+        about: "If you wish to suggestion something please open a post in #suggestions on the SkyHanni discord."
