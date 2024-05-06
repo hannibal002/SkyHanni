@@ -7,9 +7,9 @@ object ChatClickActionManager {
 
     private val actions = mutableMapOf<String, ClickableAction>()
 
-    fun createAction(onClick: () -> Any, expiresAt: SimpleTimeMark): String {
+    fun createAction(onClick: () -> Any, expiresAt: SimpleTimeMark, oneTime: Boolean = true): String {
         val token = StringUtils.generateRandomId()
-        actions[token] = ClickableAction(onClick, expiresAt = expiresAt)
+        actions[token] = ClickableAction(onClick, oneTime, expiresAt)
         return token
     }
 

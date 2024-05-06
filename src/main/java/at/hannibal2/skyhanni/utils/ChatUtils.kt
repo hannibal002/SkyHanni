@@ -144,7 +144,7 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         internalChat(Text.text(msgPrefix + message) {
-            this.onClick(expireAt, onClick)
+            this.onClick(expireAt, true, onClick)
             this.hover = "§eClick here!".asComponent()
         })
     }
