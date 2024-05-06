@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.features.mining
 
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,6 +16,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object MiningBlockColors {
 
@@ -77,6 +82,10 @@ object MiningBlockColors {
     private var dirty = false
     private var forceDirty = false
 
+    private var inDwarvenMines = false
+    private var inCrystalHollows = false
+    private var inGlaciteArea = false
+
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (value in MiningBlock.entries) {
@@ -90,14 +99,17 @@ object MiningBlockColors {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        val newEnabled = (IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea.equalsOneOf(
-            "Glacite Tunnels",
-            "Glacite Lake",
-            "Glacite Mineshafts",
-        )) || (IslandType.CRYSTAL_HOLLOWS.isInIsland())
+
+        if (LorenzUtils.lastWorldSwitch.passedSince() > 4.seconds) {
+            inGlaciteArea = MiningAPI.inGlaciteArea()
+            inDwarvenMines = IslandType.DWARVEN_MINES.isInIsland() && !(inGlaciteArea ||
+                HypixelData.skyBlockArea.equalsOneOf("Dwarven Base Camp", "Fossil Research Center")
+                )
+            inCrystalHollows = IslandType.CRYSTAL_HOLLOWS.isInIsland() && HypixelData.skyBlockArea != "Crystal Nucleus"
+        }
+        val newEnabled = inDwarvenMines || inCrystalHollows || inGlaciteArea
 
         var reload = false
-
         if (newEnabled != enabled) {
             enabled = newEnabled
             reload = true
@@ -115,8 +127,6 @@ object MiningBlockColors {
                     dirty = true
                 }
             }
-        }
-        if (enabled) {
             if (dirty) {
                 reload = true
             }
@@ -128,11 +138,36 @@ object MiningBlockColors {
         }
     }
 
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        enabled = false
+        inDwarvenMines = false
+        inCrystalHollows = false
+        inGlaciteArea = false
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Mining Block Colors")
+        if (!enabled) {
+            event.addIrrelevant("not enabled")
+            return
+        }
+
+        event.addData {
+            add("inDwarvenMines: $inDwarvenMines")
+            add("inCrystalHollows: $inCrystalHollows")
+            add("inGlaciteArea: $inGlaciteArea")
+            add("active: $active")
+        }
+    }
+
     enum class MiningBlock(
         val tabList: String,
         val onCheck: (IBlockState) -> Boolean,
         val onColor: (IBlockState, Boolean) -> IBlockState,
         var highlight: Boolean = false,
+        val checkIsland: () -> Boolean,
     ) {
         // Dwarven Mines
         MITHRIL(
@@ -143,7 +178,8 @@ object MiningBlockColors {
                         state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIGHT_BLUE))) ||
                     state.block == mithril_3
             },
-            onColor = block()
+            onColor = block(),
+            checkIsland = { true }
         ),
 
         // Crystal Hollows
@@ -153,7 +189,8 @@ object MiningBlockColors {
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.ORANGE)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { !inDwarvenMines }
         ),
         TOPAZ(
             " §r§fTopaz Gemstone Collector:",
@@ -161,7 +198,8 @@ object MiningBlockColors {
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.YELLOW)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { !inDwarvenMines }
         ),
         AMETHYST(
             " §r§fAmethyst Gemstone Collector:",
@@ -169,7 +207,8 @@ object MiningBlockColors {
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.PURPLE)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { !inDwarvenMines }
         ),
         RUBY(
             " §r§fRuby Gemstone Collector:",
@@ -177,7 +216,8 @@ object MiningBlockColors {
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.RED)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { !inDwarvenMines }
         ),
         JADE(
             " §r§fJade Gemstone Collector:",
@@ -185,7 +225,8 @@ object MiningBlockColors {
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIME)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { !inDwarvenMines }
         ),
         SAPPHIRE(
             " §r§fSapphire Gemstone Collector:",
@@ -193,14 +234,16 @@ object MiningBlockColors {
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIGHT_BLUE)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { !inDwarvenMines }
         ),
         HARD_STONE(
             " §r§fHardstone Miner: ",
             onCheck = { state ->
                 state.block == glacite
             },
-            onColor = block()
+            onColor = block(),
+            checkIsland = { !inDwarvenMines }
         ),
 
         // Glacite Tunnels
@@ -209,7 +252,8 @@ object MiningBlockColors {
             onCheck = { state ->
                 state.block == glacite
             },
-            onColor = block()
+            onColor = block(),
+            checkIsland = { inGlaciteArea }
         ),
         UMBER(
             " §r§fUmber Collector:",
@@ -217,14 +261,16 @@ object MiningBlockColors {
                 (state.block == umber || state.block == umber_3) ||
                     (state.block == umber_2 && state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BROWN))
             },
-            onColor = block()
+            onColor = block(),
+            checkIsland = { inGlaciteArea }
         ),
         TUNGSTON(
             " §r§fTungsten Collector: ",
             onCheck = { state ->
                 state.block == tungston || state.block == tungston_2 || state.block == tungston_3
             },
-            onColor = block()
+            onColor = block(),
+            checkIsland = { inGlaciteArea }
         ),
         PERIDOT(
             " §r§fPeridot Gemstone Collector: ",
@@ -232,7 +278,8 @@ object MiningBlockColors {
                 (state.block == peridot || state.block == peridot_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.GREEN)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { inGlaciteArea }
         ),
         AQUAMARINE(
             " §r§fAquamarine Gemstone Collector:",
@@ -240,7 +287,8 @@ object MiningBlockColors {
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BLUE)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { inGlaciteArea }
         ),
         CITRINE(
             " §r§fCitrine Gemstone Collector: ",
@@ -248,7 +296,8 @@ object MiningBlockColors {
                 (state.block == citrine || state.block == citrine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BROWN)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { inGlaciteArea }
         ),
         ONYX(
             " §r§fOnyx Gemstone Collector:",
@@ -256,7 +305,8 @@ object MiningBlockColors {
                 (state.block == onyx || state.block == onyx_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BLACK)
             },
-            onColor = glass()
+            onColor = glass(),
+            checkIsland = { inGlaciteArea }
         ),
         ;
     }
