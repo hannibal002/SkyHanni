@@ -22,7 +22,7 @@ object ChocolateFactoryInventory {
     @SubscribeEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.highlightBestUpgrade) return
+        if (!config.highlightBestUpgrade || !config.highlightAffordableUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack == null) continue
@@ -54,9 +54,11 @@ object ChocolateFactoryInventory {
             val currentUpdates = ChocolateFactoryAPI.factoryUpgrades
             currentUpdates.find { it.slotIndex == slotIndex }?.let { upgrade ->
                 if (upgrade.canAfford()) {
-                    slot highlight LorenzColor.GREEN.addOpacity(75)
+                    slot highlight LorenzColor.GREEN.addOpacity(200)
+                    return
                 }
             }
+            slot highlight LorenzColor.GOLD.addOpacity(200)
         }
     }
 
