@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.RawToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -85,7 +85,7 @@ object EnchantParser {
     }
 
     @SubscribeEvent
-    fun onTooltipEvent(event: RawToolTipEvent) {
+    fun onTooltipEvent(event: ItemHoverEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
 
