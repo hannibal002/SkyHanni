@@ -573,7 +573,7 @@ enum class HotmData(
 
         @SubscribeEvent
         fun onWorldSwitch(event: IslandChangeEvent) {
-            if (HotmAPI.mineshaftMayhem != null) return
+            if (HotmAPI.mineshaftMayhem == null) return
             HotmAPI.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
