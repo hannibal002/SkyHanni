@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
 import at.hannibal2.skyhanni.data.PartyAPI.transferVoluntaryPattern
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
@@ -12,10 +13,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -134,10 +133,8 @@ object PartyCommands {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onChat(event: LorenzChatEvent) {
         if (!config.reversePartyTransferMessage) return
-        val message = event.message.trimWhiteSpace().removeResets()
-        transferVoluntaryPattern.matchMatcher(message.removeColor()) {
-            val newLeader = group("newowner").cleanPlayerName().removeColor()
-            if (newLeader != LorenzUtils.getPlayerName()) return
+        if (transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) {
+            if (partyLeader != LorenzUtils.getPlayerName()) return
 
             PartyAPI.prevPartyLeader?.let {
                 event.blockedReason = "replacing"
