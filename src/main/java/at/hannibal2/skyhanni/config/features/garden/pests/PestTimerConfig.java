@@ -28,5 +28,5 @@ public class PestTimerConfig {
 
     @Expose
     @ConfigLink(owner = PestTimerConfig.class, field = "enabled")
-    public Position position = new Position(390, 65, false, true);
+    public Position position = new Position(383, 93, false, true);
 }

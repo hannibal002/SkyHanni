@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat.playerchat
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PlayerChatFilterJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.MultiFilter
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatFilter {
@@ -11,8 +12,8 @@ class PlayerChatFilter {
 
         private val filters = mutableMapOf<String, MultiFilter>()
 
-        fun shouldChatFilter(original: String): Boolean {
-            val message = original.lowercase()
+        fun shouldChatFilter(original: IChatComponent): Boolean {
+            val message = original.formattedText.lowercase()
             for (filter in filters) {
                 filter.value.matchResult(message)?.let {
                     return true

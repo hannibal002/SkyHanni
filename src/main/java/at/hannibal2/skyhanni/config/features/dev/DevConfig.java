@@ -44,12 +44,6 @@ public class DevConfig {
     @ConfigEditorBoolean
     public boolean worldEdit = false;
 
-    @Expose
-    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard." +
-        "\nCustom Scoreboard debug option")
-    @ConfigEditorBoolean
-    public boolean unknownLinesWarning = false;
-
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
     @Expose
@@ -75,6 +69,28 @@ public class DevConfig {
     )
     @ConfigEditorBoolean
     public boolean fancyContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Flip Contributors",
+        desc = "Make SkyHanni contributors appear upside down in the world.")
+    @ConfigEditorBoolean
+    public boolean flipContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Spin Contributors",
+        desc = "Make SkyHanni contributors spin around when you are looking at them. " +
+            "§eRequires 'Flip Contributors' to be enabled.")
+    @ConfigEditorBoolean
+    public boolean rotateContributors = false;
+
+    @Expose
+    @ConfigOption(
+        name = "SBA Contributors",
+        desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
+    @ConfigEditorBoolean
+    public boolean fancySbaContributors = false;
 
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")

@@ -122,7 +122,7 @@ enum class ScoreboardEvents(
     ),
     MINING_EVENTS(
         ::getMiningEventsLines,
-        ::getMiningEventsShowWhen,
+        { inAdvancedMiningIsland() },
         "§7(All Mining Event Lines)"
     ),
     DAMAGE(
@@ -158,7 +158,12 @@ enum class ScoreboardEvents(
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
         ::getActiveEventShowWhen,
-        "§7(All Active Tablist Events)"
+        "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h"
+    ),
+    STARTING_SOON_TABLIST_EVENTS(
+        ::getSoonEventLine,
+        ::getSoonEventShowWhen,
+        "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
     ),
     REDSTONE(
         ::getRedstoneLines,
@@ -167,13 +172,9 @@ enum class ScoreboardEvents(
     ),
     ;
 
-    override fun toString(): String {
-        return configLine
-    }
+    override fun toString() = configLine
 
-    fun getLines(): List<String> {
-        return displayLine.get()
-    }
+    fun getLines(): List<String> = displayLine.get()
 
     companion object {
         fun getEvent() = buildList<ScoreboardEvents?> {
@@ -232,18 +233,14 @@ private fun getVotingLines() = buildList {
     }
 }
 
-private fun getVotingShowWhen(): Boolean {
-    return SbPattern.yearVotesPattern.anyMatches(getSbLines())
-}
+private fun getVotingShowWhen(): Boolean = SbPattern.yearVotesPattern.anyMatches(getSbLines())
 
 private fun getServerCloseLines() = buildList {
     val matchingLine = getSbLines().first { ServerRestartTitle.restartingGreedyPattern.matches(it) }
     add(matchingLine.split("§8")[0])
 }
 
-private fun getServerCloseShowWhen(): Boolean {
-    return ServerRestartTitle.restartingGreedyPattern.anyMatches(getSbLines())
-}
+private fun getServerCloseShowWhen(): Boolean = ServerRestartTitle.restartingGreedyPattern.anyMatches(getSbLines())
 
 private fun getDungeonsLines() = listOf(
     SbPattern.m7dragonsPattern,
@@ -256,7 +253,7 @@ private fun getDungeonsLines() = listOf(
     SbPattern.teammatesPattern,
     SbPattern.floor3GuardiansPattern
 ).let { patterns ->
-    // BetterMap adds a random §r at the start, making it go black
+    // BetterMap adds a random §r at the start, making the line go black
     getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
 }
 
@@ -275,9 +272,7 @@ private fun getKuudraLines() = listOf(
         getSbLines().firstOrNull { pattern.matches(it) }
     }
 
-private fun getKuudraShowWhen(): Boolean {
-    return IslandType.KUUDRA_ARENA.isInIsland()
-}
+private fun getKuudraShowWhen(): Boolean = IslandType.KUUDRA_ARENA.isInIsland()
 
 private fun getDojoLines() = listOf(
     SbPattern.dojoChallengePattern,
@@ -289,9 +284,7 @@ private fun getDojoLines() = listOf(
         getSbLines().firstOrNull { pattern.matches(it) }
     }
 
-private fun getDojoShowWhen(): Boolean {
-    return SbPattern.dojoChallengePattern.anyMatches(getSbLines())
-}
+private fun getDojoShowWhen(): Boolean = SbPattern.dojoChallengePattern.anyMatches(getSbLines())
 
 private fun getDarkAuctionLines() = buildList {
     getSbLines().firstOrNull { SbPattern.startingInPattern.matches(it) }?.let { add(it) }
@@ -305,9 +298,7 @@ private fun getDarkAuctionLines() = buildList {
     }
 }
 
-private fun getDarkAuctionShowWhen(): Boolean {
-    return IslandType.DARK_AUCTION.isInIsland()
-}
+private fun getDarkAuctionShowWhen(): Boolean = IslandType.DARK_AUCTION.isInIsland()
 
 private fun getJacobContestLines() = buildList {
     getSbLines().firstOrNull { SbPattern.jacobsContestPattern.matches(it) }?.let { line ->
@@ -320,17 +311,11 @@ private fun getJacobContestLines() = buildList {
     }
 }
 
-private fun getJacobContestShowWhen(): Boolean {
-    return SbPattern.jacobsContestPattern.anyMatches(getSbLines())
-}
+private fun getJacobContestShowWhen(): Boolean = SbPattern.jacobsContestPattern.anyMatches(getSbLines())
 
-private fun getJacobMedalsLines(): List<String> {
-    return getSbLines().filter { SbPattern.medalsPattern.matches(it) }
-}
+private fun getJacobMedalsLines(): List<String> = getSbLines().filter { SbPattern.medalsPattern.matches(it) }
 
-private fun getJacobMedalsShowWhen(): Boolean {
-    return SbPattern.medalsPattern.anyMatches(getSbLines())
-}
+private fun getJacobMedalsShowWhen(): Boolean = SbPattern.medalsPattern.anyMatches(getSbLines())
 
 private fun getTrapperLines() = buildList {
     getSbLines().firstOrNull { SbPattern.peltsPattern.matches(it) }?.let { add(it) }
@@ -342,35 +327,23 @@ private fun getTrapperLines() = buildList {
     }
 }
 
-private fun getTrapperShowWhen(): Boolean {
-    return getSbLines().any {
-        ScoreboardPattern.peltsPattern.matches(it) || ScoreboardPattern.mobLocationPattern.matches(it)
-    }
-}
+private fun getTrapperShowWhen(): Boolean =
+    getSbLines().any { ScoreboardPattern.peltsPattern.matches(it) || ScoreboardPattern.mobLocationPattern.matches(it) }
 
-private fun getGardenCleanUpLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.cleanUpPattern.matches(it) }.trim())
-}
+private fun getGardenCleanUpLines(): List<String> =
+    listOf(getSbLines().first { SbPattern.cleanUpPattern.matches(it) }.trim())
 
-private fun getGardenCleanUpShowWhen(): Boolean {
-    return SbPattern.cleanUpPattern.anyMatches(getSbLines())
-}
+private fun getGardenCleanUpShowWhen(): Boolean = SbPattern.cleanUpPattern.anyMatches(getSbLines())
 
-private fun getGardenPastingLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.pastingPattern.matches(it) }.trim())
-}
+private fun getGardenPastingLines(): List<String> =
+    listOf(getSbLines().first { SbPattern.pastingPattern.matches(it) }.trim())
 
-private fun getGardenPastingShowWhen(): Boolean {
-    return SbPattern.pastingPattern.anyMatches(getSbLines())
-}
+private fun getGardenPastingShowWhen(): Boolean = SbPattern.pastingPattern.anyMatches(getSbLines())
 
-private fun getFlightDurationLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.flightDurationPattern.matches(it) }.trim())
-}
+private fun getFlightDurationLines(): List<String> =
+    listOf(getSbLines().first { SbPattern.flightDurationPattern.matches(it) }.trim())
 
-private fun getFlightDurationShowWhen(): Boolean {
-    return SbPattern.flightDurationPattern.anyMatches(getSbLines())
-}
+private fun getFlightDurationShowWhen(): Boolean = SbPattern.flightDurationPattern.anyMatches(getSbLines())
 
 private fun getWinterLines() = buildList {
     getSbLines().firstOrNull { SbPattern.winterEventStartPattern.matches(it) }?.let { add(it) }
@@ -381,12 +354,10 @@ private fun getWinterLines() = buildList {
     getSbLines().firstOrNull { SbPattern.winterCubeDmgPattern.matches(it) }?.let { add(it) }
 }
 
-private fun getWinterShowWhen(): Boolean {
-    return getSbLines().any {
-        ScoreboardPattern.winterEventStartPattern.matches(it)
-            || (ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
-            || ScoreboardPattern.winterWavePattern.matches(it)
-    }
+private fun getWinterShowWhen(): Boolean = getSbLines().any {
+    ScoreboardPattern.winterEventStartPattern.matches(it)
+        || (ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
+        || ScoreboardPattern.winterWavePattern.matches(it)
 }
 
 private fun getSpookyLines() = buildList {
@@ -401,39 +372,50 @@ private fun getSpookyLines() = buildList {
     ) // Candy
 }
 
-private fun getSpookyShowWhen(): Boolean {
-    return getSbLines().any { ScoreboardPattern.spookyPattern.matches(it) }
-}
+private fun getSpookyShowWhen(): Boolean = getSbLines().any { ScoreboardPattern.spookyPattern.matches(it) }
 
-private fun getActiveEventLine(): List<String> {
-    val currentActiveEvent = TabListData.getTabList().firstOrNull { SbPattern.eventNamePattern.matches(it) }
+private fun getTablistEvent(): String? =
+    TabListData.getTabList().firstOrNull { SbPattern.eventNamePattern.matches(it) }
         ?.let {
             SbPattern.eventNamePattern.matchMatcher(it) {
                 group("name")
             }
         }
-    val currentActiveEventEndsIn = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
+
+private fun getActiveEventLine(): List<String> {
+    val currentActiveEvent = getTablistEvent() ?: return emptyList()
+    val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
         ?.let {
             SbPattern.eventTimeEndsPattern.matchMatcher(it) {
                 group("time")
             }
         }
 
-    return listOf("$currentActiveEvent $currentActiveEventEndsIn")
+    return listOf(currentActiveEvent, " Ends in: §e$currentActiveEventTime")
 }
 
-private fun getActiveEventShowWhen(): Boolean {
-    return TabListData.getTabList().any { SbPattern.eventNamePattern.matches(it) } &&
-        TabListData.getTabList().any { SbPattern.eventTimeEndsPattern.matches(it) }
+private fun getActiveEventShowWhen(): Boolean =
+    getTablistEvent() != null && TabListData.getTabList().any { SbPattern.eventTimeEndsPattern.matches(it) }
+
+private fun getSoonEventLine(): List<String> {
+    val soonActiveEvent = getTablistEvent() ?: return emptyList()
+    val soonActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
+        ?.let {
+            SbPattern.eventTimeStartsPattern.matchMatcher(it) {
+                group("time")
+            }
+        }
+
+    return listOf(soonActiveEvent, " Starts in: §e$soonActiveEventTime")
 }
 
-private fun getBroodmotherLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
-}
+private fun getSoonEventShowWhen(): Boolean =
+    getTablistEvent() != null && TabListData.getTabList().any { SbPattern.eventTimeStartsPattern.matches(it) }
 
-private fun getBroodmotherShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
-}
+private fun getBroodmotherLines(): List<String> =
+    listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
+
+private fun getBroodmotherShowWhen(): Boolean = getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
 
 private fun getMiningEventsLines() = buildList {
     // Wind
@@ -488,21 +470,20 @@ private fun getMiningEventsLines() = buildList {
     if (getSbLines().any { SbPattern.fortunateFreezingBonusPattern.matches(it) }) {
         add(getSbLines().first { SbPattern.fortunateFreezingBonusPattern.matches(it) })
     }
+
+    // Fossil Dust
+    if (getSbLines().any { SbPattern.fossilDustPattern.matches(it) }) {
+        add(getSbLines().first { SbPattern.fossilDustPattern.matches(it) })
+    }
 }
 
-private fun getMiningEventsShowWhen(): Boolean {
-    return inAdvancedMiningIsland()
-}
-
-private fun getDamageLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.bossHPPattern.matches(it) }) +
+private fun getDamageLines(): List<String> =
+    listOf(getSbLines().first { SbPattern.bossHPPattern.matches(it) }) +
         (getSbLines().first { SbPattern.bossDamagePattern.matches(it) })
-}
 
-private fun getDamageShowWhen(): Boolean {
-    return getSbLines().any { SbPattern.bossHPPattern.matches(it) }
+private fun getDamageShowWhen(): Boolean =
+    getSbLines().any { SbPattern.bossHPPattern.matches(it) }
         && getSbLines().any { SbPattern.bossDamagePattern.matches(it) }
-}
 
 private fun getMagmaBossLines() = getSbLines().filter { line ->
     SbPattern.magmaBossPattern.matches(line)
@@ -514,47 +495,26 @@ private fun getMagmaBossLines() = getSbLines().filter { line ->
         || SbPattern.bossHealthBarPattern.matches(line)
 }
 
-private fun getMagmaBossShowWhen(): Boolean {
-    return SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
+private fun getMagmaBossShowWhen(): Boolean = SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
+
+private fun getRiftLines() = getSbLines().filter { line ->
+    RiftBloodEffigies.heartsPattern.matches(line)
+        || SbPattern.riftHotdogTitlePattern.matches(line)
+        || SbPattern.timeLeftPattern.matches(line)
+        || SbPattern.riftHotdogEatenPattern.matches(line)
+        || SbPattern.riftAveikxPattern.matches(line)
 }
 
-private fun getRiftLines() = buildList {
-    if (SbPattern.riftHotdogTitlePattern.anyMatches(getSbLines())) {
-        add(getSbLines().first { SbPattern.riftHotdogTitlePattern.matches(it) })
-        add(getSbLines().first { SbPattern.timeLeftPattern.matches(it) })
-        add(getSbLines().first { SbPattern.riftHotdogEatenPattern.matches(it) })
-    }
+private fun getEssenceLines(): List<String> = listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
 
-    if (RiftBloodEffigies.heartsPattern.anyMatches(getSbLines())) {
-        add(getSbLines().first { RiftBloodEffigies.heartsPattern.matches(it) })
-    }
+private fun getEssenceShowWhen(): Boolean = SbPattern.essencePattern.anyMatches(getSbLines())
 
-    if (SbPattern.riftAveikxPattern.anyMatches(getSbLines())) {
-        addAll(getSbLines().filter { SbPattern.riftAveikxPattern.matches(it) })
-    }
-}
-
-private fun getEssenceLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
-}
-
-private fun getEssenceShowWhen(): Boolean {
-    return SbPattern.essencePattern.anyMatches(getSbLines())
-}
-
-private fun getQueueLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+private fun getQueueLines(): List<String> =
+    listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
         (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
-}
 
-private fun getQueueShowWhen(): Boolean {
-    return SbPattern.queuePattern.anyMatches(getSbLines())
-}
+private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getSbLines())
 
-private fun getRedstoneLines(): List<String> {
-    return listOf(getSbLines().first { SbPattern.redstonePattern.matches(it) })
-}
+private fun getRedstoneLines(): List<String> = listOf(getSbLines().first { SbPattern.redstonePattern.matches(it) })
 
-private fun getRedstoneShowWhen(): Boolean {
-    return SbPattern.redstonePattern.anyMatches(getSbLines())
-}
+private fun getRedstoneShowWhen(): Boolean = SbPattern.redstonePattern.anyMatches(getSbLines())

@@ -76,8 +76,8 @@ class SkyMartCopperPrice {
                 } ?: continue
 
                 val internalName = item.getInternalName()
-                val lowestBin = internalName.getPriceOrNull() ?: continue
-                val profit = lowestBin - (otherItemsPrice ?: 0.0)
+                val itemPrice = internalName.getPriceOrNull() ?: continue
+                val profit = itemPrice - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
                 val perFormat = NumberUtil.format(factor)
@@ -86,7 +86,7 @@ class SkyMartCopperPrice {
                 val hover = buildList {
                     add(itemName)
                     add("")
-                    add("§7Item price: §6${NumberUtil.format(lowestBin)} ")
+                    add("§7Item price: §6${NumberUtil.format(itemPrice)} ")
                     otherItemsPrice?.let {
                         add("§7Additional cost: §6${NumberUtil.format(it)} ")
                     }
@@ -130,8 +130,6 @@ class SkyMartCopperPrice {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.copperPrice
-
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
@@ -141,4 +139,6 @@ class SkyMartCopperPrice {
             JsonPrimitive((it.asDouble / 1.851).round(1))
         }
     }
+
+    private fun isEnabled() = GardenAPI.inGarden() && config.copperPrice
 }

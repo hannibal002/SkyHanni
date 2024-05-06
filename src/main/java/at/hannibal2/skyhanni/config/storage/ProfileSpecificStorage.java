@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ProfileSpecificStorage {
 
@@ -59,6 +57,65 @@ public class ProfileSpecificStorage {
 
         @Expose
         public int maxRabbits = -1;
+
+        @Expose
+        public long currentChocolate = 0;
+
+        @Expose
+        public long chocolateThisPrestige = 0;
+
+        @Expose
+        public long chocolateAllTime = 0;
+
+        @Expose
+        public int rawChocPerSecond = 0;
+
+        @Expose
+        public double chocolateMultiplier = 1.0;
+
+        @Expose
+        public double rawChocolateMultiplier = 1.0;
+
+        @Expose
+        public int timeTowerLevel = 0;
+
+        @Expose
+        public long currentTimeTowerEnds = 0;
+
+        @Expose
+        public long nextTimeTower = 0;
+
+        @Expose
+        public int currentTimeTowerUses = -1;
+
+        @Expose
+        public int timeTowerCooldown = 8;
+
+        @Expose
+        public int maxTimeTowerUses = 3;
+
+        @Expose
+        public long bestUpgradeAvailableAt = 0;
+
+        @Expose
+        public long bestUpgradeCost = 0;
+
+        @Expose
+        public long lastDataSave = 0;
+
+        @Expose
+        public PositionChange positionChange = new PositionChange();
+
+        public static class PositionChange {
+            @Expose
+            public Long lastTime = null;
+
+            @Expose
+            public int lastPosition = -1;
+
+            @Expose
+            public String lastLeaderboard = null;
+        }
     }
 
     @Expose
@@ -307,6 +364,9 @@ public class ProfileSpecificStorage {
         public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
 
         @Expose
+        public Map<CropType, Integer> customGoalMilestone = new HashMap<>();
+
+        @Expose
         public PestProfitTracker.Data pestProfitTracker = new PestProfitTracker.Data();
 
         @Expose
@@ -457,10 +517,7 @@ public class ProfileSpecificStorage {
         public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
-        public List<DungeonStorage.DungeonRunInfo> runs = Stream.generate(DungeonStorage.DungeonRunInfo::new)
-            .limit(CroesusChestTracker.Companion.getMaxChests())
-            .collect(Collectors.toCollection(ArrayList::new));
-
+        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsList();
 
         public static class DungeonRunInfo {
 

@@ -36,7 +36,9 @@ object DefaultConfigFeatures {
             ChatUtils.clickableChat(
                 "Looks like this is the first time you are using SkyHanni. " +
                     "Click here to configure default options, or run /shdefaultoptions.",
-                "shdefaultoptions"
+                onClick = {
+                    onCommand("null", "null")
+                }
             )
         } else if (updated) {
             val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
@@ -44,7 +46,9 @@ object DefaultConfigFeatures {
             ChatUtils.clickableChat(
                 "Looks like you updated SkyHanni. " +
                     "Click here to configure the newly introduced options, or run $command.",
-                command
+                onClick = {
+                    onCommand(lastVersion, SkyHanniMod.version)
+                }
             )
         }
     }
