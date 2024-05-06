@@ -75,6 +75,7 @@ object MiningBlockColors {
     private var oldSneakState = false
 
     private var dirty = false
+    private var forceDirty = false
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -89,28 +90,42 @@ object MiningBlockColors {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (LorenzUtils.inSkyBlock) {
-            val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
-
-            if (sneaking != oldSneakState) {
-                oldSneakState = sneaking
-                if (oldSneakState) {
-                    dirty = true
-                    active = !active
-                }
-            }
-
-            if (dirty) {
-                Minecraft.getMinecraft().renderGlobal.loadRenderers()
-                dirty = false
-            }
-        }
-
-        enabled = (IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea.equalsOneOf(
+        val newEnabled = (IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea.equalsOneOf(
             "Glacite Tunnels",
             "Glacite Lake",
             "Glacite Mineshafts",
         )) || (IslandType.CRYSTAL_HOLLOWS.isInIsland())
+
+        var reload = false
+
+        if (newEnabled != enabled) {
+            enabled = newEnabled
+            reload = true
+            if (enabled) {
+                active = true
+            }
+        }
+
+        if (enabled) {
+            val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+            if (sneaking != oldSneakState) {
+                oldSneakState = sneaking
+                if (oldSneakState) {
+                    active = !active
+                    dirty = true
+                }
+            }
+        }
+        if (enabled) {
+            if (dirty) {
+                reload = true
+            }
+        }
+
+        if (reload) {
+            Minecraft.getMinecraft().renderGlobal.loadRenderers()
+            dirty = false
+        }
     }
 
     enum class MiningBlock(
