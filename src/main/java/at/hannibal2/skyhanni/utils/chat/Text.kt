@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.chat
 
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -11,8 +12,13 @@ object Text {
 
     val NEWLINE = "\n".asComponent()
     val HYPHEN = "-".asComponent()
+    val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
 
+    fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
+    fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
+
+    fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: IChatComponent? = null): IChatComponent {
         val result = ChatComponentText("")
         components.forEachIndexed { index, it ->
@@ -30,8 +36,6 @@ object Text {
         }
         return result
     }
-
-    fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
 
     fun IChatComponent.style(init: ChatStyle.() -> Unit): IChatComponent {
         this.chatStyle.init()
@@ -57,7 +61,7 @@ object Text {
     }
     fun IChatComponent.center(width: Int = Minecraft.getMinecraft().ingameGUI.chatGUI.chatWidth): IChatComponent {
         val textWidth = this.width()
-        val spaceWidth = " ".asComponent().width()
+        val spaceWidth = SPACE.width()
         val padding = (width - textWidth) / 2
         return join(" ".repeat(padding / spaceWidth), this)
     }
@@ -68,24 +72,30 @@ object Text {
     var IChatComponent.hover: IChatComponent?
         get() = this.chatStyle.chatHoverEvent?.value
         set(value) {
-            this.chatStyle.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, value)
+            this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         }
 
     var IChatComponent.command: String?
         get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
         set(value) {
-            this.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, value)
+            this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
         }
 
     var IChatComponent.suggest: String?
         get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
         set(value) {
-            this.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, value)
+            this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
         }
 
     var IChatComponent.url: String?
         get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
         set(value) {
-            this.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, value)
+            this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         }
+
+    fun IChatComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), onClick: () -> Any) {
+        val token = ChatClickActionManager.createAction(onClick, expiresAt)
+        this.command = "/shaction $token"
+    }
+    
 }

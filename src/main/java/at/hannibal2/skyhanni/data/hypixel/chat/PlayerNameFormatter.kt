@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.utils.ChatComponentUtils
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.toCleanChatComponent
+import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
@@ -85,7 +85,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            ChatComponentUtils.text("§bCo-Op > ") {
+            Text.text("§bCo-Op > ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -98,7 +98,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            ChatComponentUtils.text("§2Guild > ") {
+            Text.text("§2Guild > ") {
                 appendSibling(nameFormat(event.authorComponent, guildRank = event.guildRank))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -111,7 +111,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            ChatComponentUtils.text("§9Party §8> ") {
+            Text.text("§9Party §8> ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -123,7 +123,7 @@ class PlayerNameFormatter {
     fun onPrivateChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         event.chatComponent =
-            StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentUtils.text("§d${event.direction}") {
+            StringUtils.replaceIfNeeded(event.chatComponent, Text.text("§d${event.direction}") {
                 appendText(" ")
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
@@ -135,7 +135,7 @@ class PlayerNameFormatter {
     @SubscribeEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentUtils.text("") {
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, Text.text("") {
             appendSibling(
                 nameFormat(
                     event.authorComponent,

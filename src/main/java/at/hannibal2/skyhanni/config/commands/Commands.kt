@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
-import at.hannibal2.skyhanni.data.ChatClickActionManager
+import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
@@ -83,6 +83,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
@@ -567,9 +570,10 @@ object Commands {
                 addDescription(category.description)
             }
 
-            val commandInfo = ChatUtils.createHoverableChat("$color/$name", hoverText, "/$name", false)
-
-            components.add(commandInfo)
+            components.add(Text.text("$color/$name") {
+                this.hover = Text.multiline(hoverText)
+                this.suggest = "/$name"
+            })
             components.add(ChatComponentText("§7, "))
         }
         components.add(ChatComponentText("\n "))
