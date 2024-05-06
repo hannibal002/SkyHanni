@@ -34,7 +34,7 @@ object TabListReader {
     )
     private val effectCountPattern by patternGroup.pattern(
         "effects.count",
-        "You have (?<effectCount>[0-9]+) active effect"
+        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect"
     )
     private val cookiePattern by patternGroup.pattern(
         "cookie",
