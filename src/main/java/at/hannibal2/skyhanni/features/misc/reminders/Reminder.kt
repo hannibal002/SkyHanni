@@ -7,6 +7,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.Locale
 import kotlin.time.Duration
 
 data class Reminder(
@@ -19,14 +20,14 @@ data class Reminder(
         val time = Instant.ofEpochMilli(remindAt.toMillis()).atZone(ZoneId.systemDefault())
         val date = time.toLocalDate()
         if (date.isEqual(LocalDate.now())) {
-            return time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+            return time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault()))
         }
-        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
+        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault()))
     }
 
     fun formatFull(): String {
         val dateTime = Instant.ofEpochMilli(remindAt.toMillis()).atZone(ZoneId.systemDefault())
-        return dateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT))
+        return dateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.getDefault()))
     }
 
     fun shouldRemind(interval: Duration) = remindAt.isInPast() && lastReminder.passedSince() >= interval

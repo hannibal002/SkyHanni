@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.wrap
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 object ReminderManager {
 
@@ -52,7 +53,8 @@ object ReminderManager {
     }
 
     private fun parseReminder(text: String) = try {
-        TimeUtils.getDuration(text)
+        val duration = TimeUtils.getDuration(text)
+        if (duration <= 1.seconds) null else duration
     } catch (e: Exception) {
         null
     }
