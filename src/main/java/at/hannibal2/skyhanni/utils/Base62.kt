@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.reminders
+package at.hannibal2.skyhanni.utils
 
 object Base62 {
 
