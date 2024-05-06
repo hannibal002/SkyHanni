@@ -6,13 +6,18 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockCarpet
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
@@ -27,6 +32,16 @@ object MiningCommissionsBlocksColor {
 
     var enabled = false
     var active = false
+
+    private val patternGroup = RepoPattern.group("mining.commissions")
+
+    /**
+     * REGEX-TEST: §a§lCITRINE GEMSTONE COLLECTOR §r§eCommission Complete! Visit the King §r§eto claim your rewards!
+     */
+    private val commissionCompletePattern by patternGroup.pattern(
+        "complete",
+        "§a§l(?<name>.*) §r§eCommission Complete! Visit the King §r§eto claim your rewards!"
+    )
 
     private fun glass() = { state: IBlockState, result: Boolean ->
         if (result) {
@@ -91,14 +106,34 @@ object MiningCommissionsBlocksColor {
     private var inCrystalHollows = false
     private var inGlaciteArea = false
 
+    // TODO Commissin API
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (value in MiningBlock.entries) {
-            val newValue = event.tabList.any { it.startsWith(value.tabList) && !it.contains("DONE") }
-            if (value.highlight != newValue) {
-                value.highlight = newValue
+        for (block in MiningBlock.entries) {
+            val tabList = " §r§f${block.displayName}: "
+            val newValue = event.tabList.any { it.startsWith(tabList) && !it.contains("DONE") }
+            if (block.highlight != newValue) {
+                if (newValue && block in ignoredTabListCommissions) continue
+                block.highlight = newValue
+                ChatUtils.debug("changed from tab list: ${block.displayName} -> $newValue")
                 dirty = true
             }
+        }
+    }
+
+    private val ignoredTabListCommissions = TimeLimitedSet<MiningBlock>(5.seconds)
+
+    // TODO Commissin API
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!enabled) return
+        commissionCompletePattern.matchMatcher(event.message) {
+            val name = group("name")
+            val block = MiningBlock.entries.find { it.displayName.equals(name, ignoreCase = true) } ?: return
+            block.highlight = false
+            dirty = true
+            ignoredTabListCommissions.add(block)
+            ChatUtils.debug("finished from chat: $name")
         }
     }
 
@@ -180,7 +215,7 @@ object MiningCommissionsBlocksColor {
     }
 
     enum class MiningBlock(
-        val tabList: String,
+        val displayName: String,
         val onCheck: (IBlockState) -> Boolean,
         val onColor: (IBlockState, Boolean) -> IBlockState,
         var highlight: Boolean = false,
@@ -188,7 +223,7 @@ object MiningCommissionsBlocksColor {
     ) {
         // Dwarven Mines
         MITHRIL(
-            " §r§fMithril Everywhere:",
+            "Mithril Everywhere",
             onCheck = { state ->
                 (state.block == mithril && state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.CYAN)) ||
                     (state.block == mithril_2 && (state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.GRAY) ||
@@ -201,7 +236,7 @@ object MiningCommissionsBlocksColor {
 
         // Crystal Hollows
         AMBER(
-            " §r§fAmber Gemstone Collector:",
+            "Amber Gemstone Collector",
             onCheck = { state ->
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.ORANGE)
@@ -210,7 +245,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { !inDwarvenMines }
         ),
         TOPAZ(
-            " §r§fTopaz Gemstone Collector:",
+            "Topaz Gemstone Collector",
             onCheck = { state ->
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.YELLOW)
@@ -219,7 +254,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { !inDwarvenMines }
         ),
         AMETHYST(
-            " §r§fAmethyst Gemstone Collector:",
+            "Amethyst Gemstone Collector",
             onCheck = { state ->
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.PURPLE)
@@ -228,7 +263,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { !inDwarvenMines }
         ),
         RUBY(
-            " §r§fRuby Gemstone Collector:",
+            "Ruby Gemstone Collector",
             onCheck = { state ->
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.RED)
@@ -237,7 +272,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { !inDwarvenMines }
         ),
         JADE(
-            " §r§fJade Gemstone Collector:",
+            "Jade Gemstone Collector",
             onCheck = { state ->
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIME)
@@ -246,7 +281,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { !inDwarvenMines }
         ),
         SAPPHIRE(
-            " §r§fSapphire Gemstone Collector:",
+            "Sapphire Gemstone Collector",
             onCheck = { state ->
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.LIGHT_BLUE)
@@ -255,7 +290,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { !inDwarvenMines }
         ),
         HARD_STONE(
-            " §r§fHardstone Miner: ",
+            "Hardstone Miner",
             onCheck = { state ->
                 state.block == glacite
             },
@@ -265,7 +300,7 @@ object MiningCommissionsBlocksColor {
 
         // Glacite Tunnels
         GLACITE(
-            " §r§fGlacite Collector: ",
+            "Glacite Collector",
             onCheck = { state ->
                 state.block == glacite
             },
@@ -273,7 +308,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { inGlaciteArea }
         ),
         UMBER(
-            " §r§fUmber Collector:",
+            "Umber Collector",
             onCheck = { state ->
                 (state.block == umber || state.block == umber_3) ||
                     (state.block == umber_2 && state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BROWN))
@@ -282,7 +317,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { inGlaciteArea }
         ),
         TUNGSTON(
-            " §r§fTungsten Collector: ",
+            "Tungsten Collector",
             onCheck = { state ->
                 state.block == tungston || state.block == tungston_2 || state.block == tungston_3
             },
@@ -290,7 +325,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { inGlaciteArea }
         ),
         PERIDOT(
-            " §r§fPeridot Gemstone Collector: ",
+            "Peridot Gemstone Collector",
             onCheck = { state ->
                 (state.block == peridot || state.block == peridot_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.GREEN)
@@ -299,7 +334,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { inGlaciteArea }
         ),
         AQUAMARINE(
-            " §r§fAquamarine Gemstone Collector:",
+            "Aquamarine Gemstone Collector",
             onCheck = { state ->
                 (state.block == aquamarine || state.block == aquamarine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BLUE)
@@ -308,7 +343,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { inGlaciteArea }
         ),
         CITRINE(
-            " §r§fCitrine Gemstone Collector: ",
+            "Citrine Gemstone Collector",
             onCheck = { state ->
                 (state.block == citrine || state.block == citrine_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BROWN)
@@ -317,7 +352,7 @@ object MiningCommissionsBlocksColor {
             checkIsland = { inGlaciteArea }
         ),
         ONYX(
-            " §r§fOnyx Gemstone Collector:",
+            "Onyx Gemstone Collector",
             onCheck = { state ->
                 (state.block == onyx || state.block == onyx_2) &&
                     state.getValue(BlockCarpet.COLOR).equalsOneOf(EnumDyeColor.BLACK)

@@ -37,7 +37,7 @@ class VerminHighlighter {
 
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
             val id = entity.entityId
-            if (checkedEntites.contains(id)) continue
+            if (id in checkedEntites) continue
             checkedEntites.add(id)
 
             if (!isVermin(entity)) continue
