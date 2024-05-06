@@ -55,7 +55,7 @@ class SlayerRngMeterDisplay {
         "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
     )
 
-    private var display: Renderable = Renderable.placeholder(0, 0)
+    private var display = emptyList<Renderable>()
     private var lastItemDroppedTime = 0L
 
     var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
@@ -188,7 +188,7 @@ class SlayerRngMeterDisplay {
     }
 
     private fun update() {
-        display = makeLink(drawDisplay())
+        display = listOf(makeLink(drawDisplay()))
     }
 
     private fun makeLink(text: String) =
@@ -233,7 +233,7 @@ class SlayerRngMeterDisplay {
         if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        config.pos.renderRenderables(listOf(display), posLabel = "RNG Meter Display")
+        config.pos.renderRenderables(display, posLabel = "RNG Meter Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
