@@ -6,6 +6,7 @@ class FormattedEnchant(
     private val enchant: Enchant,
     private val level: Int,
     stacking: String,
+    private val isRoman: Boolean
 ) : Comparable<FormattedEnchant> {
     private val stacking: String = stacking
         get() = "§8$field"
@@ -19,7 +20,7 @@ class FormattedEnchant(
 
     fun getFormattedString(): String {
         val builder = StringBuilder()
-        builder.append(enchant.getFormattedName(level)).append(" ").append(level.toRoman())
+        builder.append(enchant.getFormattedName(level)).append(" ").append(if (isRoman) level.toRoman() else level)
 
         return if (!stacking.contains("empty")) builder.append(stacking).toString() else builder.toString()
     }

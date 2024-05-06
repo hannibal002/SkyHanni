@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.RawToolTipEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -12,6 +13,7 @@ import net.minecraft.item.ItemStack
 // Please use LorenzToolTipEvent over ItemTooltipEvent if no special EventPriority is necessary
 object ToolTipData {
     fun getTooltip(stack: ItemStack, toolTip: MutableList<String>): List<String> {
+        RawToolTipEvent(stack, toolTip).postAndCatch()
         onHover(stack, toolTip)
         return onTooltip(toolTip)
     }

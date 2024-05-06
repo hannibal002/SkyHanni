@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.RawToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.lang.NumberFormatException
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
@@ -33,7 +34,7 @@ object EnchantParser {
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
-        "enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)"
+        "enchants", "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)"
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
@@ -84,7 +85,7 @@ object EnchantParser {
     }
 
     @SubscribeEvent
-    fun onTooltipEvent(event: LorenzToolTipEvent) {
+    fun onTooltipEvent(event: RawToolTipEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
 
@@ -201,7 +202,7 @@ object EnchantParser {
             val strippedLine = loreList[i].removeColor()
 
             if (startEnchant == -1) {
-                if (this.enchants.containsEnchantment(enchants, strippedLine)) startEnchant = i
+                if (this.enchants.containsEnchantment(enchants, loreList[i])) startEnchant = i
             } else if (strippedLine.trim().isEmpty() && endEnchant == -1) endEnchant = i - 1
         }
 
@@ -213,22 +214,27 @@ object EnchantParser {
         var lastEnchant: FormattedEnchant? = null
 
         for (i in startEnchant..endEnchant) {
-            val unformattedLine = loreList[i].removeColor()
-            val matcher = enchantmentPattern.matcher(unformattedLine)
+            val matcher = enchantmentPattern.matcher(loreList[i])
             var containsEnchant = false
             var enchantsOnThisLine = 0
+            var isRoman = true
 
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
                 val enchant = this.enchants.getFromLore(matcher.group("enchant"))
-                val level = matcher.group("levelNumeral").romanToDecimal()
-                val stacking = if (matcher.group("stacking").trimStart().matches("[\\d,]+\$".toRegex())) {
+                val level = try{
+                    // If one enchant is not a roman numeral we assume all are not roman numerals (idk a situation where this wouldn't be the case)
+                    matcher.group("levelNumeral").toInt().also { isRoman = false }
+                } catch (e: NumberFormatException) {
+                    matcher.group("levelNumeral").romanToDecimal()
+                }
+                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches("[\\d,]+\$".toRegex())) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
 
                 // Last found enchant
-                lastEnchant = FormattedEnchant(enchant, level, stacking)
+                lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)
 
                 if (!orderedEnchants.add(lastEnchant)) {
                     for (e: FormattedEnchant in orderedEnchants) {
