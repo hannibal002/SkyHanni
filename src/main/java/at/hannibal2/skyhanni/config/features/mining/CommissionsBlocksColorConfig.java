@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CommissionsBlocksColorConfig {
     @Expose
@@ -11,4 +12,9 @@ public class CommissionsBlocksColorConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(name = "Sneak Toggle", desc = "Quickly disable or enable this feature via sneaking.")
+    @ConfigEditorBoolean
+    public Property<Boolean> sneakQuickToggle = Property.of(false);
 }

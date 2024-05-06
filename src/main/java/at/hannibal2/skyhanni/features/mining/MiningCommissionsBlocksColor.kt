@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraft.block.BlockCarpet
@@ -121,12 +123,14 @@ object MiningCommissionsBlocksColor {
         }
 
         if (enabled) {
-            val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
-            if (sneaking != oldSneakState) {
-                oldSneakState = sneaking
-                if (oldSneakState) {
-                    active = !active
-                    dirty = true
+            if (config.sneakQuickToggle.get()) {
+                val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+                if (sneaking != oldSneakState) {
+                    oldSneakState = sneaking
+                    if (oldSneakState) {
+                        active = !active
+                        dirty = true
+                    }
                 }
             }
             if (dirty) {
@@ -137,6 +141,17 @@ object MiningCommissionsBlocksColor {
         if (reload) {
             Minecraft.getMinecraft().renderGlobal.loadRenderers()
             dirty = false
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigReload(event: ConfigLoadEvent) {
+        config.sneakQuickToggle.onToggle {
+            oldSneakState = false
+            if (!active) {
+                active = true
+                dirty = true
+            }
         }
     }
 
