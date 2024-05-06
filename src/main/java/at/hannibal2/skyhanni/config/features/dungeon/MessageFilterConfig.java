@@ -11,4 +11,22 @@ public class MessageFilterConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean keysAndDoors = false;
+
+    @Expose
+    @ConfigOption(name = "Solo Class", desc = "Hide the message that sends when you play a class alone.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean soloClass = false;
+
+    @Expose
+    @ConfigOption(name = "Solo Class Stats", desc = "Hide the boosted class stats when starting a dungeon.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean soloStats = false;
+
+    @Expose
+    @ConfigOption(name= "Fairy Dialogue" , desc = "Hide the dialogue when a fairy is killed.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fairy = false;
 }
