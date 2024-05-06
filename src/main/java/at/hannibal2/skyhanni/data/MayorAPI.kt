@@ -15,9 +15,9 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,7 +32,7 @@ object MayorAPI {
         "foxy.extraevent",
         "Schedules an extra §.(?<event>.*) §.event during the year\\."
     )
-    val electionOver by group.pattern(
+    private val electionOver by group.pattern(
         "election.over",
         "§eThe election room is now closed\\. Clerk Seraphine is doing a final count of the votes\\.\\.\\."
     )

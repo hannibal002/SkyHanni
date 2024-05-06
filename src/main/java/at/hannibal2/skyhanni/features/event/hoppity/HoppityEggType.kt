@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import kotlin.time.Duration
 
 enum class HoppityEggType(
