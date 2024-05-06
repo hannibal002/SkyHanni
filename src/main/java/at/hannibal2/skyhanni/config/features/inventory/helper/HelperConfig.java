@@ -36,6 +36,12 @@ public class HelperConfig {
         public boolean showNumbers = false;
 
         @Expose
+        @ConfigOption(name = "Hide Tooltip", desc = "Hides the item tooltips inside the Harp.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideMelodyTooltip = false;
+
+        @Expose
         @ConfigOption(name = "Keybinds", desc = "")
         @Accordion
         public HarpConfigKeyBinds harpKeybinds = new HarpConfigKeyBinds();
