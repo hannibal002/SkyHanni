@@ -110,6 +110,13 @@ object StringUtils {
         return null
     }
 
+    fun List<String>.indexOfFirstMatch(pattern: Pattern): Int? {
+        for ((index, line) in this.withIndex()) {
+            pattern.matcher(line).let { if (it.matches()) return index }
+        }
+        return null
+    }
+
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.find()) consumer(it) }
@@ -328,7 +335,6 @@ object StringUtils {
         return replaceIfNeeded(original, ChatComponentText(newText))
     }
 
-
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
     fun enumChatFormattingByCode(char: Char): EnumChatFormatting? {
         return colorMap[char]
@@ -391,7 +397,6 @@ object StringUtils {
             if (leftChar != rightChar) return false
         }
     }
-
 
     fun <T : IChatComponent> replaceIfNeeded(
         original: T,
