@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
-import at.hannibal2.skyhanni.api.HotmAPI.mineshaftMayhem
-import at.hannibal2.skyhanni.api.HotmAPI.skymall
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -444,6 +442,8 @@ enum class HotmData(
                 return
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
+
+            if (entry == SKY_MALL) handelSkyMall(lore)
         }
 
         private fun Slot.handlePowder(): Boolean {
@@ -491,6 +491,17 @@ enum class HotmData(
             return true
         }
 
+        private fun handelSkyMall(lore: List<String>) {
+            if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
+            else {
+                val index = lore.indexOf("§aYour Current Effect") + 1
+                skymallPattern.matchMatcher(lore[index]) {
+                    val perk = group("perk")
+                    HotmAPI.skymall = SkymallPerk.entries.find { it.itemString == perk }
+                }
+            }
+        }
+
         @SubscribeEvent
         fun onScoreboardUpdate(event: ScoreboardChangeEvent) {
             if (!LorenzUtils.inSkyBlock) return
@@ -524,16 +535,6 @@ enum class HotmData(
                 abilities.filter { it.isUnlocked }.forEach {
                     it.activeLevel = if (PEAK_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
                 }
-                val skymallItem = InventoryUtils.getItemsInOpenChest().find { it.stack.name == "§aSky Mall" || it.stack.name == "§cSky Mall" }?.stack ?: return@runNextTick
-                if (skymallItem.name.contains("§c")) skymall = null
-                else {
-                    val lore = skymallItem.getLore()
-                    val index = lore.indexOf("§aYour Current Effect")+1
-                    skymallPattern.matchMatcher(lore[index]) {
-                        val perk = group("perk")
-                        skymall = SkymallPerk.entries.find { it.itemString == perk }
-                    }
-                }
             }
         }
 
@@ -546,23 +547,23 @@ enum class HotmData(
             }
             skymallPattern.matchMatcher(event.message) {
                 val perk = group("perk")
-                skymall = SkymallPerk.entries.find { it.chat == perk }
-                ChatUtils.debug("setting skymall to $skymall")
+                HotmAPI.skymall = SkymallPerk.entries.find { it.chat == perk }
+                ChatUtils.debug("setting skymall to ${HotmAPI.skymall}")
                 return
             }
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")
-                    mineshaftMayhem = MayhemPerk.entries.find { it.chat == perk }
-                    ChatUtils.debug("setting mineshaftMayhem to $mineshaftMayhem")
+                    HotmAPI.mineshaftMayhem = MayhemPerk.entries.find { it.chat == perk }
+                    ChatUtils.debug("setting mineshaftMayhem to ${HotmAPI.mineshaftMayhem}")
                 }
             }
         }
 
         @SubscribeEvent
         fun onWorldSwitch(event: IslandChangeEvent) {
-            if (mineshaftMayhem != null) return
-            mineshaftMayhem = null
+            if (HotmAPI.mineshaftMayhem != null) return
+            HotmAPI.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
 
@@ -587,8 +588,8 @@ enum class HotmData(
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")
-                add("SkyMall: $skymall")
-                add("Mineshaft Mayhem: $mineshaftMayhem")
+                add("SkyMall: ${HotmAPI.skymall}")
+                add("Mineshaft Mayhem: ${HotmAPI.mineshaftMayhem}")
             }
             event.title("HotM - Tree")
             event.addIrrelevant(
