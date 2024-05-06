@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.features.mining.MiningBlockColors
+import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
@@ -21,8 +21,8 @@ fun modifyGetModelFromBlockState(
 
     if (!LorenzUtils.inSkyBlock) return
 
-    if (MiningBlockColors.enabled && MiningBlockColors.active) {
-        for (block in MiningBlockColors.MiningBlock.entries) {
+    if (MiningCommissionsBlocksColor.enabled && MiningCommissionsBlocksColor.active) {
+        for (block in MiningCommissionsBlocksColor.MiningBlock.entries) {
             if (block.checkIsland() && block.onCheck(state)) {
                 returnState = block.onColor(state, block.highlight)
             }

@@ -18,7 +18,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-object MiningBlockColors {
+object MiningCommissionsBlocksColor {
 
     var enabled = false
     var active = false
