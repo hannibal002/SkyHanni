@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -186,7 +187,13 @@ class ComposterDisplay {
 
         if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
         storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
-        ChatUtils.chat(warningMessage)
+        if (IslandType.GARDEN.isInIsland()) {
+            ChatUtils.chat(warningMessage)
+        } else {
+            ChatUtils.clickableChat(warningMessage, onClick = {
+                HypixelCommands.warp("garden")
+            })
+        }
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 
