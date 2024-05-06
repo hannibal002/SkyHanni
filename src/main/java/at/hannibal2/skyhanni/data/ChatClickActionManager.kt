@@ -8,8 +8,8 @@ object ChatClickActionManager {
 
     private val actions = mutableListOf<ClickableAction>()
 
-    fun oneTimeClick(message: String, onClick: () -> Any, expiresAt: SimpleTimeMark) {
-        val action = ClickableAction(StringUtils.generateRandomId(), message, onClick, expiresAt = expiresAt)
+    fun sendClickableMessage(message: String, onClick: () -> Any, expiresAt: SimpleTimeMark, oneTimeClick: Boolean) {
+        val action = ClickableAction(StringUtils.generateRandomId(), message, onClick, expiresAt = expiresAt, oneTime =  oneTimeClick)
         actions.add(action)
         action.sendToChat()
     }

@@ -178,9 +178,10 @@ object ChatUtils {
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
         prefixColor: String = "§e",
+        oneTimeClick: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        ChatClickActionManager.oneTimeClick(msgPrefix + message, onClick, expireAt)
+        ChatClickActionManager.sendClickableMessage(msgPrefix + message, onClick, expireAt, oneTimeClick = oneTimeClick)
     }
 
     /**
