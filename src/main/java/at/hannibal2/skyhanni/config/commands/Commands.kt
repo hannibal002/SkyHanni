@@ -163,6 +163,7 @@ object Commands {
             )
         }, DefaultConfigFeatures::onComplete)
         registerCommand("shremind", "Set a reminder for yourself") { ReminderManager.command(it) }
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun usersNormal() {
@@ -300,7 +301,7 @@ object Commands {
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
             {
-            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
             },
             FarmingMilestoneCommand::onComplete
         )
@@ -527,7 +528,6 @@ object Commands {
     }
 
     private fun internalCommands() {
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 

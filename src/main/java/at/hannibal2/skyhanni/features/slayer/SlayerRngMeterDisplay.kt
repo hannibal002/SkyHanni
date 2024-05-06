@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -21,11 +22,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
@@ -53,7 +55,7 @@ class SlayerRngMeterDisplay {
         "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
     )
 
-    private var display = ""
+    private var display = emptyList<Renderable>()
     private var lastItemDroppedTime = 0L
 
     var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
@@ -186,10 +188,15 @@ class SlayerRngMeterDisplay {
     }
 
     private fun update() {
-        display = drawDisplay()
+        display = listOf(makeLink(drawDisplay()))
     }
 
-    private fun drawDisplay(): String {
+    private fun makeLink(text: String) =
+        Renderable.clickAndHover(text, listOf("§eClick to open RNG Meter Inventory."), onClick = {
+            HypixelCommands.showRng("slayer", SlayerAPI.getActiveSlayer()?.rngName)
+        })
+
+    fun drawDisplay(): String {
         val storage = getStorage() ?: return ""
 
         if (SlayerAPI.latestSlayerCategory.let {
@@ -221,12 +228,12 @@ class SlayerRngMeterDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        config.pos.renderString(display, posLabel = "RNG Meter Display")
+        config.pos.renderRenderables(display, posLabel = "RNG Meter Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
