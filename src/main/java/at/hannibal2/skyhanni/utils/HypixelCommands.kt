@@ -62,6 +62,10 @@ object HypixelCommands {
         send("ac $message")
     }
 
+    fun partyChat(message: String) {
+        send("pc $message")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function

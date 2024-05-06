@@ -73,10 +73,13 @@ object PartyCommands {
     }
 
     fun reverseTransfer() {
-        if (!config.reversePartyTransfer) return
+        if (!config.reversePT.command) return
         if (PartyAPI.partyMembers.isEmpty()) return
         PartyAPI.prevPartyLeader?.let {
             HypixelCommands.partyTransfer(it)
+            if (config.reversePT.message.isNotBlank()) {
+                HypixelCommands.partyChat(config.reversePT.message)
+            }
         }
     }
 
@@ -132,7 +135,7 @@ object PartyCommands {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onChat(event: LorenzChatEvent) {
-        if (!config.reversePartyTransferMessage) return
+        if (!config.reversePT.clickable) return
         if (transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) {
             if (partyLeader != LorenzUtils.getPlayerName()) return
 
@@ -143,6 +146,9 @@ object PartyCommands {
                     event.message,
                     onClick = {
                         HypixelCommands.partyTransfer(it)
+                        if (config.reversePT.message.isNotBlank()) {
+                            HypixelCommands.partyChat(config.reversePT.message)
+                        }
                     },
                     prefix = false
                 )
