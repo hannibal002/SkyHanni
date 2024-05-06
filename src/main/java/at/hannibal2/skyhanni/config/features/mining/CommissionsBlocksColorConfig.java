@@ -1,0 +1,14 @@
+package at.hannibal2.skyhanni.config.features.mining;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+public class CommissionsBlocksColorConfig {
+    @Expose
+    @ConfigOption(name = "Enabled", desc = "Change the color of ores on mining island depending on your active commissions.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enabled = false;
+}

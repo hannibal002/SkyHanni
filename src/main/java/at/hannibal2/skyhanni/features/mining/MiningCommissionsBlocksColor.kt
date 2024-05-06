@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
@@ -19,6 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object MiningCommissionsBlocksColor {
+
+    private val config get() = SkyHanniMod.feature.mining.commissionsBlocksColor
 
     var enabled = false
     var active = false
@@ -99,7 +102,6 @@ object MiningCommissionsBlocksColor {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-
         if (LorenzUtils.lastWorldSwitch.passedSince() > 4.seconds) {
             inGlaciteArea = MiningAPI.inGlaciteArea()
             inDwarvenMines = IslandType.DWARVEN_MINES.isInIsland() && !(inGlaciteArea ||
@@ -107,8 +109,8 @@ object MiningCommissionsBlocksColor {
                 )
             inCrystalHollows = IslandType.CRYSTAL_HOLLOWS.isInIsland() && HypixelData.skyBlockArea != "Crystal Nucleus"
         }
-        val newEnabled = inDwarvenMines || inCrystalHollows || inGlaciteArea
 
+        val newEnabled = (inDwarvenMines || inCrystalHollows || inGlaciteArea) && config.enabled
         var reload = false
         if (newEnabled != enabled) {
             enabled = newEnabled
