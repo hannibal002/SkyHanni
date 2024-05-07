@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.events.EntityRenderNametagEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -26,10 +25,6 @@ object ContributorManager {
         getSuffix(event.entity.name)?.let {
             event.chatComponent.appendSibling(ChatComponentText(" $it"))
         }
-    }
-
-    private fun addSuffixToNametag(entity: EntityLivingBase) {
-        getSuffix(entity.name)?.let { (entity as? EntityPlayer)?.addSuffix(ChatComponentText(" $it")) }
     }
 
     fun getSuffix(username: String): String? = getContributor(username)?.suffix
