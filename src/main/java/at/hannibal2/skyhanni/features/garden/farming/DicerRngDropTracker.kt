@@ -85,11 +85,11 @@ object DicerRngDropTracker {
         itemDrops.add(ItemDrop(CropType.PUMPKIN, DropRarity.PRAY_TO_RNGESUS, pumpkinRngesusDropPattern))
     }
 
-    enum class DropRarity(val displayName: String) {
-        UNCOMMON("§aUNCOMMON"),
-        RARE("§9RARE"),
-        CRAZY_RARE("§dCRAZY RARE"),
-        PRAY_TO_RNGESUS("§5PRAY TO RNGESUS"),
+    enum class DropRarity(val colorCode: Char, val displayName: String) {
+        UNCOMMON('a', "UNCOMMON"),
+        RARE('9', "RARE"),
+        CRAZY_RARE('d', "CRAZY RARE"),
+        PRAY_TO_RNGESUS('5', "PRAY TO RNGESUS"),
     }
 
     @SubscribeEvent
@@ -114,14 +114,27 @@ object DicerRngDropTracker {
         val items = data.drops.getOrPut(cropInHand) { mutableMapOf() }
         val list = mutableListOf<Renderable>()
         val topLine = mutableListOf<Renderable>()
+        var compactLine = ""
         topLine.add(Renderable.itemStack(cropInHand.icon))
         topLine.add(Renderable.string("§7Dicer Tracker:"))
-        list.add(Renderable.horizontalContainer(topLine))
-        for ((rarity, amount) in items.sortedDesc()) {
-            val displayName = rarity.displayName
-            list.add(Renderable.string(" §7- §e${amount.addSeparators()}x $displayName"))
+        add(listOf(Renderable.horizontalContainer(topLine)))
+        if (config.compact) {
+            var first = true
+            items.sortedDesc().entries.forEach { (rarity, amount) ->
+                if (!first) compactLine += "§7/"
+                compactLine += "§${rarity.colorCode}${amount.addSeparators()}"
+                first = false
+            }
+            list.add(Renderable.string(compactLine))
+            add(listOf(Renderable.verticalContainer(list)))
+        } else {
+            for ((rarity, amount) in items.sortedDesc()) {
+                val colorCode = rarity.colorCode
+                val displayName = rarity.displayName
+                list.add(Renderable.string(" §7- §e${amount.addSeparators()}x §$colorCode$displayName"))
+            }
+            add(listOf(Renderable.verticalContainer(list)))
         }
-        add(listOf(Renderable.verticalContainer(list)))
 
     }
 

@@ -15,6 +15,12 @@ public class DicerRngDropTrackerConfig {
     public boolean display = true;
 
     @Expose
+    @ConfigOption(name = "Compact Tracker", desc = "Compact the Dicer RNG drop Tracker Display.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compact = false;
+
+    @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
     @ConfigEditorBoolean
     @FeatureToggle
