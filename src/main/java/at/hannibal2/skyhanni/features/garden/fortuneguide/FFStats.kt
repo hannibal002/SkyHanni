@@ -84,45 +84,45 @@ object FFStats {
     fun getCropStats(crop: CropType, tool: ItemStack?) {
         FortuneStats.reset()
 
-        FortuneStats.BASE.set(Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1277.0))
-        FortuneStats.CROP_UPGRADE.set(Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0))
-        FortuneStats.ACCESSORY.set(Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0))
-        FortuneStats.FFD.set(Pair((tool?.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0))
-        FortuneStats.TURBO.set(Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0))
-        FortuneStats.DEDICATION.set(Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0))
-        FortuneStats.CULTIVATING.set(Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 20.0))
+        FortuneStats.BASE.set(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1277.0)
+        FortuneStats.CROP_UPGRADE.set((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
+        FortuneStats.ACCESSORY.set(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
+        FortuneStats.FFD.set((tool?.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
+        FortuneStats.TURBO.set(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
+        FortuneStats.DEDICATION.set(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0)
+        FortuneStats.CULTIVATING.set(FarmingFortuneDisplay.getCultivatingFortune(tool), 20.0)
 
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
         when (crop) {
             in mathCrops -> {
-                FortuneStats.BASE_TOOL.set(Pair(FarmingFortuneDisplay.getToolFortune(tool), 50.0))
-                FortuneStats.COUNTER.set(Pair(FarmingFortuneDisplay.getCounterFortune(tool), 96.0))
-                FortuneStats.HARVESTING.set(Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0))
-                FortuneStats.COLLECTION.set(Pair(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0))
-                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 20.0))
+                FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
+                FortuneStats.COUNTER.set(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
+                FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
+                FortuneStats.COLLECTION.set(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0)
+                FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
             }
 
             in dicerCrops -> {
-                FortuneStats.SUNDER.set(Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0))
-                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 20.0))
+                FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
+                FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
             }
 
             CropType.MUSHROOM -> {
-                FortuneStats.BASE_TOOL.set(Pair(FarmingFortuneDisplay.getToolFortune(tool), 30.0))
-                FortuneStats.HARVESTING.set(Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0))
-                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 16.0))
+                FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 30.0)
+                FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
+                FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 16.0)
             }
 
             CropType.COCOA_BEANS -> {
-                FortuneStats.BASE_TOOL.set(Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0))
-                FortuneStats.SUNDER.set(Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0))
-                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 16.0))
+                FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
+                FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
+                FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 16.0)
             }
 
             CropType.CACTUS -> {
-                FortuneStats.HARVESTING.set(Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0))
-                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 16.0))
+                FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
+                FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 16.0)
             }
 
             else -> {}
@@ -130,12 +130,12 @@ object FFStats {
         if (crop == CropType.CARROT) {
             val storage = GardenAPI.storage?.fortune ?: return
             val carrotFortune = if (storage.carrotFortune) 12.0 else 0.0
-            FortuneStats.EXPORTED_CARROT.set(Pair(carrotFortune, 12.0))
+            FortuneStats.EXPORTED_CARROT.set(carrotFortune, 12.0)
         }
         if (crop == CropType.PUMPKIN) {
             val storage = GardenAPI.storage?.fortune ?: return
             val pumpkinFortune = if (storage.pumpkinFortune) 12.0 else 0.0
-            FortuneStats.EXPIRED_PUMPKIN.set(Pair(pumpkinFortune, 12.0))
+            FortuneStats.EXPIRED_PUMPKIN.set(pumpkinFortune, 12.0)
         }
 
         FortuneStats.CROP_TOTAL.set(FortuneStats.getTotal())

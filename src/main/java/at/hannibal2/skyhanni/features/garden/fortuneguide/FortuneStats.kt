@@ -45,6 +45,11 @@ enum class FortuneStats(val label: String, val tooltip: String) {
         max = value.second
     }
 
+    fun set(current: Double, max: Double) {
+        this.current = current
+        this.max = max
+    }
+
     fun isActive() = max != -1.0
 
     companion object {
