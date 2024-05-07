@@ -45,7 +45,7 @@ class DungeonArchitectFeatures {
 
         // TODO use hypxel command class (once the pr is merged
         ChatUtils.clickableChat(
-            "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle.\n" +
+            "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle. \n" +
                 "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)",
             "/gfs ARCHITECT_FIRST_DRAFT 1",
             false
