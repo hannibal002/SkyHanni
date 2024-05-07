@@ -45,19 +45,30 @@ open class CustomLinesGui : GuiScreen() {
         return Renderable.drawInsideRoundedRect(
             Renderable.doubleLayered(
                 Renderable.placeholder(guiWidth, guiHeight),
-                Renderable.verticalContainer(
+                Renderable.horizontalContainer(
                     listOf(
-                        Renderable.string("Custom Lines"),
-                        Renderable.clickable(
-                            if (inTextMode) {
-                                Renderable.underlined(text)
-                            } else {
-                                text
-                            },
-                            {
-                                inTextMode = !inTextMode
-                            },
-                            bypassChecks = true
+                        Renderable.verticalContainer(
+                            listOf(
+                                Renderable.string("Custom Lines"),
+                                Renderable.clickable(
+                                    if (inTextMode) {
+                                        Renderable.underlined(text)
+                                    } else {
+                                        text
+                                    },
+                                    {
+                                        inTextMode = !inTextMode
+                                    },
+                                    bypassChecks = true
+                                )
+                            )
+                        ),
+                        Renderable.verticalContainer(
+                            listOf(
+                                Renderable.string("Custom Line 1"),
+                                Renderable.string(CustomScoreboard.customlineConfig.customLine1)
+                            ),
+                            horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT
                         )
                     )
                 )
