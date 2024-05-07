@@ -19,8 +19,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         sizeX, sizeY, paddingX, paddingY, footerSpacing
     ) {
 
-    private var equipmentFF = mutableMapOf<FFTypes, Double>()
-    private var armorFF = mutableMapOf<FFTypes, Double>()
+    private var equipmentFF = mapOf<FFTypes, Double>()
+    private var armorFF = mapOf<FFTypes, Double>()
 
     override fun onEnter() {
         val (content, footer) = getPage()

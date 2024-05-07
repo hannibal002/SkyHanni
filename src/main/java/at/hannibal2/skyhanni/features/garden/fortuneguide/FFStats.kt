@@ -23,46 +23,46 @@ object FFStats {
 
     var cakeExpireTime = 0L
 
-    val necklaceFF = mutableMapOf<FFTypes, Double>()
-    val cloakFF = mutableMapOf<FFTypes, Double>()
-    val beltFF = mutableMapOf<FFTypes, Double>()
-    val braceletFF = mutableMapOf<FFTypes, Double>()
-    var equipmentTotalFF = mutableMapOf<FFTypes, Double>()
+    var necklaceFF = mapOf<FFTypes, Double>()
+    var cloakFF = mapOf<FFTypes, Double>()
+    var beltFF = mapOf<FFTypes, Double>()
+    var braceletFF = mapOf<FFTypes, Double>()
+    var equipmentTotalFF = mapOf<FFTypes, Double>()
 
-    val helmetFF = mutableMapOf<FFTypes, Double>()
-    val chestplateFF = mutableMapOf<FFTypes, Double>()
-    val leggingsFF = mutableMapOf<FFTypes, Double>()
-    val bootsFF = mutableMapOf<FFTypes, Double>()
-    var armorTotalFF = mutableMapOf<FFTypes, Double>()
+    var helmetFF = mapOf<FFTypes, Double>()
+    var chestplateFF = mapOf<FFTypes, Double>()
+    var leggingsFF = mapOf<FFTypes, Double>()
+    var bootsFF = mapOf<FFTypes, Double>()
+    var armorTotalFF = mapOf<FFTypes, Double>()
     var usingSpeedBoots = false
 
-    val elephantFF = mutableMapOf<FFTypes, Double>()
-    val mooshroomFF = mutableMapOf<FFTypes, Double>()
-    val rabbitFF = mutableMapOf<FFTypes, Double>()
-    val beeFF = mutableMapOf<FFTypes, Double>()
+    var elephantFF = mapOf<FFTypes, Double>()
+    var mooshroomFF = mapOf<FFTypes, Double>()
+    var rabbitFF = mapOf<FFTypes, Double>()
+    var beeFF = mapOf<FFTypes, Double>()
     var currentPetItem = ""
 
-    var baseFF = mutableMapOf<FFTypes, Double>()
+    var baseFF = mapOf<FFTypes, Double>()
 
-    var totalBaseFF = mutableMapOf<FFTypes, Double>()
+    var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
         cakeExpireTime = GardenAPI.storage?.fortune?.cakeExpiring ?: -1L
 
-        getEquipmentFFData(FarmingItems.NECKLACE.getItem(), necklaceFF)
-        getEquipmentFFData(FarmingItems.CLOAK.getItem(), cloakFF)
-        getEquipmentFFData(FarmingItems.BELT.getItem(), beltFF)
-        getEquipmentFFData(FarmingItems.BRACELET.getItem(), braceletFF)
+        necklaceFF = getEquipmentFFData(FarmingItems.NECKLACE.getItem())
+        cloakFF = getEquipmentFFData(FarmingItems.CLOAK.getItem())
+        beltFF = getEquipmentFFData(FarmingItems.BELT.getItem())
+        braceletFF = getEquipmentFFData(FarmingItems.BRACELET.getItem())
 
         equipmentTotalFF =
             (necklaceFF.toList() + cloakFF.toList() + beltFF.toList() + braceletFF.toList()).groupBy({ it.first },
                 { it.second }).map { (key, values) -> key to values.sum() }
                 .toMap() as MutableMap<FFTypes, Double>
 
-        getArmorFFData(FarmingItems.HELMET.getItem(), helmetFF)
-        getArmorFFData(FarmingItems.CHESTPLATE.getItem(), chestplateFF)
-        getArmorFFData(FarmingItems.LEGGINGS.getItem(), leggingsFF)
-        getArmorFFData(FarmingItems.BOOTS.getItem(), bootsFF)
+        helmetFF = getArmorFFData(FarmingItems.HELMET.getItem())
+        chestplateFF = getArmorFFData(FarmingItems.CHESTPLATE.getItem())
+        leggingsFF = getArmorFFData(FarmingItems.LEGGINGS.getItem())
+        bootsFF = getArmorFFData(FarmingItems.BOOTS.getItem())
 
         armorTotalFF =
             (helmetFF.toList() + chestplateFF.toList() + leggingsFF.toList() + bootsFF.toList()).groupBy({ it.first },
@@ -71,12 +71,12 @@ object FFStats {
 
         usingSpeedBoots = FarmingItems.BOOTS.getItem()?.getInternalName()?.asString() in farmingBoots
 
-        getPetFFData(FarmingItems.ELEPHANT.getItem(), elephantFF)
-        getPetFFData(FarmingItems.MOOSHROOM_COW.getItem(), mooshroomFF)
-        getPetFFData(FarmingItems.RABBIT.getItem(), rabbitFF)
-        getPetFFData(FarmingItems.BEE.getItem(), beeFF)
+        elephantFF = getPetFFData(FarmingItems.ELEPHANT.getItem())
+        mooshroomFF = getPetFFData(FarmingItems.MOOSHROOM_COW.getItem())
+        rabbitFF = getPetFFData(FarmingItems.RABBIT.getItem())
+        beeFF = getPetFFData(FarmingItems.BEE.getItem())
 
-        getGenericFF(baseFF)
+        baseFF = getGenericFF()
 
         getTotalFF()
     }
@@ -141,56 +141,53 @@ object FFStats {
         FortuneStats.CROP_TOTAL.set(FortuneStats.getTotal())
     }
 
-    private fun getEquipmentFFData(item: ItemStack?, out: MutableMap<FFTypes, Double>) {
+    private fun getEquipmentFFData(item: ItemStack?): Map<FFTypes, Double> = buildMap {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        out[FFTypes.TOTAL] = 0.0
-        out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
-        out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
-        out[FFTypes.GREEN_THUMB] = FarmingFortuneDisplay.greenThumbFortune
-        out[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
-        out[FFTypes.TOTAL] = out.values.sum()
+        this[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
+        this[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
+        this[FFTypes.GREEN_THUMB] = FarmingFortuneDisplay.greenThumbFortune
+        this[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
+        this[FFTypes.TOTAL] = this.values.sum()
     }
 
-    private fun getArmorFFData(item: ItemStack?, out: MutableMap<FFTypes, Double>) {
-        out[FFTypes.TOTAL] = 0.0
+    private fun getArmorFFData(item: ItemStack?): Map<FFTypes, Double> = buildMap {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
-        out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
-        out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
-        out[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
-        out[FFTypes.TOTAL] = out.values.sum()
+        this[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
+        this[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
+        this[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
+        this[FFTypes.TOTAL] = this.values.sum()
     }
 
-    private fun getPetFFData(item: ItemStack?, out: MutableMap<FFTypes, Double>) {
+    private fun getPetFFData(item: ItemStack?): Map<FFTypes, Double> = buildMap {
         val gardenLvl = GardenAPI.getGardenLevel(overflow = false)
-        out[FFTypes.TOTAL] = 0.0
-        out[FFTypes.BASE] = getPetFF(item)
-        out[FFTypes.PET_ITEM] = when (item?.getPetItem()) {
+        this[FFTypes.TOTAL] = 0.0
+        this[FFTypes.BASE] = getPetFF(item)
+        this[FFTypes.PET_ITEM] = when (item?.getPetItem()) {
             "GREEN_BANDANA" -> 4.0 * gardenLvl
             "YELLOW_BANDANA" -> 30.0
-            "MINOS_RELIC" -> (out[FFTypes.BASE] ?: 0.0) * .33
+            "MINOS_RELIC" -> (this[FFTypes.BASE] ?: 0.0) * .33
             else -> 0.0
         }
-        out[FFTypes.TOTAL] = out.values.sum()
+        this[FFTypes.TOTAL] = this.values.sum()
     }
 
-    private fun getGenericFF(out: MutableMap<FFTypes, Double>) {
-        val storage = GardenAPI.storage?.fortune ?: return
-        out[FFTypes.TOTAL] = 0.0
-        out[FFTypes.BASE_FF] = 100.0
-        out[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
-        out[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
-        out[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
-        out[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
+    private fun getGenericFF(): Map<FFTypes, Double> = buildMap {
+        val storage = GardenAPI.storage?.fortune ?: return emptyMap()
+        this[FFTypes.BASE_FF] = 100.0
+        this[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
+        this[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
+        this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
+        this[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
         if (cakeExpireTime - System.currentTimeMillis() > 0 || cakeExpireTime == -1L) {
-            out[FFTypes.CAKE] = 5.0
+            this[FFTypes.CAKE] = 5.0
         } else {
-            out[FFTypes.CAKE] = 0.0
+            this[FFTypes.CAKE] = 0.0
         }
-        out[FFTypes.TOTAL] = out.values.sum()
+        this[FFTypes.TOTAL] = this.values.sum()
     }
 
     fun getTotalFF() {
-        var petList = mutableMapOf<FFTypes, Double>()
+        var petList = mapOf<FFTypes, Double>()
         when (FFGuideGUI.currentPet) {
             FarmingItems.ELEPHANT -> {
                 petList = elephantFF
