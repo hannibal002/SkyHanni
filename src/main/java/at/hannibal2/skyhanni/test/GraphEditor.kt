@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
-import at.hannibal2.skyhanni.data.model.graphFromJson
 import at.hannibal2.skyhanni.data.model.toJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -211,7 +210,7 @@ object GraphEditor {
             runBlocking {
                 OSUtils.readFromClipboard()?.let {
                     try {
-                        graphFromJson(it)
+                        Graph.fromJson(it)
                     } catch (e: Exception) {
                         ErrorManager.logErrorWithData(
                             e,
