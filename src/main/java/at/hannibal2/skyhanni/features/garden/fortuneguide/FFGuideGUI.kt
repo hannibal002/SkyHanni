@@ -29,26 +29,9 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
         var currentCrop: CropType? = null
 
-        // todo set this to what they have equip
         val currentPet get() = FarmingItems.currentPet
-        val currentArmor
-            get() = when (FarmingItems.currentArmor) {
-                null -> 0
-                FarmingItems.HELMET -> 1
-                FarmingItems.CHESTPLATE -> 2
-                FarmingItems.LEGGINGS -> 3
-                FarmingItems.BOOTS -> 4
-                else -> -1
-            }
-        val currentEquipment
-            get() = when (FarmingItems.currentEquip) {
-                null -> 0
-                FarmingItems.NECKLACE -> 1
-                FarmingItems.CLOAK -> 2
-                FarmingItems.BELT -> 3
-                FarmingItems.BRACELET -> 4
-                else -> -1
-            }
+        val currentArmor get() = FarmingItems.currentArmor
+        val currentEquipment get() = FarmingItems.currentEquip
 
         var mouseX = 0
         var mouseY = 0

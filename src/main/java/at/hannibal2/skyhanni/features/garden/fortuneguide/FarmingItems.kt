@@ -5,8 +5,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.item.ItemStack
 
-enum class FarmingItems {
+enum class FarmingItems(private val f: (ItemStack?) -> Map<FFTypes, Double> = { emptyMap() }) {
     WHEAT,
     CARROT,
     POTATO,
@@ -17,18 +18,18 @@ enum class FarmingItems {
     SUGAR_CANE,
     CACTUS,
     MUSHROOM,
-    HELMET,
-    CHESTPLATE,
-    LEGGINGS,
-    BOOTS,
-    NECKLACE,
-    CLOAK,
-    BELT,
-    BRACELET,
-    ELEPHANT,
-    MOOSHROOM_COW,
-    RABBIT,
-    BEE,
+    HELMET(FFStats::getArmorFFData),
+    CHESTPLATE(FFStats::getArmorFFData),
+    LEGGINGS(FFStats::getArmorFFData),
+    BOOTS(FFStats::getArmorFFData),
+    NECKLACE(FFStats::getEquipmentFFData),
+    CLOAK(FFStats::getEquipmentFFData),
+    BELT(FFStats::getEquipmentFFData),
+    BRACELET(FFStats::getEquipmentFFData),
+    ELEPHANT(FFStats::getPetFFData),
+    MOOSHROOM_COW(FFStats::getPetFFData),
+    RABBIT(FFStats::getPetFFData),
+    BEE(FFStats::getPetFFData),
     ;
 
     var selectedState = false
@@ -105,8 +106,17 @@ enum class FarmingItems {
         }
     }
 
+    private var ffData: Map<FFTypes, Double>? = null
+
+    fun getFFData() = ffData ?: run {
+        val data = f(getItem())
+        ffData = data
+        data
+    }
+
     companion object {
 
+        // TODO
         var lastEquippedPet = ELEPHANT
 
         var currentPet: FarmingItems = lastEquippedPet
@@ -125,6 +135,10 @@ enum class FarmingItems {
         fun getPetsDisplay(clickEnabled: Boolean = false): List<Renderable> = pets.map { it.getDisplay(clickEnabled) }
         fun resetClickState() {
             entries.filterNot { pets.contains(it) }.forEach { it.selectedState = false }
+        }
+
+        fun resetFFData() {
+            entries.forEach { it.ffData = null }
         }
 
         fun setDefaultPet(): FarmingItems {
