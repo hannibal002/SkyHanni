@@ -112,7 +112,7 @@ object FossilExcavatorAPI {
             ItemUtils.readItemAmount(group("item"))
         } ?: return
         // Workaround: If it is a enchanted book, we assume it is a paleontologist I book
-        if (pair.first.let { it ==  "§fEnchanted" || it == "§fEnchanted Book"}) {
+        if (pair.first.let { it == "§fEnchanted" || it == "§fEnchanted Book" }) {
             pair = "Paleontologist I" to pair.second
         }
         loot.add(pair)

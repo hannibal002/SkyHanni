@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -33,6 +31,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
@@ -93,7 +93,7 @@ class HideNotClickableItems {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (isDisabled()) return
         if (bypasssActive()) return
@@ -102,14 +102,11 @@ class HideNotClickableItems {
         val chest = guiChest.inventorySlots as ContainerChest
         val chestName = chest.getInventoryName()
 
-        for ((_, stack) in chest.getLowerItems()) {
+        for ((slot, stack) in chest.getLowerItems()) {
             if (hide(chestName, stack)) {
-                val opacity = config.opacity
-                val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
-                stack.background = color.rgb
+                slot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
             } else if (showGreenLine && config.itemsGreenLine) {
-                val color = LorenzColor.GREEN.addOpacity(200)
-                stack.borderLine = color.rgb
+                slot drawBorder LorenzColor.GREEN.addOpacity(200)
             }
         }
     }
@@ -386,7 +383,6 @@ class HideNotClickableItems {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
-        val name = stack.cleanName()
         showGreenLine = true
         if (ItemUtils.isSack(stack)) return false
 
