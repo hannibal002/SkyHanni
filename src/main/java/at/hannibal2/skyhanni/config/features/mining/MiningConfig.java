@@ -48,6 +48,11 @@ public class MiningConfig {
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
 
     @Expose
+    @ConfigOption(name = "Mineshaft", desc = "")
+    @Accordion
+    public MineshaftConfig mineshaft = new MineshaftConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle

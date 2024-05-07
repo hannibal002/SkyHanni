@@ -306,6 +306,8 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.GlacitePowderFeatures
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ProfitPerExcavation
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.solver.FossilSolverDisplay
+import at.hannibal2.skyhanni.features.mining.mineshaft.CorpseAPI
+import at.hannibal2.skyhanni.features.mining.mineshaft.MineshaftCorpseProfitPer
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionFeatures
 import at.hannibal2.skyhanni.features.minion.MinionCollectLogic
@@ -739,6 +741,8 @@ class SkyHanniMod {
         loadModule(ExcavatorProfitTracker())
         loadModule(ProfitPerExcavation())
         loadModule(GlacitePowderFeatures())
+        loadModule(MineshaftCorpseProfitPer())
+        loadModule(CorpseAPI())
         loadModule(GardenOptimalSpeed())
         loadModule(GardenLevelDisplay())
         loadModule(FarmingWeightDisplay())
