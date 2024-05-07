@@ -34,7 +34,7 @@ class CorpseAPI {
     /**
      * REGEX-TEST:     §r§9☠ Fine Onyx Gemstone §r§8x2
      */
-    private val itemPattern by chatPatternGroup.pattern("item", " {4}§r§9☠ Fine Onyx Gemstone §r§8x2")
+    private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
