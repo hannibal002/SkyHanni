@@ -73,8 +73,16 @@ open class CustomLinesGui : GuiScreen() {
         val list = mutableListOf<Renderable>()
         CustomLines.replacements.forEach {
             list.add(
-                Renderable.wrappedString(
-                    "${it.third} | ${it.second.invoke()}", maxSecondColumnWidth
+                Renderable.clickable(
+                    Renderable.wrappedString(
+                        "${it.third} | ${it.second.invoke()}", maxSecondColumnWidth
+                    ),
+                    {
+                        if (inTextMode) {
+                            textBox.textBox += it.first
+                        }
+                    },
+                    bypassChecks = true
                 )
             )
         }
