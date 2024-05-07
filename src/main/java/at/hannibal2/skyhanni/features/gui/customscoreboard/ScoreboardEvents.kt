@@ -158,7 +158,12 @@ enum class ScoreboardEvents(
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
         ::getActiveEventShowWhen,
-        "§7(All Active Tablist Events)"
+        "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h"
+    ),
+    STARTING_SOON_TABLIST_EVENTS(
+        ::getSoonEventLine,
+        ::getSoonEventShowWhen,
+        "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
     ),
     REDSTONE(
         ::getRedstoneLines,
@@ -369,26 +374,43 @@ private fun getSpookyLines() = buildList {
 
 private fun getSpookyShowWhen(): Boolean = getSbLines().any { ScoreboardPattern.spookyPattern.matches(it) }
 
-private fun getActiveEventLine(): List<String> {
-    val currentActiveEvent = TabListData.getTabList().firstOrNull { SbPattern.eventNamePattern.matches(it) }
+private fun getTablistEvent(): String? =
+    TabListData.getTabList().firstOrNull { SbPattern.eventNamePattern.matches(it) }
         ?.let {
             SbPattern.eventNamePattern.matchMatcher(it) {
                 group("name")
             }
         }
-    val currentActiveEventEndsIn = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
+
+private fun getActiveEventLine(): List<String> {
+    val currentActiveEvent = getTablistEvent() ?: return emptyList()
+    val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
         ?.let {
             SbPattern.eventTimeEndsPattern.matchMatcher(it) {
                 group("time")
             }
         }
 
-    return listOf("$currentActiveEvent $currentActiveEventEndsIn")
+    return listOf(currentActiveEvent, " Ends in: §e$currentActiveEventTime")
 }
 
 private fun getActiveEventShowWhen(): Boolean =
-    TabListData.getTabList().any { SbPattern.eventNamePattern.matches(it) } &&
-        TabListData.getTabList().any { SbPattern.eventTimeEndsPattern.matches(it) }
+    getTablistEvent() != null && TabListData.getTabList().any { SbPattern.eventTimeEndsPattern.matches(it) }
+
+private fun getSoonEventLine(): List<String> {
+    val soonActiveEvent = getTablistEvent() ?: return emptyList()
+    val soonActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
+        ?.let {
+            SbPattern.eventTimeStartsPattern.matchMatcher(it) {
+                group("time")
+            }
+        }
+
+    return listOf(soonActiveEvent, " Starts in: §e$soonActiveEventTime")
+}
+
+private fun getSoonEventShowWhen(): Boolean =
+    getTablistEvent() != null && TabListData.getTabList().any { SbPattern.eventTimeStartsPattern.matches(it) }
 
 private fun getBroodmotherLines(): List<String> =
     listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
@@ -481,6 +503,7 @@ private fun getRiftLines() = getSbLines().filter { line ->
         || SbPattern.timeLeftPattern.matches(line)
         || SbPattern.riftHotdogEatenPattern.matches(line)
         || SbPattern.riftAveikxPattern.matches(line)
+        || SbPattern.riftHayEatenPattern.matches(line)
 }
 
 private fun getEssenceLines(): List<String> = listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })

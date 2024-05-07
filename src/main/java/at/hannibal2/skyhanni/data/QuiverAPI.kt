@@ -224,7 +224,7 @@ object QuiverAPI {
                     if (currentArrowType != currentArrow || amount != currentAmount) {
                         currentArrow = currentArrowType
                         currentAmount = amount
-                        QuiverUpdateEvent(currentArrowType, currentAmount, shouldHideAmount()).postAndCatch()
+                        QuiverUpdateEvent(currentArrowType, amount, shouldHideAmount()).postAndCatch()
                     }
                 }
             }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
@@ -234,7 +235,7 @@ interface Renderable {
             }
             val isGuiPositionEditor = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
-                ToolTipData.lastSlot == null
+                ToolTipData.lastSlot == null || GuiData.preDrawEventCanceled
             } else true
             val isConfigScreen = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
 

@@ -93,7 +93,7 @@ public class FilterTypesConfig {
     public boolean diana = false;
 
     @Expose
-    @ConfigOption(name = "Factory Upgrade", desc = "Hide chocolate factory upgrade and employee promotion messages.")
+    @ConfigOption(name = "Factory Upgrade", desc = "Hide Hypixel's chocolate factory upgrade and employee promotion messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean factoryUpgrade = false;
