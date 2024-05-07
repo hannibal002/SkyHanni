@@ -46,8 +46,6 @@ object FFStats {
 
     var totalBaseFF = mutableMapOf<FFTypes, Double>()
 
-    val cropPage = mutableMapOf<FortuneStats, Pair<Double, Double>>()
-
     fun loadFFData() {
         cakeExpireTime = GardenAPI.storage?.fortune?.cakeExpiring ?: -1L
 
@@ -84,46 +82,47 @@ object FFStats {
     }
 
     fun getCropStats(crop: CropType, tool: ItemStack?) {
-        cropPage.clear()
-        cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1277.0)
-        cropPage[FortuneStats.CROP_UPGRADE] = Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
-        cropPage[FortuneStats.ACCESSORY] = Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
-        cropPage[FortuneStats.FFD] = Pair((tool?.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
-        cropPage[FortuneStats.TURBO] = Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
-        cropPage[FortuneStats.DEDICATION] = Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0)
-        cropPage[FortuneStats.CULTIVATING] = Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 20.0)
+        FortuneStats.reset()
+
+        FortuneStats.BASE.set(Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1277.0))
+        FortuneStats.CROP_UPGRADE.set(Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0))
+        FortuneStats.ACCESSORY.set(Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0))
+        FortuneStats.FFD.set(Pair((tool?.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0))
+        FortuneStats.TURBO.set(Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0))
+        FortuneStats.DEDICATION.set(Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0))
+        FortuneStats.CULTIVATING.set(Pair(FarmingFortuneDisplay.getCultivatingFortune(tool), 20.0))
 
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
         when (crop) {
             in mathCrops -> {
-                cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
-                cropPage[FortuneStats.COUNTER] = Pair(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
-                cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
-                cropPage[FortuneStats.COLLECTION] = Pair(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0)
-                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                FortuneStats.BASE_TOOL.set(Pair(FarmingFortuneDisplay.getToolFortune(tool), 50.0))
+                FortuneStats.COUNTER.set(Pair(FarmingFortuneDisplay.getCounterFortune(tool), 96.0))
+                FortuneStats.HARVESTING.set(Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0))
+                FortuneStats.COLLECTION.set(Pair(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0))
+                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 20.0))
             }
 
             in dicerCrops -> {
-                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
-                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                FortuneStats.SUNDER.set(Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0))
+                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 20.0))
             }
 
             CropType.MUSHROOM -> {
-                cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 30.0)
-                cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
-                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                FortuneStats.BASE_TOOL.set(Pair(FarmingFortuneDisplay.getToolFortune(tool), 30.0))
+                FortuneStats.HARVESTING.set(Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0))
+                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 16.0))
             }
 
             CropType.COCOA_BEANS -> {
-                cropPage[FortuneStats.BASE_TOOL] = Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
-                cropPage[FortuneStats.SUNDER] = Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
-                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                FortuneStats.BASE_TOOL.set(Pair(FarmingFortuneDisplay.getToolFortune(tool), 20.0))
+                FortuneStats.SUNDER.set(Pair(FarmingFortuneDisplay.getSunderFortune(tool), 75.0))
+                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 16.0))
             }
 
             CropType.CACTUS -> {
-                cropPage[FortuneStats.HARVESTING] = Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
-                cropPage[FortuneStats.REFORGE] = Pair(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                FortuneStats.HARVESTING.set(Pair(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0))
+                FortuneStats.REFORGE.set(Pair(FarmingFortuneDisplay.reforgeFortune, 16.0))
             }
 
             else -> {}
@@ -131,17 +130,15 @@ object FFStats {
         if (crop == CropType.CARROT) {
             val storage = GardenAPI.storage?.fortune ?: return
             val carrotFortune = if (storage.carrotFortune) 12.0 else 0.0
-            cropPage[FortuneStats.EXPORTED_CARROT] = Pair(carrotFortune, 12.0)
+            FortuneStats.EXPORTED_CARROT.set(Pair(carrotFortune, 12.0))
         }
         if (crop == CropType.PUMPKIN) {
             val storage = GardenAPI.storage?.fortune ?: return
             val pumpkinFortune = if (storage.pumpkinFortune) 12.0 else 0.0
-            cropPage[FortuneStats.EXPIRED_PUMPKIN] = Pair(pumpkinFortune, 12.0)
+            FortuneStats.EXPIRED_PUMPKIN.set(Pair(pumpkinFortune, 12.0))
         }
 
-        cropPage[FortuneStats.CROP_TOTAL] = Pair(
-            cropPage.toList().sumOf { it.second.first },
-            cropPage.toList().sumOf { it.second.second })
+        FortuneStats.CROP_TOTAL.set(FortuneStats.getTotal())
     }
 
     private fun getEquipmentFFData(item: ItemStack?, out: MutableMap<FFTypes, Double>) {

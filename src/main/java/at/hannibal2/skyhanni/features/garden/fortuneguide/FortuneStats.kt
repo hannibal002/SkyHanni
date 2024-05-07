@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumOfPair
+
 enum class FortuneStats(val label: String, val tooltip: String) {
     BASE(
         "§2Universal Farming Fortune",
@@ -28,5 +30,27 @@ enum class FortuneStats(val label: String, val tooltip: String) {
         "§2Expired Pumpkin",
         "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
             "§eRun /shpumpkin to toggle the stat"
-    )
+    );
+
+    var current: Double = 0.0
+    var max: Double = -1.0
+
+    fun reset() {
+        current = 0.0
+        max = -1.0
+    }
+
+    fun set(value: Pair<Double, Double>) {
+        current = value.first
+        max = value.second
+    }
+
+    fun isActive() = max != -1.0
+
+    companion object {
+
+        fun getTotal(): Pair<Double, Double> = entries.filter { it.isActive() }.sumOfPair { it.current to it.max }
+
+        fun reset() = entries.forEach { it.reset() }
+    }
 }

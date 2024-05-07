@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneStats
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -18,7 +19,13 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
     paddingY
 ) {
 
+    val crop get() = FFGuideGUI.currentCrop!! // TODO
+
     override fun onEnter() {
+        val item = crop.farmingItem
+        FFStats.getCropStats(crop, item.getItemOrNull())
+        FortuneUpgrades.getCropSpecific(item.getItemOrNull())
+
         FarmingItems.resetClickState()
         val toolLines = toolLines().split().map { Renderable.verticalContainer(it, 2) }
         update(
@@ -37,36 +44,36 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
     private val headers = setOf(FortuneStats.BASE, FortuneStats.CROP_TOTAL, FortuneStats.CROP_UPGRADE)
 
     private fun header(): List<Renderable> = buildList {
-        add((FortuneStats.BASE to FFStats.cropPage[FortuneStats.BASE]!!).getFarmingBar())
+        add(FortuneStats.BASE.getFarmingBar())
 
-        add(with(FortuneStats.CROP_TOTAL) {
-            val value = FFStats.cropPage[this]!!
-            GuiRenderUtils.getFarmingBar(
-                this.label.replace("Crop", FFGuideGUI.currentCrop?.name?.replace("_", " ")?.firstLetterUppercase()!!),
-                this.tooltip,
-                value.first,
-                value.second,
-                90
-            )
-        })
-        add((FortuneStats.CROP_UPGRADE to FFStats.cropPage[FortuneStats.CROP_UPGRADE]!!).getFarmingBar())
+        add(
+            FortuneStats.CROP_TOTAL.getFarmingBarWithLabel {
+                it.label.replace(
+                    "Crop",
+                    crop.name.replace("_", " ").firstLetterUppercase()
+                )
+            }
+        )
+
+        add(FortuneStats.CROP_UPGRADE.getFarmingBar())
     }
 
-    private fun Map.Entry<FortuneStats, Pair<Double, Double>>.getFarmingBar() = (key to value).getFarmingBar()
+    private fun FortuneStats.getFarmingBar() = this.getFarmingBarWithLabel { label }
 
-    private fun Pair<FortuneStats, Pair<Double, Double>>.getFarmingBar() = GuiRenderUtils.getFarmingBar(
-        first.label, first.tooltip, second.first, second.second,
-        90
-    )
+    private inline fun FortuneStats.getFarmingBarWithLabel(crossinline label: (FortuneStats) -> String) =
+        GuiRenderUtils.getFarmingBar(
+            label(this), tooltip, current, max,
+            90
+        )
 
     private fun toolLines(): List<Renderable> =
-        FFStats.cropPage.filter { it.key !in headers }.map { it.getFarmingBar() }
+        FortuneStats.entries.filter { it.isActive() && it !in headers }.map { it.getFarmingBar() }
 
     private fun equipDisplay(): Renderable =
         Renderable.fixedSizeCollum(
             Renderable.verticalContainer(
                 listOf(
-                    FFGuideGUI.currentCrop?.farmingItem?.getDisplay() ?: Renderable.placeholder(0, 0),
+                    crop.farmingItem.getDisplay(),
                     Renderable.horizontalContainer(
                         listOf(
                             Renderable.verticalContainer(FarmingItems.getArmorDisplay(), 2),

@@ -81,10 +81,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         FFStats.loadFFData()
         FortuneUpgrades.generateGenericUpgrades()
 
-        currentCrop?.farmingItem?.let { item ->
-            FFStats.getCropStats(currentCrop!!, item.getItem())
-        }
-
         // New Code
 
         FarmingItems.setDefaultPet()
@@ -113,10 +109,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
                 add(
                     hTab(crop.icon, Renderable.string("§e${crop.cropName}")) {
                         currentCrop = crop
-
-                        val item = crop.farmingItem
-                        FFStats.getCropStats(crop, item.getItemOrNull())
-                        FortuneUpgrades.getCropSpecific(item.getItemOrNull())
 
                         it.pageSwitchHorizontal()
                     }

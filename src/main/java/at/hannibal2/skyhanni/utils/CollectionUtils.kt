@@ -319,4 +319,13 @@ object CollectionUtils {
         }
         return destination
     }
+
+    inline fun <T, C : Number, D : Number> Iterable<T>.sumOfPair(selector: (T) -> Pair<C, D>): Pair<Double, Double> {
+        var sum = Pair(0.0, 0.0)
+        for (element in this) {
+            val add = selector(element)
+            sum = sum.first + add.first.toDouble() to sum.second + add.second.toDouble()
+        }
+        return sum
+    }
 }
