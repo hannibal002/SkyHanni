@@ -314,10 +314,10 @@ object RepoPatternManager {
         return patterns.filter { it.key !in holders.keys }.filter { unused ->
             val dot = unused.key.count { it == '.' }
             val possibleConflicts = noShareHolder.filter { it.key < dot }.flatMap { it.value }
-            var key = unused.key
+            var key: String = unused.key
             while (key.isNotEmpty()) {
                 if (possibleConflicts.contains(key)) return@filter false
-                key = key.substringBeforeLastOrNull(".")
+                key = key.substringBeforeLastOrNull(".") ?: return@filter true
             }
             true
         }.map { it.value.toPattern() }
