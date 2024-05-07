@@ -43,31 +43,22 @@ object MiningCommissionsBlocksColor {
         "§a§l(?<name>.*) §r§eCommission Complete! Visit the King §r§eto claim your rewards!"
     )
 
+    var color: EnumDyeColor = EnumDyeColor.RED
+
     private fun glass() = { state: IBlockState, result: Boolean ->
         if (result) {
-            state.withProperty(BlockCarpet.COLOR, EnumDyeColor.PINK)
-//                 state.withProperty(BlockCarpet.COLOR, EnumDyeColor.LIME)
+            state.withProperty(BlockCarpet.COLOR, color)
         } else {
             state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
-//                 state.withProperty(BlockCarpet.COLOR, EnumDyeColor.WHITE)
-//                 if (state == Blocks.stained_glass) {
-//                     Blocks.glass.defaultState
-//                 } else {
-//                     Blocks.glass_pane.defaultState
-//                 }
         }
     }
 
     private fun block() = { _: IBlockState, result: Boolean ->
         val wool = Blocks.wool.defaultState
         if (result) {
-            wool.withProperty(BlockCarpet.COLOR, EnumDyeColor.PINK)
-//                 wool.withProperty(BlockCarpet.COLOR, EnumDyeColor.LIME)
+            wool.withProperty(BlockCarpet.COLOR, color)
         } else {
-
             wool.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
-//                 wool.withProperty(BlockCarpet.COLOR, EnumDyeColor.WHITE)
-//                 Blocks.snow.defaultState
         }
     }
 
@@ -181,12 +172,17 @@ object MiningCommissionsBlocksColor {
 
     @SubscribeEvent
     fun onConfigReload(event: ConfigLoadEvent) {
+        color = config.color.get().toDyeColor()
         config.sneakQuickToggle.onToggle {
             oldSneakState = false
             if (!active) {
                 active = true
                 dirty = true
             }
+        }
+        config.color.onToggle {
+            color = config.color.get().toDyeColor()
+            dirty = true
         }
     }
 

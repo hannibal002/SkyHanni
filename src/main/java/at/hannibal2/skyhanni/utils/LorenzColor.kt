@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.item.EnumDyeColor
 import java.awt.Color
 
@@ -40,11 +39,33 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     fun toConfigColour(): String = "0:255:${color.red}:${color.green}:${color.blue}"
 
+    fun toDyeColor(): EnumDyeColor = when (this) {
+        WHITE -> EnumDyeColor.WHITE
+        GOLD -> EnumDyeColor.ORANGE
+        AQUA -> EnumDyeColor.MAGENTA
+        BLUE -> EnumDyeColor.LIGHT_BLUE
+        YELLOW -> EnumDyeColor.YELLOW
+        GREEN -> EnumDyeColor.LIME
+        LIGHT_PURPLE -> EnumDyeColor.PINK
+        DARK_GRAY -> EnumDyeColor.GRAY
+        GRAY -> EnumDyeColor.SILVER
+        DARK_AQUA -> EnumDyeColor.CYAN
+        DARK_PURPLE -> EnumDyeColor.PURPLE
+        DARK_BLUE -> EnumDyeColor.BLUE
+//         GOLD -> EnumDyeColor.BROWN
+        DARK_GREEN -> EnumDyeColor.GREEN
+        DARK_RED -> EnumDyeColor.RED
+        BLACK -> EnumDyeColor.BLACK
+        RED -> EnumDyeColor.RED
+
+        CHROMA -> EnumDyeColor.WHITE
+    }
+
     companion object {
 
         fun EnumDyeColor.toLorenzColor() = when (this) {
             EnumDyeColor.WHITE -> WHITE
-            EnumDyeColor.MAGENTA -> LIGHT_PURPLE
+            EnumDyeColor.MAGENTA -> AQUA
             EnumDyeColor.PINK -> LIGHT_PURPLE
             EnumDyeColor.RED -> RED
             EnumDyeColor.SILVER -> GRAY
@@ -54,13 +75,11 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
             EnumDyeColor.BLUE -> BLUE
             EnumDyeColor.PURPLE -> DARK_PURPLE
             EnumDyeColor.YELLOW -> YELLOW
-            else -> {
-                ErrorManager.logErrorWithData(
-                    Exception("Unknown dye color: $this"),
-                    "Unknown dye color: $this"
-                )
-                null
-            }
+            EnumDyeColor.ORANGE -> GOLD
+            EnumDyeColor.LIGHT_BLUE -> BLUE
+            EnumDyeColor.CYAN -> DARK_AQUA
+            EnumDyeColor.BROWN -> GOLD
+            EnumDyeColor.BLACK -> BLACK
         }
     }
 }
