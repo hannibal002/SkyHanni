@@ -162,7 +162,7 @@ class ConfigManager {
 
         inline fun <reified T> GsonBuilder.registerTypeAdapter(
             crossinline write: (JsonWriter, T) -> Unit,
-            crossinline read: (JsonReader) -> T
+            crossinline read: (JsonReader) -> T,
         ): GsonBuilder {
             this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
                 override fun write(out: JsonWriter, value: T) = write(out, value)

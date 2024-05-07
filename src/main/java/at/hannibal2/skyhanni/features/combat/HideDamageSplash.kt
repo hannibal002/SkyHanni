@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HideDamageSplash {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderDamage(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.combat.hideDamageSplash) return
 
