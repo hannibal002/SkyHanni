@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneStats
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -24,7 +23,6 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
     override fun onEnter() {
         val item = crop.farmingItem
         FFStats.getCropStats(crop, item.getItemOrNull())
-        FortuneUpgrades.getCropSpecific(item.getItemOrNull())
 
         FarmingItems.resetClickState()
         val toolLines = toolLines().split().map { Renderable.verticalContainer(it, 2) }

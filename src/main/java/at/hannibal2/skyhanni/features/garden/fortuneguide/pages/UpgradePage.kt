@@ -21,6 +21,12 @@ class UpgradePage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7)
     hasHeader = true,
 ) {
     override fun onEnter() {
+        FFGuideGUI.currentCrop?.let {
+            FortuneUpgrades.getCropSpecific(it.farmingItem.getItemOrNull())
+        } ?: {
+            FortuneUpgrades.getCropSpecific(null) // TODO
+        }
+
         FarmingItems.resetClickState()
         update(
             content = buildList {
