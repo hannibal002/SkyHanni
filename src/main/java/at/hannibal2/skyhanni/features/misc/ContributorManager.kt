@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.EntityRenderNametagEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
@@ -24,13 +21,11 @@ object ContributorManager {
     }
 
     @SubscribeEvent
-    fun onMobSpawnPlayer(event: MobEvent.Spawn.Player) {
-        addSuffixToNametag(event.mob.baseEntity)
-    }
-
-    @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.NONE) addSuffixToNametag(Minecraft.getMinecraft().thePlayer)
+    fun onRenderNametag(event: EntityRenderNametagEvent) {
+        if (event.entity !is EntityPlayer) return
+        getSuffix(event.entity.name)?.let {
+            event.chatComponent.appendSibling(ChatComponentText(" $it"))
+        }
     }
 
     private fun addSuffixToNametag(entity: EntityLivingBase) {
