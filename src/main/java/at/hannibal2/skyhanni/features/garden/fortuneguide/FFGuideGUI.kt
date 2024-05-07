@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.guide.GuideTab
@@ -14,8 +13,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import org.lwjgl.input.Mouse
-import java.io.IOException
 
 class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
@@ -24,17 +21,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
     companion object {
 
-        var guiLeft = 0
-        var guiTop = 0
-
         var currentCrop: CropType? = null
-
-        val currentPet get() = FarmingItems.currentPet
-        val currentArmor get() = FarmingItems.currentArmor
-        val currentEquipment get() = FarmingItems.currentEquip
-
-        var mouseX = 0
-        var mouseY = 0
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
@@ -110,127 +97,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             lastVerticalTabWrapper.tab?.fakeClick() // First Click Logic
         }
     }
-
-    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        super.drawScreen(mouseX, mouseY, partialTicks)
-        guiLeft = (width - sizeX) / 2
-        guiTop = (height - sizeY) / 2
-    }
-
-    override fun handleMouseInput() {
-        super.handleMouseInput()
-
-        if (Mouse.getEventButtonState()) {
-            mouseClickEvent()
-        }
-    }
-
-    @Throws(IOException::class)
-    fun mouseClickEvent() {
-        var x = guiLeft + 15
-        var y = guiTop - 28
-
-        /* if (this.currentPage != FortuneGuidePage.UPGRADES) {
-            if (currentCrop == null) {
-                when {
-                    isMouseInRect(guiLeft + 142, guiTop + 130) && currentPet != FarmingItems.ELEPHANT -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.ELEPHANT
-                        FFStats.getTotalFF()
-                    }
-
-                    isMouseInRect(guiLeft + 162, guiTop + 130) && currentPet != FarmingItems.MOOSHROOM_COW -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.MOOSHROOM_COW
-                        FFStats.getTotalFF()
-                    }
-
-                    isMouseInRect(guiLeft + 182, guiTop + 130) && currentPet != FarmingItems.RABBIT -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.RABBIT
-                        FFStats.getTotalFF()
-                    }
-
-                    isMouseInRect(guiLeft + 202, guiTop + 130) && currentPet != FarmingItems.BEE -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.BEE
-                        FFStats.getTotalFF()
-                    }
-
-                    isMouseInRect(guiLeft + 142, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentArmor = if (currentArmor == 1) 0 else 1
-                    }
-
-                    isMouseInRect(guiLeft + 162, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentArmor = if (currentArmor == 2) 0 else 2
-                    }
-
-                    isMouseInRect(guiLeft + 182, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentArmor = if (currentArmor == 3) 0 else 3
-                    }
-
-                    isMouseInRect(guiLeft + 202, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentArmor = if (currentArmor == 4) 0 else 4
-                    }
-
-                    isMouseInRect(guiLeft + 262, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentEquipment = if (currentEquipment == 1) 0 else 1
-                    }
-
-                    isMouseInRect(guiLeft + 282, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentEquipment = if (currentEquipment == 2) 0 else 2
-                    }
-
-                    isMouseInRect(guiLeft + 302, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentEquipment = if (currentEquipment == 3) 0 else 3
-                    }
-
-                    isMouseInRect(guiLeft + 322, guiTop + 5) -> {
-                        SoundUtils.playClickSound()
-                        currentEquipment = if (currentEquipment == 4) 0 else 4
-                    }
-                }
-            } else {
-                when {
-                    isMouseInRect(guiLeft + 142, guiTop + 160) && currentPet != FarmingItems.ELEPHANT -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.ELEPHANT
-                        FFStats.getTotalFF()
-                    }
-
-                    isMouseInRect(guiLeft + 162, guiTop + 160) && currentPet != FarmingItems.MOOSHROOM_COW -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.MOOSHROOM_COW
-                        FFStats.getTotalFF()
-                    }
-
-                    isMouseInRect(guiLeft + 182, guiTop + 160) && currentPet != FarmingItems.RABBIT -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.RABBIT
-                        FFStats.getTotalFF()
-                    }
-
-                    isMouseInRect(guiLeft + 202, guiTop + 160) && currentPet != FarmingItems.BEE -> {
-                        SoundUtils.playClickSound()
-                        currentPet = FarmingItems.BEE
-                        FFStats.getTotalFF()
-                    }
-                }
-            }
-        } */
-    }
-
-    private fun isMouseInRect(left: Int, top: Int) = isMouseIn(left, top, 16, 16)
-
-    private fun isMouseIn(x: Int, y: Int, width: Int, height: Int) =
-        GuiRenderUtils.isPointInRect(mouseX, mouseY, x, y, width, height)
 
     enum class FortuneGuidePage {
         OVERVIEW,

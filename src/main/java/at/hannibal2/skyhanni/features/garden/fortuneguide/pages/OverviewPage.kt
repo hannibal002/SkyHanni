@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentArmor
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentEquipment
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
@@ -121,24 +118,25 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        val armorName = currentArmor?.getItem()?.displayName ?: ""
+        val armorName = FarmingItems.currentArmor?.getItem()?.displayName ?: ""
 
-        armorFF = currentArmor?.getFFData() ?: FFStats.armorTotalFF
+        armorFF = FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF
 
-        val wordArmor = if (currentArmor == null) "Armor" else "Piece"
+        val wordArmor = if (FarmingItems.currentArmor == null) "Armor" else "Piece"
 
-        line = if (currentArmor == null) "§7§2Total fortune from your armor\n§2Select a piece for more info"
-        else "§7§2Total fortune from your\n$armorName"
-        var value = if (currentArmor == null) {
+        line =
+            if (FarmingItems.currentArmor == null) "§7§2Total fortune from your armor\n§2Select a piece for more info"
+            else "§7§2Total fortune from your\n$armorName"
+        var value = if (FarmingItems.currentArmor == null) {
             325
         } else if (FFStats.usingSpeedBoots) {
-            when (currentArmor) {
+            when (FarmingItems.currentArmor) {
                 FarmingItems.HELMET -> 76.67
                 FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 81.67
                 else -> 85
             }
         } else {
-            when (currentArmor) {
+            when (FarmingItems.currentArmor) {
                 FarmingItems.HELMET -> 78.75
                 FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 83.75
                 else -> 78.75
@@ -156,9 +154,10 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        line = if (currentArmor == null) "§7§2The base fortune from your armor\n§2Select a piece for more info"
-        else "§7§2Base fortune from your\n$armorName"
-        value = when (currentArmor) {
+        line =
+            if (FarmingItems.currentArmor == null) "§7§2The base fortune from your armor\n§2Select a piece for more info"
+            else "§7§2Base fortune from your\n$armorName"
+        value = when (FarmingItems.currentArmor) {
             null -> if (FFStats.usingSpeedBoots) 160 else 130
             FarmingItems.HELMET -> 30
             FarmingItems.LEGGINGS -> 35
@@ -177,16 +176,17 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        line = if (currentArmor == null) "§7§2The fortune from your armor's ability\n§2Select a piece for more info"
-        else "§7§2Ability fortune from your\n$armorName"
+        line =
+            if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's ability\n§2Select a piece for more info"
+            else "§7§2Ability fortune from your\n$armorName"
         value = if (FFStats.usingSpeedBoots) {
-            when (currentArmor) {
+            when (FarmingItems.currentArmor) {
                 null -> 50
                 FarmingItems.BOOTS -> 0
                 else -> 16.667
             }
         } else {
-            when (currentArmor) {
+            when (FarmingItems.currentArmor) {
                 null -> 75
                 else -> 18.75
             }
@@ -203,11 +203,12 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        line = if (currentArmor == null) "§7§2The fortune from your armor's reforge\n§2Select a piece for more info"
-        else "§7§2Total fortune from your\n$armorName}"
-        value = if (currentArmor == null) {
+        line =
+            if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's reforge\n§2Select a piece for more info"
+            else "§7§2Total fortune from your\n$armorName}"
+        value = if (FarmingItems.currentArmor == null) {
             if (FFStats.usingSpeedBoots) 115 else 120
-        } else if (currentArmor == FarmingItems.BOOTS) {
+        } else if (FarmingItems.currentArmor == FarmingItems.BOOTS) {
             if (FFStats.usingSpeedBoots) 25 else 30
         } else 30
 
@@ -222,8 +223,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        val currentPet = FFGuideGUI.currentPet.getFFData()
-        val petMaxFF = when (FFGuideGUI.currentPet) {
+        val currentPet = FarmingItems.currentPet.getFFData()
+        val petMaxFF = when (FarmingItems.currentPet) {
             FarmingItems.ELEPHANT -> 210
 
             FarmingItems.MOOSHROOM_COW -> 217
@@ -262,11 +263,11 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        val wordEquip = if (currentEquipment == null) "Equipment" else "Piece"
+        val wordEquip = if (FarmingItems.currentEquip == null) "Equipment" else "Piece"
 
-        val equipmentName = currentEquipment?.getItem()?.displayName ?: ""
+        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName ?: ""
 
-        equipmentFF = currentEquipment?.getFFData() ?: FFStats.equipmentTotalFF
+        equipmentFF = FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF
 
         val maxEquipmentBaseFortune = 5.0
         val maxEquipmentAbilityFortune = 15.0
@@ -276,19 +277,23 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         val maxFortunePerPiece =
             maxEquipmentBaseFortune + maxEquipmentAbilityFortune + maxEquipmentReforgeFortune + maxGreenThumbFortune
 
-        line = if (currentEquipment == null) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
-        else "§7§2Total fortune from your\n$equipmentName"
+        line =
+            if (FarmingItems.currentEquip == null) "§7§2Total fortune from all your equipment\n§2Select a piece for more info"
+            else "§7§2Total fortune from your\n$equipmentName"
 
         content.addTable(
             1,
             GuiRenderUtils.getFarmingBar(
-                label = "§2Total $wordEquip Fortune", tooltip = line, currentValue = equipmentFF[FFTypes.TOTAL] ?: 0,
-                maxValue = if (currentEquipment == null) maxFortunePerPiece * 4 else maxFortunePerPiece, width = 90
+                label = "§2Total $wordEquip Fortune",
+                tooltip = line,
+                currentValue = equipmentFF[FFTypes.TOTAL] ?: 0,
+                maxValue = if (FarmingItems.currentEquip == null) maxFortunePerPiece * 4 else maxFortunePerPiece,
+                width = 90
             )
         )
 
         line =
-            if (currentEquipment == null) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
+            if (FarmingItems.currentEquip == null) "§7§2The base fortune from all your equipment\n§2Select a piece for more info"
             else "§7§2Total base fortune from your\n$equipmentName"
 
         content.addTable(
@@ -297,13 +302,13 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                 label = "§2$wordEquip Base Fortune",
                 tooltip = line,
                 currentValue = equipmentFF[FFTypes.BASE] ?: 0,
-                maxValue = if (currentEquipment == null) maxEquipmentBaseFortune * 4 else maxEquipmentBaseFortune,
+                maxValue = if (FarmingItems.currentEquip == null) maxEquipmentBaseFortune * 4 else maxEquipmentBaseFortune,
                 width = 90,
             )
         )
 
         line =
-            if (currentEquipment == null) "§7§2The fortune from all of your equipment's abilities\n§2Select a piece for more info"
+            if (FarmingItems.currentEquip == null) "§7§2The fortune from all of your equipment's abilities\n§2Select a piece for more info"
             else "§7§2Total ability fortune from your\n$equipmentName"
         content.addTable(
             3,
@@ -311,13 +316,13 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                 label = "§2$wordEquip Ability",
                 tooltip = line,
                 currentValue = equipmentFF[FFTypes.ABILITY] ?: 0,
-                maxValue = if (currentEquipment == null) maxEquipmentAbilityFortune * 4 else maxEquipmentAbilityFortune,
+                maxValue = if (FarmingItems.currentEquip == null) maxEquipmentAbilityFortune * 4 else maxEquipmentAbilityFortune,
                 width = 90,
             )
         )
 
         line =
-            if (currentEquipment == null) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
+            if (FarmingItems.currentEquip == null) "§7§2The fortune from all of your equipment's reforges\n§2Select a piece for more info"
             else "§7§2Total reforge fortune from your\n$equipmentName"
 
         content.addTable(
@@ -326,14 +331,14 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                 label = "§2$wordEquip Reforge",
                 tooltip = line,
                 currentValue = equipmentFF[FFTypes.REFORGE] ?: 0,
-                maxValue = if (currentEquipment == null) maxEquipmentReforgeFortune * 4 else maxEquipmentReforgeFortune,
+                maxValue = if (FarmingItems.currentEquip == null) maxEquipmentReforgeFortune * 4 else maxEquipmentReforgeFortune,
                 width = 90,
             )
         )
 
         line =
-            if (currentEquipment == null) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
-            else "§7§2Total enchantment fortune from your\n${currentEquipment!!.getItem().displayName}"
+            if (FarmingItems.currentEquip == null) "§7§2The fortune from all of your equipment's enchantments\n§2Select a piece for more info"
+            else "§7§2Total enchantment fortune from your\n${FarmingItems.currentEquip!!.getItem().displayName}"
 
         content.addTable(
             5,
@@ -351,7 +356,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                 label = "§2$wordEquip Enchantment",
                 tooltip = line,
                 currentValue = equipmentFF[FFTypes.GREEN_THUMB] ?: 0,
-                maxValue = if (currentEquipment == null) maxGreenThumbFortune * 4 else maxGreenThumbFortune,
+                maxValue = if (FarmingItems.currentEquip == null) maxGreenThumbFortune * 4 else maxGreenThumbFortune,
                 width = 90,
             )
         )

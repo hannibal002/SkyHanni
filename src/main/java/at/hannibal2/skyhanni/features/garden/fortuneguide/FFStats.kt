@@ -156,13 +156,13 @@ object FFStats {
 
     fun getTotalFF() {
 
-        currentPetItem = FFGuideGUI.currentPet.getItem()?.getPetItem().toString()
+        currentPetItem = FarmingItems.currentPet.getItem()?.getPetItem().toString()
 
         totalBaseFF = combineFFData(
             baseFF,
             armorTotalFF,
             equipmentTotalFF,
-            FFGuideGUI.currentPet.getFFData()
+            FarmingItems.currentPet.getFFData()
         )
         FFGuideGUI.updateDisplay()
     }

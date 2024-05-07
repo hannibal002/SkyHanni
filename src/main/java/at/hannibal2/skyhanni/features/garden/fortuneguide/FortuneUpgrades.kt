@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.currentPet
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -144,7 +143,7 @@ object FortuneUpgrades {
 
     // todo needs to be called when switching pets
     private fun getPetUpgrades() {
-        if (currentPet.getItem()?.getInternalName()?.contains(";") == true) {
+        if (FarmingItems.currentPet.getItem()?.getInternalName()?.contains(";") == true) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {
