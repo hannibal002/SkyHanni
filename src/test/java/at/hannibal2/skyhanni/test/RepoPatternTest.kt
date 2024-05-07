@@ -87,7 +87,6 @@ object RepoPatternTest {
         val isRemoteSingleWorking = list[0].pattern() == remoteValue3 && list.size == 1
 
         assert(isRemoteSingleWorking)
-        assertThrows<IndexOutOfBoundsException> { list[1] }
 
         RepoPatternManager.loadPatternsFromDump(
             RepoPatternDump(
@@ -100,6 +99,108 @@ object RepoPatternTest {
         val isRemoteListToSingleWorking = list.isEmpty()
 
         assert(isRemoteListToSingleWorking)
+    }
+
+    @Test
+    fun testRemoteLoadGroup() {
+        val simpleLocalePattern1 = "I'm a test value"
+        val simpleLocalePattern2 = "I'm a test value 2"
+
+        val groupInfo = RepoPattern.exclusiveGroup(this.nextKey())
+        val group by groupInfo
+        val pattern1 by group.pattern("a", simpleLocalePattern1)
+        val pattern2 by group.pattern("b", simpleLocalePattern2)
+
+        val remoteValue1 = "I'm remote."
+        val remoteValue2 = "I'm remote 2."
+        val remoteValue3 = "I'm remote 3."
+        val remoteValue4 = "I'm remote 4."
+
+        val isLocalWorking = group.getUnusedPatterns()
+            .isEmpty() && pattern1.pattern() == simpleLocalePattern1 && pattern2.pattern() == simpleLocalePattern2
+
+        assert(isLocalWorking)
+
+        RepoPatternManager.loadPatternsFromDump(
+            RepoPatternDump(
+                regexes = mapOf(
+                    groupInfo.prefix + ".a" to remoteValue1,
+                    groupInfo.prefix + ".b" to remoteValue2
+                )
+            )
+        )
+
+        val isRemoteWorking = group.getUnusedPatterns()
+            .isEmpty() && pattern1.pattern() == remoteValue1 && pattern2.pattern() == remoteValue2
+
+        assert(isRemoteWorking)
+
+        RepoPatternManager.loadPatternsFromDump(
+            RepoPatternDump(
+                regexes = mapOf(
+                    groupInfo.prefix + ".a" to remoteValue3,
+                    groupInfo.prefix + ".b" to remoteValue2,
+                    groupInfo.prefix + ".c" to remoteValue4
+                )
+            )
+        )
+
+        val unused = group.getUnusedPatterns()
+        val isUnusedWorking =
+            unused.size == 1 && unused[0].pattern() == remoteValue4 && pattern1.pattern() == remoteValue3 && pattern2.pattern() == remoteValue2
+
+        assert(isUnusedWorking)
+    }
+
+    @Test
+    fun testRemoteLoadGroupButNotFromList() {
+        val simpleLocalePattern1 = "I'm a test value"
+        val simpleLocalePattern2 = "I'm a test value 2"
+
+        val groupInfo = RepoPattern.exclusiveGroup(this.nextKey())
+        val group by groupInfo
+        val list by group.list("a", simpleLocalePattern1, simpleLocalePattern2)
+
+        val remoteValue1 = "I'm remote."
+        val remoteValue2 = "I'm remote 2."
+        val remoteValue3 = "I'm remote 3."
+        val remoteValue4 = "I'm remote 4."
+
+        val isLocalWorking = group.getUnusedPatterns()
+            .isEmpty() && list[0].pattern() == simpleLocalePattern1 && list[1].pattern() == simpleLocalePattern2
+
+        assert(isLocalWorking)
+
+        RepoPatternManager.loadPatternsFromDump(
+            RepoPatternDump(
+                regexes = mapOf(
+                    groupInfo.prefix + ".a.1" to remoteValue1,
+                    groupInfo.prefix + ".a.2" to remoteValue2
+                )
+            )
+        )
+
+        val unused0 = group.getUnusedPatterns()
+        val isRemoteWorking = group.getUnusedPatterns()
+            .isEmpty() && list[0].pattern() == remoteValue1 && list[1].pattern() == remoteValue2
+
+        assert(isRemoteWorking)
+
+        RepoPatternManager.loadPatternsFromDump(
+            RepoPatternDump(
+                regexes = mapOf(
+                    groupInfo.prefix + ".a.1" to remoteValue3,
+                    groupInfo.prefix + ".a.2" to remoteValue2,
+                    groupInfo.prefix + ".b" to remoteValue4
+                )
+            )
+        )
+
+        val unused = group.getUnusedPatterns()
+        val isUnusedWorking =
+            unused.size == 1 && unused[0].pattern() == remoteValue4 && list[0].pattern() == remoteValue3 && list[1].pattern() == remoteValue2
+
+        assert(isUnusedWorking)
     }
 
     @Test

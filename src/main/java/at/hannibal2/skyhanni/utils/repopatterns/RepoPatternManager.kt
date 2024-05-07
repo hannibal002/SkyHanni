@@ -313,8 +313,8 @@ object RepoPatternManager {
 
         return patterns.filter { it.key !in holders.keys }.filter { unused ->
             val dot = unused.key.count { it == '.' }
-            val possibleConflicts = noShareHolder.filter { it.key < dot }.flatMap { it.value }
-            var key: String = unused.key
+            val possibleConflicts = noShareHolder.filter { it.key < dot }.flatMap { it.value }.toSet()
+            var key: String = unused.key.removePrefix(prefixWithDot)
             while (key.isNotEmpty()) {
                 if (possibleConflicts.contains(key)) return@filter false
                 key = key.substringBeforeLastOrNull(".") ?: return@filter true
