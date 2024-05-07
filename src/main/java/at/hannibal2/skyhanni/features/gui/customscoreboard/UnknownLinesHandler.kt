@@ -118,6 +118,7 @@ object UnknownLinesHandler {
             SbPattern.queuePositionPattern,
             SbPattern.fortunateFreezingBonusPattern,
             SbPattern.riftAveikxPattern,
+            SbPattern.riftHayEatenPattern,
             SbPattern.fossilDustPattern,
         )
 
