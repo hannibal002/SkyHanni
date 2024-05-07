@@ -20,7 +20,7 @@ object UnknownLinesHandler {
             .filter { it.trim().length > 3 }
 
         /*
-         * remove with pattern
+         * Remove known lines with patterns
         */
         val patternsToExclude = listOf(
             PurseAPI.coinsPattern,
@@ -118,6 +118,8 @@ object UnknownLinesHandler {
             SbPattern.queuePositionPattern,
             SbPattern.fortunateFreezingBonusPattern,
             SbPattern.riftAveikxPattern,
+            SbPattern.riftHayEatenPattern,
+            SbPattern.fossilDustPattern,
         )
 
         unknownLines = unknownLines.filterNot { line ->
