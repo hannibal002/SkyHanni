@@ -40,7 +40,6 @@ class RenderBackground {
         if (GuiEditManager.isInGui()) return
 
         GlStateManager.pushMatrix()
-        GlStateManager.pushAttrib()
 
         GlStateManager.color(1f, 1f, 1f, 1f)
         GL11.glDepthMask(false)
@@ -83,7 +82,6 @@ class RenderBackground {
         }
         GL11.glDepthMask(true)
         GlStateManager.popMatrix()
-        GlStateManager.popAttrib()
     }
 
     private fun updatePosition(position: Position): Position {
