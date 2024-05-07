@@ -81,5 +81,13 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
             EnumDyeColor.BROWN -> GOLD
             EnumDyeColor.BLACK -> BLACK
         }
+
+        fun Char.toLorenzColor(): LorenzColor? = entries.firstOrNull { it.chatColorCode == this } ?: run {
+            ErrorManager.logErrorWithData(
+                Exception("Unknown chat color: $this"),
+                "Unknown chat color: $this"
+            )
+            null
+        }
     }
 }
