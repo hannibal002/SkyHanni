@@ -118,7 +118,7 @@ object ErrorManager {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
                 throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
             } else message to 0
-            if (cache.contains(pair)) return
+            if (pair in cache) return
             cache.add(pair)
         }
 
