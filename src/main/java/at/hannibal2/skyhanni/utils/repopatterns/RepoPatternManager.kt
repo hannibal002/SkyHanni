@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -32,6 +33,15 @@ object RepoPatternManager {
      * Remote loading data that will be used to compile regexes from, once such a regex is needed.
      */
     private var regexes: RepoPatternDump? = null
+
+    /**
+     * [regexes] but as a NavigableMap. (Creates the Map at call)
+     */
+    private val remotePattern: NavigableMap<String, String>
+        get() = TreeMap(
+            if (localLoading) mapOf()
+            else regexes?.regexes ?: mapOf()
+        )
 
     /**
      * Map containing the exclusive owner of a regex key
@@ -155,11 +165,7 @@ object RepoPatternManager {
      * Reload patterns in [usedKeys] from [regexes] or their fallbacks.
      */
     private fun reloadPatterns() {
-        val remotePatterns =
-            TreeMap(
-                if (localLoading) mapOf()
-                else regexes?.regexes ?: mapOf()
-            )
+        val remotePatterns = remotePattern
         for (it in usedKeys.values) {
             when (it) {
                 is RepoPatternListImpl -> loadArrayPatterns(remotePatterns, it)
@@ -168,7 +174,7 @@ object RepoPatternManager {
         }
     }
 
-    private fun loadStandalonePattern(remotePatterns: TreeMap<String, String>, it: RepoPatternImpl) {
+    private fun loadStandalonePattern(remotePatterns: NavigableMap<String, String>, it: RepoPatternImpl) {
         val remotePattern = remotePatterns[it.key]
         try {
             if (remotePattern != null) {
@@ -185,7 +191,7 @@ object RepoPatternManager {
         it.wasOverridden = false
     }
 
-    private fun loadArrayPatterns(remotePatterns: TreeMap<String, String>, arrayPattern: RepoPatternListImpl) {
+    private fun loadArrayPatterns(remotePatterns: NavigableMap<String, String>, arrayPattern: RepoPatternListImpl) {
         val prefix = arrayPattern.key + "."
         val remotePatternList = StringUtils.subMapOfStringsStartingWith(prefix, remotePatterns)
         val patternMap = remotePatternList.mapNotNull {
@@ -282,6 +288,39 @@ object RepoPatternManager {
         }
         return RepoPatternListImpl(fallbacks.toList(), key, parentKeyHolder).also { usedKeys[key] = it }
 
+    }
+
+    /**
+     * The caller must ensure the exclusivity to the [prefix]!
+     *
+     * @param prefix the prefix to search without the dot at the end (the match includes the .)
+     * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
+     * */
+    internal fun getUnusedPatterns(prefix: String): List<Pattern> {
+        if (config.forceLocal.get()) return emptyList()
+        try {
+            verifyKeyShape(prefix)
+        } catch (e: IllegalArgumentException) {
+            ErrorManager.logErrorWithData(e, "getUnusedPatterns failed do to invalid key shape", "prefix" to prefix)
+            return emptyList()
+        }
+        val prefixWithDot = "$prefix."
+        val patterns = StringUtils.subMapOfStringsStartingWith(prefixWithDot, remotePattern)
+        val holders = StringUtils.subMapOfStringsStartingWith(prefixWithDot, usedKeys)
+
+        val noShareHolder = holders.filter { !it.value.shares }.map { it.key.removePrefix(prefixWithDot) }
+            .groupBy { it.count { it == '.' } }
+
+        return patterns.filter { it.key !in holders.keys }.filter { unused ->
+            val dot = unused.key.count { it == '.' }
+            val possibleConflicts = noShareHolder.filter { it.key < dot }.flatMap { it.value }
+            var key = unused.key
+            while (key.isNotEmpty()) {
+                if (possibleConflicts.contains(key)) return@filter false
+                key = key.substringBeforeLastOrNull(".")
+            }
+            true
+        }.map { it.value.toPattern() }
     }
 
 }
