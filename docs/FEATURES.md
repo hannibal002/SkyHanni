@@ -104,6 +104,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Only works when having enough Architect First Drafts in the sack.
 + Dungeon hub race waypoints. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
     + Only works for Nothing; No return races.
++ Added the ability to hide solo class, solo class stats and fairy dialogue chat messages in Dungeons. - raven (https://github.com/hannibal002/SkyHanni/pull/1702)
 
 </details>
 <details open><summary>
@@ -1144,6 +1145,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Options to change the distance and number of mobs to always show.
     + Option to disable in garden.
 + Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
++  Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
 
 </details>
 <details open><summary>

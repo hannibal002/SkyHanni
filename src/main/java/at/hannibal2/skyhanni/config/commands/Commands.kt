@@ -161,6 +161,7 @@ object Commands {
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
             )
         }, DefaultConfigFeatures::onComplete)
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun usersNormal() {
@@ -298,7 +299,7 @@ object Commands {
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
             {
-            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
             },
             FarmingMilestoneCommand::onComplete
         )
@@ -525,7 +526,6 @@ object Commands {
     }
 
     private fun internalCommands() {
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 
@@ -633,7 +633,8 @@ object Commands {
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
                     UpdateManager.checkUpdate(true, updateStream)
-                }
+                },
+                oneTimeClick = true
             )
         } else {
             UpdateManager.checkUpdate(true, updateStream)

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -141,10 +142,11 @@ object ChatUtils {
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
         prefixColor: String = "§e",
+        oneTimeClick: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         internalChat(Text.text(msgPrefix + message) {
-            this.onClick(expireAt, true, onClick)
+            this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = "§eClick here!".asComponent()
         })
     }
