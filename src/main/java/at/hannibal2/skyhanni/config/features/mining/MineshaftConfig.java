@@ -10,7 +10,7 @@ public class MineshaftConfig {
     @Expose
     @ConfigOption(
         name = "Profit Per Corpse",
-        desc = "Show profit/loss in chat after each looted corpse in the mineshaft. Also includes breakdown information on hover."
+        desc = "Show profit/loss in chat after each looted corpse in the Mineshaft. Also includes breakdown information on hover."
     )
     @ConfigEditorBoolean
     @FeatureToggle
