@@ -49,7 +49,7 @@ object CollectionUtils {
 
     // Taken and modified from Skytils
     @JvmStatic
-    fun <T> T.equalsOneOf(vararg other: T): Boolean {
+    fun <T> T?.equalsOneOf(vararg other: T): Boolean {
         for (obj in other) {
             if (this == obj) return true
         }

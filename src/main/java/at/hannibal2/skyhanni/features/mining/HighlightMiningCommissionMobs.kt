@@ -23,8 +23,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class HighlightMiningCommissionMobs {
 
     private val config get() = SkyHanniMod.feature.mining
+    // TODO Commissin API
     private var active = listOf<MobType>()
 
+    // TODO Commissin API
     enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
 
         // Dwarven Mines
@@ -43,6 +45,8 @@ class HighlightMiningCommissionMobs {
             it is EntitySlime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000))
         }),
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
+
+        // new commissions
         ;
     }
 
@@ -67,6 +71,7 @@ class HighlightMiningCommissionMobs {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
+        // TODO Commissin API
         MobType.entries.filter { type ->
             event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
                 ?.let { !it.endsWith("§aDONE") }
