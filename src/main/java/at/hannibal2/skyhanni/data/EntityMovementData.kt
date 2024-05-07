@@ -46,7 +46,14 @@ class EntityMovementData {
         }
     }
 
-    private val warpingPattern by RepoPattern.pattern("warping", "§7Warping...")
+    private val warpingPattern by RepoPattern.pattern(
+        "warping",
+        "§7Warping...|" +
+            "§7Warping you to your SkyBlock island...|" +
+            "§7Warping using transfer token...|" +
+            "§7Finding player...|" +
+            "§7Sending a visit request..."
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
