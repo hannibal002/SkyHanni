@@ -104,6 +104,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Only works when having enough Architect First Drafts in the sack.
 + Dungeon hub race waypoints. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
     + Only works for Nothing; No return races.
++ Added the ability to hide solo class, solo class stats and fairy dialogue chat messages in Dungeons. - raven (https://github.com/hannibal002/SkyHanni/pull/1702)
 
 </details>
 <details open><summary>
@@ -681,6 +682,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Options to show/hide boosted crop and pest icons.
 + Added Super Craft button to visitors for ease of access. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1173)
     + Checks if you have enough materials to craft the items and depending on that shows the button or not.
++ Overflow Garden crop milestones. - Luna & HiZe (https://github.com/hannibal002/SkyHanni/pull/997)
 
 </details>
 <details open><summary>
@@ -861,6 +863,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Keybinds for Chocolate Factory. - seraid (https://github.com/hannibal002/SkyHanni/pull/1644)
 + Warning when Chocolate Factory upgrade is available. - seraid (https://github.com/hannibal002/SkyHanni/pull/1642)
 + Amount of chocolate until next prestige to stats display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1638)
++ Ability to adjust the opacity of players near shared and guessed egg waypoints. - RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1582)
++ Time until the next Hoppity event in chat message for egg locator. - seraid (https://github.com/hannibal002/SkyHanni/pull/1625)
 
 </details>
 <details open><summary>
@@ -1141,6 +1145,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Options to change the distance and number of mobs to always show.
     + Option to disable in garden.
 + Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
++  Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
 
 </details>
 <details open><summary>

@@ -25,29 +25,9 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
     }
 
     fun timeUntilGoal(goal: Long): Duration {
-        val profileStorage = ChocolateFactoryAPI.profileStorage ?: return Duration.ZERO
-
+        val profileStorage = profileStorage ?: return Duration.ZERO
         val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
-
-        val baseMultiplier = profileStorage.rawChocolateMultiplier
-        val rawChocolatePerSecond = profileStorage.rawChocPerSecond
-        val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
-
-        if (rawChocolatePerSecond == 0) return Duration.INFINITE
-
-        var needed = goal - chocolate()
-        val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
-
-        val timeTowerChocPerSecond = rawChocolatePerSecond * timeTowerMultiplier
-
-        val secondsAtRate = needed / timeTowerChocPerSecond
-        if (secondsAtRate < secondsUntilTowerExpires) {
-            return secondsAtRate.seconds - updatedAgo.seconds
-        }
-
-        needed -= (secondsUntilTowerExpires * timeTowerChocPerSecond).toLong()
-        val basePerSecond = rawChocolatePerSecond * baseMultiplier
-        return (needed / basePerSecond + secondsUntilTowerExpires).seconds - updatedAgo.seconds
+        return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo.seconds
     }
 
     companion object {

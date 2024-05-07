@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
@@ -152,6 +154,17 @@ object HarpFeatures {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        if (isHarpGui(InventoryUtils.openInventoryName())) {
+            if (config.keybinds) {
+                // needed to not send duplicate clicks via keybind feature
+                if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) {
+                    event.cancel()
+                    return
+                }
+            }
+        }
+
         if (!config.quickRestart) return
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.slotNumber != closeButtonSlot) return
@@ -189,5 +202,14 @@ object HarpFeatures {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.harpKeybinds", "inventory.helper.harp.keybinds")
         event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")
+    }
+
+    @SubscribeEvent
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.hideMelodyTooltip) return
+        if (!isHarpGui(InventoryUtils.openInventoryName())) return
+        if (event.slot.inventory !is ContainerLocalMenu) return
+            event.cancel()
     }
 }

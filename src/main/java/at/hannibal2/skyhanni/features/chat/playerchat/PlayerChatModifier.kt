@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.utils.StringUtils
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PlayerChatModifier {
@@ -20,9 +22,48 @@ class PlayerChatModifier {
 
     @SubscribeEvent
     fun onChat(event: SystemMessageEvent) {
-        val newMessage = cutMessage(event.chatComponent.formattedText)
+        val original = event.chatComponent.formattedText
+        val new = cutMessage(original)
+        if (new == original) return
 
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentText(newMessage)) ?: return
+        val clickEvents = mutableListOf<ClickEvent>()
+        val hoverEvents = mutableListOf<HoverEvent>()
+        findClickableTexts(event.chatComponent, clickEvents)
+        findHoverTexts(event.chatComponent, hoverEvents)
+        val clickSize = clickEvents.size
+        val hoverSize = hoverEvents.size
+
+        // do not change the message if more than one hover or click is found
+        if (clickSize > 1 || hoverSize > 1) return
+
+        val text = ChatComponentText(new)
+        if (clickSize == 1) {
+            text.chatStyle.chatClickEvent = clickEvents.first()
+        }
+        if (hoverSize == 1) {
+            text.chatStyle.chatHoverEvent = hoverEvents.first()
+        }
+        event.chatComponent = text
+    }
+
+    private fun findClickableTexts(chatComponent: IChatComponent, clickEvents: MutableList<ClickEvent>) {
+        for (sibling in chatComponent.siblings) {
+            findClickableTexts(sibling, clickEvents)
+        }
+        val clickEvent = chatComponent.chatStyle.chatClickEvent ?: return
+        clickEvent.action ?: return
+        if (clickEvents.any { it.value == clickEvent.value }) return
+        clickEvents.add(clickEvent)
+    }
+
+    private fun findHoverTexts(chatComponent: IChatComponent, hoverEvents: MutableList<HoverEvent>) {
+        for (sibling in chatComponent.siblings) {
+            findHoverTexts(sibling, hoverEvents)
+        }
+        val hoverEvent = chatComponent.chatStyle.chatHoverEvent ?: return
+        hoverEvent.action ?: return
+        if (hoverEvents.any { it.value == hoverEvent.value }) return
+        hoverEvents.add(hoverEvent)
     }
 
     private fun cutMessage(input: String): String {
