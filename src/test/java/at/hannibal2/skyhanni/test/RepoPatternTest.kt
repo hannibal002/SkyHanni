@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 
+@Suppress("UNUSED_EXPRESSION")
 object RepoPatternTest {
 
     private val abc = generateSequence('a') { it + 1 }.take(26).joinToString("")
@@ -43,26 +44,6 @@ object RepoPatternTest {
 
         assert(isRemoteWorking)
 
-    }
-
-    @Test
-    fun testExclusivity() {
-        RepoPatternManager.inTestDuplicateUsage = false
-
-        assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.pattern(this.nextKey(), "")
-            val pattern2 by RepoPattern.pattern(this.prevKey(), "")
-            pattern1
-            pattern2
-        }
-        assertDoesNotThrow {
-            val pattern1 by RepoPattern.pattern(this.nextKey(), "")
-            val pattern2 by RepoPattern.pattern(this.prevKey() + ".a", "")
-            pattern1
-            pattern2
-        }
-
-        RepoPatternManager.inTestDuplicateUsage = true
     }
 
     @Test
@@ -103,7 +84,7 @@ object RepoPatternTest {
             )
         )
 
-        val isRemoteSingleWorking = list[0].pattern() == remoteValue3
+        val isRemoteSingleWorking = list[0].pattern() == remoteValue3 && list.size == 1
 
         assert(isRemoteSingleWorking)
         assertThrows<IndexOutOfBoundsException> { list[1] }
@@ -122,22 +103,86 @@ object RepoPatternTest {
     }
 
     @Test
-    fun testExclusivityList() {
+    fun testExclusivitySameKeyPattern() {
         RepoPatternManager.inTestDuplicateUsage = false
 
         assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.list(this.nextKey(), "")
-            val pattern2 by RepoPattern.list(this.prevKey(), "")
-            pattern1
-            pattern2
-        }
-
-        assertThrows<RuntimeException> {
-            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern1 by RepoPattern.pattern(this.nextKey(), "")
             val pattern2 by RepoPattern.pattern(this.prevKey(), "")
             pattern1
             pattern2
         }
+        assertThrows<RuntimeException> {
+            val pattern1 by RepoPattern.pattern(this.nextKey(), "")
+            val list1 by RepoPattern.list(this.prevKey(), "")
+            pattern1
+            list1
+        }
+        assertThrows<RuntimeException> {
+            val pattern1 by RepoPattern.pattern(this.nextKey(), "")
+            val group1 by RepoPattern.exclusiveGroup(this.prevKey())
+            pattern1
+            group1
+        }
+
+        RepoPatternManager.inTestDuplicateUsage = true
+    }
+
+    @Test
+    fun testExclusivitySameKeyList() {
+        RepoPatternManager.inTestDuplicateUsage = false
+
+        assertThrows<RuntimeException> {
+            val list1 by RepoPattern.list(this.nextKey(), "")
+            val pattern1 by RepoPattern.pattern(this.prevKey(), "")
+            list1
+            pattern1
+        }
+        assertThrows<RuntimeException> {
+            val list1 by RepoPattern.list(this.nextKey(), "")
+            val list2 by RepoPattern.list(this.prevKey(), "")
+            list1
+            list2
+        }
+        assertThrows<RuntimeException> {
+            val list1 by RepoPattern.list(this.nextKey(), "")
+            val group1 by RepoPattern.exclusiveGroup(this.prevKey())
+            list1
+            group1
+        }
+
+        RepoPatternManager.inTestDuplicateUsage = true
+    }
+
+    @Test
+    fun testExclusivitySameKeyExclusiveGroup() {
+        RepoPatternManager.inTestDuplicateUsage = false
+
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup(this.nextKey())
+            val pattern1 by RepoPattern.pattern(this.prevKey(), "")
+            group1
+            pattern1
+        }
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup(this.nextKey())
+            val list2 by RepoPattern.list(this.prevKey(), "")
+            group1
+            list2
+        }
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup(this.nextKey())
+            val group2 by RepoPattern.exclusiveGroup(this.prevKey())
+            group1
+            group2
+        }
+
+        RepoPatternManager.inTestDuplicateUsage = true
+    }
+
+    @Test
+    fun testExclusivitySubSpaceList() {
+        RepoPatternManager.inTestDuplicateUsage = false
 
         assertThrows<RuntimeException> {
             val pattern1 by RepoPattern.list(this.nextKey(), "")
@@ -167,15 +212,6 @@ object RepoPatternTest {
             pattern1
         }
 
-        assertDoesNotThrow {
-            val pattern1 by RepoPattern.list(this.nextKey(), "")
-            val pattern2 by RepoPattern.list(this.nextKey(), "")
-            val pattern3 by RepoPattern.pattern(this.nextKey(), "")
-            pattern1
-            pattern2
-            pattern3
-        }
-
         assertThrows<RuntimeException> {
             val pattern1 by RepoPattern.list(this.nextKey(), "")
             val pattern2 by RepoPattern.pattern(this.prevKey() + ".1.2", "")
@@ -190,43 +226,140 @@ object RepoPatternTest {
             pattern1
         }
 
-        RepoPatternManager.inTestDuplicateUsage = true
-    }
-
-    @Test
-    fun testExclusivityForExclusiveGroup() {
-        RepoPatternManager.inTestDuplicateUsage = false
-
         assertThrows<RuntimeException> {
-            val group1 by RepoPattern.exclusiveGroup(nextKey())
-            val group2 by RepoPattern.exclusiveGroup(prevKey())
-            group1
-            group2
-        }
-
-        assertDoesNotThrow {
-            val group1 by RepoPattern.exclusiveGroup(nextKey())
-            val group2 by RepoPattern.exclusiveGroup(nextKey())
-            group1
-            group2
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey() + ".a.a", "")
+            pattern1
+            pattern2
         }
 
         assertThrows<RuntimeException> {
-            val group1 by RepoPattern.exclusiveGroup(nextKey())
-            val pattern1 by RepoPattern.pattern(prevKey(), "")
-            group1
+            val pattern2 by RepoPattern.pattern(this.nextKey() + ".a.a", "")
+            val pattern1 by RepoPattern.list(this.prevKey(), "")
+            pattern2
             pattern1
         }
 
         assertThrows<RuntimeException> {
+            val pattern1 by RepoPattern.list(this.nextKey(), "")
+            val pattern2 by RepoPattern.pattern(this.prevKey() + ".a.a.a", "")
+            pattern1
+            pattern2
+        }
+
+        assertThrows<RuntimeException> {
+            val pattern2 by RepoPattern.pattern(this.nextKey() + ".a.a.a", "")
+            val pattern1 by RepoPattern.list(this.prevKey(), "")
+            pattern2
+            pattern1
+        }
+
+        RepoPatternManager.inTestDuplicateUsage = true
+    }
+
+    @Test
+    fun testExclusivityNoTrow() {
+        RepoPatternManager.inTestDuplicateUsage = false
+
+        assertDoesNotThrow {
+            // Layer 0
+            val pattern1 by RepoPattern.pattern(nextKey(), "")
+            val pattern1a by RepoPattern.pattern(prevKey() + ".a", "")
+            val pattern2 by RepoPattern.pattern(nextKey(), "")
+            val pattern2a by RepoPattern.pattern(prevKey() + ".a", "")
+            val list1 by RepoPattern.list(nextKey(), "")
+            val list2 by RepoPattern.list(nextKey(), "")
+            // Layer 1
             val group1 by RepoPattern.exclusiveGroup(nextKey())
+            val group2 by RepoPattern.exclusiveGroup(nextKey())
+            val pattern3 by group1.pattern("1", "")
+            val pattern3a by group1.pattern("1.a", "")
+            val pattern4 by group2.pattern("1", "")
+            val pattern4a by group2.pattern("1.a", "")
+            val list3 by group1.list("l1", "")
+            val list4 by group2.pattern("l1", "")
+            // Layer 2
+            val group3 by group1.exclusiveGroup("g1")
+            val group4 by group2.exclusiveGroup("g1")
+            val pattern5 by group3.pattern("1", "")
+            val pattern5a by group3.pattern("1.a", "")
+            val pattern6 by group4.pattern("1", "")
+            val pattern6a by group4.pattern("1.a", "")
+            val list5 by group3.list("l1", "")
+            val list6 by group4.pattern("l1", "")
+            // Layer 3
+            val group5 by group3.exclusiveGroup("g1")
+            val group6 by group4.exclusiveGroup("g1")
+            val pattern7 by group5.pattern("1", "")
+            val pattern7a by group5.pattern("1.a", "")
+            val pattern8 by group6.pattern("1", "")
+            val pattern8a by group6.pattern("1.a", "")
+            val list7 by group5.list("l1", "")
+            val list8 by group6.pattern("l1", "")
+
+            // Call Order mustn't matter
+            pattern1
+            pattern2
+            pattern3
+            pattern4
+            pattern5
+            pattern6
+            pattern7
+            pattern8
+            list1
+            list2
+            list3
+            list4
+            list5
+            list6
+            list7
+            list8
+            group1
+            group2
+            group3
+            group4
+            group5
+            group6
+            pattern1a
+            pattern2a
+            pattern3a
+            pattern4a
+            pattern5a
+            pattern6a
+            pattern7a
+            pattern8a
+        }
+
+        RepoPatternManager.inTestDuplicateUsage = true
+    }
+
+    @Test
+    fun testExclusivitySuperSpaceExclusiveGroup() {
+        RepoPatternManager.inTestDuplicateUsage = false
+
+        assertDoesNotThrow {
+            val group1 by RepoPattern.exclusiveGroup(nextKey() + ".a.a")
             val pattern1 by RepoPattern.pattern(prevKey() + ".a", "")
             group1
             pattern1
         }
 
         assertDoesNotThrow {
-            val group1 by RepoPattern.exclusiveGroup(nextKey() + ".a.a")
+            val group1 by RepoPattern.exclusiveGroup(nextKey() + ".a.a.a")
+            val pattern1 by RepoPattern.pattern(prevKey() + ".a", "")
+            group1
+            pattern1
+        }
+
+        RepoPatternManager.inTestDuplicateUsage = true
+    }
+
+    @Test
+    fun testExclusivitySubSpaceExclusiveGroup() {
+        RepoPatternManager.inTestDuplicateUsage = false
+
+        assertThrows<RuntimeException> {
+            val group1 by RepoPattern.exclusiveGroup(nextKey())
             val pattern1 by RepoPattern.pattern(prevKey() + ".a", "")
             group1
             pattern1
@@ -248,15 +381,6 @@ object RepoPatternTest {
             group1
         }
 
-        assertDoesNotThrow {
-            val group1 by RepoPattern.exclusiveGroup(nextKey())
-            val group2 by group1.exclusiveGroup("1")
-            val pattern1 by group2.pattern("a", "")
-            group1
-            group2
-            pattern1
-        }
-
         assertThrows<RuntimeException> {
             val group1 by RepoPattern.exclusiveGroup(nextKey())
             val group2 by group1.exclusiveGroup("1")
@@ -265,7 +389,6 @@ object RepoPatternTest {
             group2
             pattern1
         }
-
 
         RepoPatternManager.inTestDuplicateUsage = true
     }

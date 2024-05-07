@@ -22,6 +22,13 @@ open class RepoPatternGroup internal constructor(
     }
 
     /**
+     * Shortcut to [RepoPattern.list] prefixed with [prefix].
+     */
+    fun list(key: String, @Language("RegExp") vararg fallbacks: String): RepoPatternList {
+        return RepoPatternManager.ofList("$prefix.$key", fallbacks, parent)
+    }
+
+    /**
      * Shortcut to [RepoPattern.group] prefixed with [prefix].
      */
     fun group(subgroup: String): RepoPatternGroup {
