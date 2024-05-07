@@ -48,6 +48,14 @@ public class MiningConfig {
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
 
     @Expose
+    @Category(name = "Tunnel Maps", desc = "Settings for the Tunnel Maps")
+    public TunnelMapsConfig tunnelMaps = new TunnelMapsConfig();
+    @Expose
+    @ConfigOption(name = "Commissions Blocks Color", desc = "")
+    @Accordion
+    public CommissionsBlocksColorConfig commissionsBlocksColor = new CommissionsBlocksColorConfig();
+
+    @Expose
     @ConfigOption(name = "Mineshaft", desc = "")
     @Accordion
     public MineshaftConfig mineshaft = new MineshaftConfig();

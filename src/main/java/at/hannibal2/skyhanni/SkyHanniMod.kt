@@ -296,7 +296,9 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsGuide
 import at.hannibal2.skyhanni.features.mining.GoldenGoblinHighlight
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
 import at.hannibal2.skyhanni.features.mining.MiningNotifications
+import at.hannibal2.skyhanni.features.mining.TunnelsMaps
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
@@ -611,6 +613,7 @@ class SkyHanniMod {
         loadModule(DungeonMilestonesDisplay)
         loadModule(DungeonDeathCounter())
         loadModule(DungeonCleanEnd())
+        loadModule(TunnelsMaps())
         loadModule(DungeonBossMessages())
         loadModule(DungeonBossHideDamageSplash())
         loadModule(UniqueGiftingOpportunitiesFeatures)
@@ -818,6 +821,7 @@ class SkyHanniMod {
         loadModule(ShowItemUuid())
         loadModule(FrozenTreasureTracker)
         loadModule(MiningEventDisplay)
+        loadModule(MiningCommissionsBlocksColor)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
         loadModule(RiftTimer())
