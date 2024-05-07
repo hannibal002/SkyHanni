@@ -36,7 +36,7 @@ object MiningEventDisplay {
     }
 
     private fun updateEvents() {
-        islandEventData.forEach { (islandType, eventDetails) ->
+        for ((islandType, eventDetails) in islandEventData) {
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
                 MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
@@ -69,7 +69,7 @@ object MiningEventDisplay {
     }
 
     fun updateData(eventData: MiningEventData) {
-        eventData.runningEvents.forEach { (islandType, events) ->
+        for ((islandType, events) in eventData.runningEvents) {
             val sorted = events.filter { islandType == IslandType.DWARVEN_MINES || !it.event.dwarvenSpecific }
                 .sortedBy { it.endsAt - it.event.defaultLength.inWholeMilliseconds }
 

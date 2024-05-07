@@ -27,7 +27,7 @@ class CropPage : FFGuideGUI.FFGuidePage() {
         var x: Int
         var y = FFGuideGUI.guiTop - 20
         var i = 0
-        FFStats.cropPage.forEach { (key, value) ->
+        for ((key, value) in FFStats.cropPage) {
             if (key == FortuneStats.CROP_TOTAL) {
                 val newLine =
                     key.label.replace("Crop", FFGuideGUI.currentCrop?.name?.replace("_", " ")?.firstLetterUppercase()!!)

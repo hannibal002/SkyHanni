@@ -168,10 +168,10 @@ object DungeonAPI {
                     it.contains(LorenzUtils.getPlayerName())
                 }?.removeColor() ?: ""
 
-            DungeonClass.entries.forEach {
-                if (playerTeam.contains("(${it.scoreboardName} ")) {
+            for (dungeonClass in DungeonClass.entries) {
+                if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                     val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
-                    playerClass = it
+                    playerClass = dungeonClass
                     playerClassLevel = level
                 }
             }
@@ -181,15 +181,14 @@ object DungeonAPI {
     @SubscribeEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val tabList = event.footer.split("\n")
-        tabList.forEach {
-            if (noBlessingPattern.matches(it)) {
+        for (line in event.footer.split("\n")) {
+            if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
             }
-            val matcher = blessingPattern.matcher(it)
+            val matcher = blessingPattern.matcher(line)
             if (matcher.find()) {
-                val type = matcher.group("type") ?: return@forEach
+                val type = matcher.group("type") ?: continue
                 val amount = matcher.group("amount").romanToDecimalIfNecessary()
                 if (DungeonBlessings.valueOf(type.uppercase()).power != amount) {
                     DungeonBlessings.valueOf(type.uppercase()).power = amount

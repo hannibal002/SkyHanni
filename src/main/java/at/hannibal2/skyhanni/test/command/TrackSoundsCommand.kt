@@ -101,7 +101,7 @@ object TrackSoundsCommand {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (cutOfTime.isInPast()) return
-        worldSounds.forEach { (key, value) ->
+        for ((key, value) in worldSounds) {
             if (value.size != 1) {
                 event.drawDynamicText(key, "§e${value.size} sounds", 0.8)
 

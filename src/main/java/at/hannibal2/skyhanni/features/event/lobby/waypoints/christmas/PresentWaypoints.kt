@@ -105,8 +105,8 @@ class PresentWaypoints {
         waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String,
     ) {
         if (!shouldDraw) return
-        waypoints.forEach { waypoint ->
-            if (!waypoint.shouldShow()) return@forEach
+        for (waypoint in waypoints) {
+            if (!waypoint.shouldShow()) continue
             this.drawWaypointFilled(waypoint.position, color.toColor())
             this.drawDynamicText(waypoint.position, "$prefix${waypoint.name}", 1.5)
         }

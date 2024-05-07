@@ -97,9 +97,7 @@ class CroesusChestTracker {
             pageSetup(event)
 
             if (croesusEmpty) {
-                croesusChests?.forEach {
-                    it.setValuesNull()
-                }
+                croesusChests?.forEach { it.setValuesNull() }
                 return
             }
 

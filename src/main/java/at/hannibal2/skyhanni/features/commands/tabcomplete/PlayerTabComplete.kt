@@ -55,7 +55,8 @@ object PlayerTabComplete {
         return buildList {
 
             if (config.friends && PlayerCategory.FRIENDS !in ignored) {
-                FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }
+                FriendAPI.getAllFriends()
+                    .filter { it.bestFriend || !config.onlyBestFriends }
                     .forEach { add(it.name) }
             }
 

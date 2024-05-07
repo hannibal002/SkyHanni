@@ -421,8 +421,8 @@ interface Renderable {
             override val height = yOffsets.last() - yPadding
 
             override fun render(posX: Int, posY: Int) {
-                content.forEachIndexed { rowIndex, row ->
-                    row.forEachIndexed { index, renderable ->
+                for ((rowIndex, row) in content.withIndex()) {
+                    for ((index, renderable) in row.withIndex()) {
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
                         renderable?.renderXYAligned(
@@ -621,20 +621,20 @@ interface Renderable {
                 var renderY = 0
                 var virtualY = 0
                 var found = false
-                list.forEach {
-                    if ((virtualY..virtualY + it.height) in scroll.asInt()..end) {
-                        it.renderXAligned(posX, posY + renderY, width)
-                        GlStateManager.translate(0f, it.height.toFloat(), 0f)
-                        renderY += it.height
+                for (renderable in list) {
+                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
+                        renderable.renderXAligned(posX, posY + renderY, width)
+                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
+                        renderY += renderable.height
                         found = true
                     } else if (found) {
                         found = false
-                        if (renderY + it.height <= height) {
-                            it.renderXAligned(posX, posY + renderY, width)
+                        if (renderY + renderable.height <= height) {
+                            renderable.renderXAligned(posX, posY + renderY, width)
                         }
-                        return@forEach
+                        continue
                     }
-                    virtualY += it.height
+                    virtualY += renderable.height
                 }
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
@@ -680,7 +680,7 @@ interface Renderable {
 
                 var renderY = 0
                 if (hasHeader) {
-                    content[0].forEachIndexed { index, renderable ->
+                    for ((index, renderable) in content[0].withIndex()) {
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
@@ -699,7 +699,7 @@ interface Renderable {
                         .takeIf { it > 0 }
                         ?: yOffsets.size) - 1
                 for (rowIndex in range) {
-                    content[rowIndex].forEachIndexed { index, renderable ->
+                    for ((index, renderable) in content[rowIndex].withIndex()) {
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],

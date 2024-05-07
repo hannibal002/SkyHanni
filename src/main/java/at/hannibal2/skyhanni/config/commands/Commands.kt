@@ -576,9 +576,7 @@ object Commands {
 
     private fun MutableList<String>.addDescription(description: String) {
         val lines = description.splitLines(200).removeSuffix("§r").replace("§r", "§7").addOptionalDot()
-        for (line in lines.split("\n")) {
-            add("  §7${line}")
-        }
+        lines.split("\n").forEach { add("  §7${it}") }
     }
 
     private fun String.addOptionalDot(): String {
