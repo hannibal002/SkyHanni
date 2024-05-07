@@ -50,7 +50,7 @@ value class Graph(
                     out.beginObject()
                     it.neighbours.forEach { (node, weight) ->
                         val id = node.id.toString()
-                        out.name(id).value(weight)
+                        out.name(id).value(weight.round(2))
                     }
                     out.endObject()
                     out.endObject()
@@ -79,7 +79,7 @@ value class Graph(
                                 while (reader.hasNext()) {
                                     val nId = reader.nextName().toInt()
                                     val distance = reader.nextDouble()
-                                    neighbors.add(nId to distance.round(2))
+                                    neighbors.add(nId to distance)
                                 }
                                 reader.endObject()
                             }
