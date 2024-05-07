@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft
 
 object CustomLines {
 
-    private val replacements = listOf(
+    val replacements = listOf(
         Triple("%x%", { Minecraft.getMinecraft().thePlayer.posX.round(2) }, "X-Coordinate"),
         Triple("%y%", { Minecraft.getMinecraft().thePlayer.posY.round(2) }, "Y-Coordinate"),
         Triple("%z%", { Minecraft.getMinecraft().thePlayer.posZ.round(2) }, "Z-Coordinate"),

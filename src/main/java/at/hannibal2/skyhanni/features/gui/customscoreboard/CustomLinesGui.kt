@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -21,6 +20,8 @@ open class CustomLinesGui : GuiScreen() {
 
     private val guiWidth = (windowWidth / (3 / 4f)).toInt()
     private val guiHeight = (windowHeight / (3 / 4f)).toInt()
+    private val columnSpacing = 10 // temp value
+    private val maxSecondColumnWidth = 300 // temp value
 
     private var inTextMode = false
         set(value) {
@@ -40,43 +41,70 @@ open class CustomLinesGui : GuiScreen() {
     }
 
     private fun getDisplay(): Renderable {
+        val secondColumn = createRenderableSecondColumn()
+        val secondColumnWidth = secondColumn.width
+        val firstColumnMaxWidth = guiWidth - secondColumnWidth - columnSpacing
 
-        val text = Renderable.string("Input: ${textBox.editText()}")
-        return Renderable.drawInsideRoundedRect(
+        val secondColumnRenderable = Renderable.horizontalContainer(
+            listOf(
+                Renderable.placeholder(guiWidth - secondColumnWidth, 0),
+                secondColumn
+            )
+        )
+
+        val firstRenderable = createRenderableFirstColumn(firstColumnMaxWidth)
+
+        val fullRenderable = Renderable.drawInsideRoundedRect(
             Renderable.doubleLayered(
                 Renderable.placeholder(guiWidth, guiHeight),
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.verticalContainer(
-                            listOf(
-                                Renderable.string("Custom Lines"),
-                                Renderable.clickable(
-                                    if (inTextMode) {
-                                        Renderable.underlined(text)
-                                    } else {
-                                        text
-                                    },
-                                    {
-                                        inTextMode = !inTextMode
-                                    },
-                                    bypassChecks = true
-                                )
-                            )
-                        ),
-                        Renderable.verticalContainer(
-                            listOf(
-                                Renderable.string("Custom Line 1"),
-                                Renderable.string(CustomScoreboard.customlineConfig.customLine1)
-                            ),
-                            horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT
-                        )
-                    )
-                )
+                Renderable.doubleLayered(
+                    secondColumnRenderable,
+                    firstRenderable
+                ),
             ),
             LorenzColor.BLACK.addOpacity(100),
             padding = 10,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        )
+
+        return fullRenderable
+    }
+
+    private fun createRenderableSecondColumn(): Renderable {
+        val list = mutableListOf<Renderable>()
+        CustomLines.replacements.forEach {
+            list.add(
+                Renderable.wrappedString(
+                    "${it.third} | ${it.second.invoke()}", maxSecondColumnWidth
+                )
+            )
+        }
+        val replacementsRenderable = Renderable.verticalContainer(list)
+
+        return Renderable.verticalContainer(
+            listOf(
+                Renderable.string("Replacements"),
+                replacementsRenderable
+            )
+        )
+    }
+
+    private fun createRenderableFirstColumn(maxWidth: Int): Renderable {
+        val input = Renderable.wrappedString("Input: ${textBox.editText()}", width = maxWidth)
+        return Renderable.verticalContainer(
+            listOf(
+                Renderable.string("Custom Lines"),
+                Renderable.clickable(
+                    if (inTextMode) {
+                        Renderable.underlined(input)
+                    } else {
+                        input
+                    },
+                    {
+                        inTextMode = !inTextMode
+                    },
+                    bypassChecks = true
+                )
+            )
         )
     }
 
