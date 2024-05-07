@@ -79,7 +79,7 @@ value class Graph(
                                 while (reader.hasNext()) {
                                     val nId = reader.nextName().toInt()
                                     val distance = reader.nextDouble()
-                                    neighbors.add(nId to distance)
+                                    neighbors.add(nId to distance.round(2))
                                 }
                                 reader.endObject()
                             }
