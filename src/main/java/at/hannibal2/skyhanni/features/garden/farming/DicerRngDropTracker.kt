@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import java.util.regex.Pattern
 
 object DicerRngDropTracker {
@@ -86,10 +86,10 @@ object DicerRngDropTracker {
     }
 
     enum class DropRarity(val displayName: String) {
-        UNCOMMON("§a§lUNCOMMON DROP"),
-        RARE("§9§lRARE DROP"),
-        CRAZY_RARE("§d§lCRAZY RARE DROP"),
-        PRAY_TO_RNGESUS("§5§lPRAY TO RNGESUS DROP"),
+        UNCOMMON("§aUNCOMMON"),
+        RARE("§9RARE"),
+        CRAZY_RARE("§dCRAZY RARE"),
+        PRAY_TO_RNGESUS("§5PRAY TO RNGESUS"),
     }
 
     @SubscribeEvent
@@ -109,14 +109,19 @@ object DicerRngDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList {
         val cropInHand = cropInHand ?: return@buildList
         val items = data.drops.getOrPut(cropInHand) { mutableMapOf() }
-        addAsSingletonList("§7Dicer RNG Drop Tracker for $toolName§7:")
+        val list = mutableListOf<Renderable>()
+        val topLine = mutableListOf<Renderable>()
+        topLine.add(Renderable.itemStack(cropInHand.icon))
+        topLine.add(Renderable.string("§7Dicer Tracker:"))
+        list.add(Renderable.horizontalContainer(topLine))
         for ((rarity, amount) in items.sortedDesc()) {
             val displayName = rarity.displayName
-            addAsSingletonList(" §7- §e${amount.addSeparators()}x $displayName")
+            list.add(Renderable.string(" §7- §e${amount.addSeparators()}x $displayName"))
         }
+        add(listOf(Renderable.verticalContainer(list)))
 
     }
 
