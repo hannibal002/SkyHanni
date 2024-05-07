@@ -66,13 +66,14 @@ class PlayerChatManager {
     /**
      * REGEX-TEST: To nea89o: lol
      * REGEX-TEST: From nea89o: hiii
+     * REGEX-TEST: §eFrom stash: §r§fPufferfish
      * REGEX-TEST: To [MVP+] Eisengolem: Boop!
      * REGEX-TEST: From [MVP+] Eisengolem: Boop!
      * REGEX-TEST: To [MVP+] Eisengolem: danke
      */
     private val privateMessagePattern by patternGroup.pattern(
         "privatemessage",
-        "(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
+        "^(?!§eFrom stash: §r)(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
     )
 
     /**

@@ -28,7 +28,7 @@ class GardenCropMilestoneFix {
      */
     private val tabListPattern by patternGroup.pattern(
         "tablist",
-        " (?<crop>.*) (?<tier>\\d+): §r§a(?<percentage>.*)%"
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%"
     )
     private val levelUpPattern by patternGroup.pattern(
         "levelup",
