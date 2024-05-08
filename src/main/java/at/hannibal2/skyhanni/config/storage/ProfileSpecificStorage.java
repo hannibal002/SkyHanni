@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.mining.OreType;
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
@@ -476,7 +476,7 @@ public class ProfileSpecificStorage {
             public int mineshaftTotalCount = 0;
 
             @Expose
-            public Map<OreType, Integer> blocksBroken = new HashMap<>();
+            public Map<MineshaftPityDisplay.PityBlocks, Integer> blocksBroken = new HashMap<>();
         }
     }
 

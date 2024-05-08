@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.CustomBlockMineEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
@@ -44,6 +45,19 @@ object MiningAPI {
 
     var isBeingMined = false
     var lastSound = SimpleTimeMark.farPast()
+
+
+    var lastWorldSwitch = SimpleTimeMark.farPast()
+
+    var inGlacite = false
+    var inDwarvenMines = false
+    var inCrystalHollows = false
+    var inCrimsonIsle = false
+    var inEnd = false
+    var inSpidersDen = false
+
+    var currentAreaOreBlocks = listOf<OreBlock>()
+
 
     private var recentMinedBlocksMap = mutableListOf<MinedBlock>()
     private var surroundingMinedBlocks = mutableListOf<MinedBlock>()
@@ -90,13 +104,9 @@ object MiningAPI {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         val position = event.position
+        if (recentMinedBlocksMap.any { it.position == position }) return
         val blockState = event.getBlockState
         val ore = OreBlock.getByStateOrNull(blockState) ?: return
-        recentMinedBlocksMap.filter { it.position == position }.firstOrNull {
-            recentMinedBlocksMap.remove(it)
-            recentMinedBlocksMap.add(MinedBlock(it.ore, it.position, it.confirmed, SimpleTimeMark.now()))
-            return
-        }
         recentMinedBlocksMap.add(MinedBlock(ore, position, false, SimpleTimeMark.now()))
     }
 
@@ -140,6 +150,11 @@ object MiningAPI {
     fun onTick(event: LorenzTickEvent) {
         if (!inCustomMiningIsland()) return
 
+        if (lastWorldSwitch.passedSince() < 4.seconds) return
+        updateLocation()
+
+        if (currentAreaOreBlocks.isEmpty()) return
+
         // if somehow you take more than 20 seconds to mine a single block, congrats
         recentMinedBlocksMap.removeIf { it.time.passedSince() > 20.seconds }
         surroundingMinedBlocks.removeIf { it.time.passedSince() > 20.seconds }
@@ -153,6 +168,7 @@ object MiningAPI {
             .groupBy({ it.ore }, { 1 })
             .mapValues { it.value.size }
 
+        ChatUtils.debug("test")
         CustomBlockMineEvent(originalBlock.ore, blocksMinedMap).postAndCatch()
 
         surroundingMinedBlocks = mutableListOf()
@@ -175,6 +191,8 @@ object MiningAPI {
         lastColdReset = SimpleTimeMark.now()
         recentMinedBlocksMap = mutableListOf()
         surroundingMinedBlocks = mutableListOf()
+        currentAreaOreBlocks = mutableListOf()
+        lastWorldSwitch = SimpleTimeMark.now()
     }
 
     private fun updateCold(newCold: Int) {
@@ -183,5 +201,38 @@ object MiningAPI {
         lastColdUpdate = SimpleTimeMark.now()
         ColdUpdateEvent(newCold).postAndCatch()
         cold = newCold
+    }
+
+    private fun updateLocation() {
+        val newInGlacite = inGlaciteArea()
+        val newInDwarvenMines = inRegularDwarven()
+        val newInCrystalHollows = inCrystalHollows()
+        val newInCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()
+        val newInEnd = IslandType.THE_END.isInIsland()
+        val newInSpidersDen = IslandType.SPIDER_DEN.isInIsland()
+
+        if (newInGlacite != inGlacite ||
+            newInDwarvenMines != inDwarvenMines ||
+            newInCrystalHollows != inCrystalHollows ||
+            newInCrimsonIsle != inCrimsonIsle ||
+            newInEnd != inEnd ||
+            newInSpidersDen != inSpidersDen
+        ) {
+
+            inGlacite = newInGlacite
+            inDwarvenMines = newInDwarvenMines
+            inCrystalHollows = newInCrystalHollows
+            inCrimsonIsle = newInCrimsonIsle
+            inEnd = newInEnd
+            inSpidersDen = newInSpidersDen
+
+            currentAreaOreBlocks = if (newInGlacite) OreBlock.entries.filter { it.checkArea.invoke() }
+            else if (newInDwarvenMines) OreBlock.entries.filter { it.checkArea.invoke() }
+            else if (newInCrystalHollows) OreBlock.entries.filter { it.checkArea.invoke() }
+            else if (newInCrimsonIsle) OreBlock.entries.filter { it.checkArea.invoke() }
+            else if (newInEnd) OreBlock.entries.filter { it.checkArea.invoke() }
+            else if (newInSpidersDen) OreBlock.entries.filter { it.checkArea.invoke() }
+            else mutableListOf()
+        }
     }
 }

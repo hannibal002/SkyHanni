@@ -9,14 +9,21 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.mining.CustomBlockMineEvent
+import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.createHoverableChat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.block.BlockStone
+import net.minecraft.init.Blocks
+import net.minecraft.item.EnumDyeColor
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MineshaftPityDisplay {
@@ -24,7 +31,7 @@ object MineshaftPityDisplay {
 
     private val profileStorage get() = ProfileStorageData.profileSpecific?.mining?.mineshaft
 
-    private var minedBlocks: MutableMap<OreType, Int>
+    private var minedBlocks: MutableMap<PityBlocks, Int>
         get() = profileStorage?.blocksBroken ?: mutableMapOf()
         set(value) {
             profileStorage?.blocksBroken = value
@@ -51,9 +58,12 @@ object MineshaftPityDisplay {
     @SubscribeEvent
     fun onCustomBlockMine(event: CustomBlockMineEvent) {
         if (!isEnabled()) return
-        val oreType = event.originalOre.oreType ?: return
-        if (oreType.shaftMultiplier == 0) return
-        minedBlocks.addOrPut(oreType, 1)
+        val oreType = event.originalOre.getOreType() ?: return
+        ChatUtils.debug("Mined block: ${oreType.oreName}")
+        val pityBlock = PityBlocks.entries.firstOrNull {
+            oreType.equalsOneOf(it.oreTypes)
+        } ?: return
+        minedBlocks.addOrPut(pityBlock, 1)
         update()
     }
 
@@ -74,7 +84,7 @@ object MineshaftPityDisplay {
             hover.add("§7Blocks mined: §e$totalBlocks")
             hover.add("§7Pity Counter: §e$pityCounter")
             minedBlocks.forEach {
-                hover.add("    §7${it.key.oreName} mined: §e${it.value} (${(it.value * it.key.shaftMultiplier)}/$counterUntilPity)")
+                hover.add("    §7${it.key.displayName} mined: §e${it.value} (${(it.value * it.key.multiplier)}/$counterUntilPity)")
             }
             hover.add("")
             hover.add("§7Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}")
@@ -100,7 +110,7 @@ object MineshaftPityDisplay {
     private fun calculateCounter(): Int {
         if (minedBlocks.isEmpty()) return MAX_COUNTER
         var counter = MAX_COUNTER
-        minedBlocks.forEach { counter -= it.key.shaftMultiplier * it.value }
+        minedBlocks.forEach { counter -= it.key.multiplier * it.value }
         return counter
     }
 
@@ -108,12 +118,12 @@ object MineshaftPityDisplay {
         val pityCounter = calculateCounter()
         val counterUntilPity = MAX_COUNTER - pityCounter
 
-        val multipliers = OreType.entries.map { it.shaftMultiplier }.filter { it != 0 }.toSet().sorted()
+        val multipliers = PityBlocks.entries.map { it.multiplier }.toSet().sorted()
         val blocksToPityList = mutableListOf<Renderable>()
 
         multipliers.forEach { multiplier ->
-            val iconsList = OreType.entries
-                .filter { it.shaftMultiplier == multiplier }
+            val iconsList = PityBlocks.entries
+                .filter { it.multiplier == multiplier }
                 .map { Renderable.itemStack(it.item) }
             blocksToPityList.add(
                 Renderable.horizontalContainer(
@@ -195,5 +205,55 @@ object MineshaftPityDisplay {
         override fun toString(): String {
             return display
         }
+    }
+
+    enum class PityBlocks(
+        val displayName: String,
+        val oreTypes: List<OreType>,
+        val multiplier: Int,
+        val item: ItemStack
+    ) {
+        MITHRIL(
+            "Mithril",
+            listOf(OreType.MITHRIL),
+            1,
+            ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata)
+        ),
+
+        GEMSTONE(
+            "Gemstone",
+            listOf(
+                OreType.RUBY, OreType.AMBER, OreType.AMETHYST, OreType.JADE,
+                OreType.SAPPHIRE, OreType.TOPAZ, OreType.JASPER, OreType.OPAL,
+                OreType.AQUAMARINE, OreType.CITRINE, OreType.ONYX, OreType.PERIDOT
+            ),
+            4,
+            ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata)
+        ),
+        GLACITE(
+            "Glacite",
+            listOf(OreType.GLACITE),
+            4,
+            ItemStack(Blocks.packed_ice)
+        ),
+        TUNGSTEN(
+            "Tungsten",
+            listOf(OreType.TUNGSTEN),
+            4,
+            ItemStack(Blocks.clay)
+        ),
+        UMBER(
+            "Umber",
+            listOf(OreType.UMBER),
+            4,
+            ItemStack(Blocks.red_sandstone)
+        ),
+
+        TITANIUM(
+            "Titanium",
+            listOf(OreType.TITANIUM),
+            8,
+            ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata)
+        )
     }
 }
