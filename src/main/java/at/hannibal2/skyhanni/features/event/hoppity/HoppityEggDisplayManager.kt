@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -19,13 +20,13 @@ object HoppityEggDisplayManager {
         if (!HoppityEggLocator.isEnabled()) return false
         if (entity !is EntityPlayer) return false
         if (entity == LorenzUtils.getPlayer()) return false
-        return true
+        if (!entity.isRealPlayer()) return false
+        return config.playerOpacity < 100
     }
 
     @SubscribeEvent
     fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         if (!canChangeOpacity(event.entity)) return
-        if (config.playerOpacity < 100) return
 
         shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { event.entity.distanceTo(it) < 4.0 }
             ?: HoppityEggLocator.possibleEggLocations.any { event.entity.distanceTo(it) < 4.0 }
