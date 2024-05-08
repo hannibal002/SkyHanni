@@ -67,7 +67,7 @@ object GriffinBurrowParticleFinder {
             if (particleType != null) {
 
                 val location = packet.toLorenzVec().toBlockPos().down().toLorenzVec()
-                if (recentlyDugParticleBurrows.contains(location)) return
+                if (location in recentlyDugParticleBurrows) return
                 val burrow = burrows.getOrPut(location) { Burrow(location) }
 
                 when (particleType) {
