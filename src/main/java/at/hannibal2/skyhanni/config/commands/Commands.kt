@@ -635,7 +635,8 @@ object Commands {
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
                     UpdateManager.checkUpdate(true, updateStream)
-                }
+                },
+                oneTimeClick = true
             )
         } else {
             UpdateManager.checkUpdate(true, updateStream)

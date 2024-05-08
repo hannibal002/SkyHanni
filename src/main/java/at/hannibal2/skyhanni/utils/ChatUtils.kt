@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.command
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
+import at.hannibal2.skyhanni.utils.chat.Text.prefix
+import at.hannibal2.skyhanni.utils.chat.Text.url
 import net.minecraft.client.Minecraft
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -97,15 +97,11 @@ object ChatUtils {
         }
     }
 
-    fun chatComponent(message: IChatComponent) {
-        internalChat(message)
-    }
-
     private fun internalChat(message: String): Boolean {
-        return internalChat(ChatComponentText(message))
+        return chat(ChatComponentText(message))
     }
 
-    private fun internalChat(message: IChatComponent): Boolean {
+    fun chat(message: IChatComponent): Boolean {
         val formattedMessage = message.formattedText
         log.log(formattedMessage)
 
@@ -141,10 +137,11 @@ object ChatUtils {
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
         prefixColor: String = "§e",
+        oneTimeClick: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        internalChat(Text.text(msgPrefix + message) {
-            this.onClick(expireAt, onClick)
+        chat(Text.text(msgPrefix + message) {
+            this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = "§eClick here!".asComponent()
         })
     }
@@ -168,7 +165,7 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
-        internalChat(Text.text(msgPrefix + message) {
+        chat(Text.text(msgPrefix + message) {
             this.hover = Text.multiline(hover)
             if (command != null) {
                 this.command = command
@@ -196,10 +193,10 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        val text = ChatComponentText(msgPrefix + message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, url)
-        text.chatStyle.chatHoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("$prefixColor$hover"))
-        internalChat(text)
+        chat(Text.text(msgPrefix + message) {
+            this.url = url
+            this.hover = "$prefixColor$hover".asComponent()
+        })
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
@@ -217,11 +214,7 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        val baseMessage = ChatComponentText(msgPrefix)
-
-        for (component in components) baseMessage.appendSibling(component)
-
-        internalChat(baseMessage)
+        chat(Text.join(components).prefix(msgPrefix))
     }
 
     private var lastMessageSent = SimpleTimeMark.farPast()
