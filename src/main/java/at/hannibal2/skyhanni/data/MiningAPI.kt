@@ -90,9 +90,13 @@ object MiningAPI {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         val position = event.position
-        if (recentMinedBlocksMap.any { it.position == position }) return
         val blockState = event.getBlockState
         val ore = OreBlock.getByStateOrNull(blockState) ?: return
+        recentMinedBlocksMap.filter { it.position == position }.firstOrNull {
+            recentMinedBlocksMap.remove(it)
+            recentMinedBlocksMap.add(MinedBlock(it.ore, it.position, it.confirmed, SimpleTimeMark.now()))
+            return
+        }
         recentMinedBlocksMap.add(MinedBlock(ore, position, false, SimpleTimeMark.now()))
     }
 
