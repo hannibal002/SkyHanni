@@ -56,6 +56,11 @@ public class MiningConfig {
     public CommissionsBlocksColorConfig commissionsBlocksColor = new CommissionsBlocksColorConfig();
 
     @Expose
+    @ConfigOption(name = "Mineshaft", desc = "")
+    @Accordion
+    public MineshaftConfig mineshaft = new MineshaftConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
