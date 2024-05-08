@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.event.ClickEvent
@@ -45,39 +46,6 @@ class ReplaceRomanNumerals {
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!isEnabled()) return
         event.applyIfPossible { it.transformLine() }
-    }
-
-    private fun SystemMessageEvent.applyIfPossible(transform: (String) -> String) {
-        val original = chatComponent.formattedText
-        val new = transform(original)
-        if (new == original) return
-
-        val clickEvents = mutableListOf<ClickEvent>()
-        val hoverEvents = mutableListOf<HoverEvent>()
-        chatComponent.findAllEvents(clickEvents, hoverEvents)
-
-        if (clickEvents.size > 1 || hoverEvents.size > 1) return
-
-        chatComponent = ChatComponentText(new)
-        if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
-        if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
-    }
-
-    private fun IChatComponent.findAllEvents(
-        clickEvents: MutableList<ClickEvent>,
-        hoverEvents: MutableList<HoverEvent>
-    ) {
-        siblings.forEach { it.findAllEvents(clickEvents, hoverEvents) }
-
-        val clickEvent = chatStyle.chatClickEvent
-        val hoverEvent = chatStyle.chatHoverEvent
-
-        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
-            clickEvents.add(clickEvent)
-        }
-        if (hoverEvent?.action != null && hoverEvents.none { it.value == hoverEvent.value }) {
-            hoverEvents.add(hoverEvent)
-        }
     }
 
     private fun String.transformLine() = splitRegex.findAll(this).map { it.value }.joinToString("") {

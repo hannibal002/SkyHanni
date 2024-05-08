@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
@@ -408,6 +411,42 @@ object StringUtils {
                 return
             }
             foundCommands.add(message)
+        }
+    }
+
+    /**
+     * Applies a transformation on the message of a SystemMessageEvent if possible.
+     */
+    fun SystemMessageEvent.applyIfPossible(transform: (String) -> String) {
+        val original = chatComponent.formattedText
+        val new = transform(original)
+        if (new == original) return
+
+        val clickEvents = mutableListOf<ClickEvent>()
+        val hoverEvents = mutableListOf<HoverEvent>()
+        chatComponent.findAllEvents(clickEvents, hoverEvents)
+
+        if (clickEvents.size > 1 || hoverEvents.size > 1) return
+
+        chatComponent = ChatComponentText(new)
+        if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
+        if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
+    }
+
+    private fun IChatComponent.findAllEvents(
+        clickEvents: MutableList<ClickEvent>,
+        hoverEvents: MutableList<HoverEvent>
+    ) {
+        siblings.forEach { it.findAllEvents(clickEvents, hoverEvents) }
+
+        val clickEvent = chatStyle.chatClickEvent
+        val hoverEvent = chatStyle.chatHoverEvent
+
+        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
+            clickEvents.add(clickEvent)
+        }
+        if (hoverEvent?.action != null && hoverEvents.none { it.value == hoverEvent.value }) {
+            hoverEvents.add(hoverEvent)
         }
     }
 

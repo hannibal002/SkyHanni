@@ -256,7 +256,7 @@ public class MiscConfig {
     @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean replaceRomanNumerals = true;
+    public boolean replaceRomanNumerals = false;
 
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion
