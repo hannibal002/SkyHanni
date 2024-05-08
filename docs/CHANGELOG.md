@@ -56,6 +56,7 @@
     + Only works when having enough Architect First Drafts in the sack.
 + Added dungeon hub race waypoints. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
     + Only works for Nothing; No return races.
++ Added the ability to hide solo class, solo class stats and fairy dialogue chat messages in Dungeons. - raven (https://github.com/hannibal002/SkyHanni/pull/1702)
 
 #### Rift Features
 
@@ -135,6 +136,7 @@
     + Option to remove enchant descriptions.
     + Option to change enchant formatting.
     + Also parses tooltips from /show.
++ Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
 
 #### Crimson Features
 
@@ -243,11 +245,14 @@
     + Now has options for horizontal alignment.
     + Highlight the item in inventory while hovering over the item name in the display.
 + Enchant books always show descriptions regardless of if 'Hide enchant description' is enabled. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1552)
++ Added Item Ability Cooldown support for Royal Pigeon. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1705)
++ Use raw craft cost of an item if no Auction House price is available. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1682)
 
 #### Slayer Improvements
 
 + Added Dragon's Nest as a valid Enderman Slayer location. - Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1399)
 + RNG meter item will now be detected when opening slayer menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1479)
++ Clicking the slayer RNG meter now opens the selection inventory. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1694)
 
 #### Chat Improvements
 
@@ -361,6 +366,7 @@
 + Fixed visitor highlight color sometimes being wrong. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1639)
 + Fixed pet drop rarity issue in Pest Profit Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1624)
 + Fixed pest plot border showing over pest guess line. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1618)
++ Fixed crop milestone detection via tab list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1693)
 
 #### Chat Fixes
 
@@ -408,6 +414,7 @@
 + Fixed chroma not being affected by alpha. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1660)
 + Fixed an issue where Magical Power in Maxwell was sometimes not detected. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1674)
 + Fixed the Vanilla Scoreboard not reappearing after leaving SkyBlock. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1673)
++ Fixed an undetected objective in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1697)
 
 #### Dungeon Fixes
 
@@ -435,6 +442,8 @@
 + Fixed total rabbits not resetting. - seraid (https://github.com/hannibal002/SkyHanni/pull/1637)
 + Fixed error message in the Chocolate Factory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1661)
 + Fixed checkmark incorrectly showing on prestige item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1659)
++ Fixed inventory highlights sometimes remaining after exiting. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1699)
++ Fixed unintended clicks while using keybind feature in Melody's Harp or Chocolate Factory menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1690)
 
 #### Rift Fixes
 
@@ -466,6 +475,12 @@
 + Fixed not sharing location when barn full. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1608)
 + Fixed Chocolate Factory Move Tooltip flickering when clicking quickly. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1604)
 + Fixed swapped colors for Breakfast and Dinner eggs. - yhtez (https://github.com/hannibal002/SkyHanni/pull/1664)
++ Fixed typo in Hoppity's Hunt "not active" message. - walker (https://github.com/hannibal002/SkyHanni/pull/1711)
++ Fixed some cases where egg locator solver would trigger incorrectly. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1689)
+
+#### Crimson Isle Fixes
+
++ Fixed incorrect miniboss amount displayed by Crimson Isle Reputation Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1633)
 
 #### Misc Fixes
 
@@ -499,6 +514,8 @@
 + Fixed overly frequent bazaar price error messages. - hannnibal2 (https://github.com/hannibal002/SkyHanni/pull/1597)
 + Fixed overly long description for Patcher send coordinates waypoints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1631)
 + Fixed the low quiver warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1629)
++ Fixed Custom Scoreboard occasionally displaying an outdated mayor after an election switch. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1698)
++ Fixed Active Effects in Compact Tab List always showing 0. - Luna (https://github.com/hannibal002/SkyHanni/pull/1706)
 
 ### Technical Details
 

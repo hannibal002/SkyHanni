@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -160,6 +159,7 @@ object Commands {
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
             )
         }, DefaultConfigFeatures::onComplete)
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun usersNormal() {
@@ -297,7 +297,7 @@ object Commands {
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
             {
-            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
             },
             FarmingMilestoneCommand::onComplete
         )
@@ -528,7 +528,6 @@ object Commands {
     }
 
     private fun internalCommands() {
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 

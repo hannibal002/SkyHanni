@@ -138,6 +138,7 @@ data class LorenzVec(
     fun clone(): LorenzVec = LorenzVec(x, y, z)
 
     fun toDoubleArray(): Array<Double> = arrayOf(x, y, z)
+    fun toFloatArray(): Array<Float> = arrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
 
