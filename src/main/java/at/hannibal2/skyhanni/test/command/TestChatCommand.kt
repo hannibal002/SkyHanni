@@ -51,7 +51,7 @@ object TestChatCommand {
             if (finalMessage.formattedText.stripHypixelMessage() != message) {
                 ChatUtils.chat("§eChat modified!")
             }
-            ChatUtils.chatComponent(finalMessage)
+            ChatUtils.chat(finalMessage)
         }
     }
 }

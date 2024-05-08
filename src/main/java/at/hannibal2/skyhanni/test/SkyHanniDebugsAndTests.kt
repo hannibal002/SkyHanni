@@ -206,7 +206,8 @@ class SkyHanniDebugsAndTests {
                 onClick = {
                     resetConfig()
                 },
-                prefix = false
+                prefix = false,
+                oneTimeClick = true
             )
         }
 
