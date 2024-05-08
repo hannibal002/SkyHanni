@@ -34,7 +34,7 @@ object UltraRareBookAlert {
 
     private val ultraRarePattern by RepoPattern.pattern(
         "inventory.experimentstable.ultrarare",
-        "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX"
+        "§9Rare Book!"
     )
 
     private val bookPattern by RepoPattern.pattern(
@@ -42,13 +42,13 @@ object UltraRareBookAlert {
         "§9(?<enchant>.*)"
     )
 
-    private val enchantsFound = mutableListOf<Int>()
+    private var enchantsFound = false
 
     private var lastNotificationTime = SimpleTimeMark.farPast()
 
     fun notification(enchantsName: String) {
         dragonSound.playSound()
-        ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE BOOK! §d§kXX§e! You found: §9$enchantsName§.")
+        ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE BOOK! §d§kXX§e! You found: §9$enchantsName")
     }
 
     @SubscribeEvent
@@ -72,17 +72,17 @@ object UltraRareBookAlert {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.ultraRareBookAlert) return
+        if (enchantsFound) return
         if (!superpairsGui.matches(event.inventoryName)) return
 
         for ((slotId, item) in event.inventoryItems) {
-            if (slotId in enchantsFound) continue
             val firstLine = item.getLore().firstOrNull() ?: continue
             if (!ultraRarePattern.matches(firstLine)) continue
             val bookNameLine = item.getLore().getOrNull(2) ?: continue
             bookPattern.matchMatcher(bookNameLine){
                 val enchantsName = group ("enchant")
                 notification(enchantsName)
-                enchantsFound.add(slotId)
+                enchantsFound = true
                 lastNotificationTime = SimpleTimeMark.now()
             }
         }
@@ -90,6 +90,6 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        enchantsFound.clear()
+        enchantsFound = false
     }
 }
