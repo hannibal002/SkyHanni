@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SuperpairsClicksAlert {
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
 
     private var roundsNeeded = -1
     private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")
