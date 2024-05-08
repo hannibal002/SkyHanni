@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.EntityRenderNametagEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import net.minecraft.entity.player.EntityPlayer
@@ -21,9 +22,10 @@ object ContributorManager {
 
     @SubscribeEvent
     fun onRenderNametag(event: EntityRenderNametagEvent) {
-        if (event.entity !is EntityPlayer) return
-        getSuffix(event.entity.name)?.let {
-            event.chatComponent.appendSibling(ChatComponentText(" $it"))
+        (event.entity as? EntityPlayer)?.let { player ->
+            if (player.isRealPlayer()) getSuffix(event.entity.name)?.let {
+                event.chatComponent.appendSibling(ChatComponentText(" $it"))
+            }
         }
     }
 
