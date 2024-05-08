@@ -65,7 +65,7 @@ public class HelperConfig {
         public boolean superpairsClicksAlert = false;
 
         @Expose
-        @ConfigOption(name = "ULTRA-RARE Book Notification", desc = "Sends a chat message and sound when you find an ULTRA-RARE book.")
+        @ConfigOption(name = "ULTRA-RARE Book Alert", desc = "Sends a chat message, title and sound when you find an ULTRA-RARE book.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean ultraRareBookAlert = false;
