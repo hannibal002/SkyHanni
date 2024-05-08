@@ -21,8 +21,8 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object ChocolateFactoryCustomReminder {
-    private val configReminder get() = SkyHanniMod.feature.inventory.chocolateFactory.customReminder
-    private val configUpgradeWarnings get() = SkyHanniMod.feature.inventory.chocolateFactory.chocolateUpgradeWarnings
+    private val configReminder get() = ChocolateFactoryAPI.config.customReminder
+    private val configUpgradeWarnings get() = ChocolateFactoryAPI.config.chocolateUpgradeWarnings
 
     private var targetGoal: Long?
         get() = ChocolateFactoryAPI.profileStorage?.targetGoal
