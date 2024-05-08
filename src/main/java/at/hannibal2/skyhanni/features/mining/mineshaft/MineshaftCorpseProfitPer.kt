@@ -46,7 +46,7 @@ class MineshaftCorpseProfitPer {
 
         val hover = map.sortedDesc().keys.toMutableList()
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
-        val totalMessage = "Profit for $name§e: $profitPrefix${NumberUtil.format(totalProfit)}"
+        val totalMessage = "Profit for $name Corpse§e: $profitPrefix${NumberUtil.format(totalProfit)}"
         hover.add("")
         hover.add("§e$totalMessage")
         ChatUtils.hoverableChat(totalMessage, hover)
