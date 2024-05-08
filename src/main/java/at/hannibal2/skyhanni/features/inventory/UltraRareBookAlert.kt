@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
@@ -18,7 +17,8 @@ import kotlin.time.Duration.Companion.seconds
 object UltraRareBookAlert {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
-    private val chargeSound by lazy { createSound("item.fireCharge.use", 1f) }
+    //private val chargeSound by lazy { createSound("item.fireCharge.use", 1f) }
+    private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
 
     private val superpairsGui by RepoPattern.pattern(
         "inventory.experimentstable.gui",
@@ -38,14 +38,9 @@ object UltraRareBookAlert {
     private val enchantsFound = mutableListOf<Int>()
 
     fun notification(enchantsName: String) {
-        chargeSound.playSound()
-        DelayedRun.runDelayed(0.5.seconds) {
-            chargeSound.playSound()
-        }
-        DelayedRun.runDelayed(1.seconds) {
-            chargeSound.playSound()
-        }
-        ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE §d§kXX§r §ebook! You found: §9$enchantsName§.")
+        dragonSound.playSound()
+        ChatUtils.chat("You have uncovered a §d§k XX§5 ULTRA-RARE §d§kXX§r §ebook! You found: §9$enchantsName§.")
+        LorenzUtils.sendTitle("§d§kXX§5 ULTRA-RARE BOOK! §d§kXX", 5.seconds)
     }
 
     @SubscribeEvent
