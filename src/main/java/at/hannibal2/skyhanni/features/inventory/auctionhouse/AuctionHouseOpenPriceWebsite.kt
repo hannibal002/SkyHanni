@@ -29,7 +29,7 @@ class AuctionHouseOpenPriceWebsite {
     /**
      * REGEX-TEST: Auctions: "hyperion"
      */
-    private val cookieDurationPattern by patternGroup.pattern(
+    private val ahSearchPattern by patternGroup.pattern(
         "title.search",
         "Auctions: \"(?<searchTerm>.*)\""
     )
@@ -40,7 +40,7 @@ class AuctionHouseOpenPriceWebsite {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        cookieDurationPattern.matchMatcher(event.inventoryName) {
+        ahSearchPattern.matchMatcher(event.inventoryName) {
             searchTerm = group("searchTerm")
             displayItem = createDisplayItem()
         }
