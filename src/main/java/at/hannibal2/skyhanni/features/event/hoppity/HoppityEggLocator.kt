@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -36,6 +38,7 @@ object HoppityEggLocator {
     private var lastParticlePosition: LorenzVec? = null
     private var lastParticlePositionForever: LorenzVec? = null
     private var lastChange = SimpleTimeMark.farPast()
+    private var lastClick = SimpleTimeMark.farPast()
     private val validParticleLocations = mutableListOf<LorenzVec>()
 
     private var drawLocations = false
@@ -76,18 +79,23 @@ object HoppityEggLocator {
         if (!isEnabled()) return
 
         val eyeLocation = event.exactPlayerEyeLocation()
-        lastParticlePositionForever?.let {
-            if (lastChange.passedSince() < 300.milliseconds) {
-                if (eyeLocation.distance(it) > 2) {
-                    event.drawWaypointFilled(
-                        it,
-                        LorenzColor.GREEN.toColor(),
-                        seeThroughBlocks = true,
-                    )
-                    event.drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
-                }
-                if (!drawLocations) {
-                    event.draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+
+        if (config.waypointsImmediately && lastClick.passedSince() < 5.seconds) {
+            lastParticlePositionForever?.let {
+                if (lastChange.passedSince() < 300.milliseconds) {
+                    if (eyeLocation.distance(it) > 2) {
+                        event.drawWaypointFilled(
+                            it,
+                            LorenzColor.GREEN.toColor(),
+                            seeThroughBlocks = true,
+                        )
+                        event.drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
+                    }
+                    if (!drawLocations) {
+                        if (config.showLine) {
+                            event.draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                        }
+                    }
                 }
             }
         }
@@ -100,7 +108,9 @@ object HoppityEggLocator {
                     seeThroughBlocks = true,
                 )
                 event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
-                event.draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                if (config.showLine) {
+                    event.draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                }
             }
             return
         }
@@ -167,6 +177,18 @@ object HoppityEggLocator {
         ticksSinceLastParticleFound = 0
         validParticleLocations.clear()
         lastParticlePosition = null
+    }
+
+    @SubscribeEvent
+    fun onItemClick(event: ItemClickEvent) {
+        if (!isEnabled()) return
+        if (event.clickType == ClickType.RIGHT_CLICK) {
+            event.itemInHand?.let {
+                if (it.isLocatorItem) {
+                    lastClick = SimpleTimeMark.now()
+                }
+            }
+        }
     }
 
     private fun calculateEggPosition() {
