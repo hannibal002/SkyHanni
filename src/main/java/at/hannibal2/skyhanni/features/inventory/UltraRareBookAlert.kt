@@ -1,23 +1,30 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object UltraRareBookAlert {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
-    //private val chargeSound by lazy { createSound("item.fireCharge.use", 1f) }
     private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
 
     private val superpairsGui by RepoPattern.pattern(
@@ -37,10 +44,28 @@ object UltraRareBookAlert {
 
     private val enchantsFound = mutableListOf<Int>()
 
+    private var lastNotificationTime = SimpleTimeMark.farPast()
+
     fun notification(enchantsName: String) {
         dragonSound.playSound()
-        ChatUtils.chat("You have uncovered a §d§k XX§5 ULTRA-RARE §d§kXX§r §ebook! You found: §9$enchantsName§.")
-        LorenzUtils.sendTitle("§d§kXX§5 ULTRA-RARE BOOK! §d§kXX", 5.seconds)
+        ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE BOOK! §d§kXX§e! You found: §9$enchantsName§.")
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.ultraRareBookAlert) return
+        if (!superpairsGui.matches(InventoryUtils.openInventoryName())) return
+        if (lastNotificationTime.passedSince() > 5.seconds) return
+        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+
+        GlStateManager.translate(0f,0f,300f)
+
+        val pos = Position(gui.width/2, gui.height/2, 2f, true)
+
+        pos.renderString("§d§kXX§5 ULTRA-RARE BOOK! §d§kXX", posLabel = "ULTRA-RARE Book Notification")
+
+        GlStateManager.translate(0f,0f,-300f)
     }
 
     @SubscribeEvent
@@ -50,18 +75,17 @@ object UltraRareBookAlert {
         if (!superpairsGui.matches(event.inventoryName)) return
 
         for ((slotId, item) in event.inventoryItems) {
-            val firstLine = item.getLore().firstOrNull() ?: continue
             if (slotId in enchantsFound) continue
+            val firstLine = item.getLore().firstOrNull() ?: continue
             if (!ultraRarePattern.matches(firstLine)) continue
             val bookNameLine = item.getLore().getOrNull(2) ?: continue
             bookPattern.matchMatcher(bookNameLine){
                 val enchantsName = group ("enchant")
                 notification(enchantsName)
                 enchantsFound.add(slotId)
-
+                lastNotificationTime = SimpleTimeMark.now()
             }
         }
-
     }
 
     @SubscribeEvent
