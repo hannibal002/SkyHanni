@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
@@ -161,6 +162,8 @@ object LorenzUtils {
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
+
+    fun getPlayer(): EntityPlayerSP? = Minecraft.getMinecraft()?.thePlayer
 
     fun fillTable(
         data: List<DisplayTableEntry>,

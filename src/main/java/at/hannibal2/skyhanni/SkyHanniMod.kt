@@ -141,7 +141,7 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggPlayerOpacityChanger
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggDisplayManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc
@@ -669,7 +669,7 @@ class SkyHanniMod {
         loadModule(HoppityEggsManager)
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
-        loadModule(HoppityEggPlayerOpacityChanger)
+        loadModule(HoppityEggDisplayManager)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
