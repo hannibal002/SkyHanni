@@ -156,7 +156,7 @@ class GardenVisitorTimer {
         }
 
         val extraSpeed = if (GardenAPI.isCurrentlyFarming()) {
-            val duration = (millis / 3) * (GardenCropSpeed.averageBlocksPerSecond / 20)
+            val duration = (millis / 3) * (GardenCropSpeed.getRecentBPS() / 20)
             "§7/§$formatColor" + duration.format()
         } else ""
         if (config.newVisitorPing && millis < 10.seconds) {
