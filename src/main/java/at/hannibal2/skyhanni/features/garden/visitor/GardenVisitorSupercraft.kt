@@ -101,15 +101,14 @@ class GardenVisitorSupercraft {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!hasIngredients) return
 
-        if (event.slotId == 31) {
-            event.isCanceled = true
-            if (lastClick.passedSince() > 0.3.seconds) {
-                ChatUtils.sendCommandToServer("recipe $lastSuperCraftMaterial")
-                lastClick = SimpleTimeMark.now()
-            }
+        if (event.slotId != 31) return
+        event.isCanceled = true
+        if (lastClick.passedSince() > 0.3.seconds) {
+            ChatUtils.sendCommandToServer("recipe $lastSuperCraftMaterial")
+            lastClick = SimpleTimeMark.now()
         }
     }
 }

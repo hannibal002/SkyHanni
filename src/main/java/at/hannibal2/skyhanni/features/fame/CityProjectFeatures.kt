@@ -82,7 +82,8 @@ class CityProjectFeatures {
             "Daily City Project Reminder! (Click here to disable this reminder)",
             onClick = {
                 disable()
-            }
+            },
+            oneTimeClick = true
         )
     }
 

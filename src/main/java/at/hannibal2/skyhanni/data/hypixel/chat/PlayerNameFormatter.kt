@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.utils.ChatComponentUtils
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.toCleanChatComponent
+import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
@@ -49,8 +49,6 @@ class PlayerNameFormatter {
         "emblem",
         "(?<emblem>(?:§.){0,2}.) (?<author>.*)"
     )
-
-    private val empty: IChatComponent = ChatComponentText("")
 
     @SubscribeEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent) {
@@ -85,7 +83,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            ChatComponentUtils.text("§bCo-Op > ") {
+            Text.text("§bCo-Op > ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -98,7 +96,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            ChatComponentUtils.text("§2Guild > ") {
+            Text.text("§2Guild > ") {
                 appendSibling(nameFormat(event.authorComponent, guildRank = event.guildRank))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -111,7 +109,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            ChatComponentUtils.text("§9Party §8> ") {
+            Text.text("§9Party §8> ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -123,7 +121,7 @@ class PlayerNameFormatter {
     fun onPrivateChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         event.chatComponent =
-            StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentUtils.text("§d${event.direction}") {
+            StringUtils.replaceIfNeeded(event.chatComponent, Text.text("§d${event.direction}") {
                 appendText(" ")
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
@@ -131,11 +129,10 @@ class PlayerNameFormatter {
             }) ?: return
     }
 
-
     @SubscribeEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, ChatComponentUtils.text("") {
+        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, Text.text("") {
             appendSibling(
                 nameFormat(
                     event.authorComponent,
@@ -159,7 +156,7 @@ class PlayerNameFormatter {
     ): ChatComponentText {
         var cleanAuthor = cleanAuthor(author)
 
-        var emblemFormat = empty
+        var emblemFormat: IChatComponent? = null
         emblemPattern.matchStyledMatcher(author) {
             emblemFormat = componentOrThrow("emblem")
             cleanAuthor = groupOrThrow("author").stripHypixelMessage()
@@ -167,19 +164,19 @@ class PlayerNameFormatter {
 
         val name = formatAuthor(cleanAuthor.getText(), levelColor).applyFormattingFrom(cleanAuthor)
         val levelFormat = formatLevel(levelColor, level)
-        val guildRankFormat = guildRank?.intoComponent() ?: empty
-        val privateIslandRankFormat = privateIslandRank?.intoComponent() ?: empty
-        val privateIslandGuestFormat = privateIslandGuest?.intoComponent() ?: empty
+        val guildRankFormat = guildRank?.intoComponent()
+        val privateIslandRankFormat = privateIslandRank?.intoComponent()
+        val privateIslandGuestFormat = privateIslandGuest?.intoComponent()
 
         val cleanName = cleanAuthor.getText().cleanPlayerName()
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
-            val faction = it.faction.icon.toCleanChatComponent()
-            val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else empty
-            val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level).toCleanChatComponent() } ?: empty
+            val faction = it.faction.icon?.toCleanChatComponent()
+            val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else null
+            val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level).toCleanChatComponent() }
             listOf(faction, ironman, bingo)
-        } ?: listOf(empty, empty, empty)
+        } ?: listOf(null, null, null)
 
-        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, IChatComponent>()
+        val map = mutableMapOf<PlayerMessagesConfig.MessagePart, IChatComponent?>()
         map[PlayerMessagesConfig.MessagePart.SKYBLOCK_LEVEL] = levelFormat
         map[PlayerMessagesConfig.MessagePart.EMBLEM] = emblemFormat
         map[PlayerMessagesConfig.MessagePart.PLAYER_NAME] = name
@@ -191,36 +188,23 @@ class PlayerNameFormatter {
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_GUEST] = privateIslandGuestFormat
 
         val all = ChatComponentText("")
+        var first = true
         for (text in config.partsOrder.mapNotNull { map[it] }) {
-            all.appendSibling(text)
-            if (!all.unformattedText.endsWith(" ")) {
-                all.appendText(" ")
+            if (first) {
+                first = false
+            } else {
+                if (!all.unformattedText.endsWith(" ")) {
+                    all.appendText(" ")
+                }
             }
+            all.appendSibling(text)
         }
 
         return all
-//         return config.partsOrder.map { map[it] }.joinToString(" ").replaceAll("  ", " ").trim()
     }
 
-//     private fun String.add(iChatComponent: IChatComponent): ChatComponentText {
-//         val style = findStyle(iChatComponent)
-//         val text = ChatComponentText(this.trim())
-//         text.chatStyle = style
-//
-//         return text
-//     }
-//
-//     private fun String.findStyle(iChatComponent: IChatComponent): ChatStyle? {
-//         for (sibling in iChatComponent.siblings) {
-//             if (sibling.unformattedText.contains(this)) {
-//                 return sibling.chatStyle
-//             }
-//         }
-//         return null
-//     }
-
-    private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): IChatComponent {
-        val color = rawColor ?: return empty
+    private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): IChatComponent? {
+        val color = rawColor ?: return null
         val level = rawLevel?.getText() ?: error("level is null, color is not null")
         val levelData = "$color$level"
         val result = if (config.hideLevelBrackets) levelData else "§8[${levelData}§8]"
