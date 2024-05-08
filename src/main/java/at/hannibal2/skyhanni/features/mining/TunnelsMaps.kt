@@ -144,28 +144,19 @@ class TunnelsMaps {
 
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        println("a")
         if (!isEnabled()) return
-        println("b")
         clickTranslate = mapOf()
         if (!commissionInvPattern.matches(event.inventoryName)) return
-        println("c")
         clickTranslate = event.inventoryItems.mapNotNull { (slotId, item) ->
-            println("d")
             val lore = item.getLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
-            println("e")
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
-            println("f")
             val type = lore.matchFirst(collectorCommissionPattern) {
                 group("what")
             } ?: return@mapNotNull null
-            println("g")
             if (invalidGoalPattern.matches(type)) return@mapNotNull null
-            println("h")
             val mapName = getGenericName(type)
             if (mapName.isEmpty()) {
-                println("i")
                 ErrorManager.logErrorStateWithData(
                     "Unknown Collection Commission: $type", "$type can't be found in the graph.",
                     "type" to type,
@@ -174,15 +165,11 @@ class TunnelsMaps {
                 )
                 null
             } else {
-                println("j")
                 slotId to getGenericName(type)
             }
         }.toMap()
-        println("k")
         if (config.autoCommission) {
-            println("l")
             clickTranslate.values.firstOrNull()?.let {
-                println("m")
                 setActiveAndGoal(it)
             }
         }
