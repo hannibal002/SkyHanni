@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.NametagData;
+import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IChatComponent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +14,7 @@ public class MixinEntityPlayer {
     @Inject(method = "getDisplayName", at = @At("RETURN"))
     public void getDisplayName(CallbackInfoReturnable<IChatComponent> ci) {
         EntityPlayer entity = (EntityPlayer) (Object) this;
-        NametagData.INSTANCE.getDisplayName(entity, ci.getReturnValue());
+        new EntityDisplayNameEvent(entity, ci.getReturnValue()).postAndCatch();
     }
 
 }

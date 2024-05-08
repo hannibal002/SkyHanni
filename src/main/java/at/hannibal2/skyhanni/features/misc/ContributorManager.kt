@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.EntityRenderNametagEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,7 +21,7 @@ object ContributorManager {
     }
 
     @SubscribeEvent
-    fun onRenderNametag(event: EntityRenderNametagEvent) {
+    fun onRenderNametag(event: EntityDisplayNameEvent) {
         (event.entity as? EntityPlayer)?.let { player ->
             if (player.isRealPlayer()) getSuffix(event.entity.name)?.let {
                 event.chatComponent.appendSibling(ChatComponentText(" $it"))
