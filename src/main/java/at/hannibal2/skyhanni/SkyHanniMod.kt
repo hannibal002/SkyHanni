@@ -345,6 +345,7 @@ import at.hannibal2.skyhanni.features.misc.PetItemDisplay
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.PrivateIslandNoPickaxeAbility
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
+import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.RestorePieceOfWizardPortalLore
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
@@ -726,6 +727,7 @@ class SkyHanniMod {
         loadModule(TpsCounter())
         loadModule(ParticleHider())
         loadModule(MiscFeatures())
+        loadModule(ReplaceRomanNumerals())
         loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
         loadModule(GardenVisitorFeatures)
