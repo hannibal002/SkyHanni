@@ -115,15 +115,12 @@ object HoppityEggLocator {
             return
         }
 
-        val sharedEggLocation = sharedEggLocation
-        if (sharedEggLocation != null && config.sharedWaypoints) {
-            event.drawWaypointFilled(
-                sharedEggLocation,
-                LorenzColor.GREEN.toColor(),
-                seeThroughBlocks = true,
-            )
-            event.drawDynamicText(sharedEggLocation.add(y = 1), "§aShared Egg", 1.5)
-            return
+        sharedEggLocation?.let {
+            if (config.sharedWaypoints) {
+                event.drawWaypointFilled(it, LorenzColor.GREEN.toColor(), seeThroughBlocks = true,)
+                event.drawDynamicText(it.add(y = 1), "§aShared Egg", 1.5)
+                return
+            }
         }
 
         if (!config.showAllWaypoints) return
@@ -182,12 +179,10 @@ object HoppityEggLocator {
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType == ClickType.RIGHT_CLICK) {
-            event.itemInHand?.let {
-                if (it.isLocatorItem) {
-                    lastClick = SimpleTimeMark.now()
-                }
-            }
+        val item = event.itemInHand ?: return
+
+        if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem) {
+            lastClick = SimpleTimeMark.now()
         }
     }
 
