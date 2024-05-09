@@ -99,6 +99,13 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean factoryUpgrade = false;
 
+    @Expose
+    @ConfigOption(name = "Sacrifice", desc = "Hide sacrifice messages of other players.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean sacrifice = false;
+
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
