@@ -48,6 +48,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object GardenAPI {
@@ -96,6 +97,11 @@ object GardenAPI {
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
+        DelayedRun.runDelayed(500.milliseconds) {
+            if (inGarden()) {
+                checkItemInHand()
+            }
+        }
     }
 
     @SubscribeEvent
