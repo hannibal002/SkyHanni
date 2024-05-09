@@ -777,7 +777,7 @@ interface Renderable {
                         ?: yOffsets.size) - 1
 
                 val range2 =
-                    if (range.last != yOffsets.last() && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
+                    if (range.last + 2 <= yOffsets.last() && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
                         range.first..range.last() + 1
                     } else {
                         range
