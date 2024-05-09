@@ -67,6 +67,14 @@ object HypixelCommands {
         else -> send("rng $major $minor")
     }
 
+    fun island() {
+        send("is")
+    }
+
+    fun hub() {
+        send("hub")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function

@@ -42,4 +42,16 @@ public class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean viewRecipeLowerCase = true;
+
+    @Expose
+    @ConfigOption(name = "Fix Transfer Cooldown", desc = "Waits for the transfer cooldown to complete if you try to warp.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean transferCooldown = true;
+
+    @Expose
+    @ConfigOption(name = "Transfer Cooldown Ended Message", desc = "Sends a message in chat when the transfer cooldown ends.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean transferCooldownMessage = false;
 }
