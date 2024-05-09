@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MiningEventDisplay {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
-    private var display = mutableListOf<Renderable>()
+    private var display = listOf<Renderable>()
 
     private val islandEventData: MutableMap<IslandType, MiningIslandEventInfo> = mutableMapOf()
 
@@ -39,11 +39,19 @@ object MiningEventDisplay {
     }
 
     private fun updateDisplay() {
-        display.clear()
+        display = emptyList()
         updateEvents()
     }
 
     private fun updateEvents() {
+        val list = mutableListOf<String>()
+
+        if (MiningEventTracker.apiError) {
+            val count = MiningEventTracker.apiErrorCount
+            list.add("§cMining Event API Error! ($count)")
+            list.add("§cSwap servers to try again!")
+        }
+
         islandEventData.forEach { (islandType, eventDetails) ->
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
@@ -80,7 +88,7 @@ object MiningEventDisplay {
                                 Renderable.string("§8:")
                             )
                         )
-                display.add(
+                list.add(
                     Renderable.horizontalContainer(
                         listOf(
                             island,
@@ -90,6 +98,7 @@ object MiningEventDisplay {
                 )
             }
         }
+        display = list
     }
 
     private val unknownDisplay = Renderable.string("§7???")

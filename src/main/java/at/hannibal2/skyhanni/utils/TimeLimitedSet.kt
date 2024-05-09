@@ -8,7 +8,7 @@ class TimeLimitedSet<T>(expireAfterWrite: Duration) {
 
     fun add(element: T) = cache.put(element, Unit)
 
-    fun contains(element: T): Boolean = cache.containsKey(element)
+    operator fun contains(element: T): Boolean = cache.containsKey(element)
 
     fun clear() = cache.clear()
 

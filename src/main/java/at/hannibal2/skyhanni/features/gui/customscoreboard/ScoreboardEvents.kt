@@ -504,6 +504,7 @@ private fun getRiftLines() = getSbLines().filter { line ->
         || SbPattern.riftHotdogEatenPattern.matches(line)
         || SbPattern.riftAveikxPattern.matches(line)
         || SbPattern.riftHayEatenPattern.matches(line)
+        || SbPattern.cluesPattern.matches(line)
 }
 
 private fun getEssenceLines(): List<String> = listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
