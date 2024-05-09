@@ -51,7 +51,7 @@ public class AuctionHouseConfig {
     public int copyUnderbidKeybind = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Price Website", desc = "Adds a button to the Auction House that will open the item page in §ccoflnet.com§7.")
+    @ConfigOption(name = "Price Website", desc = "Adds a button to the Auction House that will open the item page in §csky.coflnet.com§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean openPriceWebsite = false;
