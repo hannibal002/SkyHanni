@@ -172,7 +172,7 @@ object HoppityEggsManager {
 
     private fun checkWarn() {
         if (!warningActive) {
-            warningActive = HoppityEggType.entries.none { it.isClaimed() }
+            warningActive = HoppityEggType.entries.all { it.isClaimed() }
         }
 
         if (warningActive) {
@@ -189,8 +189,8 @@ object HoppityEggsManager {
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size
-        ChatUtils.chat("All $amount eggs are ready!")
-        LorenzUtils.sendTitle("§eGet $amount hoppity eggs!", 5.seconds)
+        ChatUtils.chat("All $amount Hoppity Eggs are ready for finding!")
+        LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.playPlingSound()
     }
 
