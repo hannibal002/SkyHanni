@@ -94,6 +94,7 @@ object ArmorDropTracker {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
         if (!hasArmor) return
+        if (!GardenAPI.hasFarmingToolInHand()) return
 
         tracker.renderDisplay(config.pos)
     }

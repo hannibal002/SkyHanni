@@ -46,6 +46,27 @@ object HypixelCommands {
         send("togglemusic")
     }
 
+    fun partyWarp() {
+        send("party warp")
+    }
+
+    fun partyTransfer(player: String) {
+        send("party transfer $player")
+    }
+
+    fun partyAllInvite() {
+        send("party settings allinvite")
+    }
+
+    fun allChat(message: String) {
+        send("ac $message")
+    }
+
+    fun showRng(major: String? = null, minor: String? = null) = when {
+        major == null || minor == null -> send("rng")
+        else -> send("rng $major $minor")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function

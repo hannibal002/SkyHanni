@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -42,6 +44,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -58,6 +61,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -115,9 +119,10 @@ class SkyHanniDebugsAndTests {
             ChatUtils.chat("set test waypoint")
         }
 
+        var path: Graph = Graph(emptyList())
+
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
-
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()
@@ -196,7 +201,8 @@ class SkyHanniDebugsAndTests {
                 onClick = {
                     resetConfig()
                 },
-                prefix = false
+                prefix = false,
+                oneTimeClick = true
             )
         }
 
@@ -424,6 +430,11 @@ class SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    fun onTestGraphPath(event: LorenzRenderWorldEvent) {
+        event.draw3DPathWithWaypoint(path, Color.GREEN, 8, true)
+    }
+
+    @SubscribeEvent
     fun onShowInternalName(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showInternalName) return
@@ -460,7 +471,21 @@ class SkyHanniDebugsAndTests {
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
-        event.toolTip.add("§7NPC price: §6${npcPrice.addSeparators()}")
+        event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onShowBzPrice(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showBZPrice) return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+
+        val data = internalName.getBazaarData() ?: return
+        val instantBuyPrice = data.instantBuyPrice
+        val sellOfferPrice = data.sellOfferPrice
+
+        event.toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
+        event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
     }
 
     @SubscribeEvent
