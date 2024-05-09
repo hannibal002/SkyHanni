@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -44,7 +43,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -61,7 +59,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -118,8 +115,6 @@ class SkyHanniDebugsAndTests {
             testLocation = LorenzVec(x, y, z)
             ChatUtils.chat("set test waypoint")
         }
-
-        var path: Graph = Graph(emptyList())
 
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
@@ -427,11 +422,6 @@ class SkyHanniDebugsAndTests {
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
-    }
-
-    @SubscribeEvent
-    fun onTestGraphPath(event: LorenzRenderWorldEvent) {
-        event.draw3DPathWithWaypoint(path, Color.GREEN, 8, true)
     }
 
     @SubscribeEvent
