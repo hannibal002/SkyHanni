@@ -25,6 +25,7 @@ import kotlin.math.min
 /**
  * Some functions taken from NotEnoughUpdates
  */
+// TODO cleanup of redundant functions
 object GuiRenderUtils {
 
     fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, colour: Int) {
