@@ -775,7 +775,15 @@ interface Renderable {
                     yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }
                         .takeIf { it > 0 }
                         ?: yOffsets.size) - 1
-                for (rowIndex in range) {
+
+                val range2 =
+                    if (range.last != yOffsets.last() && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
+                        range.first..range.last() + 1
+                    } else {
+                        range
+                    }
+
+                for (rowIndex in range2) {
                     content[rowIndex].forEachIndexed { index, renderable ->
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(

@@ -58,7 +58,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         pageList = mapOf(
             FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
             FortuneGuidePage.CROP to CropPage(sizeX, sizeY),
-            FortuneGuidePage.UPGRADES to UpgradePage(sizeX, sizeY),
+            FortuneGuidePage.UPGRADES to UpgradePage(sizeX, sizeY - 2),
         )
         verticalTabs = listOf(
             vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {

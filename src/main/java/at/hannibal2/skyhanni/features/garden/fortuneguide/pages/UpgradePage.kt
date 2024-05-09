@@ -18,6 +18,7 @@ class UpgradePage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7)
     sizeY,
     paddingX,
     paddingY,
+    marginY = 10,
     hasHeader = true,
 ) {
     override fun onEnter() {
