@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -33,6 +33,7 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as rString
 
@@ -103,9 +104,9 @@ class ReforgeHelper {
 
     private var display: List<Renderable> = generateDisplay()
 
-    private val hoverColor = LorenzColor.GOLD.addOpacity(50).rgb
-    private val selectedColor = LorenzColor.BLUE.addOpacity(100).rgb
-    private val finishedColor = LorenzColor.GREEN.addOpacity(75).rgb
+    private val hoverColor = LorenzColor.GOLD.addOpacity(50)
+    private val selectedColor = LorenzColor.BLUE.addOpacity(100)
+    private val finishedColor = LorenzColor.GREEN.addOpacity(75)
 
     private fun itemUpdate() {
         val newItem = inventoryContainer?.getSlot(reforgeItem)?.stack
@@ -288,7 +289,7 @@ class ReforgeHelper {
 
     private fun getSortSelector(
         itemRarity: LorenzRarity,
-        sorting: SkyblockStat?
+        sorting: SkyblockStat?,
     ): (ReforgeAPI.Reforge) -> Comparable<Any?> =
         if (sorting != null) {
             { -(it.stats[itemRarity]?.get(sorting) ?: 0.0) as Comparable<Any?> }
@@ -336,12 +337,17 @@ class ReforgeHelper {
             posLabel = "Reforge Notify"
         )
         config.posList.renderRenderables(display, posLabel = "Reforge Overlay")
+    }
 
+    @SubscribeEvent
+    fun onGuiContainerBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (hoverdReforge != null && isInHexReforgeMenu) {
             if (hoverdReforge != currentReforge) {
                 colorReforgeStone(hoverColor, hoverdReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
-                inventoryContainer?.inventory?.get(reforgeItem)?.background = hoverColor
+                inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
+
+                //?.get(reforgeItem)?. = hoverColor
             }
             hoverdReforge = null
         }
@@ -350,7 +356,7 @@ class ReforgeHelper {
         if (reforgeToSearch != currentReforge) {
             colorSelected()
         } else {
-            inventoryContainer?.inventory?.get(reforgeItem)?.background = finishedColor
+            inventoryContainer?.getSlot(reforgeItem)?.highlight(finishedColor)
         }
     }
 
@@ -358,20 +364,20 @@ class ReforgeHelper {
         if (isInHexReforgeMenu) {
             colorReforgeStone(selectedColor, reforgeToSearch?.rawReforgeStoneName)
         } else {
-            inventoryContainer?.inventory?.get(exitButton)?.background = selectedColor
+            inventoryContainer?.getSlot(exitButton)?.highlight(selectedColor)
         }
     } else {
-        inventoryContainer?.inventory?.get(reforgeButton)?.background = selectedColor
+        inventoryContainer?.getSlot(reforgeButton)?.highlight(selectedColor)
     }
 
-    private fun colorReforgeStone(color: Int, reforgeStone: String?) {
-        val inventory = inventoryContainer?.inventory ?: return
-        val itemStack = inventory.firstOrNull { it?.cleanName() == reforgeStone }
-        if (itemStack != null) {
-            itemStack.background = color
+    private fun colorReforgeStone(color: Color, reforgeStone: String?) {
+        val inventory = inventoryContainer?.inventorySlots ?: return
+        val slot = inventory.firstOrNull { it?.stack?.cleanName() == reforgeStone }
+        if (slot != null) {
+            slot highlight color
         } else {
-            inventory[hexReforgeNextDownButton]?.takeIf { it.item == Items.skull }?.background = color
-            inventory[hexReforgeNextUpButton]?.takeIf { it.item == Items.skull }?.background = color
+            inventory[hexReforgeNextDownButton]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
+            inventory[hexReforgeNextUpButton]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
         }
     }
 
