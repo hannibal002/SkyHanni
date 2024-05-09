@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
@@ -22,7 +23,7 @@ object FFStats {
 
     private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
-    var cakeExpireTime = 0L
+    var cakeExpireTime = SimpleTimeMark.farPast()
 
     var equipmentTotalFF = mapOf<FFTypes, Double>()
 
@@ -36,7 +37,7 @@ object FFStats {
     var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
-        cakeExpireTime = GardenAPI.storage?.fortune?.cakeExpiring ?: -1L
+        cakeExpireTime = SimpleTimeMark(GardenAPI.storage?.fortune?.cakeExpiring ?: -1L)
 
         FarmingItems.resetFFData()
 
@@ -147,7 +148,7 @@ object FFStats {
         this[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
         this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
         this[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
-        if (cakeExpireTime - System.currentTimeMillis() > 0 || cakeExpireTime == -1L) {
+        if (cakeExpireTime.isInPast() || cakeExpireTime.isFarPast()) {
             this[FFTypes.CAKE] = 5.0
         } else {
             this[FFTypes.CAKE] = 0.0
@@ -227,11 +228,11 @@ object FFStats {
         }),
         TOTAL_PET({ FarmingItems.currentPet.getFFData() }, FFTypes.TOTAL, {
             when (FarmingItems.currentPet) {
-                FarmingItems.ELEPHANT -> 210
-                FarmingItems.MOOSHROOM_COW -> 217
-                FarmingItems.BEE -> 90
-                else -> 60
-            }
+                FarmingItems.ELEPHANT -> 150
+                FarmingItems.MOOSHROOM_COW -> 157
+                FarmingItems.BEE -> 30
+                else -> 0
+            } + PET_ITEM.max
         }),
         PET_ITEM({ FarmingItems.currentPet.getFFData() }, FFTypes.PET_ITEM, 60),
         TOTAL_EQUIP(
