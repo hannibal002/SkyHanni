@@ -45,7 +45,7 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
         add(FortuneStats.BASE.getFarmingBar())
 
         add(
-            FortuneStats.CROP_TOTAL.getFarmingBarWithLabel {
+            FortuneStats.CROP_TOTAL.getFarmingBarWithLabel(110) {
                 it.label.replace(
                     "Crop",
                     crop.name.replace("_", " ").firstLetterUppercase()
@@ -58,11 +58,11 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
 
     private fun FortuneStats.getFarmingBar() = this.getFarmingBarWithLabel { label }
 
-    private inline fun FortuneStats.getFarmingBarWithLabel(crossinline label: (FortuneStats) -> String) =
-        GuiRenderUtils.getFarmingBar(
-            label(this), tooltip, current, max,
-            90
-        )
+    private inline fun FortuneStats.getFarmingBarWithLabel(
+        width: Int = 90,
+        crossinline label: (FortuneStats) -> String,
+    ) =
+        GuiRenderUtils.getFarmingBar(label(this), tooltip, current, max, width)
 
     private fun toolLines(): List<Renderable> =
         FortuneStats.entries.filter { it.isActive() && it !in headers }.map { it.getFarmingBar() }
