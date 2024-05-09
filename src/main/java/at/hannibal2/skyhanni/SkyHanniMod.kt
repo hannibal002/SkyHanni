@@ -92,6 +92,7 @@ import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
+import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.combat.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.combat.mobs.MobHighlight
@@ -923,6 +924,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(GhostTracker())
 
         init()
 

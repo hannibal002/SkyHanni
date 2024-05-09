@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting.TextFormattingConfig;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
+import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -35,6 +36,24 @@ public class GhostCounterConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Display Text",
+        desc = "Drag text to change the appearance of the overlay."
+    )
+    @ConfigEditorDraggableList
+    public List<GhostTracker.GhostTrackerLines> ghostTrackerText = new ArrayList<>(Arrays.asList(
+        GhostTracker.GhostTrackerLines.TITLE,
+        GhostTracker.GhostTrackerLines.ITEMS,
+        GhostTracker.GhostTrackerLines.KILLS,
+        GhostTracker.GhostTrackerLines.GHOSTS_SINCE_SORROW,
+        GhostTracker.GhostTrackerLines.MAX_KILL_COMBO,
+        GhostTracker.GhostTrackerLines.COMBAT_XP_GAINED,
+        GhostTracker.GhostTrackerLines.AVERAGE_MAGIC_FIND,
+        GhostTracker.GhostTrackerLines.BESTIARY_KILLS,
+        GhostTracker.GhostTrackerLines.TOTAL_PROFIT
+    ));
 
     @Expose
     @ConfigOption(
@@ -140,4 +159,8 @@ public class GhostCounterConfig {
     @Expose
     @ConfigLink(owner = GhostCounterConfig.class, field = "enabled")
     public Position position = new Position(50, 50, false, true);
+
+    @Expose
+    @ConfigLink(owner = GhostCounterConfig.class, field = "enabled")
+    public Position trackerPosition = new Position(50, 50, false, true);
 }
