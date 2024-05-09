@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -54,10 +56,13 @@ object ChocolateFactoryBarnManager {
             val amount = group("amount").formatLong()
             if (config.showDuplicateTime) {
                 val format = ChocolateFactoryAPI.timeUntilNeed(amount).format(maxUnits = 2)
-                event.chatComponent.appendText("\n§7(§a+§b$format §aof production§7)")
+                DelayedRun.runNextTick {
+                    ChatUtils.chat("§7(§a+§b$format §aof production§7)")
+                }
                 ChocolateAmount.averageChocPerSecond()
             }
             ChocolateAmount.addToAll(amount)
+            HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {
