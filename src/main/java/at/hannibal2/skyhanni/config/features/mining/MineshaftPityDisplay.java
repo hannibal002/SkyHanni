@@ -18,7 +18,7 @@ public class MineshaftPityDisplay {
     @ConfigOption(name = "Enable Display", desc = "Enable the Mineshaft Pity Display.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enable = true;
+    public boolean enabled = true;
 
     @Expose
     @ConfigOption(name = "Stats List", desc = "Drag text to change the appearance of the display.")
@@ -37,8 +37,7 @@ public class MineshaftPityDisplay {
     @FeatureToggle
     public boolean modifyChatMessage = true;
 
-
     @Expose
-    @ConfigLink(owner = MineshaftPityDisplay.class, field = "enable")
+    @ConfigLink(owner = MineshaftPityDisplay.class, field = "enabled")
     public Position position = new Position(16, 192, false, true);
 }

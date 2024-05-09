@@ -128,7 +128,7 @@ data class LorenzVec(
 
     fun toCleanString(): String = "$x $y $z"
 
-    fun toCleanStringWithSeparators(): String = "$x, $y, $z"
+    fun toCleanStringWithSeparator(separator: String = ", "): String = listOf(x, y, z).joinToString(separator)
 
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(this.lengthSquared())

@@ -534,7 +534,7 @@ class SkyHanniDebugsAndTests {
                 BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
-                            "Looking at: ${ore.name} (${pos.toCleanStringWithSeparators()})",
+                            "Looking at: ${ore.name} (${pos.toCleanStringWithSeparator()})",
                             posLabel = "OreBlock"
                         )
                     }

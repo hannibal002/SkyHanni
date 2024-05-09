@@ -8,9 +8,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.mining.CustomBlockMineEvent
+import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.createHoverableChat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -55,10 +54,9 @@ object MineshaftPityDisplay {
     private const val MAX_COUNTER = 2000
 
     @SubscribeEvent
-    fun onCustomBlockMine(event: CustomBlockMineEvent) {
+    fun onOreMined(event: OreMinedEvent) {
         if (!isEnabled()) return
         val oreType = event.originalOre.getOreType() ?: return
-        ChatUtils.debug("Mined block: ${oreType.oreName}")
         val pityBlock = PityBlocks.entries.firstOrNull {
             it.oreTypes.contains(oreType)
         } ?: return
@@ -77,7 +75,7 @@ object MineshaftPityDisplay {
             mineshaftTotalBlocks += totalBlocks
             mineshaftTotalCount++
 
-            val message = "§5§lWOW! §r§aYou found a §r§bGlacite Mineshaft §r§aportal! §e($counterUntilPity)"
+            val message = event.message + " §e($counterUntilPity)"
 
             val hover = mutableListOf<String>()
             hover.add("§7Blocks mined: §e$totalBlocks")
@@ -189,7 +187,7 @@ object MineshaftPityDisplay {
         resetCounter()
     }
 
-    fun isEnabled() = MiningAPI.inGlacialTunnels() && config.enable
+    fun isEnabled() = MiningAPI.inGlacialTunnels() && config.enabled
 
     enum class MineshaftPityLines(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         TITLE("§3§lMineshaft Pity Counter"),
@@ -198,7 +196,6 @@ object MineshaftPityDisplay {
         NEEDED_TO_PITY("§3Needed to pity:\n§7   <blocks>"),
         TIME_SINCE_MINESHAFT("§3Last Mineshaft: §e21m 5s", { !lastMineshaftSpawn.isFarPast() }),
         AVERAGE_BLOCKS_MINESHAFT("§3Average Blocks/Mineshaft: §e361.5", { mineshaftTotalCount != 0 })
-
         ;
 
         override fun toString(): String {
