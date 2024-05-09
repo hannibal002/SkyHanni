@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.createHoverableChat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -61,7 +60,7 @@ object MineshaftPityDisplay {
         val oreType = event.originalOre.getOreType() ?: return
         ChatUtils.debug("Mined block: ${oreType.oreName}")
         val pityBlock = PityBlocks.entries.firstOrNull {
-            oreType.equalsOneOf(it.oreTypes)
+            it.oreTypes.contains(oreType)
         } ?: return
         minedBlocks.addOrPut(pityBlock, 1)
         update()

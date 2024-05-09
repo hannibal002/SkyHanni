@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -131,6 +132,7 @@ object MiningAPI {
         if (surroundingMinedBlocks.isEmpty()) return
         if (allowedSoundNames.none { it == event.soundName } && event.soundName != "random.orb") return
         if (!isBeingMined && event.pitch == 0.7936508f) {
+            ChatUtils.debug("init sound with name ${event.soundName}")
             if (allowedSoundNames.none { it == event.soundName }) return
             recentMinedBlocksMap.firstOrNull { it.position == event.location - LorenzVec(0.5, 0.5, 0.5) }?.confirmed =
                 true
@@ -138,8 +140,9 @@ object MiningAPI {
             lastSound = SimpleTimeMark.now()
             return
         } else if (isBeingMined && event.soundName == "random.orb" && event.volume == 0.5f) {
-            if (lastSound.passedSince() > 100.milliseconds) return
+            ChatUtils.debug("block sound")
             if (!surroundingMinedBlocks.last().confirmed) {
+                if (lastSound.passedSince() > 100.milliseconds) return
                 surroundingMinedBlocks.last().confirmed = true
                 lastSound = SimpleTimeMark.now()
             }
@@ -160,7 +163,8 @@ object MiningAPI {
         surroundingMinedBlocks.removeIf { it.time.passedSince() > 20.seconds }
 
         if (lastSound.passedSince() < 200.milliseconds) return
-        isBeingMined = false
+        if (!isBeingMined) return
+
         val originalBlock = recentMinedBlocksMap.firstOrNull { it.confirmed } ?: return
 
         val blocksMinedMap = surroundingMinedBlocks
@@ -168,12 +172,14 @@ object MiningAPI {
             .groupBy({ it.ore }, { 1 })
             .mapValues { it.value.size }
 
-        ChatUtils.debug("test")
+        ChatUtils.debug("original block: ${originalBlock.ore.name}")
         CustomBlockMineEvent(originalBlock.ore, blocksMinedMap).postAndCatch()
 
         surroundingMinedBlocks = mutableListOf()
         recentMinedBlocksMap.removeIf { it.time.passedSince() >= originalBlock.time.passedSince() }
         lastSound = SimpleTimeMark.farPast()
+
+        isBeingMined = false
     }
 
     @SubscribeEvent
@@ -193,6 +199,26 @@ object MiningAPI {
         surroundingMinedBlocks = mutableListOf()
         currentAreaOreBlocks = mutableListOf()
         lastWorldSwitch = SimpleTimeMark.now()
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Mining API")
+        if (!inCustomMiningIsland()) {
+            event.addIrrelevant("not in a mining island")
+            return
+        }
+
+        event.addData {
+            add("inGlacite: $inGlacite")
+            add("inDwarvenMines: $inDwarvenMines")
+            add("inCrystalHollows: $inCrystalHollows")
+            add("inCrimsonIsle: $inCrimsonIsle")
+            add("inEnd: $inEnd")
+            add("inSpidersDen: $inSpidersDen")
+            add("")
+            add("current area blocks: ${currentAreaOreBlocks.joinToString { it.name }}")
+        }
     }
 
     private fun updateCold(newCold: Int) {

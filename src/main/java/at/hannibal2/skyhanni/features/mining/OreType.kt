@@ -206,7 +206,7 @@ enum class OreType(
 
         fun OreBlock.getOreType(): OreType? {
             return OreType.entries.firstOrNull {
-                this.equalsOneOf(it.oreBlocks)
+                it.oreBlocks.contains(this)
             }
         }
     }
