@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
@@ -159,10 +160,7 @@ object FFStats {
         currentPetItem = FarmingItems.currentPet.getItem()?.getPetItem().toString()
 
         totalBaseFF = combineFFData(
-            baseFF,
-            armorTotalFF,
-            equipmentTotalFF,
-            FarmingItems.currentPet.getFFData()
+            baseFF, armorTotalFF, equipmentTotalFF, FarmingItems.currentPet.getFFData()
         )
         FFGuideGUI.updateDisplay()
     }
@@ -171,8 +169,7 @@ object FFStats {
 
     fun combineFFData(vararg value: Map<FFTypes, Double>) = combineFFData(value.toList())
     fun combineFFData(value: List<Map<FFTypes, Double>>) =
-        value.map { it.toList() }.flatten()
-            .groupBy({ it.first }, { it.second })
+        value.map { it.toList() }.flatten().groupBy({ it.first }, { it.second })
             .mapValues { (_, values) -> values.sum() }
 
     private fun getPetFF(pet: ItemStack?): Double {
@@ -194,5 +191,109 @@ object FFStats {
             }
         }
         return 0.0
+    }
+
+    internal enum class FFInfos(private val currentF: () -> Number, private val maxF: () -> Number) {
+        UNIVERSAL({ totalBaseFF }, FFTypes.TOTAL, 1277),
+        ANITA_BUFF({ baseFF }, FFTypes.ANITA, 60),
+        FARMING_LEVEL({ baseFF }, FFTypes.FARMING_LVL, 240),
+        COMMUNITY_SHOP({ baseFF }, FFTypes.COMMUNITY_SHOP, 40),
+        GARDEN_PLOTS({ baseFF }, FFTypes.PLOTS, 72),
+        CAKE_BUFF({ baseFF }, FFTypes.CAKE, 5),
+        TOTAL_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.TOTAL, {
+            BASE_ARMOR.max + ABILITY_ARMOR.max + REFORGE_ARMOR.max + REFORGE_ARMOR.max
+        }),
+        BASE_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.BASE, {
+            when (FarmingItems.currentArmor) {
+                FarmingItems.HELMET -> 30
+                FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 35
+                FarmingItems.BOOTS -> if (usingSpeedBoots) 60 else 30
+                else -> if (usingSpeedBoots) 160 else 130
+            }
+        }),
+        ABILITY_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.ABILITY, {
+            when (FarmingItems.currentArmor) {
+                FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> if (usingSpeedBoots) 16.667 else 18.75
+                FarmingItems.BOOTS -> if (usingSpeedBoots) 0 else 18.75
+                else -> if (usingSpeedBoots) 50 else 75
+            }
+        }),
+        REFORGE_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.REFORGE, {
+            when (FarmingItems.currentArmor) {
+                FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 30
+                FarmingItems.BOOTS -> if (usingSpeedBoots) 25 else 30
+                else -> if (usingSpeedBoots) 115 else 120
+            }
+        }),
+        TOTAL_PET({ FarmingItems.currentPet.getFFData() }, FFTypes.TOTAL, {
+            when (FarmingItems.currentPet) {
+                FarmingItems.ELEPHANT -> 210
+                FarmingItems.MOOSHROOM_COW -> 217
+                FarmingItems.BEE -> 90
+                else -> 60
+            }
+        }),
+        PET_ITEM({ FarmingItems.currentPet.getFFData() }, FFTypes.PET_ITEM, 60),
+        TOTAL_EQUIP(
+            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            FFTypes.TOTAL,
+            { FarmingItems.currentEquip == null },
+            { BASE_EQUIP.max + ABILITY_EQUIP.max + REFORGE_EQUIP.max + ENCHANT_EQUIP.max }
+        ),
+        BASE_EQUIP(
+            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            FFTypes.BASE,
+            { FarmingItems.currentEquip == null },
+            5.0
+        ),
+        ABILITY_EQUIP(
+            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            FFTypes.ABILITY,
+            { FarmingItems.currentEquip == null },
+            15.0
+        ),
+        REFORGE_EQUIP(
+            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            FFTypes.REFORGE,
+            { FarmingItems.currentEquip == null },
+            15.0
+        ),
+        ENCHANT_EQUIP(
+            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            FFTypes.GREEN_THUMB,
+            { FarmingItems.currentEquip == null },
+            { GardenAPI.totalAmountVisitorsExisting.toDouble() / 4.0 }
+        ),
+
+        ;
+
+        val current get() = currentF().toDouble()
+        val max get() = maxF().toDouble()
+
+        fun bar(label: String, tooltip: String) = GuiRenderUtils.getFarmingBar(label, tooltip, current, max, 90)
+
+        constructor(current: () -> Number, max: Number) : this(current, { max })
+        constructor(from: () -> Map<FFTypes, Double>, what: FFTypes, max: Number) : this({ from()[what] ?: 0.0 },
+            { max })
+
+        constructor(
+            from: () -> Map<FFTypes, Double>,
+            what: FFTypes,
+            x4: () -> Boolean,
+            max: Number,
+        ) : this({ from()[what] ?: 0.0 },
+            { if (x4()) max.toDouble() * 4 else max })
+
+        constructor(
+            from: () -> Map<FFTypes, Double>,
+            what: FFTypes,
+            x4: () -> Boolean,
+            max: () -> Number,
+        ) : this({ from()[what] ?: 0.0 },
+            { if (x4()) max().toDouble() * 4 else max() })
+
+        constructor(from: () -> Map<FFTypes, Double>, what: FFTypes, max: () -> Number) : this(
+            { from()[what] ?: 0.0 }, max
+        )
     }
 }
