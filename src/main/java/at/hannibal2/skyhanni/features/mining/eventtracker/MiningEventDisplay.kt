@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MiningEventDisplay {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
-    private var display = mutableListOf<String>()
+    private var display = listOf<String>()
 
     private val islandEventData: MutableMap<IslandType, MiningIslandEventInfo> = mutableMapOf()
 
@@ -31,11 +31,19 @@ object MiningEventDisplay {
     }
 
     private fun updateDisplay() {
-        display.clear()
+        display = emptyList()
         updateEvents()
     }
 
     private fun updateEvents() {
+        val list = mutableListOf<String>()
+
+        if (MiningEventTracker.apiError) {
+            val count = MiningEventTracker.apiErrorCount
+            list.add("§cMining Event API Error! ($count)")
+            list.add("§cSwap servers to try again!")
+        }
+
         islandEventData.forEach { (islandType, eventDetails) ->
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
@@ -53,15 +61,15 @@ object MiningEventDisplay {
 
             if (shouldShow) {
                 val upcomingEvents = formatUpcomingEvents(eventDetails.islandEvents, eventDetails.lastEvent)
-                display.add("§a${islandType.displayName}§8: $upcomingEvents")
+                list.add("§a${islandType.displayName}§8: $upcomingEvents")
             }
         }
+        display = list
     }
 
     private fun formatUpcomingEvents(events: List<RunningEventType>, lastEvent: MiningEventType?): String {
         val upcoming = events.filter { !it.endsAt.asTimeMark().isInPast() }
-            .map { if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() }
-            .toMutableList()
+            .map { if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() }.toMutableList()
 
         if (upcoming.isEmpty()) upcoming.add("§7???")
         if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.toPastString()) }
@@ -85,8 +93,8 @@ object MiningEventDisplay {
         }
     }
 
-    private fun shouldDisplay() = LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() &&
-        !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
+    private fun shouldDisplay() =
+        LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() && !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
 }
 
 private class MiningIslandEventInfo(var islandEvents: List<RunningEventType>, var lastEvent: MiningEventType? = null)
