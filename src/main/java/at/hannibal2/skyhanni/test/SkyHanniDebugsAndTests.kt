@@ -54,7 +54,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -124,10 +123,6 @@ class SkyHanniDebugsAndTests {
 
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
-            runBlocking {
-                val input = OSUtils.readFromClipboard() ?: return@runBlocking
-                path = Graph.fromJson(input)
-            }
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()
