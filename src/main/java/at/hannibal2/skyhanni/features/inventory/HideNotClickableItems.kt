@@ -93,7 +93,7 @@ class HideNotClickableItems {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (isDisabled()) return
         if (bypasssActive()) return

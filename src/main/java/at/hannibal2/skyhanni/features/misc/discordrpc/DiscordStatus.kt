@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -20,13 +21,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Pattern
@@ -64,15 +65,20 @@ fun getPetDisplay(): String = PetAPI.currentPet?.let {
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
     val cropCounter = crop?.getCounter()
-    val tier = cropCounter?.let { getTierForCropCount(it, crop) }
-
+    val allowOverflow = GardenAPI.config.cropMilestones.overflow.discordRPC
+    val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
     val progress = tier?.let {
-        LorenzUtils.formatPercentage(crop.progressToNextLevel())
+        LorenzUtils.formatPercentage(crop.progressToNextLevel(allowOverflow))
     } ?: 100 // percentage to next milestone
 
-    return if (tier != null) {
-        "${crop.cropName}: ${if (!crop.isMaxed()) "Milestone $tier ($progress)" else "MAXED (${cropCounter.addSeparators()} crops collected)"}"
-    } else AutoStatus.CROP_MILESTONES.placeholderText
+    if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
+
+    val text = if (crop.isMaxed(allowOverflow)) {
+        "MAXED (${cropCounter.addSeparators()} crops)"
+    } else {
+        "Milestone $tier ($progress)"
+    }
+    return "${crop.cropName}: $text"
 }
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
