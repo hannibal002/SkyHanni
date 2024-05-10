@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TrophyFishingDisplayConfig {
+public class TrophyFishDisplayConfig {
 
     @Expose
     @ConfigOption(
@@ -108,6 +108,31 @@ public class TrophyFishingDisplayConfig {
     }
 
     @Expose
-    @ConfigLink(owner = TrophyFishingDisplayConfig.class, field = "enabled")
+    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fishes that are still missing at this rarity.")
+    @ConfigEditorDropdown
+    public HideCaught onlyShowMissing = HideCaught.NONE;
+
+    public enum HideCaught {
+        NONE("Show All"),
+        BRONZE("Bronze"),
+        SILVER("Silver"),
+        GOLD("Gold"),
+        DIAMOND("Diamond"),
+        ;
+
+        private final String str;
+
+        HideCaught(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigLink(owner = TrophyFishDisplayConfig.class, field = "enabled")
     public Position position = new Position(144, 139, false, true);
 }

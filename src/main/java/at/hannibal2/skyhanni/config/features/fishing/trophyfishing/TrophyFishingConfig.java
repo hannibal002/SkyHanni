@@ -17,7 +17,7 @@ public class TrophyFishingConfig {
     @Expose
     @ConfigOption(name = "Trophy Fishing Display", desc = "")
     @Accordion
-    public TrophyFishingDisplayConfig display = new TrophyFishingDisplayConfig();
+    public TrophyFishDisplayConfig display = new TrophyFishDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Geyser Fishing", desc = "")

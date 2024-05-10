@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingDisplayConfig
-import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingDisplayConfig.TextPart
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -22,7 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TrophyFishingDisplay {
+class TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
     private val itemNameCache = mutableMapOf<String, NEUInternalName>()
@@ -49,6 +51,15 @@ class TrophyFishingDisplay {
         for ((rawName, data) in getOrder(trophyFishes)) {
             addRow(rawName, data, table)
         }
+        if (table.isEmpty()) {
+            get(config.onlyShowMissing)?.let {
+                val name = it.formattedString
+                table.addSingleString("§eYou caught all $name Trophy Fishes")
+                if (it != TrophyRarity.DIAMOND) {
+                    table.addSingleString("§cchange §eOnly Show Missing §cin the config to show more.")
+                }
+            }
+        }
         return table
     }
 
@@ -57,6 +68,13 @@ class TrophyFishingDisplay {
         data: MutableMap<TrophyRarity, Int>,
         table: MutableList<List<Renderable>>,
     ) {
+        get(config.onlyShowMissing)?.let { atLeast ->
+            val list = TrophyRarity.entries.filter { it <= atLeast }
+            if (list.all { (data[it] ?: 0) > 0 }) {
+                return
+            }
+        }
+
         val row = mutableMapOf<TextPart, Renderable>()
         row[TextPart.NAME] = Renderable.string(getItemName(rawName))
 
@@ -82,27 +100,35 @@ class TrophyFishingDisplay {
         TrophyRarity.DIAMOND -> TextPart.DIAMOND
     }
 
+    private fun get(value: HideCaught) = when (value) {
+        HideCaught.NONE -> null
+        HideCaught.BRONZE -> TrophyRarity.BRONZE
+        HideCaught.SILVER -> TrophyRarity.SILVER
+        HideCaught.GOLD -> TrophyRarity.GOLD
+        HideCaught.DIAMOND -> TrophyRarity.DIAMOND
+    }
+
     private fun getOrder(trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>) = sort(trophyFishes).let {
         if (config.reverseOrder) it.reversed() else it
     }
 
     private fun sort(trophyFishes: Map<String, MutableMap<TrophyRarity, Int>>): List<Map.Entry<String, MutableMap<TrophyRarity, Int>>> =
         when (config.sortingType) {
-            TrophyFishingDisplayConfig.TrophySorting.TOTAL_AMOUNT -> trophyFishes.entries.sortedBy { it.value.sumAllValues() }
+            TrophyFishDisplayConfig.TrophySorting.TOTAL_AMOUNT -> trophyFishes.entries.sortedBy { it.value.sumAllValues() }
 
-            TrophyFishingDisplayConfig.TrophySorting.BRONZE_AMOUNT -> count(trophyFishes, TrophyRarity.BRONZE)
-            TrophyFishingDisplayConfig.TrophySorting.SILVER_AMOUNT -> count(trophyFishes, TrophyRarity.SILVER)
-            TrophyFishingDisplayConfig.TrophySorting.GOLD_AMOUNT -> count(trophyFishes, TrophyRarity.GOLD)
-            TrophyFishingDisplayConfig.TrophySorting.DIAMOND_AMOUNT -> count(trophyFishes, TrophyRarity.DIAMOND)
+            TrophyFishDisplayConfig.TrophySorting.BRONZE_AMOUNT -> count(trophyFishes, TrophyRarity.BRONZE)
+            TrophyFishDisplayConfig.TrophySorting.SILVER_AMOUNT -> count(trophyFishes, TrophyRarity.SILVER)
+            TrophyFishDisplayConfig.TrophySorting.GOLD_AMOUNT -> count(trophyFishes, TrophyRarity.GOLD)
+            TrophyFishDisplayConfig.TrophySorting.DIAMOND_AMOUNT -> count(trophyFishes, TrophyRarity.DIAMOND)
 
-            TrophyFishingDisplayConfig.TrophySorting.ITEM_RARITY -> {
+            TrophyFishDisplayConfig.TrophySorting.ITEM_RARITY -> {
                 trophyFishes.entries.sortedBy { data ->
                     val name = getInternalName(data.key)
                     name.getItemStack().getItemRarityOrNull()
                 }
             }
 
-            TrophyFishingDisplayConfig.TrophySorting.HIGHEST_RARITY -> {
+            TrophyFishDisplayConfig.TrophySorting.HIGHEST_RARITY -> {
                 trophyFishes.entries.sortedBy { data ->
                     TrophyRarity.entries.filter {
                         data.value.contains(it)
@@ -110,7 +136,7 @@ class TrophyFishingDisplay {
                 }
             }
 
-            TrophyFishingDisplayConfig.TrophySorting.NAME -> {
+            TrophyFishDisplayConfig.TrophySorting.NAME -> {
                 trophyFishes.entries.sortedBy { data ->
                     getItemName(data.key).removeColor()
                 }
@@ -157,7 +183,7 @@ class TrophyFishingDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(display, extraSpace = config.extraSpace, posLabel = "Trophy Fishing Display")
     }
