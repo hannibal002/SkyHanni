@@ -50,7 +50,7 @@ class ReplaceRomanNumerals {
     }
 
     private fun String.transformLine() = splitRegex.findAll(this).map { it.value }.joinToString("") {
-        it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() < 100 }?.coloredRomanToDecimal() ?: it
+        it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() < 1000 }?.coloredRomanToDecimal() ?: it
     }
 
     private fun String.removeFormatting() = removeColor().replace(",", "")
