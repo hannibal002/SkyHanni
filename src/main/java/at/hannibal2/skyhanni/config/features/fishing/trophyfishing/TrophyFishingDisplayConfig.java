@@ -78,7 +78,7 @@ public class TrophyFishingDisplayConfig {
     public List<TextPart> textOrder = new ArrayList<>(Arrays.asList(
         TextPart.NAME,
         TextPart.ICON,
-//         TextPart.TOTAL
+        TextPart.TOTAL,
         TextPart.BRONZE,
         TextPart.SILVER,
         TextPart.GOLD,
@@ -92,7 +92,7 @@ public class TrophyFishingDisplayConfig {
         SILVER("Amount Silver"),
         GOLD("Amount Gold"),
         DIAMOND("Amount Diamond"),
-//         TOTAL("Amount Total"),
+        TOTAL("Amount Total"),
         ;
 
         private final String str;
