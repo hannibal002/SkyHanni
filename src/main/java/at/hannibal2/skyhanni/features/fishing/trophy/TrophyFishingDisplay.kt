@@ -47,24 +47,32 @@ class TrophyFishingDisplay {
         val trophyFishes = TrophyFishManager.fish ?: return emptyList()
         val table = mutableListOf<List<Renderable>>()
         for ((rawName, data) in getOrder(trophyFishes)) {
-            val row = mutableMapOf<TextPart, Renderable>()
-            row[TextPart.NAME] = Renderable.string(getItemName(rawName))
-
-            val internalName = getInternalName(rawName)
-            row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
-
-            for (value in TrophyRarity.entries) {
-                val amount = data[value] ?: 0
-                val color = value.formatCode
-                val format = "$color${amount.addSeparators()}"
-                row[get(value)] = Renderable.string(format)
-            }
-            val total = data.sumAllValues()
-            row[TextPart.TOTAL] = Renderable.string("§5${total.addSeparators()}")
-
-            table.add(config.textOrder.mapNotNull { row[it] })
+            addRow(rawName, data, table)
         }
         return table
+    }
+
+    private fun addRow(
+        rawName: String,
+        data: MutableMap<TrophyRarity, Int>,
+        table: MutableList<List<Renderable>>,
+    ) {
+        val row = mutableMapOf<TextPart, Renderable>()
+        row[TextPart.NAME] = Renderable.string(getItemName(rawName))
+
+        val internalName = getInternalName(rawName)
+        row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
+
+        for (value in TrophyRarity.entries) {
+            val amount = data[value] ?: 0
+            val color = value.formatCode
+            val format = "$color${amount.addSeparators()}"
+            row[get(value)] = Renderable.string(format)
+        }
+        val total = data.sumAllValues()
+        row[TextPart.TOTAL] = Renderable.string("§5${total.addSeparators()}")
+
+        table.add(config.textOrder.mapNotNull { row[it] })
     }
 
     private fun get(value: TrophyRarity) = when (value) {
