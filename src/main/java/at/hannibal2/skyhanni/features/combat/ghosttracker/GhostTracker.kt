@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -234,7 +235,7 @@ class GhostTracker {
         if (isMaxBestiary) return
         event.tabList.forEach { line ->
             bestiaryTablistPattern.matchMatcher(line) {
-                val level = group("level").formatInt()
+                val level = group("level").romanToDecimalIfNecessary()
                 val currentLevelKills = group("kills").formatInt().toLong()
 
                 val kills = getTotalBestiaryKills(level, currentLevelKills)
