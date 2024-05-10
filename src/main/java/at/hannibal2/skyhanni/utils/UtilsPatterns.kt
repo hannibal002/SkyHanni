@@ -73,6 +73,10 @@ object UtilsPatterns {
         "string.chatusername",
         "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?"
     )
+    val isNPCDialogue by patternGroup.pattern(
+        "string.isnpcdialogue",
+        "(§eSelect an option: .*)|(§e\\[NPC] .+)"
+    )
     val isRomanPattern by RepoPattern.pattern(
         "string.isroman",
         "^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})"

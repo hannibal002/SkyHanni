@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
+import at.hannibal2.skyhanni.utils.StringUtils.isNPCDialogue
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.event.ClickEvent
@@ -44,7 +45,7 @@ class ReplaceRomanNumerals {
 
     @SubscribeEvent
     fun onSystemMessage(event: SystemMessageEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || event.message.isNPCDialogue()) return
         event.applyIfPossible { it.transformLine() }
     }
 
