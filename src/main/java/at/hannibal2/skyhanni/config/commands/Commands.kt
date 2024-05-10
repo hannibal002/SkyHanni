@@ -333,9 +333,6 @@ object Commands {
         registerCommand("is", "") {
             TransferCooldown.transfer(HypixelCommands::island)
         }
-        registerCommand("island", "") {
-            TransferCooldown.transfer(HypixelCommands::island)
-        }
         registerCommand("warpforge", "") {
             TransferCooldown.transfer { HypixelCommands.warp("forge") }
         }
