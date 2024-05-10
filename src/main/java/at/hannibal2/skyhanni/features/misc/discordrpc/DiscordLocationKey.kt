@@ -3,11 +3,8 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-class DiscordLocationKey {
-
-    private val rpcGroup = RepoPattern.group("misc.discordrpc")
+object DiscordLocationKey {
 
     // normal keys follow a distinct pattern: lowercase the skyblock location and replace spaces with -
     private val normalRPC = setOf(

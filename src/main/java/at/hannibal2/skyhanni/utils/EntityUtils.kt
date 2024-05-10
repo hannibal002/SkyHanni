@@ -164,14 +164,6 @@ object EntityUtils {
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 
     @SubscribeEvent
-    fun onEntityRender(event: RenderLivingEvent<*>) {
-        val shEvent = SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
-            event.cancel()
-        }
-    }
-
-    @SubscribeEvent
     fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
         val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
@@ -181,10 +173,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
-        val shEvent = SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
-            event.cancel()
-        }
+        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z)
     }
 
     @SubscribeEvent
@@ -197,10 +186,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
-        val shEvent = SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
-            event.cancel()
-        }
+        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z)
     }
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()

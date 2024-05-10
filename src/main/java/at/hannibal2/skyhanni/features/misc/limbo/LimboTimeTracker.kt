@@ -117,7 +117,10 @@ object LimboTimeTracker {
             userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).round(2)
             if (onFire) userLuck *= FIRE_MULTIPLIER
             ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-            ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            if (oldPB != 0.seconds) {
+                ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            }
+
         } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
         if (userLuck > oldLuck) {
             if (onFire) {
