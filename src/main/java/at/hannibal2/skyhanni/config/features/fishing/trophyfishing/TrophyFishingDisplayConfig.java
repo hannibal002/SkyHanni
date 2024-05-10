@@ -4,10 +4,15 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class TrophyFishingDisplayConfig {
 
@@ -63,6 +68,44 @@ public class TrophyFishingDisplayConfig {
     )
     @ConfigEditorBoolean
     public boolean reverseOrder = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Text Order",
+        desc = "Drag text to change the line format."
+    )
+    @ConfigEditorDraggableList
+    public List<TextPart> textOrder = new ArrayList<>(Arrays.asList(
+        TextPart.NAME,
+        TextPart.ICON,
+//         TextPart.TOTAL
+        TextPart.BRONZE,
+        TextPart.SILVER,
+        TextPart.GOLD,
+        TextPart.DIAMOND
+    ));
+
+    public enum TextPart {
+        NAME("Item Name"),
+        ICON("Item Icon"),
+        BRONZE("Amount Bronze"),
+        SILVER("Amount Silver"),
+        GOLD("Amount Gold"),
+        DIAMOND("Amount Diamond"),
+//         TOTAL("Amount Total"),
+        ;
+
+        private final String str;
+
+        TextPart(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigLink(owner = TrophyFishingDisplayConfig.class, field = "enabled")

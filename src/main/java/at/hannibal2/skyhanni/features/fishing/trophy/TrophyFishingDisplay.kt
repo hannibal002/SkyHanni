@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingDisplayConfig
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingDisplayConfig.TextPart
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -45,23 +46,31 @@ class TrophyFishingDisplay {
     private fun createTable(): List<List<Renderable>> {
         val trophyFishes = TrophyFishManager.fish ?: return emptyList()
         val table = mutableListOf<List<Renderable>>()
-        var sort = sort(trophyFishes)
-        if (config.reverseOrder) {
-            sort = sort.reversed()
-        }
-        for ((rawName, data) in sort) {
+        for ((rawName, data) in getOrder(trophyFishes)) {
             val displayName = getItemName(rawName)
-            val line = mutableListOf<Renderable>()
-            table.add(line)
-            line.addString(displayName)
+            val map = mutableMapOf<TextPart, Renderable>()
+            map[TextPart.NAME] = Renderable.string(displayName)
             for (value in TrophyRarity.entries) {
                 val amount = data[value] ?: 0
                 val color = value.formatCode
                 val format = "$color${amount.addSeparators()}"
-                line.addString(format)
+
+                map[get(value)] = Renderable.string(format)
             }
+            table.add(config.textOrder.mapNotNull { map[it] })
         }
         return table
+    }
+
+    private fun get(value: TrophyRarity) = when (value) {
+        TrophyRarity.BRONZE -> TextPart.BRONZE
+        TrophyRarity.SILVER -> TextPart.SILVER
+        TrophyRarity.GOLD -> TextPart.GOLD
+        TrophyRarity.DIAMOND -> TextPart.DIAMOND
+    }
+
+    private fun getOrder(trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>) = sort(trophyFishes).let {
+        if (config.reverseOrder) it.reversed() else it
     }
 
     private fun sort(trophyFishes: Map<String, MutableMap<TrophyRarity, Int>>): List<Map.Entry<String, MutableMap<TrophyRarity, Int>>> =
@@ -140,5 +149,5 @@ class TrophyFishingDisplay {
         config.position.renderRenderables(display, extraSpace = config.extraSpace, posLabel = "Trophy Fishing Display")
     }
 
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland()
+    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
 }
