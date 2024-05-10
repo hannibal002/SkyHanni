@@ -156,6 +156,22 @@ public class TrophyFishDisplayConfig {
     }
 
     @Expose
+    @ConfigOption(
+        name = "Show ✖",
+        desc = "instead of the number 0, show §c✖ §7 if not found."
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> showCross = Property.of(false);
+
+    @Expose
+    @ConfigOption(
+        name = "Show ✔",
+        desc = "instead of the exact numbers, show §e§l✔ §7 if found."
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> showCheckmark = Property.of(false);
+
+    @Expose
     @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fishes that are still missing at this rarity.")
     @ConfigEditorDropdown
     public Property<HideCaught> onlyShowMissing = Property.of(HideCaught.NONE);

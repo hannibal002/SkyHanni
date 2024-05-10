@@ -80,6 +80,8 @@ class TrophyFishDisplay {
                 sortingType,
                 reverseOrder,
                 textOrder,
+                showCross,
+                showCheckmark,
                 onlyShowMissing,
             ) {
                 update()
@@ -141,8 +143,11 @@ class TrophyFishDisplay {
         for (rarity in TrophyRarity.entries) {
             val amount = data[rarity] ?: 0
             val recentlyDropped = rarity == recentlyDroppedRarity
-            val color = if (recentlyDropped) "§a" else rarity.formatCode
-            val format = "$color${amount.addSeparators()}"
+            val format = if (config.showCross.get() && amount == 0) "§c✖" else {
+                val color = if (recentlyDropped) "§a" else rarity.formatCode
+                val numberformat = if (config.showCheckmark.get()) "§l✔" else amount.addSeparators()
+                "$color$numberformat"
+            }
             row[get(rarity)] = string(format)
         }
         val total = data.sumAllValues()
