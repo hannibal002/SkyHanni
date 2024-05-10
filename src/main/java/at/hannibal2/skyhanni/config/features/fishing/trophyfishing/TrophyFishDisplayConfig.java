@@ -6,10 +6,12 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,12 +29,41 @@ public class TrophyFishDisplayConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
+    @ConfigOption(name = "When Show", desc = "Change when the trophy fish display should be visible in Crimson Isle.")
+    @ConfigEditorDropdown
+    public Property<WhenToShow> whenToShow = Property.of(WhenToShow.ALWAYS);
+
+    public enum WhenToShow {
+        ALWAYS("Always"),
+        ONLY_IN_INVENTORY("In inventory"),
+        ONLY_WITH_ROD_IN_HAND("Rod in hand"),
+        ONLY_WITH_KEYBIND("On keybind"),
+        ;
+
+        private final String str;
+
+        WhenToShow(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigOption(name = "Keybind", desc = "")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int keybind = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(
         name = "Highlight New",
         desc = "Highlight new trophies green for couple seconds."
     )
     @ConfigEditorBoolean
-    public Property<Boolean> highlightNew = Property.of(false);
+    public Property<Boolean> highlightNew = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Extra space", desc = "Space between each line of text.")

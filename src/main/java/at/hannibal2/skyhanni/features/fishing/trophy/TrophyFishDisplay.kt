@@ -1,15 +1,17 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.WhenToShow
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -28,6 +31,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -97,11 +102,11 @@ class TrophyFishDisplay {
             addRow(rawName, data, table)
         }
         if (table.isEmpty()) {
-            get(config.onlyShowMissing.get())?.let {
-                val name = it.formattedString
+            get(config.onlyShowMissing.get())?.let { rarity ->
+                val name = rarity.formattedString
                 table.addSingleString("§eYou caught all $name Trophy Fishes")
-                if (it != TrophyRarity.DIAMOND) {
-                    table.addSingleString("§cchange §eOnly Show Missing §cin the config to show more.")
+                if (rarity != TrophyRarity.DIAMOND) {
+                    table.addSingleString("§cChange §eOnly Show Missing §cin the config to show more.")
                 }
             }
         }
@@ -162,23 +167,22 @@ class TrophyFishDisplay {
     }
 
     private fun sort(trophyFishes: Map<String, MutableMap<TrophyRarity, Int>>): List<Map.Entry<String, MutableMap<TrophyRarity, Int>>> =
-//     @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
         when (config.sortingType.get()!!) {
-            TrophyFishDisplayConfig.TrophySorting.TOTAL_AMOUNT -> trophyFishes.entries.sortedBy { it.value.sumAllValues() }
+            TrophySorting.TOTAL_AMOUNT -> trophyFishes.entries.sortedBy { it.value.sumAllValues() }
 
-            TrophyFishDisplayConfig.TrophySorting.BRONZE_AMOUNT -> count(trophyFishes, TrophyRarity.BRONZE)
-            TrophyFishDisplayConfig.TrophySorting.SILVER_AMOUNT -> count(trophyFishes, TrophyRarity.SILVER)
-            TrophyFishDisplayConfig.TrophySorting.GOLD_AMOUNT -> count(trophyFishes, TrophyRarity.GOLD)
-            TrophyFishDisplayConfig.TrophySorting.DIAMOND_AMOUNT -> count(trophyFishes, TrophyRarity.DIAMOND)
+            TrophySorting.BRONZE_AMOUNT -> count(trophyFishes, TrophyRarity.BRONZE)
+            TrophySorting.SILVER_AMOUNT -> count(trophyFishes, TrophyRarity.SILVER)
+            TrophySorting.GOLD_AMOUNT -> count(trophyFishes, TrophyRarity.GOLD)
+            TrophySorting.DIAMOND_AMOUNT -> count(trophyFishes, TrophyRarity.DIAMOND)
 
-            TrophyFishDisplayConfig.TrophySorting.ITEM_RARITY -> {
+            TrophySorting.ITEM_RARITY -> {
                 trophyFishes.entries.sortedBy { data ->
                     val name = getInternalName(data.key)
                     name.getItemStack().getItemRarityOrNull()
                 }
             }
 
-            TrophyFishDisplayConfig.TrophySorting.HIGHEST_RARITY -> {
+            TrophySorting.HIGHEST_RARITY -> {
                 trophyFishes.entries.sortedBy { data ->
                     TrophyRarity.entries.filter {
                         data.value.contains(it)
@@ -186,7 +190,7 @@ class TrophyFishDisplay {
                 }
             }
 
-            TrophyFishDisplayConfig.TrophySorting.NAME -> {
+            TrophySorting.NAME -> {
                 trophyFishes.entries.sortedBy { data ->
                     getItemName(data.key).removeColor()
                 }
@@ -235,11 +239,19 @@ class TrophyFishDisplay {
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (!canRender()) return
         config.position.renderRenderables(
             display,
             extraSpace = config.extraSpace.get(),
             posLabel = "Trophy Fishing Display"
         )
+    }
+
+    fun canRender(): Boolean = when (config.whenToShow.get()!!) {
+        WhenToShow.ALWAYS -> true
+        WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
+        WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingAPI.holdingLavaRod
+        WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }
 
     fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
