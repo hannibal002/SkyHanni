@@ -32,7 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class PunchcardHighlight {
+object PunchcardHighlight {
     private val config get() = SkyHanniMod.feature.rift.punchcard
     private var lastRiftServer: String = ""
 
@@ -112,8 +112,14 @@ class PunchcardHighlight {
     fun clearList() {
         playerList.clear()
         playerQueue.clear()
-        MobData.players.forEach {
-            colorPlayer(it.baseEntity, true)
+        if (config.reverse.get()) {
+            MobData.players.forEach {
+                colorPlayer(it.baseEntity)
+            }
+        } else {
+            MobData.players.forEach {
+                colorPlayer(it.baseEntity, true)
+            }
         }
     }
 
