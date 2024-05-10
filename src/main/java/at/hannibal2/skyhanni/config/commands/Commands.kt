@@ -79,6 +79,7 @@ import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
@@ -327,13 +328,19 @@ object Commands {
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
         registerCommand("warp", "") { args: Array<String> ->
-            TransferCooldown.warpTransfer(args.joinToString(" "))
+            TransferCooldown.transfer { HypixelCommands.warp(args.joinToString(" ")) }
         }
         registerCommand("is", "") {
-            TransferCooldown.islandTransfer()
+            TransferCooldown.transfer(HypixelCommands::island)
+        }
+        registerCommand("island", "") {
+            TransferCooldown.transfer(HypixelCommands::island)
+        }
+        registerCommand("warpforge", "") {
+            TransferCooldown.transfer { HypixelCommands.warp("forge") }
         }
         registerCommand("hub", "") {
-            TransferCooldown.hubTransfer()
+            TransferCooldown.transfer(HypixelCommands::hub)
         }
     }
 
