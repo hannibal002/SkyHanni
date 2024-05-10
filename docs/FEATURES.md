@@ -808,6 +808,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlights blocks required for commissions in a custom color.
     + Greys out other blocks for clarity.
     + Works in the Glacite Tunnels and Crystal Hollows.
++ Profit Per Corpse. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1734)
+    + Displays profit/loss in chat after looting a corpse in the Mineshaft.
+    + Includes a breakdown of information on hover.
 
 </details>
 <details open><summary>
@@ -1152,6 +1155,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to disable in garden.
 + Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
 +  Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
++ Option to Replace Roman Numerals. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1722)
 
 </details>
 <details open><summary>
