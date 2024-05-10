@@ -59,6 +59,14 @@ public class TrophyFishDisplayConfig {
 
     @Expose
     @ConfigOption(
+        name = "Hunter Armor",
+        desc = "Only show when wearing a full Hunter Armor."
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> requireHunterArmor = Property.of(false);
+
+    @Expose
+    @ConfigOption(
         name = "Highlight New",
         desc = "Highlight new trophies green for couple seconds."
     )

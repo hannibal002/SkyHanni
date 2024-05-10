@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -240,6 +241,10 @@ class TrophyFishDisplay {
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!canRender()) return
+        if (EstimatedItemValue.isCurrentlyShowing()) return
+
+        if (config.requireHunterArmor.get() && !FishingAPI.wearingTrophyArmor) return
+
         config.position.renderRenderables(
             display,
             extraSpace = config.extraSpace.get(),
