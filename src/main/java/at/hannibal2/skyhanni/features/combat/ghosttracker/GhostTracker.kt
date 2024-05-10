@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -39,7 +38,6 @@ class GhostTracker {
     var currentCombatXp = 0L
 
     var currentBestiaryKills = 0L
-    var lastBestiaryUpdate = SimpleTimeMark.farPast()
     var isMaxBestiary = false
 
     private var allowedDrops = listOf<NEUInternalName>()
@@ -168,7 +166,7 @@ class GhostTracker {
     fun onProfileJoin(event: ProfileJoinEvent) {
         currentCombatXp = getCurrentCombatXp() ?: 0L
         currentBestiaryKills = storage?.bestiaryKills ?: 0
-        isMaxBestiary = currentBestiaryKills >= 125_000 // TODO: actually get the max bestiary kills for ghosts
+        isMaxBestiary = currentBestiaryKills >= MAX_BESTIARY_KILLS
     }
 
     // TODO: Skill xp gain event
@@ -192,7 +190,7 @@ class GhostTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        if (event.coins !in 200.0..2000.0) return
+        if (event.coins !in 200.0..2_000.0) return
 
         tracker.addCoins(event.coins.toInt())
     }
