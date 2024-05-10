@@ -5,12 +5,17 @@ import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDis
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -23,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 
 class TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
@@ -32,15 +38,46 @@ class TrophyFishDisplay {
     private var display = emptyList<Renderable>()
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.CRIMSON_ISLE) {
+            DelayedRun.runDelayed(200.milliseconds) {
+                update()
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
         update()
     }
 
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        display = emptyList()
+        update()
+    }
+
+    @SubscribeEvent
+    fun onConfigReload(event: ConfigLoadEvent) {
+        with(config) {
+            ConditionalUtils.onToggle(
+                enabled,
+                extraSpace,
+                sortingType,
+                reverseOrder,
+                textOrder,
+                onlyShowMissing,
+            ) {
+                update()
+            }
+        }
+    }
+
     fun update() {
+        if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
-        list.add(Renderable.table(createTable(), yPadding = config.extraSpace))
+        list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
 
         display = list
     }
@@ -52,7 +89,7 @@ class TrophyFishDisplay {
             addRow(rawName, data, table)
         }
         if (table.isEmpty()) {
-            get(config.onlyShowMissing)?.let {
+            get(config.onlyShowMissing.get())?.let {
                 val name = it.formattedString
                 table.addSingleString("§eYou caught all $name Trophy Fishes")
                 if (it != TrophyRarity.DIAMOND) {
@@ -68,7 +105,7 @@ class TrophyFishDisplay {
         data: MutableMap<TrophyRarity, Int>,
         table: MutableList<List<Renderable>>,
     ) {
-        get(config.onlyShowMissing)?.let { atLeast ->
+        get(config.onlyShowMissing.get())?.let { atLeast ->
             val list = TrophyRarity.entries.filter { it <= atLeast }
             if (list.all { (data[it] ?: 0) > 0 }) {
                 return
@@ -90,7 +127,7 @@ class TrophyFishDisplay {
         val total = data.sumAllValues()
         row[TextPart.TOTAL] = Renderable.string("§5${total.addSeparators()}")
 
-        table.add(config.textOrder.mapNotNull { row[it] })
+        table.add(config.textOrder.get().mapNotNull { row[it] })
     }
 
     private fun get(value: TrophyRarity) = when (value) {
@@ -109,11 +146,12 @@ class TrophyFishDisplay {
     }
 
     private fun getOrder(trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>) = sort(trophyFishes).let {
-        if (config.reverseOrder) it.reversed() else it
+        if (config.reverseOrder.get()) it.reversed() else it
     }
 
     private fun sort(trophyFishes: Map<String, MutableMap<TrophyRarity, Int>>): List<Map.Entry<String, MutableMap<TrophyRarity, Int>>> =
-        when (config.sortingType) {
+//     @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
+        when (config.sortingType.get()!!) {
             TrophyFishDisplayConfig.TrophySorting.TOTAL_AMOUNT -> trophyFishes.entries.sortedBy { it.value.sumAllValues() }
 
             TrophyFishDisplayConfig.TrophySorting.BRONZE_AMOUNT -> count(trophyFishes, TrophyRarity.BRONZE)
@@ -185,8 +223,12 @@ class TrophyFishDisplay {
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        config.position.renderRenderables(display, extraSpace = config.extraSpace, posLabel = "Trophy Fishing Display")
+        config.position.renderRenderables(
+            display,
+            extraSpace = config.extraSpace.get(),
+            posLabel = "Trophy Fishing Display"
+        )
     }
 
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
+    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

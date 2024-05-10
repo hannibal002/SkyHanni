@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class TrophyFishDisplayConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
@@ -31,12 +32,12 @@ public class TrophyFishDisplayConfig {
         minValue = 0,
         maxValue = 10,
         minStep = 1)
-    public int extraSpace = 1;
+    public Property<Integer> extraSpace = Property.of(1);
 
     @Expose
     @ConfigOption(name = "Sorted By", desc = "Sorting type of items in sack.")
     @ConfigEditorDropdown
-    public TrophySorting sortingType = TrophySorting.ITEM_RARITY;
+    public Property<TrophySorting> sortingType = Property.of(TrophySorting.ITEM_RARITY);
 
     public enum TrophySorting {
         ITEM_RARITY("Item Rarity"),
@@ -67,7 +68,7 @@ public class TrophyFishDisplayConfig {
         desc = "Reverse the sorting order."
     )
     @ConfigEditorBoolean
-    public boolean reverseOrder = false;
+    public Property<Boolean> reverseOrder = Property.of(false);
 
     @Expose
     @ConfigOption(
@@ -75,7 +76,7 @@ public class TrophyFishDisplayConfig {
         desc = "Drag text to change the line format."
     )
     @ConfigEditorDraggableList
-    public List<TextPart> textOrder = new ArrayList<>(Arrays.asList(
+    public Property<List<TextPart>> textOrder = Property.of(new ArrayList<>(Arrays.asList(
         TextPart.NAME,
         TextPart.ICON,
         TextPart.TOTAL,
@@ -83,7 +84,7 @@ public class TrophyFishDisplayConfig {
         TextPart.SILVER,
         TextPart.GOLD,
         TextPart.DIAMOND
-    ));
+    )));
 
     public enum TextPart {
         ICON("Item Icon"),
@@ -110,7 +111,7 @@ public class TrophyFishDisplayConfig {
     @Expose
     @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fishes that are still missing at this rarity.")
     @ConfigEditorDropdown
-    public HideCaught onlyShowMissing = HideCaught.NONE;
+    public Property<HideCaught> onlyShowMissing = Property.of(HideCaught.NONE);
 
     public enum HideCaught {
         NONE("Show All"),

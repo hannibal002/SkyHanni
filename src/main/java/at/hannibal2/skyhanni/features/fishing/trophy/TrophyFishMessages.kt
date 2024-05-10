@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignFormat
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
@@ -44,6 +45,7 @@ class TrophyFishMessages {
         val trophyFishes = TrophyFishManager.fish ?: return
         val trophyFishCounts = trophyFishes.getOrPut(internalName) { mutableMapOf() }
         val amount = trophyFishCounts.addOrPut(rarity, 1)
+        TrophyFishCaughtEvent(internalName).postAndCatch()
 
         if (shouldBlockTrophyFish(rarity, amount)) {
             event.blockedReason = "low_trophy_fish"
