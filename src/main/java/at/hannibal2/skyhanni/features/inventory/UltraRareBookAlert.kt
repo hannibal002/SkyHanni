@@ -61,18 +61,16 @@ object UltraRareBookAlert {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         GlStateManager.pushMatrix()
-        GlStateManager.translate(0f,-125f,500f)
-        GlStateManager.scale(1.5,1.5,1.0)
+        GlStateManager.translate(0f,-150f,500f)
 
         Renderable.drawInsideRoundedRect(
-            Renderable.string("§d§kXX§5 ULTRA-RARE BOOK! §d§kXX"),
+            Renderable.string("§d§kXX§5 ULTRA-RARE BOOK! §d§kXX", 1.5),
             Color(Color.DARK_GRAY.withAlpha(0), true),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0,125,gui.width,gui.height)
 
-        GlStateManager.scale(-1.5,-1.5,-1.0)
-        GlStateManager.translate(0f,125f,-500f)
+        GlStateManager.translate(0f,150f,-500f)
         GlStateManager.popMatrix()
     }
 
