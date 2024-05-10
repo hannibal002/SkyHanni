@@ -15,6 +15,11 @@ public class TrophyFishingConfig {
     public ChatMessagesConfig chatMessages = new ChatMessagesConfig();
 
     @Expose
+    @ConfigOption(name = "Trophy Fishing Display", desc = "")
+    @Accordion
+    public TrophyFishingDisplayConfig display = new TrophyFishingDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Geyser Fishing", desc = "")
     @Accordion
     public GeyserFishingConfig geyserOptions = new GeyserFishingConfig();
