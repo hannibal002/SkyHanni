@@ -96,17 +96,19 @@ open class CustomLinesGui : GuiScreen() {
         )
     }
 
-    private fun createRenderableFirstColumn(maxWidth: Int): Renderable {
-        val input = Renderable.wrappedString("Input: ${textBox.editText()}", width = maxWidth)
-        return Renderable.verticalContainer(
+    private fun createRenderableFirstColumn(maxWidth: Int) =
+        Renderable.verticalContainer(
             listOf(
                 Renderable.string("Custom Lines"),
                 Renderable.clickable(
-                    if (inTextMode) {
-                        Renderable.underlined(input)
-                    } else {
-                        input
-                    },
+                    Renderable.drawInsideRoundedRectWithOutline(
+                        Renderable.wrappedString(CustomScoreboard.customlineConfig.customLine1, maxWidth - 10),
+                        if (inTextMode) LorenzColor.BLACK.addOpacity(100) else LorenzColor.BLACK.addOpacity(150),
+                        padding = 5,
+                        topOutlineColor = LorenzColor.BLACK.addOpacity(100).rgb,
+                        bottomOutlineColor = LorenzColor.BLACK.addOpacity(100).rgb,
+                        borderOutlineThickness = 2
+                    ),
                     {
                         inTextMode = !inTextMode
                     },
@@ -114,7 +116,6 @@ open class CustomLinesGui : GuiScreen() {
                 )
             )
         )
-    }
 
     @SubscribeEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -124,7 +125,7 @@ open class CustomLinesGui : GuiScreen() {
 
         position.renderRenderable(
             getDisplay(),
-            posLabel = "CustomLinesGui",
+            posLabel = "Custom Lines Gui",
             addToGuiManager = false
         )
     }
