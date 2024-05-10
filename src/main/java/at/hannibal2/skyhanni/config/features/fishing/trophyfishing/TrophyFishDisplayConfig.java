@@ -27,6 +27,14 @@ public class TrophyFishDisplayConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
+    @ConfigOption(
+        name = "Highlight New",
+        desc = "Highlight new trophies green for couple seconds."
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> highlightNew = Property.of(false);
+
+    @Expose
     @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
     @ConfigEditorSlider(
         minValue = 0,

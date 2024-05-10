@@ -26,13 +26,16 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
+    private var recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
     private val itemNameCache = mutableMapOf<String, NEUInternalName>()
 
     private var display = emptyList<Renderable>()
@@ -48,7 +51,11 @@ class TrophyFishDisplay {
 
     @SubscribeEvent
     fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
+        recentlyDroppedTrophies[getInternalName(event.trophyFishName)] = event.rarity
         update()
+        DelayedRun.runDelayed(5.1.seconds) {
+            update()
+        }
     }
 
     @SubscribeEvent
@@ -62,6 +69,7 @@ class TrophyFishDisplay {
         with(config) {
             ConditionalUtils.onToggle(
                 enabled,
+                highlightNew,
                 extraSpace,
                 sortingType,
                 reverseOrder,
@@ -118,14 +126,18 @@ class TrophyFishDisplay {
         val internalName = getInternalName(rawName)
         row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
 
-        for (value in TrophyRarity.entries) {
-            val amount = data[value] ?: 0
-            val color = value.formatCode
+        val recentlyDroppedRarity = recentlyDroppedTrophies.getOrNull(internalName).takeIf { config.highlightNew.get() }
+
+        for (rarity in TrophyRarity.entries) {
+            val amount = data[rarity] ?: 0
+            val recentlyDropped = rarity == recentlyDroppedRarity
+            val color = if (recentlyDropped) "§a" else rarity.formatCode
             val format = "$color${amount.addSeparators()}"
-            row[get(value)] = Renderable.string(format)
+            row[get(rarity)] = Renderable.string(format)
         }
         val total = data.sumAllValues()
-        row[TextPart.TOTAL] = Renderable.string("§5${total.addSeparators()}")
+        val color = if (recentlyDroppedRarity != null) "§a" else "§5"
+        row[TextPart.TOTAL] = Renderable.string("$color${total.addSeparators()}")
 
         table.add(config.textOrder.get().mapNotNull { row[it] })
     }
