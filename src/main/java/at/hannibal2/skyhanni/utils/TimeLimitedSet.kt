@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
+import com.google.common.cache.RemovalListener
 import kotlin.time.Duration
 
-class TimeLimitedSet<T>(expireAfterWrite: Duration) {
+class TimeLimitedSet<T>(
+    expireAfterWrite: Duration,
+    removalListener: RemovalListener<T, Unit>? = null
+) {
 
-    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite)
+    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite, removalListener)
 
     fun add(element: T) = cache.put(element, Unit)
 

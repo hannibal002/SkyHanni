@@ -1,13 +1,19 @@
 package at.hannibal2.skyhanni.utils
 
 import com.google.common.cache.CacheBuilder
+import com.google.common.cache.RemovalListener
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-class TimeLimitedCache<K, V>(expireAfterWrite: Duration) {
+class TimeLimitedCache<K, V>(
+    expireAfterWrite: Duration,
+    removalListener: RemovalListener<K, V>? = null
+) {
 
     private val cache = CacheBuilder.newBuilder()
-        .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS).build<K, V>()
+        .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+        .apply { if (removalListener != null) removalListener(removalListener) }
+        .build<K, V>()
 
     fun put(key: K, value: V) = cache.put(key, value)
 

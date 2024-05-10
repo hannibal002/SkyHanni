@@ -39,11 +39,43 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import com.google.common.cache.RemovalListener
+import com.google.common.cache.RemovalNotification
 import java.util.function.Supplier
+import kotlin.time.Duration.Companion.milliseconds
 
-internal var unknownLines = listOf<String>()
+internal var confirmedUnknownLines = mutableListOf<String>()
+internal var unconfirmedUnknownLines = listOf<String>()
+internal val removalListener = RemovalListener { notification: RemovalNotification<String, Unit> ->
+    val line = notification.key ?: return@RemovalListener
+    if (unconfirmedUnknownLines.contains(line)) {
+        unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
+        confirmedUnknownLines.add(line)
+        if (config.unknownLinesWarning) {
+            val message = "CustomScoreboard detected ${
+                pluralize(
+                    confirmedUnknownLines.size,
+                    "unknown line",
+                    withNumber = true
+                )
+            }"
+            ErrorManager.logErrorWithData(
+                CustomScoreboardUtils.UndetectedScoreboardLines(message),
+                message,
+                "Unknown Lines" to confirmedUnknownLines,
+                "Island" to HypixelData.skyBlockIsland,
+                "Area" to HypixelData.skyBlockArea,
+                "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+                noStackTrace = true,
+                betaOnly = true,
+            )
+        }
+    }
+}
+internal var unknownLinesSet = TimeLimitedSet<String>(500.milliseconds, removalListener)
 internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
@@ -773,30 +805,15 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
     ).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
-    if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    if (confirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    amountOfUnknownLines = confirmedUnknownLines.size
 
-    val size = unknownLines.size
-    if (amountOfUnknownLines != size && config.unknownLinesWarning) {
-        val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
-        ErrorManager.logErrorWithData(
-            CustomScoreboardUtils.UndetectedScoreboardLines(message),
-            message,
-            "Unknown Lines" to unknownLines,
-            "Island" to HypixelData.skyBlockIsland,
-            "Area" to HypixelData.skyBlockArea,
-            "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
-            noStackTrace = true,
-            betaOnly = true,
-        )
-        amountOfUnknownLines = size
-    }
-
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unknownLines.map { it to HorizontalAlignment.LEFT }
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + confirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
 }
 
 private fun getExtraShowWhen(): Boolean {
-    if (unknownLines.isEmpty()) {
+    if (confirmedUnknownLines.isEmpty()) {
         amountOfUnknownLines = 0
     }
-    return unknownLines.isNotEmpty()
+    return confirmedUnknownLines.isNotEmpty()
 }
