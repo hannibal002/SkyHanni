@@ -74,8 +74,8 @@ class TrophyFishMessages {
         }
 
         if (config.tooltip) {
-            TrophyFishManager.getInfo(internalName)?.let {
-                edited.chatStyle = it.getTooltip(trophyFishCounts)
+            getTooltip(internalName)?.let {
+                edited.chatStyle = it
             }
         }
 

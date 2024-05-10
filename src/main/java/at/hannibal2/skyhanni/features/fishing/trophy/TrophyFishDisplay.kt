@@ -125,9 +125,13 @@ class TrophyFishDisplay {
                 return
             }
         }
+        val hover = TrophyFishAPI.hoverInfo(rawName)
+        fun string(string: String): Renderable = hover?.let {
+            Renderable.hoverTips(Renderable.string(string), tips = it.split("\n"))
+        } ?: Renderable.string(string)
 
         val row = mutableMapOf<TextPart, Renderable>()
-        row[TextPart.NAME] = Renderable.string(getItemName(rawName))
+        row[TextPart.NAME] = string(getItemName(rawName))
 
         val internalName = getInternalName(rawName)
         row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
@@ -139,11 +143,11 @@ class TrophyFishDisplay {
             val recentlyDropped = rarity == recentlyDroppedRarity
             val color = if (recentlyDropped) "§a" else rarity.formatCode
             val format = "$color${amount.addSeparators()}"
-            row[get(rarity)] = Renderable.string(format)
+            row[get(rarity)] = string(format)
         }
         val total = data.sumAllValues()
         val color = if (recentlyDroppedRarity != null) "§a" else "§5"
-        row[TextPart.TOTAL] = Renderable.string("$color${total.addSeparators()}")
+        row[TextPart.TOTAL] = string("$color${total.addSeparators()}")
 
         table.add(config.textOrder.get().mapNotNull { row[it] })
     }
