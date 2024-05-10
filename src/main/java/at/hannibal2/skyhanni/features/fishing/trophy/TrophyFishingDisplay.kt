@@ -49,6 +49,10 @@ class TrophyFishingDisplay {
         for ((rawName, data) in getOrder(trophyFishes)) {
             val row = mutableMapOf<TextPart, Renderable>()
             row[TextPart.NAME] = Renderable.string(getItemName(rawName))
+
+            val internalName = getInternalName(rawName)
+            row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
+
             for (value in TrophyRarity.entries) {
                 val amount = data[value] ?: 0
                 val color = value.formatCode
@@ -86,7 +90,7 @@ class TrophyFishingDisplay {
             TrophyFishingDisplayConfig.TrophySorting.ITEM_RARITY -> {
                 trophyFishes.entries.sortedBy { data ->
                     val name = getInternalName(data.key)
-                    name?.getItemStack()?.getItemRarityOrNull()
+                    name.getItemStack().getItemRarityOrNull()
                 }
             }
 

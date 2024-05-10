@@ -86,8 +86,8 @@ public class TrophyFishingDisplayConfig {
     ));
 
     public enum TextPart {
-        NAME("Item Name"),
         ICON("Item Icon"),
+        NAME("Item Name"),
         BRONZE("Amount Bronze"),
         SILVER("Amount Silver"),
         GOLD("Amount Gold"),
