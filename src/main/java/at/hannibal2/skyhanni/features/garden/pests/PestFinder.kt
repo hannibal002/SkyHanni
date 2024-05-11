@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class PestFinder {
+object PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
@@ -165,6 +165,18 @@ class PestFinder {
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
+        teleportNearestInfectedPlot()
+    }
+
+    @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (!isEnabled()) return
+        if (!config.showPlotInWorld) return
+        if (event.oldItem !in PestAPI.vacuumVariants) return
+        lastTimeVacuumHold = SimpleTimeMark.now()
+    }
+
+    fun teleportNearestInfectedPlot() {
         val plot = PestAPI.getNearestInfestedPlot() ?: run {
             ChatUtils.userError("No infested plots detected to warp to!")
             return
@@ -176,14 +188,6 @@ class PestFinder {
         }
 
         plot.sendTeleportTo()
-    }
-
-    @SubscribeEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (!isEnabled()) return
-        if (!config.showPlotInWorld) return
-        if (event.oldItem !in PestAPI.vacuumVariants) return
-        lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.showPlotInWorld)
