@@ -65,7 +65,7 @@ class GardenWarpCommands {
             }
 
             config.sethomeHotkey -> {
-                ChatUtils.sendCommandToServer("sethome")
+                HypixelCommands.setHome()
             }
 
             config.barnHotkey -> {
