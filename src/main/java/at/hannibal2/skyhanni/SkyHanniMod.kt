@@ -88,6 +88,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.combat.BestiaryData
+import at.hannibal2.skyhanni.features.combat.FerocityDisplay
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
@@ -683,6 +684,7 @@ class SkyHanniMod {
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
+        loadModule(FerocityDisplay())
         loadModule(InGameDateDisplay())
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
