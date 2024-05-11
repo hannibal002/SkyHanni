@@ -8,11 +8,20 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class FirePillarDisplay {
     private val config get() = SkyHanniMod.feature.slayer.blazes
+
+    /**
+     * REGEX-TEST: §6§l2s §c§l8 hits
+     */
+    private val entityNamePattern by RepoPattern.pattern(
+        "slayer.blaze.firepillar.entityname",
+        "§6§l(?<seconds>.*)s §c§l8 hits"
+    )
 
     private var display = ""
 
@@ -20,11 +29,9 @@ class FirePillarDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        val pattern = "§6§l(?<seconds>.*)s §c§l8 hits".toPattern()
-
         val seconds = EntityUtils.getEntities<EntityArmorStand>()
             .map { it.name }
-            .matchFirst<String?>(pattern) {
+            .matchFirst<String?>(entityNamePattern) {
                 group("seconds")
             }
 
