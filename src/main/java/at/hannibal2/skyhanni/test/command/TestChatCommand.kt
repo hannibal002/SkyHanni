@@ -21,22 +21,33 @@ object TestChatCommand {
             val isComplex = mutArgs.remove("-complex")
             val isClipboard = mutArgs.remove("-clipboard")
             val isHidden = mutArgs.remove("-s")
+            val multiLines = mutArgs.remove("-lines")
             val text = if (isClipboard) {
                 OSUtils.readFromClipboard()
                     ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
             } else mutArgs.joinToString(" ")
-            val component =
-                if (isComplex)
-                    try {
-                        IChatComponent.Serializer.jsonToComponent(text)
-                    } catch (ex: Exception) {
-                        ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
-                        return@launchCoroutine
-                    }
-                else ChatComponentText(text.replace("&", "§"))
-            if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
-            test(component)
+            if (multiLines) {
+                for (line in text.split("\n")) {
+                    extracted(isComplex, line, isHidden)
+                }
+            } else {
+                extracted(isComplex, text, isHidden)
+            }
         }
+    }
+
+    private fun extracted(isComplex: Boolean, text: String, isHidden: Boolean) {
+        val component =
+            if (isComplex)
+                try {
+                    IChatComponent.Serializer.jsonToComponent(text)
+                } catch (ex: Exception) {
+                    ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
+                    return
+                }
+            else ChatComponentText(text.replace("&", "§"))
+        if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
+        test(component)
     }
 
     private fun test(componentText: IChatComponent) {
@@ -51,7 +62,7 @@ object TestChatCommand {
             if (finalMessage.formattedText.stripHypixelMessage() != message) {
                 ChatUtils.chat("§eChat modified!")
             }
-            ChatUtils.chatComponent(finalMessage)
+            ChatUtils.chat(finalMessage)
         }
     }
 }

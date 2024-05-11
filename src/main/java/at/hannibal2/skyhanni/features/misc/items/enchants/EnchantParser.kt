@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -174,7 +175,18 @@ object EnchantParser {
         }
 
         // Remove enchantment lines so we can insert ours
-        loreList.subList(startEnchant, endEnchant + 1).clear()
+        try {
+            loreList.subList(startEnchant, endEnchant + 1).clear()
+        } catch (e: IndexOutOfBoundsException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Error parsing enchantment info from item",
+                "loreList" to loreList,
+                "startEnchant" to startEnchant,
+                "endEnchant" to endEnchant,
+            )
+            return
+        }
 
         val insertEnchants: MutableList<String> = mutableListOf()
 
@@ -256,10 +268,10 @@ object EnchantParser {
         // Normal is leaving the formatting as Hypixel provides it
         if (config.format.get() == EnchantParsingConfig.EnchantFormat.NORMAL) {
             normalFormatting(insertEnchants)
-        // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
+            // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
         } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
             compressedFormatting(insertEnchants)
-        // Stacked is always forcing 1 enchant per line
+            // Stacked is always forcing 1 enchant per line
         } else {
             stackedFormatting(insertEnchants)
         }
@@ -320,7 +332,11 @@ object EnchantParser {
         }
     }
 
-    private fun finishFormatting(insertEnchants: MutableList<String>, builder: StringBuilder, commaFormat: CommaFormat) {
+    private fun finishFormatting(
+        insertEnchants: MutableList<String>,
+        builder: StringBuilder,
+        commaFormat: CommaFormat,
+    ) {
         if (builder.isNotEmpty()) insertEnchants.add(builder.toString())
 
         // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
@@ -371,7 +387,7 @@ object EnchantParser {
         return if (removeGrayEnchants) -1 else lastGrayEnchant
     }
 
-    private fun itemIsBook() : Boolean {
+    private fun itemIsBook(): Boolean {
         return currentItem?.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
     }
 

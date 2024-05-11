@@ -50,7 +50,8 @@ object HypixelBazaarFetcher {
                 latestProductInformation = process(response.products)
                 failedAttempts = 0
             } else {
-                onError(fetchType, Exception("success=false, cause=${response.cause}"))
+                val rawResponse = jsonResponse.toString()
+                onError(fetchType, Exception("success=false, cause=${response.cause}"), rawResponse)
             }
         } catch (e: Exception) {
             onError(fetchType, e)
@@ -71,7 +72,7 @@ object HypixelBazaarFetcher {
         internalName to BazaarData(internalName.itemName, sellOfferPrice, insantBuyPrice, product)
     }.toMap()
 
-    private fun onError(fetchType: String, e: Exception) {
+    private fun onError(fetchType: String, e: Exception, rawResponse: String? = null) {
         val userMessage = "Failed fetching bazaar price data from hypixel"
         failedAttempts++
         if (failedAttempts <= HIDDEN_FAILED_ATTEMPTS) {
@@ -85,6 +86,7 @@ object HypixelBazaarFetcher {
                 userMessage,
                 "fetchType" to fetchType,
                 "failedAttepmts" to failedAttempts,
+                "rawResponse" to rawResponse
             )
         }
     }
