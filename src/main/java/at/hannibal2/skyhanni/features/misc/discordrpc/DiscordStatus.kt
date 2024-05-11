@@ -14,19 +14,20 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Pattern
@@ -72,13 +73,12 @@ private fun getCropMilestoneDisplay(): String {
 
     if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
 
-    val text = if (crop.isMaxed() && !allowOverflow) {
-        "MAXED (${cropCounter.addSeparators()} crops collected)"
+    val text = if (crop.isMaxed(allowOverflow)) {
+        "MAXED (${cropCounter.addSeparators()} crops)"
     } else {
         "Milestone $tier ($progress)"
     }
     return "${crop.cropName}: $text"
-
 }
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
@@ -172,20 +172,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     }),
 
     PROFILE({
-        val player = LorenzUtils.getPlayerName()
-
-        val tabData = TabListData.getTabList()
-        val levelRegex = Regex("""\[(\d{1,3})] $player""")
-        var sbLevel = ""
-// SkyBlock Level: [999] on Lemon
-        for (line in tabData) {
-            if (line.contains(player)) {
-                val colorlessLine = line.removeColor()
-                sbLevel = levelRegex.find(colorlessLine)!!.groupValues[1]
-                break
-            }
-        }
-
+        val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
         var profile = "SkyBlock Level: [$sbLevel] on "
 
         profile += when {

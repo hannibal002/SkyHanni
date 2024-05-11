@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+// TODO: Merge common code with skill overflow
 class GardenInventoryTooltipOverflow {
 
     private val config get() = SkyHanniMod.feature.garden.cropMilestones.overflow
@@ -30,26 +31,21 @@ class GardenInventoryTooltipOverflow {
         val stack = event.itemStack
         if (!stack.getLore().any { it.contains("Max tier reached!") }) return
 
-        val iterator = event.toolTip.listIterator()
         val split = stack.cleanName().split(" ")
-        val useRoman = split.last().toIntOrNull() == null
-        val cropName = split.dropLast(1).joinToString(" ")
-        val crop = CropType.getByName(cropName.removeColor()) ?: return
+        val crop = getCrop(split)
         val counter = crop.getCounter()
+
         val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
-        val nextTier = currentTier + 1
-        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflow = true)
-        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop, allowOverflow = true)
-        val have = counter - cropsForCurrentTier
-        val need = cropsForNextTier - cropsForCurrentTier
+        val (have, need) = getHaveNeed(currentTier, crop, counter)
+        val (level, nextLevel) = getLevels(split, currentTier)
+
         var next = false
-        val percent = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
+        val iterator = event.toolTip.listIterator()
+        val percentage = have.toDouble() / need.toDouble()
         for (line in iterator) {
             val maxTierReached = "§7§8Max tier reached!"
             if (line.contains(maxTierReached)) {
-                val level = if (useRoman) currentTier.toRoman() else currentTier
-                val nextLevel = if (useRoman) nextTier.toRoman() else nextTier
-                iterator.set("§7Progress to tier $nextLevel: §e$percent")
+                iterator.set("§7Progress to tier $nextLevel: §e${LorenzUtils.formatPercentage(percentage)}")
                 event.itemStack.name = "§a${crop.cropName} $level"
                 next = true
                 continue
@@ -57,11 +53,40 @@ class GardenInventoryTooltipOverflow {
             if (next) {
                 val bar = "                    "
                 if (line.contains(bar)) {
-                    val progressBar = StringUtils.progressBar(have.toDouble() / need.toDouble())
+                    val progressBar = StringUtils.progressBar(percentage)
                     iterator.set("$progressBar §e${have.addSeparators()}§6/§e${need.addSeparators()}")
                 }
             }
         }
+    }
+
+    private fun getLevels(
+        split: List<String>,
+        currentTier: Int,
+    ): Pair<String, String> {
+        val nextTier = currentTier + 1
+        val useRoman = split.last().toIntOrNull() == null
+        val level = if (useRoman) currentTier.toRoman() else "" + currentTier
+        val nextLevel = if (useRoman) nextTier.toRoman() else "" + nextTier
+        return Pair(level, nextLevel)
+    }
+
+    private fun getHaveNeed(
+        currentTier: Int,
+        crop: CropType,
+        counter: Long,
+    ): Pair<Long, Long> {
+        val nextTier = currentTier + 1
+        val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop, allowOverflow = true)
+        val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflow = true)
+        val have = counter - cropsForCurrentTier
+        val need = cropsForNextTier - cropsForCurrentTier
+        return Pair(have, need)
+    }
+
+    private fun getCrop(split: List<String>): CropType {
+        val cropName = split.dropLast(1).joinToString(" ")
+        return CropType.getByName(cropName.removeColor())
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.inventoryTooltip

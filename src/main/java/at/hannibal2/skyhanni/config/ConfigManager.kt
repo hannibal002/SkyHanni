@@ -159,6 +159,17 @@ class ConfigManager {
             .create()
 
         var configDirectory = File("config/skyhanni")
+
+        inline fun <reified T> GsonBuilder.registerTypeAdapter(
+            crossinline write: (JsonWriter, T) -> Unit,
+            crossinline read: (JsonReader) -> T,
+        ): GsonBuilder {
+            this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
+                override fun write(out: JsonWriter, value: T) = write(out, value)
+                override fun read(reader: JsonReader) = read(reader)
+            }.nullSafe())
+            return this
+        }
     }
 
     val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
