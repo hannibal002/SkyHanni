@@ -5,12 +5,20 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.toPositionsList
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
+import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
@@ -34,6 +42,7 @@ import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
+import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -65,7 +74,9 @@ object RenderUtils {
 
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
-    private val matrixBuffer = GLAllocation.createDirectFloatBuffer(16);
+    private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16);
+    private val colourBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -635,6 +646,7 @@ object RenderUtils {
         return offsetX
     }
 
+    @Deprecated("use renderable item list", ReplaceWith(""))
     fun MutableList<Any>.addItemIcon(
         item: ItemStack,
         highlight: Boolean = false,
@@ -1014,43 +1026,10 @@ object RenderUtils {
         }
     }
 
-    fun LorenzRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        GlStateManager.disableCull()
-
-        val render = Minecraft.getMinecraft().renderViewEntity
-        val worldRenderer = Tessellator.getInstance().worldRenderer
-        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(-realX, -realY, -realZ)
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-        GL11.glLineWidth(lineWidth.toFloat())
-        if (!depth) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(false)
+    fun LorenzRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
+        LineDrawer.draw3D(partialTicks) {
+            draw3DLine(p1, p2, color, lineWidth, depth)
         }
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
-        worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
-        Tessellator.getInstance().draw()
-        GlStateManager.translate(realX, realY, realZ)
-        if (!depth) {
-            GL11.glEnable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(true)
-        }
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
-        GlStateManager.enableDepth()
-    }
 
     fun LorenzRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
@@ -1229,6 +1208,159 @@ object RenderUtils {
         )
     }
 
+    fun LorenzRenderWorldEvent.draw3DPathWithWaypoint(
+        path: Graph,
+        colorLine: Color,
+        lineWidth: Int,
+        depth: Boolean,
+        startAtEye: Boolean = true,
+        textSize: Double = 1.0,
+        waypointColor: Color =
+            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+        bezierPoint: Double = 1.0,
+    ) {
+        if (path.isEmpty()) return
+        val points = if (startAtEye) {
+            listOf(
+                this.exactPlayerEyeLocation()
+                    + Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks)
+                    .toLorenzVec()/* .rotateXZ(-Math.PI / 72.0) */.times(2)
+            )
+        } else {
+            emptyList()
+        } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
+        LineDrawer.draw3D(partialTicks) {
+            drawPath(
+                points,
+                colorLine,
+                lineWidth,
+                depth,
+                bezierPoint
+            )
+        }
+        path.filter { it.name?.isNotEmpty() == true }.forEach {
+            this.drawDynamicText(it.position, it.name!!, textSize)
+        }
+        val last = path.last()
+        drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+    }
+
+    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+        val worldRenderer = tessellator.worldRenderer
+        fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean, bezierPoint: Double = 1.0) {
+            if (bezierPoint < 0) {
+                path.zipWithNext().forEach {
+                    draw3DLine(it.first, it.second, color, lineWidth, depth)
+                }
+            } else {
+                val pathLines = path.zipWithNext()
+                pathLines.forEachIndexed { index, it ->
+                    val reduce = it.second.minus(it.first).normalize().times(bezierPoint)
+                    draw3DLine(
+                        if (index != 0) it.first + reduce else it.first,
+                        if (index != pathLines.lastIndex) it.second - reduce else it.second,
+                        color,
+                        lineWidth,
+                        depth
+                    )
+                }
+                path.zipWithNext3().forEach {
+                    val p1 = it.second.minus(it.second.minus(it.first).normalize().times(bezierPoint))
+                    val p3 = it.second.minus(it.second.minus(it.third).normalize().times(bezierPoint))
+                    val p2 = it.second
+                    drawBezier2(p1, p2, p3, color, lineWidth, depth)
+                }
+            }
+        }
+
+        fun draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+            GL11.glLineWidth(lineWidth.toFloat())
+            if (!depth) {
+                GL11.glDisable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(false)
+            }
+            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+            worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
+            worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
+            worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
+            tessellator.draw()
+            if (!depth) {
+                GL11.glEnable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(true)
+            }
+        }
+
+        fun drawBezier2(
+            p1: LorenzVec,
+            p2: LorenzVec,
+            p3: LorenzVec,
+            color: Color,
+            lineWidth: Int,
+            depth: Boolean,
+            segments: Int = 30,
+        ) {
+            GL11.glLineWidth(lineWidth.toFloat())
+            if (!depth) {
+                GL11.glDisable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(false)
+            }
+            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
+            val ctrlpoints = p1.toFloatArray() + p2.toFloatArray() + p3.toFloatArray()
+            bezier2Buffer.clear()
+            ctrlpoints.forEach {
+                bezier2Buffer.put(it)
+            }
+            bezier2Buffer.flip()
+            GL11.glMap1f(
+                GL11.GL_MAP1_VERTEX_3, 0.0f, 1.0f, 3, 3,
+                bezier2Buffer
+            )
+
+            GL11.glEnable(GL11.GL_MAP1_VERTEX_3)
+
+            GL11.glBegin(GL11.GL_LINE_STRIP)
+            for (i in 0..segments) {
+                GL11.glEvalCoord1f(i.toFloat() / segments.toFloat())
+            }
+            GL11.glEnd()
+            if (!depth) {
+                GL11.glEnable(GL11.GL_DEPTH_TEST)
+                GlStateManager.depthMask(true)
+            }
+        }
+
+        companion object {
+            inline fun draw3D(
+                partialTicks: Float = 0F,
+                crossinline quads: LineDrawer.() -> Unit,
+            ) {
+
+                GlStateManager.enableBlend()
+                GlStateManager.disableLighting()
+                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+                GlStateManager.disableTexture2D()
+                GlStateManager.disableCull()
+                GlStateManager.disableAlpha()
+
+                val tessellator = Tessellator.getInstance()
+
+                GlStateManager.pushMatrix()
+                RenderUtils.translate(getViewerPos(partialTicks).negated())
+                getViewerPos(partialTicks)
+
+                quads.invoke(LineDrawer(Tessellator.getInstance()))
+
+                GlStateManager.popMatrix()
+
+                GlStateManager.enableAlpha()
+                GlStateManager.enableTexture2D()
+                GlStateManager.enableCull()
+                GlStateManager.disableBlend()
+                GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+            }
+        }
+    }
+
     class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
         val worldRenderer = tessellator.worldRenderer
         inline fun draw(
@@ -1377,10 +1509,7 @@ object RenderUtils {
         colour: Color,
         depth: Boolean,
     ) {
-        val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
-        val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
-        val cornerThree = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
-        val cornerFour = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ)
+         val (cornerOne, cornerTwo, cornerThree, cornerFour, ) = boundingBox.getCorners(boundingBox.maxY)
         this.draw3DLine(cornerOne, cornerTwo, colour, lineWidth, depth)
         this.draw3DLine(cornerTwo, cornerThree, colour, lineWidth, depth)
         this.draw3DLine(cornerThree, cornerFour, colour, lineWidth, depth)
@@ -1446,6 +1575,24 @@ object RenderUtils {
     }
 
     fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float,
+    ) {
+        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+    }
+
+    fun GuiContainerEvent.ForegroundDrawnEvent.drawSlotText(
+        xPos: Int,
+        yPos: Int,
+        text: String,
+        scale: Float,
+    ) {
+        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+    }
+
+    private fun drawSlotText(
         xPos: Int,
         yPos: Int,
         text: String,
@@ -1654,5 +1801,12 @@ object RenderUtils {
         with(ScaledResolution(Minecraft.getMinecraft())) {
             Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
         }
+    }
+
+    fun getAlpha(): Float {
+        colourBuffer.clear()
+        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colourBuffer)
+        if (colourBuffer.limit() < 4) return 1f
+        return colourBuffer.get(3)
     }
 }

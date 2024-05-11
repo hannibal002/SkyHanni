@@ -66,6 +66,11 @@ public class DebugConfig {
     public boolean showNpcPrice = false;
 
     @Expose
+    @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
+    @ConfigEditorBoolean
+    public boolean showBZPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     public boolean showItemUuid = false;

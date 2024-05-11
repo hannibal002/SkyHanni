@@ -50,7 +50,8 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
         ChocolateFactoryStat.TIME_TOWER,
-        ChocolateFactoryStat.LEADERBOARD_POS
+        ChocolateFactoryStat.LEADERBOARD_POS,
+        ChocolateFactoryStat.TIME_TO_BEST_UPGRADE
     ));
 
     @Expose
@@ -88,11 +89,22 @@ public class ChocolateFactoryConfig {
     public boolean extraTooltipStats = true;
 
     @Expose
+    @ConfigOption(name = "Duplicate Rabbit Time", desc = "Show the production time of chocolate gained from duplicate rabbits.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDuplicateTime = false;
+
+    @Expose
     @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeTowerWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Upgrade Warnings", desc = "")
+    @Accordion
+    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
@@ -148,5 +160,15 @@ public class ChocolateFactoryConfig {
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
     public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
+
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Keybinds", desc = "")
+    @Accordion
+    public ChocolateFactoryKeybindsConfig keybinds = new ChocolateFactoryKeybindsConfig();
+
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Custom Reminder", desc = "")
+    @Accordion
+    public ChocolateFactoryCustomReminderConfig customReminder = new ChocolateFactoryCustomReminderConfig();
 
 }

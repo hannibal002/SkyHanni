@@ -9,6 +9,8 @@ import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
+import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 import java.awt.Color
@@ -310,7 +312,7 @@ object GuiRenderUtils {
         color: Color,
         useChroma: Boolean,
         texture: SkillProgressBarConfig.TexturedBar.UsedTexture,
-        height: Float
+        height: Float,
     ) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(x, y, 0f)
@@ -376,5 +378,42 @@ object GuiRenderUtils {
             ChromaShaderManager.end()
         }
         GlStateManager.popMatrix()
+    }
+
+    /**@Mojang */
+    fun drawGradientRect(
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        startColor: Int,
+        endColor: Int,
+        zLevel: Double,
+    ) {
+        val f = (startColor shr 24 and 255).toFloat() / 255.0f
+        val g = (startColor shr 16 and 255).toFloat() / 255.0f
+        val h = (startColor shr 8 and 255).toFloat() / 255.0f
+        val i = (startColor and 255).toFloat() / 255.0f
+        val j = (endColor shr 24 and 255).toFloat() / 255.0f
+        val k = (endColor shr 16 and 255).toFloat() / 255.0f
+        val l = (endColor shr 8 and 255).toFloat() / 255.0f
+        val m = (endColor and 255).toFloat() / 255.0f
+        GlStateManager.disableTexture2D()
+        GlStateManager.enableBlend()
+        GlStateManager.disableAlpha()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.shadeModel(7425)
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+        worldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
+        worldRenderer.pos(right.toDouble(), top.toDouble(), zLevel).color(g, h, i, f).endVertex()
+        worldRenderer.pos(left.toDouble(), top.toDouble(), zLevel).color(g, h, i, f).endVertex()
+        worldRenderer.pos(left.toDouble(), bottom.toDouble(), zLevel).color(k, l, m, j).endVertex()
+        worldRenderer.pos(right.toDouble(), bottom.toDouble(), zLevel).color(k, l, m, j).endVertex()
+        tessellator.draw()
+        GlStateManager.shadeModel(7424)
+        GlStateManager.disableBlend()
+        GlStateManager.enableAlpha()
+        GlStateManager.enableTexture2D()
     }
 }

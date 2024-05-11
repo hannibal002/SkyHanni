@@ -170,11 +170,13 @@ object InquisitorWaypointShare {
             sendInquisitor()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message =
-                "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
-            ChatUtils.clickableChat(message, onClick = {
-                sendInquisitor()
-            })
+            val message = "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+            ChatUtils.clickableChat(
+                message, onClick = {
+                    sendInquisitor()
+                },
+                oneTimeClick = true
+            )
         }
     }
 

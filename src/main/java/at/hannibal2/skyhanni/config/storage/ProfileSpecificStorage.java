@@ -93,6 +93,12 @@ public class ProfileSpecificStorage {
         public int maxTimeTowerUses = 3;
 
         @Expose
+        public long bestUpgradeAvailableAt = 0;
+
+        @Expose
+        public long bestUpgradeCost = 0;
+
+        @Expose
         public long lastDataSave = 0;
 
         @Expose
@@ -108,6 +114,12 @@ public class ProfileSpecificStorage {
             @Expose
             public String lastLeaderboard = null;
         }
+
+        @Expose
+        public Long targetGoal = null;
+
+        @Expose
+        public String targetName = null;
     }
 
     @Expose
@@ -354,6 +366,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<String, LorenzVec> npcVisitorLocations = new HashMap<>();
+
+        @Expose
+        public Map<CropType, Integer> customGoalMilestone = new HashMap<>();
 
         @Expose
         public PestProfitTracker.Data pestProfitTracker = new PestProfitTracker.Data();
