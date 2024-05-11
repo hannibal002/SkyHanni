@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -83,6 +84,10 @@ object TrevorFeatures {
     private val clickOptionPattern by patternGroup.pattern(
         "clickoption",
         "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]"
+    )
+    private val areaTrappersDenPattern by patternGroup.pattern(
+        "area.trappersden",
+        "Trapper's Den"
     )
 
     private var timeUntilNextReady = 0
@@ -326,7 +331,7 @@ object TrevorFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        inTrapperDen = LorenzUtils.skyBlockArea == "Trapper's Den"
+        inTrapperDen = areaTrappersDenPattern.matches(LorenzUtils.skyBlockArea)
     }
 
     enum class TrapperStatus(baseColor: LorenzColor) {
