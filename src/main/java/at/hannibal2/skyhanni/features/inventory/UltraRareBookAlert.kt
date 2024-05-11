@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -22,6 +23,7 @@ import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 object UltraRareBookAlert {
 
@@ -35,7 +37,7 @@ object UltraRareBookAlert {
 
     private val ultraRarePattern by RepoPattern.pattern(
         "inventory.experimentstable.ultrarare",
-        "§9Rare Book!"
+        "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX"
     )
 
     private val bookPattern by RepoPattern.pattern(
@@ -54,10 +56,10 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        //if (!LorenzUtils.inSkyBlock) return
-        //if (!config.ultraRareBookAlert) return
-        //if (!superpairsGui.matches(InventoryUtils.openInventoryName())) return
-        //if (lastNotificationTime.passedSince() > 5.seconds) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.ultraRareBookAlert) return
+        if (!superpairsGui.matches(InventoryUtils.openInventoryName())) return
+        if (lastNotificationTime.passedSince() > 5.seconds) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         GlStateManager.pushMatrix()
