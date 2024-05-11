@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -99,7 +100,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         if (Mouse.getEventButtonState() && (mouseX - getChangelogPosition(width) - x) in (0..changelog.width) && (mouseY - 30 - y) in (0..changelog.height)) {
             if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
                 LorenzDebug.log("Clicked")
-                getChangelog()
+                getChangelog(currentVersion, UpdateManager.getNextVersion()!!)
                 openChangelog()
             }
             return true
@@ -168,38 +169,66 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     private var changelogList: List<String> = emptyList()
 
-    private fun getChangelog() {
+    private class VersionTag(
+        val first: Int,
+        val second: Int,
+        val third: Int,
+        val isBeta: Boolean,
+    ) {
+
+        constructor(l: List<Int>, beta: Boolean) : this(
+            l.getOrNull(0) ?: -1,
+            l.getOrNull(1) ?: -1,
+            l.getOrNull(2) ?: -1,
+            beta
+        )
+
+        operator fun compareTo(other: VersionTag): Int {
+            val first = first.compareTo(other.first)
+            if (first != 0) return first
+            val second = second.compareTo(other.second)
+            if (second != 0) return second
+            val beta = -isBeta.compareTo(other.isBeta)
+            if (beta != 0) return beta
+            return third.compareTo(other.third)
+        }
+    }
+
+    private fun VersionTag.shouldShow(current: VersionTag, target: VersionTag): Boolean {
+        if (this > target) return false
+        if (this < current) return false
+        if (this == current) return false
+        return true
+    }
+
+    private fun String.toVersionTag(): VersionTag {
+        val split = this.split('.')
+        val ints = split.filter { it.isInt() }.map { it.toInt() }
+        return VersionTag(ints, split.contains("Beta"))
+    }
+
+    private fun getChangelog(currentVersion: String, targetVersion: String) {
         if (changelogList.isNotEmpty()) return
         SkyHanniMod.coroutineScope.launch {
             val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases"
             val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponseAsElement(url, apiName = "github") }
             val data = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
-            val splitCurrent = currentVersion.split('.').filter { it != "Beta" }.map { it.toInt() }
-            val splitTarget =
-                UpdateManager.getNextVersion()?.split('.')?.filter { it != "Beta" }?.map { it.toInt() } ?: emptyList()
+            val splitCurrent = currentVersion.toVersionTag()
+            val splitTarget = targetVersion.toVersionTag()
+
             val neededData = data.filter {
-                val sub = it.tagName.split('.').filter { it != "Beta" }.map { it.toInt() }
-
-                val first = (splitCurrent.getOrNull(0) ?: -1) to (sub.getOrNull(0) ?: -1)
-                val second = (splitCurrent.getOrNull(1) ?: -1) to (sub.getOrNull(1) ?: -1)
-                val third = (splitCurrent.getOrNull(2) ?: -1) to (sub.getOrNull(2) ?: -1)
-
-                if (first.first > first.second) return@filter false
-                if (first.first < first.second && second.second == -1) return@filter true
-                if (second.first > second.second) return@filter false
-                if (second.first < second.second && third.second == -1) return@filter true
-                if (third.first > third.second) return@filter false
-                if (third.first == third.second) return@filter false
-                return@filter true
+                val sub = it.tagName.toVersionTag()
+                sub.shouldShow(splitCurrent, splitTarget)
             }.dropLast(1)
             val formatted = neededData.map {
                 it.body.replace(
                     "(- [^-]*)\\(https://github[\\w/.?$&#]*\\)".toRegex(), "§b$1"
-                ) // Remove github link + color contributors
+                ) // Remove GitHub link + color contributors
                     .replace("\r\n### Technical Details[^#]*".toRegex(), "\r\n") // Remove Technical Details
                     .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
-                    .replace("(\n[ \t]+)\\+".toRegex(), "$1§7") // Formatting for sub points
-                    .replace("\n\\+".toRegex(), "\n§a") // Formatting for points
+                    .replace("(\n[ \t]+)[+\\-*]".toRegex(), "$1§7") // Formatting for sub points
+                    .replace("\n[+\\-*]".toRegex(), "\n§a") // Formatting for points
+                    .replace("\\[(.+)\\]\\(.+\\)".toRegex(), "$1") // Random Links
                     .split("\r\n") // Split at newlines
                     .let {// Change §a to §c if in removed
                         val index = it.indexOf("§l§9Removed Features")
