@@ -10,7 +10,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class FerocityDisplayConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show ferocity stat as single gui element. Requires tab list widget enabled and ferocity selected to work.")
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Show ferocity stat as single gui element. " +
+        "Requires tab list widget enabled and ferocity selected to work."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
