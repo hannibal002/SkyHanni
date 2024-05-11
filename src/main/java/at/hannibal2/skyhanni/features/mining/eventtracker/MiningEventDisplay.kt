@@ -44,12 +44,12 @@ object MiningEventDisplay {
     }
 
     private fun updateEvents() {
-        val list = mutableListOf<String>()
+        val list = mutableListOf<Renderable>()
 
         if (MiningEventTracker.apiError) {
             val count = MiningEventTracker.apiErrorCount
-            list.add("§cMining Event API Error! ($count)")
-            list.add("§cSwap servers to try again!")
+            list.add(Renderable.string("§cMining Event API Error! ($count)"))
+            list.add(Renderable.string("§cSwap servers to try again!"))
         }
 
         islandEventData.forEach { (islandType, eventDetails) ->
@@ -112,7 +112,7 @@ object MiningEventDisplay {
             }.map { it.getRenderable() }.toMutableList()
 
         if (upcoming.isEmpty()) upcoming.add(unknownDisplay)
-        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.getRenderable()) }
+        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.getRenderableAsPast()) }
         return upcoming.flatMap { listOf(it, transitionDisplay) }.dropLast(1).toTypedArray()
         /* return upcoming.joinToString(" §8-> ") */
     }
