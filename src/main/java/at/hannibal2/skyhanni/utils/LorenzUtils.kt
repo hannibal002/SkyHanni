@@ -374,6 +374,7 @@ object LorenzUtils {
             lastGuiTime = 3.ticks.fromNow()
         }
         return !lastGuiTime.isInPast()
+    }
 
     fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)
