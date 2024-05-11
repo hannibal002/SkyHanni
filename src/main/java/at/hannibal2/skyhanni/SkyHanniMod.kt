@@ -427,6 +427,7 @@ import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
+import at.hannibal2.skyhanni.features.slayer.blaze.FirePillarDisplay
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerFeatures
 import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerHideParticles
@@ -689,6 +690,7 @@ class SkyHanniMod {
         loadModule(HellionShieldHelper())
         loadModule(BlazeSlayerFirePitsWarning())
         loadModule(BlazeSlayerClearView())
+        loadModule(FirePillarDisplay())
         loadModule(EndermanSlayerHideParticles())
         loadModule(PlayerChatFilter())
         loadModule(HideArmor())
