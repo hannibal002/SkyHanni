@@ -34,7 +34,7 @@ public class BlazeConfig {
     @Expose
     @ConfigOption(
         name = "Pillar Display",
-        desc = "Show a big display with timer when a Fire Pillar is about to explode. " +
+        desc = "Show a big display with a timer when the Fire Pillar is about to explode. " +
             "Also shows for other player's bosses as well."
     )
     @ConfigEditorBoolean
