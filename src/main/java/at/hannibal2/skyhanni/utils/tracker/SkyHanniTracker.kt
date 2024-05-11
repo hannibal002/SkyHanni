@@ -54,7 +54,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         "Are you sure you want to reset your total $name? Click here to confirm.",
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
-        }
+        },
+        oneTimeClick = true
     )
 
     fun modify(modifyFunction: (Data) -> Unit) {

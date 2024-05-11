@@ -166,4 +166,9 @@ public class ChocolateFactoryConfig {
     @Accordion
     public ChocolateFactoryKeybindsConfig keybinds = new ChocolateFactoryKeybindsConfig();
 
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Custom Reminder", desc = "")
+    @Accordion
+    public ChocolateFactoryCustomReminderConfig customReminder = new ChocolateFactoryCustomReminderConfig();
+
 }
