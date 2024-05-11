@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPropertiesWithType
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import io.github.moulberry.notenoughupdates.itemeditor.GuiElementTextField
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class GuiEditManager {
 
@@ -50,8 +52,6 @@ class GuiEditManager {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        latestPositions = currentPositions.toMap()
-        currentPositions.clear()
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
@@ -67,8 +67,7 @@ class GuiEditManager {
 
     companion object {
 
-        var currentPositions = mutableMapOf<String, Position>()
-        private var latestPositions = mapOf<String, Position>()
+        private var currentPositions = TimeLimitedCache<String, Position>(15.seconds)
         private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
         private var lastMovedGui: String? = null
 
@@ -79,10 +78,8 @@ class GuiEditManager {
                 name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
                 position.internalName = name
             }
-            if (!currentPositions.containsKey(name)) {
-                currentPositions[name] = position
-                currentBorderSize[posLabel] = Pair(x, y)
-            }
+            currentPositions.put(name, position)
+            currentBorderSize[posLabel] = Pair(x, y)
         }
 
         private var lastHotkeyReminded = SimpleTimeMark.farPast()
@@ -90,7 +87,7 @@ class GuiEditManager {
         @JvmStatic
         fun openGuiPositionEditor(hotkeyReminder: Boolean) {
             SkyHanniMod.screenToOpen = GuiPositionEditor(
-                latestPositions.values.toList(),
+                currentPositions.values().toList(),
                 2,
                 Minecraft.getMinecraft().currentScreen as? GuiContainer
             )
