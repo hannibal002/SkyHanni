@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
@@ -1508,10 +1509,7 @@ object RenderUtils {
         colour: Color,
         depth: Boolean,
     ) {
-        val cornerOne = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.minZ)
-        val cornerTwo = LorenzVec(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
-        val cornerThree = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
-        val cornerFour = LorenzVec(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ)
+         val (cornerOne, cornerTwo, cornerThree, cornerFour, ) = boundingBox.getCorners(boundingBox.maxY)
         this.draw3DLine(cornerOne, cornerTwo, colour, lineWidth, depth)
         this.draw3DLine(cornerTwo, cornerThree, colour, lineWidth, depth)
         this.draw3DLine(cornerThree, cornerFour, colour, lineWidth, depth)
