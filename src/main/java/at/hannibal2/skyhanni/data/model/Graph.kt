@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.registerTypeAdapter
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.fromJson
 import com.google.gson.GsonBuilder
@@ -36,6 +35,77 @@ value class Graph(
 
     override fun lastIndexOf(element: GraphNode) = graph.lastIndexOf(element)
 
+    companion object {
+        val gson = GsonBuilder().setPrettyPrinting()
+            /* ConfigManager.createBaseGsonBuilder() */.registerTypeAdapter<Graph>({ out, value ->
+                out.beginObject()
+                value.forEach {
+                    out.name(it.id.toString()).beginObject()
+                    out.name("Position").value(with(it.position) { "$x:$y:$z" })
+                    if (it.name != null) {
+                        out.name("Name").value(it.name)
+                    }
+                    out.name("Neighbours")
+                    out.beginObject()
+                    it.neighbours.forEach { (node, weight) ->
+                        val id = node.id.toString()
+                        out.name(id).value(weight)
+                    }
+                    out.endObject()
+                    out.endObject()
+                }
+                out.endObject()
+            }, { reader ->
+                reader.beginObject()
+                val list = mutableListOf<GraphNode>()
+                val neigbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
+                while (reader.hasNext()) {
+                    val id = reader.nextName().toInt()
+                    reader.beginObject()
+                    var position: LorenzVec? = null
+                    var name: String? = null
+                    var neighbors = mutableListOf<Pair<Int, Double>>()
+                    while (reader.hasNext()) {
+                        when (reader.nextName()) {
+                            "Position" -> {
+                                position = reader.nextString().split(":").let { parts ->
+                                    LorenzVec(parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble())
+                                }
+                            }
+
+                            "Neighbours" -> {
+                                reader.beginObject()
+                                while (reader.hasNext()) {
+                                    val nId = reader.nextName().toInt()
+                                    val distance = reader.nextDouble()
+                                    neighbors.add(nId to distance)
+                                }
+                                reader.endObject()
+                            }
+
+                            "Name" -> {
+                                name = reader.nextString()
+                            }
+
+                        }
+                    }
+                    val node = GraphNode(id, position!!, name)
+                    list.add(node)
+                    neigbourMap[node] = neighbors
+                    reader.endObject()
+                }
+                neigbourMap.forEach { (node, edge) ->
+                    node.neighbours = edge.associate { (id, distance) ->
+                        list.first { it.id == id } to distance
+                    }
+                }
+                reader.endObject()
+                Graph(list)
+            }).create()
+
+        fun fromJson(json: String): Graph = gson.fromJson<Graph>(json)
+        fun fromJson(json: JsonElement): Graph = gson.fromJson<Graph>(json)
+    }
 }
 
 class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null) {
@@ -59,7 +129,10 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null) 
     }
 }
 
-fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph {
+fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph =
+    this.findShortestPathAsGraphWithDistance(start, end).first
+
+fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
     val distances = mutableMapOf<GraphNode, Double>()
     val previous = mutableMapOf<GraphNode, GraphNode>()
     val visited = mutableSetOf<GraphNode>()
@@ -90,85 +163,18 @@ fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph {
         var current = end
         while (current != start) {
             add(current)
-            current = previous[current] ?: return Graph(emptyList())
+            current = previous[current] ?: return Graph(emptyList()) to 0.0
         }
         add(start)
-    }.reversed())
+    }.reversed()) to distances[end]!!
 }
 
 fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> =
     this.findShortestPathAsGraph(start, end).toPositionsList()
 
+fun Graph.findShortestDistance(start: GraphNode, end: GraphNode): Double =
+    this.findShortestPathAsGraphWithDistance(start, end).second
+
 fun Graph.toPositionsList() = this.map { it.position }
 
-private val localeGson = GsonBuilder().setPrettyPrinting()
-    /* ConfigManager.createBaseGsonBuilder() */.registerTypeAdapter<Graph>({ out, value ->
-        out.beginObject()
-        value.forEach {
-            out.name(it.id.toString()).beginObject()
-            out.name("Position").value(with(it.position) { "$x:$y:$z" })
-            if (it.name != null) {
-                out.name("Name").value(it.name)
-            }
-            out.name("Neighbours")
-            out.beginObject()
-            it.neighbours.forEach { (node, weight) ->
-                val id = node.id.toString()
-                out.name(id).value(weight.round(2))
-            }
-            out.endObject()
-            out.endObject()
-        }
-        out.endObject()
-    }, { reader ->
-        reader.beginObject()
-        val list = mutableListOf<GraphNode>()
-        val neigbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
-        while (reader.hasNext()) {
-            val id = reader.nextName().toInt()
-            reader.beginObject()
-            var position: LorenzVec? = null
-            var name: String? = null
-            var neighbors = mutableListOf<Pair<Int, Double>>()
-            while (reader.hasNext()) {
-                when (reader.nextName()) {
-                    "Position" -> {
-                        position = reader.nextString().split(":").let { parts ->
-                            LorenzVec(parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble())
-                        }
-                    }
-
-                    "Neighbours" -> {
-                        reader.beginObject()
-                        while (reader.hasNext()) {
-                            val nId = reader.nextName().toInt()
-                            val distance = reader.nextDouble()
-                            neighbors.add(nId to distance)
-                        }
-                        reader.endObject()
-                    }
-
-                    "Name" -> {
-                        name = reader.nextString()
-                    }
-
-                }
-            }
-            val node = GraphNode(id, position!!, name)
-            list.add(node)
-            neigbourMap[node] = neighbors
-            reader.endObject()
-        }
-        neigbourMap.forEach { (node, edge) ->
-            node.neighbours = edge.associate { (id, distance) ->
-                list.first { it.id == id } to distance
-            }
-        }
-        reader.endObject()
-        Graph(list)
-    }).create()
-
-fun Graph.toJson(): String = localeGson.toJson(this)
-
-fun graphFromJson(json: String): Graph = localeGson.fromJson<Graph>(json)
-fun graphFromJson(json: JsonElement): Graph = localeGson.fromJson<Graph>(json)
+fun Graph.toJson(): String = Graph.gson.toJson(this)
