@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -48,6 +49,7 @@ object PestAPI {
         }
 
     var lastPestKillTime = SimpleTimeMark.farPast()
+    var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
@@ -246,8 +248,16 @@ object PestAPI {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastPestKillTime = SimpleTimeMark.farPast()
+        lastTimeVacuumHold = SimpleTimeMark.farPast()
         gardenJoinTime = SimpleTimeMark.now()
         firstScoreboardCheck = false
+    }
+
+    @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (event.oldItem !in vacuumVariants) return
+        lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
     private fun getPlotsWithAccuratePests() = GardenPlotAPI.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }

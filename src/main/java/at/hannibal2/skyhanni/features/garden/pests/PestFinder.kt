@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -36,7 +35,6 @@ object PestFinder {
     private val config get() = PestAPI.config.pestFinder
 
     private var display = emptyList<Renderable>()
-    private var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onPestUpdate(event: PestUpdateEvent) {
@@ -111,7 +109,7 @@ object PestFinder {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         val visibility = config.visibilityType
@@ -166,14 +164,6 @@ object PestFinder {
         lastKeyPress = SimpleTimeMark.now()
 
         teleportNearestInfectedPlot()
-    }
-
-    @SubscribeEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (!isEnabled()) return
-        if (!config.showPlotInWorld) return
-        if (event.oldItem !in PestAPI.vacuumVariants) return
-        lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
     fun teleportNearestInfectedPlot() {
