@@ -210,12 +210,19 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
     private fun getChangelog(currentVersion: String, targetVersion: String) {
         if (changelogList.isNotEmpty()) return
         SkyHanniMod.coroutineScope.launch {
-            val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases"
-            val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponseAsElement(url, apiName = "github") }
-            val data = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
             val splitCurrent = currentVersion.toVersionTag()
             val splitTarget = targetVersion.toVersionTag()
 
+            val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
+            val data = mutableListOf<ChangelogJson>()
+            var pageNumber = 1
+            while (data.isEmpty() || data.last().tagName.toVersionTag() > splitCurrent) {
+                val jsonObject =
+                    withContext(dispatcher) { APIUtil.getJSONResponseAsElement(url + pageNumber, apiName = "github") }
+                val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
+                data.addAll(page)
+                pageNumber++
+            }
             val neededData = data.filter {
                 val sub = it.tagName.toVersionTag()
                 sub.shouldShow(splitCurrent, splitTarget)
@@ -240,6 +247,12 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
                             it
                         }
                     }
+                // TODO better data handeling
+                // TODO version header always on top
+                // TODO notice technical details
+                // TODO toggle for only major
+                // TODO toggle for technical details
+                // TODO always exactly one empty line between versions
             }
             changelogList = formatted.flatten().map { it.trimEnd() }
             formatted.forEach {// TODO remove
