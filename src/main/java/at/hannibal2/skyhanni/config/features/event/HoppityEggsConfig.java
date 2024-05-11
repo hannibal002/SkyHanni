@@ -19,8 +19,8 @@ public class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Waypoints Immediately",
-        desc = "Show a raw estimate waypoint immedialtey after clicking. " +
-            "§cThis might cause issues with other paricle sources."
+        desc = "Show a raw estimate waypoint immediately after clicking. " +
+            "§cThis might cause issues with other particle sources."
     )
     @ConfigEditorBoolean
     public boolean waypointsImmediately = false;
