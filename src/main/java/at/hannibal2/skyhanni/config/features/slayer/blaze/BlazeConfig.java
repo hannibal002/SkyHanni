@@ -43,5 +43,5 @@ public class BlazeConfig {
 
     @Expose
     @ConfigLink(owner = BlazeConfig.class, field = "firePillarDisplay")
-    public Position firePillarDisplayPosition = new Position(200, 120, false, true);
+    public Position firePillarDisplayPosition = new Position(400, -150, 3f);
 }
