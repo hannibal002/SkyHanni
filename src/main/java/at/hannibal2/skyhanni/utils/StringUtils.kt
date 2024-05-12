@@ -106,6 +106,9 @@ object StringUtils {
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
+    inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
+        toList().matchFirst(pattern, consumer)
+
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.matches()) return consumer(it) }
@@ -309,8 +312,9 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
-    fun Pattern.matches(string: String?) = string?.let { matcher(it).matches() } ?: false
-    fun Pattern.anyMatches(list: List<String>?) = list?.any { this.matches(it) } ?: false
+    fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
+    fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
+    fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
@@ -336,7 +340,6 @@ object StringUtils {
     ): ChatComponentText? {
         return replaceIfNeeded(original, ChatComponentText(newText))
     }
-
 
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
     fun enumChatFormattingByCode(char: Char): EnumChatFormatting? {
@@ -401,7 +404,6 @@ object StringUtils {
         }
     }
 
-
     fun <T : IChatComponent> replaceIfNeeded(
         original: T,
         newText: T,
@@ -441,7 +443,7 @@ object StringUtils {
 
     private fun IChatComponent.findAllEvents(
         clickEvents: MutableList<ClickEvent>,
-        hoverEvents: MutableList<HoverEvent>
+        hoverEvents: MutableList<HoverEvent>,
     ) {
         siblings.forEach { it.findAllEvents(clickEvents, hoverEvents) }
 

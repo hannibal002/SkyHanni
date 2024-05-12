@@ -170,7 +170,7 @@ class PlayerNameFormatter {
 
         val cleanName = cleanAuthor.getText().cleanPlayerName()
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
-            val faction = it.faction.icon?.toCleanChatComponent()
+            val faction = it.faction.icon?.trim()?.toCleanChatComponent()
             val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else null
             val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level).toCleanChatComponent() }
             listOf(faction, ironman, bingo)
