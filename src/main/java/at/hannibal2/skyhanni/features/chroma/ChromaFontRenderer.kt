@@ -42,12 +42,12 @@ class ChromaFontRenderer(private val baseColor: Int) {
         return this
     }
 
-    fun bindActualColor(): ChromaFontRenderer {
+    fun bindActualColor(alpha: Float): ChromaFontRenderer {
         GlStateManager.color(
             ColorUtils.getRed(baseColor).toFloat() / 255f,
             ColorUtils.getGreen(baseColor).toFloat() / 255f,
             ColorUtils.getBlue(baseColor).toFloat() / 255f,
-            ColorUtils.getAlpha(baseColor).toFloat() / 255f
+            alpha
         )
         return this
     }

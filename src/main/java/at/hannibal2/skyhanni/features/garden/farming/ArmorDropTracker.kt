@@ -94,6 +94,7 @@ object ArmorDropTracker {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
         if (!hasArmor) return
+        if (!GardenAPI.hasFarmingToolInHand()) return
 
         tracker.renderDisplay(config.pos)
     }
@@ -165,7 +166,7 @@ object ArmorDropTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetarmordroptracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

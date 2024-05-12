@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -117,7 +118,6 @@ class SkyHanniDebugsAndTests {
 
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
-
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()
@@ -190,22 +190,18 @@ class SkyHanniDebugsAndTests {
             }
         }
 
-        fun configManagerResetCommand(args: Array<String>) {
-            if (args.size == 1 && args[0] == "confirm") {
-                configManagerReset()
-                return
-            }
-
+        fun resetConfigCommand() {
             ChatUtils.clickableChat(
                 "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-                "shconfigmanagerreset confirm",
-                false
+                onClick = {
+                    resetConfig()
+                },
+                prefix = false,
+                oneTimeClick = true
             )
         }
 
-        private fun configManagerReset() {
-            // TODO make it so that it does not reset the config
-
+        private fun resetConfig() {
             // saving old config state
             SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "reload config manager")
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "reload config manager")
@@ -465,7 +461,21 @@ class SkyHanniDebugsAndTests {
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
-        event.toolTip.add("§7NPC price: §6${npcPrice.addSeparators()}")
+        event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onShowBzPrice(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showBZPrice) return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+
+        val data = internalName.getBazaarData() ?: return
+        val instantBuyPrice = data.instantBuyPrice
+        val sellOfferPrice = data.sellOfferPrice
+
+        event.toolTip.add("§7BZ instantBuyPrice: ${instantBuyPrice.addSeparators()}")
+        event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
     }
 
     @SubscribeEvent

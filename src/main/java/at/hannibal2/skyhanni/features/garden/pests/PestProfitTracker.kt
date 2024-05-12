@@ -31,10 +31,11 @@ object PestProfitTracker {
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)"
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)"
     )
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -139,8 +140,8 @@ object PestProfitTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetpestprofittracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
