@@ -27,31 +27,31 @@ class PowderPerHotmPerk {
         val maxPowderNeeded = perk.totalCostMaxLevel
         val percentage = (currentPowderSpend.fractionOf(maxPowderNeeded) * 100).round(2)
 
-        event.toolTip.add(" ")
-
-        when (config.powderSpentDesign) {
+        val line = when (config.powderSpentDesign) {
             PowderSpentDesign.NUMBER -> {
                 if (perk.activeLevel == perk.maxLevel) {
-                    event.toolTip.add("§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)")
+                    "§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)"
                 } else {
-                    event.toolTip.add("§7Powder spent: §e${currentPowderSpend.addSeparators()}§7 / §e${maxPowderNeeded.addSeparators()}")
+                    "§7Powder spent: §e${currentPowderSpend.addSeparators()}§7 / §e${maxPowderNeeded.addSeparators()}"
                 }
             }
             PowderSpentDesign.PERCENTAGE -> {
                 if (perk.activeLevel == perk.maxLevel) {
-                    event.toolTip.add("§7Powder spent: §e$percentage% §7(§aMax level§7)")
+                    "§7Powder spent: §e$percentage% §7(§aMax level§7)"
                 } else {
-                    event.toolTip.add("§7Powder spent: §e$percentage%§7 of max")
+                    "§7Powder spent: §e$percentage%§7 of max"
                 }
             }
             PowderSpentDesign.NUMBER_AND_PERCENTAGE -> {
                 if (perk.activeLevel == perk.maxLevel) {
-                    event.toolTip.add("§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)")
+                    "§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)"
                 } else {
-                    event.toolTip.add("§7Powder spent: §e${currentPowderSpend.addSeparators()}§7 / §e${maxPowderNeeded.addSeparators()}§7 (§e$percentage%§7)")
+                    "§7Powder spent: §e${currentPowderSpend.addSeparators()}§7/§e${maxPowderNeeded.addSeparators()}§7 (§e$percentage%§7)"
                 }
             }
         }
+
+        event.toolTip.add(2, line)
     }
 
     enum class PowderSpentDesign(val str: String) {
