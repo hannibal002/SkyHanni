@@ -140,12 +140,7 @@ object ItemUtils {
     }
 
     // Taken from NEU
-    fun createSkull(displayName: String, uuid: String, value: String): ItemStack {
-        return createSkull(displayName, uuid, value, null)
-    }
-
-    // Taken from NEU
-    fun createSkull(displayName: String, uuid: String, value: String, lore: Array<String>?): ItemStack {
+    fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         val render = ItemStack(Items.skull, 1, 3)
         val tag = NBTTagCompound()
         val skullOwner = NBTTagCompound()
@@ -159,7 +154,7 @@ object ItemUtils {
 
         textures.appendTag(textures0)
 
-        addNameAndLore(tag, displayName, lore)
+        addNameAndLore(tag, displayName, *lore)
 
         properties.setTag("textures", textures)
         skullOwner.setTag("Properties", properties)
@@ -169,10 +164,10 @@ object ItemUtils {
     }
 
     // Taken from NEU
-    private fun addNameAndLore(tag: NBTTagCompound, displayName: String, lore: Array<String>?) {
+    private fun addNameAndLore(tag: NBTTagCompound, displayName: String, vararg lore: String) {
         val display = NBTTagCompound()
         display.setString("Name", displayName)
-        if (lore != null) {
+        if (lore.isNotEmpty()) {
             val tagLore = NBTTagList()
             for (line in lore) {
                 tagLore.appendTag(NBTTagString(line))

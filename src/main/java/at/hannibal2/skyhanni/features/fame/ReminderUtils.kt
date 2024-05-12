@@ -10,7 +10,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 object ReminderUtils {
 
     // TODO: add arachne fight, add slayer boss spawned, add dragon fight
-    fun isBusy(): Boolean =
-        DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight || FarmingContestAPI.inContest ||
-            RiftAPI.inRift() || IslandType.DARK_AUCTION.isInIsland()
+    fun isBusy(ignoreFarmingContest: Boolean = false): Boolean =
+        DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight || (FarmingContestAPI.inContest && !ignoreFarmingContest) ||
+            RiftAPI.inRift() || IslandType.DARK_AUCTION.isInIsland() || IslandType.MINESHAFT.isInIsland() ||
+            IslandType.NONE.isInIsland() || IslandType.UNKNOWN.isInIsland()
 }

@@ -10,8 +10,10 @@ object DelayedRun {
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
 
-    fun runDelayed(duration: Duration, run: () -> Unit) {
-        futureTasks.add(Pair(run, SimpleTimeMark.now() + duration))
+    fun runDelayed(duration: Duration, run: () -> Unit): SimpleTimeMark {
+        val time = SimpleTimeMark.now() + duration
+        futureTasks.add(Pair(run, time))
+        return time
     }
 
     /** Runs in the next full Tick so the delay is between 50ms to 100ms**/

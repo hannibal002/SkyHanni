@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -34,7 +35,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import io.github.moulberry.notenoughupdates.util.toJsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -249,7 +249,8 @@ object GardenNextJacobContest {
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                         onClick = {
                             shareContests()
-                        }
+                        },
+                        oneTimeClick = true
                     )
                 }
             }
@@ -303,7 +304,8 @@ object GardenNextJacobContest {
                     config.shareAutomatically = ShareContestsEntry.AUTO
                     SkyHanniMod.feature.storage.contestSendingAsked = true
                     ChatUtils.chat("§2Enabled automatic sharing of future contests!")
-                }
+                },
+                oneTimeClick = true
             )
         }
     }

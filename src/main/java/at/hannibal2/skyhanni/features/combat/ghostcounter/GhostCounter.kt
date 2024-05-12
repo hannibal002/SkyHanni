@@ -324,6 +324,7 @@ object GhostCounter {
                         GhostUtil.importCTGhostCounterData()
                     },
                     prefixColor = "§6",
+                    oneTimeClick = true
                 )
             }
         }
