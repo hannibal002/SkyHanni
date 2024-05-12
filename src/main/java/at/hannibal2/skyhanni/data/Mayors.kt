@@ -31,6 +31,7 @@ enum class Mayor(
     JERRY("Jerry", "§d", Perk.PERKPOCALYPSE, Perk.STATSPOCALYPSE, Perk.JERRYPOCALYPSE),
     DERPY("Derpy", "§d", Perk.TURBO_MINIONS, Perk.AH_CLOSED, Perk.DOUBLE_MOBS_HP, Perk.MOAR_SKILLZ),
 
+    UNKNOWN("Unknown", "§c"),
     DISABLED("§cDisabled", "§7"),
     ;
 

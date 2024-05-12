@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -50,7 +51,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
 
 internal var unknownLines = listOf<String>()
@@ -266,9 +266,7 @@ enum class ScoreboardElement(
     ),
     ;
 
-    override fun toString(): String {
-        return configLine
-    }
+    override fun toString() = configLine
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf("<hidden>" to HorizontalAlignment.LEFT)
 
@@ -622,11 +620,11 @@ private fun getObjectiveDisplayPair() = buildList {
 private fun getObjectiveShowWhen(): Boolean =
     ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
-private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
-    (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,
-    (" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT),
-    (" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
-)
+private fun getSlayerDisplayPair(): List<ScoreboardElementType> = buildList {
+    add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT)
+    add(" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT)
+    add(" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
+}
 
 private fun getSlayerShowWhen() =
     if (informationFilteringConfig.hideIrrelevantLines) SlayerAPI.isInCorrectArea else true
@@ -654,7 +652,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
         if (displayConfig.displayNumbersFirst) {
             "$amountString ${QuiverAPI.currentArrow?.arrow}s"
         } else {
-            "${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}: $amountString Arrows"
+            "Arrows: $amountString ${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}"
         } to HorizontalAlignment.LEFT
     )
 }
@@ -789,6 +787,7 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
             "Unknown Lines" to unknownLines,
             "Island" to HypixelData.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
+            "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
             noStackTrace = true,
             betaOnly = true,
         )

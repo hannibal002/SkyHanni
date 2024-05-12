@@ -28,6 +28,7 @@ import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
+// TODO delete workaround class PestParticleLine when this class works again
 class PestParticleWaypoint {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint

@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class DisplayConfig {
 
@@ -56,7 +57,7 @@ public class DisplayConfig {
         "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean hideVanillaScoreboard = true;
+    public Property<Boolean> hideVanillaScoreboard = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or line name displays first. " +

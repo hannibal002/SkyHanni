@@ -27,7 +27,6 @@ public class TabCompleteConfig {
     @Expose
     @ConfigOption(name = "Only Best Friends", desc = "Only Tab Complete best friends.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean onlyBestFriends = false;
 
     @Expose

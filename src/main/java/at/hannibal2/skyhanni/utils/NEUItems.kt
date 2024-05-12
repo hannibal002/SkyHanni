@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.TypeAdapter
@@ -123,10 +123,20 @@ object NEUItems {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
-            val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
+            var name = manager.createItem(rawInternalName).displayName.lowercase()
             val internalName = rawInternalName.asInternalName()
-            val storedName = name.removePrefix("[lvl 1➡100] ")
-            map[storedName] = internalName
+
+            // TODO remove one of them once neu is consistent
+            name = name.removePrefix("§f§f§7[lvl 1➡100] ")
+            name = name.removePrefix("§7[lvl 1➡100] ")
+
+            if (name.contains("[lvl 1➡100]")) {
+                if (LorenzUtils.isInDevEnvironment()) {
+                    error("wrong name: '$name'")
+                }
+                println("wrong name: '$name'")
+            }
+            map[name] = internalName
             allInternalNames.add(internalName)
         }
         return map
@@ -158,8 +168,13 @@ object NEUItems {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
-        val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
-        if (result != -1.0) return result
+
+        getBazaarData()?.let {
+            return if (useSellingPrice) it.sellOfferPrice else it.instantBuyPrice
+        }
+
+        val result = manager.auctionManager.getLowestBin(asString())
+        if (result != -1L) return result.toDouble()
 
         if (equals("JACK_O_LANTERN")) {
             return "PUMPKIN".asInternalName().getPrice(useSellingPrice) + 1
@@ -168,8 +183,11 @@ object NEUItems {
             // 6.8 for some players
             return 7.0 // NPC price
         }
-        return getNpcPriceOrNull()
+
+        return getNpcPriceOrNull() ?: getRawCraftCostOrNull()
     }
+
+    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
