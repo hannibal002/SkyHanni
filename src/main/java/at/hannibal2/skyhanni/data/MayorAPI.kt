@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.Mayor.Companion.setAssumeMayor
 import at.hannibal2.skyhanni.data.Mayor.Companion.setAssumeMayorJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.MayorCandidate
-import at.hannibal2.skyhanni.data.jsonobjects.local.MayorElection
-import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
+import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
+import at.hannibal2.skyhanni.data.jsonobjects.other.MayorJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent

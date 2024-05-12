@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.MayorAPI.foxyExtraEventPattern
-import at.hannibal2.skyhanni.data.jsonobjects.local.MayorPerk
+import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 
