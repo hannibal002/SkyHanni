@@ -28,9 +28,13 @@ object UtilsPatterns {
         ".{2}Abiphone .*"
     )
 
+    /**
+     * REGEX-TEST: §fEnchanted Book
+     * REGEX-TEST: §f§f§fEnchanted Book
+     */
     val enchantedBookPattern by patternGroup.pattern(
         "item.name.enchanted.book",
-        ".{2}?Enchanted Book"
+        "(?:§.)+Enchanted Book"
     )
 
     val baitPattern by patternGroup.pattern(
