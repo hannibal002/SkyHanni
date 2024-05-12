@@ -3,12 +3,15 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 
 class PowderPerHotmPerk {
 
@@ -23,11 +26,29 @@ class PowderPerHotmPerk {
 
         if (perk.getLevelUpCost() == null) return
 
+        if (config.powderSpent) event.toolTip.add(2, handlePowderSpend(event, perk))
+        if (config.powderFor10Levels) handlePowderFor10Levels(event, perk)
+    }
+
+    private fun handlePowderFor10Levels(event: LorenzToolTipEvent, perk: HotmData) {
+        if (!Keyboard.KEY_LSHIFT.isKeyHeld()) return
+
+        val indexOfCost = event.toolTip.indexOfFirst { HotmData.perkCostPattern.matches(it) }
+
+        if (indexOfCost == -1) return
+
+        val powderFor10Levels =
+            perk.calculateTotalCost(perk.activeLevel + 10) - perk.calculateTotalCost(perk.activeLevel)
+
+        event.toolTip.add(indexOfCost + 2, "§7Powder for 10 levels: §e${powderFor10Levels.addSeparators()}")
+    }
+
+    private fun handlePowderSpend(event: LorenzToolTipEvent, perk: HotmData): String {
         val currentPowderSpend = perk.calculateTotalCost(perk.activeLevel)
         val maxPowderNeeded = perk.totalCostMaxLevel
         val percentage = (currentPowderSpend.fractionOf(maxPowderNeeded) * 100).round(2)
 
-        val line = when (config.powderSpentDesign) {
+        return when (config.powderSpentDesign) {
             PowderSpentDesign.NUMBER -> {
                 if (perk.activeLevel == perk.maxLevel) {
                     "§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)"
@@ -35,6 +56,7 @@ class PowderPerHotmPerk {
                     "§7Powder spent: §e${currentPowderSpend.addSeparators()}§7 / §e${maxPowderNeeded.addSeparators()}"
                 }
             }
+
             PowderSpentDesign.PERCENTAGE -> {
                 if (perk.activeLevel == perk.maxLevel) {
                     "§7Powder spent: §e$percentage% §7(§aMax level§7)"
@@ -42,6 +64,7 @@ class PowderPerHotmPerk {
                     "§7Powder spent: §e$percentage%§7 of max"
                 }
             }
+
             PowderSpentDesign.NUMBER_AND_PERCENTAGE -> {
                 if (perk.activeLevel == perk.maxLevel) {
                     "§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)"
@@ -50,8 +73,6 @@ class PowderPerHotmPerk {
                 }
             }
         }
-
-        event.toolTip.add(2, line)
     }
 
     enum class PowderSpentDesign(val str: String) {
@@ -62,5 +83,6 @@ class PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() = config.powderSpent && LorenzUtils.inSkyBlock && HotmData.inInventory
+    private fun isEnabled() =
+        (config.powderSpent || config.powderFor10Levels) && LorenzUtils.inSkyBlock && HotmData.inInventory
 }

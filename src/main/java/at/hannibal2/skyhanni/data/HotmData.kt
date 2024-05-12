@@ -350,6 +350,10 @@ enum class HotmData(
             "perk.disabled", "§c§lDISABLED|§7§eClick to select!"
         ) // unused for now since the assumption is when enabled isn't found it is disabled, but the value might be useful in the future or for debugging
 
+        val perkCostPattern by repoGroup.pattern(
+            "perk.cost", "(?:§.)*§7Cost"
+        )
+
         private val resetChatPattern by repoGroup.pattern(
             "reset.chat", "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset."
         )
