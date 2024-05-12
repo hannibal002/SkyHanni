@@ -1,70 +1,32 @@
-package at.hannibal2.skyhanni.data.jsonobjects.local;
+package at.hannibal2.skyhanni.data.jsonobjects.local
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.Expose
 
-import java.util.ArrayList;
+data class MayorJson(
+    @Expose val mayor: MayorInfo,
+    @Expose val current: MayorElection?,
+)
 
-public class MayorJson {
-    @Expose
-    public boolean success;
-    @Expose
-    public long lastUpdated;
-    @Expose
-    public Mayor mayor;
-    @Expose
-    public Election current;
+data class MayorInfo(
+    @Expose val key: String,
+    @Expose val name: String,
+    @Expose val perks: List<MayorPerk>,
+    @Expose val election: MayorElection,
+)
 
-    public class Candidate {
-        @Expose
-        public String key;
-        @Expose
-        public String name;
-        @Expose
-        public ArrayList<Perk> perks;
-        @Expose
-        public int votes;
+data class MayorElection(
+    @Expose val year: Int,
+    @Expose val candidates: List<MayorCandidate>,
+)
 
-        @Override
-        public String toString() {
-            return "Candidate{" +
-                "key='" + key + '\'' +
-                ", name='" + name + '\'' +
-                ", perks=" + perks +
-                ", votes=" + votes +
-                '}';
-        }
-    }
+data class MayorCandidate(
+    @Expose val key: String,
+    @Expose val name: String,
+    @Expose val perks: List<MayorPerk>,
+    @Expose val votes: Int,
+)
 
-    public class Election {
-        @Expose
-        public int year;
-        @Expose
-        public ArrayList<Candidate> candidates;
-    }
-
-    public class Mayor {
-        @Expose
-        public String key;
-        @Expose
-        public String name;
-        @Expose
-        public ArrayList<Perk> perks;
-        @Expose
-        public Election election;
-    }
-
-    public static class Perk {
-        @Expose
-        public String name;
-        @Expose
-        public String description;
-
-        @Override
-        public String toString() {
-            return "Perk{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-        }
-    }
-}
+data class MayorPerk(
+    @Expose val name: String,
+    @Expose val description: String,
+)
