@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -715,6 +716,53 @@ interface Renderable {
                 }
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
+        }
+
+        fun verticalSlider(
+            height: Int,
+            handler: (Int) -> Unit,
+            scrollValue: ScrollValue = ScrollValue(),
+            width: Int = 11,
+            minValue: Int = 0,
+            maxValue: Int = 100,
+            velocity: Double = 2.0,
+            button: Int? = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val scroll = ScrollInput.Companion.Vertical(
+                scrollValue,
+                minValue,
+                maxValue,
+                velocity,
+                button,
+                inverseDrag = false
+            )
+
+            private val sliderPos get() = ((scroll.asInt() - minValue).fractionOf(maxValue) * (height - 8)).toInt() + 1
+
+            override fun render(posX: Int, posY: Int) {
+                val lastScroll = scroll.asInt()
+                scroll.update(isHovered(posX, posY))
+                val newScroll = scroll.asInt()
+
+                Gui.drawRect(4, 0, width - 4, height, Color.GRAY.darker().rgb)
+                Gui.drawRect(5, 1, width - 5, height - 1, Color.GRAY.rgb)
+
+                val slider = sliderPos
+                Gui.drawRect(0, slider, width, slider + 6, Color.GRAY.darker().rgb)
+                Gui.drawRect(1, slider + 1, width - 1, slider + 5, Color.GRAY.rgb)
+
+                if (lastScroll != newScroll) {
+                    handler(newScroll)
+                }
+            }
+
         }
 
         fun drawInsideRoundedRect(

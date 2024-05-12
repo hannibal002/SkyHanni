@@ -8,7 +8,8 @@ abstract class ScrollInput(
     protected val maxValue: Int,
     protected val velocity: Double,
     protected val dragScrollMouseButton: Int?,
-    startValue: Double?
+    protected val inverseDrag: Boolean,
+    startValue: Double?,
 ) {
 
     init {
@@ -22,8 +23,6 @@ abstract class ScrollInput(
         }
         get() = scrollValue.getValue()
 
-    private var mouseEventTime = 0L
-
     fun asInt() = scroll.toInt()
     fun asDouble() = scroll
 
@@ -34,12 +33,7 @@ abstract class ScrollInput(
             scroll = scroll.coerceIn(minValue.toDouble(), maxValue.toDouble())
         }
 
-    protected fun isMouseEventValid(): Boolean {
-        val mouseEvent = Mouse.getEventNanoseconds()
-        val mouseEventsValid = mouseEvent - mouseEventTime > 20L
-        mouseEventTime = mouseEvent
-        return mouseEventsValid
-    }
+    protected fun isMouseEventValid(): Boolean = scrollValue.isMouseEventValid()
 
     abstract fun update(isValid: Boolean)
 
@@ -51,13 +45,14 @@ abstract class ScrollInput(
             maxHeight: Int,
             velocity: Double,
             dragScrollMouseButton: Int?,
-            startValue: Double? = null
-        ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, dragScrollMouseButton, startValue) {
+            inverseDrag: Boolean = true,
+            startValue: Double? = null,
+        ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, dragScrollMouseButton, inverseDrag, startValue) {
             override fun update(isValid: Boolean) {
                 if (maxValue < minValue) return
                 if (!isValid || !isMouseEventValid()) return
                 if (dragScrollMouseButton != null && Mouse.isButtonDown(dragScrollMouseButton)) {
-                    scroll += Mouse.getEventDY() * velocity
+                    scroll += Mouse.getEventDY() * velocity * if (inverseDrag) 1 else -1
                 }
                 val deltaWheel = Mouse.getEventDWheel()
                 scroll += -deltaWheel.coerceIn(-1, 1) * 2.5 * velocity
@@ -70,6 +65,9 @@ abstract class ScrollInput(
 
 class ScrollValue {
     var field: Double? = null
+
+    private var mouseEventTime = 0L
+
     fun getValue(): Double =
         field ?: throw IllegalStateException("ScrollValue should be initialized before get.")
 
@@ -80,6 +78,13 @@ class ScrollValue {
     fun init(value: Double) {
         if (field != null) return
         field = value
+    }
+
+    fun isMouseEventValid(): Boolean {
+        val mouseEvent = Mouse.getEventNanoseconds()
+        val mouseEventsValid = mouseEvent - mouseEventTime > 20L
+        mouseEventTime = mouseEvent
+        return mouseEventsValid
     }
 
 }
