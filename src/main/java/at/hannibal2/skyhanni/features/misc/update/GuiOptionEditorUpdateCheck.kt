@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.update
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -145,12 +146,18 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
                         scrollList ?: run {
                             Renderable.scrollList(
                                 changelogList.map {
-                                    if (it.startsWith("§l§9Version")) {
-                                        Renderable.string(it, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
-                                    } else {
-                                        Renderable.wrappedString(it, width)
-                                    }
-                                },
+                                    listOf(
+                                        Renderable.string(
+                                            "§l§9Version " + it.first.toString(),
+                                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                                        )
+                                    ) + makeChangeLogToRenderable(it.second, width) + listOf(
+                                        Renderable.placeholder(
+                                            0,
+                                            15
+                                        )
+                                    )
+                                }.flatten(),
                                 height,
                                 velocity = 6.0,
                                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -167,12 +174,28 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         }
     }
 
-    private var changelogList: List<String> = emptyList()
+    private fun makeChangeLogToRenderable(
+        it: Map<String, List<String>>,
+        width: Int,
+    ) = it.mapNotNull { (key, value) ->
+        if (key == "§l§9Technical Details") {
+            return@mapNotNull null
+        }
+        value.map {
+            Renderable.wrappedString(
+                it,
+                width
+            )
+        }
+    }.flatten()
+
+    private var changelogList: List<Pair<VersionTag, Map<String, List<String>>>> = emptyList()
 
     private class VersionTag(
         val first: Int,
         val second: Int,
         val third: Int,
+        val fourth: Int,
         val isBeta: Boolean,
     ) {
 
@@ -180,6 +203,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             l.getOrNull(0) ?: -1,
             l.getOrNull(1) ?: -1,
             l.getOrNull(2) ?: -1,
+            l.getOrNull(3) ?: -1,
             beta
         )
 
@@ -190,7 +214,17 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             if (second != 0) return second
             val beta = -isBeta.compareTo(other.isBeta)
             if (beta != 0) return beta
-            return third.compareTo(other.third)
+            val third = third.compareTo(other.third)
+            if (third != 0) return third
+            return fourth.compareTo(other.fourth)
+        }
+
+        override fun toString(): String {
+            return if (isBeta) {
+                "$first" + if (second == -1) " Beta" else ".$second" + if (third == -1) " Beta" else " Beta $third" + if (fourth == -1) "" else ".$fourth"
+            } else {
+                "$first" + if (second == -1) "" else ".$second" + if (third == -1) "" else ".$third" + if (fourth == -1) "" else ".$fourth"
+            }
         }
     }
 
@@ -210,56 +244,67 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
     private fun getChangelog(currentVersion: String, targetVersion: String) {
         if (changelogList.isNotEmpty()) return
         SkyHanniMod.coroutineScope.launch {
-            val splitCurrent = currentVersion.toVersionTag()
-            val splitTarget = targetVersion.toVersionTag()
+            try {
+                val splitCurrent = currentVersion.toVersionTag()
+                val splitTarget = targetVersion.toVersionTag()
 
-            val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
-            val data = mutableListOf<ChangelogJson>()
-            var pageNumber = 1
-            while (data.isEmpty() || data.last().tagName.toVersionTag() > splitCurrent) {
-                val jsonObject =
-                    withContext(dispatcher) { APIUtil.getJSONResponseAsElement(url + pageNumber, apiName = "github") }
-                val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
-                data.addAll(page)
-                pageNumber++
-            }
-            val neededData = data.filter {
-                val sub = it.tagName.toVersionTag()
-                sub.shouldShow(splitCurrent, splitTarget)
-            }.dropLast(1)
-            val formatted = neededData.map {
-                it.body.replace(
-                    "(- [^-]*)\\(https://github[\\w/.?$&#]*\\)".toRegex(), "§b$1"
-                ) // Remove GitHub link + color contributors
-                    .replace("\r\n### Technical Details[^#]*".toRegex(), "\r\n") // Remove Technical Details
-                    .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
-                    .replace("(\n[ \t]+)[+\\-*]".toRegex(), "$1§7") // Formatting for sub points
-                    .replace("\n[+\\-*]".toRegex(), "\n§a") // Formatting for points
-                    .replace("\\[(.+)\\]\\(.+\\)".toRegex(), "$1") // Random Links
-                    .split("\r\n") // Split at newlines
-                    .let {// Change §a to §c if in removed
-                        val index = it.indexOf("§l§9Removed Features")
-                        if (index != -1) {
-                            it.subList(0, index) + it.subList(index, it.size).map {
-                                it.replace("§a", "§c")
-                            }
-                        } else {
-                            it
+                val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
+                val data = mutableListOf<ChangelogJson>()
+                var pageNumber = 1
+                while (data.isEmpty() || data.last().tagName.toVersionTag() > splitCurrent) {
+                    val jsonObject =
+                        withContext(dispatcher) {
+                            APIUtil.getJSONResponseAsElement(
+                                url + pageNumber,
+                                apiName = "github"
+                            )
                         }
-                    }
-                // TODO better data handeling
-                // TODO version header always on top
-                // TODO notice technical details
-                // TODO toggle for only major
-                // TODO toggle for technical details
-                // TODO always exactly one empty line between versions
-            }
-            changelogList = formatted.flatten().map { it.trimEnd() }
-            formatted.forEach {// TODO remove
-                it.forEach {
-                    //ChatUtils.chat(it, prefix = false, prefixColor = "")
-                    LorenzDebug.log(it)
+                    val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
+                    data.addAll(page)
+                    pageNumber++
                 }
+                val neededData = data.filter {
+                    val sub = it.tagName.toVersionTag()
+                    sub.shouldShow(splitCurrent, splitTarget)
+                }.dropLast(1)
+                val formatted = neededData.map {
+                    var headline = 0
+                    it.tagName.toVersionTag() to
+                        it.body.replace(
+                            "\\(https://github[\\w/.?$&#]*\\)".toRegex(), ""
+                        ) // Remove GitHub link
+                            .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b$1") // Color contributors
+                            //.replace("\r\n### Technical Details[^#]*".toRegex(), "\r\n") // Remove Technical Details
+                            .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
+                            .replace("(\n[ \t]+)[+\\-*]".toRegex(), "$1§7") // Formatting for sub points
+                            .replace("\n[+\\-*]".toRegex(), "\n§a") // Formatting for points
+                            .replace("\\[(.+)\\]\\(.+\\)".toRegex(), "$1") // Random Links
+                            .replace("§l§9Version[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
+                            .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
+                            .split("\r\n") // Split at newlines
+                            .map { it.trimEnd() } // Remove trailing empty stuff
+                            .groupBy {
+                                if (it.startsWith("§l§9")) {
+                                    headline++
+                                }
+                                headline
+                            }.mapKeys { it.value.firstOrNull() ?: "" }
+                            .toMutableMap()
+                            .also {// Change §a to §c if in removed
+                                val key = "§l§9Removed Features"
+                                val subgroup = it[key] ?: return@also
+                                it[key] = subgroup.map {
+                                    it.replace("§a", "§c")
+                                }
+                            }.toMap()
+                    // TODO caching formated for 30mins
+                    // TODO notice technical details
+                    // TODO toggle for only major
+                    // TODO toggle for technical details
+                }
+                changelogList = formatted
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
             }
         }
     }
