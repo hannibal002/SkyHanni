@@ -59,13 +59,12 @@ class ChocolateFactoryShortcut {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (showItem && event.slotId == 15) {
-            event.cancel()
-            if (lastClick.passedSince() > 2.seconds) {
-                HypixelCommands.chocolateFactory()
-                lastClick = SimpleTimeMark.now()
-            }
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!showItem || event.slotId != 15) return
+        event.cancel()
+        if (lastClick.passedSince() > 2.seconds) {
+            HypixelCommands.chocolateFactory()
+            lastClick = SimpleTimeMark.now()
         }
     }
 }

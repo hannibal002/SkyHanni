@@ -7,11 +7,13 @@ import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -22,6 +24,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.IOException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -38,6 +41,7 @@ class MiningEventTracker {
         "bossbar.active",
         "§e§lEVENT (?<event>.+) §e§lACTIVE IN (?<area>.+) §e§lfor §a§l(?<time>\\S+)§r"
     )
+
     // TODO add test messages
     private val eventStartedPattern by patternGroup.pattern(
         "started",
@@ -54,6 +58,12 @@ class MiningEventTracker {
     private var lastSentEvent: MiningEventType? = null
 
     private var canRequestAt = SimpleTimeMark.farPast()
+
+    companion object {
+        var apiErrorCount = 0
+
+        val apiError get() = apiErrorCount > 0
+    }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -136,13 +146,28 @@ class MiningEventTracker {
             LorenzUtils.getPlayerUuid()
         )
         val miningEventJson = ConfigManager.gson.toJson(miningEventData)
+
+        if (apiError) {
+            ChatUtils.debug("blocked sending mining event data: api error")
+            return
+        }
         SkyHanniMod.coroutineScope.launch {
             sendData(miningEventJson)
         }
     }
 
     private fun sendData(json: String) {
-        val response = APIUtil.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+        val response = try {
+            APIUtil.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+        } catch (e: IOException) {
+            if (LorenzUtils.debug) {
+                ErrorManager.logErrorWithData(
+                    e, "Sending mining event data was unsuccessful",
+                    "sentData" to json
+                )
+            }
+            return
+        }
         if (!response.success) return
 
         val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(response.data)
@@ -156,20 +181,39 @@ class MiningEventTracker {
         }
     }
 
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (apiError) {
+            canRequestAt = SimpleTimeMark.now()
+        }
+    }
+
     private fun fetchData() {
         canRequestAt = SimpleTimeMark.now() + defaultCooldown
         SkyHanniMod.coroutineScope.launch {
-            val data = APIUtil.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+            val data = try {
+                APIUtil.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+            } catch (e: Exception) {
+                apiErrorCount++
+                canRequestAt = SimpleTimeMark.now() + 20.minutes
+                if (LorenzUtils.debug) {
+                    ErrorManager.logErrorWithData(
+                        e, "Receiving mining event data was unsuccessful",
+                    )
+                }
+                return@launch
+            }
             val miningEventData = ConfigManager.gson.fromJson(data, MiningEventDataReceive::class.java)
 
             if (!miningEventData.success) {
                 ErrorManager.logErrorWithData(
-                    Exception("PostFailure"), "Sending mining event data was unsuccessful",
+                    Exception("PostFailure"), "Receiving mining event data was unsuccessful",
                     "cause" to miningEventData.cause,
                     "recievedData" to data
                 )
                 return@launch
             }
+            apiErrorCount = 0
 
             canRequestAt = SimpleTimeMark.now() + miningEventData.data.updateIn.milliseconds
 

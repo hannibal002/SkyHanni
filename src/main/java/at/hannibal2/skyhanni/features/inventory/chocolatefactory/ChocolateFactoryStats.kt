@@ -155,7 +155,9 @@ object ChocolateFactoryStats {
         TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
         CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
-        TIME_TO_BEST_UPGRADE("§eBest Upgrade: §b 59m 4s"),
+        TIME_TO_BEST_UPGRADE(
+            "§eBest Upgrade: §b 59m 4s",
+            { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L }),
         ;
 
         override fun toString(): String {

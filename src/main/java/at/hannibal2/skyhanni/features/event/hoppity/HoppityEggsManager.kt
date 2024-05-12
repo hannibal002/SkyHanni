@@ -16,9 +16,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -69,7 +70,7 @@ object HoppityEggsManager {
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
-            val note = group("note")
+            val note = group("note").removeColor()
             meal.markClaimed()
             lastMeal = meal
             lastNote = note
@@ -107,7 +108,7 @@ object HoppityEggsManager {
 
             if (config.timeInChat) {
                 val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt not active. Next Hoppity's Hunt event in §b${timeUntil.format()}§e.")
+                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
             return
@@ -134,7 +135,8 @@ object HoppityEggsManager {
             ChatUtils.clickableChat(
                 "Click here to share the location of this chocolate egg with the server!",
                 onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) },
-                expireAt = 30.seconds.fromNow()
+                expireAt = 30.seconds.fromNow(),
+                oneTimeClick = true
             )
         }
     }
