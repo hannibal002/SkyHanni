@@ -136,7 +136,7 @@ object EnigmaSoulWaypoints {
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(y = 1), "§5$soul Soul", 1.5)
+                event.drawDynamicText(it.add(y = 1), "§5${soul.replace("Soul ", "")} Soul", 1.5)
             }
         }
     }
