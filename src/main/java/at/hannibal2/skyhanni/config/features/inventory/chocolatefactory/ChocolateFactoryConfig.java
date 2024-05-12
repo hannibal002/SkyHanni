@@ -83,6 +83,14 @@ public class ChocolateFactoryConfig {
     public int barnCapacityThreshold = 6;
 
     @Expose
+    @ConfigOption(
+        name = "Rabbit Crush During Hoppity",
+        desc = "Only warn about rabbit crush when the Hoppity event is active."
+    )
+    @ConfigEditorBoolean
+    public boolean rabbitCrushOnlyDuringHoppity = false;
+
+    @Expose
     @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")
     @ConfigEditorBoolean
     @FeatureToggle

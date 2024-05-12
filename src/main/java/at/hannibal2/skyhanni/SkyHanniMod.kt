@@ -141,8 +141,8 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggDisplayManager
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc
@@ -430,6 +430,7 @@ import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerClearView
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerDaggerHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.BlazeSlayerFirePitsWarning
+import at.hannibal2.skyhanni.features.slayer.blaze.FirePillarDisplay
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerFeatures
 import at.hannibal2.skyhanni.features.slayer.enderman.EndermanSlayerHideParticles
@@ -486,7 +487,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.23",
+    version = "0.25.Beta.25",
 )
 class SkyHanniMod {
 
@@ -693,6 +694,7 @@ class SkyHanniMod {
         loadModule(HellionShieldHelper())
         loadModule(BlazeSlayerFirePitsWarning())
         loadModule(BlazeSlayerClearView())
+        loadModule(FirePillarDisplay())
         loadModule(EndermanSlayerHideParticles())
         loadModule(PlayerChatFilter())
         loadModule(HideArmor())

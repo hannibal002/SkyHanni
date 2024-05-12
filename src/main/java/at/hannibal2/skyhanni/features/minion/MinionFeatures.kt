@@ -23,12 +23,14 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -169,8 +171,10 @@ class MinionFeatures {
 
     @SubscribeEvent
     fun onMinionOpen(event: MinionOpenEvent) {
+        removeBuggedMinions()
         val minions = minions ?: return
         val entity = lastClickedEntity ?: return
+
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
@@ -192,6 +196,27 @@ class MinionFeatures {
         lastClickedEntity = null
         minionInventoryOpen = true
         lastMinionOpened = 0
+    }
+
+    private fun removeBuggedMinions() {
+        val minions = minions ?: return
+
+        val removedEntities = mutableListOf<LorenzVec>()
+        for (location in minions.keys) {
+            val entitiesNearby = EntityUtils.getEntities<EntityArmorStand>().map { it.distanceTo(location) }
+            if (!entitiesNearby.any { it == 0.0 }) {
+                removedEntities.add(location)
+            }
+        }
+
+        val size = removedEntities.size
+        if (size == 0) return
+        Companion.minions = minions.editCopy {
+            for (removedEntity in removedEntities) {
+                remove(removedEntity)
+            }
+            ChatUtils.chat("Removed $size wrong/bugged minion locations from your island.")
+        }
     }
 
     @SubscribeEvent
