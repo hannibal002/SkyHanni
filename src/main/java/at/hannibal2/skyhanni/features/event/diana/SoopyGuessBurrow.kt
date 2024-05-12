@@ -24,7 +24,7 @@ import kotlin.math.sin
 class SoopyGuessBurrow {
 
     private var dingIndex = 0
-    private var lastDing = 0L
+    private var hasDinged = false
     private var lastDingPitch = 0f
     private var firstPitch = 0f
     private var lastParticlePoint: LorenzVec? = null
@@ -43,7 +43,7 @@ class SoopyGuessBurrow {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        lastDing = 0L
+        hasDinged = false
         lastDingPitch = 0f
         firstPitch = 0f
         lastParticlePoint = null
@@ -63,11 +63,11 @@ class SoopyGuessBurrow {
         if (event.soundName != "note.harp") return
 
         val pitch = event.pitch
-        if (lastDing == 0L) {
+        if (!hasDinged) {
             firstPitch = pitch
         }
 
-        lastDing = System.currentTimeMillis()
+        hasDinged = true
 
         if (pitch < lastDingPitch) {
             firstPitch = pitch
