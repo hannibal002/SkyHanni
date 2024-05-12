@@ -434,6 +434,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 + Customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
 + Mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
++ Blaze Slayer fire pillar display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1766)
+    + Shows a large display with a timer when the Fire Pillar is about to explode.
+    + Also displays for other players' bosses.
 
 </details>
 <details open><summary>
