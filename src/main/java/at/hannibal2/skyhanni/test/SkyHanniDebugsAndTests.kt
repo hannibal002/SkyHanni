@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -92,6 +93,24 @@ class SkyHanniDebugsAndTests {
         }
 
         private var testLocation: LorenzVec? = null
+
+        val position = Position(20, 20)
+
+        val scrollValue = ScrollValue()
+
+        @SubscribeEvent
+        fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+            position.renderRenderables(
+                listOf(
+                    Renderable.verticalSlider(
+                        100,
+                        handler = {},
+                        scrollValue
+                    ).renderBounds(),
+                    Renderable.string("${scrollValue.getValue()}")
+                ), posLabel = "Test"
+            )
+        }
 
         @SubscribeEvent
         fun onRenderWorld(event: LorenzRenderWorldEvent) {
