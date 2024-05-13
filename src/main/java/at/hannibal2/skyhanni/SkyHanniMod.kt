@@ -924,7 +924,7 @@ class SkyHanniMod {
         loadModule(GardenInventoryTooltipOverflow())
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
-        loadModule(SuperCraftFeatures)
+        loadModule(SuperCraftFeatures())
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
