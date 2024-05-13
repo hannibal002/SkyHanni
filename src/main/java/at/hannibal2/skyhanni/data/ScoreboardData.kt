@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -66,8 +68,19 @@ class ScoreboardData {
         var objectiveTitle = ""
     }
 
+    var dirty = false
+
+    @SubscribeEvent(receiveCanceled = true)
+    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+        if (event.packet is S3BPacketScoreboardObjective) {
+            dirty = true
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onTick(event: LorenzTickEvent) {
+        if (!dirty) return
+        dirty = false
 
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }
