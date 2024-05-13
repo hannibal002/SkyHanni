@@ -189,7 +189,7 @@ object HoppityEggsManager {
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size
-        ChatUtils.chat("All $amount Hoppity Eggs are ready for finding!")
+        ChatUtils.chat("All $amount Hoppity Eggs are ready to be found.!")
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.playPlingSound()
     }
