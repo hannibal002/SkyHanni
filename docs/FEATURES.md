@@ -434,6 +434,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 + Customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
 + Mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
++ Blaze Slayer fire pillar display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1766)
+    + Shows a large display with a timer when the Fire Pillar is about to explode.
+    + Also displays for other players' bosses.
 
 </details>
 <details open><summary>
@@ -570,7 +573,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   is empty when fully filled and show a preview how these stats change when hovering over an upgrade
 + Hide crop money display, crop milestone display and garden visitor list while inside anita show, SkyMart or the
   composter inventory
-+ Hide chat messages from the visitors in the garden. (Except Beth and Spaceman)
++ Hide chat messages from the visitors in the garden. (Except Beth, Maeve and Spaceman)
 + Show the average crop milestone in the crop milestone inventory.
 + **FF for Contest** - Show the minimum needed Farming Fortune for reaching a medal in the Jacob's Farming Contest
   inventory.
@@ -802,6 +805,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Glacial Powder as stack size in the Fossil Excavator. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
 + Highlight own Golden/Diamond Goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
 + Click to get an Ascension Rope from sacks in the Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1542)
++ Tunnel Maps. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1546)
+    + Provides a way to navigate inside the new Glacite Tunnels.
++ Commissions Blocks Color. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1701)
+    + Highlights blocks required for commissions in a custom color.
+    + Greys out other blocks for clarity.
+    + Works in the Glacite Tunnels and Crystal Hollows.
++ Profit Per Corpse. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1734)
+    + Displays profit/loss in chat after looting a corpse in the Mineshaft.
+    + Includes a breakdown of information on hover.
 
 </details>
 <details open><summary>
@@ -1146,6 +1158,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to disable in garden.
 + Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
 +  Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
++ Option to Replace Roman Numerals. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1722)
 
 </details>
 <details open><summary>
