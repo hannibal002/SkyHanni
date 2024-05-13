@@ -10,13 +10,14 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
-import at.hannibal2.skyhanni.utils.ChatUtils.createHoverableChat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
@@ -94,7 +95,11 @@ object MineshaftPityDisplay {
 
             resetCounter()
 
-            if (config.modifyChatMessage) event.chatComponent = createHoverableChat(message, hover)
+            val newComponent = Text.text(message) {
+                this.hover = Text.multiline(hover)
+            }
+
+            if (config.modifyChatMessage) event.chatComponent = newComponent
         }
     }
 
