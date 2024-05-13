@@ -1159,6 +1159,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
 +  Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
 + Option to Replace Roman Numerals. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1722)
++ Simple Ferocity Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1765)
+    + Shows the Ferocity stat as a single GUI element.
+    + Requires the Tab List widget to be enabled and Ferocity to be selected to work.
 
 </details>
 <details open><summary>
