@@ -167,7 +167,7 @@ class PlayerNameFormatter {
             cleanAuthor = groupOrThrow("author").stripHypixelMessage()
         }
 
-        val name = formatAuthor(cleanAuthor.getText().trim(), levelColor).applyFormattingFrom(cleanAuthor)
+        val name = formatAuthor(cleanAuthor.getText(), levelColor).applyFormattingFrom(cleanAuthor)
         val levelFormat = formatLevel(levelColor, level)
         val guildRankFormat = guildRank?.intoComponent()
         val privateIslandRankFormat = privateIslandRank?.intoComponent()
