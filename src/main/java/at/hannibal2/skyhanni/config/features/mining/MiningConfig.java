@@ -56,6 +56,11 @@ public class MiningConfig {
     public CommissionsBlocksColorConfig commissionsBlocksColor = new CommissionsBlocksColorConfig();
 
     @Expose
+    @ConfigOption(name = "Mineshaft", desc = "")
+    @Accordion
+    public MineshaftConfig mineshaft = new MineshaftConfig();
+
+    @Expose
     @ConfigOption(name = "Mineshaft Pity Display", desc = "")
     @Accordion
     public MineshaftPityDisplay mineshaftPityDisplay = new MineshaftPityDisplay();

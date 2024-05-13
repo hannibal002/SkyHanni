@@ -115,6 +115,12 @@ public class ProfileSpecificStorage {
             @Expose
             public String lastLeaderboard = null;
         }
+
+        @Expose
+        public Long targetGoal = null;
+
+        @Expose
+        public String targetName = null;
     }
 
     @Expose

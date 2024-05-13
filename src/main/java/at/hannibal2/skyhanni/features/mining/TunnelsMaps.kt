@@ -112,9 +112,13 @@ class TunnelsMaps {
     private val commissionInvPattern by RepoPattern.pattern(
         "mining.commission.inventory", "Commissions"
     )
+    /**
+     * REGEX-TEST: §7- §b277 Glacite Powder
+     * REGEX-TEST: §7- §b1,010 Glacite Powder
+     */
     private val glacitePattern by RepoPattern.pattern(
         "mining.commisson.reward.glacite",
-        "§7- §b\\d+ Glacite Powder"
+        "§7- §b[\\d,]+ Glacite Powder"
     )
     private val collectorCommissionPattern by RepoPattern.pattern(
         "mining.commisson.collector",

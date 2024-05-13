@@ -90,11 +90,9 @@ object ChocolateFactoryDataLoader {
         "rabbit.unemployed",
         "Rabbit \\w+ - Unemployed"
     )
-
-    // todo get coach jackrabbit when prestige 4
     private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "other.upgrade",
-        "Rabbit Shrine"
+        "Rabbit Shrine|Coach Jackrabbit"
     )
 
     @SubscribeEvent
