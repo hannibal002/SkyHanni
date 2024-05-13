@@ -27,6 +27,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
@@ -362,4 +363,13 @@ object LorenzUtils {
         || inAdvancedMiningIsland()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+
+    fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
+        val cornerOne = LorenzVec(minX, y, minZ)
+        val cornerTwo = LorenzVec(minX, y, maxZ)
+        val cornerThree = LorenzVec(maxX, y, maxZ)
+        val cornerFour = LorenzVec(maxX, y, minZ)
+
+        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
+    }
 }

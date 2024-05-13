@@ -681,7 +681,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
         if (displayConfig.displayNumbersFirst) {
             "$amountString ${QuiverAPI.currentArrow?.arrow}s"
         } else {
-            "${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}: $amountString Arrows"
+            "Arrows: $amountString ${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}"
         } to HorizontalAlignment.LEFT
     )
 }

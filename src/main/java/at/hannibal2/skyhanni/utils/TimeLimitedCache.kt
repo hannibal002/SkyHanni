@@ -21,9 +21,9 @@ class TimeLimitedCache<K, V>(
 
     fun clear() = cache.invalidateAll()
 
-    fun values(): MutableCollection<V> = cache.asMap().values
+    fun values(): Collection<V> = cache.asMap().values
 
-    fun keys(): MutableSet<K> = cache.asMap().keys
+    fun keys(): Set<K> = cache.asMap().keys
 
     fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
 }

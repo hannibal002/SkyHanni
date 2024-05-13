@@ -13,8 +13,10 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.utils.ChatUtils.changeColor
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
@@ -140,7 +142,10 @@ class PlayerNameFormatter {
                     level = event.levelComponent
                 )
             )
-            appendSibling(event.action.intoComponent())
+
+            appendText(" ")
+            appendSibling(event.action.intoComponent().changeColor(LorenzColor.GRAY))
+
             appendText(" ")
             appendSibling(event.item.intoComponent())
         }) ?: return
@@ -170,7 +175,7 @@ class PlayerNameFormatter {
 
         val cleanName = cleanAuthor.getText().cleanPlayerName()
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
-            val faction = it.faction.icon?.toCleanChatComponent()
+            val faction = it.faction.icon?.trim()?.toCleanChatComponent()
             val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else null
             val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level).toCleanChatComponent() }
             listOf(faction, ironman, bingo)
