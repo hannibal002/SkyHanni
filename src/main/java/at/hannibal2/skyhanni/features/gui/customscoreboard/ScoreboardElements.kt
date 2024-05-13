@@ -42,40 +42,32 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import com.google.common.cache.RemovalListener
-import com.google.common.cache.RemovalNotification
 import java.util.function.Supplier
 import kotlin.time.Duration.Companion.milliseconds
 
 internal var confirmedUnknownLines = mutableListOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
-internal val removalListener = RemovalListener { notification: RemovalNotification<String, Unit> ->
-    val line = notification.key ?: return@RemovalListener
-    if (unconfirmedUnknownLines.contains(line)) {
-        unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
-        confirmedUnknownLines.add(line)
-        if (config.unknownLinesWarning) {
-            val message = "CustomScoreboard detected ${
-                pluralize(
-                    confirmedUnknownLines.size,
-                    "unknown line",
-                    withNumber = true
-                )
-            }"
-            ErrorManager.logErrorWithData(
-                CustomScoreboardUtils.UndetectedScoreboardLines(message),
-                message,
-                "Unknown Lines" to confirmedUnknownLines,
-                "Island" to HypixelData.skyBlockIsland,
-                "Area" to HypixelData.skyBlockArea,
-                "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
-                noStackTrace = true,
-                betaOnly = true,
-            )
-        }
-    }
+internal var unknownLinesSet = TimeLimitedSet<String>(500.milliseconds) { onRemoval(it) }
+
+private fun onRemoval(line: String) {
+    if (!unconfirmedUnknownLines.contains(line)) return
+    unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
+    confirmedUnknownLines.add(line)
+    if (!config.unknownLinesWarning) return
+    val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
+    val message = "CustomScoreboard detected $pluralize"
+    ErrorManager.logErrorWithData(
+        CustomScoreboardUtils.UndetectedScoreboardLines(message),
+        message,
+        "Unknown Lines" to confirmedUnknownLines,
+        "Island" to HypixelData.skyBlockIsland,
+        "Area" to HypixelData.skyBlockArea,
+        "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        noStackTrace = true,
+        betaOnly = true,
+    )
 }
-internal var unknownLinesSet = TimeLimitedSet<String>(500.milliseconds, removalListener)
+
 internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
