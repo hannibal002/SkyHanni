@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
+import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -25,6 +27,8 @@ object TrevorSolver {
     var mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
     var mobLocation = TrapperMobArea.NONE
     var averageHeight = (minHeight + maxHeight) / 2
+    var possibleNames = arrayOf("Trackable", "Untrackable", "Undetected", "Endangered", "Elusive")
+
 
     fun findMobHeight(height: Int, above: Boolean) {
         val playerPosition = LocationUtils.playerLocation().round(2)
@@ -52,13 +56,14 @@ object TrevorSolver {
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
+            val mob = MobData.entityToMob[entity]
+            val isTrevor = (mob != null && mob.name != name && isTrevorMob(mob))
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) }
-            if (animalHealths.any { it == entityHealth } && currentMob != null) {
+            if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
                 if (foundID == entity.entityId) {
                     val dist = entity.position.toLorenzVec().distanceToPlayer()
-                    if ((currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP) && mobLocation == TrapperMobArea.OASIS) return
-
+                    if ((currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP) && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
                     canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
@@ -78,7 +83,12 @@ object TrevorSolver {
             foundID = -1
         }
     }
-
+    private fun isTrevorMob(mob: Mob) : Boolean{
+        val name = mob.name
+        val firstWord = name.substringBefore(" ")
+        if(possibleNames.any{prefix: String -> prefix == firstWord}) return true
+        return false
+    }
     fun resetLocation() {
         maxHeight = 0.0
         minHeight = 0.0
