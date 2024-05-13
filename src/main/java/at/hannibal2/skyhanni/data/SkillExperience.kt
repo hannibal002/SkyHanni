@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,10 +23,6 @@ class SkillExperience {
         "inventory",
         ".* §e(?<number>.*)§6/.*"
     )
-    private val actionBarLowLevelPattern by patternGroup.pattern(
-        "actionbarlow",
-        ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*"
-    )
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -46,11 +41,6 @@ class SkillExperience {
             val baseExp = getExpForLevel(nextLevel - 1)
             val totalExp = baseExp + overflow
             skillExp[skill] = totalExp
-            SkillExpGainEvent(skill).postAndCatch()
-        }
-        actionBarLowLevelPattern.matchMatcher(event.actionBar) {
-            val skill = group("skill").lowercase()
-            SkillExpGainEvent(skill).postAndCatch()
         }
     }
 
@@ -186,4 +176,3 @@ class SkillExperience {
         )
     }
 }
-
