@@ -199,7 +199,7 @@ class MinionFeatures {
     }
 
     private fun removeBuggedMinions() {
-        if (IslandType.HUB.isInIsland()) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
         val removedEntities = mutableListOf<LorenzVec>()
