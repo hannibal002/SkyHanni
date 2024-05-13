@@ -111,7 +111,7 @@ object TabListData {
     var dirty = false
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (event.packet is S38PacketPlayerListItem) {
             dirty = true
         }
