@@ -56,7 +56,7 @@ object GriffinBurrowParticleFinder {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val packet = event.packet
