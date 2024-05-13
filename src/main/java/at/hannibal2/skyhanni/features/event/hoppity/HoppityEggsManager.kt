@@ -183,7 +183,7 @@ object HoppityEggsManager {
     }
 
     private fun warn() {
-        if (config.warnUnclaimedEggs) return
+        if (!config.warnUnclaimedEggs) return
         if (isBuzy()) return
         if (lastWarnTime.passedSince() < 30.seconds) return
 
