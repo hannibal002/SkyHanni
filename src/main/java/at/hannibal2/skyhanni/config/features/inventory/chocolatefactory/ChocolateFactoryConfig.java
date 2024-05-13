@@ -50,6 +50,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
         ChocolateFactoryStat.TIME_TOWER,
+        ChocolateFactoryStat.TIME_TOWER_FULL,
         ChocolateFactoryStat.LEADERBOARD_POS,
         ChocolateFactoryStat.TIME_TO_BEST_UPGRADE
     ));
@@ -81,6 +82,14 @@ public class ChocolateFactoryConfig {
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
+
+    @Expose
+    @ConfigOption(
+        name = "Rabbit Crush During Hoppity",
+        desc = "Only warn about rabbit crush when the Hoppity event is active."
+    )
+    @ConfigEditorBoolean
+    public boolean rabbitCrushOnlyDuringHoppity = false;
 
     @Expose
     @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")

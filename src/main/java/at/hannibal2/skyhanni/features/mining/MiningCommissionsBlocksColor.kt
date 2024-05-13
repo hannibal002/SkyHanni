@@ -131,10 +131,9 @@ object MiningCommissionsBlocksColor {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (LorenzUtils.lastWorldSwitch.passedSince() > 4.seconds) {
-            inGlaciteArea = MiningAPI.inGlaciteArea()
-            inDwarvenMines = IslandType.DWARVEN_MINES.isInIsland() && !(inGlaciteArea ||
-                HypixelData.skyBlockArea.equalsOneOf("Dwarven Base Camp", "Fossil Research Center")
-                )
+            inGlaciteArea = MiningAPI.inGlaciteArea() && !IslandType.MINESHAFT.isInIsland()
+            inDwarvenMines = IslandType.DWARVEN_MINES.isInIsland() &&
+                !(inGlaciteArea || HypixelData.skyBlockArea.equalsOneOf("Dwarven Base Camp", "Fossil Research Center"))
             inCrystalHollows = IslandType.CRYSTAL_HOLLOWS.isInIsland() && HypixelData.skyBlockArea != "Crystal Nucleus"
         }
 
