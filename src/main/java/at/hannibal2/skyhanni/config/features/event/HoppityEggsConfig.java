@@ -44,6 +44,12 @@ public class HoppityEggsConfig {
     public boolean showClaimedEggs = false;
 
     @Expose
+    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnUnclaimedEggs = false;
+
+    @Expose
     @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
     @ConfigEditorBoolean
     @FeatureToggle
