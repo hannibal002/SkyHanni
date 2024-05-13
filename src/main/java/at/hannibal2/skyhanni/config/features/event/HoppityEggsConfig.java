@@ -17,6 +17,21 @@ public class HoppityEggsConfig {
     public boolean waypoints = true;
 
     @Expose
+    @ConfigOption(
+        name = "Show Waypoints Immediately",
+        desc = "Show a raw estimate waypoint immediately after clicking. " +
+            "§cThis might cause issues with other particle sources."
+    )
+    @ConfigEditorBoolean
+    public boolean waypointsImmediately = false;
+
+    @Expose
+    @ConfigOption(name = "Show Line", desc = "Show a line to the waypoint.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLine = false;
+
+    @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +
         "Only works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
@@ -27,6 +42,12 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnUnclaimedEggs = false;
 
     @Expose
     @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
