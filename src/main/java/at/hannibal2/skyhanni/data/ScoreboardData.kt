@@ -71,7 +71,7 @@ class ScoreboardData {
     var dirty = false
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (event.packet is S3BPacketScoreboardObjective) {
             dirty = true
         }
