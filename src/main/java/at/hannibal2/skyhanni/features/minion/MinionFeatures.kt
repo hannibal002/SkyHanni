@@ -29,8 +29,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -339,7 +339,7 @@ class MinionFeatures {
         val minions = minions ?: return
         for (minion in minions) {
             val location = minion.key.add(y = 1.0)
-            if (!location.canBeSeen()) continue
+            if (location.distanceToPlayer() > 50) continue
 
             val lastEmptied = minion.value.lastClicked
             if (playerLocation.distance(location) >= config.emptiedTime.distance) continue
