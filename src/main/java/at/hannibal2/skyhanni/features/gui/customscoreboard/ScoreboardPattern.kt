@@ -390,7 +390,7 @@ object ScoreboardPattern {
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
-        "(§.)*Your Total Damage: §.\\d+( §e\\(#\\d+\\)?)?$"
+        "(§.)*Your Total Damage: §.\\d+.*$"
     )
     val winterCubeDmgPattern by eventsSb.pattern(
         "wintereventcubedmg",
