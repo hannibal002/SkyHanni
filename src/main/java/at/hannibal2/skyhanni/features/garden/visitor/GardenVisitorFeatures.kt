@@ -600,7 +600,7 @@ object GardenVisitorFeatures {
             return
         }
 
-        event.addData {
+        event.addIrrelevant {
             val visitors = VisitorAPI.getVisitors()
 
             add("visitors: ${visitors.size}")
