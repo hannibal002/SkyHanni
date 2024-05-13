@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isGemstone
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -76,7 +77,6 @@ object MiningCommissionsBlocksColor {
             if (block.highlight != newValue) {
                 if (newValue && block in ignoredTabListCommissions) continue
                 block.highlight = newValue
-                ChatUtils.debug("changed from tab list: ${block.commissionName} -> $newValue")
                 dirty = true
             }
         }
@@ -94,13 +94,12 @@ object MiningCommissionsBlocksColor {
             block.highlight = false
             dirty = true
             ignoredTabListCommissions.add(block)
-            ChatUtils.debug("finished from chat: $name")
         }
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        val newEnabled = (inDwarvenMines || inCrystalHollows || inGlacite) && config.enabled
+        val newEnabled = (inCrystalHollows || inGlacite) && config.enabled
         var reload = false
         if (newEnabled != enabled) {
             enabled = newEnabled

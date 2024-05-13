@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.EventCounter
 import at.hannibal2.skyhanni.data.FameRanks
 import at.hannibal2.skyhanni.data.FixedRateTimerManager
 import at.hannibal2.skyhanni.data.FriendAPI
@@ -564,6 +565,7 @@ class SkyHanniMod {
         loadModule(ContributorManager)
         loadModule(TabComplete)
         loadModule(HypixelBazaarFetcher)
+        loadModule(EventCounter)
 
         // APIs
         loadModule(BazaarApi())
@@ -925,7 +927,7 @@ class SkyHanniMod {
         loadModule(GardenInventoryTooltipOverflow())
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
-        loadModule(SuperCraftFeatures())
+        loadModule(SuperCraftFeatures)
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime())
         loadModule(RareDropMessages())
