@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
-import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -72,9 +71,9 @@ import at.hannibal2.skyhanni.test.command.CopyActionBarCommand
 import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -82,6 +81,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
@@ -463,6 +463,10 @@ object Commands {
             "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
         ) { TrackSoundsCommand.command(it) }
         registerCommand(
+            "shtrackparticles",
+            "Tracks the particles for the specified duration (in seconds) and copies it to the clipboard"
+        ) { TrackParticlesCommand.command(it) }
+        registerCommand(
             "shcopytablist",
             "Copies the tab list data to the clipboard"
         ) { TabListData.copyCommand(it) }
@@ -482,10 +486,6 @@ object Commands {
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
         ) { CopyItemCommand.command() }
-        registerCommand(
-            "shcopyparticles",
-            "Copied information about the particles that spawn in the next 50ms to the clipboard"
-        ) { CopyNearbyParticlesCommand.command(it) }
         registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.command(it) }
         registerCommand(
             "shtestmessage",
