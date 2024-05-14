@@ -107,7 +107,7 @@ object QuiverAPI {
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
             return
         }
 
@@ -120,7 +120,7 @@ object QuiverAPI {
                     "message" to message,
                 )
             arrowAmount[ranOutType.internalName] = 0
-            QuiverUpdateEvent(ranOutType, currentAmount, shouldHideAmount()).postAndCatch()
+            QuiverUpdateEvent(ranOutType, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
         }
 
         fillUpJaxPattern.matchMatcher(message) {
@@ -135,7 +135,7 @@ object QuiverAPI {
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             if (filledUpType == currentArrow) {
-                QuiverUpdateEvent(filledUpType, currentAmount, shouldHideAmount()).postAndCatch()
+                QuiverUpdateEvent(filledUpType, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
             }
             return
 
@@ -147,7 +147,7 @@ object QuiverAPI {
             FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
 
             if (currentArrow == FLINT_ARROW_TYPE) {
-                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+                QuiverUpdateEvent(currentArrow, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
             }
             return
         }
@@ -165,7 +165,7 @@ object QuiverAPI {
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             if (filledUpType == currentArrow) {
-                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+                QuiverUpdateEvent(currentArrow, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
             }
             return
         }
@@ -174,7 +174,7 @@ object QuiverAPI {
             currentAmount = 0
             arrowAmount.clear()
 
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
             return
         }
 
@@ -182,7 +182,7 @@ object QuiverAPI {
             currentArrow = NONE_ARROW_TYPE
             currentAmount = 0
 
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
             return
         }
     }
@@ -224,7 +224,7 @@ object QuiverAPI {
                     if (currentArrowType != currentArrow || amount != currentAmount) {
                         currentArrow = currentArrowType
                         currentAmount = amount
-                        QuiverUpdateEvent(currentArrowType, amount, shouldHideAmount()).postAndCatch()
+                        QuiverUpdateEvent(currentArrowType, amount, wearingSkeletonMasterChestplate()).postAndCatch()
                     }
                 }
             }
@@ -253,7 +253,7 @@ object QuiverAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
-    private fun shouldHideAmount() = wearingSkeletonMasterChestplate
+    fun wearingSkeletonMasterChestplate() = wearingSkeletonMasterChestplate
 
     private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {
@@ -266,7 +266,7 @@ object QuiverAPI {
         wearingSkeletonMasterChestplate =
             InventoryUtils.getChestplate()?.getInternalName() == SKELETON_MASTER_CHESTPLATE
         if (wasWearing != wearingSkeletonMasterChestplate) {
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            QuiverUpdateEvent(currentArrow, currentAmount, wearingSkeletonMasterChestplate()).postAndCatch()
         }
     }
 
