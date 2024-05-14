@@ -212,7 +212,7 @@ object InquisitorWaypointShare {
             return
         }
         inquisitor = -1
-        HypixelCommands.partyChat("pc Inquisitor dead!")
+        HypixelCommands.partyChat("Inquisitor dead!")
     }
 
     fun sendInquisitor() {
