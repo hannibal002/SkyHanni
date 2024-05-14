@@ -137,7 +137,7 @@ object TrevorTracker {
     private fun shouldDisplay(): Boolean {
         if (!config.dataTracker) return false
         if (!TrevorFeatures.onFarmingIsland()) return false
-        if (TrevorFeatures.inTrapperDen()) return true
+        if (TrevorFeatures.inTrapperDen) return true
         return when (config.displayType) {
             true -> (TrevorFeatures.inBetweenQuests || TrevorFeatures.questActive)
             else -> TrevorFeatures.questActive

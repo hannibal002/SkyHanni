@@ -19,8 +19,8 @@ public class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Waypoints Immediately",
-        desc = "Show a raw estimate waypoint immedialtey after clicking. " +
-            "§cThis might cause issues with other paricle sources."
+        desc = "Show a raw estimate waypoint immediately after clicking. " +
+            "§cThis might cause issues with other particle sources."
     )
     @ConfigEditorBoolean
     public boolean waypointsImmediately = false;
@@ -42,6 +42,12 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnUnclaimedEggs = false;
 
     @Expose
     @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")

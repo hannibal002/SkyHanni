@@ -34,7 +34,7 @@ object ChocolateFactoryCustomReminder {
             ChocolateFactoryAPI.profileStorage?.targetName = value
         }
 
-    fun isActive() = targetGoal != null
+    fun isActive() = targetGoal != null && configReminder.enabled
 
     private var display = emptyList<Renderable>()
 
