@@ -15,16 +15,18 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EntityMovementData {
+object EntityMovementData {
 
-    companion object {
+    private val warpingPattern by RepoPattern.pattern(
+        "data.entity.warping",
+        "§7(?:Warping|Warping you to your SkyBlock island|Warping using transfer token|Finding player|Sending a visit request)\\.\\.\\."
+    )
 
-        private val entityLocation = mutableMapOf<Entity, LorenzVec>()
+    private val entityLocation = mutableMapOf<Entity, LorenzVec>()
 
-        fun addToTrack(entity: Entity) {
-            if (entity !in entityLocation) {
-                entityLocation[entity] = entity.getLorenzVec()
-            }
+    fun addToTrack(entity: Entity) {
+        if (entity !in entityLocation) {
+            entityLocation[entity] = entity.getLorenzVec()
         }
     }
 
@@ -45,15 +47,6 @@ class EntityMovementData {
             }
         }
     }
-
-    private val warpingPattern by RepoPattern.pattern(
-        "warping",
-        "§7Warping...|" +
-            "§7Warping you to your SkyBlock island...|" +
-            "§7Warping using transfer token...|" +
-            "§7Finding player...|" +
-            "§7Sending a visit request..."
-    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
