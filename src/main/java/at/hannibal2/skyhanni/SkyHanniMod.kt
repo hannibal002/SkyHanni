@@ -712,7 +712,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowParticleFinder)
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
-        loadModule(HighlightBonzoMasks())
+        loadModule(HighlightBonzoMasks)
         loadModule(BazaarCancelledBuyOrderClipboard())
         loadModule(CompactSplashPotionMessage())
         loadModule(CroesusChestTracker())
