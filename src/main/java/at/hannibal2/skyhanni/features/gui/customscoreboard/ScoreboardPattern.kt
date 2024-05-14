@@ -297,10 +297,6 @@ object ScoreboardPattern {
         "essence",
         "^\\s*.*Essence: §.(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$"
     )
-    val brokenRedstonePattern by miscSb.pattern(
-        "brokenredstone",
-        "\\s*(?:(?:§.)*⚡ (§.)*Redston|e: (?:§.)*\\d+%)\\s*"
-    )
     val redstonePattern by miscSb.pattern(
         "redstone",
         "\\s*(§.)*⚡ §cRedstone: (§.)*\\d{1,3}%$"
@@ -390,7 +386,7 @@ object ScoreboardPattern {
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
-        "(§.)*Your Total Damage: §.\\d+( §e\\(#\\d+\\)?)?$"
+        "(§.)*Your Total Damage: §.\\d+.*$"
     )
     val winterCubeDmgPattern by eventsSb.pattern(
         "wintereventcubedmg",

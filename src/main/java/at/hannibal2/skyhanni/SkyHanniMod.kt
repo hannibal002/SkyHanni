@@ -487,7 +487,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.25",
+    version = "0.25.Beta.26",
 )
 class SkyHanniMod {
 
@@ -511,7 +511,7 @@ class SkyHanniMod {
         loadModule(EntityData())
         loadModule(MobData())
         loadModule(MobDetection())
-        loadModule(EntityMovementData())
+        loadModule(EntityMovementData)
         loadModule(TestExportTools)
         loadModule(ItemClickData())
 //        loadModule(Year300RaffleEvent)
@@ -525,7 +525,7 @@ class SkyHanniMod {
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropMilestonesCommunityFix)
-        loadModule(GardenCropUpgrades())
+        loadModule(GardenCropUpgrades)
         loadModule(VisitorListener())
         loadModule(VisitorRewardWarning())
         loadModule(OwnInventoryData())
@@ -738,7 +738,7 @@ class SkyHanniMod {
         loadModule(MinionCraftHelper())
         loadModule(TpsCounter())
         loadModule(ParticleHider())
-        loadModule(MiscFeatures())
+        loadModule(MiscFeatures)
         loadModule(ReplaceRomanNumerals())
         loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
