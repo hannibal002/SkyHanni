@@ -81,6 +81,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
