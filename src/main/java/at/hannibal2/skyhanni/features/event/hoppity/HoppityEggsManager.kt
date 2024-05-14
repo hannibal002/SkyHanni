@@ -191,7 +191,7 @@ object HoppityEggsManager {
         val amount = HoppityEggType.entries.size
         ChatUtils.chat("All $amount Hoppity Eggs are ready to be found.!")
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
-        SoundUtils.playPlingSound()
+        SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
     private fun isBuzy() = ReminderUtils.isBusy(config.showDuringContest)
