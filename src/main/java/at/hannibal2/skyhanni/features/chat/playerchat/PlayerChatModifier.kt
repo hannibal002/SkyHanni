@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
@@ -22,28 +23,7 @@ class PlayerChatModifier {
 
     @SubscribeEvent
     fun onChat(event: SystemMessageEvent) {
-        val original = event.chatComponent.formattedText
-        val new = cutMessage(original)
-        if (new == original) return
-
-        val clickEvents = mutableListOf<ClickEvent>()
-        val hoverEvents = mutableListOf<HoverEvent>()
-        findClickableTexts(event.chatComponent, clickEvents)
-        findHoverTexts(event.chatComponent, hoverEvents)
-        val clickSize = clickEvents.size
-        val hoverSize = hoverEvents.size
-
-        // do not change the message if more than one hover or click is found
-        if (clickSize > 1 || hoverSize > 1) return
-
-        val text = ChatComponentText(new)
-        if (clickSize == 1) {
-            text.chatStyle.chatClickEvent = clickEvents.first()
-        }
-        if (hoverSize == 1) {
-            text.chatStyle.chatHoverEvent = hoverEvents.first()
-        }
-        event.chatComponent = text
+        event.applyIfPossible { cutMessage(it) }
     }
 
     private fun findClickableTexts(chatComponent: IChatComponent, clickEvents: MutableList<ClickEvent>) {

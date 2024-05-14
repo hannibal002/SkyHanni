@@ -97,6 +97,16 @@ object ChocolateFactoryTimeTowerManager {
         return endTime > currentTime
     }
 
+    fun timeTowerFullTimemark(): SimpleTimeMark {
+        val profileStorage = profileStorage ?: return SimpleTimeMark.farPast()
+        if (timeTowerFull()) return SimpleTimeMark.farPast()
+        val nextChargeDuration = SimpleTimeMark(profileStorage.nextTimeTower)
+        val remainingChargesAfter = profileStorage.maxTimeTowerUses - (profileStorage.currentTimeTowerUses + 1)
+        val endTime = nextChargeDuration + (profileStorage.timeTowerCooldown).hours * remainingChargesAfter
+
+        return endTime
+    }
+
     fun timeTowerActiveDuration(): Duration {
         if (!timeTowerActive()) return Duration.ZERO
         val currentTime = profileStorage?.lastDataSave ?: 0

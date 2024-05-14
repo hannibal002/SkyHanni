@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Taken from Skytils
 @Mixin(BlockRendererDispatcher.class)
 public abstract class MixinBlockRendererDispatcher implements IResourceManagerReloadListener {
     @Inject(method = "getModelFromBlockState", at = @At("RETURN"), cancellable = true)

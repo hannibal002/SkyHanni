@@ -64,12 +64,13 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
                 it.currentChocolate += amount
                 it.chocolateThisPrestige += amount
                 it.chocolateAllTime += amount
-                updateBestUpgrade(amount)
+                updateBestUpgrade()
             }
         }
 
-        private fun updateBestUpgrade(price: Long) {
+        private fun updateBestUpgrade() {
             profileStorage?.let {
+                if (it.bestUpgradeAvailableAt == 0L || it.bestUpgradeCost == 0L) return
                 val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
                 it.bestUpgradeAvailableAt = canAffordAt.toMillis()
             }
