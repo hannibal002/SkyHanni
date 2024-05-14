@@ -31,7 +31,7 @@ class AuctionHouseOpenPriceWebsite {
      */
     private val ahSearchPattern by patternGroup.pattern(
         "title.search",
-        "Auctions: \"(?<searchTerm>.*)\""
+        "Auctions: \"(?<searchTerm>.*)\"?"
     )
 
     private var searchTerm = ""
@@ -41,7 +41,7 @@ class AuctionHouseOpenPriceWebsite {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         ahSearchPattern.matchMatcher(event.inventoryName) {
-            searchTerm = group("searchTerm")
+            searchTerm = group("searchTerm").removeSuffix("\"")
             displayItem = createDisplayItem()
         }
     }
