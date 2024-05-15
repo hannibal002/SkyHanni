@@ -23,6 +23,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
@@ -58,6 +59,8 @@ object EnchantParser {
     private var orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
 
     private val loreCache: Cache = Cache()
+
+    val isSbaLoaded by lazy { Loader.isModLoaded("skyblockaddons") }
 
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()

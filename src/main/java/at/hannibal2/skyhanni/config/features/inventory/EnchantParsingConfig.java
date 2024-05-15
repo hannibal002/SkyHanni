@@ -39,7 +39,7 @@ public class EnchantParsingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level. §eIf  SkyHanni chroma " +
+    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level. §eIf SkyHanni chroma " +
         "is disabled this will default to §6Gold.")
     @ConfigEditorDropdown
     public Property<LorenzColor> perfectEnchantColor = Property.of(LorenzColor.CHROMA);

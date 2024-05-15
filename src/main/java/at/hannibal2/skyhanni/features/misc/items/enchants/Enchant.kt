@@ -37,7 +37,7 @@ open class Enchant : Comparable<Enchant> {
         }
 
         // TODO when chroma is disabled maybe use the neu chroma style instead of gold
-        if (colour == LorenzColor.CHROMA && !ChromaManager.config.enabled.get()) return "§6"
+        if (colour == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6"
         return colour.getChatColor()
     }
 
