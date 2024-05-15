@@ -73,7 +73,7 @@ object UtilsPatterns {
         "string.chatusername",
         "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?"
     )
-    val isSelectOption by patternGroup.pattern(
+    val isSelectOptionPattern by patternGroup.pattern(
         "string.isselectoption",
         "(§eSelect an option: .*)|(§e\\[NPC] .+)"
     )
