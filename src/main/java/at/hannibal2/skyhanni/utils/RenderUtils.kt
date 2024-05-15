@@ -216,7 +216,7 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.enableCull()
         GlStateManager.enableTexture2D()
-        GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, 1, 1, 0)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         val time = Minecraft.getMinecraft().theWorld.totalWorldTime + partialTicks.toDouble()
@@ -433,7 +433,7 @@ object RenderUtils {
         GlStateManager.scale(finalScale, finalScale, finalScale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableTexture2D()
         minecraft.fontRendererObj.drawString(
             finalText,
@@ -675,7 +675,7 @@ object RenderUtils {
         GlStateManager.enableBlend()
         GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
 
@@ -733,7 +733,7 @@ object RenderUtils {
         GlStateManager.enableBlend()
         GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
         color.bindColor()
@@ -785,7 +785,7 @@ object RenderUtils {
         GlStateManager.enableBlend()
         GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
         color.bindColor()
@@ -986,7 +986,7 @@ object RenderUtils {
         }
         GlStateManager.pushMatrix()
         GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
 
         val minecraft = Minecraft.getMinecraft()
         val fontRenderer = minecraft.fontRendererObj
@@ -1049,7 +1049,7 @@ object RenderUtils {
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.disableTexture2D()
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
@@ -1533,7 +1533,7 @@ object RenderUtils {
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GL11.glLineWidth(lineWidth.toFloat())
         if (!depth) {
             GL11.glDisable(GL11.GL_DEPTH_TEST)
@@ -1776,7 +1776,7 @@ object RenderUtils {
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.shadeModel(7425)
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
