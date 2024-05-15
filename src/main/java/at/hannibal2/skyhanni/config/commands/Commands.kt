@@ -256,7 +256,7 @@ object Commands {
             "Resets the Pest Profit Tracker"
         ) { PestProfitTracker.resetCommand() }
         registerCommand(
-            "shresetmythologicalcreatureracker",
+            "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker"
         ) { MythologicalCreatureTracker.resetCommand() }
         registerCommand(
