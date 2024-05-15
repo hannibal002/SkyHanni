@@ -74,6 +74,19 @@ object HoppityEggsManager {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
+        hoppityEventNotOn.matchMatcher(event.message) {
+            val currentYear = SkyBlockTime.now().year
+
+            if (config.timeInChat) {
+                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
+                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+                event.blockedReason = "hoppity_egg"
+            }
+            return
+        }
+
+        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
@@ -109,17 +122,6 @@ object HoppityEggsManager {
             getEggType(event).markSpawned()
             return
         }
-
-        hoppityEventNotOn.matchMatcher(event.message) {
-            val currentYear = SkyBlockTime.now().year
-
-            if (config.timeInChat) {
-                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
-                event.blockedReason = "hoppity_egg"
-            }
-            return
-        }
     }
 
     internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
@@ -150,7 +152,7 @@ object HoppityEggsManager {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isAvtive()) return
         if (!config.showClaimedEggs) return
         if (isBuzy()) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
@@ -166,6 +168,7 @@ object HoppityEggsManager {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isAvtive()) return
         HoppityEggType.checkClaimed()
         checkWarn()
     }
@@ -205,5 +208,7 @@ object HoppityEggsManager {
         )
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
+
+    fun isAvtive() = LorenzUtils.inSkyBlock && ChocolateFactoryAPI.isHoppityEvent()
 
 }
