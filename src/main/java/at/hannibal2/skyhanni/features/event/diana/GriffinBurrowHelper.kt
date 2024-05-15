@@ -47,11 +47,26 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
+    private val allowedBlocksAboveGround =
+        listOf(
+            Blocks.air,
+            Blocks.leaves,
+            Blocks.leaves2,
+            Blocks.tallgrass,
+            Blocks.double_plant,
+            Blocks.red_flower,
+            Blocks.yellow_flower,
+            Blocks.spruce_fence
+        )
+
     var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
     var lastTitleSentTime = SimpleTimeMark.farPast()
     private var shouldFocusOnInquis = false
+
+    private var testList = listOf<LorenzVec>()
+    private var testGriffinSpots = false
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
@@ -81,9 +96,6 @@ object GriffinBurrowHelper {
 
         loadTestGriffinSpots()
     }
-
-    private var testList = listOf<LorenzVec>()
-    private var testGriffinSpots = false
 
     fun testGriffinSpots() {
         testGriffinSpots = !testGriffinSpots
@@ -211,19 +223,6 @@ object GriffinBurrowHelper {
     }
 
     private fun findGround(point: LorenzVec): LorenzVec? {
-        // TODO move outside function
-        val allowedBlocksAboveGround =
-            listOf(
-                Blocks.air,
-                Blocks.leaves,
-                Blocks.leaves2,
-                Blocks.tallgrass,
-                Blocks.double_plant,
-                Blocks.red_flower,
-                Blocks.yellow_flower,
-                Blocks.spruce_fence
-            )
-
         fun isValidGround(y: Double): Boolean {
             val isGround = point.copy(y = y).getBlockAt() == Blocks.grass
             val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
@@ -231,7 +230,6 @@ object GriffinBurrowHelper {
         }
 
         var gY = 140.0
-
         while (!isValidGround(gY)) {
             gY--
             if (gY < 65) {
@@ -252,6 +250,7 @@ object GriffinBurrowHelper {
                 return point.copy(y = LocationUtils.playerLocation().y)
             }
         }
+
         if (gY == start) {
             return point.copy(y = LocationUtils.playerLocation().y)
         }
