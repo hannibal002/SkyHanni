@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -79,6 +80,7 @@ object EnchantParser {
             config.commaFormat,
             config.hideVanillaEnchants,
             config.hideEnchantDescriptions,
+            ChromaManager.config.enabled,
         ) {
             markCacheDirty()
         }

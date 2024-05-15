@@ -64,7 +64,7 @@ object FontRendererHook {
     @JvmStatic
     fun beginChromaRendering(text: String, shadow: Boolean) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!ChromaManager.config.enabled) return
+        if (!ChromaManager.config.enabled.get()) return
         if (ChromaManager.config.allChroma && ChromaManager.config.ignoreChat && cameFromChat) {
             endChromaFont()
             return
@@ -102,7 +102,7 @@ object FontRendererHook {
     fun forceWhiteColorCode(formatIndex: Int): Int {
         if (!LorenzUtils.inSkyBlock) return formatIndex
 
-        if (!ChromaManager.config.enabled) return formatIndex
+        if (!ChromaManager.config.enabled.get()) return formatIndex
 
         val drawState = currentDrawState ?: return formatIndex
         if (drawState.getChromaState() && formatIndex <= WHITE_FORMAT_INDEX) { // If it's a color code
@@ -115,7 +115,7 @@ object FontRendererHook {
     @JvmStatic
     fun restoreChromaState() {
         if (!LorenzUtils.inSkyBlock) return
-        if (!ChromaManager.config.enabled) return
+        if (!ChromaManager.config.enabled.get()) return
 
         currentDrawState?.restoreChromaEnv()
     }
@@ -123,7 +123,7 @@ object FontRendererHook {
     @JvmStatic
     fun endChromaRendering() {
         if (!LorenzUtils.inSkyBlock) return
-        if (!ChromaManager.config.enabled) return
+        if (!ChromaManager.config.enabled.get()) return
 
         if (previewChroma) {
             previewChroma = false
@@ -137,13 +137,13 @@ object FontRendererHook {
 
     @JvmStatic
     fun insertZColorCode(constant: String): String {
-        return if (LorenzUtils.inSkyBlock && !ChromaManager.config.enabled) constant else "0123456789abcdefklmnorz"
+        return if (LorenzUtils.inSkyBlock && !ChromaManager.config.enabled.get()) constant else "0123456789abcdefklmnorz"
     }
 
     @JvmStatic
     fun toggleChromaAndResetStyle(formatIndex: Int): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
-        if (!ChromaManager.config.enabled) return false
+        if (!ChromaManager.config.enabled.get()) return false
         if (formatIndex == CHROMA_FORMAT_INDEX) {
             toggleChromaOn()
             return true
