@@ -159,7 +159,7 @@ object GraphEditor {
     }
 
     private fun chatAtDisable() =
-        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate", "shgraph")
+        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate", ::commandIn)
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
