@@ -425,6 +425,10 @@ object Commands {
             "shtestsackapi",
             "Get the amount of an item in sacks according to internal feature SackAPI"
         ) { SackAPI.testSackAPI(it) }
+        registerCommand(
+            "shtestgriffinspots",
+            "Show potential griffin spots around you."
+        ) { GriffinBurrowHelper.testGriffinSpots() }
     }
 
     private fun developersCodingHelp() {
