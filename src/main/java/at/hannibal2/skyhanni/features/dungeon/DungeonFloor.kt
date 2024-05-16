@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 enum class DungeonFloor(private val bossName: String) {
-    ENTRANCE("The Watcher"),
+    E("The Watcher"),
     F1("Bonzo"),
     F2("Scarf"),
     F3("The Professor"),

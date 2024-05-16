@@ -28,24 +28,22 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
-class RiftBloodEffigies {
+object RiftBloodEffigies {
 
     private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
 
     private var locations: List<LorenzVec> = emptyList()
     private var effigiesTimes = cleanMap()
 
-    companion object {
-        private val group = RepoPattern.group("rift.area.stillgore.effegies")
-        val effigiesTimerPattern by group.pattern(
-            "respawn",
-            "§eRespawn §c(?<time>.*) §7\\(or click!\\)"
-        )
-        val heartsPattern by group.pattern(
-            "heart",
-            "Effigies: (?<hearts>((§[7c])?⧯)*)"
-        )
-    }
+    private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")
+    private val effigiesTimerPattern by patternGroup.pattern(
+        "respawn",
+        "§eRespawn §c(?<time>.*) §7\\(or click!\\)"
+    )
+    val heartsPattern by patternGroup.pattern(
+        "heart",
+        "Effigies: (?<hearts>((§[7c])?⧯)*)"
+    )
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -146,9 +144,10 @@ class RiftBloodEffigies {
                     continue
                 }
 
-                if (config.respawningSoon && duration.passedSince() < config.respwningSoonTime.minutes) {
+                val timeUntil = duration.timeUntil()
+                if (config.respawningSoon && timeUntil <= config.respwningSoonTime.minutes) {
                     event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
-                    val time = duration.timeUntil()
+                    val time = timeUntil.format()
                     event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
                     continue
                 }

@@ -90,7 +90,7 @@ object PartyCommands {
 
         if (command == "p" || command == "party") {
             val friends = if (config.tabComplete.friends) {
-                FriendAPI.getAllFriends().filter { it.bestFriend || config.tabComplete.onlyBestFriends }.map { it.name }
+                FriendAPI.getAllFriends().filter { it.bestFriend || !config.tabComplete.onlyBestFriends }.map { it.name }
             } else {
                 emptyList<String>()
             }

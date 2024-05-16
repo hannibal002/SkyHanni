@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MiningEventConfig {
@@ -14,7 +15,7 @@ public class MiningEventConfig {
         "also enables you sending data. §eTakes up to a minute to sync new events.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Show Outside Mining Islands", desc = "Shows the event tracker when you are not inside of the Dwarven Mines or Crystal Hollows.")
@@ -58,5 +59,6 @@ public class MiningEventConfig {
     }
 
     @Expose
-    public Position position = new Position(15, 70, false, true);
+    @ConfigLink(owner = MiningEventConfig.class, field = "enabled")
+    public Position position = new Position(200, 60, false, true);
 }

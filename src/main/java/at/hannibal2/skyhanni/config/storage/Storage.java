@@ -48,4 +48,6 @@ public class Storage {
     @Expose
     public String currentFameRank = "New player";
 
+    @Expose
+    public List<String> blacklistedUsers = new ArrayList<>();
 }

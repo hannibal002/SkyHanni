@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -29,10 +31,11 @@ object PestProfitTracker {
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)"
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)"
     )
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -130,8 +133,15 @@ object PestProfitTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetpestprofittracker")
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.GARDEN) {
+            tracker.firstUpdate()
+        }
+    }
+
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled

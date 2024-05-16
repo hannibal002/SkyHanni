@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CrimsonIsleConfig {
@@ -21,6 +22,11 @@ public class CrimsonIsleConfig {
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
     @Expose
+    @ConfigOption(name = "Matriach Helper", desc = "Helper for Heavy Pearls")
+    @Accordion
+    public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
+
+    @Expose
     @ConfigOption(name = "Pablo NPC Helper", desc = "Shows a clickable message that grabs the flower needed from your sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -32,6 +38,7 @@ public class CrimsonIsleConfig {
     public boolean volcanoExplosivity = false;
 
     @Expose
+    @ConfigLink(owner = CrimsonIsleConfig.class, field = "volcanoExplosivity")
     public Position positionVolcano = new Position(20, 20, false, true);
 
     @Expose
@@ -43,5 +50,7 @@ public class CrimsonIsleConfig {
     public boolean showDojoRankDisplay = false;
 
     @Expose
+    @ConfigLink(owner = CrimsonIsleConfig.class, field = "showDojoRankDisplay")
     public Position dojoRankDisplayPosition = new Position(-378, 206, false, true);
+
 }

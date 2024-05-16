@@ -21,14 +21,20 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropMilestoneFix {
     private val patternGroup = RepoPattern.group("garden.cropmilestone.fix")
+
+    /**
+     * REGEX-TEST:  Cocoa Beans 31: §r§a68%
+     * REGEX-TEST:  Potato 32: §r§a97.7%
+     */
     private val tabListPattern by patternGroup.pattern(
         "tablist",
-        " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%"
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%"
     )
     private val levelUpPattern by patternGroup.pattern(
         "levelup",
         " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)"
     )
+
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      */

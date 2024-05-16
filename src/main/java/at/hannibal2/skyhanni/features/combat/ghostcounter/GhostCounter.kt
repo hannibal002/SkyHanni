@@ -24,8 +24,8 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGho
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CombatUtils._isKilling
 import at.hannibal2.skyhanni.utils.CombatUtils.calculateETA
@@ -318,10 +318,13 @@ object GhostCounter {
         if (notifyCTModule && ProfileStorageData.profileSpecific?.ghostCounter?.ctDataImported != true) {
             notifyCTModule = false
             if (isUsingCTGhostCounter()) {
-                clickableChat(
+                ChatUtils.clickableChat(
                     "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
-                    "shimportghostcounterdata",
+                    onClick = {
+                        GhostUtil.importCTGhostCounterData()
+                    },
                     prefixColor = "§6",
+                    oneTimeClick = true
                 )
             }
         }

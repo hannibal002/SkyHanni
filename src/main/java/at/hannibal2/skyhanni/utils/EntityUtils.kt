@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -123,7 +124,7 @@ object EntityUtils {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
-        if (!boss && !LorenzUtils.inDungeons) {
+        if (!boss && !DungeonAPI.inDungeon()) {
             // Corrupted
             if (maxHealth == health * 3 * derpyMultiplier) return true
             // Runic
@@ -181,14 +182,6 @@ object EntityUtils {
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 
     @SubscribeEvent
-    fun onEntityRender(event: RenderLivingEvent<*>) {
-        val shEvent = SkyHanniRenderEntityEvent(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
-            event.cancel()
-        }
-    }
-
-    @SubscribeEvent
     fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
         val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
@@ -198,10 +191,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
-        val shEvent = SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
-            event.cancel()
-        }
+        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z)
     }
 
     @SubscribeEvent
@@ -214,10 +204,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
-        val shEvent = SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
-            event.cancel()
-        }
+        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z)
     }
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()

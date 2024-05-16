@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -41,7 +41,7 @@ object InquisitorWaypointShare {
      */
     private val partyOnlyCoordsPattern by patternGroup.pattern(
         "party.onlycoords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+),? y: (?<y>[^ ]+),? z: (?<z>[^ ]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
 
     //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
@@ -84,15 +84,14 @@ object InquisitorWaypointShare {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         if (event.repeatSeconds(3)) {
             inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
         }
-        if (event.repeatSeconds(1)) {
-            waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
-        }
+
+        waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
     }
 
     @SubscribeEvent
@@ -171,9 +170,13 @@ object InquisitorWaypointShare {
             sendInquisitor()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message =
-                "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
-            ChatUtils.clickableChat(message, "shshareinquis")
+            val message = "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+            ChatUtils.clickableChat(
+                message, onClick = {
+                    sendInquisitor()
+                },
+                oneTimeClick = true
+            )
         }
     }
 

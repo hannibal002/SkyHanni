@@ -208,7 +208,7 @@ class DungeonChatFilter {
             message.isFiltered(MessageTypes.START) -> return "start"
         }
 
-        if (!LorenzUtils.inDungeons) return ""
+        if (!DungeonAPI.inDungeon()) return ""
 
         return when {
             message.isFiltered(MessageTypes.AMBIENCE) -> "ambience"

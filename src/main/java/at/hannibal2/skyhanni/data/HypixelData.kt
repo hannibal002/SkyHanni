@@ -111,8 +111,8 @@ class HypixelData {
         var profileName = ""
         var joinedWorld = SimpleTimeMark.farPast()
 
-        var skyBlockArea = "?"
-        var skyBlockAreaWithSymbol = "?"
+        var skyBlockArea: String? = null
+        var skyBlockAreaWithSymbol: String? = null
 
         // Data from locraw
         var locrawData: JsonObject? = null
@@ -182,7 +182,12 @@ class HypixelData {
             ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
                 return group("maxamount").toInt()
             }
-            return if (serverId?.startsWith("mega") == true) 80 else 26
+
+            return when (skyBlockIsland) {
+                IslandType.MINESHAFT -> 4
+                IslandType.CRYSTAL_HOLLOWS -> 24
+                else -> if (serverId?.startsWith("mega") == true) 80 else 26
+            }
         }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
@@ -227,6 +232,8 @@ class HypixelData {
         locraw.forEach { locraw[it.key] = "" }
         joinedWorld = SimpleTimeMark.now()
         serverId = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent
@@ -237,6 +244,8 @@ class HypixelData {
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
         locrawData = null
+        skyBlockArea = null
+        skyBlockAreaWithSymbol = null
     }
 
     @SubscribeEvent

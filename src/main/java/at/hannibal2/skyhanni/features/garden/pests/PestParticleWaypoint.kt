@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -27,6 +28,7 @@ import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
+// TODO delete workaround class PestParticleLine when this class works again
 class PestParticleWaypoint {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
@@ -37,7 +39,7 @@ class PestParticleWaypoint {
     private var secondParticlePoint: LorenzVec? = null
     private var lastParticlePoint: LorenzVec? = null
     private var guessPoint: LorenzVec? = null
-    private val locations = mutableListOf<LorenzVec>()
+    private var locations = listOf<LorenzVec>()
     private var particles = 0
     private var lastParticles = 0
     private var isPointingToPest = false
@@ -61,7 +63,7 @@ class PestParticleWaypoint {
 
     private fun reset() {
         lastPestTrackerUse = SimpleTimeMark.farPast()
-        locations.clear()
+        locations = emptyList()
         guessPoint = null
         lastParticlePoint = null
         firstParticlePoint = null
@@ -100,13 +102,17 @@ class PestParticleWaypoint {
         } else if (secondParticlePoint == null) {
             secondParticlePoint = location
             lastParticlePoint = location
-            locations.add(location)
+            locations = locations.editCopy {
+                add(location)
+            }
         } else {
             val firstDistance = secondParticlePoint?.let { firstParticlePoint?.distance(it) } ?: return
             val distance = lastParticlePoint?.distance(location) ?: return
             if ((distance - firstDistance).absoluteValue > 0.1) return
             lastParticlePoint = location
-            locations.add(location)
+            locations = locations.editCopy {
+                add(location)
+            }
         }
         ++particles
     }
@@ -130,7 +136,7 @@ class PestParticleWaypoint {
 
         val waypoint = getWaypoint() ?: return
 
-        val text = if (isPointingToPest) "§aPest Guess" else "§cInfected Plot Guess"
+        val text = if (isPointingToPest) "§aPest Guess" else "§cInfested Plot Guess"
         val color = color ?: error("color is null")
 
         event.drawWaypointFilled(waypoint, color, beacon = true)
@@ -168,7 +174,7 @@ class PestParticleWaypoint {
 
     private fun calculateWaypoint(): LorenzVec? {
         val firstParticle = firstParticlePoint ?: return null
-        val list = locations.toMutableSet()
+        val list = locations.toList()
         var pos = LorenzVec(0.0, 0.0, 0.0)
         for ((i, particle) in list.withIndex()) {
             pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -31,6 +33,13 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     override fun toString(): String {
         if (millis == 0L) return "The Far Past"
         return Instant.ofEpochMilli(millis).toString()
+    }
+
+    fun formattedDate(pattern: String): String {
+        val instant = Instant.ofEpochMilli(millis)
+        val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        val formatter = DateTimeFormatter.ofPattern(pattern)
+        return localDateTime.format(formatter)
     }
 
     fun toMillis() = millis

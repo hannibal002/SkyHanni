@@ -1,14 +1,39 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.enchantment.Enchantment
+import net.minecraft.item.ItemStack
 import java.util.Collections
+import java.util.Queue
 import java.util.WeakHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 
 object CollectionUtils {
 
-    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+    inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
+        while (true)
+            action(this.poll() ?: break)
+        return this
+    }
+
+    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
+        for (i in 1..amount)
+            this.poll() ?: break
+        return this
+    }
+
+    inline fun <reified E, reified K, reified L : MutableCollection<K>>
+        Queue<E>.drainTo(list: L, action: (E) -> K): L {
+        while (true)
+            list.add(action(this.poll() ?: break))
+        return list
+    }
+
+    inline fun <reified E, reified L : MutableCollection<E>>
+        Queue<E>.drainTo(list: L): L {
         while (true)
             list.add(this.poll() ?: break)
+        return list
     }
 
     // Let garbage collector handle the removal of entries in this list
@@ -24,7 +49,7 @@ object CollectionUtils {
 
     // Taken and modified from Skytils
     @JvmStatic
-    fun <T> T.equalsOneOf(vararg other: T): Boolean {
+    fun <T> T?.equalsOneOf(vararg other: T): Boolean {
         for (obj in other) {
             if (this == obj) return true
         }
@@ -124,6 +149,9 @@ object CollectionUtils {
         return this
     }
 
+    operator fun IntRange.contains(range: IntRange): Boolean =
+        range.first in this && range.last in this
+
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }
@@ -138,13 +166,6 @@ object CollectionUtils {
 
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
         return toList().sorted().reversed().toMap()
-    }
-
-    inline fun <reified T> ConcurrentLinkedQueue<T>.drainForEach(action: (T) -> Unit) {
-        while (true) {
-            val value = this.poll() ?: break
-            action(value)
-        }
     }
 
     fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
@@ -171,4 +192,121 @@ object CollectionUtils {
     @Suppress("UNCHECKED_CAST")
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
         takeIf { null !in this } as? List<T>
+
+    // TODO add cache
+    fun MutableList<Renderable>.addString(
+        text: String,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+    }
+
+    // TODO add internal name support, and caching
+    fun MutableList<Renderable>.addItemStack(
+        itemStack: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize,
+    ) {
+        if (highlight) {
+            // Hack to add enchant glint, like Hypixel does it
+            itemStack.addEnchantment(Enchantment.protection, 0)
+        }
+        add(Renderable.itemStack(itemStack, scale = scale))
+    }
+
+    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+        addItemStack(internalName.getItemStack())
+    }
+
+    inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) {
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
+    }
+
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) = buildList {
+        addString(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                addString("§a[$display]")
+            } else {
+                addString("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                addString("§e]")
+            }
+            addString(" ")
+        }
+    }
+
+    inline fun MutableList<Renderable>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                ChatUtils.lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(Renderable.horizontalContainer(buildList {
+            addString(prefix)
+            addString("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            addString("§a]")
+        }))
+    }
+
+    inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
+        val destination = LinkedHashMap<R, V>()
+        for (element in this) {
+            val newKey = transform(element)
+            if (newKey != null) {
+                destination[newKey] = element.value
+            }
+        }
+        return destination
+    }
+
+    inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {
+        val iterator = iterator()
+        if (!iterator.hasNext()) return emptyList()
+        var one = iterator.next()
+        if (!iterator.hasNext()) return emptyList()
+        var two = iterator.next()
+        val result = mutableListOf<R>()
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            result.add(transform(one, two, next))
+            one = two
+            two = next
+        }
+        return result
+    }
+
+    fun <T> Iterable<T>.zipWithNext3(): List<Triple<T, T, T>> {
+        return zipWithNext3 { a, b, c -> Triple(a, b, c) }
+    }
+
+    fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
+        return filterKeys { it != null } as Map<K, V>
+    }
 }

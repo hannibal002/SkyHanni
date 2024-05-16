@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class OptimalSpeedConfig {
@@ -27,6 +28,7 @@ public class OptimalSpeedConfig {
     public boolean signEnabled = true;
 
     @Expose
+    @ConfigLink(owner = OptimalSpeedConfig.class, field = "signEnabled")
     public Position signPosition = new Position(20, -195, false, true);
 
     @Expose
@@ -35,5 +37,6 @@ public class OptimalSpeedConfig {
     public CustomSpeedConfig customSpeed = new CustomSpeedConfig();
 
     @Expose
+    @ConfigLink(owner = OptimalSpeedConfig.class, field = "showOnHUD")
     public Position pos = new Position(5, -200, false, true);
 }

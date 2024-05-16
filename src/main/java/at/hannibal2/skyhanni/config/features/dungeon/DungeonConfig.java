@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class DungeonConfig {
@@ -22,6 +23,7 @@ public class DungeonConfig {
     public boolean showMilestonesDisplay = false;
 
     @Expose
+    @ConfigLink(owner = DungeonConfig.class, field = "showMilestonesDisplay")
     public Position showMileStonesDisplayPos = new Position(10, 10, false, true);
 
     @Expose
@@ -31,6 +33,7 @@ public class DungeonConfig {
     public boolean deathCounterDisplay = false;
 
     @Expose
+    @ConfigLink(owner = DungeonConfig.class, field = "deathCounterDisplay")
     public Position deathCounterPos = new Position(10, 10, false, true);
 
     @Expose
@@ -55,6 +58,14 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightTeammates = true;
+
+    @Expose
+    @ConfigOption(name = "Architect Notifier",
+        desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed. " +
+            "§cOnly works when having enough §5Architect First Drafts §cin the sack.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean architectNotifier = true;
 
     @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
@@ -117,4 +128,9 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shadowAssassinJumpNotifier = false;
+
+    @Expose
+    @ConfigOption(name = "Dungeon Races Guide", desc = "")
+    @Accordion
+    public DungeonsRaceGuideConfig dungeonsRaceGuide = new DungeonsRaceGuideConfig();
 }
