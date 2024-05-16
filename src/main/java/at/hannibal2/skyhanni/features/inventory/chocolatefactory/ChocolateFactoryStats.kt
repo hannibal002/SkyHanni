@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -95,8 +96,14 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
             put(
                 ChocolateFactoryStat.TIME_TOWER_FULL,
-                "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
-                    "§bHappens at: ${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                if (timeTowerFull == SimpleTimeMark(0)) {
+                    "§eFull Tower Charges: §aNow" +
+                        "§bHappens at: §aNow"
+                } else {
+                    "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
+                        "§bHappens at: ${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                }
+
             )
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
