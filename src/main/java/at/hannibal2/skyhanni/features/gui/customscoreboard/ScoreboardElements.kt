@@ -639,7 +639,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
         ).getChatColor()
     } else {
         ""
-    }) + if (QuiverAPI.wearingSkeletonMasterChestplate()) {
+    }) + if (QuiverAPI.wearingSkeletonMasterChestplate) {
         "∞"
     } else {
         when (arrowConfig.arrowAmountDisplay) {
