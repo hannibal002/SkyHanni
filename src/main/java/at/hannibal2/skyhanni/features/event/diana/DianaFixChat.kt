@@ -70,7 +70,7 @@ class DianaFixChat {
                 if (lastToggleMusicPrompt.passedSince() > 30.seconds) {
                     lastToggleMusicPrompt = SimpleTimeMark.now()
                     ChatUtils.clickableChat(
-                        "§cError detecting Diana Guess! Changing the Particle Quality has not worked:( " +
+                        "§cError detecting Diana Guess! Changing the Particle Quality has not worked :( " +
                                 "§eClick here to disable hypixel music!",
                         onClick = {
                             hasSetToggleMusic = true
