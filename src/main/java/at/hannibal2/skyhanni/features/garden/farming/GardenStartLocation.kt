@@ -73,7 +73,7 @@ object GardenStartLocation {
 
         if (showStartWaypoint()) {
             GardenAPI.storage?.cropStartLocations?.get(crop)
-                ?.add(-0.5, 0.5, -0.5)
+                ?.roundLocationToBlock()
                 ?.also {
                     event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
                     event.drawDynamicText(it, "§b${crop.cropName}", 1.5)
@@ -90,10 +90,10 @@ object GardenStartLocation {
                     shouldShowLastFarmedWaypoint = true
                 }
                 if (shouldShowLastFarmedWaypoint) {
-                    event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true, beacon = true)
-                    event.drawDynamicText(location, "§b${crop.cropName}", 1.5, yOff = 4f)
+                    event.drawWaypointFilled(location, LorenzColor.LIGHT_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
+                    event.drawDynamicText(location, "§b${crop.cropName}", 1.5)
                     if (shouldShowBoth()) {
-                        event.drawDynamicText(location, "§eLast Farmed", 1.1, yOff = 17f)
+                        event.drawDynamicText(location, "§eLast Farmed", 1.1, yOff = 12f)
                     }
                 }
             }
