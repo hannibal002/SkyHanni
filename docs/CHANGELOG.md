@@ -170,6 +170,12 @@
     + Highlights the Heavy Pearls.
     + Draws a line to the Heavy Pearls.
 
+#### Slayer Featues
+
++ Added Blaze Slayer fire pillar display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1766)
+    + Shows a large display with a timer when the Fire Pillar is about to explode.
+    + Also displays for other players' bosses.
+
 #### Misc Features
 
 + Added No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
@@ -185,6 +191,9 @@
 + Added /shignore. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1469)
     + This lets you block users from running party commands.
 + Option to Replace Roman Numerals. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1722)
++ Added a simple Ferocity Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1765)
+    + Shows the Ferocity stat as a single GUI element.
+    + Requires the Tab List widget to be enabled and Ferocity to be selected to work.
 
 ### Improvements
 
@@ -226,6 +235,10 @@
     + The secondary visitor timer now accurately checks your BPS (Blocks Per Second) instead of assuming a value of 20.
 + Do Not Hide Maeve's Garden Chat Dialogue. - Luna (https://github.com/hannibal002/SkyHanni/pull/1742)
     + Maeve's Garden visitor dialogue is no longer hidden, preventing confusion about potential bugs.
++ Displays the middle of the plot while the pest line is showing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1647)
+    + This makes it clearer when the guess points to the middle of the plot rather than to a pest.
++ Improved pest count accuracy in plot detection. - Empa (https://github.com/hannibal002/SkyHanni/pull/1764)
++ Added options to show crops per second and crops per hour in the Crop Milestone Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1536)
 
 #### Diana Improvements
 
@@ -277,6 +290,7 @@
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1648)
 + Changed Chocolate Factory shortcut icon. - seraid (https://github.com/hannibal002/SkyHanni/pull/1640)
 + Added incoming tab list event to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1666)
++ Changed the default design of the quiver line in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1752)
 
 #### Commands Improvements
 
@@ -318,6 +332,7 @@
     + Click an item that can be upgraded/purchased with chocolate to set it as a reminder goal.
     + Works with Rabbits, Barn, Time Tower, etc.
     + Option to display this timer universally, even outside the inventory.
++ Added a display for the time remaining until Tower Charges are full. - Empa (https://github.com/hannibal002/SkyHanni/pull/1760)
 
 #### Slayer Improvements
 
@@ -348,6 +363,8 @@
 
 + Renamed Deep Caverns parkour to Deep Caverns Guide. - seraid (https://github.com/hannibal002/SkyHanni/pull/1443)
 + Make Fossil Excavator a category rather than accordion. - walker (https://github.com/hannibal002/SkyHanni/pull/1441)
++ Disabled colored blocks in the Mineshaft. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1749)
++ Disabled mining commissions block color in Dwarven Mines. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1790)
 
 #### Event Improvements
 
@@ -387,6 +404,8 @@
 + Expanded options for Hoppity Waypoint rendering. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1739)
 + Improved wording for Chocolate Factory spam filter and upgrade notification config options. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1729)
++ Added an option to only receive Rabbit Crush warnings during the Hoppity event. - Empa (https://github.com/hannibal002/SkyHanni/pull/1762)
++ Warn when all three Hoppity eggs are ready to be found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1747)
 
 #### Rift Improvements
 
@@ -400,11 +419,11 @@
 + Added a way to disable marking low-level parties in dungeon finder by setting it to 0. -
   seraid (https://github.com/hannibal002/SkyHanni/pull/1626)
 
-#### Misc Improvements
-
 #### Fishing Improvements
 
 + Fixed a typo in the fishing profit tracker. - raven (https://github.com/hannibal002/SkyHanni/pull/1678)
+
+#### Misc Improvements
 
 + Improved mod performance. - CalMWolfs, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1342)
 + Added option to toggle No Bits Warning sound. - Empa (https://github.com/hannibal002/SkyHanni/pull/1425)
@@ -418,6 +437,9 @@
 + Added descriptions for missing config categories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1600)
 + Architect Draft messages can now be copied and pasted. - raven (https://github.com/hannibal002/SkyHanni/pull/1732)
 + Updated setting description for clarity. - seraid (https://github.com/hannibal002/SkyHanni/pull/1736)
++ The GUI position editor can now edit all GUIs that were visible within the last 20 seconds, including those inside inventories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1768)
++ Improved the performance of scoreboard and tab list reading. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1779)
++ Improved performance of minion nametag feature and removed unnecessary checks between blocks. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1780)
 
 ### Fixes
 
@@ -501,6 +523,9 @@
 + Fixed a rare crash related to complex chat events. - !nea (https://github.com/hannibal002/SkyHanni/pull/1707)
 + Fixed stash getting detected as private message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1716)
 + Fixed spaces in chat formatting. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1704)
++ Fixed player chat spacing issue with the crimson faction icon. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1770)
++ Fixed extra space in chat formatting. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1785)
++ Fixed incorrect chat format when using the Hypixel command /show. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1781)
 
 #### GUI Fixes
 
@@ -553,6 +578,8 @@
 + Fixed text transparency issues with Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1730)
 + Fixed more double objectives in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1731)
 + Fixed missing Hay Eaten line in Custom Scoreboard in Rift. - Empa (https://github.com/hannibal002/SkyHanni/pull/1721)
++ Fixed Custom Scoreboard showing the Spooky Festival Time twice. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1757)
++ Fixed unknown scoreboard lines chat error message when Hypixel sends incomplete line data. - Empa (https://github.com/hannibal002/SkyHanni/pull/1761)
 
 #### Dungeon Fixes
 
@@ -597,6 +624,8 @@
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1726)
 + Fixed the Chocolate Factory upgrade warning incorrectly displaying when no upgrade was possible. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1741)
++ Fixed a case where the chocolate factory upgrade warning did not work. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1758)
++ Fixed Chocolate Factory time remaining calculations while the Time Tower is active. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1774)
 
 #### Rift Fixes
 
@@ -605,6 +634,7 @@
 + Fixed Blood Effigies timers in the Rift. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1649)
     + Fixed timers showing even when above the set respawn time.
     + Fixed display flickering due to milliseconds.
++ Fixed duplicate word "soul" in an Enigma Waypoint. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1776)
 
 #### Mining Fixes
 
@@ -690,6 +720,8 @@
 + Fixed Custom Scoreboard occasionally displaying an outdated mayor after an election switch. -
   j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1698)
 + Fixed Active Effects in Compact Tab List always showing 0. - Luna (https://github.com/hannibal002/SkyHanni/pull/1706)
++ Fixed bugged minion name tags on your private island when opening a minion. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1630)
++ Fixed supercrafted items being incorrectly added to profit trackers. - Empa (https://github.com/hannibal002/SkyHanni/pull/1784)
 
 ### Technical Details
 
@@ -869,6 +901,8 @@
 + Added EntityRenderLayersEvent for enabling and disabling an entities layers. -
   ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1696)
     + Useful for hiding extra layers of a player such as armor, capes, Items and so on.
++ Removed code duplication in AxisAlignedBB.getCorners. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1756)
++ Added a RemovalListener to TimeLimitedCache and TimeLimitedSet. - Empa (https://github.com/hannibal002/SkyHanni/pull/1761)
 
 ### Removed Features
 

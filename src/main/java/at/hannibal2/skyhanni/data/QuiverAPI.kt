@@ -52,7 +52,8 @@ object QuiverAPI {
 
     private var arrows: List<ArrowType> = listOf()
 
-    private var wearingSkeletonMasterChestplate = false
+    var wearingSkeletonMasterChestplate = false
+        private set
     private var hasBow = false
 
     const val MAX_ARROW_AMOUNT = 2880
@@ -107,7 +108,7 @@ object QuiverAPI {
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            postUpdateEvent()
             return
         }
 
@@ -120,7 +121,7 @@ object QuiverAPI {
                     "message" to message,
                 )
             arrowAmount[ranOutType.internalName] = 0
-            QuiverUpdateEvent(ranOutType, currentAmount, shouldHideAmount()).postAndCatch()
+            postUpdateEvent(ranOutType)
         }
 
         fillUpJaxPattern.matchMatcher(message) {
@@ -135,7 +136,7 @@ object QuiverAPI {
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             if (filledUpType == currentArrow) {
-                QuiverUpdateEvent(filledUpType, currentAmount, shouldHideAmount()).postAndCatch()
+                postUpdateEvent()
             }
             return
 
@@ -147,7 +148,7 @@ object QuiverAPI {
             FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
 
             if (currentArrow == FLINT_ARROW_TYPE) {
-                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+                postUpdateEvent()
             }
             return
         }
@@ -165,7 +166,7 @@ object QuiverAPI {
 
             arrowAmount.addOrPut(filledUpType.internalName, amount)
             if (filledUpType == currentArrow) {
-                QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+                postUpdateEvent()
             }
             return
         }
@@ -174,7 +175,7 @@ object QuiverAPI {
             currentAmount = 0
             arrowAmount.clear()
 
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            postUpdateEvent()
             return
         }
 
@@ -182,7 +183,7 @@ object QuiverAPI {
             currentArrow = NONE_ARROW_TYPE
             currentAmount = 0
 
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            postUpdateEvent()
             return
         }
     }
@@ -224,7 +225,7 @@ object QuiverAPI {
                     if (currentArrowType != currentArrow || amount != currentAmount) {
                         currentArrow = currentArrowType
                         currentAmount = amount
-                        QuiverUpdateEvent(currentArrowType, amount, shouldHideAmount()).postAndCatch()
+                        postUpdateEvent()
                     }
                 }
             }
@@ -253,8 +254,6 @@ object QuiverAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
-    private fun shouldHideAmount() = wearingSkeletonMasterChestplate
-
     private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {
             it.item is ItemBow && !fakeBowsPattern.matches(it.getInternalName().asString())
@@ -266,8 +265,12 @@ object QuiverAPI {
         wearingSkeletonMasterChestplate =
             InventoryUtils.getChestplate()?.getInternalName() == SKELETON_MASTER_CHESTPLATE
         if (wasWearing != wearingSkeletonMasterChestplate) {
-            QuiverUpdateEvent(currentArrow, currentAmount, shouldHideAmount()).postAndCatch()
+            postUpdateEvent()
         }
+    }
+
+    private fun postUpdateEvent(arrowType: ArrowType? = currentArrow) {
+        QuiverUpdateEvent(arrowType, currentAmount, wearingSkeletonMasterChestplate).postAndCatch()
     }
 
     @SubscribeEvent
