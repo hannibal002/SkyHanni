@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.million
@@ -55,11 +57,14 @@ object ChocolateShopPrice {
         val inventoryItems = inventoryItems
         for ((slot, item) in inventoryItems) {
             val lore = item.getLore()
+            val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != 0.0 }
+
             val chocolate = ChocolateFactoryAPI.getChocolateBuyCost(lore) ?: continue
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
+            val profit = itemPrice - (otherItemsPrice ?: 0.0)
 
-            val factor = (itemPrice / chocolate) * multiplier
+            val factor = (profit / chocolate) * multiplier
             val perFormat = NumberUtil.format(factor)
 
             val itemName = item.itemName
@@ -68,11 +73,13 @@ object ChocolateShopPrice {
 
                 add("")
                 add("§7Item price: §6${NumberUtil.format(itemPrice)} ")
-                add("§7Chocolate amount: §c${NumberUtil.format(chocolate)} ")
-
+                otherItemsPrice?.let {
+                    add("§7Additional cost: §6${NumberUtil.format(it)} ")
+                }
+                add("§7Profit per purchase: §6${NumberUtil.format(profit)} ")
                 add("")
+                add("§7Chocolate amount: §c${NumberUtil.format(chocolate)} ")
                 add("§7Profit per million chocolate: §6${perFormat} ")
-
                 add("")
                 val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(chocolate)
                 add("§7Time until affordable: §6$formattedTimeUntilGoal ")
