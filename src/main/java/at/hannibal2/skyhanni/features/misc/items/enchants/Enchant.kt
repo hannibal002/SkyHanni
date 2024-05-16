@@ -30,15 +30,15 @@ open class Enchant : Comparable<Enchant> {
 
         // TODO change color to string (support for bold)
         val colour = when {
-            level >= maxLevel -> config.perfectEnchantColor.get()
-            level > goodLevel -> config.greatEnchantColor.get()
-            level == goodLevel -> config.goodEnchantColor.get()
-            else -> config.poorEnchantColor.get()
+            level >= maxLevel -> config.perfectEnchantColor
+            level > goodLevel -> config.greatEnchantColor
+            level == goodLevel -> config.goodEnchantColor
+            else -> config.poorEnchantColor
         }
 
         // TODO when chroma is disabled maybe use the neu chroma style instead of gold
-        if (colour == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
-        return colour.getChatColor()
+        if (colour.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
+        return colour.get().getChatColor()
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"
