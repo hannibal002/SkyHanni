@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboPlaytime
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -29,7 +31,10 @@ object CopyPlaytime {
             event.isCanceled = true
             val text = LimboPlaytime.tooltipPlaytime.dropLast(2).toMutableList()
 
-            text.add(0, "${LorenzUtils.getPlayerName()}'s Playtime Stats")
+            text.add(
+                0,
+                "${LorenzUtils.getPlayerName()}'s - ${HypixelData.profileName.firstLetterUppercase()} Playtime Stats"
+            )
 
             ClipboardUtils.copyToClipboard(text.joinToString("\n") { it.removeColor() })
         }
