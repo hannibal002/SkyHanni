@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class StackTrackerConfig {
+public class StackDisplayConfig {
     @Expose
     @ConfigOption(name = "Enable", desc = "Show the number of stacks you have.")
     @ConfigEditorBoolean
@@ -15,6 +15,6 @@ public class StackTrackerConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigLink(owner = StackTrackerConfig.class, field = "enabled")
-    public Position stackTrackerPos = new Position(480, 235);
+    @ConfigLink(owner = StackDisplayConfig.class, field = "enabled")
+    public Position stackDisplayPos = new Position(480, 235);
 }

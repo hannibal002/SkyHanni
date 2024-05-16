@@ -25,9 +25,9 @@ public class CombatConfig {
     public QuiverConfig quiverConfig = new QuiverConfig();
 
     @Expose
-    @ConfigOption(name = "Stack Tracker", desc = "")
+    @ConfigOption(name = "Armor Stack Display", desc = "")
     @Accordion
-    public StackTrackerConfig stackTrackerConfig = new StackTrackerConfig();
+    public StackDisplayConfig stackDisplayConfig = new StackDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")

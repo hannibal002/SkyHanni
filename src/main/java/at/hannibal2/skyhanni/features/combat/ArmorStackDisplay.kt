@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class StackTracker {
-    private val config get() = SkyHanniMod.feature.combat.stackTrackerConfig
+class ArmorStackDisplay {
+    private val config get() = SkyHanniMod.feature.combat.stackDisplayConfig
     private var display = ""
 
     /**
@@ -34,7 +34,7 @@ class StackTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.stackTrackerPos.renderString(display, posLabel = "Stack Tracker Display")
+        config.stackDisplayPos.renderString(display, posLabel = "Stack Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
