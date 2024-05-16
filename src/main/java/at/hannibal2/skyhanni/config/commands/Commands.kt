@@ -256,7 +256,7 @@ object Commands {
             "Resets the Pest Profit Tracker"
         ) { PestProfitTracker.resetCommand() }
         registerCommand(
-            "shresetmythologicalcreatureracker",
+            "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker"
         ) { MythologicalCreatureTracker.resetCommand() }
         registerCommand(
@@ -425,6 +425,10 @@ object Commands {
             "shtestsackapi",
             "Get the amount of an item in sacks according to internal feature SackAPI"
         ) { SackAPI.testSackAPI(it) }
+        registerCommand(
+            "shtestgriffinspots",
+            "Show potential griffin spots around you."
+        ) { GriffinBurrowHelper.testGriffinSpots() }
     }
 
     private fun developersCodingHelp() {
