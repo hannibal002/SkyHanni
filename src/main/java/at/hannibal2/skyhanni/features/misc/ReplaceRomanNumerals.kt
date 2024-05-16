@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import at.hannibal2.skyhanni.utils.StringUtils.isSelectOption
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
@@ -55,6 +56,12 @@ class ReplaceRomanNumerals {
         if (!isEnabled() || event.message.isSelectOption()) return
         event.applyIfPossible { it.transformLine() }
     }
+
+    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
+    private val isSelectOptionPattern by patternGroup.pattern(
+        "string.isselectoption",
+        "(§eSelect an option: .*)|(§e\\[NPC] .+)"
+    )
 
     private fun String.transformLine() = splitRegex.findAll(this).map { it.value }.joinToString("") {
         it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() != 2000 }?.coloredRomanToDecimal() ?: it

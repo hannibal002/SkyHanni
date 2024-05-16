@@ -320,8 +320,6 @@ object StringUtils {
 
     fun String.isRoman(): Boolean = UtilsPatterns.isRomanPattern.matches(this)
 
-    fun String.isSelectOption(): Boolean = UtilsPatterns.isSelectOptionPattern.matches(this)
-
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
