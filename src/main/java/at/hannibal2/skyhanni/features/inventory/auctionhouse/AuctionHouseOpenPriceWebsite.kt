@@ -41,7 +41,7 @@ class AuctionHouseOpenPriceWebsite {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         ahSearchPattern.matchMatcher(event.inventoryName) {
-            searchTerm = group("searchTerm").removeSuffix("\"")
+            searchTerm = group("searchTerm").removeSuffix("\"").replace(" ", "%20")
             displayItem = createDisplayItem()
         }
     }
