@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,13 +28,6 @@ class ReplaceRomanNumerals {
 
         event.toolTip.replaceAll { it.transformLine() }
     }
-
-//     @SubscribeEvent(priority = EventPriority.LOWEST)
-//     fun onItemHover(event: ItemHoverEvent) {
-//         if (!isEnabled()) return
-//
-//         event.toolTip.replaceAll { it.transformLine() }
-//     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onChatHover(event: ChatHoverEvent) {
