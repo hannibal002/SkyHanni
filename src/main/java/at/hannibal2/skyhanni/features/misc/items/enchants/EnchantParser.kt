@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -22,6 +23,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
@@ -58,6 +60,8 @@ object EnchantParser {
 
     private val loreCache: Cache = Cache()
 
+    val isSbaLoaded by lazy { Loader.isModLoaded("skyblockaddons") }
+
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()
 
@@ -79,6 +83,7 @@ object EnchantParser {
             config.commaFormat,
             config.hideVanillaEnchants,
             config.hideEnchantDescriptions,
+            ChromaManager.config.enabled,
         ) {
             markCacheDirty()
         }
