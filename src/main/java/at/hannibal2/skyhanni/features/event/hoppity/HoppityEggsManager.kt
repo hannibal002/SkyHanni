@@ -153,7 +153,7 @@ object HoppityEggsManager {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isAvtive()) return
+        if (!isActive()) return
         if (!config.showClaimedEggs) return
         if (isBuzy()) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
@@ -169,7 +169,7 @@ object HoppityEggsManager {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isAvtive()) return
+        if (!isActive()) return
         HoppityEggType.checkClaimed()
         checkWarn()
     }
@@ -217,6 +217,5 @@ object HoppityEggsManager {
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 
-    fun isAvtive() = LorenzUtils.inSkyBlock && ChocolateFactoryAPI.isHoppityEvent()
-
+    fun isActive() = LorenzUtils.inSkyBlock && ChocolateFactoryAPI.isHoppityEvent()
 }
