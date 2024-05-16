@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -189,7 +190,14 @@ object HoppityEggsManager {
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size
-        ChatUtils.chat("All $amount Hoppity Eggs are ready to be found.!")
+        val message = "All $amount Hoppity Eggs are ready to be found!"
+        if (config.warpUnclaimedEggs) {
+            ChatUtils.clickableChat(
+                message,
+                onClick = { HypixelCommands.warp(config.warpDestination) },
+                "§eClick to /warp ${config.warpDestination}!"
+            )
+        } else ChatUtils.chat(message)
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
