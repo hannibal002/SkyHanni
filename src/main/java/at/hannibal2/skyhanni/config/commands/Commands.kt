@@ -328,16 +328,20 @@ object Commands {
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
         registerCommand("warp", "") { args: Array<String> ->
-            TransferCooldown.transfer { HypixelCommands.warp(args.joinToString(" ")) }
+            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer { HypixelCommands.warp(args.joinToString(" ")) }
+            else HypixelCommands.warp(args.joinToString(" "))
         }
         registerCommand("is", "") {
-            TransferCooldown.transfer(HypixelCommands::island)
+            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer(HypixelCommands::island)
+            else HypixelCommands.island()
         }
         registerCommand("warpforge", "") {
-            TransferCooldown.transfer { HypixelCommands.warp("forge") }
+            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer { HypixelCommands.warp("forge") }
+            else HypixelCommands.warp("forge")
         }
         registerCommand("hub", "") {
-            TransferCooldown.transfer(HypixelCommands::hub)
+            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer(HypixelCommands::hub)
+            else HypixelCommands.hub()
         }
     }
 

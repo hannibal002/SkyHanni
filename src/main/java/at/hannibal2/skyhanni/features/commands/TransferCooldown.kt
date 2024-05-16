@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.util.EnumChatFormatting
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -22,7 +23,7 @@ object TransferCooldown {
         if (!config.transferCooldown || isActive) return
         isActive = true
         delayedRunner.runDelayed(3.seconds) {
-            if (config.transferCooldownMessage) ChatUtils.chat(
+            if (config.transferCooldownMessage && LorenzUtils.inSkyBlock) ChatUtils.chat(
                 "${EnumChatFormatting.GREEN}Player Transfer Cooldown has ended.",
                 prefix = true
             )
