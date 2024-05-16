@@ -86,8 +86,7 @@ object TrevorSolver {
     private fun isTrevorMob(mob: Mob) : Boolean{
         val name = mob.name
         val firstWord = name.substringBefore(" ")
-        if(possibleNames.any{prefix: String -> prefix == firstWord}) return true
-        return false
+        return possibleNames.contains(firstWord)
     }
     fun resetLocation() {
         maxHeight = 0.0
