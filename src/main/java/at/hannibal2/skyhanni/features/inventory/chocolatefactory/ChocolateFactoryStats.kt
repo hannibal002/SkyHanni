@@ -98,10 +98,10 @@ object ChocolateFactoryStats {
                 ChocolateFactoryStat.TIME_TOWER_FULL,
                 if (timeTowerFull == SimpleTimeMark(0)) {
                     "§eFull Tower Charges: §aNow" +
-                        "§bHappens at: §aNow"
+                        "§eHappens at: §aNow"
                 } else {
                     "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
-                        "§bHappens at: ${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                        "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
                 }
 
             )
