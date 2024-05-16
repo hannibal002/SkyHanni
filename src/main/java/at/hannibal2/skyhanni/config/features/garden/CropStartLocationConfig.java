@@ -17,7 +17,7 @@ public class CropStartLocationConfig {
     @Expose
     @ConfigOption(name = "Crop Location Mode", desc = "Whether to show waypoint at start location (set with §e/shcropstartlocation §7) or last farmed location.")
     @ConfigEditorDropdown
-    public CropLocationMode cropLocationMode = CropLocationMode.START;
+    public CropLocationMode mode = CropLocationMode.START;
 
     public enum CropLocationMode {
         START("Start Only"),

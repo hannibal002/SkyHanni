@@ -92,18 +92,18 @@ object GardenStartLocation {
                 }
                 if (shouldShowLastFarmedWaypoint) {
                     event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true, beacon = true)
-                    event.drawDynamicText(location, "§b${crop.cropName}", 1.5)
+                    event.drawDynamicText(location, "§b${crop.cropName}", 1.5, yOff = 4f)
                     if (shouldShowBoth()) {
-                        event.drawDynamicText(location, "§eLast Farmed", 1.1, yOff = 12f)
+                        event.drawDynamicText(location, "§eLast Farmed", 1.1, yOff = 17f)
                     }
                 }
             }
         }
     }
 
-    private fun shouldShowBoth() = config.cropLocationMode == CropLocationMode.BOTH
-    private fun showStartWaypoint() = config.cropLocationMode != CropLocationMode.LAST_FARMED
-    private fun showLastFarmedWaypoint() = config.cropLocationMode != CropLocationMode.START
+    private fun shouldShowBoth() = config.mode == CropLocationMode.BOTH
+    private fun showStartWaypoint() = config.mode != CropLocationMode.LAST_FARMED
+    private fun showLastFarmedWaypoint() = config.mode != CropLocationMode.START
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
 }
