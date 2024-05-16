@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -96,7 +95,7 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
             put(
                 ChocolateFactoryStat.TIME_TOWER_FULL,
-                if (timeTowerFull == SimpleTimeMark(0)) {
+                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
                     "§eFull Tower Charges: §aNow" +
                         "§eHappens at: §aNow"
                 } else {
