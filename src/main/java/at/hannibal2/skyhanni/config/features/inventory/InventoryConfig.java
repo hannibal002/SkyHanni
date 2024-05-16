@@ -59,6 +59,11 @@ public class InventoryConfig {
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
     @Expose
+    @ConfigOption(name = "Experimentation Table", desc = "Features for the experimentation Table.")
+    @Accordion
+    public ExperimentationTableDisplayConfig experimentationTableDisplay = new ExperimentationTableDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
