@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class DianaFixPrompts {
+class DianaFixChat {
 
     private var hasSetParticleQuality = false
     private var hasSetToggleMusic = false
