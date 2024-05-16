@@ -929,7 +929,7 @@ class SkyHanniMod {
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures)
         loadModule(InfernoMinionFeatures())
-        loadModule(LimboPlaytime())
+        loadModule(LimboPlaytime)
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
