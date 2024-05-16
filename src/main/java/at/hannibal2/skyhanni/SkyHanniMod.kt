@@ -91,6 +91,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.combat.BestiaryData
 import at.hannibal2.skyhanni.features.combat.FerocityDisplay
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
+import at.hannibal2.skyhanni.features.combat.StackTracker
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
@@ -937,6 +938,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(StackTracker())
 
         init()
 

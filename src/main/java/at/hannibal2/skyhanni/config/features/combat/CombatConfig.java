@@ -25,6 +25,11 @@ public class CombatConfig {
     public QuiverConfig quiverConfig = new QuiverConfig();
 
     @Expose
+    @ConfigOption(name = "Stack Tracker", desc = "")
+    @Accordion
+    public StackTrackerConfig stackTrackerConfig = new StackTrackerConfig();
+
+    @Expose
     @ConfigOption(name = "Summonings", desc = "")
     @Accordion
     public SummoningsConfig summonings = new SummoningsConfig();
