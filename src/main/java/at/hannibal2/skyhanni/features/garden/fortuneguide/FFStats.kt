@@ -157,6 +157,7 @@ object FFStats {
 
     private fun getEquipmentFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
+        out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
         out[FFTypes.GREEN_THUMB] = FarmingFortuneDisplay.greenThumbFortune
@@ -166,6 +167,7 @@ object FFStats {
 
     private fun getArmorFFData(item: ItemStack, out: MutableMap<FFTypes, Double>) {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
+        out[FFTypes.TOTAL] = 0.0
         out[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         out[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
         out[FFTypes.GEMSTONE] = FarmingFortuneDisplay.gemstoneFortune
