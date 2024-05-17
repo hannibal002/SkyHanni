@@ -33,6 +33,6 @@ enum class FortuneStats(val label: String, val tooltip: String) {
     SUPREME_CHOCOLATE_BAR(
         "§2Supreme Chocolate Bar",
         "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
-            "§eRun /shcocoa to toggle the stat"
+            "§eRun /shcocoabeans to toggle the stat"
     ),
 }
