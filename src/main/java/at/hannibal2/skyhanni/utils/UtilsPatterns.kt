@@ -96,4 +96,9 @@ object UtilsPatterns {
         "tablist.profile",
         "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*"
     )
+
+    val shopOptionsPattern by patternGroup.pattern(
+        "inventory.shopoptions",
+        "Shop Trading Options"
+    )
 }
