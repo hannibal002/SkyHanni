@@ -53,7 +53,7 @@ object FarmingFortuneDisplay {
     )
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip",
-        "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?\$"
+        "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?(?: §d\\(\\+(\\d+)\\))?\$"
     )
     private val armorAbilityPattern by patternGroup.pattern(
         "armorability",
@@ -63,7 +63,6 @@ object FarmingFortuneDisplay {
         "lotusability",
         "§7Piece Bonus: §6+(?<bonus>.*)☘"
     )
-
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
@@ -83,8 +82,10 @@ object FarmingFortuneDisplay {
 
     var displayedFortune = 0.0
     var reforgeFortune = 0.0
+    var gemstoneFortune = 0.0
     var itemBaseFortune = 0.0
     var greenThumbFortune = 0.0
+    var pesterminatorFortune = 0.0
 
     private var foundTabUniversalFortune = false
     private var foundTabCropFortune = false
@@ -305,6 +306,7 @@ object FarmingFortuneDisplay {
     fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
     fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
     fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
+    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 1.0
 
     fun getAbilityFortune(item: ItemStack?) = item?.let {
         getAbilityFortune(it.getInternalName(), it.getLore())
@@ -334,22 +336,25 @@ object FarmingFortuneDisplay {
     fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
         displayedFortune = 0.0
         reforgeFortune = 0.0
+        gemstoneFortune = 0.0
         itemBaseFortune = 0.0
         greenThumbFortune = 0.0
+        pesterminatorFortune = getPesterminatorFortune(tool)
 
-        //TODO code cleanup
+        // TODO code cleanup (after ff rework)
 
         for (line in tool?.getLore()!!) {
             tooltipFortunePattern.matchMatcher(line) {
                 displayedFortune = group(1)!!.toDouble()
                 reforgeFortune = group(2)?.toDouble() ?: 0.0
+                gemstoneFortune = group(3)?.toDouble() ?: 0.0
             } ?: continue
 
             itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
                 5.0
             } else {
                 val dummiesFF = (tool.getFarmingForDummiesCount() ?: 0) * 1.0
-                displayedFortune - reforgeFortune - enchantmentFortune - dummiesFF
+                displayedFortune - reforgeFortune - gemstoneFortune - pesterminatorFortune - enchantmentFortune - dummiesFF
             }
             greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
                 displayedFortune - reforgeFortune - itemBaseFortune
