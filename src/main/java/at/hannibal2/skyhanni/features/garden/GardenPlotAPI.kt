@@ -318,8 +318,8 @@ object GardenPlotAPI {
         // These don't refer to Minecraft chunks but rather garden plots, but I use
         // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
         val plotSize = 96
-        val chunkX = floor((plot.middle.x + 48) / plotSize).toInt()
-        val chunkZ = floor((plot.middle.z + 48) / plotSize).toInt()
+        val chunkX = floor((plot.middle.x + 48.001) / plotSize).toInt()
+        val chunkZ = floor((plot.middle.z + 48.001) / plotSize).toInt()
         val chunkMinX = (chunkX * plotSize) - 48
         val chunkMinZ = (chunkZ * plotSize) - 48
 
@@ -332,7 +332,7 @@ object GardenPlotAPI {
             for (j in 0..plotSize step plotSize) {
                 val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
                 val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
-                tryDraw3DLine(start, end, cornerColor, 2, true)
+                tryDraw3DLine(start, end, cornerColor, 3, true)
             }
         }
 
@@ -341,9 +341,9 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
             val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
             // Front lines
-            tryDraw3DLine(start, end, lineColor, 1, true)
+            tryDraw3DLine(start, end, lineColor, 2, true)
             // Back lines
-            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 2, true)
         }
 
         // Render vertical on Z-Axis
@@ -351,9 +351,9 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
             val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
             // Left lines
-            tryDraw3DLine(start, end, lineColor, 1, true)
+            tryDraw3DLine(start, end, lineColor, 2, true)
             // Right lines
-            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 2, true)
         }
 
         // Render horizontal
@@ -367,7 +367,7 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
             val isRedLine = y == buildLimit
             val color = if (isRedLine) Color.red else lineColor
-            val depth = if (isRedLine) 2 else 1
+            val depth = if (isRedLine) 3 else 2
             // (minX, minZ) -> (minX, minZ + 96)
             tryDraw3DLine(start, start.add(z = plotSize), color, depth, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
