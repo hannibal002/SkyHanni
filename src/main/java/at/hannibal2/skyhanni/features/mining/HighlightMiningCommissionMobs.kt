@@ -38,7 +38,7 @@ class HighlightMiningCommissionMobs {
         // Crystal Hollows
         AUTOMATON("Automaton Slayer", { it is EntityIronGolem }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
-        YOG("Yog Slayer", { it is EntityMagmaCube }),
+        YOG("Yog Slayer", { it is EntityMagmaCube && it.hasMaxHealth(35_000) }),
         THYST("Thyst Slayer", { it is EntityEndermite && it.hasMaxHealth(5_000) }),
         CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name == "Team Treasurite" }),
         SLUDGE("Sludge Slayer", {

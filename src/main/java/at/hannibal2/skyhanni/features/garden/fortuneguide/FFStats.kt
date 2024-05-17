@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.CropAccessoryData
-import at.hannibal2.skyhanni.data.GardenCropUpgrades.Companion.getUpgradeLevel
+import at.hannibal2.skyhanni.data.GardenCropUpgrades.getUpgradeLevel
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
@@ -55,7 +55,7 @@ object FFStats {
     fun getCropStats(crop: CropType, tool: ItemStack?) {
         FortuneStats.reset()
 
-        FortuneStats.BASE.set(totalBaseFF[FFTypes.TOTAL] ?: 100.0, 1277.0)
+        FortuneStats.BASE.set(totalBaseFF[FFTypes.TOTAL] ?: 100.0, if (usingSpeedBoots) 1373.0 else 1377.0)
         FortuneStats.CROP_UPGRADE.set((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
         FortuneStats.ACCESSORY.set(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
         FortuneStats.FFD.set((tool?.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
@@ -72,28 +72,33 @@ object FFStats {
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 FortuneStats.COLLECTION.set(FarmingFortuneDisplay.getCollectionFortune(tool), 48.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
             in dicerCrops -> {
                 FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 20.0)
             }
 
             CropType.MUSHROOM -> {
                 FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 30.0)
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 16.0)
             }
 
             CropType.COCOA_BEANS -> {
                 FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 20.0)
                 FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 16.0)
             }
 
             CropType.CACTUS -> {
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 16.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 16.0)
             }
 
             else -> {}
@@ -107,6 +112,11 @@ object FFStats {
             val storage = GardenAPI.storage?.fortune ?: return
             val pumpkinFortune = if (storage.pumpkinFortune) 12.0 else 0.0
             FortuneStats.EXPIRED_PUMPKIN.set(pumpkinFortune, 12.0)
+        }
+        if (crop == CropType.COCOA_BEANS) {
+            val storage = GardenAPI.storage?.fortune ?: return
+            val cocoaBeansFortune = if (storage.cocoaBeansFortune) 12.0 else 0.0
+            cropPage[FortuneStats.SUPREME_CHOCOLATE_BAR] = Pair(cocoaBeansFortune, 12.0)
         }
 
         FortuneStats.CROP_TOTAL.set(FortuneStats.getTotal())
@@ -125,6 +135,8 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         this[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         this[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
+        this[FFTypes.GEMSTONE] = FarmingFortuneDisplay.gemstoneFortune
+        this[FFTypes.PESTERMINATOR] = FarmingFortuneDisplay.pesterminatorFortune
         this[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
         this[FFTypes.TOTAL] = this.values.sum()
     }
