@@ -938,7 +938,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(FlareDisplay())
+        loadModule(FlareDisplay)
 
         init()
 

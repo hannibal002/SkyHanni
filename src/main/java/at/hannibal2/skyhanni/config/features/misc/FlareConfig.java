@@ -50,6 +50,7 @@ public class FlareConfig {
         NONE("No Outline"),
         FILLED("Filled"),
         WIREFRAME("Wireframe"),
+        CIRCLE("Circle")
         ;
 
         private final String str;
@@ -65,9 +66,19 @@ public class FlareConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Color of the area", desc = "The color of the area.")
+    @ConfigOption(name = "Warning Flare Color", desc = "Color for Warning Flare.")
     @ConfigEditorColour
-    public String color = "0:153:18:159:85";
+    public String warningColor = "0:153:29:255:136";
+
+    @Expose
+    @ConfigOption(name = "Alert Flare Color", desc = "Color for Alert Flare.")
+    @ConfigEditorColour
+    public String alertColor = "0:153:0:159:137";
+
+    @Expose
+    @ConfigOption(name = "SOS Flare Color", desc = "Color for SOS Flare.")
+    @ConfigEditorColour
+    public String sosColor = "0:153:159:0:5";
 
     @Expose
     @ConfigLink(owner = FlareConfig.class, field = "overlayEnabled")

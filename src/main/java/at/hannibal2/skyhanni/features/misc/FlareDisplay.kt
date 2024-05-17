@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -20,12 +21,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class FlareDisplay {
+object FlareDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.flareConfig
     private var display = emptyList<Renderable>()
-    private val flareTime = 180000
     private var flareList = mutableMapOf<FlareType, EntityArmorStand>()
+    private const val FLARE_TIME = 180_000
 
     private val flares = mapOf(
         "ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMwNjIyMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjJlMmJmNmMxZWMzMzAyNDc5MjdiYTYzNDc5ZTU4NzJhYzY2YjA2OTAzYzg2YzgyYjUyZGFjOWYxYzk3MTQ1OCIKICAgIH0KICB9Cn0="
@@ -47,7 +48,7 @@ class FlareDisplay {
         if (!isEnabled()) return
         flareList.values.removeIf { !it.isEntityAlive }
         EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().forEach { entity ->
-            if (entity.ticksExisted > flareTime) return@forEach
+            if (entity.ticksExisted > FLARE_TIME) return@forEach
             for ((texture, flareType) in flares) {
                 if (flareList.contains(flareType)) return@forEach
                 if (entity.hasSkullTexture(texture)) {
@@ -57,23 +58,22 @@ class FlareDisplay {
         }
         display = buildList {
             for ((flare, entity) in flareList) {
-                val letime = (flareTime - entity.ticksExisted / 20 * 1000).milliseconds
+                val time = (FLARE_TIME - entity.ticksExisted / 20 * 1000).milliseconds
 
-                add(Renderable.string("§6${flare.displayName}: §e$letime §b${flare.buff}"))
-
-                if (letime <= 5.seconds) {
+                add(Renderable.string("§6${flare.displayName}: §e$time §b${flare.buff}"))
+                if (time <= 5.seconds) {
                     when (config.alertType) {
                         FlareConfig.AlertType.CHAT -> {
-                            ChatUtils.chat("§6${flare.displayName} expire in b${letime.inWholeSeconds}")
+                            ChatUtils.chat("§6${flare.displayName} expire in b${time.inWholeSeconds}")
                         }
 
                         FlareConfig.AlertType.TITLE -> {
-                            LorenzUtils.sendTitle("§6${flare.displayName} expire in §b${letime.inWholeSeconds}", 1.seconds)
+                            LorenzUtils.sendTitle("§6${flare.displayName} expire in §b${time.inWholeSeconds}", 1.seconds)
                         }
 
                         FlareConfig.AlertType.CHAT_TITLE -> {
-                            ChatUtils.chat("${flare.displayName} expire in ${letime.inWholeSeconds}")
-                            LorenzUtils.sendTitle("${flare.displayName} expire in ${letime.inWholeSeconds}", 1.seconds)
+                            ChatUtils.chat("§6${flare.displayName} expire in §b${time.inWholeSeconds}")
+                            LorenzUtils.sendTitle("§6${flare.displayName} expire in §b${time.inWholeSeconds}", 1.seconds)
                         }
 
                         else -> return
@@ -86,14 +86,25 @@ class FlareDisplay {
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        for (flare in flareList.values) {
+        for ((flare, entity) in flareList) {
+
+            val color = when (flare) {
+                FlareType.WARNING -> config.warningColor
+                FlareType.ALERT -> config.alertColor
+                FlareType.SOS -> config.sosColor
+            }.toChromaColor()
+
             when (config.outlineType) {
                 FlareConfig.OutlineType.FILLED -> {
-                    event.drawSphereInWorld(config.color.toChromaColor(), flare.getLorenzVec(), 40f)
+                    event.drawSphereInWorld(color, entity.getLorenzVec(), 40f)
                 }
 
                 FlareConfig.OutlineType.WIREFRAME -> {
-                    event.drawSphereWireframeInWorld(config.color.toChromaColor(), flare.getLorenzVec(), 40f)
+                    event.drawSphereWireframeInWorld(color, entity.getLorenzVec(), 40f)
+                }
+
+                FlareConfig.OutlineType.CIRCLE -> {
+                    RenderUtils.drawCircle(entity, event.partialTicks, 40.0, color)
                 }
 
                 else -> return
