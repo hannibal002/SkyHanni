@@ -353,8 +353,7 @@ class ChatFilter {
         "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
         "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!".toPattern(),
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
-        "§7You upgraded to §r§d.*?§r§7!".toPattern()
-
+        "§7You upgraded to §r§d.*?§r§7!".toPattern(),
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
