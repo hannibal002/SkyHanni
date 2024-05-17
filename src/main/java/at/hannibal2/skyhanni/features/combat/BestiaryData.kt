@@ -25,9 +25,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -36,6 +38,17 @@ object BestiaryData {
     private val config get() = SkyHanniMod.feature.combat.bestiary
 
     private val patternGroup = RepoPattern.group("combat.bestiary.data")
+
+    private val tierProgressPattern by patternGroup.pattern(
+        "tierprogress",
+        "§7Progress to Tier [\\dIVXC]+: §b[\\d.]+%"
+    )
+
+    private val overallProgressPattern by patternGroup.pattern(
+        "overallprogress",
+        "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"
+    )
+
     private val progressPattern by patternGroup.pattern(
         "progress",
         "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)"
@@ -97,7 +110,7 @@ object BestiaryData {
         isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
         stackList.putAll(items)
         inInventory = true
-        overallProgressEnabled = items[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } ?: false
+        overallProgressEnabled = isOverallProgressEnabled(items)
         update()
     }
 
@@ -382,6 +395,21 @@ object BestiaryData {
                 })
             }
         }
+    }
+
+    private fun isOverallProgressEnabled(inventoryItems: Map<Int, ItemStack>): Boolean {
+        if (inventoryItems[52]?.item == Items.ender_eye) {
+            return inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } == true
+        }
+
+        indexes.forEach { index ->
+            val item = inventoryItems[index] ?: return true
+            val hasTierProgress = item.getLore().any { tierProgressPattern.matches(it) }
+            val hasOverallProgress = item.getLore().any { overallProgressPattern.matches(it) }
+            if (hasTierProgress && !hasOverallProgress) return false
+        }
+
+        return true
     }
 
     private fun isBestiaryGui(stack: ItemStack?, name: String): Boolean {
