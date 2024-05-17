@@ -318,8 +318,8 @@ object GardenPlotAPI {
         // These don't refer to Minecraft chunks but rather garden plots, but I use
         // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
         val plotSize = 96
-        val chunkX = floor((plot.middle.x + 48.001) / plotSize).toInt()
-        val chunkZ = floor((plot.middle.z + 48.001) / plotSize).toInt()
+        val chunkX = floor((plot.middle.x + 48) / plotSize).toInt()
+        val chunkZ = floor((plot.middle.z + 48) / plotSize).toInt()
         val chunkMinX = (chunkX * plotSize) - 48
         val chunkMinZ = (chunkZ * plotSize) - 48
 
