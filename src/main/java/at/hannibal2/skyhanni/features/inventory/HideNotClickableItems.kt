@@ -135,7 +135,7 @@ class HideNotClickableItems {
                 ChatUtils.error("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
-                if (config.itemsBypass) {
+                if (config.itemsBypass && !hideReason.contains("SkyBlock Menu")) {
                     event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
                 }
             }
