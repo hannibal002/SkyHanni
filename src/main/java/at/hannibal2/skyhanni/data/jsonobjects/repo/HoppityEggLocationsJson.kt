@@ -20,4 +20,6 @@ data class HoppityEggLocationsJson(
     @Expose val shrineIndex: Int,
     @Expose val coachRabbitIndex: Int,
     @Expose val maxRabbits: Int,
+    @Expose val prestigeMultiplier: Double,
+    @Expose val rabbitUpgradeCostConstants: Map<Int, Map<String, Double>>,
 )

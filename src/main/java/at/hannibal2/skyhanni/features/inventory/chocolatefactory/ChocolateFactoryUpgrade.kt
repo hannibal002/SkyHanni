@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import kotlin.math.floor
+import kotlin.math.pow
+import kotlin.math.round
 
 data class ChocolateFactoryUpgrade(
     val slotIndex: Int,
@@ -24,6 +27,25 @@ data class ChocolateFactoryUpgrade(
             canAffordIn.isInfinite() -> SimpleTimeMark.farFuture()
             else -> SimpleTimeMark.now() + canAffordIn
         }
+    }
+
+    fun getNext(): ChocolateFactoryUpgrade? {
+        if (price == null || isMaxed) return null
+
+        // For now only get next level if it is a rabbit. Maybe add other stuff later.
+        if (!isRabbit) return null
+
+        val base = ChocolateFactoryAPI.rabbitUpgradeCostConstants[slotIndex]?.get("base") ?: return null
+        val multiplier = ChocolateFactoryAPI.rabbitUpgradeCostConstants[slotIndex]?.get("multiplier") ?: return null
+        val prestigeMultiplier = 1 + ChocolateFactoryAPI.prestigeMultiplier * ChocolateFactoryAPI.currentPrestige
+
+        val nextPrice = floor(round(base * multiplier.pow((level + 1)) * prestigeMultiplier)).toLong()
+
+        val next = ChocolateFactoryUpgrade(
+            slotIndex, level + 1, nextPrice, extraPerSecond, nextPrice / (extraPerSecond ?: 1.0), isRabbit, isPrestige
+        )
+
+        return next
     }
 
     fun canAfford(): Boolean {
