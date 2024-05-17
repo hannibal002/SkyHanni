@@ -16,22 +16,20 @@ class VolcanoExplosivityDisplay {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
     private val patternGroup = RepoPattern.group("crimson.volcano")
-    private val headerPattern by patternGroup.pattern(
-        "header.tablistline",
-        "(?:§.)*Volcano Explosivity:(?:[\\S ]+)*"
-    )
     private val statusPattern by patternGroup.pattern(
-        "status.tablistline",
-        " *(?<status>(?:§.)*\\S+)"
+        "tablistline",
+        " *Volcano: (?<status>(?:§.)*\\S+)"
     )
     private var display = ""
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
-        val text = event.tabList.nextAfter({ headerPattern.matches(it) }) ?: return
-        statusPattern.matchMatcher(text) {
-            display = "§bVolcano Explosivity§7: ${group("status")}"
+        for (line in event.tabList) {
+            statusPattern.matchMatcher(line) {
+                display = "§bVolcano Explosivity§7: ${group("status")}"
+                break
+            }
         }
     }
 
