@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.time.LocalDate
 
 // todo: create abstract class for this and BasketWaypoints
 class PresentWaypoints {
@@ -122,6 +123,11 @@ class PresentWaypoints {
             loadEventWaypoints(data.presents_entrances ?: error("'presents_entrances' is null in EventWaypoints!"))
     }
 
+    private fun isDecember(): Boolean {
+        val currentMonth = LocalDate.now().month
+        return currentMonth == java.time.Month.DECEMBER
+    }
+
     private fun isEnabled(): Boolean =
-        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints)
+        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints && isDecember())
 }
