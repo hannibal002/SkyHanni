@@ -149,6 +149,8 @@ object ChocolateFactoryDataLoader {
         processInventory(list, inventory)
 
         findBestUpgrades(list)
+        findBestUpgradeConfiguration(list)
+
         ChocolateFactoryAPI.factoryUpgrades = list
     }
 
@@ -351,6 +353,28 @@ object ChocolateFactoryDataLoader {
 
         val upgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)
+    }
+
+    private fun findBestUpgradeConfiguration(list: List<ChocolateFactoryUpgrade>) {
+        val rabbits = ArrayList(list.filter { it.isRabbit })
+        findBestUpgradeConfiguration(rabbits, profileStorage?.currentChocolate ?: 0)
+    }
+
+    private fun findBestUpgradeConfiguration(list: ArrayList<ChocolateFactoryUpgrade>, remainingChocolate: Long) {
+        // removing time tower here as people like to determine when to buy it themselves.
+        val notMaxed =
+            list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null }
+
+        val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
+
+        //  No best upgrade or cant afford best upgrade
+        if (bestUpgrade == null || (bestUpgrade.price ?: Long.MAX_VALUE) > remainingChocolate) {
+            ChocolateFactoryAPI.bestUpgradeConfig = list.associateBy { it.slotIndex }
+            return
+        }
+
+        list[list.indexOf(bestUpgrade)] = bestUpgrade.getNext() ?: bestUpgrade
+        findBestUpgradeConfiguration(list, remainingChocolate - (bestUpgrade.price ?: 0))
     }
 
     private fun findBestUpgrades(list: MutableList<ChocolateFactoryUpgrade>) {

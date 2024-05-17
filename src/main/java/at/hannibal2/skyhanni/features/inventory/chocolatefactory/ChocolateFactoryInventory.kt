@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
@@ -24,13 +25,30 @@ object ChocolateFactoryInventory {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
-
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack == null) continue
             val slotIndex = slot.slotNumber
 
             if (slotIndex == ChocolateFactoryAPI.bestPossibleSlot) {
-                event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, "§6✦", 1f)
+                slot drawBorder LorenzColor.GOLD.addOpacity(150)
+            }
+
+            if (slotIndex in ChocolateFactoryAPI.bestUpgradeConfig.keys) {
+                val current = ChocolateFactoryAPI.factoryUpgrades.find { it.slotIndex == slotIndex } ?: continue
+                val upgrade = ChocolateFactoryAPI.bestUpgradeConfig[slotIndex] ?: continue
+
+                if (upgrade.isMaxed) continue
+
+                val dif = upgrade.level - current.level
+
+                if (dif > 0) {
+                    val color = when {
+                        dif < 5 -> LorenzColor.GREEN
+                        dif < 10 -> LorenzColor.YELLOW
+                        else -> LorenzColor.RED
+                    }
+                    event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, color.getChatColor() + upgrade.level, 1f)
+                }
             }
         }
     }
@@ -50,6 +68,7 @@ object ChocolateFactoryInventory {
                     slot highlight LorenzColor.GREEN.addOpacity(75)
                 }
             }
+
             if (slotIndex == ChocolateFactoryAPI.bestAffordableSlot) {
                 slot highlight LorenzColor.GREEN.addOpacity(200)
             }

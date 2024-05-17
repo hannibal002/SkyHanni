@@ -64,9 +64,14 @@ object ChocolateFactoryAPI {
 
     var clickRabbitSlot: Int? = null
 
+    var prestigeMultiplier = 0.4
+    var rabbitUpgradeCostConstants = mapOf<Int, Map<String, Double>>()
+
     var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
+
+    var bestUpgradeConfig = mapOf<Int, ChocolateFactoryUpgrade>()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -106,6 +111,9 @@ object ChocolateFactoryAPI {
         shrineIndex = data.shrineIndex
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
+
+        prestigeMultiplier = data.prestigeMultiplier
+        rabbitUpgradeCostConstants = data.rabbitUpgradeCostConstants
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
