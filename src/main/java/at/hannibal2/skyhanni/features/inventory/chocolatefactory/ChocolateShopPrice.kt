@@ -84,6 +84,11 @@ object ChocolateShopPrice {
                 val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(chocolate)
                 add("§7Time until affordable: §6$formattedTimeUntilGoal ")
 
+                add("")
+                val chocolatePerHour = ChocolateFactoryAPI.chocolatePerSecond * 60 * 60
+                val profitPerHour = chocolatePerHour * (factor / 1000000)
+                add("§7Money per hour: §6${NumberUtil.format(profitPerHour)} ")
+
             }
             table.add(
                 DisplayTableEntry(
