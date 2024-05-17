@@ -96,8 +96,8 @@ object ChocolateFactoryStats {
             put(
                 ChocolateFactoryStat.TIME_TOWER_FULL,
                 if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
-                    "§eFull Tower Charges: §aNow" +
-                        "§eHappens at: §aNow"
+                    "§eFull Tower Charges: §a§lNow\n" +
+                        "§eHappens at: §a§lNow"
                 } else {
                     "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
                         "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
