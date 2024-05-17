@@ -485,8 +485,7 @@ object GardenVisitorFeatures {
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 
         val name = group("name")
-        if (name == "Spaceman") return false
-        if (name == "Beth") return false
+        if (name in setOf("Beth", "Maeve", "Spaceman")) return false
 
         return VisitorAPI.getVisitorsMap().keys.any { it.removeColor() == name }
     } ?: false
@@ -601,7 +600,7 @@ object GardenVisitorFeatures {
             return
         }
 
-        event.addData {
+        event.addIrrelevant {
             val visitors = VisitorAPI.getVisitors()
 
             add("visitors: ${visitors.size}")

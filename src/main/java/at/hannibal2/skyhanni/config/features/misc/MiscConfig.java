@@ -246,6 +246,12 @@ public class MiscConfig {
     @FeatureToggle
     public boolean fixGhostEntities = true;
 
+    @Expose
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean replaceRomanNumerals = false;
+
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion
     @Expose

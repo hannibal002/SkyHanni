@@ -386,4 +386,23 @@ object ItemUtils {
         }
         return name
     }
+
+    fun ItemStack.loreCosts(): MutableList<NEUInternalName> {
+        var found = false
+        val list = mutableListOf<NEUInternalName>()
+        for (lines in getLore()) {
+            if (lines == "§7Cost") {
+                found = true
+                continue
+            }
+
+            if (!found) continue
+            if (lines.isEmpty()) return list
+
+            NEUInternalName.fromItemNameOrNull(lines)?.let {
+                list.add(it)
+            }
+        }
+        return list
+    }
 }

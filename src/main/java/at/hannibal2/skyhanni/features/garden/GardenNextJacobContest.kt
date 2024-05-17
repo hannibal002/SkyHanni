@@ -99,7 +99,7 @@ object GardenNextJacobContest {
             return
         }
 
-        event.addData {
+        event.addIrrelevant {
             add("Current time: ${SimpleTimeMark.now()}")
             add("")
 
@@ -249,7 +249,8 @@ object GardenNextJacobContest {
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                         onClick = {
                             shareContests()
-                        }
+                        },
+                        oneTimeClick = true
                     )
                 }
             }
@@ -303,7 +304,8 @@ object GardenNextJacobContest {
                     config.shareAutomatically = ShareContestsEntry.AUTO
                     SkyHanniMod.feature.storage.contestSendingAsked = true
                     ChatUtils.chat("§2Enabled automatic sharing of future contests!")
-                }
+                },
+                oneTimeClick = true
             )
         }
     }

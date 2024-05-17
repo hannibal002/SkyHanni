@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -17,6 +18,21 @@ public class HoppityEggsConfig {
     public boolean waypoints = true;
 
     @Expose
+    @ConfigOption(
+        name = "Show Waypoints Immediately",
+        desc = "Show a raw estimate waypoint immediately after clicking. " +
+            "§cThis might cause issues with other particle sources."
+    )
+    @ConfigEditorBoolean
+    public boolean waypointsImmediately = false;
+
+    @Expose
+    @ConfigOption(name = "Show Line", desc = "Show a line to the waypoint.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLine = false;
+
+    @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +
         "Only works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
@@ -27,6 +43,22 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnUnclaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Click to Warp", desc = "Makes the eggs ready chat message clickable to warp you to an island.")
+    @ConfigEditorBoolean
+    public boolean warpUnclaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Warp Destination", desc = "A custom island to warp to in the above option.")
+    @ConfigEditorText
+    public String warpDestination = "nucleus";
 
     @Expose
     @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
