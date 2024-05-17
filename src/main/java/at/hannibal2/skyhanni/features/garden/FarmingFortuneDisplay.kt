@@ -347,7 +347,7 @@ object FarmingFortuneDisplay {
 
         for (line in tool?.getLore()!!) {
             tooltipFortunePattern.matchMatcher(line) {
-                displayedFortune = group("display")!!.toDouble()
+                displayedFortune = group("display")?.toDouble() ?: 0.0
                 reforgeFortune = groupOrNull("reforge")?.toDouble() ?: 0.0
                 gemstoneFortune = groupOrNull("gemstone")?.toDouble() ?: 0.0
             } ?: continue
