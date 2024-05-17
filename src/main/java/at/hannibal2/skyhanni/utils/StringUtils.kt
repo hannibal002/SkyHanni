@@ -42,6 +42,7 @@ object StringUtils {
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
+    private val colorChars = "abcdefABCDEF0123456789".toSet()
 
     /**
      * Removes color and optionally formatting codes from the given string, leaving plain text.
@@ -54,6 +55,9 @@ object StringUtils {
         // Formatting indicator: The '§' character indicating the beginning of a formatting sequence
         // Formatting code: The character following a formatting indicator which specifies what color or text style this sequence corresponds to
         // Formatting sequence: The combination of a formatting indicator and code that changes the color or format of a string
+
+        // Flag for whether there is a text style (non-color and non-reset formatting code) currently being applied
+        var isFormatted = false
 
         // Find the first formatting indicator
         var nextFormattingSequence = indexOf('§')
@@ -74,14 +78,27 @@ object StringUtils {
             // Write everything from the read index up to the next formatting indicator into our clean string
             cleanedString.append(this, readIndex, nextFormattingSequence)
 
+            // Get the formatting code (note: this may not be a valid formatting code)
+            val formattingCode = this.getOrNull(nextFormattingSequence + 1)
+
             // If the next formatting sequence's code indicates a non-color format and we should keep those
-            if (keepFormatting && nextFormattingSequence + 1 < length && this[nextFormattingSequence + 1] in formattingChars) {
+            if (keepFormatting && formattingCode in formattingChars) {
+                // Update formatted flag based on whether this is a reset or a style format code
+                isFormatted = formattingCode?.lowercaseChar() != 'r'
+
                 // Set the readIndex to the formatting indicator, so that the next loop will start writing from that paragraph symbol
                 readIndex = nextFormattingSequence
                 // Find the next § symbol after the formatting sequence
                 nextFormattingSequence = indexOf('§', startIndex = readIndex + 1)
             } else {
                 // If this formatting sequence should be skipped (either a color code, or !keepFormatting or an incomplete formatting sequence without a code)
+
+                // If being formatted and color code encountered, reset the current formatting code
+                if (isFormatted && formattingCode in colorChars) {
+                    cleanedString.append("§r")
+                    isFormatted = false
+                }
+
                 // Set the readIndex to after this formatting sequence, so that the next loop will skip over it before writing the string
                 readIndex = nextFormattingSequence + 2
                 // Find the next § symbol after the formatting sequence
