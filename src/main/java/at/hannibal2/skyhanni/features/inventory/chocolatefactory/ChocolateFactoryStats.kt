@@ -95,8 +95,14 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
             put(
                 ChocolateFactoryStat.TIME_TOWER_FULL,
-                "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
-                    "§bHappens at: ${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
+                    "§eFull Tower Charges: §a§lNow\n" +
+                        "§eHappens at: §a§lNow"
+                } else {
+                    "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
+                        "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                }
+
             )
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
