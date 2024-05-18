@@ -342,6 +342,7 @@
     + Option to display this timer universally, even outside the inventory.
 + Added a display for the time remaining until Tower Charges are full. - Empa (https://github.com/hannibal002/SkyHanni/pull/1760)
 + Include item prices for upgrading in the Chocolate Shop calculation. - seraid (https://github.com/hannibal002/SkyHanni/pull/1805)
++ Added display of prestige level in chocolate factory statistics. - seraid (https://github.com/hannibal002/SkyHanni/pull/1827)
 
 #### Slayer Improvements
 
@@ -453,6 +454,7 @@
 + The GUI position editor can now edit all GUIs that were visible within the last 20 seconds, including those inside inventories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1768)
 + Improved the performance of scoreboard and tab list reading. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1779)
 + Improved performance of minion nametag feature and removed unnecessary checks between blocks. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1780)
++ Re-added different arrow types in Quiver Reminder after a run. - Empa (https://github.com/hannibal002/SkyHanni/pull/1832)
 
 ### Fixes
 
@@ -471,6 +473,11 @@
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1607)
 + Fixed error message when starting slayer quest in mining islands. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1619)
++ Fixed multiple slayer warning bugs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1814)
+    + Fixed slayer warning showing up at the wrong time.
+    + Fixed Slayer Warning showing up when others are damaging mobs in an incorrect area.
+    + Fixed showing warnings while doing Diana.
+    + Fixed Slayer warning being off when joining/leaving the Rift.
 
 #### Garden Fixes
 
@@ -519,6 +526,11 @@
     + Gemstones and the Pesterminator are now included in the calculations.
     + The total value for each armor piece is now displayed correctly.
     + Updated total universal farming values to reflect these changes.
++ Fixed Farming Contest Stats taking too long to display in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1829)
++ Fixed Farming Contest blocking other GUIs even while outside the Garden. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1829)
++ Fixed showing the wrong visitor time when info is not in the tab list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1831)
++ Fixed an error in /ff when you don't have a gemstone. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1823)
++ Fixed plot border rendering in the Garden. - seraid (https://github.com/hannibal002/SkyHanni/pull/1819)
 
 #### Chat Fixes
 
@@ -543,6 +555,8 @@
 + Fixed player chat spacing issue with the crimson faction icon. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1770)
 + Fixed extra space in chat formatting. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1785)
 + Fixed incorrect chat format when using the Hypixel command /show. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1781)
++ Fixed replacing words in dialogue with numbers. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1755)
++ Minor co-op chat capitalization fix. - appable (https://github.com/hannibal002/SkyHanni/pull/1825)
 
 #### GUI Fixes
 
@@ -598,6 +612,7 @@
 + Fixed Custom Scoreboard showing the Spooky Festival Time twice. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1757)
 + Fixed unknown scoreboard lines chat error message when Hypixel sends incomplete line data. - Empa (https://github.com/hannibal002/SkyHanni/pull/1761)
 + Fixed Custom Scoreboard error during Winter Event. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1789)
++ Fixed max island size display in Crimson Isle and Catacombs in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1822)
 
 #### Dungeon Fixes
 
@@ -648,6 +663,12 @@
 + Fixed Chocolate Factory Shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1815)
     + Profit calculations now show in sub-menus.
     + Total chocolate value now updates when buying something from the Chocolate Factory Shop.
++ Fixed displaying Chest Value in minion inventories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1834)
++ Fixed displaying Chest Value in some bazaar pages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1833)
++ Fixed the selling of SkyBlock Menu. - seraid (https://github.com/hannibal002/SkyHanni/pull/1820)
++ Fixed Dark Candy not appearing in Candy Bag possible items. - seraid (https://github.com/hannibal002/SkyHanni/pull/1820)
++ Fixed the ability to hide Chocolate Factory upgrade messages. - seraid (https://github.com/hannibal002/SkyHanni/pull/1820)
++ Fixed Time Until Next Charge display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1806)
 
 #### Rift Fixes
 
@@ -699,10 +720,17 @@
 
 + Fixed incorrect miniboss amount displayed by Crimson Isle Reputation Helper. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1633)
++ Fixed Volcano Explosivity Display. - Luna (https://github.com/hannibal002/SkyHanni/pull/1821)
+    + Broken when Hypixel introduced the new tab list.
 
 #### Diana Fixes
 
 + Fixed an error in the All Burrows List. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1809)
+
+#### Combat Fixes
+
++ Fixed Low Quiver Warning incorrectly appearing when switching to no arrows. - Empa (https://github.com/hannibal002/SkyHanni/pull/1832)
++ Fixed bestiary display always being disabled in search mode. - appable (https://github.com/hannibal002/SkyHanni/pull/1828)
 
 #### Misc Fixes
 
