@@ -216,7 +216,7 @@ object FFStats {
             val backupEquip = FarmingItems.currentEquip
             FarmingItems.currentArmor = null
             FarmingItems.currentEquip = null
-            val total = maxSumToThis(it)
+            val total = maxSumToThis(it) + 100
             FarmingItems.currentArmor = backupArmor
             FarmingItems.currentEquip = backupEquip
             total
