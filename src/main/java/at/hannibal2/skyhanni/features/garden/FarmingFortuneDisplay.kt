@@ -53,7 +53,7 @@ object FarmingFortuneDisplay {
         "§7You have §6\\+(?<ff>\\d{1,3})☘ .*"
     )
     private val tooltipFortunePattern by patternGroup.pattern(
-        "tooltip",
+        "tooltip.new",
         "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$"
     )
     private val armorAbilityPattern by patternGroup.pattern(
