@@ -116,7 +116,7 @@ object FFStats {
         if (crop == CropType.COCOA_BEANS) {
             val storage = GardenAPI.storage?.fortune ?: return
             val cocoaBeansFortune = if (storage.cocoaBeansFortune) 12.0 else 0.0
-            cropPage[FortuneStats.SUPREME_CHOCOLATE_BAR] = Pair(cocoaBeansFortune, 12.0)
+            FortuneStats.SUPREME_CHOCOLATE_BAR.set(cocoaBeansFortune, 12.0)
         }
 
         FortuneStats.CROP_TOTAL.set(FortuneStats.getTotal())
@@ -206,17 +206,28 @@ object FFStats {
         return 0.0
     }
 
-    internal enum class FFInfos(private val currentF: () -> Number, private val maxF: () -> Number) {
-        UNIVERSAL({ totalBaseFF }, FFTypes.TOTAL, 1277),
-        ANITA_BUFF({ baseFF }, FFTypes.ANITA, 60),
-        FARMING_LEVEL({ baseFF }, FFTypes.FARMING_LVL, 240),
-        COMMUNITY_SHOP({ baseFF }, FFTypes.COMMUNITY_SHOP, 40),
-        GARDEN_PLOTS({ baseFF }, FFTypes.PLOTS, 72),
-        CAKE_BUFF({ baseFF }, FFTypes.CAKE, 5),
-        TOTAL_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.TOTAL, {
-            BASE_ARMOR.max + ABILITY_ARMOR.max + REFORGE_ARMOR.max + REFORGE_ARMOR.max
+    internal enum class FFInfos(
+        val sumTo: FFInfos?,
+        private val currentF: () -> Number,
+        private val maxF: (FFInfos) -> Number,
+    ) {
+        UNIVERSAL(null, { totalBaseFF }, FFTypes.TOTAL, {
+            val backupArmor = FarmingItems.currentArmor
+            val backupEquip = FarmingItems.currentEquip
+            FarmingItems.currentArmor = null
+            FarmingItems.currentEquip = null
+            val total = maxSumToThis(it)
+            FarmingItems.currentArmor = backupArmor
+            FarmingItems.currentEquip = backupEquip
+            total
         }),
-        BASE_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.BASE, {
+        ANITA_BUFF(UNIVERSAL, { baseFF }, FFTypes.ANITA, 60),
+        FARMING_LEVEL(UNIVERSAL, { baseFF }, FFTypes.FARMING_LVL, 240),
+        COMMUNITY_SHOP(UNIVERSAL, { baseFF }, FFTypes.COMMUNITY_SHOP, 40),
+        GARDEN_PLOTS(UNIVERSAL, { baseFF }, FFTypes.PLOTS, 72),
+        CAKE_BUFF(UNIVERSAL, { baseFF }, FFTypes.CAKE, 5),
+        TOTAL_ARMOR(UNIVERSAL, { FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.TOTAL),
+        BASE_ARMOR(TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.BASE, {
             when (FarmingItems.currentArmor) {
                 FarmingItems.HELMET -> 30
                 FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 35
@@ -224,89 +235,125 @@ object FFStats {
                 else -> if (usingSpeedBoots) 160 else 130
             }
         }),
-        ABILITY_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.ABILITY, {
+        ABILITY_ARMOR(TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.ABILITY, {
             when (FarmingItems.currentArmor) {
                 FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> if (usingSpeedBoots) 16.667 else 18.75
                 FarmingItems.BOOTS -> if (usingSpeedBoots) 0 else 18.75
                 else -> if (usingSpeedBoots) 50 else 75
             }
         }),
-        REFORGE_ARMOR({ FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.REFORGE, {
+        REFORGE_ARMOR(TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.REFORGE, {
             when (FarmingItems.currentArmor) {
                 FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 30
                 FarmingItems.BOOTS -> if (usingSpeedBoots) 25 else 30
                 else -> if (usingSpeedBoots) 115 else 120
             }
         }),
-        TOTAL_PET({ FarmingItems.currentPet.getFFData() }, FFTypes.TOTAL, {
+        ENCHANT_ARMOR(
+            sumTo = TOTAL_ARMOR,
+            from = { FarmingItems.currentArmor?.getFFData() ?: armorTotalFF },
+            what = FFTypes.PESTERMINATOR,
+            x4 = { FarmingItems.currentArmor == null },
+            max = 5
+        ),
+        GEMSTONE_ARMOR(TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: armorTotalFF }, FFTypes.GEMSTONE, {
+            when (FarmingItems.currentArmor) {
+                FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS -> 20
+                FarmingItems.BOOTS -> if (usingSpeedBoots) 16 else 20
+                else -> if (usingSpeedBoots) 76 else 80
+            }
+        }),
+        TOTAL_PET(UNIVERSAL, { FarmingItems.currentPet.getFFData() }, FFTypes.TOTAL),
+        PET_BASE(TOTAL_PET, { FarmingItems.currentPet.getFFData() }, FFTypes.BASE, {
             when (FarmingItems.currentPet) {
                 FarmingItems.ELEPHANT -> 150
                 FarmingItems.MOOSHROOM_COW -> 157
                 FarmingItems.BEE -> 30
                 else -> 0
-            } + PET_ITEM.max
+            }
         }),
-        PET_ITEM({ FarmingItems.currentPet.getFFData() }, FFTypes.PET_ITEM, 60),
+        PET_ITEM(TOTAL_PET, { FarmingItems.currentPet.getFFData() }, FFTypes.PET_ITEM, 60),
         TOTAL_EQUIP(
-            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
-            FFTypes.TOTAL,
-            { FarmingItems.currentEquip == null },
-            { BASE_EQUIP.max + ABILITY_EQUIP.max + REFORGE_EQUIP.max + ENCHANT_EQUIP.max }
+            sumTo = UNIVERSAL,
+            from = { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            what = FFTypes.TOTAL
         ),
         BASE_EQUIP(
-            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
-            FFTypes.BASE,
-            { FarmingItems.currentEquip == null },
-            5.0
+            sumTo = TOTAL_EQUIP,
+            from = { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            what = FFTypes.BASE,
+            x4 = { FarmingItems.currentEquip == null },
+            max = 5.0
         ),
         ABILITY_EQUIP(
-            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
-            FFTypes.ABILITY,
-            { FarmingItems.currentEquip == null },
-            15.0
+            sumTo = TOTAL_EQUIP,
+            from = { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            what = FFTypes.ABILITY,
+            x4 = { FarmingItems.currentEquip == null },
+            max = 15.0
         ),
         REFORGE_EQUIP(
-            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
-            FFTypes.REFORGE,
-            { FarmingItems.currentEquip == null },
-            15.0
+            sumTo = TOTAL_EQUIP,
+            from = { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            what = FFTypes.REFORGE,
+            x4 = { FarmingItems.currentEquip == null },
+            max = 15.0
         ),
         ENCHANT_EQUIP(
-            { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
-            FFTypes.GREEN_THUMB,
-            { FarmingItems.currentEquip == null },
-            { GardenAPI.totalAmountVisitorsExisting.toDouble() / 4.0 }
+            sumTo = TOTAL_EQUIP,
+            from = { FarmingItems.currentEquip?.getFFData() ?: equipmentTotalFF },
+            what = FFTypes.GREEN_THUMB,
+            x4 = { FarmingItems.currentEquip == null },
+            max = { GardenAPI.totalAmountVisitorsExisting.toDouble() / 4.0 }
         ),
-
         ;
 
         val current get() = currentF().toDouble()
-        val max get() = maxF().toDouble()
+        val max get() = maxF(this).toDouble()
 
         fun bar(label: String, tooltip: String) = GuiRenderUtils.getFarmingBar(label, tooltip, current, max, 90)
 
-        constructor(current: () -> Number, max: Number) : this(current, { max })
-        constructor(from: () -> Map<FFTypes, Double>, what: FFTypes, max: Number) : this({ from()[what] ?: 0.0 },
-            { max })
+        constructor(sumTo: FFInfos?, current: () -> Number, max: Number) : this(sumTo, current, { max })
+        constructor(sumTo: FFInfos?, from: () -> Map<FFTypes, Double>, what: FFTypes, max: Number) : this(sumTo, {
+            from()[what] ?: 0.0
+        }, { max }
+        )
 
         constructor(
+            sumTo: FFInfos?,
             from: () -> Map<FFTypes, Double>,
             what: FFTypes,
             x4: () -> Boolean,
             max: Number,
-        ) : this({ from()[what] ?: 0.0 },
-            { if (x4()) max.toDouble() * 4 else max })
+        ) : this(sumTo, { from()[what] ?: 0.0 }, { if (x4()) max.toDouble() * 4 else max }
+        )
 
         constructor(
+            sumTo: FFInfos?,
             from: () -> Map<FFTypes, Double>,
             what: FFTypes,
             x4: () -> Boolean,
             max: () -> Number,
-        ) : this({ from()[what] ?: 0.0 },
-            { if (x4()) max().toDouble() * 4 else max() })
-
-        constructor(from: () -> Map<FFTypes, Double>, what: FFTypes, max: () -> Number) : this(
-            { from()[what] ?: 0.0 }, max
+        ) : this(sumTo, { from()[what] ?: 0.0 }, { if (x4()) max().toDouble() * 4 else max() }
         )
+
+        constructor(
+            sumTo: FFInfos?,
+            from: () -> Map<FFTypes, Double>,
+            what: FFTypes,
+            max: (FFInfos) -> Number,
+        ) : this(
+            sumTo, { from()[what] ?: 0.0 }, max
+        )
+
+        constructor(
+            sumTo: FFInfos?,
+            from: () -> Map<FFTypes, Double>,
+            what: FFTypes,
+        ) : this(sumTo, { from()[what] ?: 0.0 }, ::maxSumToThis)
+
     }
+
+    private fun maxSumToThis(self: FFInfos): Double = FFInfos.entries.filter { it.sumTo == self }.sumOf { it.max }
+
 }
