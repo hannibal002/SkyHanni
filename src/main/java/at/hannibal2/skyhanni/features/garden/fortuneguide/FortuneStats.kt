@@ -2,11 +2,10 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumOfPair
 
-enum class FortuneStats(val label: String, val tooltip: String) {
+enum class FortuneStats(private val label0: () -> String, private val tooltip0: () -> String) {
     BASE(
         "§2Universal Farming Fortune",
-        "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-            "§eSee on the grass block page"
+        "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" + "§eSee on the grass block page"
     ),
     CROP_TOTAL("§6Crop Farming Fortune", "§7§2Farming fortune for this crop"),
     ACCESSORY("§2Talisman Bonus", "§7§2Fortune from your talisman\n§2You get 10☘ per talisman tier"),
@@ -22,24 +21,20 @@ enum class FortuneStats(val label: String, val tooltip: String) {
     CULTIVATING("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n§2You get 2☘ per level"),
     TURBO("§2Turbo-Crop Enchantment", "§7§2Fortune for each enchantment level\n§2You get 5☘ per level"),
     DEDICATION("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n§2and crop milestone"),
-    EXPORTED_CARROT(
-        "§2Exportable Carrots",
-        "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
-            "§eRun /shcarrot to toggle the stat"
-    ),
-    EXPIRED_PUMPKIN(
-        "§2Expired Pumpkin",
-        "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
-            "§eRun /shpumpkin to toggle the stat"
-    ),
-    SUPREME_CHOCOLATE_BAR(
-        "§2Supreme Chocolate Bar",
-        "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
-            "§eRun /shcocoabeans to toggle the stat"
-    );
+    CARROLYN(::carrolynLabel, {
+        "§7§2Gain 12☘ from giving 3,000\n to Carrolyn in Scarleton!\n §eRun /shcarrolyn ${
+            FFGuideGUI.currentCrop?.niceName
+        } to toggle the stat"
+    }),
+    ;
+
+    constructor(label: String, tooltip: String) : this({ label }, { tooltip })
 
     var current: Double = 0.0
     var max: Double = -1.0
+
+    val label get() = label0()
+    val tooltip get() = tooltip0()
 
     fun reset() {
         current = 0.0
@@ -65,3 +60,6 @@ enum class FortuneStats(val label: String, val tooltip: String) {
         fun reset() = entries.forEach { it.reset() }
     }
 }
+
+private fun carrolynLabel(): String =
+    CarrolynTable.getByCrop(FFGuideGUI.currentCrop)?.label?.let { "§2$it" } ?: "§cError"

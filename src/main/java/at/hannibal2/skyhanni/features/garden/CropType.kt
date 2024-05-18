@@ -66,6 +66,9 @@ enum class CropType(
 
     override fun toString(): String = cropName
 
+    val patternKeyName = name.lowercase().replace('_', '.')
+    val niceName = name.lowercase().replace('_', ' ')
+
     companion object {
 
         fun getByNameOrNull(itemName: String): CropType? {

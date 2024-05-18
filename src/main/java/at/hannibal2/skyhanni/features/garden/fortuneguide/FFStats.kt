@@ -103,20 +103,9 @@ object FFStats {
 
             else -> {}
         }
-        if (crop == CropType.CARROT) {
-            val storage = GardenAPI.storage?.fortune ?: return
-            val carrotFortune = if (storage.carrotFortune) 12.0 else 0.0
-            FortuneStats.EXPORTED_CARROT.set(carrotFortune, 12.0)
-        }
-        if (crop == CropType.PUMPKIN) {
-            val storage = GardenAPI.storage?.fortune ?: return
-            val pumpkinFortune = if (storage.pumpkinFortune) 12.0 else 0.0
-            FortuneStats.EXPIRED_PUMPKIN.set(pumpkinFortune, 12.0)
-        }
-        if (crop == CropType.COCOA_BEANS) {
-            val storage = GardenAPI.storage?.fortune ?: return
-            val cocoaBeansFortune = if (storage.cocoaBeansFortune) 12.0 else 0.0
-            FortuneStats.SUPREME_CHOCOLATE_BAR.set(cocoaBeansFortune, 12.0)
+        CarrolynTable.getByCrop(crop)?.let {
+            val ff = if (it.get()) 12.0 else 0.0
+            FortuneStats.CARROLYN.set(ff, 12.0)
         }
 
         FortuneStats.CROP_TOTAL.set(FortuneStats.getTotal())

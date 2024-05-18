@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
@@ -80,6 +82,13 @@ object CaptureFarmingGear {
         "RANCHERS", "FARMER", "RABBIT"
     )
 
+    init {
+        CarrolynTable.entries.forEach {
+            it.completeMessagePattern
+            it.thxMessagePattern
+        }
+    }
+
     fun captureFarmingGear() {
         val farmingItems = farmingItems ?: return
         val itemStack = InventoryUtils.getItemInHand() ?: return
@@ -113,22 +122,14 @@ object CaptureFarmingGear {
         }
     }
 
-    fun reverseCarrotFortune() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        storage.carrotFortune = !storage.carrotFortune
-        ChatUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
-    }
-
-    fun reversePumpkinFortune() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        storage.pumpkinFortune = !storage.pumpkinFortune
-        ChatUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
-    }
-
-    fun reverseCocoaBeansFortune() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        storage.cocoaBeansFortune = !storage.cocoaBeansFortune
-        ChatUtils.chat("Toggled supreme chocolate bar fortune to: ${storage.cocoaBeansFortune}")
+    fun handelCarrolyn(input: Array<String>) {
+        val string = input.joinToString("_").uppercase()
+        val crop = CropType.entries.firstOrNull { it.name == string }
+            ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string").run { return }
+        val carrolyn = CarrolynTable.getByCrop(crop)
+            ?: ChatUtils.userError("Invalid Argument, crop is not valid").run { return }
+        carrolyn.set(!carrolyn.get())
+        ChatUtils.chat("Toggled ${carrolyn.label} fortune to: ${carrolyn.get()}")
     }
 
     private fun getUniqueVisitorsForTier(tier: Int): Int {
@@ -327,12 +328,15 @@ object CaptureFarmingGear {
         val msg = event.message.removeColor().trim()
         fortuneUpgradePattern.matchMatcher(msg) {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
+            return
         }
         farmingLevelUpPattern.matchMatcher(msg) {
             storage.farmingLevel = group("level").romanToDecimalIfNecessary()
+            return
         }
         anitaBuffPattern.matchMatcher(msg) {
             storage.anitaUpgrade = group("level").toInt() / 4
+            return
         }
         lotusUpgradePattern.matchMatcher(msg) {
             val piece = group("piece").uppercase()
@@ -341,6 +345,7 @@ object CaptureFarmingGear {
                     outdatedItems[item] = true
                 }
             }
+            return
         }
         petLevelUpPattern.matchMatcher(msg) {
             val pet = group("pet").uppercase().replace("✦", "").trim().replace(" ", "_")
@@ -349,30 +354,30 @@ object CaptureFarmingGear {
                     outdatedItems[item] = true
                 }
             }
+            return
         }
         cakePattern.matchMatcher(msg) {
             storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
+            return
         }
-        if (msg == "CARROTS EXPORTATION COMPLETE!") {
-            storage.carrotFortune = true
+        CarrolynTable.entries.forEach {
+            it.completeMessagePattern.matchMatcher(msg) {
+                it.set(true)
+                return
+            }
+            it.thxMessagePattern.matchMatcher(msg) {
+                it.set(true)
+                ChatUtils.chat(it.thxResponse)
+                return
+            }
         }
-        if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
-            storage.pumpkinFortune = true
-        }
-        if (msg == "CHOCOLATE BARS EXPORTATION COMPLETE!") {
-            storage.cocoaBeansFortune = true
-        }
-        if (msg == "[NPC] Carrolyn: Thank you for the carrots.") {
-            storage.carrotFortune = true
-            ChatUtils.chat("§aYou have already given Carrolyn enough Exportable Carrots.")
-        }
-        if (msg == "[NPC] Carrolyn: Thank you for the pumpkins.") {
-            storage.pumpkinFortune = true
-            ChatUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkins.")
-        }
-        if (msg == "[NPC] Carrolyn: Thank you for the chocolate.") {
-            storage.cocoaBeansFortune = true
-            ChatUtils.chat("§aYou have already given Carrolyn enough Supreme Chocolate Bars.")
-        }
+    }
+
+    @SubscribeEvent
+    fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        //TODO check config version
+        event.move(46, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
+        event.move(46, "#profile.garden.fortune.pumpkinFortune", "#profile.garden.fortune.carrolyn.PUMPKIN")
+        event.move(46, "#profile.garden.fortune.cocoaBeansFortune", "#profile.garden.fortune.carrolyn.COCOA_BEANS")
     }
 }
