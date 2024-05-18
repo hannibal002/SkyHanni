@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -31,7 +33,6 @@ import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
 object CaptureFarmingGear {
-    private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
     private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
@@ -90,7 +91,15 @@ object CaptureFarmingGear {
     }
 
     fun captureFarmingGear() {
-        val farmingItems = farmingItems ?: return
+        for (armor in InventoryUtils.getArmor()) {
+            if (armor == null) continue
+            val split = armor.getInternalName().asString().split("_")
+            if (split.first() in farmingSets) {
+                val category = armor.getItemCategoryOrNull() ?: continue
+                FarmingItems.getFromItemCategoryOne(category)?.setItem(armor)
+            }
+        }
+
         val itemStack = InventoryUtils.getItemInHand() ?: return
 
         val currentCrop = itemStack.getCropType()
@@ -99,22 +108,7 @@ object CaptureFarmingGear {
             //todo better fall back items
             //todo Daedalus axe
         } else {
-            for (item in FarmingItems.entries) {
-                if (item.name == currentCrop.name) {
-                    farmingItems[item] = itemStack
-                }
-            }
-        }
-        for (armor in InventoryUtils.getArmor()) {
-            if (armor == null) continue
-            val split = armor.getInternalName().asString().split("_")
-            if (split.first() in farmingSets) {
-                for (item in FarmingItems.entries) {
-                    if (item.name == split.last()) {
-                        farmingItems[item] = armor
-                    }
-                }
-            }
+            currentCrop.farmingItem.setItem(itemStack)
         }
 
         TabListData.getTabList().matchFirst(strengthPattern) {
@@ -151,15 +145,14 @@ object CaptureFarmingGear {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val storage = GardenAPI.storage?.fortune ?: return
-        val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
         if (PetAPI.isPetMenu(event.inventoryName)) {
-            pets(farmingItems, items, outdatedItems)
+            pets(items, outdatedItems)
             return
         }
         when (event.inventoryName) {
-            "Your Equipment and Stats" -> equipmentAndStats(items, farmingItems, outdatedItems)
+            "Your Equipment and Stats" -> equipmentAndStats(items, outdatedItems)
             "Your Skills" -> skills(items, storage)
             "Community Shop" -> communityShop(items)
             "Configure Plots" -> configurePlots(items, storage)
@@ -248,69 +241,54 @@ object CaptureFarmingGear {
     }
 
     private fun pets(
-        farmingItems: MutableMap<FarmingItems, ItemStack>,
         items: Map<Int, ItemStack>,
         outdatedItems: MutableMap<FarmingItems, Boolean>,
     ) {
         // If they've 2 of same pet, one will be overwritten
-        // optimize
-
-        for (pet in listOf(
-            FarmingItems.ELEPHANT,
-            FarmingItems.MOOSHROOM_COW,
-            FarmingItems.RABBIT,
-            FarmingItems.BEE
-        )) {
-            if (farmingItems[pet] == null) {
-                farmingItems[pet] = FFGuideGUI.getFallbackItem(pet)
-            }
-        }
 
         // setting to current saved level -1 to stop later pages saving low rarity pets
-        var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestMooshroomRarity = (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestElephantRarity = (FarmingItems.ELEPHANT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestMooshroomRarity = (FarmingItems.MOOSHROOM_COW.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestRabbitRarity = (FarmingItems.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestBeeRarity = (FarmingItems.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
 
         for ((_, item) in items) {
-            val split = item.getInternalName().asString().split(";")
-            if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
-                farmingItems[FarmingItems.ELEPHANT] = item
+            if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
+            val (name, rarity) = item.getInternalName().asString().split(";")
+            if (name == "ELEPHANT" && rarity.toInt() > highestElephantRarity) {
+                FarmingItems.ELEPHANT.setItem(item)
                 outdatedItems[FarmingItems.ELEPHANT] = false
-                highestElephantRarity = split.last().toInt()
+                highestElephantRarity = rarity.toInt()
             }
-            if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
-                farmingItems[FarmingItems.MOOSHROOM_COW] = item
+            if (name == "MOOSHROOM_COW" && rarity.toInt() > highestMooshroomRarity) {
+                FarmingItems.MOOSHROOM_COW.setItem(item)
                 outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                highestMooshroomRarity = split.last().toInt()
+                highestMooshroomRarity = rarity.toInt()
             }
-            if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
-                farmingItems[FarmingItems.RABBIT] = item
+            if (name == "RABBIT" && rarity.toInt() > highestRabbitRarity) {
+                FarmingItems.RABBIT.setItem(item)
                 outdatedItems[FarmingItems.RABBIT] = false
-                highestRabbitRarity = split.last().toInt()
+                highestRabbitRarity = rarity.toInt()
             }
-            if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
-                farmingItems[FarmingItems.BEE] = item
+            if (name == "BEE" && rarity.toInt() > highestBeeRarity) {
+                FarmingItems.BEE.setItem(item)
                 outdatedItems[FarmingItems.BEE] = false
-                highestBeeRarity = split.last().toInt()
+                highestBeeRarity = rarity.toInt()
             }
         }
     }
 
     private fun equipmentAndStats(
         items: Map<Int, ItemStack>,
-        farmingItems: MutableMap<FarmingItems, ItemStack>,
         outdatedItems: MutableMap<FarmingItems, Boolean>,
     ) {
         for ((_, slot) in items) {
             val split = slot.getInternalName().asString().split("_")
+            val category = slot.getItemCategoryOrNull() ?: continue
             if (split.first() == "LOTUS") {
-                for (item in FarmingItems.entries) {
-                    if (item.name == split.last()) {
-                        farmingItems[item] = slot
-                        outdatedItems[item] = false
-                    }
-                }
+                val item = FarmingItems.getFromItemCategoryOne(category) ?: continue
+                item.setItem(slot)
+                outdatedItems[item] = false
                 FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
                 val enchantments = slot.getEnchantments() ?: emptyMap()
                 val greenThumbLvl = (enchantments["green_thumb"] ?: continue)

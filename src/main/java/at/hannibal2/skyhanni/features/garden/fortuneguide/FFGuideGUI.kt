@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.CropPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -22,15 +21,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
     companion object {
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
-
-        private val fallbackItems = mutableMapOf<FarmingItems, ItemStack>()
-
-        fun getFallbackItem(item: FarmingItems) = fallbackItems.getOrPut(item) {
-            val name = "§cNo saved ${item.name.lowercase().replace("_", " ")}"
-            ItemStack(Blocks.barrier).setStackDisplayName(name)
-        }
-
-        fun isFallbackItem(item: ItemStack) = item.name.startsWith("§cNo saved ")
 
         fun open() {
             CaptureFarmingGear.captureFarmingGear()

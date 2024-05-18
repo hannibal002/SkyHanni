@@ -1,42 +1,53 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
-enum class FarmingItems(private val f: (ItemStack?) -> Map<FFTypes, Double> = { emptyMap() }) {
-    WHEAT,
-    CARROT,
-    POTATO,
-    NETHER_WART,
-    PUMPKIN,
-    MELON,
-    COCOA_BEANS,
-    SUGAR_CANE,
-    CACTUS,
-    MUSHROOM,
-    HELMET(FFStats::getArmorFFData),
-    CHESTPLATE(FFStats::getArmorFFData),
-    LEGGINGS(FFStats::getArmorFFData),
-    BOOTS(FFStats::getArmorFFData),
-    NECKLACE(FFStats::getEquipmentFFData),
-    CLOAK(FFStats::getEquipmentFFData),
-    BELT(FFStats::getEquipmentFFData),
-    BRACELET(FFStats::getEquipmentFFData),
-    ELEPHANT(FFStats::getPetFFData),
-    MOOSHROOM_COW(FFStats::getPetFFData),
-    RABBIT(FFStats::getPetFFData),
-    BEE(FFStats::getPetFFData),
+enum class FarmingItems(
+    val itemCategory: ItemCategory,
+    private val ffCalculation: (ItemStack?) -> Map<FFTypes, Double> = { emptyMap() },
+) {
+    WHEAT(ItemCategory.HOE),
+    CARROT(ItemCategory.HOE),
+    POTATO(ItemCategory.HOE),
+    NETHER_WART(ItemCategory.HOE),
+    PUMPKIN(ItemCategory.AXE),
+    MELON(ItemCategory.AXE),
+    COCOA_BEANS(ItemCategory.AXE),
+    SUGAR_CANE(ItemCategory.HOE),
+    CACTUS(ItemCategory.HOE),
+    MUSHROOM(ItemCategory.HOE),
+    HELMET(ItemCategory.HELMET, FFStats::getArmorFFData),
+    CHESTPLATE(ItemCategory.CHESTPLATE, FFStats::getArmorFFData),
+    LEGGINGS(ItemCategory.LEGGINGS, FFStats::getArmorFFData),
+    BOOTS(ItemCategory.BOOTS, FFStats::getArmorFFData),
+    NECKLACE(ItemCategory.NECKLACE, FFStats::getEquipmentFFData),
+    CLOAK(ItemCategory.CLOAK, FFStats::getEquipmentFFData),
+    BELT(ItemCategory.BELT, FFStats::getEquipmentFFData),
+    BRACELET(ItemCategory.BRACELET, FFStats::getEquipmentFFData),
+    ELEPHANT(ItemCategory.PET, FFStats::getPetFFData),
+    MOOSHROOM_COW(ItemCategory.PET, FFStats::getPetFFData),
+    RABBIT(ItemCategory.PET, FFStats::getPetFFData),
+    BEE(ItemCategory.PET, FFStats::getPetFFData),
     ;
 
     var selectedState = false
 
-    fun getItem() = getItemOrNull() ?: FFGuideGUI.getFallbackItem(this)
+    fun getItem() = getItemOrNull() ?: fallbackItem
+
+    private val fallbackItem: ItemStack by lazy {
+        val name = "§cNo saved ${name.lowercase().replace("_", " ")}"
+        ItemStack(Blocks.barrier).setStackDisplayName(name)
+    }
 
     fun getItemOrNull() = ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.get(this)
+    fun setItem(value: ItemStack) = ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.set(this, value)
 
     private fun onClick(): () -> Unit = when (this) {
         in armor -> {
@@ -109,7 +120,7 @@ enum class FarmingItems(private val f: (ItemStack?) -> Map<FFTypes, Double> = { 
     private var ffData: Map<FFTypes, Double>? = null
 
     fun getFFData() = ffData ?: run {
-        val data = f(getItem())
+        val data = ffCalculation(getItemOrNull())
         ffData = data
         data
     }
@@ -148,5 +159,8 @@ enum class FarmingItems(private val f: (ItemStack?) -> Map<FFTypes, Double> = { 
             }
             return lastEquippedPet
         }
+
+        fun getFromItemCategory(category: ItemCategory) = entries.filter { it.itemCategory == category }
+        fun getFromItemCategoryOne(category: ItemCategory) = entries.firstOrNull { it.itemCategory == category }
     }
 }

@@ -120,10 +120,7 @@ object FortuneUpgrades {
 
     private fun getArmorUpgrades() {
         for (piece in FarmingItems.armor) {
-            val item = piece.getItem() ?: return
-            // todo skip if it doesnt exist -> tell them to buy it later
-
-            if (FFGuideGUI.isFallbackItem(item)) return
+            val item = piece.getItemOrNull() ?: return // todo tell them to buy it later
 
             recombobulateItem(item, genericUpgrades)
             when (item.getReforgeName()) {
@@ -141,7 +138,7 @@ object FortuneUpgrades {
 
     // todo needs to be called when switching pets
     private fun getPetUpgrades() {
-        if (FarmingItems.currentPet.getItem()?.getInternalName()?.contains(";") == true) {
+        if (FarmingItems.currentPet.getItemOrNull()?.getInternalName()?.contains(";") == true) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {
