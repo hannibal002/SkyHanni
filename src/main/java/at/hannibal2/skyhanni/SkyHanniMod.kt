@@ -270,6 +270,8 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseCopyUnderbidPrice
+import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseOpenPriceWebsite
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
@@ -362,7 +364,6 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
@@ -486,7 +487,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.26",
+    version = "0.25.Beta.28",
 )
 class SkyHanniMod {
 
@@ -632,6 +633,7 @@ class SkyHanniMod {
         loadModule(ShiftClickBrewing())
         loadModule(BazaarOpenPriceWebsite())
         loadModule(AuctionHouseCopyUnderbidPrice())
+        loadModule(AuctionHouseOpenPriceWebsite())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown)

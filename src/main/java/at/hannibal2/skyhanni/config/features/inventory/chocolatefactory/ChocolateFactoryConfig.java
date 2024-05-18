@@ -104,11 +104,17 @@ public class ChocolateFactoryConfig {
     public boolean showDuplicateTime = false;
 
     @Expose
-    @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
+    @ConfigOption(name = "Time Tower Usage Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeTowerWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Time Tower Reminder", desc = "Notification a minute before the time tower ends.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeTowerReminder = true;
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
