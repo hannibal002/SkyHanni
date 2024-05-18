@@ -61,6 +61,11 @@ public class GardenConfig {
     public EliteFarmingWeightConfig eliteFarmingWeights = new EliteFarmingWeightConfig();
 
     @Expose
+    @ConfigOption(name = "Farming Collection", desc = "")
+    @Accordion
+    public EliteFarmingCollectionConfig eliteFarmingCollection = new EliteFarmingCollectionConfig();
+
+    @Expose
     @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
     @Accordion
     // TODO rename to dicerRngDropTracker

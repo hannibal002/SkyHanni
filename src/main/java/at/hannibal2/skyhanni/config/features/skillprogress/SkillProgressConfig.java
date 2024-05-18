@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -48,6 +49,11 @@ public class SkillProgressConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Elite Bot ranking display", desc = "")
+    @Accordion
+    public EliteSkillsDisplayConfig rankDisplay = new EliteSkillsDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Hide In Action Bar", desc = "Hide the skill progress in the Hypixel action bar.")
