@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 data class FortuneUpgrade(
     val description: String,
     val costCopper: Int?,
-    //todo make into NEUInternalName
     private val requiredItemName: String,
     val itemQuantity: Int,
     val fortuneIncrease: Double,

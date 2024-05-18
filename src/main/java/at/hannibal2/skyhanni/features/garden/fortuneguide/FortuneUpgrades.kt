@@ -22,8 +22,6 @@ import net.minecraft.item.ItemStack
 
 object FortuneUpgrades {
 
-    private val equipment = listOf(FarmingItems.NECKLACE, FarmingItems.CLOAK, FarmingItems.BELT, FarmingItems.BRACELET)
-    private val armor = listOf(FarmingItems.HELMET, FarmingItems.CHESTPLATE, FarmingItems.LEGGINGS, FarmingItems.BOOTS)
     private val axeCrops = listOf(CropType.MELON, CropType.PUMPKIN, CropType.COCOA_BEANS)
 
     val genericUpgrades = mutableListOf<FortuneUpgrade>()
@@ -91,7 +89,7 @@ object FortuneUpgrades {
 
     private fun getEquipmentUpgrades() {
         val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
-        for (piece in equipment) {
+        for (piece in FarmingItems.equip) {
             val item = piece.getItem() ?: return
             // todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
@@ -121,7 +119,7 @@ object FortuneUpgrades {
     // todo adding armor tier upgrades later
 
     private fun getArmorUpgrades() {
-        for (piece in armor) {
+        for (piece in FarmingItems.armor) {
             val item = piece.getItem() ?: return
             // todo skip if it doesnt exist -> tell them to buy it later
 

@@ -21,6 +21,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
     companion object {
 
+        /** Value for which crop page is active */
         var currentCrop: CropType? = null
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
@@ -50,8 +51,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
     init {
         FFStats.loadFFData()
         FortuneUpgrades.generateGenericUpgrades()
-
-        // New Code
 
         FarmingItems.setDefaultPet()
 
