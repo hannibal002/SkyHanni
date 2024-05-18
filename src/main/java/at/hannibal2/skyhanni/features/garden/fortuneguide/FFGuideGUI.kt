@@ -21,9 +21,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
     companion object {
 
-        /** Value for which crop page is active */
-        var currentCrop: CropType? = null
-
         fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
 
         private val fallbackItems = mutableMapOf<FarmingItems, ItemStack>()
@@ -48,6 +45,9 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
     }
 
+    /** Value for which crop page is active */
+    private var currentCrop: CropType? = null
+
     init {
         FFStats.loadFFData()
         FortuneUpgrades.generateGenericUpgrades()
@@ -56,8 +56,8 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
         pageList = mapOf(
             FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
-            FortuneGuidePage.CROP to CropPage(sizeX, sizeY),
-            FortuneGuidePage.UPGRADES to UpgradePage(sizeX, sizeY - 2),
+            FortuneGuidePage.CROP to CropPage({ currentCrop!! }, sizeX, sizeY),
+            FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )
         verticalTabs = listOf(
             vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {
@@ -101,5 +101,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         OVERVIEW,
         CROP,
         UPGRADES,
+
     }
 }

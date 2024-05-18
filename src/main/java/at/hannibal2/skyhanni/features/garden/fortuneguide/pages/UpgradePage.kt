@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrade
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
@@ -13,16 +13,20 @@ import at.hannibal2.skyhanni.utils.guide.GuideScrollPage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import java.text.DecimalFormat
 
-class UpgradePage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : GuideScrollPage(
-    sizeX,
-    sizeY,
-    paddingX,
-    paddingY,
-    marginY = 10,
-    hasHeader = true,
-) {
+class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
+    GuideScrollPage(
+        sizeX,
+        sizeY,
+        paddingX,
+        paddingY,
+        marginY = 10,
+        hasHeader = true,
+    ) {
+
+    val crop get() = crop0()
+
     override fun onEnter() {
-        FFGuideGUI.currentCrop?.let {
+        crop?.let {
             FortuneUpgrades.getCropSpecific(it.farmingItem.getItemOrNull())
         } ?: {
             FortuneUpgrades.getCropSpecific(null) // TODO
@@ -32,7 +36,7 @@ class UpgradePage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7)
         update(
             content = buildList {
                 add(header())
-                val upgradeList = if (FFGuideGUI.currentCrop == null)
+                val upgradeList = if (crop == null)
                     FortuneUpgrades.genericUpgrades
                 else
                     FortuneUpgrades.cropSpecificUpgrades

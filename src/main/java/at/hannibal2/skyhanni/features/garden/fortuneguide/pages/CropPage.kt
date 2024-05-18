@@ -1,24 +1,24 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneStats
 import at.hannibal2.skyhanni.utils.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
-class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : GuideTablePage(
-    sizeX,
-    sizeY,
-    paddingX,
-    paddingY
-) {
+class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
+    GuideTablePage(
+        sizeX,
+        sizeY,
+        paddingX,
+        paddingY
+    ) {
 
-    val crop get() = FFGuideGUI.currentCrop!! // TODO
+    val crop get() = crop0()
 
     override fun onEnter() {
         val item = crop.farmingItem
@@ -39,30 +39,19 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
         )
     }
 
-    private val headers = setOf(FortuneStats.BASE, FortuneStats.CROP_TOTAL, FortuneStats.CROP_UPGRADE)
-
     private fun header(): List<Renderable> = buildList {
         add(FortuneStats.BASE.getFarmingBar())
 
         add(
-            FortuneStats.CROP_TOTAL.getFarmingBarWithLabel(110) {
-                it.label.replace(
-                    "Crop",
-                    crop.name.replace("_", " ").firstLetterUppercase()
-                )
-            }
+            FortuneStats.CROP_TOTAL.getFarmingBar(110)
         )
 
         add(FortuneStats.CROP_UPGRADE.getFarmingBar())
     }
 
-    private fun FortuneStats.getFarmingBar() = this.getFarmingBarWithLabel { label }
-
-    private inline fun FortuneStats.getFarmingBarWithLabel(
+    private fun FortuneStats.getFarmingBar(
         width: Int = 90,
-        crossinline label: (FortuneStats) -> String,
-    ) =
-        GuiRenderUtils.getFarmingBar(label(this), tooltip, current, max, width)
+    ) = GuiRenderUtils.getFarmingBar(label(crop), tooltip(crop), current, max, width)
 
     private fun toolLines(): List<Renderable> =
         FortuneStats.entries.filter { it.isActive() && it !in headers }.map { it.getFarmingBar() }
@@ -89,4 +78,8 @@ class CropPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) : 
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
         )
+
+    companion object {
+        private val headers = setOf(FortuneStats.BASE, FortuneStats.CROP_TOTAL, FortuneStats.CROP_UPGRADE)
+    }
 }

@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumOfPair
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
-enum class FortuneStats(private val label0: () -> String, private val tooltip0: () -> String) {
+enum class FortuneStats(private val label0: (CropType) -> String, private val tooltip0: (CropType) -> String) {
     BASE(
         "§2Universal Farming Fortune",
         "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" + "§eSee on the grass block page"
     ),
-    CROP_TOTAL("§6Crop Farming Fortune", "§7§2Farming fortune for this crop"),
+    CROP_TOTAL(
+        { crop -> "§6${crop.niceName.firstLetterUppercase()} Farming Fortune" },
+        { "§7§2Farming fortune for this crop" }),
     ACCESSORY("§2Talisman Bonus", "§7§2Fortune from your talisman\n§2You get 10☘ per talisman tier"),
     CROP_UPGRADE("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n§2You get 5☘ per level"),
     BASE_TOOL("§2Base tool fortune", "§7§2Crop specific fortune from your tool"),
@@ -21,11 +25,7 @@ enum class FortuneStats(private val label0: () -> String, private val tooltip0: 
     CULTIVATING("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n§2You get 2☘ per level"),
     TURBO("§2Turbo-Crop Enchantment", "§7§2Fortune for each enchantment level\n§2You get 5☘ per level"),
     DEDICATION("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n§2and crop milestone"),
-    CARROLYN(::carrolynLabel, {
-        "§7§2Gain 12☘ from giving 3,000\n to Carrolyn in Scarleton!\n §eRun /shcarrolyn ${
-            FFGuideGUI.currentCrop?.niceName
-        } to toggle the stat"
-    }),
+    CARROLYN(::carrolynLabel, ::carrolynToolTip),
     ;
 
     constructor(label: String, tooltip: String) : this({ label }, { tooltip })
@@ -33,8 +33,8 @@ enum class FortuneStats(private val label0: () -> String, private val tooltip0: 
     var current: Double = 0.0
     var max: Double = -1.0
 
-    val label get() = label0()
-    val tooltip get() = tooltip0()
+    fun label(crop: CropType) = label0(crop)
+    fun tooltip(crop: CropType) = tooltip0(crop)
 
     fun reset() {
         current = 0.0
@@ -61,5 +61,11 @@ enum class FortuneStats(private val label0: () -> String, private val tooltip0: 
     }
 }
 
-private fun carrolynLabel(): String =
-    CarrolynTable.getByCrop(FFGuideGUI.currentCrop)?.label?.let { "§2$it" } ?: "§cError"
+private fun carrolynLabel(crop: CropType): String =
+    CarrolynTable.getByCrop(crop)?.label?.let { "§2$it" } ?: "§cError"
+
+private fun carrolynToolTip(crop: CropType): String =
+    "§7§2Gain 12☘ from giving 3,000\n to Carrolyn in Scarleton!\n §eRun /shcarrolyn ${
+        crop.niceName
+    } to toggle the stat"
+
