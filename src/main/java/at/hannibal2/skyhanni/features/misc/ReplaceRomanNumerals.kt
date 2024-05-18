@@ -21,10 +21,13 @@ class ReplaceRomanNumerals {
     // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
     private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
 
-    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
+    //
+    /**
+     * REGEX-TEST: §eSelect an option: §r§a[§aOk, then what?§a]
+     */
     private val isSelectOptionPattern by patternGroup.pattern(
         "string.isselectoption",
-        "(§eSelect an option: .*)|(§e\\[NPC] .+)"
+        "§eSelect an option: .*"
     )
 
     // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
@@ -54,6 +57,8 @@ class ReplaceRomanNumerals {
         if (!isEnabled() || event.message.isSelectOption()) return
         event.applyIfPossible { it.transformLine() }
     }
+
+    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
 
     private fun String.transformLine() = splitRegex.findAll(this).map { it.value }.joinToString("") {
         it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() != 2000 }?.coloredRomanToDecimal() ?: it
