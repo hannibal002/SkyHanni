@@ -39,11 +39,19 @@ object BestiaryData {
 
     private val patternGroup = RepoPattern.group("combat.bestiary.data")
 
+    /**
+     * REGEX-TEST: §7Progress to Tier 14: §b26%
+     * REGEX-TEST: §7Progress to Tier XV: §b57.1%
+     */
     private val tierProgressPattern by patternGroup.pattern(
         "tierprogress",
         "§7Progress to Tier [\\dIVXC]+: §b[\\d.]+%"
     )
 
+    /**
+     * REGEX-TEST: §7Overall Progress: §b55.2%
+     * REGEX-TEST: §7Overall Progress: §b100% §7(§c§lMAX!§7)
+     */
     private val overallProgressPattern by patternGroup.pattern(
         "overallprogress",
         "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"
