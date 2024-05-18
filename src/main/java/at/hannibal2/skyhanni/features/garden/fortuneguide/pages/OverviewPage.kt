@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFInfos
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats.FFInfos
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
