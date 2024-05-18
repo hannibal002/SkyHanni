@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object FarmingCollectionDisplay {
 
@@ -45,6 +46,7 @@ object FarmingCollectionDisplay {
 
     private var checkDuration = 10.minutes
     private var worldSwapRefresh = true
+    private var settingToggleCooldown = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -78,7 +80,6 @@ object FarmingCollectionDisplay {
 
     private var display = emptyList<Renderable>()
 
-
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (GardenAPI.hideExtraGuis()) return
@@ -98,7 +99,10 @@ object FarmingCollectionDisplay {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.crop.afterChange {
-            lastLeaderboardFetch = SimpleTimeMark.farPast()
+            if (settingToggleCooldown.passedSince() < 30.seconds) {
+                settingToggleCooldown = SimpleTimeMark.now()
+                lastLeaderboardFetch = SimpleTimeMark.farPast()
+            }
         }
     }
 

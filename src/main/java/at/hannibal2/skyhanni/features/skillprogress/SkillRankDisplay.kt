@@ -41,6 +41,7 @@ object SkillRankDisplay {
 
     private var checkDuration = 10.minutes
     private var worldSwapRefresh = true
+    private var settingToggleCooldown = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -86,7 +87,10 @@ object SkillRankDisplay {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.skill.afterChange {
-            lastLeaderboardFetch = SimpleTimeMark.farPast()
+            if (settingToggleCooldown.passedSince() < 30.seconds) {
+                settingToggleCooldown = SimpleTimeMark.now()
+                lastLeaderboardFetch = SimpleTimeMark.farPast()
+            }
         }
     }
 
