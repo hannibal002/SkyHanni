@@ -21,7 +21,13 @@ class ReplaceRomanNumerals {
     // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
     private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
 
-    // Remove after pr 1717 is ready and switch to ItemHoverEvent
+    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
+    private val isSelectOptionPattern by patternGroup.pattern(
+        "string.isselectoption",
+        "(§eSelect an option: .*)|(§e\\[NPC] .+)"
+    )
+
+    // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
@@ -48,12 +54,6 @@ class ReplaceRomanNumerals {
         if (!isEnabled() || event.message.isSelectOption()) return
         event.applyIfPossible { it.transformLine() }
     }
-
-    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
-    private val isSelectOptionPattern by patternGroup.pattern(
-        "string.isselectoption",
-        "(§eSelect an option: .*)|(§e\\[NPC] .+)"
-    )
 
     private fun String.transformLine() = splitRegex.findAll(this).map { it.value }.joinToString("") {
         it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() != 2000 }?.coloredRomanToDecimal() ?: it
