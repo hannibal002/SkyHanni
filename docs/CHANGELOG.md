@@ -154,6 +154,7 @@
   RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1582)
 + Added time until the next Hoppity event in chat message for egg locator. -
   seraid (https://github.com/hannibal002/SkyHanni/pull/1625)
++ Added a warning before the Time Tower in the Chocolate Factory ends. - seraid (https://github.com/hannibal002/SkyHanni/pull/1816)
 
 #### Inventory Features
 
@@ -163,6 +164,7 @@
     + Option to change enchant formatting.
     + Also parses tooltips from /show.
 + Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
++ Added an option in the Auction House search browser to search for the item on coflnet.com. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1743)
 
 #### Crimson Features
 
@@ -239,6 +241,9 @@
     + This makes it clearer when the guess points to the middle of the plot rather than to a pest.
 + Improved pest count accuracy in plot detection. - Empa (https://github.com/hannibal002/SkyHanni/pull/1764)
 + Added options to show crops per second and crops per hour in the Crop Milestone Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1536)
++ Added tool gemstone information to /ff crop pages. - maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/1817)
++ Added supreme chocolate bars to the Cocoa Beans menu in /ff. - maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/1817)
+    + Toggle this information with `/shcocoabeans`.
 
 #### Diana Improvements
 
@@ -251,6 +256,8 @@
     + Disabled per default.
 + Now detecting inquisitor share messages sent from CT module "InquisitorChecker". -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1359)
++ Added a Diana chat helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1808)
+    + This feature helps to enable /particlequality extreme and /togglemusic when needed.
 
 #### GUI Improvements
 
@@ -508,6 +515,10 @@
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1692)
 + Fixed the secondary visitor timer constantly disappearing while farming. -
   Luna (https://github.com/hannibal002/SkyHanni/pull/1737)
++ Fixed /ff not displaying armor fortune correctly. - maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/1817)
+    + Gemstones and the Pesterminator are now included in the calculations.
+    + The total value for each armor piece is now displayed correctly.
+    + Updated total universal farming values to reflect these changes.
 
 #### Chat Fixes
 
@@ -634,6 +645,9 @@
 + Fixed a case where the chocolate factory upgrade warning did not work. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1758)
 + Fixed Chocolate Factory time remaining calculations while the Time Tower is active. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1774)
 + Fixed enchantment colours showing as white when SkyHanni chroma is not enabled. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1798)
++ Fixed Chocolate Factory Shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1815)
+    + Profit calculations now show in sub-menus.
+    + Total chocolate value now updates when buying something from the Chocolate Factory Shop.
 
 #### Rift Fixes
 
@@ -685,6 +699,10 @@
 
 + Fixed incorrect miniboss amount displayed by Crimson Isle Reputation Helper. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1633)
+
+#### Diana Fixes
+
++ Fixed an error in the All Burrows List. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1809)
 
 #### Misc Fixes
 
@@ -741,6 +759,8 @@
 + Fixed removal of incorrect minion name tags. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1791)
     + No longer resets all minion nametags when clicking the wheat minion in the Hub.
     + No longer resets minion nametags that are far away from the clicked minion.
++ Fixed the armor hider also hiding items in the inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1813)
++ Fixed an error in the Outside SkyBlock setting. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1810)
 
 ### Technical Details
 
