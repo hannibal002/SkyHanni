@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.config.features.garden.EliteFarmingCollectionConfig
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteCollectionGraphEntry
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboard
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EliteAPISettingsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
@@ -41,7 +43,15 @@ object FarmingCollectionDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.eliteFarmingCollection
 
-    private val CHECK_DURATION = 10.minutes
+    private var checkDuration = 10.minutes
+    private var worldSwapRefresh = true
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<EliteAPISettingsJson>("EliteAPISettings")
+        checkDuration = data.refreshTime.minutes
+        worldSwapRefresh = data.worldSwapRefresh
+    }
 
     private val eliteCollectionApiGson by lazy {
         ConfigManager.createBaseGsonBuilder()
@@ -80,7 +90,9 @@ object FarmingCollectionDisplay {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        resetData()
+        if (worldSwapRefresh) {
+            resetData()
+        }
     }
 
     @SubscribeEvent
@@ -102,7 +114,7 @@ object FarmingCollectionDisplay {
             hasFetchedCollection = true
         }
 
-        if (lastLeaderboardFetch.passedSince() > CHECK_DURATION) {
+        if (lastLeaderboardFetch.passedSince() > checkDuration) {
             lastLeaderboardFetch = SimpleTimeMark.now()
             val crop = if (config.crop.get() == CropDisplay.AUTO) {
                 lastBrokenCrop ?: CropType.WHEAT
@@ -212,7 +224,7 @@ object FarmingCollectionDisplay {
             )
         }
         if (config.showTimeUntilRefresh) {
-            val time = CHECK_DURATION - lastLeaderboardFetch.passedSince()
+            val time = checkDuration - lastLeaderboardFetch.passedSince()
             val timedisplay = if (time.isNegative()) "Now" else time.format()
 
             newDisplay.add(
