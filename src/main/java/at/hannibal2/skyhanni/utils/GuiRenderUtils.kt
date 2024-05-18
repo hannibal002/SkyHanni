@@ -185,7 +185,8 @@ object GuiRenderUtils {
         width: Int,
         textScale: Float = .7f,
     ): Renderable {
-        val percent = currentValue.fractionOf(maxValue)
+        val current = currentValue.toDouble().coerceAtLeast(0.0)
+        val percent = current.fractionOf(maxValue)
         val scale = textScale.toDouble()
         return Renderable.hoverTips(Renderable.verticalContainer(
             listOf(
@@ -193,7 +194,7 @@ object GuiRenderUtils {
                 Renderable.fixedSizeLine(
                     listOf(
                         Renderable.string(
-                            "§2${DecimalFormat("0.##").format(currentValue.toDouble())} / ${
+                            "§2${DecimalFormat("0.##").format(current)} / ${
                                 DecimalFormat(
                                     "0.##"
                                 ).format(maxValue)
