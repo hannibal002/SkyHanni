@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.skillprogress.EliteSkillsDisplayConfig.SkillDisplay
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboard
+import at.hannibal2.skyhanni.data.jsonobjects.other.EliteSkillGraphEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EliteAPISettingsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -68,6 +68,7 @@ object SkillRankDisplay {
     private var lastSkillFetched: String? = null
     private var lastLeaderboardFetch = SimpleTimeMark.farPast()
     private var lastXPGained = SimpleTimeMark.farPast()
+    private var hasSkillsBeenFetched = false
 
     private var display = emptyList<Renderable>()
 
@@ -145,6 +146,7 @@ object SkillRankDisplay {
     }
 
     private fun resetData() {
+        hasSkillsBeenFetched = false
         lastLeaderboardFetch = SimpleTimeMark.farPast()
         skillRanks.clear()
         skillPlacements.clear()
@@ -233,6 +235,10 @@ object SkillRankDisplay {
             lastSkillFetched = skill
             currentSkills[skill] = data.amount
 
+            if (!hasSkillsBeenFetched && data.amount == 0L) {
+                hasSkillsBeenFetched = true
+                getCurrentSkills()
+            }
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e,
@@ -246,9 +252,29 @@ object SkillRankDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun playerLogout(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        SkyHanniMod.feature.storage.lastSkillObtained = lastSkillGained
+    private fun getCurrentSkills() {
+        if (profileID == null) return
+        val url =
+            "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}/skills?days=1"
+        val response = APIUtil.getJSONResponseAsElement(url)
+
+        try {
+            val data = eliteCollectionApiGson.fromJson<Array<EliteSkillGraphEntry>>(response)
+
+            data.sortBy { it.timestamp }
+            currentSkills = data.lastOrNull()?.skills?.toMutableMap() ?: mutableMapOf()
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Error loading user skill\n" +
+                    "§eLoading the skill data from elitebot.dev failed!\n" +
+                    "§eYou can switch worlds to try to fix the problem.\n" +
+                    "§cIf this message repeats, please report it on Discord!\n",
+                "url" to url,
+                "apiResponse" to response,
+            )
+        }
     }
 
     private fun isEnabled() = config.display && LorenzUtils.inSkyBlock

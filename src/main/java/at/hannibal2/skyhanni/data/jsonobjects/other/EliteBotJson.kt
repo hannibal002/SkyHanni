@@ -46,7 +46,14 @@ data class PestWeightData(
     @Expose @SerializedName("values") val pestWeights: Map<PestType, Map<Int, Double>>
 )
 
+data class EliteCollectionGraphEntry(
+    @Expose val timestamp: Long,
+    @Expose val crops: Map<CropType, Long>,
+)
+
 data class EliteSkillGraphEntry(
     @Expose val timestamp: Long,
     @Expose val skills: Map<String, Long>,
 )
+
+
