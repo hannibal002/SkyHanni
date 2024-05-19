@@ -21,7 +21,7 @@ object CustomScoreboardUtils {
         pattern.matchMatcher(line) {
             group(group)
         }
-    } ?: "0"
+    }
 
     fun getProfileTypeSymbol() = when {
         HypixelData.ironman -> "§7♲ "

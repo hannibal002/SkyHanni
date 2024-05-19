@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServe
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.MiningAPI.getCold
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
@@ -129,6 +130,11 @@ enum class ScoreboardElement(
         ::getNorthStarsDisplayPair,
         ::getNorthStarsShowWhen,
         "North Stars: §d756"
+    ),
+    SOULFLOW(
+        ::getSoulflowDisplayPair,
+        ::getSoulflowDisplayWhen,
+        "Soulflow: §3761"
     ),
     EMPTY_LINE(
         ::getEmptyLineDisplayPair,
@@ -349,10 +355,9 @@ private fun getProfileDisplayPair() =
 private fun getPurseDisplayPair(): List<ScoreboardElementType> {
     var purse = PurseAPI.currentPurse.formatNum()
 
-    val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.coinsPattern, "earned")
-
-    if (earned != "0") {
-        purse += " §7(§e+$earned§7)§6"
+    if (!displayConfig.hideCoinsDifference) {
+        val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.coinsPattern, "earned")
+        if (earned != null) purse += " §7(§e+$earned§7)§6"
     }
 
     return listOf(
@@ -368,7 +373,7 @@ private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getMotesDisplayPair(): List<ScoreboardElementType> {
     val motes = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes")
-        .formatNum()
+        ?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -382,7 +387,7 @@ private fun getMotesDisplayPair(): List<ScoreboardElementType> {
 private fun getMotesShowWhen() = inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBankDisplayPair(): List<ScoreboardElementType> {
-    val bank = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
+    val bank = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank") ?: "0"
 
     return listOf(
         when {
@@ -429,7 +434,7 @@ private fun getBitsShowWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CA
 
 private fun getCopperDisplayPair(): List<ScoreboardElementType> {
     val copper = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper")
-        .formatNum()
+        ?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -443,7 +448,7 @@ private fun getCopperDisplayPair(): List<ScoreboardElementType> {
 private fun getCopperShowWhen() = inAnyIsland(IslandType.GARDEN)
 
 private fun getGemsDisplayPair(): List<ScoreboardElementType> {
-    val gems = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
+    val gems = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems") ?: "0"
 
     return listOf(
         when {
@@ -462,8 +467,8 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> "<hidden>"
-            displayConfig.displayNumbersFirst/* && heat != "§6IMMUNE" */ -> if (heat == "0") "§c♨ 0 Heat" else "$heat Heat"
-            else -> if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat"
+            displayConfig.displayNumbersFirst/* && heat != "§6IMMUNE" */ -> heat?.let { "$heat Heat" } ?: "§c♨ 0 Heat"
+            else -> heat?.let { "Heat: $heat" } ?: "§c♨ 0 Heat"
         } to HorizontalAlignment.LEFT
     )
 }
@@ -489,7 +494,7 @@ private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
     val northStars =
         getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
-            .formatNum()
+            ?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -501,6 +506,20 @@ private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getNorthStarsShowWhen() = inAnyIsland(IslandType.WINTER)
+
+private fun getSoulflowDisplayPair(): List<ScoreboardElementType> {
+    val soulflow = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.soulflowPattern, "soulflow")
+        ?.formatNum() ?: "0"
+    return listOf(
+        when {
+            informationFilteringConfig.hideEmptyLines && soulflow == "0" -> "<hidden>"
+            displayConfig.displayNumbersFirst -> "§3$soulflow Soulflow"
+            else -> "Soulflow: §3$soulflow"
+        } to HorizontalAlignment.LEFT
+    )
+}
+
+private fun getSoulflowDisplayWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.LEFT)
 
@@ -540,11 +559,15 @@ private fun getDateDisplayPair() =
     )
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
-    var symbol = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol")
-    if (symbol == "0") symbol = ""
+    val symbol =
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
-            .formatted(dayAndMonthElement = false, yearElement = false) + " $symbol" to HorizontalAlignment.LEFT
+            .formatted(
+                dayAndMonthElement = false,
+                yearElement = false,
+                timeFormat24h = displayConfig.skyblockTime24hFormat
+            ) + " $symbol" to HorizontalAlignment.LEFT
     )
 }
 
@@ -694,21 +717,21 @@ private fun getPowderDisplayPair() = buildList {
                 TabListData.getTabList(),
                 ScoreboardPattern.mithrilPowderPattern,
                 "mithrilpowder"
-            ).formatNum()
+            )?.formatNum() ?: "0"
         ),
         Triple(
             "Gemstone", "§d", getGroupFromPattern(
                 TabListData.getTabList(),
                 ScoreboardPattern.gemstonePowderPattern,
                 "gemstonepowder"
-            ).formatNum()
+            )?.formatNum() ?: "0"
         ),
         Triple(
             "Glacite", "§b", getGroupFromPattern(
                 TabListData.getTabList(),
                 ScoreboardPattern.glacitePowderPattern,
                 "glacitepowder"
-            ).formatNum()
+            )?.formatNum() ?: "0"
         )
     )
 
@@ -788,8 +811,8 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
         inAnyIsland(
             IslandType.DUNGEON_HUB,
             IslandType.KUUDRA_ARENA,
-            IslandType.CRIMSON_ISLE
-        )
+            IslandType.CRIMSON_ISLE,
+        ) || MiningAPI.inGlaciteArea()
     }
 }
 
