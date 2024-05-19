@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -50,7 +49,10 @@ object HoppityCollectionStats {
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
 
     private var totalRabbits = 0
+
     private val rabbitRarities = mutableMapOf<String, RabbitCollectionRarity>()
+    private val rarityBonuses = mutableMapOf<RabbitCollectionRarity, ChocolateBonuses>()
+    private var specialBonuses = emptyMap<String, ChocolateBonuses>()
 
     var inInventory = false
 
@@ -71,6 +73,17 @@ object HoppityCollectionStats {
     }
 
     @SubscribeEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!inInventory) return
+
+        config.hoppityStatsPosition.renderRenderables(
+            display,
+            extraSpace = 5,
+            posLabel = "Hoppity's Collection Stats"
+        )
+    }
+
+    @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         rabbitRarities.clear()
 
@@ -81,18 +94,13 @@ object HoppityCollectionStats {
             for (rabbit in rarityData.rabbits) {
                 rabbitRarities[rabbit] = rarity
             }
+
+            rarityBonuses[rarity] = ChocolateBonuses(rarityData.chocolate, rarityData.multiplier)
         }
-    }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!inInventory) return
-
-        config.hoppityStatsPosition.renderRenderables(
-            display,
-            extraSpace = 5,
-            posLabel = "Hoppity's Collection Stats"
-        )
+        specialBonuses = data.special.mapValues {
+            ChocolateBonuses(it.value.chocolate, it.value.multiplier)
+        }
     }
 
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
@@ -125,7 +133,7 @@ object HoppityCollectionStats {
 
         val table = mutableListOf<DisplayTableEntry>()
         for (rarity in RabbitCollectionRarity.entries) {
-            val filtered = loggedRabbits.filterKeys {
+            val rabbitsOfRarity = loggedRabbits.filterKeys {
                 val apiName = toApiRabbitName(it)
                 rabbitRarities[apiName] == rarity
             }
@@ -133,11 +141,14 @@ object HoppityCollectionStats {
             val isTotal = rarity == RabbitCollectionRarity.TOTAL
 
             val title = "${rarity.displayName} Rabbits"
-            val amountFound = filtered.count { it.value > 0 }
-            val totalOfRarity = filtered.size
-            val duplicates = filtered.values.sumOf { (it - 1).coerceAtLeast(0) }
-            val chocolatePerSecond = rarity.chocolatePerSecond * amountFound
-            val chocolateMultiplier = (rarity.chocolateMultiplier * amountFound)
+            val foundRabbits = rabbitsOfRarity.filter { it.value > 0 }
+            val amountFound = foundRabbits.size
+            val totalOfRarity = rabbitsOfRarity.size
+            val duplicates = rabbitsOfRarity.values.sumOf { (it - 1).coerceAtLeast(0) }
+
+            val chocolateBonuses = foundRabbits.keys.map { getChocolateBonuses(it) }
+            val chocolatePerSecond = chocolateBonuses.sumOf { it.chocolate }
+            val chocolateMultiplier = chocolateBonuses.sumOf { it.multiplier }
 
             if (!isTotal) {
                 totalAmountFound += amountFound
@@ -219,20 +230,31 @@ object HoppityCollectionStats {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 
+    private fun getChocolateBonuses(rabbit: String): ChocolateBonuses {
+        val apiName = toApiRabbitName(rabbit)
+        return specialBonuses[apiName]
+            ?: rarityBonuses[rabbitRarities[apiName]]
+            ?: ChocolateBonuses(0, 0.0)
+    }
+
+
+    private data class ChocolateBonuses(
+        val chocolate: Int,
+        val multiplier: Double
+    )
+
     // todo in future make the amount and multiplier work with mythic rabbits (can't until I have some)
     enum class RabbitCollectionRarity(
         val displayName: String,
-        val chocolatePerSecond: Int,
-        val chocolateMultiplier: Double,
         val item: NEUInternalName,
     ) {
-        COMMON("§fCommon", 1, 0.002, "STAINED_GLASS".asInternalName()),
-        UNCOMMON("§aUncommon", 2, 0.003, "STAINED_GLASS-5".asInternalName()),
-        RARE("§9Rare", 4, 0.004, "STAINED_GLASS-11".asInternalName()),
-        EPIC("§5Epic", 10, 0.005, "STAINED_GLASS-10".asInternalName()),
-        LEGENDARY("§6Legendary", 0, 0.02, "STAINED_GLASS-1".asInternalName()),
-        MYTHIC("§dMythic", 0, 0.0, "STAINED_GLASS-6".asInternalName()),
-        TOTAL("§cTotal", 0, 0.0, "STAINED_GLASS-14".asInternalName()),
+        COMMON("§fCommon", "STAINED_GLASS".asInternalName()),
+        UNCOMMON("§aUncommon", "STAINED_GLASS-5".asInternalName()),
+        RARE("§9Rare", "STAINED_GLASS-11".asInternalName()),
+        EPIC("§5Epic", "STAINED_GLASS-10".asInternalName()),
+        LEGENDARY("§6Legendary", "STAINED_GLASS-1".asInternalName()),
+        MYTHIC("§dMythic", "STAINED_GLASS-6".asInternalName()),
+        TOTAL("§cTotal", "STAINED_GLASS-14".asInternalName()),
         ;
 
         companion object {
