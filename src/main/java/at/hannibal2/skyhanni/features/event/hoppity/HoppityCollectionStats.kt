@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityCollectionJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -45,10 +48,13 @@ object HoppityCollectionStats {
     )
 
     private var display = emptyList<Renderable>()
-    private val loggedRabbits = mutableMapOf<String, RabbitCollectionInfo>()
+    private val loggedRabbits
+        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
+
     private var totalRabbits = 0
+    private var rabbitRarities = emptyMap<String, RabbitCollectionRarity>()
+
     var inInventory = false
-    private var currentPage = 0
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -62,14 +68,16 @@ object HoppityCollectionStats {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
+        display = emptyList()
     }
 
     @SubscribeEvent
-    fun onProfileChange(event: ProfileJoinEvent) {
-        display = emptyList()
-        loggedRabbits.clear()
-        currentPage = 0
-        inInventory = false
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<HoppityCollectionJson>("HoppityCollection")
+        val rabbits = data.rabbits
+        rabbitRarities = rabbits.entries.flatMap { (rarity, rabbits) ->
+            rabbits.map { rabbit -> rabbit to rarity }
+        }.toMap()
     }
 
     @SubscribeEvent
@@ -112,14 +120,14 @@ object HoppityCollectionStats {
 
         val table = mutableListOf<DisplayTableEntry>()
         for (rarity in RabbitCollectionRarity.entries) {
-            val filtered = loggedRabbits.filter { it.value.rarity == rarity }
+            val filtered = loggedRabbits.filterKeys { rabbitRarities[it] == rarity }
 
             val isTotal = rarity == RabbitCollectionRarity.TOTAL
 
             val title = "${rarity.displayName} Rabbits"
-            val amountFound = filtered.filter { it.value.found }.size
+            val amountFound = filtered.count { it.value > 0 }
             val totalOfRarity = filtered.size
-            val duplicates = filtered.values.sumOf { it.duplicates }
+            val duplicates = filtered.values.sumOf { (it - 1).coerceAtLeast(0) }
             val chocolatePerSecond = rarity.chocolatePerSecond * amountFound
             val chocolateMultiplier = (rarity.chocolateMultiplier * amountFound)
 
@@ -160,11 +168,15 @@ object HoppityCollectionStats {
         return table
     }
 
+    fun incrementRabbit(name: String) {
+        loggedRabbits[name] = (loggedRabbits[name] ?: 0) + 1
+    }
+
     private fun logRabbits(event: InventoryFullyOpenedEvent): Int {
         var totalAmount = 0
 
         for ((_, item) in event.inventoryItems) {
-            val itemName = item.displayName ?: continue
+            val itemName = item.displayName?.removeColor() ?: continue
             val itemLore = item.getLore()
 
             var duplicatesFound = 0
@@ -187,26 +199,20 @@ object HoppityCollectionStats {
 
             val rarity = rabbitRarity ?: continue
 
-            if (itemName == "§dEinstein" && found) {
+            if (itemName == "Einstein" && found) {
                 ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
             }
 
             val duplicates = duplicatesFound.coerceAtLeast(0)
-            loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
+            loggedRabbits[itemName] = (if (found) 1 else 0) + duplicates
         }
         return totalAmount
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 
-    private data class RabbitCollectionInfo(
-        val rarity: RabbitCollectionRarity,
-        val found: Boolean,
-        val duplicates: Int,
-    )
-
     // todo in future make the amount and multiplier work with mythic rabbits (can't until I have some)
-    private enum class RabbitCollectionRarity(
+    enum class RabbitCollectionRarity(
         val displayName: String,
         val chocolatePerSecond: Int,
         val chocolateMultiplier: Double,

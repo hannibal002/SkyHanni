@@ -58,6 +58,11 @@ object HoppityEggsManager {
         "§cThis only works during Hoppity's Hunt!"
     )
 
+    private val rabbitFoundChatPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.rabbitfound",
+        "§D§LHOPPITY'S HUNT §7You found §.(?<name>[\\w -]+) §7\\(§.§L(?<rarity>\\w+)§7\\)!"
+    )
+
     private var lastMeal: HoppityEggType? = null
     private var lastNote: String? = null
 
@@ -122,6 +127,10 @@ object HoppityEggsManager {
         eggSpawnedPattern.matchMatcher(event.message) {
             getEggType(event).markSpawned()
             return
+        }
+
+        rabbitFoundChatPattern.matchMatcher(event.message) {
+            HoppityCollectionStats.incrementRabbit(group("name"))
         }
     }
 
