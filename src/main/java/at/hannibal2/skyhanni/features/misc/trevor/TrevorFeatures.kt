@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -83,6 +84,10 @@ object TrevorFeatures {
         "clickoption",
         "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]"
     )
+    private val areaTrappersDenPattern by patternGroup.pattern(
+        "area.trappersden",
+        "Trapper's Den"
+    )
 
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
@@ -97,6 +102,7 @@ object TrevorFeatures {
 
     var questActive = false
     var inBetweenQuests = false
+    var inTrapperDen = false
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
@@ -301,7 +307,7 @@ object TrevorFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!inTrapperDen()) return
+        if (!inTrapperDen) return
         if (!config.trapperTalkCooldown) return
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
@@ -322,6 +328,11 @@ object TrevorFeatures {
         resetTrapper()
     }
 
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        inTrapperDen = areaTrappersDenPattern.matches(LorenzUtils.skyBlockArea)
+    }
+
     enum class TrapperStatus(baseColor: LorenzColor) {
         READY(LorenzColor.DARK_GREEN),
         WAITING(LorenzColor.DARK_AQUA),
@@ -333,8 +344,6 @@ object TrevorFeatures {
     }
 
     fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
-
-    fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

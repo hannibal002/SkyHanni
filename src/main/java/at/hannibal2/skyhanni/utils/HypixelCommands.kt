@@ -118,6 +118,10 @@ object HypixelCommands {
         send("ac $message")
     }
 
+    fun particleQuality(quality: String) {
+        send("pq $quality")
+    }
+
     fun showRng(major: String? = null, minor: String? = null) = when {
         major == null || minor == null -> send("rng")
         else -> send("rng $major $minor")
