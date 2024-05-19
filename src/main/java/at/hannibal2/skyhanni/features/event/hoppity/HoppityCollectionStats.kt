@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityCollectionJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuHoppityJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -38,10 +40,6 @@ object HoppityCollectionStats {
         "duplicates.found",
         "§7Duplicates Found: §a(?<duplicates>[\\d,]+)"
     )
-    private val rabbitNotFoundPattern by patternGroup.pattern(
-        "rabbit.notfound",
-        "(?:§.)+You have not found this rabbit yet!"
-    )
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
@@ -52,7 +50,7 @@ object HoppityCollectionStats {
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
 
     private var totalRabbits = 0
-    private var rabbitRarities = emptyMap<String, RabbitCollectionRarity>()
+    private val rabbitRarities = mutableMapOf<String, RabbitCollectionRarity>()
 
     var inInventory = false
 
@@ -63,6 +61,7 @@ object HoppityCollectionStats {
 
         inInventory = true
         display = buildDisplay(event)
+        checkSpecialRabbits()
     }
 
     @SubscribeEvent
@@ -72,12 +71,17 @@ object HoppityCollectionStats {
     }
 
     @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<HoppityCollectionJson>("HoppityCollection")
-        val rabbits = data.rabbits
-        rabbitRarities = rabbits.entries.flatMap { (rarity, rabbits) ->
-            rabbits.map { rabbit -> rabbit to rarity }
-        }.toMap()
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        rabbitRarities.clear()
+
+        val data = event.readConstant<NeuHoppityJson>("hoppity").hoppity
+        for ((rarityString, rarityData) in data.rarities.entries) {
+            val rarity = RabbitCollectionRarity.valueOf(rarityString.uppercase())
+
+            for (rabbit in rarityData.rabbits) {
+                rabbitRarities[rabbit] = rarity
+            }
+        }
     }
 
     @SubscribeEvent
@@ -92,7 +96,8 @@ object HoppityCollectionStats {
     }
 
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
-        val totalAmount = logRabbits(event)
+        logRabbits(event)
+        val totalAmount = getTotalRabbits(event)
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
@@ -120,7 +125,10 @@ object HoppityCollectionStats {
 
         val table = mutableListOf<DisplayTableEntry>()
         for (rarity in RabbitCollectionRarity.entries) {
-            val filtered = loggedRabbits.filterKeys { rabbitRarities[it] == rarity }
+            val filtered = loggedRabbits.filterKeys {
+                val apiName = toApiRabbitName(it)
+                rabbitRarities[apiName] == rarity
+            }
 
             val isTotal = rarity == RabbitCollectionRarity.TOTAL
 
@@ -170,43 +178,43 @@ object HoppityCollectionStats {
 
     fun incrementRabbit(name: String) {
         loggedRabbits[name] = (loggedRabbits[name] ?: 0) + 1
+        checkSpecialRabbits()
     }
 
-    private fun logRabbits(event: InventoryFullyOpenedEvent): Int {
-        var totalAmount = 0
+    // Used because NEU stores rabbit using their API names rather than in-game names
+    private fun toApiRabbitName(name: String): String {
+        return name.lowercase().replace("[- ]".toRegex(), "_")
+    }
 
+    private fun getTotalRabbits(event: InventoryFullyOpenedEvent): Int {
+        return event.inventoryItems.firstNotNullOf {
+            it.value.getLore().matchFirst(rabbitsFoundPattern) {
+                group("total").formatInt()
+            }
+        }
+    }
+
+    private fun logRabbits(event: InventoryFullyOpenedEvent) {
         for ((_, item) in event.inventoryItems) {
             val itemName = item.displayName?.removeColor() ?: continue
             val itemLore = item.getLore()
+            var isRabbit = rabbitRarityPattern.anyMatches(itemLore)
+            if (!isRabbit) continue
 
-            var duplicatesFound = 0
-            var rabbitRarity: RabbitCollectionRarity? = null
-            var found = true
+            var count = itemLore.matchFirst(duplicatesFoundPattern) {
+                group("duplicates").formatInt() + 1
+            } ?: 0
 
-            for (line in itemLore) {
-                rabbitRarityPattern.matchMatcher(line) {
-                    rabbitRarity = RabbitCollectionRarity.fromDisplayName(group("rarity"))
-                }
-                duplicatesFoundPattern.matchMatcher(line) {
-                    duplicatesFound = group("duplicates").formatInt()
-                }
-                if (rabbitNotFoundPattern.matches(line)) found = false
-
-                rabbitsFoundPattern.matchMatcher(line) {
-                    totalAmount = group("total").formatInt()
-                }
-            }
-
-            val rarity = rabbitRarity ?: continue
-
-            if (itemName == "Einstein" && found) {
-                ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
-            }
-
-            val duplicates = duplicatesFound.coerceAtLeast(0)
-            loggedRabbits[itemName] = (if (found) 1 else 0) + duplicates
+            loggedRabbits[itemName] = count
         }
-        return totalAmount
+    }
+
+    // checks special rabbits whenever loggedRabbits is modified to update misc stored values
+    // TODO: make this better than hard-coded checks
+    private fun checkSpecialRabbits() {
+        if ((loggedRabbits["einstein"] ?: 0) > 0) {
+            ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
+        }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
