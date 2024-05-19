@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -23,24 +25,31 @@ class CompactBestiaryChatMessage {
 
     private val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
 
+    private val patternGroup = RepoPattern.group("chat.bestiary")
+    private val titleMessagePattern by patternGroup.pattern(
+        "title",
+        "§f {34}§6§lBESTIARY"
+    )
+    private val borderMessagePattern by patternGroup.pattern(
+        "border",
+        "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
 
-        val titleMessage = "§f                                  §6§lBESTIARY"
-        val border = "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
-
         val message = event.message
 
-        if (message == border) {
+        if (borderMessagePattern.matches(message)) {
             lastBorder = event.chatComponent
         }
         if (message == " ") {
             lastEmpty = event.chatComponent
         }
 
-        if (message == titleMessage) {
+        if (titleMessagePattern.matches(message)) {
             event.blockedReason = "bestiary"
             ChatManager.retractMessage(lastBorder, "bestiary")
             ChatManager.retractMessage(lastEmpty, "bestiary")
@@ -63,7 +72,8 @@ class CompactBestiaryChatMessage {
                 blockedLines = 0
                 inBestiary = false
             }
-            if (message == border) {
+
+            if (borderMessagePattern.matches(message)) {
                 inBestiary = false
 
                 val list = bestiaryDescription.map { it.replace("§f", "").trim() }

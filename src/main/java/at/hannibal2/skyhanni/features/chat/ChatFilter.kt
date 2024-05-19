@@ -19,6 +19,7 @@ class ChatFilter {
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
 
     /// <editor-fold desc="Regex Patterns & Messages">
+    //TODO replace this with repo list patterns when added
     // Lobby Messages
     private val lobbyPatterns = listOf(
         // player join

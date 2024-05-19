@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -38,17 +39,37 @@ class BingoCardReader {
         "hiddengoal",
         ".*§7§eThe next hint will unlock in (?<time>.*)"
     )
+    private val communityHiddenGoalPattern by patternGroup.pattern(
+        "hiddengoalcommunity",
+        "§7This goal will be revealed §7when it hits Tier IV."
+    )
+    private val invNamePattern by patternGroup.pattern(
+        "invname",
+        "Bingo Card"
+    )
+    private val goalPersonalPattern by patternGroup.pattern(
+        "personalgoal",
+        ".*Personal Goal"
+    )
+    private val goalCommunityPattern by patternGroup.pattern(
+        "communitygoal",
+        ".*Community Goal"
+    )
+    private val goalReachedPattern by patternGroup.pattern(
+        "goalreached",
+        "GOAL REACHED"
+    )
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.enabled) return
-        if (event.inventoryName != "Bingo Card") return
+        if (!invNamePattern.matches(event.inventoryName)) return
 
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
             val goalType = when {
-                lore.any { it.endsWith("Personal Goal") } -> GoalType.PERSONAL
-                lore.any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
+                lore.any { goalPersonalPattern.matches(it) } -> GoalType.PERSONAL
+                lore.any { goalCommunityPattern.matches(it) } -> GoalType.COMMUNITY
                 else -> continue
             }
             val name = stack.name.removeColor()
@@ -70,7 +91,7 @@ class BingoCardReader {
                 description = description.substring(2)
             }
 
-            val done = lore.any { it.contains("GOAL REACHED") }
+            val done = lore.any { goalReachedPattern.matches(it) }
             val communtyGoalPercentage = readCommuntyGoalPercentage(lore)
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
@@ -134,7 +155,7 @@ class BingoCardReader {
             }
 
             GoalType.COMMUNITY -> {
-                if (originalDescription == "§7This goal will be revealed §7when it hits Tier IV.") {
+                if (communityHiddenGoalPattern.matches(originalDescription)) {
                     unknownTip = true
                 }
                 null

@@ -13,6 +13,7 @@ class CompactSplashPotionMessage {
 
     private val config get() = SkyHanniMod.feature.chat.compactPotionMessages
 
+    //TODO use repo list patterns when added
     private val potionEffectPatternList = listOf(
         "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
         "§a§lBUFF! §fYou have gained §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),

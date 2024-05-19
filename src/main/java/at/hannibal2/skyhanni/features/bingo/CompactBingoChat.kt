@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,6 +33,51 @@ class CompactBingoChat {
         "border",
         "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
     )
+    private val skillLevelUpPattern by patternGroup.pattern(
+        "levelup",
+        " {2}§r§b§lSKILL LEVEL UP.*"
+    )
+    private val skyblockLevelUpPattern by patternGroup.pattern(
+        "sblevelup",
+        " {2}§r§3§lSKYBLOCK LEVEL UP §bLevel.*"
+    )
+    private val rewardsPattern by patternGroup.pattern(
+        "rewards",
+        " {2}§r§a§lREWARDS"
+    )
+    private val accessToBazaarPattern by patternGroup.pattern(
+        "bazaar",
+        " {3}§r§7§6Access to Bazaar"
+    )
+    private val accessToCommunityShopPattern by patternGroup.pattern(
+        "communityshop",
+        " {3}§r§7§bAccess to Community Shop"
+    )
+    private val autoPickupPattern by patternGroup.pattern(
+        "pickup",
+        " {3}§r§7§8+§aAuto-pickup block and mob drops"
+    )
+    private val collectionLevelUpPattern by patternGroup.pattern(
+        "collectionlevelup",
+        " {2}§r§6§lCOLLECTION LEVEL UP.*"
+    )
+    private val newAreaPattern by patternGroup.pattern(
+        "newarea",
+        " §r§6§lNEW AREA DISCOVERED!"
+    )
+    private val newAreaStartsWithPattern by patternGroup.pattern(
+        "newareastartswith",
+        "^(§7 {3}■ §r| {5}§r| {3}§r).*"
+    )
+    private val containsTradeRecipePattern by patternGroup.pattern(
+        "containstraderecipe",
+        ".*(Trade|Recipe).*"
+    )
+    private val exactTradeRecipePattern by patternGroup.pattern(
+        "exacttraderecipe",
+        "^(Trade|Recipe)$"
+    )
+
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -57,26 +103,25 @@ class CompactBingoChat {
 
     // TODO USE SH-REPO
     private fun onSkillLevelUp(message: String): Boolean {
-        if (message.startsWith("  §r§b§lSKILL LEVEL UP ")) {
+        skillLevelUpPattern.matchMatcher(message) {
             inSkillLevelUp = true
             return false
         }
 
-        if (inSkillLevelUp && !message.contains("Access to") && !message.endsWith(" Enchantment")) {
-            return true
-        }
-
-        return false
+        //TODO this doesn't seem to be the right message
+        return inSkillLevelUp && !message.contains("Access to") && !message.endsWith(" Enchantment")
     }
 
     private fun onSkyBlockLevelUp(message: String): Boolean {
-        if (message.startsWith("  §r§3§lSKYBLOCK LEVEL UP §bLevel ")) {
+        skyblockLevelUpPattern.matchMatcher(message) {
             inSkyBlockLevelUp = true
             return false
         }
 
         if (inSkyBlockLevelUp) {
-            if (message == "  §r§a§lREWARDS") return true
+            rewardsPattern.matchMatcher(message) {
+                return true
+            }
             // We don't care about extra health & strength
             healthPattern.matchMatcher(message) {
                 return true
@@ -84,28 +129,31 @@ class CompactBingoChat {
             strengthPattern.matchMatcher(message) {
                 return true
             }
-
             // No Bazaar and Community Shop in bingo
-            if (message == "   §r§7§6Access to Bazaar") return true
-            if (message == "   §r§7§bAccess to Community Shop") return true
-
+            accessToBazaarPattern.matchMatcher(message) {
+                return true
+            }
+            accessToCommunityShopPattern.matchMatcher(message) {
+                return true
+            }
             // Always enabled in bingo
-            if (message == "   §r§7§8+§aAuto-pickup block and mob drops") return true
+            autoPickupPattern.matchMatcher(message) {
+                return true
+            }
         }
-
         return false
     }
 
     private fun onCollectionLevelUp(message: String): Boolean {
-        if (message.startsWith("  §r§6§lCOLLECTION LEVEL UP ")) {
+        collectionLevelUpPattern.matchMatcher(message) {
             inCollectionLevelUp = true
             return false
         }
 
         if (inCollectionLevelUp) {
-            if (message.contains("Trade") || message.contains("Recipe")) {
+            if (containsTradeRecipePattern.matches(message)) {
                 val text = message.removeColor().replace(" ", "")
-                if (text == "Trade" || text == "Recipe") {
+                if (exactTradeRecipePattern.matches(text)) {
                     collectionLevelUpLastLine?.let { ChatUtils.chat(it, false) }
                 }
             } else {
@@ -118,7 +166,7 @@ class CompactBingoChat {
     }
 
     private fun onNewAreaDiscovered(message: String): Boolean {
-        if (message == " §r§6§lNEW AREA DISCOVERED!") {
+        newAreaPattern.matchMatcher(message) {
             newArea = 1
             return false
         }
@@ -130,7 +178,7 @@ class CompactBingoChat {
             }
 
             if (newArea == 2) {
-                if (message.startsWith("§7   ■ §r") || message.startsWith("     §r") || message.startsWith("   §r")) {
+                if (newAreaStartsWithPattern.matches(message)) {
                     return true
                 } else {
                     newArea = 0

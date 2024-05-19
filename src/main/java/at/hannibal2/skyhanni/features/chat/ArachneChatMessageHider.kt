@@ -31,7 +31,6 @@ class ArachneChatMessageHider {
         "border",
         "§a§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
     )
-
     private val arachneDownPattern by patternGroup.pattern(
         "down",
         " {30}§r§6§lARACHNE DOWN!"

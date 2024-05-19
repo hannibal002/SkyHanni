@@ -37,6 +37,18 @@ object EnderNodeTracker {
 
     private var miteGelInInventory = 0
 
+    //TODO seraid fix later
+//     private val patternGroup = RepoPattern.group("endernode.tracker")
+//     private val enderNodeRegex by patternGroup.pattern(
+//         "endernode",
+//         """ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!"""
+//     )
+//     private val endermanRegex by patternGroup.pattern(
+//         "enderman",
+//         """ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!"""
+//     )
+
+
     private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 

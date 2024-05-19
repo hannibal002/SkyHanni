@@ -17,9 +17,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -31,6 +33,12 @@ class BingoCardDisplay {
     private var display = emptyList<Renderable>()
 
     private var hasHiddenPersonalGoals = false
+
+    private val patternGroup = RepoPattern.group("bingo.carddisplay")
+    private val invNamePattern by patternGroup.pattern(
+        "invname",
+        "Bingo Card"
+    )
 
     companion object {
 
@@ -244,7 +252,7 @@ class BingoCardDisplay {
     }
 
     private fun canEditDisplay() =
-        Minecraft.getMinecraft().currentScreen is GuiInventory || InventoryUtils.openInventoryName() == "Bingo Card"
+        Minecraft.getMinecraft().currentScreen is GuiInventory || invNamePattern.matches(InventoryUtils.openInventoryName())
 
     @SubscribeEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {

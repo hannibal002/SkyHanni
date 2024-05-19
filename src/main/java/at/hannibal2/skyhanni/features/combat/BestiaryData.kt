@@ -65,6 +65,66 @@ object BestiaryData {
         "title",
         "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$"
     )
+    private val familiesCompletedPercentPattern by patternGroup.pattern(
+        "familiescompletedpercent",
+        "§7Families Completed: §a100%"
+    )
+    private val overallProgressHiddenPattern by patternGroup.pattern(
+        "overallprogresshidden",
+        "§7Overall Progress: §cHIDDEN"
+    )
+    private val overallProgressShownPattern by patternGroup.pattern(
+        "overallprogresshidden",
+        "§7Overall Progress: §aSHOWN"
+    )
+    private val invNameBestiaryFishingPattern by patternGroup.pattern(
+        "invnamebestiaryfishing",
+        "Bestiary(?: ➜ Fishing)?"
+    )
+    private val invNameBestiaryPattern by patternGroup.pattern(
+        "invnamebestiary",
+        "Bestiary"
+    )
+    private val familiesFoundPattern by patternGroup.pattern(
+        "familiesfound",
+        ".*Families Found.*"
+    )
+    private val familiesFoundStartPattern by patternGroup.pattern(
+        "familiesfoundstart",
+        "Families Found.*"
+    )
+    private val familiesCompletedPattern by patternGroup.pattern(
+        "familiescompleted",
+        ".*Families Completed.*"
+    )
+    private val killsPattern by patternGroup.pattern(
+        "kills",
+        "Kills:.*"
+    )
+    private val progressToTierPattern by patternGroup.pattern(
+        "progresstotier",
+        ".*Progress to Tier.*"
+    )
+    private val overallProgressPlainPattern by patternGroup.pattern(
+        "overallprogressplain",
+        ".*Overall Progress.*"
+    )
+    private val searchResultsPattern by patternGroup.pattern(
+        "searchresults",
+        "Search Results"
+    )
+    private val queryPattern by patternGroup.pattern(
+        "query",
+        "§7Query: §a"
+    )
+    private val resultsPattern by patternGroup.pattern(
+        "results",
+        "§7Results: §a"
+    )
+    private val blankLinePattern by patternGroup.pattern(
+        "blankline",
+        " {20}.*"
+    )
 
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
@@ -97,10 +157,11 @@ object BestiaryData {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
                 val lore = stack.getLore()
-                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
+                if (lore.any { overallProgressPattern.matches(it) || familiesCompletedPercentPattern.matches(it) }) {
                     slot highlight LorenzColor.GREEN
                 }
-                if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
+
+                if (!overallProgressEnabled && lore.any { overallProgressHiddenPattern.matches(it) }) {
                     slot highlight LorenzColor.RED
                 }
             }
@@ -114,7 +175,9 @@ object BestiaryData {
         val items = event.inventoryItems
         val stack = items[4] ?: return
         val bestiaryGui = isBestiaryGui(stack, inventoryName)
-        if (!(inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary") && !bestiaryGui) return
+
+        if (!(invNameBestiaryFishingPattern.matches(inventoryName) && !bestiaryGui)) return
+        //TODO seraid fix later
         isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
         stackList.putAll(items)
         inInventory = true
@@ -169,12 +232,14 @@ object BestiaryData {
                 if (!line.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = line.substring(line.lastIndexOf(' ') + 1)
-                if (previousLine.contains("Families Found")) {
+
+                if (familiesFoundPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         familiesFound = group("current").formatLong()
                         totalFamilies = group("needed").formatLong()
                     }
-                } else if (previousLine.contains("Families Completed")) {
+
+                } else if (familiesCompletedPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         familiesCompleted = group("current").formatLong()
                     }
@@ -198,19 +263,20 @@ object BestiaryData {
             var actualRealTotalKill: Long = 0
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
-                if (loreLine.startsWith("Kills: ")) {
+                if (killsPattern.matches(loreLine)) {
                     actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatLong()
                         ?: 0
                 }
-                if (!loreLine.startsWith("                    ")) continue
+
+                if (!blankLinePattern.matches(loreLine)) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
-                if (previousLine.contains("Progress to Tier")) {
+                if (progressToTierPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToTier = group("needed").formatLong()
                         currentKillToTier = group("current").formatLong()
                     }
-                } else if (previousLine.contains("Overall Progress")) {
+                } else if (overallProgressPlainPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToMax = group("needed").formatLong()
                         currentTotalKill = group("current").formatLong()
@@ -407,7 +473,7 @@ object BestiaryData {
 
     private fun isOverallProgressEnabled(inventoryItems: Map<Int, ItemStack>): Boolean {
         if (inventoryItems[52]?.item == Items.ender_eye) {
-            return inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } == true
+            return inventoryItems[52]?.getLore()?.any { overallProgressShownPattern.matches(it) } == true
         }
 
         indexes.forEach { index ->
@@ -424,10 +490,10 @@ object BestiaryData {
         if (stack == null) return false
         val bestiaryGuiTitleMatcher = titlePattern.matcher(name)
         if (bestiaryGuiTitleMatcher.matches()) {
-            if ("Bestiary" != bestiaryGuiTitleMatcher.group(1)) {
+            if (!invNameBestiaryPattern.matches(bestiaryGuiTitleMatcher.group(1))) {
                 var loreContainsFamiliesFound = false
                 for (line in stack.getLore()) {
-                    if (line.removeColor().startsWith("Families Found")) {
+                    if (familiesFoundStartPattern.matches(line.removeColor())) {
                         loreContainsFamiliesFound = true
                         break
                     }
@@ -437,10 +503,11 @@ object BestiaryData {
                 }
             }
             return true
-        } else if (name == "Search Results") {
+
+        } else if (searchResultsPattern.matches(name)) {
             val loreList = stack.getLore()
-            if (loreList.size >= 2 && loreList[0].startsWith("§7Query: §a")
-                && loreList[1].startsWith("§7Results: §a")
+            if (loreList.size >= 2 && queryPattern.matches(loreList[0])
+                && resultsPattern.matches(loreList[1])
             ) {
                 return true
             }

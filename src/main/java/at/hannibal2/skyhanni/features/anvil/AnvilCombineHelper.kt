@@ -9,11 +9,19 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnvilCombineHelper {
+
+    private val patternGroup = RepoPattern.group("anvil.helper")
+    private val guiNamePattern by patternGroup.pattern(
+        "guiname",
+        "Anvil"
+    )
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -24,7 +32,7 @@ class AnvilCombineHelper {
         val chest = event.gui.inventorySlots as ContainerChest
         val chestName = chest.getInventoryName()
 
-        if (chestName != "Anvil") return
+        if (!guiNamePattern.matches(chestName)) return
 
         val matchLore = mutableListOf<String>()
 

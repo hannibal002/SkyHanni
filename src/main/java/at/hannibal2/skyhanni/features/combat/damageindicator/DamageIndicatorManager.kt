@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -68,7 +69,11 @@ class DamageIndicatorManager {
     private val maxHealth = mutableMapOf<UUID, Long>()
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
-    private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
+    private val patternGroup = RepoPattern.group("damage.indicator")
+    private val enderSlayerHitsNumberPattern by patternGroup.pattern(
+        "hits",
+        ".* §[5fd]§l(?<hits>\\d+) Hits?"
+    )
 
     companion object {
 
