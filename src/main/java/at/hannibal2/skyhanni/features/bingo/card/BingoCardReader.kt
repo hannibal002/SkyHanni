@@ -91,7 +91,7 @@ class BingoCardReader {
                 description = description.substring(2)
             }
 
-            val done = lore.any { goalReachedPattern.matches(it) }
+            val done = lore.any { goalReachedPattern.find(it) }
             val communtyGoalPercentage = readCommuntyGoalPercentage(lore)
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
