@@ -347,6 +347,7 @@ object ChocolateFactoryDataLoader {
     private fun findAllBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
 
         ChocolateFactoryAPI.allBestPossibleUpgrades.clear()
+        ChocolateFactoryAPI.totalUpgradeCost = 0L
         for (upgrade in list) {
             ChocolateFactoryAPI.allBestPossibleUpgrades[upgrade.slotIndex] = LinkedList()
         }
@@ -384,13 +385,13 @@ object ChocolateFactoryDataLoader {
         ChocolateFactoryAPI.totalMultiplierIncreaseAfterUpgrades += 0.1 * (if (bIndex == ChocolateFactoryAPI.coachRabbitIndex) 1 else 0)
 
         // Should never throw since empty lists are added in caller method.
-        ChocolateFactoryAPI.allBestPossibleUpgrades[bIndex]?.add(bestUpgrade)
-            ?: throw IllegalStateException("Best upgrade not found in list")
+        ChocolateFactoryAPI.allBestPossibleUpgrades[bIndex]?.add(bestUpgrade) ?: throw IllegalStateException("Best upgrade not found in list")
+        ChocolateFactoryAPI.totalUpgradeCost += bestUpgrade.price ?: throw IllegalStateException("Best upgrade price is null")
 
         // Calculate price of next upgrade if it isn't maxed
         var nextPrice: Long? = null
 
-        if (bestUpgrade.level < (ChocolateFactoryAPI.maxUpgradeLevelPerPrestige[bIndex]?.get(ChocolateFactoryAPI.currentPrestige - 1) ?: 0)) {
+        if (bestUpgrade.level + 1 < (ChocolateFactoryAPI.maxUpgradeLevelPerPrestige[bIndex]?.get(ChocolateFactoryAPI.currentPrestige - 1) ?: 0)) {
 
             // Use upgrade cost per level if it exists, otherwise use the formula.
             if ((ChocolateFactoryAPI.upgradeCostPerLevel[bIndex]?.size ?: 0) > bestUpgrade.level + 1) {
