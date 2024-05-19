@@ -27,6 +27,15 @@ class ArachneChatMessageHider {
         "spawn",
         "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)"
     )
+    private val arachneMessageBorderPattern by patternGroup.pattern(
+        "border",
+        "§a§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+    )
+
+    private val arachneDownPattern by patternGroup.pattern(
+        "down",
+        " {30}§r§6§lARACHNE DOWN!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -51,13 +60,15 @@ class ArachneChatMessageHider {
             return true
         }
 
-        if (message == "§a§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
+        arachneMessageBorderPattern.matchMatcher(message) {
             hideArachneDeadMessage = !hideArachneDeadMessage
             return true
         }
-        if (message == "                              §r§6§lARACHNE DOWN!") {
-            hideArachneDeadMessage = true
+
+        arachneDownPattern.matchMatcher(message) {
+            return true
         }
+
         return hideArachneDeadMessage
     }
 
