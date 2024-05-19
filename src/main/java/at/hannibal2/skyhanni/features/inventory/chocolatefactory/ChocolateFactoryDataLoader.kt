@@ -413,7 +413,7 @@ object ChocolateFactoryDataLoader {
         // Calculate price of next upgrade if it isn't maxed
         var nextPrice: Long? = null
 
-        if (bestUpgrade.level < (ChocolateFactoryAPI.maxUpgradeLevelPerPrestige[bIndex]?.get(ChocolateFactoryAPI.currentPrestige - 1) ?: 0)) {
+        if (bestUpgrade.level + 1 < (ChocolateFactoryAPI.maxUpgradeLevelPerPrestige[bIndex]?.get(ChocolateFactoryAPI.currentPrestige - 1) ?: 0)) {
 
             // Use upgrade cost per level if it exists, otherwise use the formula.
             if ((ChocolateFactoryAPI.upgradeCostPerLevel[bIndex]?.size ?: 0) > bestUpgrade.level + 1) {
