@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.storage;
 
+import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
@@ -50,4 +51,11 @@ public class Storage {
 
     @Expose
     public List<String> blacklistedUsers = new ArrayList<>();
+
+    @Expose
+    public CropType lastCropBroken = null;
+
+    @Expose
+    public String lastSkillObtained = null;
+
 }

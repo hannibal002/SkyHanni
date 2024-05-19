@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -150,6 +151,15 @@ class ConfigManager {
                         return reader.nextString().toLong().asTimeMark()
                     }
                 }.nullSafe())
+                .registerTypeAdapter(CropType::class.java, object : TypeAdapter<CropType>() {
+                    override fun write(out: JsonWriter, value: CropType?) {
+                        out.value(value?.name)
+                    }
+
+                    override fun read(reader: JsonReader): CropType {
+                        return CropType.valueOf(reader.nextString())
+                    }
+                })
                 .enableComplexMapKeySerialization()
         }
 

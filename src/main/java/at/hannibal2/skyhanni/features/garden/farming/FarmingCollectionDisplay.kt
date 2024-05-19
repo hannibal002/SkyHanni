@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingCollectionConfig.CropDisplay
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.jsonobjects.other.EliteCollectionGraphEntry
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EliteAPISettingsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -36,9 +35,9 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 object FarmingCollectionDisplay {
 
@@ -46,7 +45,6 @@ object FarmingCollectionDisplay {
 
     private var checkDuration = 10.minutes
     private var worldSwapRefresh = true
-    private var settingToggleCooldown = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -74,8 +72,11 @@ object FarmingCollectionDisplay {
     private var currentCollections = mutableMapOf<CropType, Long>()
     private var lastFetchedCrop: CropType? = null
 
-    private var lastBrokenCrop: CropType? = null
-    private var hasFetchedCollection = false
+    private var lastBrokenCrop: CropType?
+        get() = SkyHanniMod.feature.storage.lastCropBroken
+        set(value) {
+            SkyHanniMod.feature.storage.lastCropBroken = value
+        }
     private var lastLeaderboardFetch = SimpleTimeMark.farPast()
 
     private var display = emptyList<Renderable>()
@@ -99,10 +100,7 @@ object FarmingCollectionDisplay {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.crop.afterChange {
-            if (settingToggleCooldown.passedSince() < 30.seconds) {
-                settingToggleCooldown = SimpleTimeMark.now()
-                lastLeaderboardFetch = SimpleTimeMark.farPast()
-            }
+            lastLeaderboardFetch = SimpleTimeMark.farPast()
         }
     }
 
@@ -110,13 +108,6 @@ object FarmingCollectionDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (profileID == null) return
-
-        if (!hasFetchedCollection) {
-            SkyHanniMod.coroutineScope.launch {
-                getCurrentCollection()
-            }
-            hasFetchedCollection = true
-        }
 
         if (lastLeaderboardFetch.passedSince() > checkDuration) {
             lastLeaderboardFetch = SimpleTimeMark.now()
@@ -172,7 +163,6 @@ object FarmingCollectionDisplay {
     }
 
     private fun resetData() {
-        hasFetchedCollection = false
         lastLeaderboardFetch = SimpleTimeMark.farPast()
         collectionRanks.clear()
         collectionPlacements.clear()
@@ -217,7 +207,6 @@ object FarmingCollectionDisplay {
                     listOf("§bClick to refresh."),
                     onClick = {
                         lastLeaderboardFetch = SimpleTimeMark.farPast()
-                        hasFetchedCollection = false
                         ChatUtils.chat("Collection leaderboard updating...")
                     }
                 )
@@ -260,6 +249,7 @@ object FarmingCollectionDisplay {
             }
             collectionPlacements[crop] = placements
             lastFetchedCrop = crop
+            currentCollections[crop] = data.amount
 
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
@@ -274,35 +264,15 @@ object FarmingCollectionDisplay {
         }
     }
 
-    private fun getCurrentCollection() {
-        if (profileID == null) return
-        val url =
-            "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}/crops?days=1"
-        val response = APIUtil.getJSONResponseAsElement(url)
-
-        try {
-            val data = eliteCollectionApiGson.fromJson<Array<EliteCollectionGraphEntry>>(response)
-
-            data.sortBy { it.timestamp }
-            currentCollections = data.lastOrNull()?.crops?.toMutableMap() ?: mutableMapOf()
-
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Error loading user farming collection\n" +
-                    "§eLoading the farming collection data from elitebot.dev failed!\n" +
-                    "§eYou can re-enter the garden to try to fix the problem.\n" +
-                    "§cIf this message repeats, please report it on Discord!\n",
-                "url" to url,
-                "apiResponse" to response,
-            )
-        }
-    }
-
     private fun getEliteBotLeaderboardForCrop(crop: CropType) = when (crop) {
         CropType.NETHER_WART -> "netherwart"
         CropType.SUGAR_CANE -> "sugarcane"
         else -> crop.simpleName
+    }
+
+    @SubscribeEvent
+    fun playerLogout(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+        SkyHanniMod.feature.storage.lastCropBroken = lastBrokenCrop
     }
 
     private fun isEnabled() =
