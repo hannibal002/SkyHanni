@@ -252,7 +252,11 @@ object FarmingCollectionDisplay {
             }
             collectionPlacements[crop] = placements
             lastFetchedCrop = crop
-            currentCollections[crop] = data.amount
+
+            if (data.amount != 0L) {
+                currentCollections[crop] = data.amount
+            }
+
 
             if (!hasCollectionBeenFetched && data.amount == 0L) {
                 hasCollectionBeenFetched = true

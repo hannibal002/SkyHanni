@@ -233,7 +233,9 @@ object SkillRankDisplay {
             }
             skillPlacements[skill] = placements
             lastSkillFetched = skill
-            currentSkills[skill] = data.amount
+            if (data.amount != 0L) {
+                currentSkills[skill] = data.amount
+            }
 
             if (!hasSkillsBeenFetched && data.amount == 0L) {
                 hasSkillsBeenFetched = true
