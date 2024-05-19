@@ -22,5 +22,5 @@ public class AlignmentConfig {
     @Expose
     @ConfigOption(name = "Margin", desc = "Space between the border of your screen and the scoreboard.")
     @ConfigEditorSlider(minValue = 0, maxValue = 50, minStep = 1)
-    public int margin = 5;
+    public int margin = 0;
 }
