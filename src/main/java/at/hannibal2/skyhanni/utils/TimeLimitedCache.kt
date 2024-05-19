@@ -25,4 +25,9 @@ class TimeLimitedCache<K, V>(
     fun keys(): Set<K> = cache.asMap().keys
 
     fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
+    operator fun set(key: K, value: V) {
+        put(key, value)
+    }
+
+    operator fun get(key: K): V? = getOrNull(key)
 }

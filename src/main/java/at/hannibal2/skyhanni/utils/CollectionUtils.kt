@@ -309,4 +309,7 @@ object CollectionUtils {
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
         return filterKeys { it != null } as Map<K, V>
     }
+
+    fun <K, V> Map<K, V>.containsKey(vararg keys: K) = keys.all { this.keys.contains(it) }
+
 }
