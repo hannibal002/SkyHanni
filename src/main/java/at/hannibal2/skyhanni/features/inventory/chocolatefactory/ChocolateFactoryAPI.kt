@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.LinkedList
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -58,20 +59,25 @@ object ChocolateFactoryAPI {
 
     var currentPrestige = 1
     var chocolatePerSecond = 0.0
+
     var leaderboardPosition: Int? = null
     var leaderboardPercentile: Double? = null
     var chocolateForPrestige = 150_000_000L
 
     var clickRabbitSlot: Int? = null
 
-    var prestigeMultiplier = 0.4
-    var rabbitUpgradeCostConstants = mapOf<Int, Map<String, Double>>()
+    var upgradeCostFormulaConstants = mapOf<Int, Map<String, Double>>()
+    var upgradeCostPerLevel = mapOf<Int, List<Int>>()
+    var maxUpgradeLevelPerPrestige: Map<Int, List<Int>> = mapOf()
 
     var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
-    var bestUpgradeConfig = mapOf<Int, ChocolateFactoryUpgrade>()
+    var allBestPossibleUpgrades = hashMapOf<Int, LinkedList<ChocolateFactoryUpgrade>>()
+    var totalUpgradeCost = 0L
+    var totalBaseIncreaseAfterUpgrades = 0
+    var totalMultiplierIncreaseAfterUpgrades = 0.0
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -112,8 +118,11 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
 
-        prestigeMultiplier = data.prestigeMultiplier
-        rabbitUpgradeCostConstants = data.rabbitUpgradeCostConstants
+        upgradeCostFormulaConstants = data.upgradeCostFormulaConstants
+        upgradeCostPerLevel = data.upgradeCostsPerLevel
+        maxUpgradeLevelPerPrestige = data.maxUpgradeLevelPerPrestige
+
+        println(maxUpgradeLevelPerPrestige)
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }

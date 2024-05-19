@@ -33,9 +33,11 @@ object ChocolateFactoryInventory {
                 slot drawBorder LorenzColor.GOLD.addOpacity(150)
             }
 
-            if (slotIndex in ChocolateFactoryAPI.bestUpgradeConfig.keys) {
+            if (slotIndex in ChocolateFactoryAPI.allBestPossibleUpgrades.keys) {
                 val current = ChocolateFactoryAPI.factoryUpgrades.find { it.slotIndex == slotIndex } ?: continue
-                val upgrade = ChocolateFactoryAPI.bestUpgradeConfig[slotIndex] ?: continue
+                val upgrades = ChocolateFactoryAPI.allBestPossibleUpgrades[slotIndex] ?: continue
+                if (upgrades.isEmpty()) continue
+                val upgrade = upgrades.last
 
                 if (upgrade.isMaxed) continue
 

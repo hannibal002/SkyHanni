@@ -20,6 +20,7 @@ data class HoppityEggLocationsJson(
     @Expose val shrineIndex: Int,
     @Expose val coachRabbitIndex: Int,
     @Expose val maxRabbits: Int,
-    @Expose val prestigeMultiplier: Double,
-    @Expose val rabbitUpgradeCostConstants: Map<Int, Map<String, Double>>,
+    @Expose val upgradeCostFormulaConstants: Map<Int, Map<String, Double>>,
+    @Expose val upgradeCostsPerLevel: Map<Int, List<Int>>,
+    @Expose val maxUpgradeLevelPerPrestige: Map<Int, List<Int>>
 )
