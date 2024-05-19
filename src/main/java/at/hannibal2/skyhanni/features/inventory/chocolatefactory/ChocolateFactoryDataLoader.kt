@@ -141,6 +141,8 @@ object ChocolateFactoryDataLoader {
         processInventory(list, inventory)
 
         findBestUpgrades(list)
+
+        // TODO: Make more performant / run it as a coroutine. It can take a long time for many possible upgrades.
         findAllBestUpgrades(list)
 
         ChocolateFactoryAPI.factoryUpgrades = list
@@ -347,15 +349,37 @@ object ChocolateFactoryDataLoader {
     private fun findAllBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
 
         ChocolateFactoryAPI.allBestPossibleUpgrades.clear()
+        ChocolateFactoryAPI.totalUpgradeCost = 0L
         for (upgrade in list) {
             ChocolateFactoryAPI.allBestPossibleUpgrades[upgrade.slotIndex] = LinkedList()
         }
 
         // For now only look at rabbits, implementing rabbit coach could be more complex
-        val currentUpgrades = ArrayList(list)
+        val currentUpgrades = ArrayList(list.filter { it.effectiveCost != null && it.extraPerSecond != null })
         findAllBestUpgradesImpl(currentUpgrades, profileStorage?.currentChocolate ?: 0)
 
         ChocolateFactoryAPI.totalUpgradeCost = calculateTotalUpgradeCost(ChocolateFactoryAPI.allBestPossibleUpgrades)
+
+        // Test
+        ChocolateFactoryAPI.allBestPossibleUpgrades.clear()
+        ChocolateFactoryAPI.totalUpgradeCost = 0L
+        for (upgrade in list) {
+            ChocolateFactoryAPI.allBestPossibleUpgrades[upgrade.slotIndex] = LinkedList()
+        }
+
+        val upgrades = ArrayList<ChocolateFactoryUpgrade>()
+        upgrades.add(ChocolateFactoryUpgrade(29, 1, 680, 1.44, 680.0, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(30, 1, 2721, 2.87, 1429.0, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(31, 1, 6123, 4.32, 2143.0, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(32, 1, 10886, 5.74, 2857.5, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(33, 1, 17010, 7.2, 3572.2, isRabbit = true, isPrestige = false))
+        //upgrades.add(ChocolateFactoryUpgrade(42, 1, 2200000, 0.5, 1000000.0, isRabbit = false, isPrestige = false))
+
+        val currentChocolate = 33412136L + 133648819L + 300709895L + 534595425L + 835305384L
+        findAllBestUpgradesImpl(upgrades, currentChocolate)
+
+        ChocolateFactoryAPI.totalUpgradeCost = calculateTotalUpgradeCost(ChocolateFactoryAPI.allBestPossibleUpgrades)
+
     }
 
     /** Find the best possible upgrades for the current chocolate amount.
@@ -367,8 +391,7 @@ object ChocolateFactoryDataLoader {
     private fun findAllBestUpgradesImpl(list: ArrayList<ChocolateFactoryUpgrade>, remainingChocolate: Long) {
 
         // removing time tower here as people like to determine when to buy it themselves.
-        val notMaxed =
-            list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null }
+        val notMaxed = list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null }
 
         // find the best current upgrade out of the current possible upgrades
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
@@ -384,8 +407,8 @@ object ChocolateFactoryDataLoader {
         ChocolateFactoryAPI.totalMultiplierIncreaseAfterUpgrades += 0.1 * (if (bIndex == ChocolateFactoryAPI.coachRabbitIndex) 1 else 0)
 
         // Should never throw since empty lists are added in caller method.
-        ChocolateFactoryAPI.allBestPossibleUpgrades[bIndex]?.add(bestUpgrade)
-            ?: throw IllegalStateException("Best upgrade not found in list")
+        ChocolateFactoryAPI.allBestPossibleUpgrades[bIndex]?.add(bestUpgrade) ?: throw IllegalStateException("Best upgrade not found in list")
+        ChocolateFactoryAPI.totalUpgradeCost += bestUpgrade.price ?: throw IllegalStateException("Best upgrade price is null")
 
         // Calculate price of next upgrade if it isn't maxed
         var nextPrice: Long? = null
@@ -403,7 +426,7 @@ object ChocolateFactoryDataLoader {
                 val multiplier = ChocolateFactoryAPI.upgradeCostFormulaConstants[bIndex]?.get("exp") ?: 0.0
                 val prestigeMultiplier = (ChocolateFactoryAPI.upgradeCostFormulaConstants[bIndex]?.get("prestige")
                     ?: 0.0) * (ChocolateFactoryAPI.currentPrestige - 1)
-                nextPrice = floor(round(base * multiplier.pow((bestUpgrade.level + 1)) * (1 + prestigeMultiplier))).toLong()
+                nextPrice = floor(round(base * multiplier.pow(bestUpgrade.level + 1)) * (1 + prestigeMultiplier)).toLong()
             }
         }
 
@@ -418,8 +441,7 @@ object ChocolateFactoryDataLoader {
         )
         for (i in list.indices) {
             val afterChocPerSec = ChocolateAmount.averageChocPerSecond(
-                rawPerSecondIncrease = ChocolateFactoryAPI.totalBaseIncreaseAfterUpgrades + (ChocolateFactoryAPI.rabbitSlots[list[i].slotIndex]
-                    ?: 0),
+                rawPerSecondIncrease = ChocolateFactoryAPI.totalBaseIncreaseAfterUpgrades + (ChocolateFactoryAPI.rabbitSlots[list[i].slotIndex] ?: 0),
                 baseMultiplierIncrease = (ChocolateFactoryAPI.totalMultiplierIncreaseAfterUpgrades + if (list[i].slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 0.01 else 0.0)
             )
 
@@ -429,7 +451,7 @@ object ChocolateFactoryDataLoader {
         }
 
         // recursive call to find the next best upgrade after spending the cost of the best upgrade.
-        findAllBestUpgradesImpl(list, remainingChocolate - (bestUpgrade.price ?: 0))
+        findAllBestUpgradesImpl(list, remainingChocolate - bestUpgrade.price)
     }
 
     private fun calculateTotalUpgradeCost(upgrades: Map<Int, List<ChocolateFactoryUpgrade>>) =
