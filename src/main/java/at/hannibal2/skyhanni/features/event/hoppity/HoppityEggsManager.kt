@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -74,6 +75,19 @@ object HoppityEggsManager {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
+        hoppityEventNotOn.matchMatcher(event.message) {
+            val currentYear = SkyBlockTime.now().year
+
+            if (config.timeInChat) {
+                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
+                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+                event.blockedReason = "hoppity_egg"
+            }
+            return
+        }
+
+        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
@@ -109,17 +123,6 @@ object HoppityEggsManager {
             getEggType(event).markSpawned()
             return
         }
-
-        hoppityEventNotOn.matchMatcher(event.message) {
-            val currentYear = SkyBlockTime.now().year
-
-            if (config.timeInChat) {
-                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
-                event.blockedReason = "hoppity_egg"
-            }
-            return
-        }
     }
 
     internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
@@ -150,7 +153,7 @@ object HoppityEggsManager {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isActive()) return
         if (!config.showClaimedEggs) return
         if (isBuzy()) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
@@ -166,6 +169,7 @@ object HoppityEggsManager {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isActive()) return
         HoppityEggType.checkClaimed()
         checkWarn()
     }
@@ -189,9 +193,16 @@ object HoppityEggsManager {
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size
-        ChatUtils.chat("All $amount Hoppity Eggs are ready for finding!")
+        val message = "All $amount Hoppity Eggs are ready to be found!"
+        if (config.warpUnclaimedEggs) {
+            ChatUtils.clickableChat(
+                message,
+                onClick = { HypixelCommands.warp(config.warpDestination) },
+                "§eClick to /warp ${config.warpDestination}!"
+            )
+        } else ChatUtils.chat(message)
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
-        SoundUtils.playPlingSound()
+        SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
     private fun isBuzy() = ReminderUtils.isBusy(config.showDuringContest)
@@ -206,4 +217,5 @@ object HoppityEggsManager {
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 
+    fun isActive() = LorenzUtils.inSkyBlock && ChocolateFactoryAPI.isHoppityEvent()
 }

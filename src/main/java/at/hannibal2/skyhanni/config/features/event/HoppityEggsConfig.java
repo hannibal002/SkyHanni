@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -44,10 +45,20 @@ public class HoppityEggsConfig {
     public boolean showClaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready for finding.")
+    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnUnclaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Click to Warp", desc = "Makes the eggs ready chat message clickable to warp you to an island.")
+    @ConfigEditorBoolean
+    public boolean warpUnclaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Warp Destination", desc = "A custom island to warp to in the above option.")
+    @ConfigEditorText
+    public String warpDestination = "nucleus";
 
     @Expose
     @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")

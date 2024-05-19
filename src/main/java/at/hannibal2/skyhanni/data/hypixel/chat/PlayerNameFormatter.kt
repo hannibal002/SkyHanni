@@ -85,7 +85,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            Text.text("§bCo-Op > ") {
+            Text.text("§bCo-op > ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())

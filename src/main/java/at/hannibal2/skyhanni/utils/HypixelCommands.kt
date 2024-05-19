@@ -54,6 +54,10 @@ object HypixelCommands {
         send("party transfer $player")
     }
 
+    fun particleQuality(quality: String) {
+        send("pq $quality")
+    }
+
     fun partyAllInvite() {
         send("party settings allinvite")
     }
