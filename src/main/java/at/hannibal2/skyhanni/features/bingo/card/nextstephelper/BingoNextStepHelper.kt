@@ -58,7 +58,7 @@ class BingoNextStepHelper {
     )
     private val npcMessagePattern by patternGroup.pattern(
         "crystal.npcmessage",
-        "§e[NPC] §dRhys§f: §rThank you for the items!§r"
+        "§e\\[NPC] §dRhys§f: §rThank you for the items!§r"
     )
 
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
