@@ -69,6 +69,10 @@ object BestiaryData {
         "familiescompletedpercent",
         "§7Families Completed: §a100%"
     )
+    private val overallProgressPercentPattern by patternGroup.pattern(
+        "overallprogresspercent",
+        "7Overall Progress: §b100% §7(§c§lMAX!§7)"
+    )
     private val overallProgressHiddenPattern by patternGroup.pattern(
         "overallprogresshidden",
         "§7Overall Progress: §cHIDDEN"
@@ -157,7 +161,7 @@ object BestiaryData {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
                 val lore = stack.getLore()
-                if (lore.any { overallProgressPattern.matches(it) || familiesCompletedPercentPattern.matches(it) }) {
+                if (lore.any { overallProgressPercentPattern.matches(it) || familiesCompletedPercentPattern.matches(it) }) {
                     slot highlight LorenzColor.GREEN
                 }
 

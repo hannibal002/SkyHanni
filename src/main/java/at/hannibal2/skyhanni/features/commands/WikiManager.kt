@@ -17,10 +17,29 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
 object WikiManager {
+    //TODO seraid fix later
     private const val OFFICIAL_URL_PREFIX = "https://wiki.hypixel.net/"
     private const val OFFICIAL_SEARCH_PREFIX = "index.php?search="
     private const val FANDOM_URL_PREFIX = "https://hypixel-skyblock.fandom.com/wiki/"
     private const val FANDOM_SEARCH_PREFIX = "Special:Search?query="
+
+//     private val patternGroup = RepoPattern.group("wikimanager")
+//     private val OFFICIAL_URL_PREFIX by patternGroup.pattern(
+//         "officalurlprefix",
+//         "https://wiki.hypixel.net/"
+//     )
+//     private val FANDOM_URL_PREFIX by patternGroup.pattern(
+//         "fandomurlprefix",
+//         "https://hypixel-skyblock.fandom.com/wiki/"
+//     )
+//     private val OFFICIAL_URL_PREFIX by patternGroup.pattern(
+//         "officalsearchprefix",
+//         "index.php?search="
+//     )
+//     private val OFFICIAL_URL_PREFIX by patternGroup.pattern(
+//         "fandomsearchprefix,
+//         "Special:Search?query="
+//     )
 
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 

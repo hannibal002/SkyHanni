@@ -79,6 +79,8 @@ class MobFinder {
         "lividpattern",
         "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!"
     )
+
+    //TODO make this a repo pattern
     private val f1Message1Pattern by patternGroup.pattern(
         "f1message1",
         "§c\\[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable."

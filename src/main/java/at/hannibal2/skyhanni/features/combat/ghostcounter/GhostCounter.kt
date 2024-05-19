@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -95,6 +96,14 @@ object GhostCounter {
     private val skillLevelPattern by patternGroup.pattern(
         "skilllevel",
         ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*"
+    )
+    private val invNamePattern by patternGroup.pattern(
+        "invname",
+        "Bestiary ➜ Dwarven Mines"
+    )
+    private val killsPattern by patternGroup.pattern(
+        "kills",
+        "Kills:.*"
     )
 
     private val format = NumberFormat.getInstance()
@@ -484,7 +493,7 @@ object GhostCounter {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = event.inventoryName
-        if (inventoryName != "Bestiary ➜ Dwarven Mines") return
+        if (!invNamePattern.matches(inventoryName)) return
         val stacks = event.inventoryItems
         val ghostStack = stacks.values.find { it.displayName.contains("Ghost") } ?: return
         val bestiaryNextLevel =
@@ -494,7 +503,7 @@ object GhostCounter {
         var kills = 0.0
         for (line in ghostStack.getLore()) {
             val l = line.removeColor().trim()
-            if (l.startsWith("Kills: ")) {
+            if (killsPattern.matches(l)) {
                 kills = "Kills: (.*)".toRegex().find(l)?.groupValues?.get(1)?.formatDouble() ?: 0.0
             }
             ghostXPPattern.matchMatcher(line.removeColor().trim()) {

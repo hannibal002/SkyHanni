@@ -1,9 +1,16 @@
 package at.hannibal2.skyhanni.features.combat.ghostcounter
 
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 object GhostData {
+
+    private val patternGroup = RepoPattern.group("ghost.data")
+    private val sorrowCountPattern by patternGroup.pattern(
+        "sorrowcount",
+        "§6§lRARE DROP! §r§9Sorrow §r§b\\\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\\\)"
+    )
 
     private var session = mutableMapOf(
         Option.KILLS to 0.0,
@@ -45,6 +52,7 @@ object GhostData {
     }
 
     enum class Option(val pattern: Pattern? = null) {
+        //TODO seraid figure this out later
         KILLS,
         SORROWCOUNT("§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
         VOLTACOUNT("§6§lRARE DROP! §r§9Volta §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),

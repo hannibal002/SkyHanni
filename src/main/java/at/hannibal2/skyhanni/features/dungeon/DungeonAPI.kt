@@ -73,6 +73,10 @@ object DungeonAPI {
         "noblessings",
         "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r"
     )
+    private val dungeonEnteredPattern by patternGroup.pattern(
+        "dungeonentered",
+        "§e\\[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon."
+    )
 
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
@@ -212,7 +216,7 @@ object DungeonAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val floor = dungeonFloor ?: return
-        if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
+        if (dungeonEnteredPattern.matches(event.message)) {
             started = true
             DungeonStartEvent(floor).postAndCatch()
         }

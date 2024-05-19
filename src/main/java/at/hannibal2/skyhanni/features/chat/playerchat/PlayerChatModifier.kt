@@ -17,6 +17,8 @@ class PlayerChatModifier {
     private val patterns = mutableListOf<Regex>()
 
     private val patternGroup = RepoPattern.group("chat.modifier")
+
+    //TODO seraid fix later
     private val replaceFirstOldPattern by patternGroup.pattern(
         "firstold",
         "§[7ab6]((?:\\w+){2,16})'s"
