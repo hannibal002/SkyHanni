@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.enums
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import net.minecraft.client.Minecraft
 
 enum class OutsideSbFeature(private val displayName: String) {
     MODIFY_VISUAL_WORDS("Modify Visual Words"),
@@ -21,5 +22,6 @@ enum class OutsideSbFeature(private val displayName: String) {
 
     override fun toString() = displayName
 
-    fun isSelected() = SkyHanniMod.feature.misc.showOutsideSB.contains(this)
+    fun isSelected() =
+        Minecraft.getMinecraft().thePlayer != null && SkyHanniMod.feature.misc.showOutsideSB.contains(this)
 }
