@@ -30,7 +30,7 @@ class HighlightMiningCommissionMobs {
         // Dwarven Mines
         DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }),
         STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }),
-        ICE_WALKER("Ice Walker Slayer", { it.name == "Ice Walker" }),
+        ICE_WALKER("Glacite Walker Slayer", { it.name == "Ice Walker" }),
         GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.contains("Golden Goblin") }),
 
         // Crystal Hollows
