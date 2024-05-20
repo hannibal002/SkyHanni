@@ -78,5 +78,10 @@ public class EliteFarmingCollectionConfig {
         }
     }
 
+    @Expose
+    @ConfigOption(name = "Show Position", desc = "Show your current position next to the xp amount if below §b#5000")
+    @ConfigEditorBoolean
+    public boolean showPosition = false;
+
 
 }

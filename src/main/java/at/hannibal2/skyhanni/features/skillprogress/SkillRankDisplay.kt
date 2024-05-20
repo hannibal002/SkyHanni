@@ -117,6 +117,9 @@ object SkillRankDisplay {
         updateDisplay()
     }
 
+    //TODO
+//     why does farming xp only increase sometimes for people - maybe related to another feature being turned off? something messing with actionbar update maybe? could another mod be messing with it
+
     @SubscribeEvent
     fun onSkillGained(event: SkillExpGainEvent) {
         if (!skillRanks.containsKey(event.skill) && lastSkillGained != event.skill) {
@@ -169,10 +172,13 @@ object SkillRankDisplay {
 
         val difference = amountToBeat - skill
 
+        val displayPosition = if (config.showPosition && rank != -1) "§7[§b#$rank§7]" else ""
+
+
         val newDisplay = mutableListOf<Renderable>()
         newDisplay.add(
             Renderable.clickAndHover(
-                "§6§l${lastSkillFetched?.firstLetterUppercase()}: §e${skill.addSeparators()}",
+                "§6§l${lastSkillFetched?.firstLetterUppercase()}: §e${skill.addSeparators()} $displayPosition",
                 listOf("§eClick to open your Elite Bot Profile."),
                 onClick = {
                     OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/")
@@ -215,6 +221,7 @@ object SkillRankDisplay {
         if (profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/$skill/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}?includeUpcoming=true"
+//         "https://api.elitebot.dev/Leaderboard/rank/$skill/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
 
         val response = APIUtil.getJSONResponseAsElement(url)
 
@@ -258,6 +265,7 @@ object SkillRankDisplay {
         if (profileID == null) return
         val url =
             "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}/skills?days=1"
+//         "https://api.elitebot.dev/Graph/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30/skills?days=1"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {
@@ -279,5 +287,5 @@ object SkillRankDisplay {
         }
     }
 
-    private fun isEnabled() = config.display && LorenzUtils.inSkyBlock
+    private fun isEnabled() = config.display && LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || !config.showInGarden)
 }

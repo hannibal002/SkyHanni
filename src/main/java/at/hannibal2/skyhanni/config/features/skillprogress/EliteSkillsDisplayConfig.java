@@ -34,6 +34,11 @@ public class EliteSkillsDisplayConfig {
     public int alwaysShowTime = 30;
 
     @Expose
+    @ConfigOption(name = "Only Show In Garden", desc = "Only show the skill display while on the garden island")
+    @ConfigEditorBoolean
+    public boolean showInGarden = false;
+
+    @Expose
     @ConfigOption(name = "Show Time Until Refresh", desc = "Show the time until the leaderboard updates.")
     @ConfigEditorBoolean
     public boolean showTimeUntilRefresh = true;
@@ -77,4 +82,9 @@ public class EliteSkillsDisplayConfig {
             return this.name;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Show Position", desc = "Show your current position next to the xp amount if below §b#5000")
+    @ConfigEditorBoolean
+    public boolean showPosition = false;
 }

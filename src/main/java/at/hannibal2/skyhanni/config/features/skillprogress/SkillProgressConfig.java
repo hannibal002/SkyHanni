@@ -15,6 +15,11 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class SkillProgressConfig {
 
     @Expose
+    @ConfigOption(name = "Elite Bot ranking display", desc = "")
+    @Accordion
+    public EliteSkillsDisplayConfig rankDisplay = new EliteSkillsDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Enabled", desc = "Show the Skill Progress Display.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -49,11 +54,6 @@ public class SkillProgressConfig {
             return str;
         }
     }
-
-    @Expose
-    @ConfigOption(name = "Elite Bot ranking display", desc = "")
-    @Accordion
-    public EliteSkillsDisplayConfig rankDisplay = new EliteSkillsDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Hide In Action Bar", desc = "Hide the skill progress in the Hypixel action bar.")

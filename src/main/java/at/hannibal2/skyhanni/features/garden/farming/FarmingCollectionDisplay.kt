@@ -187,11 +187,12 @@ object FarmingCollectionDisplay {
         val amountToBeat = placements[nextRank] ?: 0
 
         val difference = amountToBeat - collection
+        val displayPosition = if (config.showPosition && rank != -1) "§7[§b#$rank§7]" else ""
 
         val newDisplay = mutableListOf<Renderable>()
         newDisplay.add(
             Renderable.clickAndHover(
-                "§6§l$lastFetchedCrop: §e${collection.addSeparators()}",
+                "§6§l$lastFetchedCrop: §e${collection.addSeparators()} $displayPosition",
                 listOf("§eClick to open your Farming Profile."),
                 onClick = {
                     OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/")
@@ -234,7 +235,7 @@ object FarmingCollectionDisplay {
         if (profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}?includeUpcoming=true"
-
+//             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {
@@ -279,6 +280,7 @@ object FarmingCollectionDisplay {
         if (profileID == null) return
         val url =
             "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}/crops?days=1"
+//         "https://api.elitebot.dev/Graph/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30/crops?days=1"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {
