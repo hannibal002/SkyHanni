@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -31,6 +32,14 @@ object AuctionsHighlighter {
         "auction",
         "§7(?:Starting bid|Top bid): §6(?<coins>.*) coins"
     )
+    private val soldPattern by patternGroup.pattern(
+        "sold",
+        "§7Status: §aSold!"
+    )
+    private val expiredPattern by patternGroup.pattern(
+        "expired",
+        "§7Status: §cExpired!"
+    )
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -44,11 +53,12 @@ object AuctionsHighlighter {
 
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()
-            if (lore.any { it == "§7Status: §aSold!" }) {
+            if (lore.any { soldPattern.matches(it) }) {
                 slot highlight LorenzColor.GREEN
                 continue
             }
-            if (lore.any { it == "§7Status: §cExpired!" }) {
+
+            if (lore.any { expiredPattern.matches(it) }) {
                 slot highlight LorenzColor.RED
                 continue
             }

@@ -11,12 +11,20 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftUpsideDownParkour {
 
     private val config get() = RiftAPI.config.area.mirrorverse.upsideDownParkour
     private var parkourHelper: ParkourHelper? = null
+
+    private val patternGroup = RepoPattern.group("parkour.rift")
+    private val healthPattern by patternGroup.pattern(
+        "message",
+        "§c§lOH NO! THE LAVA OOFED YOU BACK TO THE START!"
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -46,7 +54,7 @@ class RiftUpsideDownParkour {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (event.message == "§c§lOH NO! THE LAVA OOFED YOU BACK TO THE START!") {
+        if (healthPattern.matches(event.message)) {
             parkourHelper?.reset()
         }
     }

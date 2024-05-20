@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,9 +22,14 @@ object CruxTalismanDisplay {
 
     private val config get() = RiftAPI.config.cruxTalisman
 
-    private val progressPattern by RepoPattern.pattern(
-        "rift.everywhere.crux.progress",
+    private val patternGroup = RepoPattern.group("rift.everywhere.crux")
+    private val progressPattern by patternGroup.pattern(
+        "progress",
         ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*"
+    )
+    private val totalBonusesPattern by patternGroup.pattern(
+        "bonuses",
+        "§7Total Bonuses.*"
     )
 
     private val partialName = "CRUX_TALISMAN"
@@ -105,7 +111,7 @@ object CruxTalismanDisplay {
                     val crux = Crux(name, tier, progress, progress.contains("MAXED"))
                     displayLine.add(crux)
                 }
-                if (line.startsWith("§7Total Bonuses")) {
+                if (totalBonusesPattern.matches(line)) {
                     bonusFound = true
                     continue@line
                 }

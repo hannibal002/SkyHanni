@@ -65,6 +65,50 @@ object BestiaryData {
         "title",
         "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$"
     )
+    private val lorePattern by patternGroup.pattern(
+        "lore",
+        "§7(?:Overall Progress: §b100% §7(§c§lMAX!§7)|Families Completed: §a100%)"
+    )
+    private val loreProgressHiddenPattern by patternGroup.pattern(
+        "loreprogresshidden",
+        "§7Overall Progress: §cHIDDEN"
+    )
+    private val loreProgressShownPattern by patternGroup.pattern(
+        "loreprogressshown",
+        "§7Overall Progress: §aSHOWN"
+    )
+    private val familiesFoundContainsPattern by patternGroup.pattern(
+        "familiesfoundcontains",
+        ".*Families Found.*"
+    )
+    private val familiesFoundStartsPattern by patternGroup.pattern(
+        "familiesfoundstart",
+        "Families Found.*"
+    )
+    private val familiesCompletedPattern by patternGroup.pattern(
+        "familiescompleted",
+        ".*Families Completed.*"
+    )
+    private val killsPattern by patternGroup.pattern(
+        "kills",
+        "Kills:.*"
+    )
+    private val progressTierPattern by patternGroup.pattern(
+        "progresstier",
+        ".*Progress to Tier.*"
+    )
+    private val progressOverallPattern by patternGroup.pattern(
+        "progressoverall",
+        ".*Overall Progress.*"
+    )
+    private val queryPattern by patternGroup.pattern(
+        "query",
+        "§7Query: §a.*"
+    )
+    private val resultsPattern by patternGroup.pattern(
+        "results",
+        "§7Results: §a.*"
+    )
 
     private var display = emptyList<List<Any>>()
     private val mobList = mutableListOf<BestiaryMob>()
@@ -97,10 +141,10 @@ object BestiaryData {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
                 val lore = stack.getLore()
-                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
+                if (lore.any { lorePattern.matches(it) }) {
                     slot highlight LorenzColor.GREEN
                 }
-                if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
+                if (!overallProgressEnabled && lore.any { loreProgressHiddenPattern.matches(it) }) {
                     slot highlight LorenzColor.RED
                 }
             }
@@ -169,12 +213,13 @@ object BestiaryData {
                 if (!line.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = line.substring(line.lastIndexOf(' ') + 1)
-                if (previousLine.contains("Families Found")) {
+                if (familiesFoundContainsPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         familiesFound = group("current").formatLong()
                         totalFamilies = group("needed").formatLong()
                     }
-                } else if (previousLine.contains("Families Completed")) {
+
+                } else if (familiesCompletedPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         familiesCompleted = group("current").formatLong()
                     }
@@ -198,19 +243,20 @@ object BestiaryData {
             var actualRealTotalKill: Long = 0
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
-                if (loreLine.startsWith("Kills: ")) {
+                if (killsPattern.matches(loreLine)) {
                     actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatLong()
                         ?: 0
                 }
                 if (!loreLine.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
-                if (previousLine.contains("Progress to Tier")) {
+                if (progressTierPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToTier = group("needed").formatLong()
                         currentKillToTier = group("current").formatLong()
                     }
-                } else if (previousLine.contains("Overall Progress")) {
+
+                } else if (progressOverallPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToMax = group("needed").formatLong()
                         currentTotalKill = group("current").formatLong()
@@ -407,7 +453,7 @@ object BestiaryData {
 
     private fun isOverallProgressEnabled(inventoryItems: Map<Int, ItemStack>): Boolean {
         if (inventoryItems[52]?.item == Items.ender_eye) {
-            return inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } == true
+            return inventoryItems[52]?.getLore()?.any { loreProgressShownPattern.matches(it) } == true
         }
 
         indexes.forEach { index ->
@@ -427,7 +473,7 @@ object BestiaryData {
             if ("Bestiary" != bestiaryGuiTitleMatcher.group(1)) {
                 var loreContainsFamiliesFound = false
                 for (line in stack.getLore()) {
-                    if (line.removeColor().startsWith("Families Found")) {
+                    if (familiesFoundStartsPattern.matches(line.removeColor())) {
                         loreContainsFamiliesFound = true
                         break
                     }
@@ -439,8 +485,8 @@ object BestiaryData {
             return true
         } else if (name == "Search Results") {
             val loreList = stack.getLore()
-            if (loreList.size >= 2 && loreList[0].startsWith("§7Query: §a")
-                && loreList[1].startsWith("§7Results: §a")
+            if (loreList.size >= 2 && queryPattern.matches(loreList[0])
+                && resultsPattern.matches(loreList[1])
             ) {
                 return true
             }

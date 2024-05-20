@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -31,13 +32,20 @@ class HighlightBonzoMasks {
 
     // Technically this timer is overestimating since mage level affects the cooldown, however I don't care.
     private val bonzoMaskCooldown = 360.seconds
-    private val bonzoMaskMessage = "^Your (.*Bonzo's Mask) saved your life!$".toRegex()
-
     private val spiritMaskCooldown = 30.seconds
-    private val spiritMaskMessage = "^Second Wind Activated! Your Spirit Mask saved your life!$".toRegex()
 
     private val greenHue = Color.RGBtoHSB(0, 255, 0, null)[0].toDouble()
     private val redHue = Color.RGBtoHSB(255, 0, 0, null)[0].toDouble()
+
+    private val patternGroup = RepoPattern.group("highlightbonzomask")
+    private val spiritMaskMessage by patternGroup.pattern(
+        "spiritmask",
+        "^Second Wind Activated! Your Spirit Mask saved your life!$"
+    )
+    private val bonzoMaskMessage by patternGroup.pattern(
+        "bonzomask",
+        "^Your (.*Bonzo's Mask) saved your life!$"
+    )
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -66,9 +74,9 @@ class HighlightBonzoMasks {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val message = event.message.removeColor()
-        if (bonzoMaskMessage.matches(message)) {
+        if (bonzoMaskMessage.toRegex().matches(message)) {
             maskTimers["BONZO_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), bonzoMaskCooldown)
-        } else if (spiritMaskMessage.matches(message)) {
+        } else if (spiritMaskMessage.toRegex().matches(message)) {
             maskTimers["SPIRIT_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), spiritMaskCooldown)
         }
     }

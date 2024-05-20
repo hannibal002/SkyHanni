@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -19,6 +21,20 @@ class ChumBucketHider {
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
     private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
     private val hiddenEntities = TimeLimitedSet<Entity>(5.seconds)
+
+    private val patternGroup = RepoPattern.group("chumbucket")
+    private val isBucketPattern by patternGroup.pattern(
+        "isbucket",
+        ".*('s Chum(?:cap)? Bucket)$"
+    )
+    private val chumAmountPattern by patternGroup.pattern(
+        "chumamount",
+        ".*/10 §aChums.*"
+    )
+    private val emptyPattern by patternGroup.pattern(
+        "empty",
+        "^§[fa]Empty Chum(?:cap)? Bucket$"
+    )
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -41,7 +57,8 @@ class ChumBucketHider {
         val name = entity.name
 
         // First text line
-        if (name.endsWith("'s Chum Bucket") || name.endsWith("'s Chumcap Bucket")) {
+
+        if (isBucketPattern.matches(name)) {
             if (name.contains(LorenzUtils.getPlayerName()) && !config.hideOwn.get()) return
             titleEntity.add(entity)
             hiddenEntities.add(entity)
@@ -50,7 +67,7 @@ class ChumBucketHider {
         }
 
         // Second text line
-        if (name.contains("/10 §aChums")) {
+        if (chumAmountPattern.matches(name)) {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
@@ -62,7 +79,8 @@ class ChumBucketHider {
         }
 
         // Chum Bucket
-        if (config.hideBucket.get() && entity.inventory.any { it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket") }) {
+
+        if (config.hideBucket.get() && entity.inventory.any { emptyPattern.matches(it.name) }) {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {

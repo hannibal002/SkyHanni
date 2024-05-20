@@ -12,6 +12,8 @@ import kotlin.time.Duration.Companion.milliseconds
 class ShyCruxWarnings {
 
     private val config get() = RiftAPI.config.area.wyldWoods
+
+    //TODO seraid
     private val shyNames = arrayOf("I'm ugly! :(", "Eek!", "Don't look at me!", "Look away!")
 
     @SubscribeEvent

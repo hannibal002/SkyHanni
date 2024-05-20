@@ -163,6 +163,5 @@ object RiftBloodEffigies {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
     }
 }

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -33,9 +34,14 @@ class MinionCraftHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo
 
+    private val patternGroup = RepoPattern.group("bingo.minion")
     private val minionNamePattern by RepoPattern.pattern(
-        "bingo.minion.name",
+        "name",
         "(?<name>.*) Minion (?<number>.*)"
+    )
+    private val minionCheckPattern by patternGroup.pattern(
+        "minioncheck",
+        "Minion(?! Skin)"
     )
 
     private var display = emptyList<String>()
@@ -258,7 +264,7 @@ class MinionCraftHelper {
         return replace(lastText, "" + next)
     }
 
-    private fun isMinionName(itemName: String) = itemName.contains(" Minion ") && !itemName.contains(" Minion Skin")
+    private fun isMinionName(itemName: String) = minionCheckPattern.matches(itemName)
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {

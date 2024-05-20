@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
 class TheGreatSpook {
 
@@ -18,14 +20,28 @@ class TheGreatSpook {
     private var displayTimeLeft = ""
     private var notificationSeconds = 0
 
+    private val patternGroup = RepoPattern.group("thegreatspook")
+    private val primalPattern by patternGroup.pattern(
+        "primal",
+        " §r§cPrimal Fears§r§7: "
+    )
+    private val fearPattern by patternGroup.pattern(
+        "fear",
+        " §r§5Fear: "
+    )
+    private val endPattern by patternGroup.pattern(
+        "end",
+        " §r§dEnds In§r§7: "
+    )
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (isAllDisabled()) return
         if (!event.repeatSeconds(1)) return
 
-        if (isTimerEnabled() || isNotificationEnabled()) displayTimer = checkTabList(" §r§cPrimal Fears§r§7: ")
-        if (isFearStatEnabled()) displayFearStat = checkTabList(" §r§5Fear: ")
-        if (isTimeLeftEnabled()) displayTimeLeft = checkTabList(" §r§dEnds In§r§7: ")
+        if (isTimerEnabled() || isNotificationEnabled()) displayTimer = checkTabList(primalPattern)
+        if (isFearStatEnabled()) displayFearStat = checkTabList(fearPattern)
+        if (isTimeLeftEnabled()) displayTimeLeft = checkTabList(endPattern)
         if (isNotificationEnabled()) {
             if (displayTimer.endsWith("READY!!")) {
                 if (notificationSeconds > 0) {
@@ -38,8 +54,8 @@ class TheGreatSpook {
         }
     }
 
-    private fun checkTabList(matchString: String): String {
-        return (TabListData.getTabList().find { it.contains(matchString) } ?: "").trim()
+    private fun checkTabList(pattern: Pattern): String {
+        return (TabListData.getTabList().find { pattern.matcher(it).find() } ?: "").trim()
     }
 
     @SubscribeEvent

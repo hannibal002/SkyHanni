@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -68,12 +69,20 @@ class DamageIndicatorManager {
     private val maxHealth = mutableMapOf<UUID, Long>()
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
-    private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
+    private val patternGroup = RepoPattern.group("damageindicator")
+    private val enderSlayerHitsNumberPattern by patternGroup.pattern(
+        "enderslayer",
+        ".* §[5fd]§l(?<hits>\\d+) Hits?"
+    )
 
     companion object {
 
         private var data = mapOf<UUID, EntityData>()
-        private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
+        private val patternGroup = RepoPattern.group("damageindicator")
+        private val damagePattern by patternGroup.pattern(
+            "damage",
+            "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)"
+        )
 
         fun isBoss(entity: EntityLivingBase) = data.values.any { it.entity == entity }
 

@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -49,9 +50,22 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
      *  e - Accepted
      *  a - Completed
      */
-    val tabListQuestPattern by RepoPattern.pattern(
-        "crimson.reputation.tablist",
+    private val patternGroup = RepoPattern.group("crimson.reputation")
+    val tabListQuestPattern by patternGroup.pattern(
+        "tablist",
         " §r§[cdea].*"
+    )
+    private val reputationPattern by patternGroup.pattern(
+        "reputation",
+        ".*Reputation.*"
+    )
+    private val magePattern by patternGroup.pattern(
+        "mage",
+        ".*Mage.*"
+    )
+    private val barbarianPattern by patternGroup.pattern(
+        "barbarian",
+        ".*Barbarian.*"
     )
 
     init {
@@ -98,11 +112,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
         if (event.repeatSeconds(3)) {
             TabListData.getTabList()
-                .filter { it.contains("Reputation:") }
+                .filter { reputationPattern.matches(it) }
                 .forEach {
-                    factionType = if (it.contains("Mage")) {
+                    factionType = if (magePattern.matches(it)) {
                         FactionType.MAGE
-                    } else if (it.contains("Barbarian")) {
+                    } else if (barbarianPattern.matches(it)) {
                         FactionType.BARBARIAN
                     } else {
                         FactionType.NONE

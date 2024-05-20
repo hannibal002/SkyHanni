@@ -27,22 +27,34 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
 
-val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
+//TODO seraid
+val pursePattern = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
 val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
+val ownerRegex = Regex(".*Owner: (\\w+).*")
+
+private val patternGroup = RepoPattern.group("discordstatus")
+
+// Samples: Revenant Horror I; Tarantula Broodfather IV
+private val slayerRegex by patternGroup.pattern(
+    "slayer",
+    "(?<name>(?:\\w| )*) (?<level>[IV]+)"
+)
+
+
 
 private fun getVisitingName(): String {
     val tabData = TabListData.getTabList()
-    val ownerRegex = Regex(".*Owner: (\\w+).*")
+
     for (line in tabData) {
         val colorlessLine = line.removeColor()
         if (ownerRegex.matches(colorlessLine)) {
@@ -119,8 +131,8 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     PURSE({
         val scoreboard = ScoreboardData.sidebarLinesFormatted
         // Matches coins amount in purse or piggy, with optional decimal points
-        val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
-            purseRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+        val coins = scoreboard.firstOrNull { pursePattern.matches(it.removeColor()) }?.let {
+            pursePattern.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
         val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
             motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
@@ -196,8 +208,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         var slayerName = ""
         var slayerLevel = ""
         var bossAlive = "spawning"
-        val slayerRegex =
-            Pattern.compile("(?<name>(?:\\w| )*) (?<level>[IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
+
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val noColorLine = line.removeColor()

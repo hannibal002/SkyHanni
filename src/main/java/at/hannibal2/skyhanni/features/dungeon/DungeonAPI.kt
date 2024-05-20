@@ -32,18 +32,6 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DungeonAPI {
-
-    private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
-    private val uniqueClassBonus =
-        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
-
-    private val bossPattern =
-        "View all your (?<name>\\w+) Collection".toPattern()
-    private val levelPattern =
-        " +(?<kills>\\d+).*".toPattern()
-    private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
-    private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
-
     var dungeonFloor: String? = null
     var started = false
     var inBossRoom = false
@@ -52,18 +40,14 @@ object DungeonAPI {
     var isUniqueClass = false
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-    private val timePattern =
-        "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
-
     private val patternGroup = RepoPattern.group("dungeon")
-
     private val dungeonComplete by patternGroup.pattern(
         "complete",
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
     )
     private val dungeonRoomPattern by patternGroup.pattern(
         "room",
-        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)"
+        "§7\\d+/\\d+/\\d+ §\\w+ (?<roomId>[\\w,-]+)"
     )
     private val blessingPattern by patternGroup.pattern(
         "blessings",
@@ -73,6 +57,51 @@ object DungeonAPI {
         "noblessings",
         "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r"
     )
+    private val startMessagePattern by patternGroup.pattern(
+        "startmessage",
+        "§e\\[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon."
+    )
+    private val goBackPattern by patternGroup.pattern(
+        "goback",
+        "§aGo Back"
+    )
+    private val toBossCollectionsPattern by patternGroup.pattern(
+        "tobosscollections",
+        "§7To Boss Collections"
+    )
+    private val totalKillsLorePattern by patternGroup.pattern(
+        "totalkillslore",
+        ".*Total Kills:.*"
+    )
+    private val floorPattern by patternGroup.pattern(
+        "floorpattern",
+        " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)",
+    )
+    private val uniqueClassBonusPattern by patternGroup.pattern(
+        "uniqueclassbonus",
+        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$",
+    )
+    private val bossPattern by patternGroup.pattern(
+        "boss",
+        "View all your (?<name>\\w+) Collection",
+    )
+    private val levelPattern by patternGroup.pattern(
+        "level",
+        " +(?<kills>\\d+).*",
+    )
+    private val killPattern by patternGroup.pattern(
+        "kill",
+        " +☠ Defeated (?<boss>\\w+).*",
+    )
+    private val totalKillsPattern by patternGroup.pattern(
+        "totalkills",
+        "§7Total Kills: §e(?<kills>.*)",
+    )
+    private val timePattern by patternGroup.pattern(
+        "time",
+        "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s", // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
+    )
+
 
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
@@ -212,11 +241,11 @@ object DungeonAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val floor = dungeonFloor ?: return
-        if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
+        if (startMessagePattern.matches(event.message)) {
             started = true
             DungeonStartEvent(floor).postAndCatch()
         }
-        if (event.message.removeColor().matches(uniqueClassBonus)) {
+        if (event.message.removeColor().matches(uniqueClassBonusPattern.toRegex())) {
             isUniqueClass = true
         }
 
@@ -253,13 +282,13 @@ object DungeonAPI {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.name == "§aGo Back") {
+            if (goBackPattern.matches(item.name)) {
                 item.getLore().getOrNull(0)?.let { firstLine ->
-                    if (firstLine == "§7To Boss Collections") {
+                    if (toBossCollectionsPattern.matches(firstLine)) {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                         val floor = DungeonFloor.byBossName(name) ?: return
                         val lore = inventoryItems[4]?.getLore() ?: return
-                        val line = lore.find { it.contains("Total Kills:") } ?: return
+                        val line = lore.find { totalKillsLorePattern.matches(it) } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
                             group("kills").formatInt()
                         } ?: return

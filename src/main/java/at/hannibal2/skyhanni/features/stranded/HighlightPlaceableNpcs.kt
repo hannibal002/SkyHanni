@@ -19,9 +19,14 @@ class HighlightPlaceableNpcs {
 
     private val config get() = SkyHanniMod.feature.misc.stranded
 
+    private val patternGroup = RepoPattern.group("stranded.highlightplacement")
     private val locationPattern by RepoPattern.pattern(
-        "stranded.highlightplacement.location",
+        "location",
         "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]"
+    )
+    private val lorePattern by patternGroup.pattern(
+        "lore",
+        "§e(this NPC!|your location!)$"
     )
 
     private var inInventory = false
@@ -67,7 +72,7 @@ class HighlightPlaceableNpcs {
 
     private fun isPlaceableNpc(lore: List<String>): Boolean {
         // Checking if NPC & placeable
-        if (lore.isEmpty() || !(lore.last() == "§ethis NPC!" || lore.last() == "§eyour location!")) {
+        if (lorePattern.matches(lore.last())) {
             return false
         }
 

@@ -11,8 +11,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,9 +32,15 @@ object Year300RaffleEvent {
 
     private var overlay: List<Any>? = null
 
+    private val patternGroup = RepoPattern.group("year300raffle")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§6§lACTIVE PLAYER! §eYou gained §b+1 Raffle Ticket§e!"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§6§lACTIVE PLAYER! §eYou gained §b+1 Raffle Ticket§e!") {
+        if (messagePattern.matches(event.message)) {
             lastTimerReceived = SimpleTimeMark.now()
         }
     }

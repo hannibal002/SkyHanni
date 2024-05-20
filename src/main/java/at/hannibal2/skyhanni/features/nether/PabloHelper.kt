@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
@@ -19,17 +20,20 @@ class PabloHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    private val patterns = listOf(
-        "\\[NPC] Pablo: Could you bring me an (?<flower>[\\w ]+).*".toPattern(),
-        "\\[NPC] Pablo: Bring me that (?<flower>[\\w ]+) as soon as you can!".toPattern()
+    private val patternGroup = RepoPattern.group("pablohelper")
+    private val messagePattern by patternGroup.list(
+        "message",
+        "\\[NPC] Pablo: Could you bring me an (?<flower>[\\w ]+).*",
+        "\\[NPC] Pablo: Bring me that (?<flower>[\\w ]+) as soon as you can!",
     )
+
     private var lastSentMessage = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
-        val itemName = patterns.matchMatchers(event.message.removeColor()) {
+        val itemName = messagePattern.matchMatchers(event.message.removeColor()) {
             group("flower")
         } ?: return
 

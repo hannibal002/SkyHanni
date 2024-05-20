@@ -163,6 +163,7 @@ object DiscordLocationKey {
         "Glacite Mineshafts" to "glacite-tunnels",
     ) // maps sublocations to their broader image
 
+    // list of nether locations because there are sooo many (truncated some according to scoreboard)
     private val specialNetherRPC = arrayOf(
         "Aura's Lab",
         "Barbarian Outpost",
@@ -206,7 +207,6 @@ object DiscordLocationKey {
         "The Wasteland",
         "Throne Room"
     )
-    // list of nether locations because there are sooo many (truncated some according to scoreboard)
 
     private val specialRiftRPC = mapOf(
         "Enigma's Crib" to "wyld-woods",

@@ -19,7 +19,9 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
@@ -36,6 +38,16 @@ object EnigmaSoulWaypoints {
     private val trackedSouls = mutableListOf<String>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true
+
+    private val patternGroup = RepoPattern.group("enigmasoulwaypoints")
+    private val messagePatterns by patternGroup.pattern(
+        "message",
+        "^(You have already found that Enigma Soul!|SOUL! You unlocked an Enigma Soul!)$",
+    )
+    private val lorePatterns by patternGroup.pattern(
+        "lore",
+        "§8✖ Not completed yet!",
+    )
 
     private val item by lazy {
         val neuItem = "SKYBLOCK_ENIGMA_SOUL".asInternalName().getItemStack()
@@ -66,7 +78,7 @@ object EnigmaSoulWaypoints {
 
         for (stack in event.inventoryItems.values) {
             val split = stack.displayName.split("Enigma: ")
-            if (split.size == 2 && stack.getLore().last() == "§8✖ Not completed yet!") {
+            if (split.size == 2 && lorePatterns.matches(stack.getLore().last())) {
                 inventoryUnfound.add(split.last())
             }
         }
@@ -159,7 +171,8 @@ object EnigmaSoulWaypoints {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message.removeColor().trim()
-        if (message == "You have already found that Enigma Soul!" || message == "SOUL! You unlocked an Enigma Soul!") {
+
+        if (messagePatterns.matches(message)) {
             hideClosestSoul()
         }
     }
