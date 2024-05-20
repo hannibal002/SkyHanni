@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -54,6 +55,18 @@ class BingoNextStepHelper {
     private val crystalFoundPattern by patternGroup.pattern(
         "crystal.found",
         " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)"
+    )
+    private val rhysMessagePattern by patternGroup.pattern(
+        "thanksitems",
+        "§e\\[NPC] §dRhys§f: §rThank you for the items!§r"
+    )
+    private val emeraldRingPattern by patternGroup.pattern(
+        "emerald",
+        "Craft an Emerald Ring."
+    )
+    private val hoeBlueprintPattern by patternGroup.pattern(
+        "blueprint",
+        "Obtain a Mathematical Hoe Blueprint."
     )
 
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
@@ -168,7 +181,10 @@ class BingoNextStepHelper {
                     }
                 }
             }
-            if (currentStep is PartialProgressItemsStep && currentStep.displayName == rhysTaskName && event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r") {
+            if (currentStep is PartialProgressItemsStep && currentStep.displayName == rhysTaskName && rhysMessagePattern.matches(
+                    event.message
+                )
+            ) {
                 currentStep.amountHavingHidden -= 10
             }
         }
@@ -269,7 +285,8 @@ class BingoNextStepHelper {
             return CollectionStep(name, amount) withItemIslandRequirement name
         }
 
-        if (description == "Craft an Emerald Ring.") {
+
+        if (emeraldRingPattern.matches(description)) {
             return CraftStep("Emerald Ring") requires (
                 ItemsStep(
                     "32x Enchanted Emerald",
@@ -279,7 +296,7 @@ class BingoNextStepHelper {
                 ) requires IslandType.DWARVEN_MINES.getStep())
         }
 
-        if (description == "Obtain a Mathematical Hoe Blueprint.") {
+        if (hoeBlueprintPattern.matches(description)) {
             return CraftStep("Mathematical Hoe Blueprint") requires (
                 ItemsStep(
                     "32x Jacob's Ticket",
