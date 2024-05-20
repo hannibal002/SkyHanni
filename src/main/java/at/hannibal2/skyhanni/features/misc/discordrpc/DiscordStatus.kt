@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -36,20 +38,29 @@ import kotlin.time.Duration.Companion.minutes
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
 
-//TODO seraid
-val pursePattern = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
-val motesRegex = Regex("""Motes: ([\d,]+)""")
-val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
-val ownerRegex = Regex(".*Owner: (\\w+).*")
-
 private val patternGroup = RepoPattern.group("discordstatus")
 
 // Samples: Revenant Horror I; Tarantula Broodfather IV
-private val slayerRegex by patternGroup.pattern(
+private val slayerPattern by patternGroup.pattern(
     "slayer",
     "(?<name>(?:\\w| )*) (?<level>[IV]+)"
 )
-
+private val ownerPattern by patternGroup.pattern(
+    "owner",
+    ".*Owner: (?<owner>\\w+).*"
+)
+private val bitsPattern by patternGroup.pattern(
+    "bits",
+    "Bits: (?<bits>[\\d|,]+)[\\d|.]*"
+)
+private val motesPattern by patternGroup.pattern(
+    "motes",
+    "Motes: (?<motes>[\\d,]+)"
+)
+private val pursePattern by patternGroup.pattern(
+    "purse",
+    "(?:Purse|Piggy): (?<purse>[\\d,]+)[\\d.]*"
+)
 
 
 private fun getVisitingName(): String {
@@ -57,8 +68,8 @@ private fun getVisitingName(): String {
 
     for (line in tabData) {
         val colorlessLine = line.removeColor()
-        if (ownerRegex.matches(colorlessLine)) {
-            return ownerRegex.find(colorlessLine)!!.groupValues[1]
+        ownerPattern.matchMatcher(colorlessLine) {
+            return group("owner")
         }
     }
     return "Someone"
@@ -131,12 +142,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     PURSE({
         val scoreboard = ScoreboardData.sidebarLinesFormatted
         // Matches coins amount in purse or piggy, with optional decimal points
-        val coins = scoreboard.firstOrNull { pursePattern.matches(it.removeColor()) }?.let {
-            pursePattern.find(it.removeColor())?.groupValues?.get(1) ?: ""
+
+        val coins = scoreboard.map { it.removeColor() }.matchFirst(pursePattern) {
+            group("purse")
         }
-        val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
-            motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+        val motes = scoreboard.map { it.removeColor() }.matchFirst(motesPattern) {
+            group("motes")
         }
+
         lastKnownDisplayStrings[PURSE] = when {
             coins == "1" -> "1 Coin"
             coins != "" && coins != null -> "$coins Coins"
@@ -150,8 +163,8 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     BITS({
         val scoreboard = ScoreboardData.sidebarLinesFormatted
-        val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
-            bitsRegex.find(it.removeColor())?.groupValues?.get(1)
+        val bits = scoreboard.map { it.removeColor() }.matchFirst(bitsPattern) {
+            group("bits")
         }
 
         when (bits) {
@@ -212,7 +225,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val noColorLine = line.removeColor()
-            val match = slayerRegex.matcher(noColorLine)
+            val match = slayerPattern.matcher(noColorLine)
             when {
                 match.matches() -> {
                     slayerName = match.group("name")

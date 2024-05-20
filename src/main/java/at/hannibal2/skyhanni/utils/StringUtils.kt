@@ -342,6 +342,8 @@ object StringUtils {
 
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
+    fun Pattern.replace(string: String, replacement: String): String = matcher(string).replaceAll(replacement)
+
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false

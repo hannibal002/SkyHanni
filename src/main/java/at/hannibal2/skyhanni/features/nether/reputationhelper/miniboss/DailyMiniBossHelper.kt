@@ -101,7 +101,6 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         miniBosses.clear()
         for ((displayName, quest) in data) {
             val displayItem = quest.item
-            //TODO seraid
             val pattern = "§f *§r§6§l${displayName.uppercase()} DOWN!".toPattern()
             val location = reputationHelper.readLocationData(quest.location)
             miniBosses.add(CrimsonMiniBoss(displayName, displayItem, location, pattern))

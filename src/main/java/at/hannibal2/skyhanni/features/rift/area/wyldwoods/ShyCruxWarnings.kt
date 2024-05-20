@@ -6,12 +6,23 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 class ShyCruxWarnings {
 
     private val config get() = RiftAPI.config.area.wyldWoods
+
+    private val patternGroup = RepoPattern.group("shycruxwarnings")
+    private val shyNamesPatterns by patternGroup.list(
+        "names",
+        "I'm ugly! :\\(",
+        "Eek!",
+        "Don't look at me!",
+        "Look away!",
+    )
 
     //TODO seraid
     private val shyNames = arrayOf("I'm ugly! :(", "Eek!", "Don't look at me!", "Look away!")
@@ -22,8 +33,12 @@ class ShyCruxWarnings {
         checkForShy()
     }
 
+    private fun isShyName(name: String): Boolean {
+        return shyNamesPatterns.any { it.matches(name) }
+    }
+
     private fun checkForShy() {
-        if (EntityUtils.getAllEntities().any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
+        if (EntityUtils.getAllEntities().any { it.distanceToPlayer() < 8 && isShyName(it.name) }) {
             LorenzUtils.sendTitle("§eLook away!", 150.milliseconds)
         }
     }
