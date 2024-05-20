@@ -37,17 +37,42 @@ class CroesusChestTracker {
 
     private val patternGroup = RepoPattern.group("dungeon.croesus")
 
-    private val croesusPattern by patternGroup.pattern("inventory", "Croesus")
-    private val croesusEmptyPattern by patternGroup.pattern("empty", "§cNo treasures!")
-    private val kismetPattern by patternGroup.pattern("kismet.reroll", "§aReroll Chest")
-    private val kismetUsedPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
-
-    private val floorPattern by patternGroup.pattern("chest.floor", "§7Tier: §eFloor (?<floor>[IV]+)")
-    private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
-
-    private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more Chests to open!")
-    private val openedPattern by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")
-    private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§8No Chests Opened!")
+    private val croesusPattern by patternGroup.pattern(
+        "inventory",
+        "Croesus"
+    )
+    private val croesusEmptyPattern by patternGroup.pattern(
+        "empty",
+        "§cNo treasures!"
+    )
+    private val kismetPattern by patternGroup.pattern(
+        "kismet.reroll",
+        "§aReroll Chest"
+    )
+    private val kismetUsedPattern by patternGroup.pattern(
+        "kismet.used",
+        "§aYou already rerolled a chest!"
+    )
+    private val floorPattern by patternGroup.pattern(
+        "chest.floor",
+        "§7Tier: §eFloor (?<floor>[IV]+)"
+    )
+    private val masterPattern by patternGroup.pattern(
+        "chest.master",
+        ".*Master.*"
+    )
+    private val keyUsedPattern by patternGroup.pattern(
+        "chest.state.keyused",
+        "§aNo more Chests to open!"
+    )
+    private val openedPattern by patternGroup.pattern(
+        "chest.state.opened",
+        "§8Opened Chest:.*"
+    )
+    private val unopenedPattern by patternGroup.pattern(
+        "chest.state.unopened",
+        "§8No Chests Opened!"
+    )
 
     private val kismetSlotId = 50
     private val emptySlotId = 22

@@ -68,9 +68,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
-private val config get() = VisitorAPI.config
-
 object GardenVisitorFeatures {
+    private val config get() = VisitorAPI.config
 
     private var display = emptyList<List<Any>>()
 

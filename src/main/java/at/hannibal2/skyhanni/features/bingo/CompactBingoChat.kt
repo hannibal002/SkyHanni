@@ -25,6 +25,8 @@ class CompactBingoChat {
         "border",
         "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
     )
+
+    //TODO seraid revert this back to how it was before, this is unreadable
     private val inSkyblockPattern by patternGroup.pattern(
         "inskyblock",
         "(^\\s{3}§r§7§8\\+§a. §c❁ Strength\\s*$)|(^\\s{3}§r§7§8\\+§a.* §c❤ Health\\s*$)|(^ {3}§r§7§bAccess to Community Shop\\s*$)|(^ {3}§r§7§8\\+§aAuto-pickup block and mob drops\\s*$)|(^ §r§7§6Access to Bazaar\\s*$)|(^ §r§a§lREWARDS\\s*$)\n"

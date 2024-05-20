@@ -28,6 +28,11 @@ object TabListRenderer {
     private const val COLUMN_SPACING = 6
     private const val TAB_Z_OFFSET = 10f
 
+    private val fireSalePattern by RepoPattern.pattern(
+        "tablist.firesaletitle",
+        "§.§lFire Sales: §r§f\\([0-9]+\\)"
+    )
+
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
         if (!LorenzUtils.inSkyBlock) return
@@ -205,11 +210,6 @@ object TabListRenderer {
         }
         GlStateManager.translate(0f, 0f, -TAB_Z_OFFSET)
     }
-
-    private val fireSalePattern by RepoPattern.pattern(
-        "tablist.firesaletitle",
-        "§.§lFire Sales: §r§f\\([0-9]+\\)"
-    )
 
     @SubscribeEvent
     fun onSkipTablistLine(event: SkipTabListLineEvent) {
