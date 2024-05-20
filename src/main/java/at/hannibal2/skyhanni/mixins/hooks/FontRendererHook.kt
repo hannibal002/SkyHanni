@@ -15,6 +15,8 @@ import net.minecraft.client.renderer.GlStateManager
  */
 object FontRendererHook {
 
+    private val config get() = ChromaManager.config
+
     private const val CHROMA_FORMAT_INDEX = 22
     private const val WHITE_FORMAT_INDEX = 15
 
@@ -63,9 +65,8 @@ object FontRendererHook {
 
     @JvmStatic
     fun beginChromaRendering(text: String, shadow: Boolean) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!ChromaManager.config.enabled) return
-        if (ChromaManager.config.allChroma && ChromaManager.config.ignoreChat && cameFromChat) {
+        if (!isEnabled()) return
+        if (config.allChroma && config.ignoreChat && cameFromChat) {
             endChromaFont()
             return
         }
@@ -78,7 +79,7 @@ object FontRendererHook {
         currentDrawState = if (shadow) DRAW_CHROMA_SHADOW else DRAW_CHROMA
 
         // Best feature ngl
-        if (ChromaManager.config.allChroma) {
+        if (config.allChroma) {
             // Handles setting the base color of text when they don't use color codes i.e. MoulConfig
             if (shadow) {
                 GlStateManager.color(0.33f, 0.33f, 0.33f, RenderUtils.getAlpha())
@@ -100,9 +101,7 @@ object FontRendererHook {
 
     @JvmStatic
     fun forceWhiteColorCode(formatIndex: Int): Int {
-        if (!LorenzUtils.inSkyBlock) return formatIndex
-
-        if (!ChromaManager.config.enabled) return formatIndex
+        if (!isEnabled()) return formatIndex
 
         val drawState = currentDrawState ?: return formatIndex
         if (drawState.getChromaState() && formatIndex <= WHITE_FORMAT_INDEX) { // If it's a color code
@@ -114,40 +113,40 @@ object FontRendererHook {
 
     @JvmStatic
     fun restoreChromaState() {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!ChromaManager.config.enabled) return
+        if (!isEnabled()) return
 
         currentDrawState?.restoreChromaEnv()
     }
 
     @JvmStatic
     fun endChromaRendering() {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!ChromaManager.config.enabled) return
+        if (!isEnabled()) return
 
         if (previewChroma) {
             previewChroma = false
             endChromaFont()
         }
 
-        if (ChromaManager.config.allChroma) endChromaFont()
+        if (config.allChroma) endChromaFont()
 
         currentDrawState?.endChromaEnv()
     }
 
     @JvmStatic
     fun insertZColorCode(constant: String): String {
-        return if (LorenzUtils.inSkyBlock && !ChromaManager.config.enabled) constant else "0123456789abcdefklmnorz"
+        return if (LorenzUtils.inSkyBlock && !isChromaEnabled()) constant else "0123456789abcdefklmnorz"
     }
 
     @JvmStatic
     fun toggleChromaAndResetStyle(formatIndex: Int): Boolean {
-        if (!LorenzUtils.inSkyBlock) return false
-        if (!ChromaManager.config.enabled) return false
+        if (!isEnabled()) return false
         if (formatIndex == CHROMA_FORMAT_INDEX) {
             toggleChromaOn()
             return true
         }
         return false
     }
+
+    private fun isChromaEnabled() = config.enabled.get()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && isChromaEnabled()
 }

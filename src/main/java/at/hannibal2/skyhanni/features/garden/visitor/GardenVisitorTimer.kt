@@ -99,6 +99,9 @@ class GardenVisitorTimer {
                 }
                 millis = TimeUtils.getDuration(timeInfo)
             }
+        } ?: run {
+            display = "§cVisitor time info not in tab list"
+            return
         }
 
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
