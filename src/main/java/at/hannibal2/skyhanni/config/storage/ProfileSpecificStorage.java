@@ -348,6 +348,9 @@ public class ProfileSpecificStorage {
             public boolean pumpkinFortune = false;
 
             @Expose
+            public boolean cocoaBeansFortune = false;
+
+            @Expose
             public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
         }
 
