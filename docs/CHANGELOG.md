@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.25 (In Beta)
+## Version 0.25
 
 ### New Features
 
@@ -639,7 +639,10 @@
 + Fixed unknown scoreboard lines chat error message when Hypixel sends incomplete line data. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1761)
 + Fixed Custom Scoreboard error during Winter Event. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1789)
-+ Fixed max island size display in Crimson Isle and Catacombs in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1822)
++ Fixed max island size display in Crimson Isle and Catacombs in Custom Scoreboard. -
+  j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1822)
++ Fixed some issues where skyhanni guis would have click and hover events when they shouldn't. -
+  CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1846)
 
 #### Dungeon Fixes
 
@@ -701,6 +704,12 @@
 + Fixed the ability to hide Chocolate Factory upgrade messages. -
   seraid (https://github.com/hannibal002/SkyHanni/pull/1820)
 + Fixed Time Until Next Charge display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1806)
++ Fixed typos and formatting in Craft Materials From Bazaar. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1840)
++ Fixed invalid bazaar items being highlighted in the clickable items feature. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1841)
++ Fixed Bazaar price features not working for Ultimate Jerry. -
+  hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1842)
 
 #### Rift Fixes
 
@@ -831,6 +840,8 @@
 + Fixed the armor hider also hiding items in the inventory. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1813)
 + Fixed an error in the Outside SkyBlock setting. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1810)
++ Fixed memory leaks. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1839)
++ Fixed a small Memory Leak in MobData. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1844)
 
 ### Technical Details
 
