@@ -15,7 +15,7 @@ public class MiningEventConfig {
         "also enables you sending data. §eTakes up to a minute to sync new events.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Show Outside Mining Islands", desc = "Shows the event tracker when you are not inside of the Dwarven Mines or Crystal Hollows.")

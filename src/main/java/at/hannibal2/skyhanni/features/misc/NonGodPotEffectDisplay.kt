@@ -220,7 +220,7 @@ class NonGodPotEffectDisplay {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
         if (!checkFooter) return
         if (packet is S47PacketPlayerListHeaderFooter) {
