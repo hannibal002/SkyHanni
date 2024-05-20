@@ -46,7 +46,7 @@
 + Added option to highlight own Golden/Diamond Goblin. -
   Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
 + Added Glacial Powder as stack size in the Fossil Excavator. -
-  jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
+  jani (https://github.com/hannibal002/SkyHanni/pull/1458)
 + Click to get an Ascension Rope from sacks in the Mineshaft. -
   j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1542)
 + Added Tunnel Maps. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1546)
@@ -225,7 +225,7 @@
 + Added options to toggle overflow garden levels and overflow level up messages. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1325)
 + Added an option to disable custom garden key binds while on the barn plot. -
-  jani270 (https://github.com/hannibal002/SkyHanni/pull/1559)
+  jani (https://github.com/hannibal002/SkyHanni/pull/1559)
 + Added option to block accepting/refusing visitors depending on coin loss. -
   Albin (https://github.com/hannibal002/SkyHanni/pull/1502)
 + Changed broken Pest Particle Waypoint to just show existing particles better, no guess. -
@@ -458,7 +458,7 @@
 + Added option to toggle No Bits Warning sound. - Empa (https://github.com/hannibal002/SkyHanni/pull/1425)
 + Show enchantment in book bundle name in profit tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1391)
 + Added the option to choose the duration and color of Patcher Coords Waypoints. -
-  jani270 (https://github.com/hannibal002/SkyHanni/pull/1476)
+  jani (https://github.com/hannibal002/SkyHanni/pull/1476)
 + Added support to right-click in GUI editor to open config for all remaining GUI elements. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1455)
 + Fixed another memory leak. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1491)
