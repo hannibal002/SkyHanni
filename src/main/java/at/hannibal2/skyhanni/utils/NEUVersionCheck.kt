@@ -36,7 +36,6 @@ object NEUVersionCheck {
         openPopupWindow(
             "NotEnoughUpdates is $what!\n" +
                 "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
-                "You currently need NEU version 2.2.0 or later.\n" +
                 "Use these links to download the latest version:",
             Pair("Join SkyHanni Discord", "https://discord.com/invite/skyhanni-997079228510117908"),
             Pair("Open SkyHanni GitHub", "https://github.com/hannibal002/SkyHanni"),
