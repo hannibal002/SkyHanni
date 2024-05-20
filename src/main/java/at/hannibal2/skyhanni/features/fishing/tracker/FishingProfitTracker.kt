@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
@@ -35,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias CategoryName = String
 
-object FishingProfitTracker {
+object FishingProfitTracker: SimpleTracker() {
 
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
@@ -45,7 +46,7 @@ object FishingProfitTracker {
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
-    private val tracker = SkyHanniItemTracker(
+    override val tracker = SkyHanniItemTracker(
         "Fishing Profit Tracker",
         { Data() },
         { it.fishing.fishingProfitTracker }) { drawDisplay(it) }
@@ -235,10 +236,6 @@ object FishingProfitTracker {
     @SubscribeEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         tracker.firstUpdate()
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight

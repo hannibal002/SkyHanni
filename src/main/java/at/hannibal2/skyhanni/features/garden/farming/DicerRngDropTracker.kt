@@ -14,18 +14,21 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.Resettable
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-object DicerRngDropTracker {
-
+object DicerRngDropTracker: SimpleTracker() {
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = GardenAPI.config.dicerCounters
-    private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker })
+    override val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker })
     { drawDisplay(it) }
+
+    override val name = tracker.name
 
     class Data : TrackerData() {
 
@@ -170,9 +173,5 @@ object DicerRngDropTracker {
 
             ConfigManager.gson.toJsonTree(items)
         }
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 }

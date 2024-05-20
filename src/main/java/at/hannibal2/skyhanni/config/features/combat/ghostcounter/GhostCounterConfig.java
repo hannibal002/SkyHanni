@@ -133,10 +133,6 @@ public class GhostCounterConfig {
     @ConfigEditorBoolean
     public boolean showMax = false;
 
-    @ConfigOption(name = "Reset", desc = "Reset the counter.")
-    @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetCounter = GhostUtil.INSTANCE::reset;
-
     @Expose
     @ConfigLink(owner = GhostCounterConfig.class, field = "enabled")
     public Position position = new Position(50, 50, false, true);

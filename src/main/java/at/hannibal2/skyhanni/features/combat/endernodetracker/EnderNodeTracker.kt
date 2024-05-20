@@ -25,13 +25,15 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object EnderNodeTracker {
+object EnderNodeTracker: SimpleTracker() {
+    override val name = "Ender Node Tracker"
 
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
 
@@ -40,7 +42,7 @@ object EnderNodeTracker {
     private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
-    private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
+    override val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
         formatDisplay(
             drawDisplay(it)
         )
@@ -255,9 +257,5 @@ object EnderNodeTracker {
             newList.add(map[index.ordinal])
         }
         return newList
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 }

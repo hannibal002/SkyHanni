@@ -18,12 +18,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-object PestProfitTracker {
+object PestProfitTracker: SimpleTracker() {
     val config get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
@@ -39,7 +40,7 @@ object PestProfitTracker {
     )
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
-    private val tracker = SkyHanniItemTracker(
+    override val tracker = SkyHanniItemTracker(
         "Pest Profit Tracker",
         { Data() },
         { it.garden.pestProfitTracker }) { drawDisplay(it) }
@@ -138,10 +139,6 @@ object PestProfitTracker {
         if (event.newIsland == IslandType.GARDEN) {
             tracker.firstUpdate()
         }
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled

@@ -84,8 +84,10 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
+import at.hannibal2.skyhanni.utils.tracker.Resettable
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
@@ -165,6 +167,7 @@ object Commands {
     }
 
     private fun usersNormal() {
+        registerCommand("shresettracker", "Reset SkyHanni trackers") { commandTracker(it) }
         registerCommand(
             "shmarkplayer",
             "Add a highlight effect to a player for better visibility"
@@ -187,10 +190,6 @@ object Commands {
             "Manually sets the crop start location"
         ) { GardenStartLocation.setLocationCommand() }
         registerCommand(
-            "shclearslayerprofits",
-            "Clearing the total slayer profit for the current slayer type"
-        ) { SlayerProfitTracker.clearProfitCommand(it) }
-        registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3"
         ) { GhostUtil.importCTGhostCounterData() }
@@ -198,29 +197,6 @@ object Commands {
             "shclearfarmingitems",
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
-        registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
-        registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand() }
-        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerRngDropTracker.resetCommand() }
-        registerCommand(
-            "shresetendernodetracker",
-            "Resets the Ender Node Tracker"
-        ) { EnderNodeTracker.resetCommand() }
-        registerCommand(
-            "shresetarmordroptracker",
-            "Resets the Armor Drop Tracker"
-        ) { ArmorDropTracker.resetCommand() }
-        registerCommand(
-            "shresetfrozentreasuretracker",
-            "Resets the Frozen Treasure Tracker"
-        ) { FrozenTreasureTracker.resetCommand() }
-        registerCommand(
-            "shresetfishingtracker",
-            "Resets the Fishing Profit Tracker"
-        ) { FishingProfitTracker.resetCommand() }
-        registerCommand(
-            "shresetvisitordrops",
-            "Reset the Visitors Drop Statistics"
-        ) { GardenVisitorDropStatistics.resetCommand() }
         registerCommand("shbingotoggle", "Toggle the bingo card display mode") { BingoCardDisplay.toggleCommand() }
         registerCommand(
             "shfarmingprofile",
@@ -243,26 +219,6 @@ object Commands {
             "shsensreduce",
             "Lowers the mouse sensitivity for easier small adjustments (for farming)"
         ) { SensitivityReducer.manualToggle() }
-        registerCommand(
-            "shresetvermintracker",
-            "Resets the Vermin Tracker"
-        ) { VerminTracker.resetCommand() }
-        registerCommand(
-            "shresetdianaprofittracker",
-            "Resets the Diana Profit Tracker"
-        ) { DianaProfitTracker.resetCommand() }
-        registerCommand(
-            "shresetpestprofittracker",
-            "Resets the Pest Profit Tracker"
-        ) { PestProfitTracker.resetCommand() }
-        registerCommand(
-            "shresetmythologicalcreaturetracker",
-            "Resets the Mythological Creature Tracker"
-        ) { MythologicalCreatureTracker.resetCommand() }
-        registerCommand(
-            "shresetseacreaturetracker",
-            "Resets the Sea Creature Tracker"
-        ) { SeaCreatureTracker.resetCommand() }
         registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method."
@@ -544,6 +500,26 @@ object Commands {
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
         registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
+    }
+
+    private fun commandTracker(args: Array<String>) {
+        val trackers: List<Resettable> = listOf(
+            SlayerProfitTracker, VerminTracker, PowderTracker, GardenVisitorDropStatistics, PestProfitTracker,
+            DicerRngDropTracker, ArmorDropTracker, SeaCreatureTracker, FishingProfitTracker, FrozenTreasureTracker,
+            MythologicalCreatureTracker, DianaProfitTracker, GhostUtil, EnderNodeTracker
+        )
+
+        val components = mutableListOf<ChatComponentText>()
+        components.add(ChatComponentText("§7Click to reset a SkyHanni tracker:"))
+        for (tracker in trackers) {
+            components.add(ChatComponentText(("\n")))
+            val trackerComponent = Text.text(" §7§l- §b${tracker.name}") {
+                onClick { tracker.resetCommand() }
+                hover = ChatComponentText("§eClick to reset §b${tracker.name}")
+            }
+            components.add(trackerComponent)
+        }
+        ChatUtils.multiComponentMessage(components)
     }
 
     private fun commandHelp(args: Array<String>) {

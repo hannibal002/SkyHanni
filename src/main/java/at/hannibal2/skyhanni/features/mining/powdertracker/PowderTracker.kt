@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonArray
@@ -27,8 +28,7 @@ import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object PowderTracker {
-
+object PowderTracker: SimpleTracker() {
     private val config get() = SkyHanniMod.feature.mining.powderTracker
 
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
@@ -85,7 +85,7 @@ object PowderTracker {
         calculateResourceHour(chestInfo)
     }
 
-    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker })
+    override val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker })
     { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {
@@ -370,8 +370,4 @@ object PowderTracker {
     )
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
-
-    fun resetCommand() {
-        tracker.resetCommand()
-    }
 }

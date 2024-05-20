@@ -25,9 +25,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.Resettable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object GardenVisitorDropStatistics {
+object GardenVisitorDropStatistics: Resettable {
+    override val name = "Garden Visitor Drop Statistics"
 
     private val config get() = GardenAPI.config.visitors.dropsStatistics
     private var display = emptyList<List<Any>>()
@@ -241,7 +243,7 @@ object GardenVisitorDropStatistics {
         display = formatDisplay(drawDisplay(storage))
     }
 
-    fun resetCommand() {
+    override fun resetCommand() {
         val storage = GardenAPI.storage?.visitorDrops ?: return
         ChatUtils.clickableChat("Click here to reset Visitor Drops Statistics.", onClick = {
             acceptedVisitors = 0

@@ -22,13 +22,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-object SeaCreatureTracker {
+object SeaCreatureTracker: SimpleTracker() {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
@@ -37,7 +38,7 @@ object SeaCreatureTracker {
         "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
     )
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
+    override val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
     { drawDisplay(it) }
     private var lastArmorCheck = SimpleTimeMark.farPast()
     private var isTrophyFishing = false
@@ -165,10 +166,6 @@ object SeaCreatureTracker {
         if (!FishingAPI.isFishing(checkRodInHand = false)) return
 
         tracker.renderDisplay(config.position)
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing && !LorenzUtils.inKuudraFight

@@ -25,13 +25,15 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.Resettable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object SlayerProfitTracker {
+object SlayerProfitTracker: Resettable {
+    override val name = "Slayer Profit Tracker"
 
     private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
 
@@ -240,7 +242,7 @@ object SlayerProfitTracker {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    fun clearProfitCommand(args: Array<String>) {
+    override fun resetCommand() {
         if (itemLogCategory == "") {
             ChatUtils.userError(
                 "No current slayer data found! " +
@@ -249,6 +251,12 @@ object SlayerProfitTracker {
             return
         }
 
-        getTracker()?.resetCommand()
+        val tracker = getTracker() ?: return
+
+        ChatUtils.clickableChat(
+            "Are you sure you want to reset your total ${tracker.name}? Click here to confirm.",
+            onClick = { tracker.resetCommand() },
+            oneTimeClick = true
+        )
     }
 }

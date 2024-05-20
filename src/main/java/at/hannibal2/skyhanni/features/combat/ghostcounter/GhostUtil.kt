@@ -7,18 +7,31 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.tracker.Resettable
 import io.github.moulberry.notenoughupdates.util.Utils
 import java.io.FileReader
 
-object GhostUtil {
+object GhostUtil: Resettable {
+    override val name = "Ghost Counter"
 
-    fun reset() {
-        for (opt in GhostData.Option.entries) {
-            opt.set(0.0)
-            opt.set(0.0, true)
-        }
-        GhostCounter.storage?.totalMF = 0.0
-        GhostCounter.update()
+    override fun resetCommand() {
+        ChatUtils.clickableChat(
+            "Are you sure you want to reset your Ghost Counter? Click here to confirm.",
+            onClick = {
+                for (opt in GhostData.Option.entries) {
+                    opt.set(0.0)
+                    opt.set(0.0, true)
+                }
+                GhostCounter.storage?.totalMF = 0.0
+                GhostCounter.update()
+                ChatUtils.chat("Ghost Counter reset!")
+            },
+            oneTimeClick = true
+        )
+    }
+
+    private fun reset() {
+
     }
 
     fun isUsingCTGhostCounter(): Boolean {

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -20,7 +21,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-object MythologicalCreatureTracker {
+object MythologicalCreatureTracker: SimpleTracker() {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
 
@@ -50,7 +51,7 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
     )
 
-    private val tracker =
+    override val tracker =
         SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
         { drawDisplay(it) }
 
@@ -125,10 +126,6 @@ object MythologicalCreatureTracker {
         if (!isEnabled()) return
 
         tracker.renderDisplay(config.position)
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled

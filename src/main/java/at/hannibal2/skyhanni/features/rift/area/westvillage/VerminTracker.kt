@@ -18,13 +18,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.Resettable
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
-object VerminTracker {
+object VerminTracker: SimpleTracker() {
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
     private val silverfishPattern by patternGroup.pattern(
@@ -53,7 +55,7 @@ object VerminTracker {
 
     private val config get() = RiftAPI.config.area.westVillage.verminTracker
 
-    private val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker })
+    override val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker })
     { drawDisplay(it) }
 
     class Data : TrackerData() {
@@ -174,10 +176,6 @@ object VerminTracker {
         if (event.newIsland == IslandType.THE_RIFT) {
             tracker.firstUpdate()
         }
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 
     private fun isEnabled() = RiftAPI.inRift() && config.enabled

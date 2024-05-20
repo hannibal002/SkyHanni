@@ -20,12 +20,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object FrozenTreasureTracker {
+object FrozenTreasureTracker: SimpleTracker() {
 
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
 
@@ -39,7 +40,7 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker })
+    override val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker })
     { formatDisplay(drawDisplay(it)) }
 
     init {
@@ -189,8 +190,4 @@ object FrozenTreasureTracker {
 
     private fun inGlacialCave() =
         onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
-
-    fun resetCommand() {
-        tracker.resetCommand()
-    }
 }

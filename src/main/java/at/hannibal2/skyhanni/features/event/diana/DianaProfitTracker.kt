@@ -19,11 +19,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.Resettable
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object DianaProfitTracker {
+object DianaProfitTracker: SimpleTracker() {
 
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NEUInternalName>()
@@ -38,7 +40,7 @@ object DianaProfitTracker {
         "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!"
     )
 
-    private val tracker = SkyHanniItemTracker(
+    override val tracker = SkyHanniItemTracker(
         "Diana Profit Tracker",
         { Data() },
         { it.diana.dianaProfitTracker }) { drawDisplay(it) }
@@ -147,10 +149,6 @@ object DianaProfitTracker {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled

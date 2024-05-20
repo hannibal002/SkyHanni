@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SimpleTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
@@ -27,7 +28,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-object ArmorDropTracker {
+object ArmorDropTracker: SimpleTracker() {
 
     private val config get() = GardenAPI.config.farmingArmorDrop
 
@@ -38,7 +39,7 @@ object ArmorDropTracker {
 
     private var hasArmor = false
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
+    override val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
     { drawDisplay(it) }
 
     class Data : TrackerData() {
@@ -164,9 +165,5 @@ object ArmorDropTracker {
             new.add("drops", old)
             new
         }
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 }
