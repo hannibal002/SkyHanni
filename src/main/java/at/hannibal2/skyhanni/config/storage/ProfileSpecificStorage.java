@@ -120,6 +120,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public String targetName = null;
+
+        @Expose
+        public Integer hoppityShopYearOpened = -1;
     }
 
     @Expose
