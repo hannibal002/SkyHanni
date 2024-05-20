@@ -39,6 +39,10 @@ object HoppityCollectionStats {
         "duplicates.found",
         "§7Duplicates Found: §a(?<duplicates>[\\d,]+)"
     )
+    private val rabbitNotFoundPattern by patternGroup.pattern(
+        "rabbit.notfound",
+        "(?:§.)+You have not found this rabbit yet!"
+    )
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
@@ -209,14 +213,16 @@ object HoppityCollectionStats {
         for ((_, item) in event.inventoryItems) {
             val itemName = item.displayName?.removeColor() ?: continue
             val itemLore = item.getLore()
-            var isRabbit = rabbitRarityPattern.anyMatches(itemLore)
+            val isRabbit = rabbitRarityPattern.anyMatches(itemLore)
             if (!isRabbit) continue
 
-            var count = itemLore.matchFirst(duplicatesFoundPattern) {
-                group("duplicates").formatInt() + 1
+            val found = !rabbitNotFoundPattern.anyMatches(itemLore)
+
+            val duplicates = itemLore.matchFirst(duplicatesFoundPattern) {
+                group("duplicates").formatInt()
             } ?: 0
 
-            loggedRabbits[itemName] = count
+            loggedRabbits[itemName] = if (found) duplicates + 1 else 0
         }
     }
 
