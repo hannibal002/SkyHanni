@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -55,6 +57,8 @@ object ChocolateFactoryStats {
             "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
         }
 
+        val timeTowerFull = ChocolateFactoryTimeTowerManager.timeTowerFullTimemark()
+
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
         val chocolateUntilPrestigeCalculation =
             ChocolateFactoryAPI.chocolateForPrestige - ChocolateAmount.PRESTIGE.chocolate()
@@ -68,7 +72,7 @@ object ChocolateFactoryStats {
         val upgradeAvailableAt = ChocolateAmount.CURRENT.formattedTimeUntilGoal(profileStorage.bestUpgradeCost)
 
         val map = buildMap {
-            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory Stats")
+            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
 
             put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
             put(ChocolateFactoryStat.THIS_PRESTIGE, "§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
@@ -90,6 +94,17 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.EMPTY_4, "")
 
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
+            put(
+                ChocolateFactoryStat.TIME_TOWER_FULL,
+                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
+                    "§eFull Tower Charges: §a§lNow\n" +
+                        "§eHappens at: §a§lNow"
+                } else {
+                    "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
+                        "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                }
+
+            )
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
                 ChocolateFactoryStat.RAW_PER_SECOND,
@@ -101,19 +116,15 @@ object ChocolateFactoryStats {
             )
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
         }
-        val text = config.statsDisplayList.filter { it.shouldDisplay() }.mapNotNull { map[it] }
+        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n") ?: listOf() }
 
         display = listOf(Renderable.clickAndHover(
             Renderable.verticalContainer(text.map(Renderable::string)),
             tips = listOf("§bCopy to Clipboard!"),
             onClick = {
                 val list = text.toMutableList()
-                val titleHeader = list.indexOf("§6§lChocolate Factory Stats")
-                if (titleHeader != -1) {
-                    list[titleHeader] = "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats"
-                } else {
-                    list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
-                }
+                list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
+
                 ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
             }
         ))
@@ -152,6 +163,9 @@ object ChocolateFactoryStats {
         EMPTY_3(""),
         EMPTY_4(""),
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
+        TIME_TOWER_FULL(
+            "§eTime Tower Full Charges: §b5h 13m 59s\n§bHappens at: Monday, May 13 5:32 AM",
+            { ChocolateFactoryTimeTowerManager.currentCharges() != -1 || ChocolateFactoryTimeTowerManager.timeTowerFull() }),
         TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
         CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
