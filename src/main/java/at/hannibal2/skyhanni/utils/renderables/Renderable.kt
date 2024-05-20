@@ -29,6 +29,7 @@ import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -155,6 +156,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() &&
                     shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
+                    && !NEUItems.neuHasFocus() && Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
                 ) {
                     onClick()
                 }

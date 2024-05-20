@@ -185,7 +185,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getNewYearCake() = getAttributeInt("new_years_cake")
 
-    fun ItemStack.getEnchantments() = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
+    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
         enchantments.keySet.associateWith { enchantments.getInteger(it) }
     }
