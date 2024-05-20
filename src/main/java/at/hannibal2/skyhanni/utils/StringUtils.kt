@@ -14,6 +14,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.NavigableMap
 import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
@@ -98,6 +99,23 @@ object StringUtils {
         return cleanedString.toString()
     }
 
+    /**
+     * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
+     */
+    fun <T> subMapOfStringsStartingWith(prefix: String, map: NavigableMap<String, T>): NavigableMap<String, T> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subMap(prefix, true, lastKey, false)
+    }
+
+    fun nextLexicographicallyStringWithSameLength(input: String): String {
+        val lastCharPosition = input.length - 1
+        val inputWithoutLastChar = input.substring(0, lastCharPosition)
+        val lastChar = input[lastCharPosition]
+        val incrementedLastChar = (lastChar.code + 1).toChar()
+        return inputWithoutLastChar + incrementedLastChar
+    }
+
     fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
@@ -163,6 +181,12 @@ object StringUtils {
             }
         }
         return default
+    }
+
+    fun String.substringBeforeLastOrNull(needle: String): String? {
+        val index = this.lastIndexOf(needle)
+        if (index < 0) return null
+        return this.substring(0, index)
     }
 
     fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
