@@ -27,7 +27,7 @@ object DefaultConfigFeatures {
         }
 
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
-        val updated = true || SkyHanniMod.version !in knownToggles
+        val updated = SkyHanniMod.version !in knownToggles
         val processor = FeatureToggleProcessor()
         ConfigProcessorDriver(processor).processConfig(SkyHanniMod.feature)
         knownToggles[SkyHanniMod.version] = processor.allOptions.map { it.path }
