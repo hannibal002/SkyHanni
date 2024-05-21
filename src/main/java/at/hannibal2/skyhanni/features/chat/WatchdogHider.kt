@@ -5,32 +5,45 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class WatchdogHider {
+object WatchdogHider {
 
     private var inWatchdog = false
     private var blockedLines = 0
     private var startLineComponent: IChatComponent? = null
 
+    private val patternGroup = RepoPattern.group("watchdoghider")
+    private val watchdogMessagePattern by patternGroup.pattern(
+        "message",
+        "§4\\[WATCHDOG ANNOUNCEMENT]"
+    )
+
+    private const val WATCHDOG_START_LINE = "§f"
+    private const val WATCHDOG_END_LINE = "§c"
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
 
-        when (event.message) {
-            watchdogStartLine -> {
+        val message = event.message
+
+        when {
+            message == WATCHDOG_START_LINE -> {
                 startLineComponent = event.chatComponent
                 blockedLines = 0
             }
 
-            watchdogAnnouncementLine -> {
+            watchdogMessagePattern.matches(message) -> {
                 ChatManager.retractMessage(startLineComponent, "watchdog")
                 startLineComponent = null
                 inWatchdog = true
             }
 
-            watchdogEndLine -> {
+            message == WATCHDOG_END_LINE -> {
                 event.blockedReason = "watchdog"
                 inWatchdog = false
             }
@@ -44,13 +57,6 @@ class WatchdogHider {
                 inWatchdog = false
             }
         }
-    }
-
-    companion object {
-
-        private const val watchdogStartLine = "§f"
-        private const val watchdogAnnouncementLine = "§4[WATCHDOG ANNOUNCEMENT]"
-        private const val watchdogEndLine = "§c"
     }
 
     @SubscribeEvent

@@ -15,7 +15,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -25,6 +29,28 @@ import kotlin.time.Duration.Companion.seconds
 
 class VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
+
+    private val patternGroup = RepoPattern.group("visitorrewardwarning")
+    private val refuseOfferPattern by patternGroup.pattern(
+        "refuseoffer",
+        "§cRefuse Offer"
+    )
+    private val acceptOfferPattern by patternGroup.pattern(
+        "acceptoffer",
+        "§aAccept Offer"
+    )
+    private val refuseOfferReplacePattern by patternGroup.pattern(
+        "refuseofferrepalce",
+        "§cRefuse Offer§r"
+    )
+    private val acceptOfferReplacePattern by patternGroup.pattern(
+        "acceptofferreplace",
+        "§aAccept Offer§r"
+    )
+    private val clickToGivePattern by patternGroup.pattern(
+        "clicktogive",
+        "§eClick to give!"
+    )
 
     @SubscribeEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
@@ -59,8 +85,8 @@ class VisitorRewardWarning {
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = stack.name == "§cRefuse Offer"
-        val isAcceptSlot = stack.name == "§aAccept Offer"
+        val isRefuseSlot = refuseOfferPattern.matches(stack.name)
+        val isAcceptSlot = acceptOfferPattern.matches(stack.name)
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
@@ -78,7 +104,7 @@ class VisitorRewardWarning {
             }
             return
         }
-        if (isAcceptSlot && stack.getLore().contains("§eClick to give!")) {
+        if (isAcceptSlot && clickToGivePattern.anyFound(stack.getLore())) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }
@@ -91,8 +117,8 @@ class VisitorRewardWarning {
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.name == "§cRefuse Offer"
-        val isAcceptSlot = event.itemStack.name == "§aAccept Offer"
+        val isRefuseSlot = refuseOfferPattern.matches(event.itemStack.name)
+        val isAcceptSlot = acceptOfferPattern.matches(event.itemStack.name)
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return
@@ -112,9 +138,9 @@ class VisitorRewardWarning {
     ) {
         val blockedToolTip = mutableListOf<String>()
         for (line in copiedTooltip) {
-            if (line.contains("§aAccept Offer§r")) {
+            if (acceptOfferReplacePattern.find(line)) {
                 blockedToolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
-            } else if (line.contains("§cRefuse Offer§r")) {
+            } else if (refuseOfferReplacePattern.find(line)) {
                 blockedToolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
             } else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
                 blockedToolTip.add("§8" + line.removeColor())

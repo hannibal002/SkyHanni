@@ -15,6 +15,9 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,6 +25,20 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class GardenComposterInventoryFeatures {
 
     private val config get() = GardenAPI.config.composters
+
+    private val patternGroup = RepoPattern.group("gardencomposterinventoryfeatures")
+    private val costPattern by patternGroup.pattern(
+        "cost",
+        "§7Upgrade Cost:"
+    )
+    private val copperPattern by patternGroup.pattern(
+        "copper",
+        " Copper$"
+    )
+    private val clickUpgradePattern by patternGroup.pattern(
+        "clickupgrade",
+        "§eClick to upgrade!"
+    )
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -38,14 +55,14 @@ class GardenComposterInventoryFeatures {
         var amountItems = 0
         for (line in event.toolTipRemovedPrefix()) {
             i++
-            if (line == "§7Upgrade Cost:") {
+            if (costPattern.matches(line)) {
                 next = true
                 indexFullCost = i
                 continue
             }
 
             if (next) {
-                if (line.endsWith(" Copper")) continue
+                if (copperPattern.matches(line)) continue
                 if (line == "") break
                 val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
                     ErrorManager.logErrorStateWithData(
@@ -89,7 +106,7 @@ class GardenComposterInventoryFeatures {
             val chest = guiChest.inventorySlots as ContainerChest
 
             for ((slot, stack) in chest.getUpperItems()) {
-                if (stack.getLore().any { it == "§eClick to upgrade!" }) {
+                if (clickUpgradePattern.anyFound(stack.getLore())) {
                     slot highlight LorenzColor.GOLD
                 }
             }

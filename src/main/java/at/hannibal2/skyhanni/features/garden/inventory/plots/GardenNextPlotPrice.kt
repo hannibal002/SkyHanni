@@ -9,9 +9,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenNextPlotPrice {
+
+    private val patternGroup = RepoPattern.group("gardennextplotprice")
+    private val plotPattern by patternGroup.pattern(
+        "plot",
+        "^§ePlot"
+    )
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -20,7 +28,7 @@ class GardenNextPlotPrice {
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        if (!event.itemStack.name.startsWith("§ePlot")) return
+        if (!plotPattern.find(event.itemStack.name)) return
 
         var next = false
         val list = event.toolTip

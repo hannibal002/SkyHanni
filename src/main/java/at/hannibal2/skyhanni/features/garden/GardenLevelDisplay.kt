@@ -66,6 +66,10 @@ class GardenLevelDisplay {
         "chat.increase",
         " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience"
     )
+    private val maxPattern by patternGroup.pattern(
+        "max",
+        "§7§8Max level reached!"
+    )
 
     private var display = ""
 
@@ -124,7 +128,7 @@ class GardenLevelDisplay {
             gardenLevelPattern.findMatcher(line) {
                 currentLevel = group("currentLevel").romanToDecimalIfNecessary() - 1
             }
-            if (line == "§7§8Max level reached!") currentLevel = 15
+            if (maxPattern.matches(line)) currentLevel = 15
             expToNextLevelPattern.findMatcher(line) {
                 nextLevelExp = group("nextLevelExp").formatLong()
             }

@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+
 enum class ComposterUpgrade(val displayName: String, val slotNumber: Int) {
     COMPOSTER_SPEED("Composter Speed", 20),
     MULTI_DROP("Multi Drop", 21),
@@ -9,11 +11,15 @@ enum class ComposterUpgrade(val displayName: String, val slotNumber: Int) {
     ;
 
     companion object {
+        private val patternGroup = RepoPattern.group("composterupgrade")
+        private val upgradePattern by patternGroup.pattern(
+            "upgrade",
+            "§a(?<name>${regexValues()})(?: (?<level>.*))?"
+        )
+
+        val regex = upgradePattern
 
         private fun regexValues() = entries.joinToString("|") { it.displayName }
-
-        // TODO USE SH-REPO
-        val regex = "§a(?<name>${regexValues()})(?: (?<level>.*))?".toPattern()
 
         fun getByName(name: String) = entries.firstOrNull { it.displayName == name }
     }

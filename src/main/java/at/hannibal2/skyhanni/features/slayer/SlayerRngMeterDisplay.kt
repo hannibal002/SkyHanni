@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -60,6 +61,14 @@ class SlayerRngMeterDisplay {
     private val bookFormatPattern by patternGroup.pattern(
         "book.format",
         "§aEnchanted Book \\((?<name>.*)§a\\)"
+    )
+    private val selectedPattern by patternGroup.pattern(
+        "selected",
+        "§a§lSELECTED"
+    )
+    private val dropPattern by patternGroup.pattern(
+        "drop",
+        "§7Selected Drop"
     )
 
     private var display = emptyList<Renderable>()
@@ -154,7 +163,7 @@ class SlayerRngMeterDisplay {
         if (name != getCurrentSlayer()) return
 
         val internalName = event.inventoryItems.values
-            .find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
+            .find { item -> item.getLore().any { selectedPattern.find(it) } }
         setNewGoal(internalName?.getInternalName())
     }
 
@@ -166,7 +175,7 @@ class SlayerRngMeterDisplay {
 
         if (name != getCurrentSlayer()) return
 
-        val rawName = lore.nextAfter("§7Selected Drop") ?: return
+        val rawName = lore.nextAfter({ dropPattern.matches(it) }) ?: return
         val itemName = bookFormatPattern.matchMatcher(rawName) {
             group("name")
         } ?: rawName

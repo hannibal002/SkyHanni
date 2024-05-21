@@ -25,6 +25,9 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.format
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -37,8 +40,15 @@ object EnderNodeTracker {
 
     private var miteGelInInventory = 0
 
-    private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
-    private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
+    private val patternGroup = RepoPattern.group("endernodetracker")
+    private val enderNodePattern by patternGroup.pattern(
+        "endernode",
+        "ENDER NODE!.+You found (?:(?<amount>\\d)x )?§r(?<item>.+)§r§f!"
+    )
+    private val endermanPattern by patternGroup.pattern(
+        "enderman",
+        "(RARE|PET) DROP! §r(?<item>.+) §r§b\\("
+    )
 
     private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
         formatDisplay(
@@ -75,15 +85,15 @@ object EnderNodeTracker {
         var amount = 1
 
         // check whether the loot is from an ender node or an enderman
-        enderNodeRegex.find(message)?.let {
+        enderNodePattern.matchMatcher(message) {
             tracker.modify { storage ->
                 storage.totalNodesMined++
             }
-            amount = it.groups[1]?.value?.substringBefore("x")?.toIntOrNull() ?: 1
-            item = it.groups[2]?.value
-        } ?: endermanRegex.find(message)?.let {
+            amount = group(amount).toIntOrNull() ?: 1
+            item = group(item)
+        } ?: endermanPattern.findMatcher(message) {
             amount = 1
-            item = it.groups[2]?.value
+            item = group(item)
         }
 
         when {

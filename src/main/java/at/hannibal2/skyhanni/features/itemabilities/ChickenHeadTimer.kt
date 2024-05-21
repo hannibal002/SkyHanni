@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,6 +26,12 @@ class ChickenHeadTimer {
     private val cooldown = 5.seconds
 
     private val chickenHead = "CHICKEN_HEAD".asInternalName()
+
+    private val patternGroup = RepoPattern.group("chickenheadtimer")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§aYou laid an egg!"
+    )
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -42,7 +50,7 @@ class ChickenHeadTimer {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (!hasChickenHead) return
-        if (event.message == "§aYou laid an egg!") {
+        if (messagePattern.matches(event.message)) {
             lastTime = SimpleTimeMark.now()
             if (config.hideChat) {
                 event.blockedReason = "chicken_head_timer"

@@ -15,12 +15,20 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PowerStoneGuideFeatures {
 
     private var missing = mutableMapOf<Int, NEUInternalName>()
     private var inInventory = false
+
+    private val patternGroup = RepoPattern.group("powerstoneguidefeatures")
+    private val lorePattern by patternGroup.pattern(
+        "lore",
+        "§7Learned: §cNot Yet ✖"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -31,7 +39,7 @@ class PowerStoneGuideFeatures {
 
         for ((slot, item) in event.inventoryItems) {
             val lore = item.getLore()
-            if (lore.contains("§7Learned: §cNot Yet ✖")) {
+            if (lorePattern.anyFound(lore)) {
                 val rawName = lore.nextAfter("§7Power stone:") ?: continue
                 val name = NEUInternalName.fromItemName(rawName)
                 missing[slot] = name

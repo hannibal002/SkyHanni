@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,6 +28,10 @@ class SkillExperience {
     private val actionBarLowLevelPattern by patternGroup.pattern(
         "actionbarlow",
         "§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\)"
+    )
+    private val progressToPattern by patternGroup.pattern(
+        "progressto",
+        "Progress to Level"
     )
 
     @SubscribeEvent
@@ -66,7 +71,7 @@ class SkillExperience {
 
             var next = false
             for (line in lore) {
-                if (line.contains("Progress to Level")) {
+                if (progressToPattern.find(line)) {
                     next = true
                     continue
                 }

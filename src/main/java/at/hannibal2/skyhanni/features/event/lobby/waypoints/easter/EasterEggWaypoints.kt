@@ -11,6 +11,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class EasterEggWaypoints {
@@ -19,6 +22,24 @@ class EasterEggWaypoints {
     private var closest: EasterEgg? = null
     private var isEgg: Boolean = false
 
+    private val patternGroup = RepoPattern.group("eastereggwaypoints")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "^§a§lYou found an Easter Egg! §r|§aYou have received the §bsuper reward§a!|§cYou already found this egg!"
+    )
+    private val scoreboardLevelPattern by patternGroup.pattern(
+        "scoreboardlevel",
+        "Hypixel Level"
+    )
+    private val easterScoreboardPattern by patternGroup.pattern(
+        "easterscoreboard",
+        "Easter"
+    )
+    private val eggScoreboardPattern by patternGroup.pattern(
+        "eggscoreboard",
+        "Easter Eggs"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
@@ -26,8 +47,7 @@ class EasterEggWaypoints {
 
         if (!isEnabled()) return
 
-        val message = event.message
-        if (message.startsWith("§a§lYou found an Easter Egg! §r") || message == "§aYou have received the §bsuper reward§a!" || message == "§cYou already found this egg!") {
+        if (messagePattern.matches(event.message)) {
             val egg = EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
             egg.found = true
             if (closest == egg) {
@@ -108,9 +128,9 @@ class EasterEggWaypoints {
         '§ewww.hypixel.net'
     */
     private fun checkScoreboardEasterSpecific(): Boolean {
-        val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
-        val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Easter") }
-        val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Easter Eggs") }
+        val a = ScoreboardData.sidebarLinesFormatted.any { scoreboardLevelPattern.find(it) }
+        val b = ScoreboardData.sidebarLinesFormatted.any { easterScoreboardPattern.find(it) }
+        val c = ScoreboardData.sidebarLinesFormatted.any { eggScoreboardPattern.find(it) }
         return a && b && c
     }
 

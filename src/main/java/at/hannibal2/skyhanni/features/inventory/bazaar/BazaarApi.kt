@@ -25,13 +25,25 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class BazaarApi {
+
+    private val patternGroup = RepoPattern.group("collections")
+    private val buyPattern by patternGroup.pattern(
+        "buy",
+        "§aBuy Instantly"
+    )
+    private val bazaarPattern by patternGroup.pattern(
+        "bazaar",
+        "§7To Bazaar"
+    )
 
     private var loadedNpcPriceData = false
 
@@ -80,7 +92,7 @@ class BazaarApi {
     private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
-        if (buyInstantly.displayName != "§aBuy Instantly") return null
+        if (buyPattern.matches(buyInstantly.displayName)) return null
         val bazaarItem = inventoryItems[13] ?: return null
 
         return NEUInternalName.fromItemName(bazaarItem.displayName)
@@ -129,7 +141,7 @@ class BazaarApi {
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.name.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+        if (items.any { it.name.equalsIgnoreColor("Go Back") && bazaarPattern.matches(it.getLore().firstOrNull()) }) {
             return true
         }
 

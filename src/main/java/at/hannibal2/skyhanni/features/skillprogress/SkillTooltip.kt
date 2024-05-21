@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillTooltip {
@@ -20,12 +22,18 @@ class SkillTooltip {
     private val overflowConfig get() = SkillProgress.config.overflowConfig
     private val customGoalConfig get() = SkillProgress.config.customGoalConfig
 
+    private val patternGroup = RepoPattern.group("skilltooltip")
+    private val lorePattern by patternGroup.pattern(
+        "lore",
+        "Click to view!"
+    )
+
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = InventoryUtils.openInventoryName()
         val stack = event.itemStack
-        if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!") }) {
+        if (inventoryName == "Your Skills" && stack.getLore().any { lorePattern.find(it) }) {
             val iterator = event.toolTip.listIterator()
             val split = stack.cleanName().split(" ")
             val skillName = split.first()

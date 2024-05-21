@@ -17,7 +17,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
@@ -43,6 +45,82 @@ import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
 
 class MobFinder {
+    private val patternGroup = RepoPattern.group("mobfinder")
+
+    private val f1Message1Pattern by patternGroup.pattern(
+        "f1message1",
+        "§c\\[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable."
+    )
+    private val f1Message2Pattern by patternGroup.pattern(
+        "f1message2",
+        "§c\\[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!"
+    )
+    private val f1Message3Pattern by patternGroup.pattern(
+        "f1message3",
+        "§c\\[BOSS] Bonzo§r§f: Oh I'm dead!"
+    )
+    private val f1Message4Pattern by patternGroup.pattern(
+        "f1message4",
+        "§c\\[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.."
+    )
+    private val f2Message1Pattern by patternGroup.pattern(
+        "f2message1",
+        "§c\\[BOSS] Scarf§r§f: ARISE, MY CREATIONS!"
+    )
+    private val f2Message2Pattern by patternGroup.pattern(
+        "f2message2",
+        "§c\\[BOSS] Scarf§r§f: Those toys are not strong enough I see."
+    )
+    private val f2Message3Pattern by patternGroup.pattern(
+        "f2message3",
+        "§c\\[BOSS] Scarf§r§f: Don't get too excited though."
+    )
+    private val f2Message4Pattern by patternGroup.pattern(
+        "f2message4",
+        "§c\\[BOSS] Scarf§r§f: Whatever..."
+    )
+    private val f3Message1Pattern by patternGroup.pattern(
+        "f3message1",
+        "§c\\[BOSS] The Professor§r§f: I was burdened with terrible news recently..."
+    )
+    private val f3Message2Pattern by patternGroup.pattern(
+        "f3message2",
+        "§c\\[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?"
+    )
+    private val f3Message3Pattern by patternGroup.pattern(
+        "f3message3",
+        "§c\\[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique."
+    )
+    private val f3Message4Pattern by patternGroup.pattern(
+        "f3message4",
+        "§c\\[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!"
+    )
+    private val f3Message5Pattern by patternGroup.pattern(
+        "f3message5",
+        "§c\\[BOSS] The Professor§r§f: What?! My Guardian power is unbeatable!"
+    )
+    private val f5Message1Pattern by patternGroup.pattern(
+        "f5message1",
+        "§c\\[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him."
+    )
+    private val f6Message1Pattern by patternGroup.pattern(
+        "f6message1",
+        "§c\\[BOSS] Sadan§r§f: ENOUGH!"
+    )
+    private val f6Message2Pattern by patternGroup.pattern(
+        "f6message2",
+        "§c\\[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect."
+    )
+    private val f6Message3Pattern by patternGroup.pattern(
+        "f6message3",
+        "§c\\[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!"
+    )
+
+    //TODO is the .* between [BOSS] and Livid needed?
+    private val correctLividPattern by patternGroup.pattern(
+        "lividpattern",
+        "§c\\[BOSS].*Livid§r§f: Impossible! How did you figure out which one I was\\?!"
+    )
 
     // F1
     private var floor1bonzo1 = false
@@ -71,8 +149,6 @@ class MobFinder {
     // F5
     private var floor5lividEntity: EntityOtherPlayerMP? = null
     private var floor5lividEntitySpawnTime = 0L
-    private val correctLividPattern =
-        "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!".toPattern()
 
     // F6
     private var floor6Giants = false
@@ -512,92 +588,92 @@ class MobFinder {
 
     fun handleChat(message: String) {
         if (!DungeonAPI.inDungeon()) return
-        when (message) {
+        when {
             // F1
-            "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
+            f1Message1Pattern.matches(message) -> {
                 floor1bonzo1 = true
                 floor1bonzo1SpawnTime = System.currentTimeMillis() + 11_250
             }
 
-            "§c[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!" -> {
+            f1Message2Pattern.matches(message) -> {
                 floor1bonzo1 = false
             }
 
-            "§c[BOSS] Bonzo§r§f: Oh I'm dead!" -> {
+            f1Message3Pattern.matches(message) -> {
                 floor1bonzo2 = true
                 floor1bonzo2SpawnTime = System.currentTimeMillis() + 4_200
             }
 
-            "§c[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.." -> {
+            f1Message4Pattern.matches(message) -> {
                 floor1bonzo2 = false
             }
 
             // F2
-            "§c[BOSS] Scarf§r§f: ARISE, MY CREATIONS!" -> {
+            f2Message1Pattern.matches(message) -> {
                 floor2summons1 = true
                 floor2summons1SpawnTime = System.currentTimeMillis() + 3_500
             }
 
-            "§c[BOSS] Scarf§r§f: Those toys are not strong enough I see." -> {
+            f2Message2Pattern.matches(message) -> {
                 floor2summons1 = false
             }
 
-            "§c[BOSS] Scarf§r§f: Don't get too excited though." -> {
+            f2Message3Pattern.matches(message) -> {
                 floor2secondPhase = true
                 floor2secondPhaseSpawnTime = System.currentTimeMillis() + 6_300
             }
 
-            "§c[BOSS] Scarf§r§f: Whatever..." -> {
+            f2Message4Pattern.matches(message) -> {
                 floor2secondPhase = false
             }
 
             // F3
-            "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
+            f3Message1Pattern.matches(message) -> {
                 floor3GuardianShield = true
                 floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 15_400
             }
 
-            "§c[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?" -> {
+            f3Message2Pattern.matches(message) -> {
                 floor3GuardianShield = false
                 DamageIndicatorManager.removeDamageIndicator(BossType.DUNGEON_F3_GUARDIAN)
                 floor3Professor = true
                 floor3ProfessorSpawnTime = System.currentTimeMillis() + 10_300
             }
 
-            "§c[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique." -> {
+            f3Message3Pattern.matches(message) -> {
                 floor3Professor = false
 
                 floor3ProfessorGuardianPrepare = true
                 floor3ProfessorGuardianPrepareSpawnTime = System.currentTimeMillis() + 10_500
             }
 
-            "§c[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!" -> {
+            f3Message4Pattern.matches(message) -> {
                 floor3ProfessorGuardian = true
             }
 
-            "§c[BOSS] The Professor§r§f: What?! My Guardian power is unbeatable!" -> {
+            f3Message5Pattern.matches(message) -> {
                 floor3ProfessorGuardian = false
             }
 
             // F5
-            "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
+            f5Message1Pattern.matches(message) -> {
                 floor5lividEntity = DungeonLividFinder.lividEntity
                 floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
             }
 
             // F6
-            "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
+            f6Message1Pattern.matches(message) -> {
                 floor6Giants = true
                 floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400
             }
 
-            "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
+            f6Message2Pattern.matches(message) -> {
                 floor6Giants = false
                 floor6Sadan = true
                 floor6SadanSpawnTime = System.currentTimeMillis() + 32_500
             }
 
-            "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
+            f6Message3Pattern.matches(message) -> {
                 floor6Sadan = false
             }
         }

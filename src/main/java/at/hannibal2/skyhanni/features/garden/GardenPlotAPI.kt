@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -73,6 +74,14 @@ object GardenPlotAPI {
     private val portableWasherPattern by patternGroup.pattern(
         "spray.cleared.portablewasher",
         "§9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
+    )
+    private val costPattern by patternGroup.pattern(
+        "cost",
+        "§7Cost:"
+    )
+    private val pastingPattern by patternGroup.pattern(
+        "pasting",
+        "§7Pasting in progress:"
     )
 
     var plots = listOf<Plot>()
@@ -294,8 +303,8 @@ object GardenPlotAPI {
             plot.locked = false
             plot.isBeingPasted = false
             for (line in lore) {
-                if (line.contains("§7Cost:")) plot.locked = true
-                if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
+                if (costPattern.find(line)) plot.locked = true
+                if (pastingPattern.find(line)) plot.isBeingPasted = true
                 plot.uncleared = false
                 uncleanedPlotPattern.matchMatcher(line) {
                     plot.uncleared = true

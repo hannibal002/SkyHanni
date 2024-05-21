@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -21,12 +22,32 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object StringUtils {
-    private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
-    private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
-    private val resetPattern = "(?i)§R".toPattern()
-    private val sFormattingPattern = "(?i)§S".toPattern()
-    private val stringColourPattern = "^§[0123456789abcdef]".toPattern()
-    private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
+
+    private val patternGroup = RepoPattern.group("stringutils")
+    private val whiteSpaceResetPattern by patternGroup.pattern(
+        "whitespacereset",
+        "^(?:\\s|§r)*|(?:\\s|§r)*$"
+    )
+    private val whiteSpacePattern by patternGroup.pattern(
+        "whitespace",
+        "^\\s*|\\s*$"
+    )
+    private val resetPattern by patternGroup.pattern(
+        "reset",
+        "(?i)§R"
+    )
+    private val sFormattingPattern by patternGroup.pattern(
+        "sformatting",
+        "(?i)§S"
+    )
+    private val stringColourPattern by patternGroup.pattern(
+        "stringcolour",
+        "^§[0123456789abcdef]"
+    )
+    private val asciiPattern by patternGroup.pattern(
+        "ascii",
+        "[^\\x00-\\x7F]"
+    )
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")

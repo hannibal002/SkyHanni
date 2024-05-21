@@ -21,7 +21,7 @@ class PabloHelper {
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
     private val patternGroup = RepoPattern.group("pablohelper")
-    private val messagePattern by patternGroup.list(
+    private val messagePatterns by patternGroup.list(
         "message",
         "^\\[NPC] Pablo: Could you bring me an (?<flower>[\\w ]+).*",
         "\\[NPC] Pablo: Bring me that (?<flower>[\\w ]+) as soon as you can!",

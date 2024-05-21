@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -17,7 +18,12 @@ class FishingHookDisplay {
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
     private var armorStand: EntityArmorStand? = null
     private val potentionArmorStands = mutableListOf<EntityArmorStand>()
-    private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
+
+    private val patternGroup = RepoPattern.group("fishinghookdisplay")
+    private val matchPattern by patternGroup.pattern(
+        "pattern",
+        "§e§l(\\d+(\\.\\d+)?)"
+    )
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -84,7 +90,7 @@ class FishingHookDisplay {
         if (name == "§c§l!!!") {
             return true
         }
-        return pattern.matcher(name).matches()
+        return this@FishingHookDisplay.matchPattern.matcher(name).matches()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.holdingRod

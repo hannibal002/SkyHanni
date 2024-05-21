@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -35,7 +36,6 @@ object InquisitorWaypointShare {
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
 
     private val patternGroup = RepoPattern.group("diana.waypoints")
-
     /**
      * REGEX-TEST: §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: 6.7
      */
@@ -43,7 +43,6 @@ object InquisitorWaypointShare {
         "party.onlycoords",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
-
     //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
@@ -56,6 +55,15 @@ object InquisitorWaypointShare {
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
     )
+    private val dugPattern by patternGroup.pattern(
+        "dug",
+        "§r§eYou dug out "
+    )
+    private val inquisPattern by patternGroup.pattern(
+        "inquis",
+        "Inquis"
+    )
+
 
     private var time = 0L
     private var testTime = 0L
@@ -104,7 +112,7 @@ object InquisitorWaypointShare {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message
-        if (message.contains("§eYou dug out")) {
+        if (dugPattern.find(message)) {
             testTime = System.currentTimeMillis()
             lastInquisitorMessage = message
 
@@ -115,6 +123,7 @@ object InquisitorWaypointShare {
                 logger.log("reverse!")
                 logger.log("diff: $diff")
             }
+
             if (diff > 1500 || diff < -500) {
                 return
             }
@@ -122,7 +131,7 @@ object InquisitorWaypointShare {
         }
 
         // TODO: Change the check to only one line once we have a confirmed inquis message line
-        if (message.contains("§r§eYou dug out ") && message.contains("Inquis")) {
+        if (dugPattern.find(message) && inquisPattern.find(message)) {
             time = System.currentTimeMillis()
             logger.log("found Inquisitor")
         }

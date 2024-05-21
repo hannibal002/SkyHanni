@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TiaRelayWaypoints {
@@ -21,6 +23,12 @@ class TiaRelayWaypoints {
     init {
         Relay.entries.forEach { it.chatPattern }
     }
+
+    private val patternGroup = RepoPattern.group("tiarelaywaypoints")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§aYou completed the maintenance on the relay!"
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -35,7 +43,7 @@ class TiaRelayWaypoints {
             return
         }
 
-        if (message == "§aYou completed the maintenance on the relay!") {
+        if (messagePattern.matches(message)) {
             waypoint = null
             island = IslandType.NONE
         }

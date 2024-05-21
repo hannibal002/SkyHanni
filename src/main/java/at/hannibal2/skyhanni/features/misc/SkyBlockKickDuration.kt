@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -22,10 +24,20 @@ class SkyBlockKickDuration {
     private var lastKickTime = SimpleTimeMark.farPast()
     private var hasWarned = false
 
+    private val patternGroup = RepoPattern.group("skyblockkickduration")
+    private val kickedPattern by patternGroup.pattern(
+        "kicked",
+        "§cYou were kicked while joining that server!"
+    )
+    private val problemPattern by patternGroup.pattern(
+        "problem",
+        "§cThere was a problem joining SkyBlock, try again in a moment!"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (event.message == "§cYou were kicked while joining that server!") {
+        if (kickedPattern.matches(event.message)) {
 
             if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
                 kickMessage = false
@@ -36,7 +48,7 @@ class SkyBlockKickDuration {
             }
         }
 
-        if (event.message == "§cThere was a problem joining SkyBlock, try again in a moment!") {
+        if (problemPattern.matches(event.message)) {
             kickMessage = false
             showTime = true
             lastKickTime = SimpleTimeMark.now()

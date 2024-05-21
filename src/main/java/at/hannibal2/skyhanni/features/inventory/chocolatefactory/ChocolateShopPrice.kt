@@ -40,6 +40,10 @@ object ChocolateShopPrice {
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!"
     )
+    private val lorePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "shop.tochocshop",
+        "§7To Chocolate Shop"
+    )
 
     var inInventory = false
     private var callUpdate = false
@@ -59,7 +63,7 @@ object ChocolateShopPrice {
         val isInShopOptions = UtilsPatterns.shopOptionsPattern.matches(event.inventoryName)
 
         if (!isInShop && !isInShopOptions) return
-        if (event.inventoryItems[48]?.getLore()?.first() != "§7To Chocolate Shop" && isInShopOptions) return
+        if (lorePattern.matches(event.inventoryItems[48]?.getLore()?.first()) && isInShopOptions) return
 
         inInventory = true
         callUpdate = isInShop

@@ -17,7 +17,7 @@ class PlayerChatModifier {
     private val config get() = SkyHanniMod.feature.chat.playerMessage
 
     private val patternGroup = RepoPattern.group("chat.modifier")
-    private val playerPattern by patternGroup.list(
+    private val playerPatterns by patternGroup.list(
         "patterns",
         "§[ab6]\\[(?:VIP|MVP)(?:§.|\\+)*] {1,2}(?:§[7ab6])?(\\w{2,16})",// ranked player with prefix everywhere
         "§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)",//all players without rank prefix in notification messages

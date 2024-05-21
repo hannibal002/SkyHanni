@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SharkFishCounter {
@@ -16,6 +18,12 @@ class SharkFishCounter {
     private var counter = mutableListOf(0, 0, 0, 0)
     private var display = ""
     private var hasWaterRodInHand = false
+
+    private val patternGroup = RepoPattern.group("sharkfishcounter")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!"
+    )
 
     @SubscribeEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
@@ -48,7 +56,7 @@ class SharkFishCounter {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (event.message != "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!") return
+        if (messagePattern.matches(event.message)) return
         val count = counter.sum()
         if (count == 0) return
 

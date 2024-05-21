@@ -5,10 +5,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 
 object ItemNameResolver {
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
+
+    private val patternGroup = RepoPattern.group("itemnameresolver")
+    private val duplexPattern by patternGroup.pattern(
+        "duplex",
+        "ULTIMATE_DUPLEX;(?<tier>.*)"
+    )
 
     internal fun getInternalNameOrNull(itemName: String): NEUInternalName? {
         val lowercase = itemName.lowercase()
@@ -85,8 +92,6 @@ object ItemNameResolver {
     }
 
     // Workaround for duplex
-    private val duplexPattern = "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern()
-
     private fun fixEnchantmentName(originalName: String): NEUInternalName {
         duplexPattern.matchMatcher(originalName) {
             val tier = group("tier")

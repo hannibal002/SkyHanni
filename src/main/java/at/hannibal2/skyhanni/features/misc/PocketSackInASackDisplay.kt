@@ -8,12 +8,20 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PocketSackInASackDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.pocketSackInASack
     private val maxedStitched = 3
+
+    private val patternGroup = RepoPattern.group("pocketsackinasackdisplay")
+    private val lorePattern by patternGroup.pattern(
+        "lore",
+        "7This sack is"
+    )
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
@@ -40,7 +48,7 @@ class PocketSackInASackDisplay {
         val iterator = event.toolTip.listIterator()
         var next = false
         for (line in iterator) {
-            if (line.contains("7This sack is")) {
+            if (lorePattern.find(line)) {
                 val color = if (applied == maxedStitched) "§a" else "§b"
                 iterator.set("§7This sack is stitched $color$applied§7/$color$maxedStitched")
                 next = true

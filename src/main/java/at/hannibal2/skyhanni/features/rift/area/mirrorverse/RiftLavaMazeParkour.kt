@@ -11,12 +11,20 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftLavaMazeParkour {
 
     private val config get() = RiftAPI.config.area.mirrorverse.lavaMazeConfig
     private var parkourHelper: ParkourHelper? = null
+
+    private val patternGroup = RepoPattern.group("riftlavamazeparkour")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§c§lEEK! THE LAVA OOFED YOU!"
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -46,7 +54,7 @@ class RiftLavaMazeParkour {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (event.message == "§c§lEEK! THE LAVA OOFED YOU!") {
+        if (messagePattern.matches(event.message)) {
             parkourHelper?.reset()
         }
     }

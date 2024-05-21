@@ -13,21 +13,67 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 class ToolTooltipTweaks {
 
+
     private val config get() = GardenAPI.config.tooltipTweak
-    private val tooltipFortunePattern =
-        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
-    private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
-    private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
-    private val abilityDescriptionStart = "§5§o§7These boots gain §a+2❈ Defense"
-    private val abilityDescriptionEnd = "§5§o§7Skill level."
+
+    private val patternGroup = RepoPattern.group("tooltiptweaks")
+    private val tooltipFortunePattern by patternGroup.pattern(
+        "tooltipfortune",
+        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?\$"
+    )
+    private val counterStartLinePatterns by patternGroup.list(
+        "counterstart",
+        "§5§o§6Logarithmic Counter",
+        "§5§o§6Collection Analysis",
+    )
+    private val reforgeEndLinePatterns by patternGroup.list(
+        "reforgeend",
+        "§5§o",
+        "§5§o§7chance for multiple crops.",
+    )
+    private val abilityDescriptionStartPattern by patternGroup.pattern(
+        "abilitydescriptionstart",
+        "§5§o§7These boots gain §a+2❈ Defense",
+    )
+    private val abilityDescriptionEndPattern by patternGroup.pattern(
+        "abilitydescriptionend",
+        "§5§o§7Skill level.",
+    )
+    private val bonusPattern by patternGroup.pattern(
+        "bonus",
+        "^§5§o§7§8Bonus ",
+    )
+    private val removingDescriptionPattern by patternGroup.pattern(
+        "removingdescription",
+        "§5§o",
+    )
+    private val youHavePattern by patternGroup.pattern(
+        "youhave",
+        "^§5§o§7You have",
+    )
+    private val bountifulPattern by patternGroup.pattern(
+        "bonus",
+        "§5§o§9Bountiful Bonus",
+    )
+    private val blessedPattern by patternGroup.pattern(
+        "removingdescription",
+        "§5§o§9Blessed Bonus",
+    )
+    private val miscPattern by patternGroup.pattern(
+        "misc",
+        "Click to|§7§8This item can be reforged!|Dyed",
+    )
 
     private val statFormatter = DecimalFormat("0.##")
 
@@ -63,8 +109,7 @@ class ToolTooltipTweaks {
         var removingAbilityDescription = false
 
         for (line in iterator) {
-            val match = tooltipFortunePattern.matchEntire(line)?.groups
-            if (match != null) {
+            if (tooltipFortunePattern.matches(line)) {
                 val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
 
                 FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
@@ -109,35 +154,35 @@ class ToolTooltipTweaks {
             }
             // Beware, dubious control flow beyond these lines
             if (config.compactToolTooltips || FFGuideGUI.isInGui()) {
-                if (line.startsWith("§5§o§7§8Bonus ")) removingFarmhandDescription = true
+                if (bonusPattern.find(line)) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
                     iterator.remove()
-                    removingFarmhandDescription = line != "§5§o"
-                } else if (removingCounterDescription && !line.startsWith("§5§o§7You have")) {
+                    removingFarmhandDescription = !removingDescriptionPattern.matches(line)
+                } else if (removingCounterDescription && !youHavePattern.find(line)) {
                     iterator.remove()
                 } else {
                     removingCounterDescription = false
                 }
-                if (counterStartLine.contains(line)) removingCounterDescription = true
+                if (counterStartLinePatterns.any { it.find(line) }) removingCounterDescription = true
 
-                if (line == "§5§o§9Blessed Bonus") removingReforgeDescription = true
+                if (blessedPattern.matches(line)) removingReforgeDescription = true
                 if (removingReforgeDescription) {
                     iterator.remove()
-                    removingReforgeDescription = !reforgeEndLine.contains(line)
+                    removingReforgeDescription = reforgeEndLinePatterns.any { it.find(line) }
                 }
-                if (line == "§5§o§9Bountiful Bonus") removingReforgeDescription = true
+                if (bountifulPattern.matches(line)) removingReforgeDescription = true
 
                 if (FFGuideGUI.isInGui()) {
-                    if (line.contains("Click to ") || line.contains("§7§8This item can be reforged!") || line.contains("Dyed")) {
+                    if (miscPattern.find(line)) {
                         iterator.remove()
                     }
 
-                    if (line == abilityDescriptionStart) {
+                    if (abilityDescriptionStartPattern.matches(line)) {
                         removingAbilityDescription = true
                     }
                     if (removingAbilityDescription) {
                         iterator.remove()
-                        if (line == abilityDescriptionEnd) {
+                        if (abilityDescriptionEndPattern.matches(line)) {
                             removingAbilityDescription = false
                         }
                     }

@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityNpc {
@@ -18,6 +20,12 @@ object HoppityNpc {
 
     private var slotsToHighlight = mutableSetOf<Int>()
     private var inShop = false
+
+    private val patternGroup = RepoPattern.group("hoppitynpc")
+    private val lorePattern by patternGroup.pattern(
+        "lore",
+        "§eClick to trade!"
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -46,7 +54,7 @@ object HoppityNpc {
         if (!inShop) return
         slotsToHighlight.clear()
         for ((slot, item) in event.inventoryItems) {
-            if (item.getLore().contains("§eClick to trade!")) {
+            if (lorePattern.anyFound(item.getLore())) {
                 slotsToHighlight.add(slot)
             }
         }

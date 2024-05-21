@@ -21,7 +21,9 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
@@ -41,8 +43,26 @@ class JacobFarmingContestsInventory {
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
-    private val medalPattern by RepoPattern.pattern(
-        "garden.jacob.contests.inventory.medal",
+
+    private val patternGroup = RepoPattern.group("garden.jacob.contests.inventory")
+    private val scorePattern by patternGroup.pattern(
+        "score",
+        "^§7Your score: §e"
+    )
+    private val jacobPattern by patternGroup.pattern(
+        "jacob",
+        "§eJacob's Farming Contest"
+    )
+    private val rewardPattern by patternGroup.pattern(
+        "reward",
+        "§eClick to claim reward!"
+    )
+    private val finneganPattern by patternGroup.pattern(
+        "finnegan",
+        "Contest boosted by Finnegan!"
+    )
+    private val medalPattern by patternGroup.pattern(
+        "medal",
         "§7§7You placed in the (?<medal>.*) §7bracket!"
     )
 
@@ -61,7 +81,7 @@ class JacobFarmingContestsInventory {
 
         val foundEvents = mutableListOf<String>()
         for ((slot, item) in event.inventoryItems) {
-            if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
+            if (!item.getLore().any { scorePattern.find(it) }) continue
 
             foundEvents.add(item.name)
             val time = FarmingContestAPI.getSbTimeFor(item.name) ?: continue
@@ -140,7 +160,7 @@ class JacobFarmingContestsInventory {
         slot: Slot,
     ) {
         GardenNextJacobContest.monthPattern.matchMatcher(chestName) {
-            if (!slot.stack.getLore().any { it.contains("§eJacob's Farming Contest") }) return
+            if (!slot.stack.getLore().any { jacobPattern.find(it) }) return
 
             val day = GardenNextJacobContest.dayPattern.matchMatcher(itemName) { group("day") } ?: return
             val year = group("year")
@@ -171,7 +191,7 @@ class JacobFarmingContestsInventory {
         val chest = guiChest.inventorySlots as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
-            if (stack.getLore().any { it == "§eClick to claim reward!" }) {
+            if (stack.getLore().any { rewardPattern.matches(it) }) {
                 slot highlight LorenzColor.GREEN
             }
         }
@@ -203,7 +223,7 @@ class JacobFarmingContestsInventory {
         var finneganContest = false
 
         for (line in stack.getLore()) {
-            if (line.contains("Contest boosted by Finnegan!")) finneganContest = true
+            if (finneganPattern.find(line)) finneganContest = true
 
             val name = medalPattern.matchMatcher(line) { group("medal").removeColor() } ?: continue
             val medal = LorenzUtils.enumValueOfOrNull<ContestBracket>(name) ?: return

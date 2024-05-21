@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
@@ -29,6 +31,16 @@ object GriffinBurrowParticleFinder {
     private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
     private var lastDugParticleBurrow: LorenzVec? = null
+
+    private val patternGroup = RepoPattern.group("griffenburrowparticlefinder")
+    private val startWithPattern by patternGroup.pattern(
+        "dug",
+        "^§eYou dug out a Griffin Burrow!|^§eYou finished the Griffin burrow chain! §r§7(4/4)"
+    )
+    private val defendersPattern by patternGroup.pattern(
+        "defenders",
+        "§cDefeat all the burrow defenders in order to dig it!"
+    )
 
     // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
     private var fakeBurrow: LorenzVec? = null
@@ -135,9 +147,7 @@ object GriffinBurrowParticleFinder {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val message = event.message
-        if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
-            message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
-        ) {
+        if (startWithPattern.matches(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
             if (burrow != null) {
@@ -146,7 +156,7 @@ object GriffinBurrowParticleFinder {
                 }
             }
         }
-        if (message == "§cDefeat all the burrow defenders in order to dig it!") {
+        if (defendersPattern.matches(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
         }
     }

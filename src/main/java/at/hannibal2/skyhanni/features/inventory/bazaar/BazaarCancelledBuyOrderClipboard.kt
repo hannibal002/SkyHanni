@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -20,7 +21,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class BazaarCancelledBuyOrderClipboard {
 
     private val patternGroup = RepoPattern.group("bazaar.cancelledorder")
-
     /**
      * REGEX-TEST: §6§7from §a50§7x §7missing items.
      * REGEX-TEST: §7§a22§7x §7missing items.
@@ -38,6 +38,14 @@ class BazaarCancelledBuyOrderClipboard {
         "inventorytitle",
         "Order options"
     )
+    private val cancelOrderPattern by patternGroup.pattern(
+        "cancelorder",
+        "Cancel Order"
+    )
+    private val cannotCancelPattern by patternGroup.pattern(
+        "cannotcancel",
+        "§7Cannot cancel order while there are"
+    )
 
     private var latestAmount: Int? = null
 
@@ -46,7 +54,7 @@ class BazaarCancelledBuyOrderClipboard {
         if (!isEnabled()) return
         if (!inventoryTitlePattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[11] ?: return
-        if (!stack.name.contains("Cancel Order")) return
+        if (!cancelOrderPattern.find(stack.name)) return
 
         val lore = stack.getLore()
         lore.matchFirst(lastAmountPattern) {
@@ -55,7 +63,7 @@ class BazaarCancelledBuyOrderClipboard {
         }
 
         // nothing to cancel
-        if (lore.firstOrNull() == "§7Cannot cancel order while there are") {
+        if (cannotCancelPattern.matches(lore.firstOrNull())) {
             return
         }
 

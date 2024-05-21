@@ -12,18 +12,30 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class JoinCrystalHollows {
 
     private var lastWrongPassTime = 0L
 
+    private val patternGroup = RepoPattern.group("joincrystalhollows")
+    private val hopInMinecartPattern by patternGroup.pattern(
+        "hopinminecart",
+        "§e\\[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!"
+    )
+    private val noPassPattern by patternGroup.pattern(
+        "nopass",
+        "§cYou do not have an active Crystal Hollows pass!"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
-        if (message == "§cYou do not have an active Crystal Hollows pass!") {
+        if (noPassPattern.matches(message)) {
             lastWrongPassTime = System.currentTimeMillis()
             if (!IslandType.DWARVEN_MINES.isInIsland()) {
                 ChatUtils.clickableChat("Click here to warp to Dwarven Mines!",
@@ -34,7 +46,7 @@ class JoinCrystalHollows {
                 ChatUtils.chat("Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
             }
         }
-        if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!" && inTime()) {
+        if (hopInMinecartPattern.matches(message) && inTime()) {
             ChatUtils.clickableChat("Click here to warp to Crystal Hollows!", onClick = {
                 HypixelCommands.warp("ch")
             })

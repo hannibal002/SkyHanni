@@ -30,6 +30,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -61,6 +64,16 @@ object VampireSlayerFeatures {
     private val killerSpringTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdmN2E3YmM4YWM4NmYyM2NhN2JmOThhZmViNzY5NjAyMjdlMTgzMmZlMjA5YTMwMjZmNmNlYjhiZGU3NGY1NCJ9fX0="
     private var nextClawSend = 0L
+
+    private val patternGroup = RepoPattern.group("vampireslayerfeatures")
+    private val twinclawsPattern by patternGroup.pattern(
+        "twinclaws",
+        "(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s"
+    )
+    private val spawnedByPattern by patternGroup.pattern(
+        "spawnedby",
+        "§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(?<name>\\w*)"
+    )
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -105,20 +118,16 @@ object VampireSlayerFeatures {
         if (configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle) {
             //TODO seraid fix later
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
-                if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) {
+                if (twinclawsPattern.find(stand.name)) {
                     val coopList = configCoopBoss.coopMembers.split(",").toList()
                     val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
                         it.name.contains(username)
                     }
                     val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                        coopList.isNotEmpty() && configCoopBoss.highlight && coopList.any { it2 ->
-                            var contain = false
-                            if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                                val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
-                                    .find(it.name)?.groupValues?.get(1)
-                                contain = it2 == name
-                            }
-                            contain
+                        coopList.isNotEmpty() && configCoopBoss.highlight && coopList.any { coopMember ->
+                            spawnedByPattern.findMatcher(it.name) {
+                                group("name") == coopMember
+                            } ?: false
                         }
                     }
                     val shouldSendTitle =
@@ -144,14 +153,10 @@ object VampireSlayerFeatures {
         getAllNameTagsInRadiusWith("Spawned by").forEach {
             val coopList = configCoopBoss.coopMembers.split(",").toList()
             val containUser = it.name.contains(username)
-            val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
-                var contain = false
-                if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                    val name =
-                        ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
-                    contain = it2 == name
-                }
-                contain
+            val containCoop = coopList.isNotEmpty() && coopList.any { coopMember ->
+                spawnedByPattern.findMatcher(it.name) {
+                    group("name") == coopMember
+                } ?: false
             }
             val neededHealth = baseMaxHealth * 0.2f
             if (containUser && taggedEntityList.contains(this.entityId)) {
@@ -204,15 +209,10 @@ object VampireSlayerFeatures {
         if (!event.clickedEntity.isNPC()) return
         val coopList = configCoopBoss.coopMembers.split(",").toList()
         event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by").forEach {
-            val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
-                var contain = false
-                //TODO seraid fix later
-                if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                    val name =
-                        ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
-                    contain = it2 == name
-                }
-                contain
+            val containCoop = coopList.isNotEmpty() && coopList.any { coopMember ->
+                spawnedByPattern.findMatcher(it.name) {
+                    group("name") == coopMember
+                } ?: false
             }
             if (it.name.contains(username) || containCoop) return
             if (!taggedEntityList.contains(event.clickedEntity.entityId)) {

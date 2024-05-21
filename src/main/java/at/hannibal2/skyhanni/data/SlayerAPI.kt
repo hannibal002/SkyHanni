@@ -15,7 +15,10 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -33,6 +36,20 @@ object SlayerAPI {
     var latestSlayerProgress = ""
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
+
+    private val patternGroup = RepoPattern.group("slayerapi")
+    private val slayerQuestPattern by patternGroup.pattern(
+        "slayerquest",
+        "Slayer Quest"
+    )
+    private val slayerQuestCompletePattern by patternGroup.pattern(
+        "slayerquestcomplete",
+        " {2}§r§a§lSLAYER QUEST COMPLETE!"
+    )
+    private val slayerQuestStartedPattern by patternGroup.pattern(
+        "slayerqueststarted",
+        "§r§5§lSLAYER QUEST STARTED!"
+    )
 
     fun getLatestProgressChangeTime() = if (latestSlayerProgress == "§eSlay the boss!") {
         System.currentTimeMillis()
@@ -81,11 +98,11 @@ object SlayerAPI {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
+        if (slayerQuestStartedPattern.find(event.message)) {
             questStartTime = System.currentTimeMillis()
         }
 
-        if (event.message == "  §r§a§lSLAYER QUEST COMPLETE!") {
+        if (slayerQuestCompletePattern.matches(event.message)) {
             SlayerQuestCompleteEvent().postAndCatch()
         }
     }
@@ -113,14 +130,15 @@ object SlayerAPI {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 
-        val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest") ?: ""
+        //TODO seraid figure this out
+        val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter({ slayerQuestPattern.matches(it) }) ?: ""
         if (slayerQuest != latestSlayerCategory) {
             val old = latestSlayerCategory
             latestSlayerCategory = slayerQuest
             SlayerChangeEvent(old, latestSlayerCategory).postAndCatch()
         }
 
-        val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2) ?: ""
+        val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter({ slayerQuestPattern.matches(it) }, 2) ?: ""
         if (latestSlayerProgress != slayerProgress) {
             SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
             latestSlayerProgress = slayerProgress

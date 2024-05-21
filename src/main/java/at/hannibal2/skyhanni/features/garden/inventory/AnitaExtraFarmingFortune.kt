@@ -6,14 +6,15 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson.Price
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -21,9 +22,18 @@ class AnitaExtraFarmingFortune {
 
     private val config get() = GardenAPI.config.anitaShop
 
-    private val realAmountPattern by RepoPattern.pattern(
-        "garden.inventory.anita.extrafortune.realamount",
+    private val patternGroup = RepoPattern.group("garden.inventory.anita.extrafortune")
+    private val realAmountPattern by patternGroup.pattern(
+        "realamount",
         "§5§o§aJacob's Ticket §8x(?<realAmount>.*)"
+    )
+    private val extraFarmingPattern by patternGroup.pattern(
+        "extrafarming",
+        "Extra Farming Fortune"
+    )
+    private val clickTradePattern by patternGroup.pattern(
+        "clicktrade",
+        "§5§o§eClick to trade!"
     )
 
     private var levelPrice = mapOf<Int, Price>()
@@ -34,7 +44,7 @@ class AnitaExtraFarmingFortune {
 
         if (InventoryUtils.openInventoryName() != "Anita") return
 
-        if (!event.itemStack.displayName.contains("Extra Farming Fortune")) return
+        if (!extraFarmingPattern.find(event.itemStack.displayName)) return
 
         val anitaUpgrade = GardenAPI.storage?.fortune?.anitaUpgrade ?: return
 
@@ -57,7 +67,7 @@ class AnitaExtraFarmingFortune {
         }
         jacobTickets = (contributionFactor * jacobTickets).toInt()
 
-        val index = event.toolTip.indexOfFirst("§5§o§eClick to trade!")?.let { it - 1 } ?: return
+        val index = event.toolTip.indexOfFirst { clickTradePattern.matches(it) }.let { it - 1 }
 
         // TODO: maybe only show the price when playing classic
 //        if (!LorenzUtils.noTradeMode) {

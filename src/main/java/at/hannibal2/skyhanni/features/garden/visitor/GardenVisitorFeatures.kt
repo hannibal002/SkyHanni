@@ -50,9 +50,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
 import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -96,6 +98,22 @@ object GardenVisitorFeatures {
         "partialaccepted",
         "§aYou gave some of the required items!"
     )
+    private val itemsRequiredPattern by patternGroup.pattern(
+        "itemsrequired",
+        "§7Items Required:"
+    )
+    private val clickGivePattern by patternGroup.pattern(
+        "clickgive",
+        "§eClick to give!"
+    )
+    private val acceptOfferPattern by patternGroup.pattern(
+        "acceptoffer",
+        "§aAccept Offer"
+    )
+    private val rewardsPattern by patternGroup.pattern(
+        "rewards",
+        "Rewards"
+    )
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
@@ -118,7 +136,7 @@ object GardenVisitorFeatures {
         visitor.lastLore = emptyList()
 
         for (line in lore) {
-            if (line == "§7Items Required:") continue
+            if (itemsRequiredPattern.matches(line)) continue
             if (line.isEmpty()) break
 
             val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
@@ -139,8 +157,7 @@ object GardenVisitorFeatures {
         visitor.blockedLore = listOf()
         visitor.blockReason = visitor.blockReason()
 
-        val alreadyReady = offerItem.getLore().any { it == "§eClick to give!" }
-        if (alreadyReady) {
+        if (clickGivePattern.anyFound(offerItem.getLore())) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "tooltipClickToGive")
         } else {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "tooltipMissingItems")
@@ -304,7 +321,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorAPI.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.name != "§aAccept Offer") return
+        if (!acceptOfferPattern.matches(itemStack.name)) return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
@@ -322,7 +339,7 @@ object GardenVisitorFeatures {
         val foundRewards = mutableListOf<NEUInternalName>()
 
         for (formattedLine in stack.getLore()) {
-            if (formattedLine.contains("Rewards")) {
+            if (rewardsPattern.find(formattedLine)) {
                 readingShoppingList = false
             }
 
@@ -387,7 +404,7 @@ object GardenVisitorFeatures {
                 finalList.set(index, copperLine)
             }
 
-            if (formattedLine.contains("Rewards")) {
+            if (rewardsPattern.find(formattedLine)) {
                 readingShoppingList = false
             }
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue

@@ -17,7 +17,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLiving
@@ -43,7 +45,7 @@ class SummoningMobManager {
     )
     private val despawnPattern by patternGroup.pattern(
         "despawn",
-        "§cYou have despawned your (monster|monsters)!"
+        "§cYou have despawned your (monster|monsters)!|^§c ☠ §r§7You "
     )
     private val healthPattern by patternGroup.pattern( //§a§ohannibal2's Tank Zombie§r §a160k§c❤
         "health",
@@ -51,7 +53,7 @@ class SummoningMobManager {
     )
     private val seraphRecallPattern by patternGroup.pattern( //§cThe Seraph recalled your 3 summoned allies!
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d) summoned allies!"
+        "§cThe Seraph recalled your (\\d) summoned allies!|§cThe Seraph recalled your summoned ally!"
     )
 
     @SubscribeEvent
@@ -68,13 +70,13 @@ class SummoningMobManager {
             searchMobs = true
         }
 
-        if (despawnPattern.matcher(message).matches() || message.startsWith("§c ☠ §r§7You ")) {
+        if (despawnPattern.find(message)) {
             despawned()
             if (config.summoningMobDisplay && !message.contains("☠")) {
                 event.blockedReason = "summoning_soul"
             }
         }
-        if (message == "§cThe Seraph recalled your summoned ally!" || seraphRecallPattern.matcher(message).matches()) {
+        if (seraphRecallPattern.matches(message)) {
             despawned()
             if (config.summoningMobDisplay) {
                 event.blockedReason = "summoning_soul"

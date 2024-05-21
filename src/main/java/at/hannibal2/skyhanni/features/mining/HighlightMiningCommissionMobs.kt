@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityEndermite
 import net.minecraft.entity.monster.EntityIronGolem
@@ -21,6 +23,12 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HighlightMiningCommissionMobs {
+
+    private val patternGroup = RepoPattern.group("highlightminingcommisionmods")
+    private val tablistPattern by patternGroup.pattern(
+        "tablist",
+        "§aDONE$"
+    )
 
     private val config get() = SkyHanniMod.feature.mining
     // TODO Commissin API
@@ -74,7 +82,7 @@ class HighlightMiningCommissionMobs {
         // TODO Commissin API
         MobType.entries.filter { type ->
             event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
-                ?.let { !it.endsWith("§aDONE") }
+                ?.let { !tablistPattern.find(it) }
                 ?: false
         }.let {
             if (it != active) {

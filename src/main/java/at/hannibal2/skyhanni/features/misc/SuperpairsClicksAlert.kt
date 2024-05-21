@@ -6,16 +6,36 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SuperpairsClicksAlert {
 
     private val config get() = SkyHanniMod.feature.misc
 
+    private val patternGroup = RepoPattern.group("superpairsclickalert")
+    private val roundsNeededPattern by patternGroup.pattern(
+        "roundsneeded",
+        "(?:Chain|Series) of (?<roundsneeded>\\d+):"
+    )
+    private val currentRoundPattern by patternGroup.pattern(
+        "currentround",
+        "Round: (?<round>\\d+)"
+    )
+    private val tooLowPattern by patternGroup.pattern(
+        "toolow",
+        "Enchanting level too low!|Not enough experience!"
+    )
+    private val practiceModePattern by patternGroup.pattern(
+        "practicemode",
+        "Practice mode has no rewards"
+    )
+
     private var roundsNeeded = -1
-    private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")
-    private val currentRoundRegex = Regex("""Round: (\d+)""")
     private val targetInventoryNames = arrayOf("Chronomatron", "Ultrasequencer")
 
     @SubscribeEvent
@@ -26,13 +46,14 @@ class SuperpairsClicksAlert {
         // player may have drank Metaphysical Serum which reduces clicks needed by up to 3, so need to parse it
         for (i in 24 downTo 20) {
             val lore = event.inventoryItems[i]?.getLore() ?: continue
-            if (lore.any { it.contains("Practice mode has no rewards") }) {
+            if (practiceModePattern.anyFound(lore)) {
                 roundsNeeded = -1
                 break
             }
-            if (lore.any { it.contains("Enchanting level too low!") || it.contains("Not enough experience!") }) continue
-            val match = lore.asReversed().firstNotNullOfOrNull { roundsNeededRegex.find(it.removeColor()) } ?: continue
-            roundsNeeded = match.groups[1]!!.value.toInt()
+            if (tooLowPattern.anyFound(lore)) continue
+            lore.asReversed().findFirst(roundsNeededPattern) {
+                roundsNeeded = group("roundsneeded").toInt()
+            }
             break
         }
     }
@@ -43,13 +64,15 @@ class SuperpairsClicksAlert {
         if (roundsNeeded == -1) return
         if (!targetInventoryNames.any { event.inventoryName.contains(it) }) return
 
-        if ( // checks if we have succeeded in either minigame
-            (event.inventoryName.contains("Chronomatron")
-                && ((event.inventoryItems[4]?.displayName?.removeColor()
-                ?.let { currentRoundRegex.find(it) }
-                ?.groups?.get(1)?.value?.toInt() ?: -1) > roundsNeeded))
+        val currentRounds = event.inventoryItems[4]?.displayName?.removeColor()?.let {
+            currentRoundPattern.findMatcher(it) {
+                group("round").toInt()
+            }
+        } ?: -1
 
-            || (event.inventoryName.contains("Ultrasequencer")
+        // checks if we have succeeded in either minigame
+        if ((event.inventoryName.contains("Chronomatron")
+                && (currentRounds > roundsNeeded)) || (event.inventoryName.contains("Ultrasequencer")
                 && event.inventoryItems.entries
                 .filter { it.key < 45 }
                 .any { it.value.stackSize > roundsNeeded })

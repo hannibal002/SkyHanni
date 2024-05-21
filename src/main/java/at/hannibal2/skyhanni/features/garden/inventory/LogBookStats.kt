@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
@@ -32,6 +33,10 @@ class LogBookStats {
     private val pagePattern by groupPattern.pattern(
         "page.current",
         "§ePage (?<page>\\d)"
+    )
+    private val nextPagePattern by groupPattern.pattern(
+        "nextpage",
+        "§aNext Page"
     )
 
     private val config get() = GardenAPI.config
@@ -109,7 +114,7 @@ class LogBookStats {
             return
         }
         for (item in event.inventoryItems.values) {
-            if (item.displayName != "§aNext Page") continue
+            if (!nextPagePattern.matches(item.displayName)) continue
             item.getLore().matchFirst(pagePattern) {
                 currentPage = group("page").toInt() - 1
             }

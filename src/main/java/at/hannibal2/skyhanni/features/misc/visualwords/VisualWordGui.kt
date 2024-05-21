@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -58,6 +59,12 @@ open class VisualWordGui : GuiScreen() {
     private var modifiedWords = mutableListOf<VisualWord>()
 
     private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
+
+    private val patternGroup = RepoPattern.group("visualwordgui")
+    private val wordsPattern by patternGroup.pattern(
+        "words",
+        "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)"
+    )
 
     companion object {
 
@@ -567,9 +574,8 @@ open class VisualWordGui : GuiScreen() {
             var importedWords = 0
             var skippedWords = 0
             val lists = json["custom"].asJsonObject["visualWords"].asJsonArray
-            val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
             loop@ for (line in lists) {
-                pattern.matchMatcher(line.asString) {
+                wordsPattern.matchMatcher(line.asString) {
                     val from = group("from").replace("&", "&&")
                     val to = group("to").replace("&", "&&")
                     val state = group("state").toBoolean()

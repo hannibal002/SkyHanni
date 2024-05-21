@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -93,6 +94,33 @@ class HypixelData {
             "skyblock.area",
             "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
         )
+
+
+        private val changedPattern by patternGroup.pattern(
+            "changed",
+            "^your profile was changed to:"
+        )
+        private val playingOnPattern by patternGroup.pattern(
+            "playingon",
+            "^you are playing on profile:"
+        )
+        private val strandedPattern by patternGroup.pattern(
+            "stranded",
+            " §a☀ §aStranded"
+        )
+        private val ironmanPattern by patternGroup.pattern(
+            "ironman",
+            " §7♲ §7Ironman"
+        )
+        private val livePattern by patternGroup.pattern(
+            "live",
+            "§ewww.hypixel.net"
+        )
+        private val alphaPattern by patternGroup.pattern(
+            "alpha",
+            "§ealpha.hypixel.net"
+        )
+
 
         var hypixelLive = false
         var hypixelAlpha = false
@@ -256,13 +284,13 @@ class HypixelData {
         if (!LorenzUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
-        if (message.startsWith("your profile was changed to:")) {
+        if (changedPattern.find(message)) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
         }
-        if (message.startsWith("you are playing on profile:")) {
+        if (playingOnPattern.find(message)) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
             if (profileName == newProfile) return
             profileName = newProfile
@@ -352,8 +380,8 @@ class HypixelData {
         if (list.isEmpty()) return
 
         val last = list.last()
-        hypixelLive = last == "§ewww.hypixel.net"
-        hypixelAlpha = last == "§ealpha.hypixel.net"
+        hypixelLive = livePattern.matches(last)
+        hypixelAlpha = alphaPattern.matches(last)
     }
 
     private fun checkSidebar() {
@@ -365,12 +393,12 @@ class HypixelData {
             if (BingoAPI.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
-            when (line) {
-                " §7♲ §7Ironman" -> {
+            when {
+                ironmanPattern.matches(line) -> {
                     ironman = true
                 }
 
-                " §a☀ §aStranded" -> {
+                strandedPattern.matches(line) -> {
                     stranded = true
                 }
             }

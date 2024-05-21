@@ -35,7 +35,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -46,6 +49,16 @@ import kotlin.time.Duration.Companion.seconds
 object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
+
+    private val patternGroup = RepoPattern.group("bingo.compactchat")
+    private val clearedPattern by patternGroup.pattern(
+        "cleared",
+        "§6Poof! §r§eYou have cleared your griffin burrows!"
+    )
+    private val killedByPattern by patternGroup.pattern(
+        "killedby",
+        "^§c ☠ §r§7You were killed by §r"
+    )
 
     private val allowedBlocksAboveGround =
         listOf(
@@ -183,12 +196,12 @@ object GriffinBurrowHelper {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
+        if (killedByPattern.find(event.message)) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
         }
 
         // talking to Diana NPC
-        if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
+        if (clearedPattern.matches(event.message)) {
             resetAllData()
         }
     }

@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -78,7 +79,19 @@ object ItemDisplayOverlayFeatures {
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
-        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+        "(§.)*You were the (§.)*(?<rank>\\w+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+    )
+    private val clickViewPattern by patternGroup.pattern(
+        "clickview",
+        "Click to view!"
+    )
+    private val placeMinionPattern by patternGroup.pattern(
+        "placeminion",
+        "Place this minion"
+    )
+    private val isOwnVacuumPattern by patternGroup.pattern(
+        "isownvacuum",
+        "Click to trade!|Starting bid:|Buy it now:"
     )
 
     @SubscribeEvent
@@ -135,7 +148,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (MINION_TIER.isSelected() && itemName.contains(" Minion ") &&
-            !itemName.contains("Recipe") && lore.any { it.contains("Place this minion") }
+            !itemName.contains("Recipe") && lore.any { placeMinionPattern.find(it) }
         ) {
             val array = itemName.split(" ")
             val last = array[array.size - 1]
@@ -160,7 +173,7 @@ object ItemDisplayOverlayFeatures {
 
         if (SKILL_LEVEL.isSelected() &&
             InventoryUtils.openInventoryName() == "Your Skills" &&
-            lore.any { it.contains("Click to view!") }
+            lore.any { clickViewPattern.find(it) }
         ) {
             if (CollectionAPI.isCollectionTier0(lore)) return "0"
             val split = itemName.split(" ")
@@ -177,7 +190,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
-            if (lore.any { it.contains("Click to view!") }) {
+            if (lore.any { clickViewPattern.find(it) }) {
                 if (CollectionAPI.isCollectionTier0(lore)) return "0"
                 val name = item.name
                 if (name.startsWith("§e")) {
@@ -263,7 +276,7 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun isOwnVacuum(lore: List<String>) =
-        lore.none { it.contains("Click to trade!") || it.contains("Starting bid:") || it.contains("Buy it now:") }
+        lore.none { isOwnVacuumPattern.find(it) }
 
     var done = false
 

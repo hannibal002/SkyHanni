@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -32,9 +33,18 @@ object AdvancedPlayerList {
 
     private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
-    private val levelPattern by RepoPattern.pattern(
-        "misc.compacttablist.advanced.level.new",
+    private val patternGroup = RepoPattern.group("misc.compacttablist.advanced")
+    private val levelPattern by patternGroup.pattern(
+        "level.new",
         "\\[(?<level>.*)] §r(?<name>.*)$"
+    )
+    private val infoPattern by patternGroup.pattern(
+        "info",
+        "Server Info| {15}§r§3§lInfo"
+    )
+    private val playersPattern by patternGroup.pattern(
+        "players",
+        "§r§a§lPlayers"
     )
 
     private var playerDatas = mutableMapOf<String, PlayerData>()
@@ -58,9 +68,8 @@ object AdvancedPlayerList {
         for (line in original) {
             i++
             if (i == 1) continue
-            if (line.isEmpty() || line.contains("Server Info")) break
-            if (line == "               §r§3§lInfo") break
-            if (line.contains("§r§a§lPlayers")) {
+            if (line.isEmpty() || infoPattern.find(line)) break
+            if (playersPattern.find(line)) {
                 extraTitles++
                 continue
             }

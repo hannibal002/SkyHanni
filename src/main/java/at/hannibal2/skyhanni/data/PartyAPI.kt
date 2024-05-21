@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
@@ -77,6 +78,10 @@ object PartyAPI {
     private val dungeonFinderJoinPattern by patternGroup.pattern(
         "dungeonfinder.join",
         "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)"
+    )
+    private val leftPartyPattern by patternGroup.pattern(
+        "leftparty",
+        "§eYou left the party.|§cThe party was disbanded because all invites expired and the party was empty.|§cYou are not currently in a party."
     )
 
     val partyMembers = mutableListOf<String>()
@@ -174,10 +179,7 @@ object PartyAPI {
         kickedPattern.matchMatcher(message) {
             partyLeft()
         }
-        if (message == "§eYou left the party." ||
-            message == "§cThe party was disbanded because all invites expired and the party was empty." ||
-            message == "§cYou are not currently in a party."
-        ) {
+        if (leftPartyPattern.matches(message)) {
             partyLeft()
         }
 

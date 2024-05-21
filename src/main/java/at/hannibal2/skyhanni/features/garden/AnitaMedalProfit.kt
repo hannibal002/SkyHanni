@@ -21,11 +21,31 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class AnitaMedalProfit {
+
+    private val patternGroup = RepoPattern.group("anitamedalprofit")
+    private val costPattern by patternGroup.pattern(
+        "cost",
+        "§7Cost"
+    )
+    private val closePattern by patternGroup.pattern(
+        "close",
+        "§cClose"
+    )
+    private val goldMedalsPattern by patternGroup.pattern(
+        "goldmedals",
+        "§eUnique Gold Medals"
+    )
+    private val medalTradesPattern by patternGroup.pattern(
+        "medaltrades",
+        "§aMedal Trades"
+    )
 
     private val config get() = GardenAPI.config.anitaShop
     private var display = emptyList<Renderable>()
@@ -80,9 +100,9 @@ class AnitaMedalProfit {
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item) ?: return
         if (itemName == " ") return
-        if (itemName == "§cClose") return
-        if (itemName == "§eUnique Gold Medals") return
-        if (itemName == "§aMedal Trades") return
+        if (closePattern.matches(itemName)) return
+        if (goldMedalsPattern.matches(itemName)) return
+        if (medalTradesPattern.matches(itemName)) return
 
         val fullCost = getFullCost(getRequiredItems(item))
         if (fullCost < 0) return
@@ -158,7 +178,7 @@ class AnitaMedalProfit {
         val items = mutableListOf<String>()
         var next = false
         for (line in item.getLore()) {
-            if (line == "§7Cost") {
+            if (costPattern.matches(line)) {
                 next = true
                 continue
             }

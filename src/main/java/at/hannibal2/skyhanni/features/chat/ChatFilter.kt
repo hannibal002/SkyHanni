@@ -22,7 +22,7 @@ class ChatFilter {
     /// <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
     private val patternGroup = RepoPattern.group("chat.filter")
-    private val lobbyPattern by patternGroup.list(
+    private val lobbyPatterns by patternGroup.list(
         "lobby",
         // player join
         "(?: §b>§c>§a>§r §r)?.* §6(?:joined|(?:spooked|slid) into) the lobby!(?:§r §a<§c<§b<)?",
@@ -43,12 +43,12 @@ class ChatFilter {
         // pet consumables
         "§b✦ §r§7You earned §r§a\\d+ §r§7Pet Consumables?!",
     )
-    private val lobbyMessagesPattern by patternGroup.list(
+    private val lobbyMessagesPatterns by patternGroup.list(
         "lobbymessages",
         // prototype
         " {2}§r§f§l➤ §r§6You have reached your Hype limit! Add Hype to Prototype Lobby minigames by right-clicking with the Hype Diamond!",
     )
-    private val lobbyMessagesContainsPattern by patternGroup.list(
+    private val lobbyMessagesContainsPatterns by patternGroup.list(
         "lobbymessagecontains",
         // prototype
         "§r§6§lWelcome to the Prototype Lobby§r",
@@ -62,7 +62,7 @@ class ChatFilter {
         "§aYou are still radiating with §bGenerosity§r§a!",
     )
     // Warping
-    private val warpingPattern by patternGroup.list(
+    private val warpingPatterns by patternGroup.list(
         "warping",
         "§7Sending to server (.*)\\.\\.\\.",
         "§7Request join for Hub (.*)\\.\\.\\.",
@@ -72,7 +72,7 @@ class ChatFilter {
         // (canvas room – flower house, election room – community center, void sepulchre – the end)
         "§dWarped to (.*)§r§d!",
     )
-    private val warpingMessagesPattern by patternGroup.list(
+    private val warpingMessagesPatterns by patternGroup.list(
         "warpingmessages",
         "§7Warping...", "§7Warping you to your SkyBlock island...", "§7Warping using transfer token...",
 
@@ -80,37 +80,37 @@ class ChatFilter {
         "§7Finding player...", "§7Sending a visit request...",
     )
     // Welcome
-    private val welcomeMessagesPattern by patternGroup.list(
+    private val welcomeMessagesPatterns by patternGroup.list(
         "welcomemessages",
         "§eWelcome to §r§aHypixel SkyBlock§r§e!",
     )
     // Guild EXP
-    private val guildExpPattern by patternGroup.list(
+    private val guildExpPatterns by patternGroup.list(
         "guildexp",
         // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
         // §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
         "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!",
     )
     // Kill Combo
-    private val killComboPattern by patternGroup.list(
+    private val killComboPatterns by patternGroup.list(
         "killcombo",
         //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
         "§.§l\\+(.*) Kill Combo (.*)",
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!",
     )
-    private val killComboMessagesPattern by patternGroup.list(
+    private val killComboMessagesPatterns by patternGroup.list(
         "killcombomessages",
         "§6§l+50 Kill Combo",
     )
     // Profile Join
-    private val profileJoinMessageStartsWithPattern by patternGroup.list(
+    private val profileJoinMessageStartsWithPatterns by patternGroup.list(
         "profilejoinmessagesstartswith",
         "^§aYou are playing on profile: §e",
         "^§8Profile ID: ",
     )
     // OTHERS
     // Bazaar And AH Mini
-    private val miniBazaarAndAHMessagesPattern by patternGroup.list(
+    private val miniBazaarAndAHMessagesPatterns by patternGroup.list(
         "minibazaarandahmessages",
         "§7Putting item in escrow...",
         "§7Putting coins in escrow...",
@@ -135,7 +135,7 @@ class ChatFilter {
         "§8Withdrawing coins...",
     )
     // Slayer
-    private val slayerPattern by patternGroup.list(
+    private val slayerPatterns by patternGroup.list(
         "slayer",
         // start
         " {2}§r§5§lSLAYER QUEST STARTED!",
@@ -146,16 +146,16 @@ class ChatFilter {
         " {3}§r§e(.*)Slayer LVL 9 §r§5- §r§a§lLVL MAXED OUT!",
         " {3}§r§5§l» §r§7Talk to Maddox to claim your (.*) Slayer XP!",
     )
-    private val slayerMessagesPattern by patternGroup.list(
+    private val slayerMessagesPatterns by patternGroup.list(
         "slayermessages",
         " {2}§r§6§lNICE! SLAYER BOSS SLAIN!", "§eYou received kill credit for assisting on a slayer miniboss!",
     )
-    private val slayerMessageStartWithPattern by patternGroup.list(
+    private val slayerMessageStartWithPatterns by patternGroup.list(
         "slayermessagestartwith",
         "^§e✆ RING..."
     )
     // Slayer Drop
-    private val slayerDropPattern by patternGroup.list(
+    private val slayerDropPatterns by patternGroup.list(
         "slayerdrop",
         // Zombie
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)",
@@ -193,7 +193,7 @@ class ChatFilter {
         "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)",
     )
     // Useless Drop
-    private val uselessDropPattern by patternGroup.list(
+    private val uselessDropPatterns by patternGroup.list(
         "uselessdrop",
         "§6§lRARE DROP! §r§aEnchanted Ender Pearl (.*)",
         "§6§lRARE DROP! §r§fCarrot (.*)",
@@ -202,18 +202,18 @@ class ChatFilter {
         "§6§lRARE DROP! §r§5Earth Shard (.*)",
         "§6§lRARE DROP! §r§5Zombie Lord Chestplate (.*)",
     )
-    private val uselessDropMessagesPattern by patternGroup.list(
+    private val uselessDropMessagesPatterns by patternGroup.list(
         "uselessdropmessages",
         "§6§lRARE DROP! §r§aEnchanted Ender Pearl",
         "§6§lRARE DROP! §r§aEnchanted End Stone",
         "§6§lRARE DROP! §r§5Crystal Fragment",
     )
     // Useless Notification
-    private val uselessNotificationPattern by patternGroup.list(
+    private val uselessNotificationPatterns by patternGroup.list(
         "uselessnotification",
         "§aYou tipped \\d+ players? in \\d+(?: different)? games?!",
     )
-    private val uselessNotificationMessagesPattern by patternGroup.list(
+    private val uselessNotificationMessagesPatterns by patternGroup.list(
         "uselessnotificationmessages",
         "§eYour previous §r§6Plasmaflux Power Orb §r§ewas removed!",
         "§aYou used your §r§6Mining Speed Boost §r§aPickaxe Ability!",
@@ -224,18 +224,18 @@ class ChatFilter {
         "§aYou have just received §r§60 coins §r§aas interest in your co-op bank account!",
     )
     // Party
-    private val partyMessagesPattern by patternGroup.list(
+    private val partyMessagesPatterns by patternGroup.list(
         "partymessages",
         "§9§m-----------------------------------------------------",
     )
     // MONEY
     // Auction House
-    private val auctionHouseMessagesPattern by patternGroup.list(
+    private val auctionHouseMessagesPatterns by patternGroup.list(
         "auctionhousemessages",
         "§b-----------------------------------------------------", "§eVisit the Auction House to collect your item!",
     )
     // Bazaar
-    private val bazaarPattern by patternGroup.list(
+    private val bazaarPatterns by patternGroup.list(
         "bazaar",
         "§eBuy Order Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.",
         "§eSell Offer Setup! §r§a(.*)§r§7x (.*) §r§7for §r§6(.*) coins§r§7.",
@@ -243,12 +243,12 @@ class ChatFilter {
         "§cCancelled! §r§7Refunded §r§a(.*)§r§7x (.*) §r§7from cancelling sell offer!",
     )
     // Winter Island
-    private val winterIslandPattern by patternGroup.list(
+    private val winterIslandPatterns by patternGroup.list(
         "winterisland",
         "§r§f☃ §r§7§r(.*) §r§7mounted a §r§fSnow Cannon§r§7!",
     )
     // Useless Warning
-    private val uselessWarningMessagesPattern by patternGroup.list(
+    private val uselessWarningMessagesPatterns by patternGroup.list(
         "uselesswarningmessages",
         "§cYou are sending commands too fast! Please slow down.", // TODO prevent in the future
         "§cYou can't use this while in combat!",
@@ -261,13 +261,13 @@ class ChatFilter {
         "§cYou cannot open the SkyBlock menu while in combat!",
     )
     // Annoying Spam
-    private val annoyingSpamPattern by patternGroup.list(
+    private val annoyingSpamPatterns by patternGroup.list(
         "annoyingspam",
         "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.",
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.",
         "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!",
     )
-    private val annoyingSpamMessagesPattern by patternGroup.list(
+    private val annoyingSpamMessagesPatterns by patternGroup.list(
         "annoyingspammessages",
         "§cThere are blocks in the way!",
         "§aYour Blessing enchant got you double drops!",
@@ -296,7 +296,7 @@ class ChatFilter {
         "§eNew buff§r§r§r:(.*)"
     )
     // Winter Gift
-    private val winterGiftPattern by patternGroup.list(
+    private val winterGiftPatterns by patternGroup.list(
         "wintergift",
         // winter gifts useless
         "§f§lCOMMON! §r§3.* XP §r§egift with §r.*§r§e!",
@@ -329,7 +329,7 @@ class ChatFilter {
         "§cThis gift is for §r.*§r§c, sorry!",
     )
     // Powder Mining
-    private val powderMiningPattern by patternGroup.list(
+    private val powderMiningPatterns by patternGroup.list(
         "powdermining",
         "§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c.",
         "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] Rough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.",
@@ -346,7 +346,7 @@ class ChatFilter {
         "chat.firesale",
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*"
     )
-    private val fireSaleMessagesPattern by patternGroup.list(
+    private val fireSaleMessagesPatterns by patternGroup.list(
         "firesalemessages",
         "§c♨ §eFire Sales for .* §eare starting soon!",
         "§c\\s*♨ .* (?:Skin|Rune|Dye) §e(?:for a limited time )?\\(.* §eleft\\)(?:§c|!)",
@@ -355,20 +355,20 @@ class ChatFilter {
         "§c♨ §r§eFire Sales? for .* §r§eended!",
         "§c {3}♨ §eAnd \\d+ more!",
     )
-    private val eventPattern by patternGroup.list(
+    private val eventPatterns by patternGroup.list(
         "event",
         "§f +§r§7You are now §r§.Event Level §r§.*§r§7!",
         "§f +§r§7You earned §r§.* Event Silver§r§7!",
         "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#",
     )
-    private val factoryUpgradePattern by patternGroup.list(
+    private val factoryUpgradePatterns by patternGroup.list(
         "factoryupgrade",
         "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!",
         "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!",
         "§7You will now produce §r§6.* Chocolate §r§7per click!",
         "§7You upgraded to §r§d.*?§r§7!",
     )
-    private val powderMiningMessagesPattern by patternGroup.list(
+    private val powderMiningMessagesPatterns by patternGroup.list(
         "powderminingmessages",
         "§aYou uncovered a treasure chest!",
         "§aYou received §r§f1 §r§aWishing Compass§r§a.",
@@ -378,26 +378,26 @@ class ChatFilter {
         // Useful, maybe in another chat
         "§6You have successfully picked the lock on this chest!",
     )
-    private val fireSaleActiveMessagesPattern by patternGroup.list(
+    private val fireSaleActiveMessagesPatterns by patternGroup.list(
         "firesaleactivemessages",
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA",
         "§c♨ §eSelling multiple items for a limited time!",
     )
-    private val eventMessagePattern by patternGroup.list(
+    private val eventMessagePatterns by patternGroup.list(
         "eventmessage",
         "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
     // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
-    private val soloClassPattern by patternGroup.list(
+    private val soloClassPatterns by patternGroup.list(
         "soloclass",
         "§6Your §r§a(Healer|Mage|Berserk|Archer|Tank) §r§6stats are doubled because you are the only player using this class!",
     )
-    private val soloStatsPattern by patternGroup.list(
+    private val soloStatsPatterns by patternGroup.list(
         "solostats",
         "§a\\[(Healer|Mage|Berserk|Archer|Tank)].*",
     )
     // &r&dGenevieve the Fairy&r&f: You killed me! Take this &r&6Revive Stone &r&fso that my death is not in vain!&r
-    private val fairyPattern by patternGroup.list(
+    private val fairyPatterns by patternGroup.list(
         "fairy",
         "§d[\\w']+ the Fairy§r§f: You killed me! Take this §r§6Revive Stone §r§fso that my death is not in vain!",
         "§d[\\w']+ the Fairy§r§f: You killed me! I'll revive you so that my death is not in vain!",

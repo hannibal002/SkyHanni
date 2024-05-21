@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
@@ -60,9 +61,22 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
      * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
      * REGEX-TEST: §7miniboss §a1 §7time!
      */
-    val minibossAmountPattern by RepoPattern.pattern(
-        "crimson.reputationhelper.quest.minibossamount",
+    private val patternGroup = RepoPattern.group("crimson.reputationhelper.quest")
+    val minibossAmountPattern by patternGroup.pattern(
+        "minibossamount",
         "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+    )
+    private val dojoPattern by patternGroup.pattern(
+        "dojo",
+        "§aYou completed your Dojo quest! Visit the Town Board to claim the rewards."
+    )
+    private val rescuePattern by patternGroup.pattern(
+        "rescue",
+        "§aYou completed your rescue quest! Visit the Town Board to claim the rewards,"
+    )
+    private val trophyFishPattern by patternGroup.pattern(
+        "trophyfish",
+        "§6§lTROPHY FISH! §r§bYou caught a"
     )
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
@@ -120,18 +134,18 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         if (!isEnabled()) return
 
         val message = event.message
-        if (message == "§aYou completed your Dojo quest! Visit the Town Board to claim the rewards.") {
+        if (dojoPattern.matches(message)) {
             val dojoQuest = getQuest<DojoQuest>() ?: return
             dojoQuest.state = QuestState.READY_TO_COLLECT
             update()
         }
-        if (message == "§aYou completed your rescue quest! Visit the Town Board to claim the rewards,") {
+        if (rescuePattern.matches(message)) {
             val rescueMissionQuest = getQuest<RescueMissionQuest>() ?: return
             rescueMissionQuest.state = QuestState.READY_TO_COLLECT
             update()
         }
 
-        if (message.contains("§6§lTROPHY FISH! §r§bYou caught a")) {
+        if (trophyFishPattern.matches(message)) {
             val fishQuest = getQuest<TrophyFishQuest>() ?: return
             if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
             val fishName = fishQuest.fishName

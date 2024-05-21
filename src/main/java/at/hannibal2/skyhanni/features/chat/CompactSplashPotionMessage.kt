@@ -7,22 +7,25 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CompactSplashPotionMessage {
 
     private val config get() = SkyHanniMod.feature.chat.compactPotionMessages
 
-    private val potionEffectPatternList = listOf(
-        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
-        "§a§lBUFF! §fYou have gained §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
-        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
+    private val patternGroup = RepoPattern.group("compactsplashpotionmessage")
+    private val potionEffectPatterns by patternGroup.list(
+        "potioneffectlist",
+        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!",
+        "§a§lBUFF! §fYou have gained §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!",
+        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!",
 
         // Fix for Hypixel having a different message for Poisoned Candy.
         // Did not make the first pattern optional to prevent conflicts with Dungeon Buffs/other things
-        "§a§lBUFF! §fYou have gained §r(?<effectName>§2Poisoned Candy I)§r§f!".toPattern(),
-        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>§2Poisoned Candy I)§r§f!".toPattern(),
-        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>§2Poisoned Candy I)§r§f!".toPattern()
+        "§a§lBUFF! §fYou have gained §r(?<effectName>§2Poisoned Candy I)§r§f!",
+        "§a§lBUFF! §fYou splashed yourself with §r(?<effectName>§2Poisoned Candy I)§r§f!",
+        "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>§2Poisoned Candy I)§r§f!"
     )
 
     @SubscribeEvent
@@ -46,7 +49,7 @@ class CompactSplashPotionMessage {
     }
 
     private fun String.isPotionMessage(): Boolean {
-        return potionEffectPatternList.any {
+        return potionEffectPattern.any {
             it.matchMatcher(this) {
                 val effectName = group("effectName")
                 // If splashed by a player, append their name.

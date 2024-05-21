@@ -13,13 +13,26 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO: Merge common code with skill overflow
 class GardenInventoryTooltipOverflow {
 
     private val config get() = SkyHanniMod.feature.garden.cropMilestones.overflow
+
+    private val patternGroup = RepoPattern.group("gardeninventorytooltipoverflow")
+    private val maxTierPattern by patternGroup.pattern(
+        "maxtier",
+        "Max tier reached!"
+    )
+    private val colourCodeMaxTierPattern by patternGroup.pattern(
+        "colourcodemaxtier",
+        "§7§8Max tier reached!"
+    )
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -29,7 +42,7 @@ class GardenInventoryTooltipOverflow {
         if (inventoryName != "Crop Milestones") return
 
         val stack = event.itemStack
-        if (!stack.getLore().any { it.contains("Max tier reached!") }) return
+        if (maxTierPattern.anyFound(stack.getLore())) return
 
         val split = stack.cleanName().split(" ")
         val crop = getCrop(split)
@@ -43,8 +56,7 @@ class GardenInventoryTooltipOverflow {
         val iterator = event.toolTip.listIterator()
         val percentage = have.toDouble() / need.toDouble()
         for (line in iterator) {
-            val maxTierReached = "§7§8Max tier reached!"
-            if (line.contains(maxTierReached)) {
+            if (colourCodeMaxTierPattern.find(line)) {
                 iterator.set("§7Progress to tier $nextLevel: §e${LorenzUtils.formatPercentage(percentage)}")
                 event.itemStack.name = "§a${crop.cropName} $level"
                 next = true

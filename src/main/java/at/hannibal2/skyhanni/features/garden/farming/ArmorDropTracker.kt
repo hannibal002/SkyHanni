@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -31,8 +32,9 @@ object ArmorDropTracker {
 
     private val config get() = GardenAPI.config.farmingArmorDrop
 
-    private val armorPattern by RepoPattern.pattern(
-        "garden.armordrops.armor",
+    private val patternGroup = RepoPattern.group("garden.armordrops")
+    private val armorPattern by patternGroup.pattern(
+        "armor",
         "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)"
     )
 
@@ -40,6 +42,10 @@ object ArmorDropTracker {
 
     private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
     { drawDisplay(it) }
+
+    init {
+        ArmorDropType.entries.forEach { it.chatPattern }
+    }
 
     class Data : TrackerData() {
 
@@ -51,11 +57,17 @@ object ArmorDropTracker {
         var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
     }
 
-    // Todo use repo pattern
-    enum class ArmorDropType(val dropName: String, val chatMessage: String) {
+    // TODO seraid use repo pattern
+    enum class ArmorDropType(val dropName: String, private val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
         SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
         FERMENTO("§6Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b(Armor Set Bonus)"),
+        ;
+
+        val chatPattern by patternGroup.pattern(
+            this.name,
+            this.chatMessage
+        )
     }
 
     @SubscribeEvent
@@ -66,7 +78,7 @@ object ArmorDropTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         for (dropType in ArmorDropType.entries) {
-            if (dropType.chatMessage == event.message) {
+            if (dropType.chatPattern.matches(event.message)) {
                 addDrop(dropType)
                 if (config.hideChat) {
                     event.blockedReason = "farming_armor_drops"

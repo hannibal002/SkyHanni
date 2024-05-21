@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -22,6 +24,12 @@ class BurrowWarpHelper {
 
     private var lastWarpTime = SimpleTimeMark.farPast()
     private var lastWarp: WarpPoint? = null
+
+    private val patternGroup = RepoPattern.group("burrowwarphelper")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§cYou haven't unlocked this fast travel destination!"
+    )
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
@@ -48,7 +56,7 @@ class BurrowWarpHelper {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (event.message == "§cYou haven't unlocked this fast travel destination!") {
+        if (messagePattern.matches(event.message)) {
             if (lastWarpTime.passedSince() < 1.seconds) {
                 lastWarp?.let {
                     it.unlocked = false

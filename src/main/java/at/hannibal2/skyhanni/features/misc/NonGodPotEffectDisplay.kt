@@ -19,7 +19,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -39,6 +41,62 @@ class NonGodPotEffectDisplay {
     private var checkFooter = false
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
+
+
+    private val patternGroup = RepoPattern.group("nongodpoteffect")
+    private val clearedEffectsPattern by patternGroup.pattern(
+        "clearedeffects",
+        "§aYou cleared all of your active effects!"
+    )
+    private val smolderingPattern by patternGroup.pattern(
+        "smoldering",
+        "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!"
+    )
+    private val glowyPattern by patternGroup.pattern(
+        "glowy",
+        "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!"
+    )
+    private val wispPattern by patternGroup.pattern(
+        "wisp",
+        "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!"
+    )
+    private val greatSpookPattern by patternGroup.pattern(
+        "greatspook",
+        "§eYou consumed a §r§fGreat Spook Potion§r§e!"
+    )
+    private val harvestHambingerPattern by patternGroup.pattern(
+        "harvesthambinger",
+        "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!"
+    )
+    private val pestRepellentPattern by patternGroup.pattern(
+        "pestrepellent",
+        "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!"
+    )
+    private val pestRepellentMaxPattern by patternGroup.pattern(
+        "pestrepellentmax",
+        "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!"
+    )
+    private val goblinPattern by patternGroup.pattern(
+        "goblin",
+        "§e\\[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain."
+    )
+    private val goblinGonePattern by patternGroup.pattern(
+        "goblingone",
+        "§cThe Goblin King's §r§afoul stench §r§chas dissipated!"
+    )
+    private val activeEffectsPattern by patternGroup.pattern(
+        "activeeffects",
+        "§a§lActive Effects$"
+    )
+    private val containsRemainingPattern by patternGroup.pattern(
+        "containsremaning",
+        "Remaining"
+    )
+    private val noRemainingPattern by patternGroup.pattern(
+        "noremaning",
+        "^§7Time Remaining: §aCompleted!$|Remaining Uses"
+    )
+
 
     // TODO move the whole list into the repo
     enum class NonGodPotEffect(
@@ -91,50 +149,51 @@ class NonGodPotEffectDisplay {
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§aYou cleared all of your active effects!") {
+        val message = event.message
+        if (clearedEffectsPattern.matches(message)) {
             effectDuration.clear()
             update()
         }
 
-        if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
+        if (smolderingPattern.matches(message)) {
             effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
             update()
         }
 
-        if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
+        if (glowyPattern.matches(message)) {
             effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
             update()
         }
 
-        if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
+        if (wispPattern.matches(message)) {
             effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
             update()
         }
 
-        if (event.message == "§eYou consumed a §r§fGreat Spook Potion§r§e!") {
+        if (greatSpookPattern.matches(message)) {
             effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
             update()
         }
 
-        if (event.message == "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!") {
+        if (harvestHambingerPattern.matches(message)) {
             effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
             update()
         }
 
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
+        if (pestRepellentPattern.matches(message)) {
             effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
         }
 
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
+        if (pestRepellentMaxPattern.matches(message)) {
             effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
         }
 
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
+        if (goblinPattern.matches(message)) {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
 
-        if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
+        if (goblinGonePattern.matches(message)) {
             effectDuration.remove(NonGodPotEffect.GOBLIN)
             update()
         }
@@ -198,9 +257,8 @@ class NonGodPotEffectDisplay {
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
-                    if (line.contains("Remaining") &&
-                        line != "§7Time Remaining: §aCompleted!" &&
-                        !line.contains("Remaining Uses")
+                    if (containsRemainingPattern.find(line) &&
+                        noRemainingPattern.find(line)
                     ) {
                         val duration = try {
                             TimeUtils.getDuration(line.split("§f")[1])
@@ -227,7 +285,7 @@ class NonGodPotEffectDisplay {
             val formattedText = packet.footer.formattedText
             val lines = formattedText.replace("§r", "").split("\n")
 
-            if (!lines.any { it.contains("§a§lActive Effects") }) return
+            if (!lines.any { activeEffectsPattern.find(it) }) return
             checkFooter = false
 
             var effectsCount = 0

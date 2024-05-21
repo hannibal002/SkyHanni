@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -29,9 +30,14 @@ object FrozenTreasureTracker {
 
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
 
+    private val patternGroup = RepoPattern.group("event.jerry.frozentreasure")
     private val compactPattern by RepoPattern.pattern(
-        "event.jerry.frozentreasure.compact",
+        "compact",
         "COMPACT! You found an Enchanted Ice!"
+    )
+    private val cavePattern by RepoPattern.pattern(
+        "cave",
+        " §7⏣ §3Glacial Cave"
     )
 
     private var estimatedIce = 0L
@@ -188,7 +194,7 @@ object FrozenTreasureTracker {
     private fun onJerryWorkshop() = IslandType.WINTER.isInIsland()
 
     private fun inGlacialCave() =
-        onJerryWorkshop() && ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §3Glacial Cave")
+        onJerryWorkshop() && cavePattern.anyFound(ScoreboardData.sidebarLinesFormatted)
 
     fun resetCommand() {
         tracker.resetCommand()

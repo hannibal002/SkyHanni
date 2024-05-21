@@ -16,8 +16,10 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.time.Duration
@@ -32,6 +34,12 @@ class ComposterDisplay {
 
     private val bucket by lazy { "BUCKET".asInternalName().getItemStack() }
     private var tabListData by ComposterAPI::tabListData
+
+    private val patternGroup = RepoPattern.group("composterdisplay")
+    private val scoreboardLinePattern by patternGroup.pattern(
+        "scoreboardline",
+        "§b§lComposter:"
+    )
 
     enum class DataType(rawPattern: String, val icon: String) {
         ORGANIC_MATTER(" Organic Matter: §r(.*)", "WHEAT"),
@@ -97,7 +105,7 @@ class ComposterDisplay {
         val newData = mutableMapOf<DataType, String>()
 
         for (line in tabList) {
-            if (line == "§b§lComposter:") {
+            if (scoreboardLinePattern.matches(line)) {
                 next = true
                 continue
             }

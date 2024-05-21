@@ -116,6 +116,10 @@ object MaxwellAPI {
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\."
     )
+    private val statsTuningPattern by patternGroup.pattern(
+        "statstuning",
+        "§.. (?<name>.+)"
+    )
 
     fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
 
@@ -173,7 +177,7 @@ object MaxwellAPI {
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
-                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.name) {
+                    it.name = statsTuningPattern.matchMatcher(stack.name) {
                         group("name")
                     } ?: ErrorManager.skyHanniError(
                         "found no name in thaumaturgy",

@@ -11,7 +11,10 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,13 +22,27 @@ class RngMeterInventory {
 
     private val config get() = SkyHanniMod.feature.inventory.rngMeter
 
+    private val patternGroup = RepoPattern.group("rngmeterinventory")
+    private val rngMeterPattern by patternGroup.pattern(
+        "rngmeter",
+        "RNG Meter"
+    )
+    private val noRNGDropPattern by patternGroup.pattern(
+        "norngdrop",
+        "You don't have an RNG drop"
+    )
+    private val selectedPattern by patternGroup.pattern(
+        "selected",
+        "§a§lSELECTED"
+    )
+
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.stack
         if (config.floorName && chestName == "Catacombs RNG Meter") {
-            if (stack.name.removeColor() == "RNG Meter") {
+            if (rngMeterPattern.matches(stack.name.removeColor())) {
                 event.stackTip = stack.getLore()[0].between("(", ")")
             }
         }
@@ -39,7 +56,7 @@ class RngMeterInventory {
         if (config.noDrop && chestName == "Catacombs RNG Meter") {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
-                if (stack.getLore().any { it.contains("You don't have an RNG drop") }) {
+                if (stack.getLore().any { noRNGDropPattern.find(it) }) {
                     slot highlight LorenzColor.RED
                 }
             }
@@ -48,7 +65,7 @@ class RngMeterInventory {
         if (config.selectedDrop && chestName.endsWith(" RNG Meter")) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 val stack = slot.stack
-                if (stack.getLore().any { it.contains("§a§lSELECTED") }) {
+                if (stack.getLore().any { selectedPattern.find(it) }) {
                     slot highlight LorenzColor.YELLOW
                 }
             }

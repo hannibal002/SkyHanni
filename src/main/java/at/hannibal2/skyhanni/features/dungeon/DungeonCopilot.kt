@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,10 +34,22 @@ class DungeonCopilot {
         "blood.door",
         "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
     )
-
-    private val keyPatternsList = listOf(
-        "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
-        "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
+    private val provenSelfPattern by patternGroup.pattern(
+        "provenself",
+        "§c\\[BOSS] The Watcher§r§f: You have proven yourself. You may pass."
+    )
+    private val enoughNowPattern by patternGroup.pattern(
+        "enoughnow",
+        "§c\\[BOSS] The Watcher§r§f: That will be enough for now."
+    )
+    private val waitDungeonStartMessagePattern by patternGroup.pattern(
+        "waitdungeonstartmessage",
+        "§a is now ready!$"
+    )
+    private val keyPatterns by patternGroup.list(
+        "keypattern",
+        "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!",
+        "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!",
     )
 
     private var nextStep = ""
@@ -56,13 +69,14 @@ class DungeonCopilot {
             changeNextStep("Ready up")
         }
 
-        if (message.endsWith("§a is now ready!") && message.contains(LorenzUtils.getPlayerName())) {
+
+        if (waitDungeonStartMessagePattern.matches(message) && message.contains(LorenzUtils.getPlayerName())) {
             changeNextStep("Wait for the dungeon to start!")
         }
 
         // Key Pickup
         var foundKeyOrDoor = false
-        keyPatternsList.any {
+        keyPattern.any {
             it.matchMatcher(message) {
                 val key = group("key")
                 changeNextStep("Open $key Door")
@@ -83,9 +97,9 @@ class DungeonCopilot {
 
         if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors) return "dungeon_keys_and_doors"
 
-        if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
+        if (enoughNowPattern.matches(message)) changeNextStep("Clear Blood Room")
 
-        if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
+        if (provenSelfPattern.matches(message)) {
             if (DungeonAPI.getCurrentBoss() == DungeonFloor.E) {
                 changeNextStep("")
             } else {

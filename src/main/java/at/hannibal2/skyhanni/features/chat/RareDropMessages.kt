@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
@@ -45,6 +46,10 @@ class RareDropMessages {
         "pet.petobtainedmessage",
         "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
     )
+    private val rarityNamePattern by chatGroup.pattern(
+        "rarityname",
+        "^(?i)[aeiou]"
+    )
 
     private val patterns = listOf(
         petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern
@@ -63,8 +68,8 @@ class RareDropMessages {
             val rarityName = colorCodeToRarity(rarityColor.first()).uppercase()
             val petName = group("petName")
             val end = group("end")
-            //TODO seraid fix regex ending with .*
-            if (start.endsWith("a ") && rarityName.matches("(?i)[aeiou].*".toRegex()))
+
+            if (start.endsWith("a ") && rarityNamePattern.find(rarityName))
                 start = start.replace(" $".toRegex(), "n ")
 
             event.chatComponent = ChatComponentText(

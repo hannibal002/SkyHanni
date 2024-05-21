@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -22,9 +23,22 @@ class StatsTuning {
 
     private val config get() = SkyHanniMod.feature.inventory.statsTuning
 
-    private val statPointsPattern by RepoPattern.pattern(
-        "inventory.statstuning.points",
+    private val patternGroup = RepoPattern.group("inventory.statstuning")
+    private val statPointsPattern by patternGroup.pattern(
+        "points",
         "§7Stat has: §e(?<amount>\\d+) points?"
+    )
+    private val loadingPattern by patternGroup.pattern(
+        "loading",
+        "§7You are loading:"
+    )
+    private val tuningPattern by patternGroup.pattern(
+        "tuning",
+        "§aStats Tuning"
+    )
+    private val selectedPattern by patternGroup.pattern(
+        "selected",
+        "§aCurrently selected!"
     )
 
     @SubscribeEvent
@@ -48,7 +62,7 @@ class StatsTuning {
         var grab = false
         val list = mutableListOf<String>()
         for (line in stack.getLore()) {
-            if (line == "§7You are loading:") {
+            if (loadingPattern.matches(line)) {
                 grab = true
                 continue
             }
@@ -71,7 +85,7 @@ class StatsTuning {
     }
 
     private fun renderTunings(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.name != "§aStats Tuning") return false
+        if (!tuningPattern.matches(stack.name)) return false
         val tunings = MaxwellAPI.tunings ?: return false
 
         event.stackTip = tunings
@@ -104,7 +118,7 @@ class StatsTuning {
             val stack = slot.stack
             val lore = stack.getLore()
 
-            if (lore.any { it == "§aCurrently selected!" }) {
+            if (lore.any { selectedPattern.matches(it) }) {
                 slot highlight LorenzColor.GREEN
             }
         }

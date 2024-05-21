@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -27,6 +28,14 @@ class ArachneChatMessageHider {
     private val arachneSpawnPattern by patternGroup.pattern(
         "spawn",
         "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)"
+    )
+    private val messageSpawnPattern by patternGroup.pattern(
+        "messagespawn",
+        "§a§l▬{64}"
+    )
+    private val messageDownPattern by patternGroup.pattern(
+        "messagedown",
+        "\" {30}§r§6§lARACHNE DOWN!\""
     )
 
     @SubscribeEvent
@@ -52,11 +61,11 @@ class ArachneChatMessageHider {
             return true
         }
 
-        if (message == "§a§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
+        if (messageSpawnPattern.matches(message)) {
             hideArachneDeadMessage = !hideArachneDeadMessage
             return true
         }
-        if (message == "                              §r§6§lARACHNE DOWN!") {
+        if (messageDownPattern.matches(message)) {
             hideArachneDeadMessage = true
         }
         return hideArachneDeadMessage

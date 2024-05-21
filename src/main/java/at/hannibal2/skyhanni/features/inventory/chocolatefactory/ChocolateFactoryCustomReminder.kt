@@ -13,9 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,6 +37,12 @@ object ChocolateFactoryCustomReminder {
             ChocolateFactoryAPI.profileStorage?.targetName = value
         }
 
+    private val patternGroup = RepoPattern.group("chocolatefactorycustomreminder")
+    private val noChocPattern by patternGroup.pattern(
+        "nochoc",
+        "§cYou don't have enough Chocolate!"
+    )
+
     fun isActive() = targetGoal != null && configReminder.enabled
 
     private var display = emptyList<Renderable>()
@@ -45,7 +53,7 @@ object ChocolateFactoryCustomReminder {
     fun onChat(event: SystemMessageEvent) {
         if (!isEnabled()) return
         if (configReminder.hideChat) {
-            if (event.message == "§cYou don't have enough Chocolate!") {
+            if (noChocPattern.matches(event.message)) {
                 event.blockedReason = "custom_reminder"
             }
         }

@@ -26,7 +26,7 @@ class CompactBingoChat {
         "border",
         "§[e3]§l▬{64}"
     )
-    private val inSkyblockPattern by patternGroup.list(
+    private val inSkyblockPatterns by patternGroup.list(
         "inskyblock",
         "(^\\s{3}§r§7§8\\+§a. §c❁ Strength\\s*$)",
         "(^\\s{3}§r§7§8\\+§a.* §c❤ Health\\s*$)",

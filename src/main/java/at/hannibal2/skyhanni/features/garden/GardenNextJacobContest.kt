@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -74,6 +75,14 @@ object GardenNextJacobContest {
     private val cropPattern by patternGroup.pattern(
         "crop",
         "§(e○|6☘) §7(?<crop>.*)"
+    )
+    val jacobPattern by patternGroup.pattern(
+        "jacob",
+        "§e§lJacob's Contest:"
+    )
+    private val jacobFarmingPattern by patternGroup.pattern(
+        "jacobfarming",
+        "§6§eJacob's Farming Contest"
     )
 
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
@@ -135,7 +144,7 @@ object GardenNextJacobContest {
         val newList = mutableListOf<String>()
         var counter = 0
         for (line in event.tabList) {
-            if (line == "§e§lJacob's Contest:") {
+            if (jacobPattern.matches(line)) {
                 newList.add(line)
                 next = true
                 continue
@@ -223,7 +232,7 @@ object GardenNextJacobContest {
         // Manually loading contests
         for (item in items) {
             val lore = item.getLore()
-            if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
+            if (!lore.any { jacobFarmingPattern.find(it) }) continue
 
             val day = dayPattern.matchMatcher(item.name) { group("day").toInt() } ?: continue
 

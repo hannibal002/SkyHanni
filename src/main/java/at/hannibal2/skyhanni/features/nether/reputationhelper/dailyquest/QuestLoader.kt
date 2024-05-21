@@ -20,10 +20,42 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
+
+    private val patternGroup = RepoPattern.group("questloader")
+    private val factionPattern by patternGroup.pattern(
+        "faction",
+        "Faction Quests:"
+    )
+    private val spookPattern by patternGroup.pattern(
+        "spook",
+        "The Great Spook"
+    )
+    private val completedPattern by patternGroup.pattern(
+        "completed",
+        "Completed!"
+    )
+    private val startPattern by patternGroup.pattern(
+        "start",
+        "Click to start!"
+    )
+    private val daysPattern by patternGroup.pattern(
+        "days",
+        " Days"
+    )
+    private val fearPattern by patternGroup.pattern(
+        "fear",
+        "Fear: §r"
+    )
+    private val primalPattern by patternGroup.pattern(
+        "primal",
+        "Primal Fears"
+    )
 
     companion object {
 
@@ -39,7 +71,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         var i = -1
         dailyQuestHelper.greatSpook = false
         for (line in TabListData.getTabList()) {
-            if (line.contains("Faction Quests:")) {
+            if (factionPattern.find(line)) {
                 i = 0
                 continue
             }
@@ -57,7 +89,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     private fun readQuest(line: String) {
         if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.find(line)) return
 
-        if (line.contains("The Great Spook")) {
+        if (spookPattern.find(line)) {
             dailyQuestHelper.greatSpook = true
             dailyQuestHelper.update()
             return
@@ -159,13 +191,13 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             if (!categoryName.equals(name, ignoreCase = true)) continue
             val stack = event.inventoryItems[22] ?: continue
 
-            val completed = stack.getLore().any { it.contains("Completed!") }
+            val completed = stack.getLore().any { completedPattern.find(it) }
             if (completed && quest.state != QuestState.COLLECTED) {
                 quest.state = QuestState.COLLECTED
                 dailyQuestHelper.update()
             }
 
-            val accepted = !stack.getLore().any { it.contains("Click to start!") }
+            val accepted = !stack.getLore().any { startPattern.find(it) }
             if (accepted && quest.state == QuestState.NOT_ACCEPTED) {
                 quest.state = QuestState.ACCEPTED
                 dailyQuestHelper.update()
@@ -227,10 +259,10 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun hasGreatSpookLine(text: String) = when {
-        text.contains("The Great Spook") -> true
-        text.contains(" Days") -> true
-        text.contains("Fear: §r") -> true
-        text.contains("Primal Fears") -> true
+        spookPattern.matches(text) -> true
+        daysPattern.matches(text) -> true
+        fearPattern.matches(text) -> true
+        primalPattern.matches(text) -> true
 
         else -> false
     }

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,9 +28,14 @@ class BlazeSlayerDaggerHelper {
 
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
 
-    private val attunementPattern by RepoPattern.pattern(
-        "slayer.blaze.dagger.attunement",
-        "§cStrike using the §r(.+) §r§cattunement on your dagger!"
+    private val patternGroup = RepoPattern.group("slayer.blaze.dagger")
+    private val lorePattern by patternGroup.pattern(
+        "lore",
+        "§7Attuned: "
+    )
+    private val attunementPattern by patternGroup.pattern(
+        "attunement",
+        "§cStrike using the §r(.+) §r§cattunement on your dagger!|§cYour hit was reduced by Hellion Shield!"
     )
 
     private var clientSideClicked = false
@@ -46,7 +52,7 @@ class BlazeSlayerDaggerHelper {
         if (!config.hideDaggerWarning) return
 
         val message = event.message
-        if (attunementPattern.matches(message) || message == "§cYour hit was reduced by Hellion Shield!") {
+        if (attunementPattern.matches(message)) {
             event.blockedReason = "blaze_slayer_dagger"
         }
     }
@@ -150,7 +156,7 @@ class BlazeSlayerDaggerHelper {
             val otherDagger = getDaggerFromStack(stack) ?: continue
             if (dagger != otherDagger) continue
             for (line in stack.getLore()) {
-                if (!line.contains("§7Attuned: ")) continue
+                if (!lorePattern.find(line)) continue
 
                 for (shield in dagger.shields) {
                     if (line.contains(shield.cleanName)) {

@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -54,6 +55,26 @@ class CityProjectFeatures {
     private val completedPattern by patternGroup.pattern(
         "completed",
         "§aProject is (?:being built|released)!"
+    )
+    private val contributePattern by patternGroup.pattern(
+        "contribute",
+        "§eContribute this component!"
+    )
+    private val cityPattern by patternGroup.pattern(
+        "city",
+        "§8City Project"
+    )
+    private val costPattern by patternGroup.pattern(
+        "cost",
+        "§7Cost"
+    )
+    private val bitsPattern by patternGroup.pattern(
+        "bits",
+        "Bits"
+    )
+    private val clickContributePattern by patternGroup.pattern(
+        "clickcontribute",
+        "§eClick to contribute!"
     )
 
     companion object {
@@ -104,7 +125,7 @@ class CityProjectFeatures {
             // internal name -> amount
             val materials = mutableMapOf<NEUInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
-                if (item.name != "§eContribute this component!") continue
+                if (!contributePattern.matches(item.name)) continue
                 fetchMaterials(item, materials)
             }
 
@@ -128,7 +149,7 @@ class CityProjectFeatures {
                         nextTime = endTime
                     }
                 }
-                if (item.name != "§eContribute this component!") continue
+                if (!contributePattern.matches(item.name)) continue
                 nextTime = now
             }
             ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime.toMillis()
@@ -138,7 +159,7 @@ class CityProjectFeatures {
     private fun inCityProject(event: InventoryFullyOpenedEvent): Boolean {
         val lore = event.inventoryItems[4]?.getLore() ?: return false
         if (lore.isEmpty()) return false
-        if (lore[0] != "§8City Project") return false
+        if (!cityPattern.matches(lore[0])) return false
         return true
     }
 
@@ -178,13 +199,13 @@ class CityProjectFeatures {
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
         if (completed) return
         for (line in lore) {
-            if (line == "§7Cost") {
+            if (costPattern.matches(line)) {
                 next = true
                 continue
             }
             if (!next) continue
             if (line == "") break
-            if (line.contains("Bits")) break
+            if (bitsPattern.find(line)) break
 
             val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
             val internalName = NEUInternalName.fromItemName(name)
@@ -217,7 +238,7 @@ class CityProjectFeatures {
             val lore = stack.getLore()
             if (lore.isEmpty()) continue
             val last = lore.last()
-            if (last == "§eClick to contribute!") {
+            if (clickContributePattern.matches(last)) {
                 slot highlight LorenzColor.YELLOW
             }
         }

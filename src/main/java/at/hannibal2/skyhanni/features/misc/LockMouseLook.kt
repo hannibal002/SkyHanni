@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -17,6 +19,12 @@ object LockMouseLook {
     private val storage get() = SkyHanniMod.feature.storage
     var lockedMouse = false
     private const val lockedPosition = -1F / 3F
+
+    private val patternGroup = RepoPattern.group("lockmouse")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "^§aTeleported you to §r§aPlot"
+    )
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -30,7 +38,7 @@ object LockMouseLook {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!event.message.startsWith("§aTeleported you to §r§aPlot")) return
+        if (!messagePattern.find(event.message)) return
         if (lockedMouse) toggleLock()
     }
 

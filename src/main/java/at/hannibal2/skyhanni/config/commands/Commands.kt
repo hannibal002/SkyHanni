@@ -79,12 +79,14 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
@@ -104,6 +106,16 @@ object Commands {
             ConfigGuiManager.openConfigGui()
         }
     }
+
+    private val patternGroup = RepoPattern.group("commands")
+    private val releasesPattern by patternGroup.pattern(
+        "releases",
+        "(?i)(?:full|release)s?"
+    )
+    private val betaPattern by patternGroup.pattern(
+        "beta",
+        "(?i)(?:beta|latest)s?"
+    )
 
     // command -> description
     private val commands = mutableListOf<CommandInfo>()
@@ -631,8 +643,9 @@ object Commands {
         val currentStream = SkyHanniMod.feature.about.updateStream.get()
         val arg = args.firstOrNull() ?: "current"
         val updateStream = when {
-            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
-            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+
+            releasesPattern.matches(arg) -> UpdateStream.RELEASES
+            betaPattern.matches(arg) -> UpdateStream.BETA
             else -> currentStream
         }
 

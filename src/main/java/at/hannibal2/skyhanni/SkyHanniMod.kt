@@ -871,7 +871,7 @@ class SkyHanniMod {
         loadModule(HarpFeatures)
         loadModule(EnderNodeTracker)
         loadModule(CompactBestiaryChatMessage())
-        loadModule(WatchdogHider())
+        loadModule(WatchdogHider)
         loadModule(AuctionHousePriceComparison())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())

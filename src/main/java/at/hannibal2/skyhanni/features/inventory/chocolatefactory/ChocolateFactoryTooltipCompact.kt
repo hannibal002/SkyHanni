@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -18,6 +20,12 @@ object ChocolateFactoryTooltipCompact {
     private var lastClick = SimpleTimeMark.farPast()
     private var lastHover = SimpleTimeMark.farPast()
     private var tooltipToHover = listOf<String>()
+
+    private val patternGroup = RepoPattern.group("chocolatefactorytooltipcompact")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§7§eClick to uncover the meaning of life!"
+    )
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -52,7 +60,7 @@ object ChocolateFactoryTooltipCompact {
 
         val itemStack = event.itemStack
         val lore = itemStack.getLore()
-        if (!lore.any { it == "§7§eClick to uncover the meaning of life!" }) return
+        if (!lore.any { messagePattern.matches(it) }) return
         if (lastClick.passedSince() >= 1.seconds && !config.compactOnClickAlways) return
         val list = mutableListOf<String>()
         list.add(itemStack.name)

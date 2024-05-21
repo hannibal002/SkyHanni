@@ -17,7 +17,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -44,9 +46,15 @@ object LimboTimeTracker {
     private var doMigrate = false
     private var unmigratedPB = 0
 
+    private val patternGroup = RepoPattern.group("limbotimetracker")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§cYou are AFK. Move around to return from AFK.|§cYou were spawned in Limbo."
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
+        if (messagePattern.matches(event.message)) {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
             onFire = Minecraft.getMinecraft().thePlayer.isBurning

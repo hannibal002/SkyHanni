@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -37,6 +38,11 @@ object DianaProfitTracker {
         "coins",
         "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!"
     )
+    private val foundBurrowPattern by patternGroup.pattern(
+        "griffinfeather",
+        "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!|§eFollow the arrows to find the §r§6treasure§r§e!"
+    )
+
 
     private val tracker = SkyHanniItemTracker(
         "Diana Profit Tracker",
@@ -121,9 +127,7 @@ object DianaProfitTracker {
             tryHide(event)
         }
 
-        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
-            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
-        ) {
+        if (foundBurrowPattern.matches(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }

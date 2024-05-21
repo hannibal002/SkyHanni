@@ -87,6 +87,14 @@ class MinionFeatures {
         "item.collect",
         "^§aCollect All$"
     )
+    private val pickedUpMinionPattern by patternGroup.pattern(
+        "pickedupminion",
+        "^§aYou picked up a minion!"
+    )
+    private val placedMinionPattern by patternGroup.pattern(
+        "placedminion",
+        "^§bYou placed a minion!"
+    )
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
@@ -307,13 +315,13 @@ class MinionFeatures {
                 it.lastClicked = System.currentTimeMillis()
             }
         }
-        if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
+        if (pickedUpMinionPattern.find(message) && lastMinion != null) {
             minions = minions?.editCopy { remove(lastMinion) }
             lastClickedEntity = null
             lastMinion = null
             lastMinionOpened = 0L
         }
-        if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
+        if (placedMinionPattern.find(message) && newMinion != null) {
             minions = minions?.editCopy {
                 this[newMinion!!] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = newMinionName

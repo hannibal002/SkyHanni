@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,6 +21,12 @@ class DungeonHighlightClickedBlocks {
     private val blocks = mutableListOf<ClickedBlock>()
     private var colorIndex = 0
     private val colors = listOf(LorenzColor.YELLOW, LorenzColor.AQUA, LorenzColor.GREEN, LorenzColor.LIGHT_PURPLE)
+
+    private val patternGroup = RepoPattern.group("dungeonhighlightclickedblocks")
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§cYou hear the sound of something opening..."
+    )
 
     private fun getNextColor(): LorenzColor {
         var id = colorIndex + 1
@@ -32,7 +40,7 @@ class DungeonHighlightClickedBlocks {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!DungeonAPI.inDungeon()) return
 
-        if (event.message == "§cYou hear the sound of something opening...") {
+        if (messagePattern.matches(event.message)) {
             event.blockedReason = "dungeon_highlight_clicked_block"
         }
     }

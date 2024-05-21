@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -47,6 +48,26 @@ class ItemAbilityCooldown {
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
         "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+    )
+    private val creeperActivatedPattern by patternGroup.pattern(
+        "creeperactivated",
+        "§dCreeper Veil §r§aActivated!"
+    )
+    private val creeperForceDeactivatedPattern by patternGroup.pattern(
+        "creeperforcedeactivated",
+        "§dCreeper Veil §r§cDe-activated! §r§8(Expired)|§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
+    )
+    private val creeperDeactivatedPattern by patternGroup.pattern(
+        "creeperdeactivated",
+        "§dCreeper Veil §r§cDe-activated!"
+    )
+    private val alignedSelfPattern by patternGroup.pattern(
+        "alignedself",
+        "§eYou §r§aaligned §r§eyourself!"
+    )
+    private val rangarockCanceledPattern by patternGroup.pattern(
+        "ragnarockcanceled",
+        "§cRagnarock was cancelled due to being hit!"
     )
 
     private var lastAbility = ""
@@ -348,25 +369,22 @@ class ItemAbilityCooldown {
         if (!isEnabled()) return
 
         val message = event.message
-        if (message == "§dCreeper Veil §r§aActivated!") {
+        if (creeperActivatedPattern.matches(message)) {
             ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
         }
-        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)"
-            || message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
-        ) {
+        if (creeperForceDeactivatedPattern.matches(message)) {
             ItemAbility.WITHER_CLOAK.activate()
         }
-        if (message == "§dCreeper Veil §r§cDe-activated!") {
+        if (creeperDeactivatedPattern.matches(message)) {
             ItemAbility.WITHER_CLOAK.activate(null, 5000)
         }
-
         youAlignedOthersPattern.matchMatcher(message) {
             ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6_000)
         }
-        if (message == "§eYou §r§aaligned §r§eyourself!") {
+        if (alignedSelfPattern.matches(message)) {
             ItemAbility.GYROKINETIC_WAND_RIGHT.activate(LorenzColor.BLUE, 6_000)
         }
-        if (message == "§cRagnarock was cancelled due to being hit!") {
+        if (rangarockCanceledPattern.matches(message)) {
             ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
         }
         youBuffedYourselfPattern.matchMatcher(message) {

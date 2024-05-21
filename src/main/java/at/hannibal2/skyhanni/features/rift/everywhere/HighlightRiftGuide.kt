@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -15,6 +17,13 @@ class HighlightRiftGuide {
 
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
+
+    private val patternGroup = RepoPattern.group("highlightriftguide")
+    private val notCompletedPattern by patternGroup.pattern(
+        "notcompleted",
+        "§8✖ Not completed yet!"
+    )
+
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -32,7 +41,7 @@ class HighlightRiftGuide {
         val highlightedItems = mutableListOf<Int>()
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
-            if (lore.isNotEmpty() && lore.last() == "§8✖ Not completed yet!") {
+            if (lore.isNotEmpty() && notCompletedPattern.matches(lore.last())) {
                 highlightedItems.add(slot)
             }
         }

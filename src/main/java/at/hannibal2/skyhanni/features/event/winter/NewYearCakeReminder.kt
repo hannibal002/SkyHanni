@@ -20,15 +20,20 @@ import kotlin.time.Duration.Companion.seconds
 class NewYearCakeReminder {
 
     private val config get() = SkyHanniMod.feature.event.winter
-    private val sidebarDetectionPattern by RepoPattern.pattern(
-        "event.winter.newyearcake.reminder.sidebar",
+    private val patternGroup = RepoPattern.group("event.winter.newyearcake.reminder")
+    private val sidebarDetectionPattern by patternGroup.pattern(
+        "sidebar",
         "§dNew Year Event!§f (?<time>.*)"
+    )
+    private val messagePattern by patternGroup.pattern(
+        "message",
+        "§aYou claimed a §r§cNew Year Cake§r§a!"
     )
     private var lastReminderSend = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§aYou claimed a §r§cNew Year Cake§r§a!") {
+        if (messagePattern.matches(event.message)) {
             markCakeClaimed()
         }
     }

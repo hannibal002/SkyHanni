@@ -28,6 +28,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -36,6 +38,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.roundToLong
 
 object EstimatedItemValue {
+
+    private val patternGroup = RepoPattern.group("estimateditemvalue")
+    private val clickToCollectPattern by patternGroup.pattern(
+        "clicktocollect",
+        "§eClick to collect!"
+    )
+    private val armorSetPattern by patternGroup.pattern(
+        "armorset",
+        "Armor Set"
+    )
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<List<Any>>()
@@ -141,12 +153,12 @@ object EstimatedItemValue {
 
         val openInventoryName = InventoryUtils.openInventoryName()
         if (openInventoryName.startsWith("Museum ")) {
-            if (item.getLore().any { it.contains("Armor Set") }) {
+            if (item.getLore().any { armorSetPattern.matches(it) }) {
                 return
             }
         }
         if (openInventoryName == "Island Deliveries") {
-            if (item.getLore().any { it == "§eClick to collect!" }) {
+            if (item.getLore().any { clickToCollectPattern.matches(it) }) {
                 return
             }
         }
