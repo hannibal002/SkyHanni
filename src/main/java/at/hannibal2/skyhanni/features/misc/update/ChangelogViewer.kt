@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.containsKey
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -50,7 +51,10 @@ object ChangelogViewer {
     private val primaryColor = LorenzColor.DARK_GRAY.toColor().addAlpha(218)
     private val primary2Color = LorenzColor.DARK_GRAY.toColor().darker().withAlpha(220)
 
-    fun showChangelog(currentVersion: String, targetVersion: String) {
+    fun showChangelog(currentVersion: String, targetVersion: String) =
+        showChangelog(currentVersion.toVersionTag(), targetVersion.toVersionTag())
+
+    private fun showChangelog(currentVersion: VersionTag, targetVersion: VersionTag) {
         getChangelog(currentVersion, targetVersion)
         openChangelog()
     }
@@ -117,7 +121,10 @@ object ChangelogViewer {
                     if (shouldMakeNewList || lastWidth != width || lastHeight != height) {
                         lastWidth = width
                         lastHeight = height
-                        val changelogList = cache.subMap(startVersion, false, endVersion, true).descendingMap()
+                        val changelogList = (cache.subMap(startVersion, false, endVersion, true)
+                            .takeIf { it.isNotEmpty() }
+                            ?: cache.subMap(startVersion, true, endVersion, true) // If startVersion == endVersion
+                            ).descendingMap()
                         scrollList = makeScrollList(changelogList, width, height)
                     }
                     scrollList
@@ -225,6 +232,8 @@ object ChangelogViewer {
                 "$first" + if (second == -1) "" else ".$second" + if (third == -1) "" else ".$third" + if (fourth == -1) "" else ".$fourth"
             }
         }
+
+        fun isValid() = first != -1
     }
 
     /** Inclusive for both borders */
@@ -241,9 +250,9 @@ object ChangelogViewer {
         return VersionTag(ints, split.contains("Beta"))
     }
 
-    private fun getChangelog(currentVersion: String, targetVersion: String) {
-        startVersion = currentVersion.toVersionTag()
-        endVersion = targetVersion.toVersionTag()
+    private fun getChangelog(currentVersion: VersionTag, targetVersion: VersionTag) {
+        startVersion = currentVersion
+        endVersion = targetVersion
         if (cache.containsKey(startVersion, endVersion)) return
         SkyHanniMod.coroutineScope.launch {
             try {
@@ -302,5 +311,43 @@ object ChangelogViewer {
                 ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
             }
         }
+    }
+
+    fun handelCommand(args: Array<String>) {
+        when (args.size) {
+            0 -> UpdateManager.getNextVersion()?.let { showChangelog(SkyHanniMod.version, it) }
+                ?: ChatUtils.userError("You are up to date, if you want to look at past change logs use the command with arguments. Usage: [version you want to look at] [your version]")
+
+            1 -> {
+                val tag = args[0].toVersionTag()
+                if (!tag.isValid()) {
+                    ChatUtils.userError("Version shape requirement failed")
+                    return
+                }
+                val current = SkyHanniMod.version.toVersionTag()
+                if (tag <= current) {
+                    showChangelog(tag, tag)
+                } else {
+                    showChangelog(current, tag)
+                }
+            }
+
+            2 -> {
+                val target = args[0].toVersionTag()
+                if (!target.isValid()) {
+                    ChatUtils.userError("Version shape requirement failed, first argument")
+                    return
+                }
+                val current = args[1].toVersionTag()
+                if (!current.isValid()) {
+                    ChatUtils.userError("Version shape requirement failed, second argument")
+                    return
+                }
+                showChangelog(current, target)
+            }
+
+            else -> ChatUtils.userError("Invalid amount of arguments. Usage: [version you want to look at] [your version]")
+        }
+
     }
 }
