@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
@@ -79,7 +80,7 @@ class SlayerQuestWarning {
     }
 
     private var needSlayerQuest = false
-    private var lastWarning = 0L
+    private var lastWarning = SimpleTimeMark.farPast()
     private var currentReason = ""
 
     private fun needNewQuest(reason: String) {
