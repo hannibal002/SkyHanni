@@ -124,6 +124,13 @@ object ChangelogViewer {
                 }.renderXYAligned(0, 0, width, height)
                 GlStateManager.translate(0f, -buttonPanel.height - 5f, 0f)
                 buttonPanel.renderXAligned(0, -buttonPanel.height - 5, width)
+                Renderable.drawInsideRoundedRect(
+                    Renderable.string(
+                        "§9$startVersion §e--> §9$endVersion",
+                    ),
+                    primaryColor,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
+                ).renderXAligned(0, -buttonPanel.height - 5, width)
                 GlStateManager.translate(0f, buttonPanel.height + 5f, 0f)
             }
             GlStateManager.translate(-xTranslate.toFloat(), -yTranslate.toFloat(), 0f)
@@ -260,15 +267,21 @@ object ChangelogViewer {
                 neededData.forEach {
                     var headline = 0
                     cache[it.tagName.toVersionTag()] = it.body.replace(
-                        "\\(https://github[\\w/.?$&#]*\\)".toRegex(), ""
+                        "[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), ""
                     ) // Remove GitHub link
-                        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b$1") // Color contributors
-                        //.replace("\r\n### Technical Details[^#]*".toRegex(), "\r\n") // Remove Technical Details
                         .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
-                        .replace("(\n[ \t]+)[+\\-*]".toRegex(), "$1§7") // Formatting for sub points
-                        .replace("\n[+\\-*]".toRegex(), "\n§a") // Formatting for points
+                        .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
+                        .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
+                        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b$1") // Color contributors
                         .replace("\\[(.+)\\]\\(.+\\)".toRegex(), "$1") // Random Links
-                        .replace("§l§9Version[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
+                        .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
+                        .replace("(?<rest>(?<format>§[kmolnrKMOLNR])?.*?(?<colour>§[0-9a-fA-F])?.*)\\*\\*(?<content>.*)\\*\\*".toRegex()) {
+                            val rest = it.groups["rest"]?.value ?: ""
+                            val foramt = it.groups["format"]?.value ?: ""
+                            val colour = it.groups["colour"]?.value ?: ""
+                            val content = it.groups["content"]?.value ?: ""
+                            "$rest§l$content§r$foramt$colour"
+                        } // Bolding markdown
                         .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
                         .split("\r\n") // Split at newlines
                         .map { it.trimEnd() } // Remove trailing empty stuff
