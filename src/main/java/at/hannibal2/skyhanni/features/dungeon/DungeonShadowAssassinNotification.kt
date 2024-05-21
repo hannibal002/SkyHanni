@@ -15,7 +15,7 @@ class DungeonShadowAssassinNotification {
     @SubscribeEvent
     fun onWorldBoarderChange(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
-        if (DungeonAPI.dungeonFloor?.contains("3") == true && DungeonAPI.inBossRoom) return
+        if (DungeonAPI.dungeonFloor?.name?.contains("3") == true && DungeonAPI.inBossRoom) return
 
         val packet = event.packet as? AccessorWorldBoarderPacket ?: return
         val action = packet.action

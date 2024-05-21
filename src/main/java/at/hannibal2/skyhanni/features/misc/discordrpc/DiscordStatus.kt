@@ -308,7 +308,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         if (!DungeonAPI.inDungeon()) {
             AutoStatus.DUNGEONS.placeholderText
         } else {
-            val boss = DungeonAPI.getCurrentBoss()
+            val boss = DungeonAPI.dungeonFloor
             if (boss == null) {
                 "Unknown dungeon boss"
             } else {

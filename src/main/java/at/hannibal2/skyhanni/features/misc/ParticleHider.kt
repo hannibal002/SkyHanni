@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.projectile.EntitySmallFireball
@@ -12,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ParticleHider {
 
-    private fun inM7Boss() = DungeonAPI.inDungeon() && DungeonAPI.dungeonFloor == "M7" && DungeonAPI.inBossRoom
+    private fun inM7Boss() = DungeonAPI.inDungeon() && DungeonAPI.dungeonFloor == DungeonFloor.M7 && DungeonAPI.inBossRoom
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {

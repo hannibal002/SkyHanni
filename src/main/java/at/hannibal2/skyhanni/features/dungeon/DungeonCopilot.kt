@@ -86,7 +86,7 @@ class DungeonCopilot {
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
-            if (DungeonAPI.getCurrentBoss() == DungeonFloor.E) {
+            if (DungeonAPI.dungeonFloor == DungeonFloor.E) {
                 changeNextStep("")
             } else {
                 changeNextStep("Enter Boss Room")

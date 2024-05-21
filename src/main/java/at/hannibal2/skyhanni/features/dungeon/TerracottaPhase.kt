@@ -45,5 +45,5 @@ class TerracottaPhase {
     private fun isActive() = isEnabled() && inTerracottaPhase
 
     private fun isEnabled() =
-        DungeonAPI.inDungeon() && DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F6
+        DungeonAPI.inDungeon() && DungeonAPI.inBossRoom && DungeonAPI.dungeonFloor == DungeonFloor.F6
 }

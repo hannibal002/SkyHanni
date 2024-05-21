@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class DungeonStartEvent(dungeonFloor: String) : LorenzEvent()
+import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
+
+class DungeonStartEvent(dungeonFloor: DungeonFloor) : LorenzEvent()

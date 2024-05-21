@@ -249,13 +249,9 @@ object DiscordLocationKey {
     private fun getAmbiguousKey(location: String): String {
         val island = LorenzUtils.skyBlockIsland
 
-        DungeonAPI.dungeonFloor?.lowercase()?.let {
-            if (it.startsWith("m")) {
-                return "master-mode"
-            }
-            if (it.startsWith("f")) {
-                return "dungeon"
-            }
+        DungeonAPI.dungeonFloor?.let {
+            if (it.isMaster) return "master-mode"
+            else  return "dungeon"
         }
 
         return when (location) {

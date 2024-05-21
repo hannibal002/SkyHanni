@@ -44,7 +44,7 @@ object DungeonAPI {
     private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
-    var dungeonFloor: String? = null
+    var dungeonFloor: DungeonFloor? = null
     var started = false
     var inBossRoom = false
     var playerClass: DungeonClass? = null
@@ -105,17 +105,17 @@ object DungeonAPI {
     }
 
     private fun checkBossName(bossName: String): Boolean {
-        val correctBoss = when (dungeonFloor!!) {
-            "E" -> "The Watcher"
-            "F1", "M1" -> "Bonzo"
-            "F2", "M2" -> "Scarf"
-            "F3", "M3" -> "The Professor"
-            "F4", "M4" -> "Thorn"
-            "F5", "M5" -> "Livid"
-            "F6", "M6" -> "Sadan"
-            "F7", "M7" -> "Maxor"
-            else -> null
-        } ?: return false
+        val floor = dungeonFloor ?: return false
+        val correctBoss = when (floor) {
+            DungeonFloor.E -> "The Watcher"
+            DungeonFloor.F1, DungeonFloor.M1 -> "Bonzo"
+            DungeonFloor.F2, DungeonFloor.M2 -> "Scarf"
+            DungeonFloor.F3, DungeonFloor.M3 -> "The Professor"
+            DungeonFloor.F4, DungeonFloor.M4 -> "Thorn"
+            DungeonFloor.F5, DungeonFloor.M5 -> "Livid"
+            DungeonFloor.F6, DungeonFloor.M6 -> "Sadan"
+            DungeonFloor.F7, DungeonFloor.M7 -> "Maxor"
+        }
 
         // Livid has a prefix in front of the name, so we check ends with to cover all the livids
         return bossName.endsWith(correctBoss)
@@ -126,11 +126,6 @@ object DungeonAPI {
             return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
         }
         return ""
-    }
-
-    fun getCurrentBoss(): DungeonFloor? {
-        val floor = dungeonFloor ?: return null
-        return DungeonFloor.valueOf(floor.replace("M", "F"))
     }
 
     fun getRoomID(): String? {
@@ -158,7 +153,7 @@ object DungeonAPI {
         if (dungeonFloor == null) {
             ScoreboardData.sidebarLinesFormatted.matchFirst(floorPattern) {
                 val floor = group("floor")
-                dungeonFloor = floor
+                dungeonFloor = DungeonFloor.entries.find { it.name == floor }
                 DungeonEnterEvent(floor).postAndCatch()
             }
         }

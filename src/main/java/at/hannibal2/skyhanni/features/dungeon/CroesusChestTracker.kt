@@ -224,8 +224,8 @@ class CroesusChestTracker {
 
     @SubscribeEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
-        if (event.floor == "E") return
-        croesusChests?.add(0, DungeonRunInfo(event.floor))
+        if (event.floor == DungeonFloor.E) return
+        croesusChests?.add(0, DungeonRunInfo(DungeonFloor.getNormalName(event.floor)))
         currentRunIndex = 0
         if ((croesusChests?.size ?: 0) > maxChests) {
             croesusChests?.dropLast(1)
