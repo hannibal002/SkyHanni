@@ -126,7 +126,7 @@ object ChangelogViewer {
                 buttonPanel.renderXAligned(0, -buttonPanel.height - 5, width)
                 Renderable.drawInsideRoundedRect(
                     Renderable.string(
-                        "§9$startVersion §e--> §9$endVersion",
+                        "§9$startVersion §e➜ §9$endVersion",
                     ),
                     primaryColor,
                     horizontalAlign = RenderUtils.HorizontalAlignment.LEFT

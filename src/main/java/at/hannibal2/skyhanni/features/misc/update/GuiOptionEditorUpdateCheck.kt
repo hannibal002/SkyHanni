@@ -38,13 +38,19 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             changelog.render(getChangelogPosition(width), 30)
         }
 
+        val widthRemaining = width - button.width - 10
+
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
-            TextRenderUtils.drawStringCentered(
-                "${GREEN}The update will be installed after your next restart.", fr, width / 2F, 50F, true, -1
+            TextRenderUtils.drawStringCenteredScaledMaxWidth(
+                "${GREEN}The update will be installed after your next restart.",
+                fr,
+                widthRemaining / 2F,
+                40F,
+                true,
+                widthRemaining,
+                -1
             )
         }
-
-        val widthRemaining = width - button.width - 10
 
         GlStateManager.scale(2F, 2F, 1F)
         val sameVersion = currentVersion.equals(nextVersion, true)
