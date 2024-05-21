@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
@@ -32,6 +33,13 @@ class EntityData {
                 maxHealthMap[entity] = maxHealth
                 EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).postAndCatch()
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (event.repeatSeconds(30)) {
+            maxHealthMap.keys.removeIf { it.isDead }
         }
     }
 
