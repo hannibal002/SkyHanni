@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.item.EnumDyeColor
+import net.minecraft.util.EnumChatFormatting
 import java.awt.Color
 
 enum class LorenzColor(val chatColorCode: Char, private val color: Color, private val coloredLabel: String) {
@@ -61,6 +62,9 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
         CHROMA -> EnumDyeColor.WHITE
     }
+
+    fun toChatFormatting(): EnumChatFormatting? =
+        EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() }
 
     companion object {
 

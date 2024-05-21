@@ -80,7 +80,7 @@ class SpawnTimers {
 
     // All this to detect "quickspawn" vs regular arachne spawn
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!saveNextTickParticles) return
         if (searchTime.passedSince() < 3.seconds) return
 
