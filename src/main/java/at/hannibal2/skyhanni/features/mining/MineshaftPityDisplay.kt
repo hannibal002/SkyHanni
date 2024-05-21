@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -70,6 +71,7 @@ object MineshaftPityDisplay {
         if (!isEnabled()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
+            val chance = calculateChance(pityCounter)
             val counterUntilPity = MAX_COUNTER - pityCounter
             val totalBlocks = minedBlocks.values.sum()
 
@@ -81,6 +83,7 @@ object MineshaftPityDisplay {
             val hover = mutableListOf<String>()
             hover.add("§7Blocks mined: §e$totalBlocks")
             hover.add("§7Pity Counter: §e$pityCounter")
+            hover.add("§7Chance: §e1§6/§e${chance.round(1)} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)")
             minedBlocks.forEach {
                 hover.add("    §7${it.key.displayName} mined: §e${it.value} (${(it.value * it.key.multiplier)}/$counterUntilPity)")
             }
@@ -116,8 +119,18 @@ object MineshaftPityDisplay {
         return counter
     }
 
+    // if the chance is 1/1500, it will return 1500
+    private fun calculateChance(counter: Int): Double {
+        // TODO: use HotmAPI to get values
+        val surveyorPercent = 0.0
+        val peakMountainPercent = 0.0
+        val chance = counter / (1 + surveyorPercent / 100 + peakMountainPercent / 100)
+        return chance
+    }
+
     private fun update() {
         val pityCounter = calculateCounter()
+        val chance = calculateChance(pityCounter)
         val counterUntilPity = MAX_COUNTER - pityCounter
 
         val multipliers = PityBlocks.entries.map { it.multiplier }.toSet().sorted()
@@ -126,7 +139,7 @@ object MineshaftPityDisplay {
         multipliers.forEach { multiplier ->
             val iconsList = PityBlocks.entries
                 .filter { it.multiplier == multiplier }
-                .map { Renderable.itemStack(it.item) }
+                .map { Renderable.itemStack(it.displayItem) }
             blocksToPityList.add(
                 Renderable.horizontalContainer(
                     listOf(
@@ -154,7 +167,7 @@ object MineshaftPityDisplay {
             put(MineshaftPityLines.COUNTER, Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"))
             put(
                 MineshaftPityLines.CHANCE,
-                Renderable.string("§3Chance: §e1§6/§e$pityCounter §7(§b${((1.0 / pityCounter) * 100).addSeparators()}%§7)")
+                Renderable.string("§3Chance: §e1§6/§e${chance.round(1)} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)")
             )
             put(MineshaftPityLines.NEEDED_TO_PITY, neededToPityRenderable)
             put(
@@ -212,7 +225,7 @@ object MineshaftPityDisplay {
         val displayName: String,
         val oreTypes: List<OreType>,
         val multiplier: Int,
-        val item: ItemStack
+        val displayItem: ItemStack
     ) {
         MITHRIL(
             "Mithril",
