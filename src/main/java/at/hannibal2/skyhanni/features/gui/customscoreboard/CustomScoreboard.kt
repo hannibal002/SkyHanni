@@ -186,7 +186,7 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock && OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) dirty = true
+            if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) dirty = true
         }
     }
 
