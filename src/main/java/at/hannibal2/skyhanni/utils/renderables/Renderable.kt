@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -150,6 +151,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() &&
                     shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
+                    && !NEUItems.neuHasFocus() && Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
                 ) {
                     onClick()
                 }
