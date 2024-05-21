@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import kotlin.math.floor
+import kotlin.math.pow
+import kotlin.math.round
 
 data class ChocolateFactoryUpgrade(
     val slotIndex: Int,

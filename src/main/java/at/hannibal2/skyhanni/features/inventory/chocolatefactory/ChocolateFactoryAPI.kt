@@ -68,16 +68,16 @@ object ChocolateFactoryAPI {
 
     var upgradeCostFormulaConstants = mapOf<Int, Map<String, Double>>()
     var upgradeCostPerLevel = mapOf<Int, List<Int>>()
-    var maxUpgradeLevelPerPrestige: Map<Int, List<Int>> = mapOf()
+    var maxUpgradeLevelPerPrestige = mapOf<Int, List<Int>>()
 
     var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
-    var allBestPossibleUpgrades = hashMapOf<Int, LinkedList<ChocolateFactoryUpgrade>>()
+    var allBestPossibleUpgrades: Map<Int, MutableList<ChocolateFactoryUpgrade>> = mapOf()
+    var lastUpgradesWhenChecking: Map<Int,ChocolateFactoryUpgrade> = mapOf()
+    var lastBestNotAffordableUpgrade: ChocolateFactoryUpgrade? = null
     var totalUpgradeCost = 0L
-    var totalBaseIncreaseAfterUpgrades = 0
-    var totalMultiplierIncreaseAfterUpgrades = 0.0
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {

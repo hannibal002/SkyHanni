@@ -38,17 +38,14 @@ object ChocolateFactoryInventory {
                 val upgrades = ChocolateFactoryAPI.allBestPossibleUpgrades[slotIndex] ?: continue
                 if (upgrades.isEmpty()) continue
 
-                // Can maybe be replaced by upgrades.last()
-                val upgrade = upgrades.maxBy { it.level }
+                val upgrade = upgrades.last()
 
                 if (upgrade.isMaxed) continue
 
                 val dif = upgrade.level - current.level + 1
 
-                if (dif > 0) {
-                    val color =  LorenzColor.AQUA
-                    event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, color.getChatColor() + dif, 1f)
-                }
+                val color = LorenzColor.AQUA
+                event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, color.getChatColor() + dif, 1f)
             }
         }
     }
