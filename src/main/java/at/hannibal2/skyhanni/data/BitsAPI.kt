@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -63,7 +64,7 @@ object BitsAPI {
     )
 
     // Chat patterns
-    private val bitsChatGroup = bitsDataGroup.group("chat")
+    private val bitsChatGroup = bitsDataGroup.group("chat.new")
 
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
         "rankup.bits",
@@ -77,7 +78,7 @@ object BitsAPI {
 
     private val boosterCookieAte by bitsChatGroup.pattern(
         "boostercookieate",
-        "§eYou consumed a §6Booster Cookie§e!.*"
+        "^§eYou consumed a §6Booster Cookie§e!"
     )
 
     // GUI patterns
@@ -192,7 +193,7 @@ object BitsAPI {
             return
         }
 
-        boosterCookieAte.matchMatcher(message) {
+        boosterCookieAte.findMatcher(message) {
             bitsAvailable += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
             val cookieTime = cookieBuffTime
             cookieBuffTime = if (cookieTime == null) SimpleTimeMark.now() + 4.days else cookieTime + 4.days

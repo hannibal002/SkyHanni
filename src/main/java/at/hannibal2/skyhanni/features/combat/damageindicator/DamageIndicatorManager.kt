@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -69,10 +69,10 @@ class DamageIndicatorManager {
     private val maxHealth = mutableMapOf<UUID, Long>()
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
-    private val patternGroup = RepoPattern.group("damageindicator")
+    private val patternGroup = RepoPattern.group("damageindicator.new")
     private val enderSlayerHitsNumberPattern by patternGroup.pattern(
         "enderslayer",
-        ".* §[5fd]§l(?<hits>\\d+) Hits?"
+        " §[5fd]§l(?<hits>\\d+) Hits?$"
     )
 
     companion object {
@@ -676,7 +676,7 @@ class DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_4 -> 100
                 else -> 100
             }
-            val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name) {
+            val hits = enderSlayerHitsNumberPattern.findMatcher(armorStandHits.name) {
                 group("hits").toInt()
             } ?: error("No hits number found in ender slayer name '${armorStandHits.name}'")
 

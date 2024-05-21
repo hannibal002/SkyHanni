@@ -14,7 +14,7 @@ object MobFactories {
         armorStand: EntityArmorStand,
         extraEntityList: List<EntityLivingBase>
     ): Mob? =
-        MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.slayerNameFilter.findMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.SLAYER,
@@ -89,7 +89,7 @@ object MobFactories {
         armorStand: EntityArmorStand,
         extraEntityList: List<EntityLivingBase>
     ): Mob? =
-        MobFilter.summonFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.summonFilter.findMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.SUMMON,

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -27,7 +28,7 @@ import kotlin.time.Duration
 class BingoCardReader {
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
-    private val patternGroup = RepoPattern.group("bingo.card")
+    private val patternGroup = RepoPattern.group("bingo.card.new")
     private val percentagePattern by patternGroup.pattern(
         "percentage",
         " {2}§8Top §.(?<percentage>.*)%"
@@ -38,7 +39,7 @@ class BingoCardReader {
     )
     private val personalHiddenGoalPattern by patternGroup.pattern(
         "hiddengoal",
-        ".*§7§eThe next hint will unlock in (?<time>.*)"
+        "§7§eThe next hint will unlock in (?<time>.*)$"
     )
     private val goalReachedPattern by patternGroup.pattern(
         "goalreached",
@@ -146,7 +147,7 @@ class BingoCardReader {
         var unknownTip = false
         val nextHintTime: Duration? = when (goalType) {
             GoalType.PERSONAL -> {
-                personalHiddenGoalPattern.matchMatcher(originalDescription) {
+                personalHiddenGoalPattern.findMatcher(originalDescription) {
                     unknownTip = true
                     TimeUtils.getDuration(group("time").removeColor())
                 }

@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -46,14 +47,14 @@ import net.minecraft.entity.player.EntityPlayer
 @Suppress("RegExpRedundantEscape")
 object MobFilter {
 
-    private val repoGroup = RepoPattern.group("mob.detection")
+    private val repoGroup = RepoPattern.group("mob.detection.new")
 
     /** REGEX-TEST: Wither Husk 500M❤ */
     val mobNameFilter by repoGroup.pattern(
         "filter.basic",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+"
     )
-    val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
+    val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+")
 
     /** REGEX-TEST: ﴾ Storm ﴿
      *  REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
@@ -72,7 +73,7 @@ object MobFilter {
         "filter.dungeon",
         "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$"
     )
-    val summonFilter by repoGroup.pattern("filter.summon", "^(?<owner>\\w+)'s (?<name>.*) \\d+.*")
+    val summonFilter by repoGroup.pattern("filter.summon", "^(?<owner>\\w+)'s (?<name>.*) \\d+")
     val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$")
     val jerryPattern by repoGroup.pattern(
         "jerry",
@@ -85,7 +86,7 @@ object MobFilter {
         "pattern.jerry.magma.cube",
         "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤"
     )
-    val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (?<name>.*).*")
+    val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", "Spawned by: (?<name>.*)")
 
     internal const val RAT_SKULL =
         "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
@@ -235,7 +236,7 @@ object MobFilter {
             )
         ) // Will false trigger if there is another Dinnerbone Giant
         baseEntity is EntityCaveSpider -> MobUtils.getArmorStand(baseEntity, -1)
-            ?.takeIf { summonOwnerPattern.matches(it.cleanName()) }?.let {
+            ?.takeIf { summonOwnerPattern.find(it.cleanName()) }?.let {
                 MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)
                     ?.let { MobResult.illegal }
             }

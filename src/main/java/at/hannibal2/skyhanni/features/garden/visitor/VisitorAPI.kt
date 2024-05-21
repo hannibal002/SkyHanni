@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -37,7 +38,7 @@ object VisitorAPI {
     )
     private val visitorNamePattern by patternGroup.pattern(
         "visitor.name",
-        " (?:§.)+(?<name>§.[^§]+).*"
+        "^ (?:§.)+(?<name>§.[^§]+)"
     )
 
     fun getVisitorsMap() = visitors
@@ -186,7 +187,7 @@ object VisitorAPI {
                 continue
             }
 
-            visitorNamePattern.matchMatcher(line) {
+            visitorNamePattern.findMatcher(line) {
                 visitorsInTab.add(group("name").trim())
             }
 

@@ -128,16 +128,23 @@ class SkyblockGuideHighlightFeature private constructor(
             }
         }
 
-        private val taskOnlyCompleteOncePattern =
-            patternGroup.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
-        private val xPattern = patternGroup.pattern("$keyPrefixCondition.x", "§c ?✖.*")
-        private val totalProgressPattern =
-            patternGroup.pattern("$keyPrefixCondition.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
-        private val categoryProgressPattern =
-            patternGroup.pattern(
-                "$keyPrefixCondition.category",
-                "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%"
-            )
+        //TODO this is not it --signed gravy
+        private val taskOnlyCompleteOncePattern = patternGroup.pattern(
+            "$keyPrefixCondition.once",
+            "§7§eThis task can only be completed once!"
+        )
+        private val xPattern = patternGroup.pattern(
+            "$keyPrefixCondition.x",
+            "§c ?✖.*"
+        )
+        private val totalProgressPattern = patternGroup.pattern(
+            "$keyPrefixCondition.total",
+            "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%"
+        )
+        private val categoryProgressPattern = patternGroup.pattern(
+            "$keyPrefixCondition.category",
+            "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%"
+        )
 
         private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
             val internalName = event.item?.getInternalName()

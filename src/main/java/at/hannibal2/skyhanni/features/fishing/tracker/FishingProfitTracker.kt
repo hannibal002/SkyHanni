@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -40,8 +40,8 @@ object FishingProfitTracker {
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
     private val coinsChatPattern by RepoPattern.pattern(
-        "fishing.tracker.chat.coins",
-        ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\."
+        "fishing.tracker.chat.coins.new",
+        "CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.$"
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
@@ -191,7 +191,7 @@ object FishingProfitTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        coinsChatPattern.matchMatcher(event.message) {
+        coinsChatPattern.findMatcher(event.message) {
             tracker.addCoins(group("coins").formatInt())
             addCatch()
         }

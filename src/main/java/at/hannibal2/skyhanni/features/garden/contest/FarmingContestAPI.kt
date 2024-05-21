@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,7 +27,7 @@ import kotlin.time.Duration.Companion.minutes
 
 object FarmingContestAPI {
 
-    private val patternGroup = RepoPattern.group("garden.farming.contest")
+    private val patternGroup = RepoPattern.group("garden.farming.contest.new")
     private val timePattern by patternGroup.pattern(
         "time",
         "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)"
@@ -37,7 +38,7 @@ object FarmingContestAPI {
     )
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
-        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*"
+        "^\\s*(?:§e○|§6☘) §f(?<crop>.*) §a"
     )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
@@ -95,7 +96,7 @@ object FarmingContestAPI {
 
     private fun readCurrentCrop(): CropType? {
         val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
-        return sidebarCropPattern.matchMatcher(line) {
+        return sidebarCropPattern.findMatcher(line) {
             CropType.getByName(group("crop"))
         }
     }

@@ -95,7 +95,7 @@ object UnknownLinesHandler {
             SbPattern.dojoPointsPattern,
             SbPattern.dojoTimePattern,
             SbPattern.objectivePattern,
-            ServerRestartTitle.restartingGreedyPattern,
+            ServerRestartTitle.restartingGreedyMatchesPattern,
             SbPattern.travelingZooPattern,
             SbPattern.newYearPattern,
             SbPattern.spookyPattern,

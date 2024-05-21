@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -28,7 +29,7 @@ object ChocolateFactoryAPI {
     val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
-    val patternGroup = RepoPattern.group("misc.chocolatefactory")
+    val patternGroup = RepoPattern.group("misc.chocolatefactory.new")
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
         "(?<amount>[\\d,]+) Chocolate"
@@ -135,7 +136,7 @@ object ChocolateFactoryAPI {
     }
 
     fun getChocolateBuyCost(lore: List<String>): Long? {
-        val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
+        val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.find(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
         }

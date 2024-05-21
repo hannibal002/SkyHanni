@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -224,12 +225,12 @@ object ItemUtils {
 
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
-            UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
+            UtilsPatterns.abiPhonePattern.find(name) -> ItemCategory.ABIPHONE
             PetAPI.hasPetName(cleanName) -> ItemCategory.PET
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
-            UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
-            UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK
+            UtilsPatterns.potionPattern.find(name) -> ItemCategory.POTION
+            UtilsPatterns.sackPattern.find(name) -> ItemCategory.SACK
             else -> ItemCategory.NONE
         } else {
             LorenzUtils.enumValueOfOrNull<ItemCategory>(itemCategory)

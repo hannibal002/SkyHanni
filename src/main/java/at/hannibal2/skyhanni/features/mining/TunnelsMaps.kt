@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -104,10 +105,10 @@ class TunnelsMaps {
     }
 
     private val oldGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.old", ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*"
+        "mining.tunnels.maps.gem.old.new", "Ruby|Amethyst|Jade|Sapphire|Amber|Topaz"
     )
     private val newGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*"
+        "mining.tunnels.maps.gem.newer", "Aquamarine|Onyx|Citrine|Peridot"
     )
     private val commissionInvPattern by RepoPattern.pattern(
         "mining.commission.inventory", "Commissions"
@@ -206,8 +207,8 @@ class TunnelsMaps {
             when {
                 key.contains("Campfire") -> campfire = value.first()
                 key.contains("Fairy") -> fairy[key] = value.first()
-                newGemstonePattern.matches(key) -> newGemstone[key] = value
-                oldGemstonePattern.matches(key) -> oldGemstone[key] = value
+                newGemstonePattern.find(key) -> newGemstone[key] = value
+                oldGemstonePattern.find(key) -> oldGemstone[key] = value
                 else -> other[key] = value
             }
         }

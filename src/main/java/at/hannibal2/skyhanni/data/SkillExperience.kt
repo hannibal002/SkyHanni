@@ -9,24 +9,24 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkillExperience {
-    private val patternGroup = RepoPattern.group("data.skill")
+    private val patternGroup = RepoPattern.group("data.skill.new")
     private val actionBarPattern by patternGroup.pattern(
         "actionbar",
-        ".*§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\).*"
+        "§3\\+.* (?<skill>.*) \\((?<overflow>.*)/(?<needed>.*)\\)"
     )
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
-        ".* §e(?<number>.*)§6/.*"
+        " §e(?<number>.*)§6/"
     )
     private val actionBarLowLevelPattern by patternGroup.pattern(
         "actionbarlow",
-        ".*§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\).*"
+        "§3+(?<add>.+) (?<skill>.*) \\((?<percentage>.*)%\\)"
     )
 
     @SubscribeEvent
@@ -38,7 +38,7 @@ class SkillExperience {
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        actionBarPattern.matchMatcher(event.actionBar) {
+        actionBarPattern.findMatcher(event.actionBar) {
             val skill = group("skill").lowercase()
             val overflow = group("overflow").formatLong()
             val neededForNextLevel = group("needed").formatLong()
@@ -48,7 +48,7 @@ class SkillExperience {
             skillExp[skill] = totalExp
             SkillExpGainEvent(skill).postAndCatch()
         }
-        actionBarLowLevelPattern.matchMatcher(event.actionBar) {
+        actionBarLowLevelPattern.findMatcher(event.actionBar) {
             val skill = group("skill").lowercase()
             SkillExpGainEvent(skill).postAndCatch()
         }
@@ -75,7 +75,7 @@ class SkillExperience {
                     val skillName = split[0].lowercase()
                     val level = split[1].romanToDecimal()
                     val baseExp = getExpForLevel(level)
-                    inventoryPattern.matchMatcher(line) {
+                    inventoryPattern.findMatcher(line) {
                         val overflow = group("number").formatLong()
                         val experience = baseExp + overflow
                         skillExp[skillName] = experience

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
@@ -34,12 +35,12 @@ object EnchantParser {
 
     private val config get() = SkyHanniMod.feature.inventory.enchantParsing
 
-    val patternGroup = RepoPattern.group("misc.items.enchantparsing")
+    val patternGroup = RepoPattern.group("misc.items.enchantparsing.new")
     val enchantmentPattern by patternGroup.pattern(
         "enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)"
     )
     private val grayEnchantPattern by patternGroup.pattern(
-        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
+        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency)"
     )
 
     private var currentItem: ItemStack? = null
@@ -380,7 +381,7 @@ object EnchantParser {
         for (total in 0 until 2) { // Using the fact that there should be at most 2 vanilla enchants
             if (i + 1 >= loreList.size) break // In case the tooltip is very short (i.e, hovering over a short chat component)
             val line = loreList[i]
-            if (grayEnchantPattern.matcher(line).matches()) {
+            if (grayEnchantPattern.find(line)) {
                 lastGrayEnchant = i
 
                 if (removeGrayEnchants) loreList.removeAt(i) else i++

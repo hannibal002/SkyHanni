@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -32,7 +33,7 @@ object CaptureFarmingGear {
     private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
     private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
-    private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
+    private val patternGroup = RepoPattern.group("garden.fortuneguide.capture.new")
     private val farmingLevelUpPattern by patternGroup.pattern(
         "farminglevel",
         "SKILL LEVEL UP Farming .*➜(?<level>.*)"
@@ -68,11 +69,11 @@ object CaptureFarmingGear {
 
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
-        "§7Progress to Tier (?<nextTier>\\w+):.*"
+        "§7Progress to Tier (?<nextTier>\\w+):"
     )
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
-        ".* §e(?<having>.*)§6/(?<total>.*)"
+        "§e(?<having>.*)§6/(?<total>.*)$"
     )
 
     private val farmingSets = arrayListOf(
@@ -174,10 +175,10 @@ object CaptureFarmingGear {
             var tier = -1
             var tierProgress = -1
             for (line in item.getLore()) {
-                tierPattern.matchMatcher(line) {
+                tierPattern.findMatcher(line) {
                     tier = group("nextTier").romanToDecimalIfNecessary() - 1
                 }
-                tierProgressPattern.matchMatcher(line) {
+                tierProgressPattern.findMatcher(line) {
                     tierProgress = group("having").toInt()
                 }
             }

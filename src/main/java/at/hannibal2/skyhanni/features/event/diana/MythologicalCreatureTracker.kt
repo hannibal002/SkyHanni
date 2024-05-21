@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -24,30 +24,30 @@ object MythologicalCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
 
-    private val patternGroup = RepoPattern.group("event.diana.mythological.tracker")
+    private val patternGroup = RepoPattern.group("event.diana.mythological.tracker.new")
     private val minotaurPattern by patternGroup.pattern(
         "minotaur",
-        ".* §r§eYou dug out a §r§2Minotaur§r§e!"
+        "§r§eYou dug out a §r§2Minotaur§r§e!$"
     )
     private val gaiaConstructPattern by patternGroup.pattern(
         "gaiaconstruct",
-        ".* §r§eYou dug out a §r§2Gaia Construct§r§e!"
+        "§r§eYou dug out a §r§2Gaia Construct§r§e!$"
     )
     private val minosChampionPattern by patternGroup.pattern(
         "minoschampion",
-        ".* §r§eYou dug out a §r§2Minos Champion§r§e!"
+        "§r§eYou dug out a §r§2Minos Champion§r§e!$"
     )
     private val siameseLynxesPattern by patternGroup.pattern(
         "siameselynxes",
-        ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!"
+        "§r§eYou dug out §r§2Siamese Lynxes§r§e!$"
     )
     private val minosHunterPattern by patternGroup.pattern(
         "minoshunter",
-        ".* §r§eYou dug out a §r§2Minos Hunter§r§e!"
+        "§r§eYou dug out a §r§2Minos Hunter§r§e!$"
     )
     private val minosInquisitorPattern by patternGroup.pattern(
         "minosinquisitor",
-        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
+        "§r§eYou dug out a §r§2Minos Inquisitor§r§e!$"
     )
 
     private val tracker =
@@ -80,7 +80,7 @@ object MythologicalCreatureTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         MythologicalCreatureType.entries.forEach { creatureType ->
-            if (creatureType.pattern.matches(event.message)) {
+            if (creatureType.pattern.find(event.message)) {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tracker.modify {
                     it.count.addOrPut(creatureType, 1)

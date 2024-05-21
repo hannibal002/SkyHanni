@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -40,10 +41,10 @@ class GardenLevelDisplay {
             ProfileStorageData.playerSpecific?.useRomanNumerals = value
         }
 
-    private val patternGroup = RepoPattern.group("garden.level")
+    private val patternGroup = RepoPattern.group("garden.level.new")
     private val expToNextLevelPattern by patternGroup.pattern(
         "inventory.nextxp",
-        ".* §e(?<nextLevelExp>.*)§6/.*"
+        "§e(?<nextLevelExp>.*)§6/"
     )
     private val gardenItemNamePattern by patternGroup.pattern(
         "inventory.name",
@@ -51,11 +52,11 @@ class GardenLevelDisplay {
     )
     private val overflowPattern by patternGroup.pattern(
         "inventory.overflow",
-        ".*§r §6(?<overflow>.*)"
+        "§r §6(?<overflow>.*)$"
     )
     private val gardenLevelPattern by patternGroup.pattern(
         "inventory.levelprogress",
-        "§7Progress to Level (?<currentLevel>[^:]*).*"
+        "^§7Progress to Level (?<currentLevel>[^:]*)"
     )
     private val gardenMaxLevelPattern by patternGroup.pattern(
         "inventory.max",
@@ -120,14 +121,14 @@ class GardenLevelDisplay {
         var nextLevelExp = 0L
         var currentLevel = 0
         for (line in item.getLore()) {
-            gardenLevelPattern.matchMatcher(line) {
+            gardenLevelPattern.findMatcher(line) {
                 currentLevel = group("currentLevel").romanToDecimalIfNecessary() - 1
             }
             if (line == "§7§8Max level reached!") currentLevel = 15
-            expToNextLevelPattern.matchMatcher(line) {
+            expToNextLevelPattern.findMatcher(line) {
                 nextLevelExp = group("nextLevelExp").formatLong()
             }
-            overflowPattern.matchMatcher(line) {
+            overflowPattern.findMatcher(line) {
                 val overflow = group("overflow").formatLong()
                 GardenAPI.gardenExp = overflow
                 update()

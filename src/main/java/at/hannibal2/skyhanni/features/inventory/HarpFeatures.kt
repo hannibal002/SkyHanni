@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -38,22 +38,22 @@ object HarpFeatures {
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
-    private val patternGroup = RepoPattern.group("harp")
+    private val patternGroup = RepoPattern.group("harp.new")
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
-        "Harp.*"
+        "^Harp"
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",
-        "Melody.*"
+        "^Melody"
     )
     private val songSelectedPattern by patternGroup.pattern(
         "song.selected",
         "§aSong is selected!"
     )
 
-    private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
-    private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
+    private fun isHarpGui(chestName: String) = inventoryTitlePattern.find(chestName)
+    private fun isMenuGui(chestName: String) = menuTitlePattern.find(chestName)
 
     @SubscribeEvent
     fun onGui(event: GuiKeyPressEvent) {

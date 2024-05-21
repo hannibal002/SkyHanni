@@ -8,24 +8,25 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class TabWidgetSettings {
-    private val patternGroup = RepoPattern.group("tab.widget.setting")
+    private val patternGroup = RepoPattern.group("tab.widget.setting.new")
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
         "(Widgets in.*|Widgets on.*)"
     )
     private val mainPageWidgetPattern by patternGroup.pattern(
         "main",
-        "§7Currently:.*"
+        "^§7Currently:"
     )
     private val subPageWidgetPattern by patternGroup.pattern(
         "sub",
-        "§eClick to .*"
+        "^§eClick to"
     )
     private val shownSettingPattern by patternGroup.pattern(
         "show",
@@ -33,11 +34,11 @@ class TabWidgetSettings {
     )
     private val clickToDisablePattern by patternGroup.pattern(
         "click.disable",
-        ".*(disable!)"
+        "(disable!)$"
     )
     private val enabledPattern by patternGroup.pattern(
         "is.enabled",
-        ".*ENABLED"
+        "ENABLED$"
     )
 
     var inInventory = false
@@ -51,9 +52,9 @@ class TabWidgetSettings {
         val inventoryName = event.inventoryName
         if (mainPageSettingPattern.matches(inventoryName)) {
             inInventory = true
-            val items = event.inventoryItems.filter { mainPageWidgetPattern.anyMatches(it.value.getLore()) }
+            val items = event.inventoryItems.filter { mainPageWidgetPattern.anyFound(it.value.getLore()) }
             for ((slot, stack) in items) {
-                highlights[slot] = if (enabledPattern.anyMatches(stack.getLore())) {
+                highlights[slot] = if (enabledPattern.anyFound(stack.getLore())) {
                     LorenzColor.GREEN
                 } else {
                     LorenzColor.RED
@@ -64,11 +65,11 @@ class TabWidgetSettings {
         if (shownSettingPattern.matches(inventoryName)) {
             inInventory = true
             val items = event.inventoryItems.filter {
-                subPageWidgetPattern.matches(it.value.getLore().lastOrNull())
+                subPageWidgetPattern.find(it.value.getLore().lastOrNull())
             }
 
             for ((slot, stack) in items) {
-                highlights[slot] = if (clickToDisablePattern.anyMatches(stack.getLore())) {
+                highlights[slot] = if (clickToDisablePattern.anyFound(stack.getLore())) {
                     LorenzColor.GREEN
                 } else {
                     LorenzColor.RED

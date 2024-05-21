@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -136,7 +136,7 @@ class Mob(
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
         owner = (ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+            summonOwnerPattern.findMatcher(it.cleanName()) { this.group("name") }
         } else null)?.let { MobUtils.OwnerShip(it) }
     }
 

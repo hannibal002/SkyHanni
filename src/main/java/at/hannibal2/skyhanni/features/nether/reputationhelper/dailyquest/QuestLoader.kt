@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.item.ItemStack
 
@@ -55,7 +55,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
-        if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.matches(line)) return
+        if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.find(line)) return
 
         if (line.contains("The Great Spook")) {
             dailyQuestHelper.greatSpook = true

@@ -25,7 +25,7 @@ object StringUtils {
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
-    private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val stringColourPattern = "^§[0123456789abcdef]".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
@@ -134,6 +134,13 @@ object StringUtils {
         return null
     }
 
+    inline fun <T> List<String>.findFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.find()) return consumer(it) }
+        }
+        return null
+    }
+
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.find()) consumer(it) }
@@ -172,7 +179,7 @@ object StringUtils {
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
         val matcher = stringColourPattern.matcher(string)
-        if (matcher.matches()) {
+        if (matcher.find()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
             return if (darker) {
                 colorInt.darkenColor()
@@ -314,7 +321,7 @@ object StringUtils {
     private fun matchPlayerChatMessage(string: String): Matcher? {
         var username = ""
         var matcher = UtilsPatterns.playerChatPattern.matcher(string)
-        if (matcher.matches()) {
+        if (matcher.find()) {
             username = matcher.group("important").removeResets()
         }
         if (username == "") return null
@@ -338,6 +345,7 @@ object StringUtils {
 
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
+    fun Pattern.anyFound(list: List<String>?): Boolean = list?.any { this.find(it) } ?: false
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false

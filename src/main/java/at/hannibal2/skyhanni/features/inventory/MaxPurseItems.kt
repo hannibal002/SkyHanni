@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -18,14 +18,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MaxPurseItems {
     private val config get() = SkyHanniMod.feature.inventory.bazaar
 
-    private val patternGroup = RepoPattern.group("inventory.maxpurse")
+    private val patternGroup = RepoPattern.group("inventory.maxpurse.new")
     private val orderPattern by patternGroup.pattern(
         "order",
-        ".*§6(?<coins>[\\d.,]+) coins §7each.*"
+        "§6(?<coins>[\\d.,]+) coins §7each"
     )
     private val instantPattern by patternGroup.pattern(
         "instant",
-        ".*Price per unit: §6(?<coins>[\\d.,]+) coins.*"
+        "Price per unit: §6(?<coins>[\\d.,]+) coins"
     )
     private val createOrderPattern by patternGroup.pattern(
         "createorder",
@@ -43,7 +43,7 @@ class MaxPurseItems {
         for (item in Minecraft.getMinecraft().thePlayer.openContainer.inventory) {
             val name = item?.displayName ?: continue
             createOrderPattern.matchMatcher(name) {
-                item.getLore().matchFirst(orderPattern) {
+                item.getLore().findFirst(orderPattern) {
                     // +0.1 because I expect people to use the gold nugget option
                     buyOrderPrice = group("coins").formatDouble() + 0.1
                     // If we get to this point, we have the instant price because instant is earlier in the list of items
@@ -52,7 +52,7 @@ class MaxPurseItems {
                 }
             }
             createInstantPattern.matchMatcher(name) {
-                item.getLore().matchFirst(instantPattern) {
+                item.getLore().findFirst(instantPattern) {
                     instantBuyPrice = group("coins").formatDouble()
                 }
             }

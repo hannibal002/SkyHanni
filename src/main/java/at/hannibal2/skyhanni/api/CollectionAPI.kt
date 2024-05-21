@@ -13,17 +13,18 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object CollectionAPI {
-    private val patternGroup = RepoPattern.group("data.collection.api")
+    private val patternGroup = RepoPattern.group("data.collection.api.new")
     private val counterPattern by patternGroup.pattern(
         "counter",
-        ".* §e(?<amount>.*)§6/.*"
+        " §e(?<amount>.*)§6/"
     )
     private val singleCounterPattern by patternGroup.pattern(
         "singlecounter",
@@ -31,7 +32,7 @@ object CollectionAPI {
     )
     private val collectionTier0Pattern by patternGroup.pattern(
         "tierzero",
-        "§7Progress to .* I: .*"
+        "^§7Progress to .* I: "
     )
 
     val collectionValue = mutableMapOf<NEUInternalName, Long>()
@@ -75,7 +76,7 @@ object CollectionAPI {
                 }
 
                 val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
-                lore.matchFirst(counterPattern) {
+                lore.findFirst(counterPattern) {
                     val counter = group("amount").formatLong()
                     collectionValue[internalName] = counter
                 }
@@ -98,6 +99,6 @@ object CollectionAPI {
         collectionValue.addOrPut(internalName, event.amount.toLong())
     }
 
-    fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
+    fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.find(it) }
     fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
 }

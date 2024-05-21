@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -33,8 +33,8 @@ object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
     private val levelPattern by RepoPattern.pattern(
-        "misc.compacttablist.advanced.level",
-        ".*\\[(?<level>.*)] §r(?<name>.*)"
+        "misc.compacttablist.advanced.level.new",
+        "\\[(?<level>.*)] §r(?<name>.*)$"
     )
 
     private var playerDatas = mutableMapOf<String, PlayerData>()
@@ -64,7 +64,7 @@ object AdvancedPlayerList {
                 extraTitles++
                 continue
             }
-            val playerData: PlayerData? = levelPattern.matchMatcher(line) {
+            val playerData: PlayerData? = levelPattern.findMatcher(line) {
                 val levelText = group("level")
                 val removeColor = levelText.removeColor()
                 try {

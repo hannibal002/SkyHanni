@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -123,8 +123,8 @@ class BazaarApi {
         if (!inBazaarInventory) return
         // TODO USE SH-REPO
         // TODO remove dynamic pattern
-        "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
-            .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
+        "^\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem".toPattern()
+            .findMatcher(event.message.removeColor()) { currentSearchedItem = "" }
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {

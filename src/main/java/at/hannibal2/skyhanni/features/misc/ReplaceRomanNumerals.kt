@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
@@ -26,8 +26,8 @@ class ReplaceRomanNumerals {
      * REGEX-TEST: §eSelect an option: §r§a[§aOk, then what?§a]
      */
     private val isSelectOptionPattern by patternGroup.pattern(
-        "string.isselectoption",
-        "§eSelect an option: .*"
+        "string.isselectoption.new",
+        "^§eSelect an option:"
     )
 
     // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
@@ -58,7 +58,7 @@ class ReplaceRomanNumerals {
         event.applyIfPossible { it.transformLine() }
     }
 
-    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
+    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.find(this)
 
     private fun String.transformLine() = splitRegex.findAll(this).map { it.value }.joinToString("") {
         it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() != 2000 }?.coloredRomanToDecimal() ?: it

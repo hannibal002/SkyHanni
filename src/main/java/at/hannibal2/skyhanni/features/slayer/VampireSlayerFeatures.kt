@@ -103,6 +103,7 @@ object VampireSlayerFeatures {
         if (name != "Bloodfiend ") return
 
         if (configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle) {
+            //TODO seraid fix later
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
                 if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) {
                     val coopList = configCoopBoss.coopMembers.split(",").toList()
@@ -205,6 +206,7 @@ object VampireSlayerFeatures {
         event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by").forEach {
             val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
                 var contain = false
+                //TODO seraid fix later
                 if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
                     val name =
                         ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)

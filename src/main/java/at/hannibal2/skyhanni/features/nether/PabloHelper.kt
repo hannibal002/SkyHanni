@@ -23,7 +23,7 @@ class PabloHelper {
     private val patternGroup = RepoPattern.group("pablohelper")
     private val messagePattern by patternGroup.list(
         "message",
-        "\\[NPC] Pablo: Could you bring me an (?<flower>[\\w ]+).*",
+        "^\\[NPC] Pablo: Could you bring me an (?<flower>[\\w ]+).*",
         "\\[NPC] Pablo: Bring me that (?<flower>[\\w ]+) as soon as you can!",
     )
 

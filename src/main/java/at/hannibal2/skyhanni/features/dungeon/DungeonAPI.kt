@@ -21,6 +21,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -40,7 +42,7 @@ object DungeonAPI {
     var isUniqueClass = false
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-    private val patternGroup = RepoPattern.group("dungeon")
+    private val patternGroup = RepoPattern.group("dungeon.new")
     private val dungeonComplete by patternGroup.pattern(
         "complete",
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
@@ -71,7 +73,7 @@ object DungeonAPI {
     )
     private val totalKillsLorePattern by patternGroup.pattern(
         "totalkillslore",
-        ".*Total Kills:.*"
+        "Total Kills:"
     )
     private val floorPattern by patternGroup.pattern(
         "floorpattern",
@@ -87,11 +89,11 @@ object DungeonAPI {
     )
     private val levelPattern by patternGroup.pattern(
         "level",
-        " +(?<kills>\\d+).*",
+        "^ +(?<kills>\\d+)",
     )
     private val killPattern by patternGroup.pattern(
         "kill",
-        " +☠ Defeated (?<boss>\\w+).*",
+        "^ +☠ Defeated (?<boss>\\w+)",
     )
     private val totalKillsPattern by patternGroup.pattern(
         "totalkills",
@@ -250,7 +252,7 @@ object DungeonAPI {
         }
 
         if (!LorenzUtils.inSkyBlock) return
-        killPattern.matchMatcher(event.message.removeColor()) {
+        killPattern.findMatcher(event.message.removeColor()) {
             val bossCollections = bossStorage ?: return
             val boss = DungeonFloor.byBossName(group("boss"))
             if (matches() && boss != null && boss !in bossCollections) {
@@ -288,7 +290,7 @@ object DungeonAPI {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                         val floor = DungeonFloor.byBossName(name) ?: return
                         val lore = inventoryItems[4]?.getLore() ?: return
-                        val line = lore.find { totalKillsLorePattern.matches(it) } ?: return
+                        val line = lore.find { totalKillsLorePattern.find(it) } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
                             group("kills").formatInt()
                         } ?: return
@@ -313,7 +315,7 @@ object DungeonAPI {
                         name = group("name")
                     }
                 }
-                levelPattern.matchMatcher(colorlessLine) {
+                levelPattern.findMatcher(colorlessLine) {
                     if (matches()) {
                         kills = group("kills").toInt()
                         break@nextLine

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -20,20 +21,23 @@ class CompactBingoChat {
     private var collectionLevelUpLastLine: String? = null
     private var newArea = 0 // 0 = nothing, 1 = after first message, 2 = after second message
 
-    private val patternGroup = RepoPattern.group("bingo.compactchat")
+    private val patternGroup = RepoPattern.group("bingo.compactchat.new")
     private val borderPattern by patternGroup.pattern(
         "border",
-        "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+        "§[e3]§l▬{64}"
     )
-
-    //TODO seraid revert this back to how it was before, this is unreadable
-    private val inSkyblockPattern by patternGroup.pattern(
+    private val inSkyblockPattern by patternGroup.list(
         "inskyblock",
-        "(^\\s{3}§r§7§8\\+§a. §c❁ Strength\\s*$)|(^\\s{3}§r§7§8\\+§a.* §c❤ Health\\s*$)|(^ {3}§r§7§bAccess to Community Shop\\s*$)|(^ {3}§r§7§8\\+§aAuto-pickup block and mob drops\\s*$)|(^ §r§7§6Access to Bazaar\\s*$)|(^ §r§a§lREWARDS\\s*$)\n"
+        "(^\\s{3}§r§7§8\\+§a. §c❁ Strength\\s*$)",
+        "(^\\s{3}§r§7§8\\+§a.* §c❤ Health\\s*$)",
+        "(^ {3}§r§7§bAccess to Community Shop\\s*$)",
+        "(^ {3}§r§7§8\\+§aAuto-pickup block and mob drops\\s*$)",
+        "(^ §r§7§6Access to Bazaar\\s*$)",
+        "(^ §r§a§lREWARDS\\s*$)\n"
     )
     private val skillLevelUpPattern by patternGroup.pattern(
         "skilllevelup",
-        " {2}§r§b§lSKILL LEVEL UP.*"
+        " ^{2}§r§b§lSKILL LEVEL UP"
     )
     private val tradeRecipePattern by patternGroup.pattern(
         "traderecipe",
@@ -45,11 +49,11 @@ class CompactBingoChat {
     )
     private val collectionLevelUpPattern by patternGroup.pattern(
         "collection",
-        " {2}§r§6§lCOLLECTION LEVEL UP.*"
+        " ^{2}§r§6§lCOLLECTION LEVEL UP"
     )
     private val skyblockLevelUpPattern by patternGroup.pattern(
         "enchant",
-        " {2}§r§3§lSKYBLOCK LEVEL UP §bLevel.*"
+        " ^{2}§r§3§lSKYBLOCK LEVEL UP §bLevel"
     )
     private val newAreaDiscoverdPattern by patternGroup.pattern(
         "newareadiscovered",
@@ -84,7 +88,7 @@ class CompactBingoChat {
 
     // TODO USE SH-REPO
     private fun onSkillLevelUp(message: String): Boolean {
-        if (skillLevelUpPattern.matches(message)) {
+        if (skillLevelUpPattern.find(message)) {
             inSkillLevelUp = true
             return false
         }
@@ -98,18 +102,19 @@ class CompactBingoChat {
     }
 
     private fun onSkyBlockLevelUp(message: String): Boolean {
-        if (skyblockLevelUpPattern.matches(message)) {
+        if (skyblockLevelUpPattern.find(message)) {
             inSkyBlockLevelUp = true
             return false
         }
 
-        if (inSkyBlockLevelUp && inSkyblockPattern.matches(message)) return true
+
+        if (inSkyBlockLevelUp && inSkyblockPattern.any { it.matches(message) }) return true
 
         return false
     }
 
     private fun onCollectionLevelUp(message: String): Boolean {
-        if (collectionLevelUpPattern.matches(message)) {
+        if (collectionLevelUpPattern.find(message)) {
             inCollectionLevelUp = true
             return false
         }

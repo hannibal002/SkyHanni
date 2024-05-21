@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -58,7 +59,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
-    private val patternGroup = RepoPattern.group("inventory.item.overlay")
+    private val patternGroup = RepoPattern.group("inventory.item.overlay.new")
     private val masterSkullPattern by patternGroup.pattern(
         "masterskull",
         "(.*)Master Skull - Tier ."
@@ -69,7 +70,7 @@ object ItemDisplayOverlayFeatures {
     )
     private val harvestPattern by patternGroup.pattern(
         "harvest",
-        "§7§7You may harvest §6(?<amount>.).*"
+        "^§7§7You may harvest §6(?<amount>.)"
     )
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
@@ -201,7 +202,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".asInternalName()) {
-            lore.matchFirst(harvestPattern) {
+            lore.findFirst(harvestPattern) {
                 val amount = group("amount").toInt()
                 return when {
                     amount > 4 -> "§a$amount"

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -22,8 +22,8 @@ class RiftTimer {
     private val config get() = RiftAPI.config.timer
 
     private val timePattern by RepoPattern.pattern(
-        "rift.everywhere.timer",
-        "§(?<color>[a7])(?<time>.*)ф Left.*"
+        "rift.everywhere.timer.new",
+        "^§(?<color>[a7])(?<time>.*)ф Left"
     )
 
     private var display = emptyList<String>()
@@ -45,7 +45,7 @@ class RiftTimer {
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
 
-        event.actionBar.split("     ").matchFirst(timePattern) {
+        event.actionBar.split("     ").findFirst(timePattern) {
             val color = group("color")
             val newTime = TimeUtils.getDuration(group("time").replace("m", "m "))
 

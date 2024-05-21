@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -14,10 +15,10 @@ class ArachneChatMessageHider {
     private val config get() = SkyHanniMod.feature.chat
     private var hideArachneDeadMessage = false
 
-    private val patternGroup = RepoPattern.group("chat.arachne")
+    private val patternGroup = RepoPattern.group("chat.arachne.new")
     private val arachneCallingPattern by patternGroup.pattern(
         "calling",
-        "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*"
+        "^§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!"
     )
     private val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
@@ -40,7 +41,7 @@ class ArachneChatMessageHider {
 
     private fun shouldHide(message: String): Boolean {
 
-        arachneCallingPattern.matchMatcher(message) {
+        arachneCallingPattern.findMatcher(message) {
             return true
         }
         arachneCrystalPattern.matchMatcher(message) {

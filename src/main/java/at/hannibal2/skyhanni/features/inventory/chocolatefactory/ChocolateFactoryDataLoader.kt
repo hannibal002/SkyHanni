@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -44,7 +45,7 @@ object ChocolateFactoryDataLoader {
     )
     private val chocolateForPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.forprestige",
-        "§7§cRequires (?<amount>\\w+) Chocolate this.*"
+        "^§7§cRequires (?<amount>\\w+) Chocolate this"
     )
     private val chocolateMultiplierPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.multiplier",
@@ -80,11 +81,11 @@ object ChocolateFactoryDataLoader {
     )
     private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.amount",
-        "Rabbit \\S+ - \\[(?<amount>\\d+)].*"
+        "^Rabbit \\S+ - \\[(?<amount>\\d+)]"
     )
     private val upgradeTierPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "upgradetier",
-        ".*\\s(?<tier>[IVXLC]+)"
+        "\\s(?<tier>[IVXLC]+)$"
     )
     private val unemployedRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.unemployed",
@@ -179,7 +180,7 @@ object ChocolateFactoryDataLoader {
             chocolateThisPrestigePattern.matchMatcher(line) {
                 profileStorage.chocolateThisPrestige = group("amount").formatLong()
             }
-            chocolateForPrestigePattern.matchMatcher(line) {
+            chocolateForPrestigePattern.findMatcher(line) {
                 ChocolateFactoryAPI.chocolateForPrestige = group("amount").formatLong()
                 prestigeCost = ChocolateFactoryAPI.chocolateForPrestige
             }
@@ -295,7 +296,7 @@ object ChocolateFactoryDataLoader {
 
         when (slotIndex) {
             in ChocolateFactoryAPI.rabbitSlots -> {
-                level = rabbitAmountPattern.matchMatcher(itemName) {
+                level = rabbitAmountPattern.findMatcher(itemName) {
                     group("amount").formatInt()
                 } ?: run {
                     if (unemployedRabbitPattern.matches(itemName)) 0 else null
@@ -313,7 +314,7 @@ object ChocolateFactoryDataLoader {
             }
 
             in ChocolateFactoryAPI.otherUpgradeSlots -> {
-                level = upgradeTierPattern.matchMatcher(itemName) {
+                level = upgradeTierPattern.findMatcher(itemName) {
                     group("tier").romanToDecimal()
                 } ?: run {
                     if (otherUpgradePattern.matches(itemName)) 0 else null

@@ -63,6 +63,7 @@ class RareDropMessages {
             val rarityName = colorCodeToRarity(rarityColor.first()).uppercase()
             val petName = group("petName")
             val end = group("end")
+            //TODO seraid fix regex ending with .*
             if (start.endsWith("a ") && rarityName.matches("(?i)[aeiou].*".toRegex()))
                 start = start.replace(" $".toRegex(), "n ")
 

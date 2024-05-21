@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -15,9 +15,9 @@ object DungeonMilestonesDisplay {
 
     private val config get() = SkyHanniMod.feature.dungeon
 
-    val milestonePattern by RepoPattern.pattern(
-        "dungeon.milestone",
-        "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*"
+    private val milestonePattern by RepoPattern.pattern(
+        "dungeon.milestone.new",
+        "^§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a"
     )
 
     private var display = ""
@@ -37,7 +37,7 @@ object DungeonMilestonesDisplay {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (milestonePattern.matches(event.message)) {
+        if (milestonePattern.find(event.message)) {
             event.blockedReason = "dungeon_milestone"
             currentMilestone++
             update()

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object UtilsPatterns {
 
-    private val patternGroup = RepoPattern.group("utils")
+    private val patternGroup = RepoPattern.group("utils.new")
 
     /** Examples:
     §d§l§ka§r §d§l§d§lMYTHIC ACCESSORY §d§l§ka
@@ -25,7 +25,7 @@ object UtilsPatterns {
 
     val abiPhonePattern by patternGroup.pattern(
         "item.name.abiphone",
-        ".{2}Abiphone .*"
+        "^.{2}Abiphone"
     )
 
     /**
@@ -49,7 +49,7 @@ object UtilsPatterns {
 
     val potionPattern by patternGroup.pattern(
         "item.name.potion",
-        ".*Potion"
+        "Potion$"
     )
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",
@@ -61,7 +61,7 @@ object UtilsPatterns {
     )
     val costLinePattern by patternGroup.pattern(
         "item.cost.line",
-        "(?:§5§o)?§7Cost.*"
+        "^(?:§5§o)?§7Cost"
     )
 
     val timeAmountPattern by patternGroup.pattern(
@@ -71,7 +71,7 @@ object UtilsPatterns {
 
     val playerChatPattern by patternGroup.pattern(
         "string.playerchat",
-        "(?<important>.*?)(?:§[f7r])*: .*"
+        "^(?<important>.*?)(?:§[f7r])*:"
     )
     val chatUsernamePattern by patternGroup.pattern(
         "string.chatusername",
@@ -84,7 +84,7 @@ object UtilsPatterns {
 
     val sackPattern by patternGroup.pattern(
         "item.sack",
-        ".*Sack"
+        "Sack$"
     )
 
     val seasonPattern by patternGroup.pattern(
@@ -94,7 +94,7 @@ object UtilsPatterns {
 
     val tabListProfilePattern by patternGroup.pattern(
         "tablist.profile",
-        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*"
+        "^(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §])"
     )
 
     val shopOptionsPattern by patternGroup.pattern(

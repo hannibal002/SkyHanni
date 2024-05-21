@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigi
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -239,11 +241,11 @@ private fun getVotingLines() = buildList {
 private fun getVotingShowWhen(): Boolean = SbPattern.yearVotesPattern.anyMatches(getSbLines())
 
 private fun getServerCloseLines() = buildList {
-    val matchingLine = getSbLines().first { ServerRestartTitle.restartingGreedyPattern.matches(it) }
+    val matchingLine = getSbLines().first { ServerRestartTitle.restartingGreedyPattern.find(it) }
     add(matchingLine.split("§8")[0])
 }
 
-private fun getServerCloseShowWhen(): Boolean = ServerRestartTitle.restartingGreedyPattern.anyMatches(getSbLines())
+private fun getServerCloseShowWhen(): Boolean = ServerRestartTitle.restartingGreedyPattern.anyFound(getSbLines())
 
 private fun getDungeonsLines() = listOf(
     SbPattern.m7dragonsPattern,

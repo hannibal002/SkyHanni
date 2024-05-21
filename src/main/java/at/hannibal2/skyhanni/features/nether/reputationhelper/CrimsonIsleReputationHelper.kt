@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -50,22 +50,22 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
      *  e - Accepted
      *  a - Completed
      */
-    private val patternGroup = RepoPattern.group("crimson.reputation")
+    private val patternGroup = RepoPattern.group("crimson.reputation.new")
     val tabListQuestPattern by patternGroup.pattern(
         "tablist",
-        " §r§[cdea].*"
+        "^ §r§[cdea]"
     )
     private val reputationPattern by patternGroup.pattern(
         "reputation",
-        ".*Reputation.*"
+        "Reputation"
     )
     private val magePattern by patternGroup.pattern(
         "mage",
-        ".*Mage.*"
+        "Mage"
     )
     private val barbarianPattern by patternGroup.pattern(
         "barbarian",
-        ".*Barbarian.*"
+        "Barbarian"
     )
 
     init {
@@ -112,11 +112,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
         if (event.repeatSeconds(3)) {
             TabListData.getTabList()
-                .filter { reputationPattern.matches(it) }
+                .filter { reputationPattern.find(it) }
                 .forEach {
-                    factionType = if (magePattern.matches(it)) {
+                    factionType = if (magePattern.find(it)) {
                         FactionType.MAGE
-                    } else if (barbarianPattern.matches(it)) {
+                    } else if (barbarianPattern.find(it)) {
                         FactionType.BARBARIAN
                     } else {
                         FactionType.NONE

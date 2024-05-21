@@ -22,9 +22,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -38,7 +38,7 @@ import kotlin.time.Duration.Companion.minutes
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
 
-private val patternGroup = RepoPattern.group("discordstatus")
+private val patternGroup = RepoPattern.group("discordstatus.new")
 
 // Samples: Revenant Horror I; Tarantula Broodfather IV
 private val slayerPattern by patternGroup.pattern(
@@ -47,7 +47,7 @@ private val slayerPattern by patternGroup.pattern(
 )
 private val ownerPattern by patternGroup.pattern(
     "owner",
-    ".*Owner: (?<owner>\\w+).*"
+    "Owner: (?<owner>\\w+)"
 )
 private val bitsPattern by patternGroup.pattern(
     "bits",
@@ -68,7 +68,7 @@ private fun getVisitingName(): String {
 
     for (line in tabData) {
         val colorlessLine = line.removeColor()
-        ownerPattern.matchMatcher(colorlessLine) {
+        ownerPattern.findMatcher(colorlessLine) {
             return group("owner")
         }
     }

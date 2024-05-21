@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -18,10 +19,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestones {
 
-    private val patternGroup = RepoPattern.group("data.garden.milestone")
+    private val patternGroup = RepoPattern.group("data.garden.milestone.new")
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§7Harvest §f(?<name>.*) §7on .*"
+        "^§7Harvest §f(?<name>.*) §7on "
     )
     val totalPattern by patternGroup.pattern(
         "total",
@@ -31,7 +32,7 @@ object GardenCropMilestones {
     private val config get() = GardenAPI.config.cropMilestones
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
-        itemStack.getLore().matchFirst(cropPattern) {
+        itemStack.getLore().findFirst(cropPattern) {
             val name = group("name")
             return CropType.getByNameOrNull(name)
         }

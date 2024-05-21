@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -26,22 +28,22 @@ class DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     //  Repo group and patterns
-    private val patternGroup = RepoPattern.group("dungeon.finder")
+    private val patternGroup = RepoPattern.group("dungeon.finder.new")
     private val pricePattern by patternGroup.pattern(
         "price",
-        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*"
+        "^(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL)"
     )
     private val carryPattern by patternGroup.pattern(
         "carry",
-        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*"
+        "^(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2})"
     )
     private val nonPugPattern by patternGroup.pattern(
         "nonpug",
-        "(?i).*(PERM|VC|DISCORD).*"
+        "^(?i).*(PERM|VC|DISCORD)"
     )
     private val memberPattern by patternGroup.pattern(
         "member",
-        ".*§.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)"
+        "§.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)$"
     )
     private val ineligiblePattern by patternGroup.pattern(
         "ineligible",
@@ -57,11 +59,11 @@ class DungeonFinderFeatures {
     )
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM Catacombs).*"
+        "^(The Catacombs)|(MM Catacombs)"
     )
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
-        ".*('s Party)"
+        "('s Party)$"
     )
     private val partyFinderTitlePattern by patternGroup.pattern(
         "party.finder.title",
@@ -101,11 +103,11 @@ class DungeonFinderFeatures {
     )
     private val floorNumberPattern by patternGroup.pattern(
         "floor.number",
-        ".* (?<floorNum>[IV\\d]+)"
+        " (?<floorNum>[IV\\d]+)$"
     )
     private val getDungeonClassPattern by patternGroup.pattern(
         "get.dungeon.class",
-        ".* (?<class>.*)"
+        " (?<class>.*)$"
     )
     private val detectDungeonClassPattern by patternGroup.pattern(
         "detect.dungeon.class",
@@ -149,7 +151,7 @@ class DungeonFinderFeatures {
             } else if (entranceFloorPattern.matches(name)) {
                 "E"
             } else if (floorPattern.matches(name)) {
-                floorNumberPattern.matchMatcher(name) {
+                floorNumberPattern.findMatcher(name) {
                     group("floorNum").romanToDecimalIfNecessary().toString()
                 } ?: continue
             } else continue
@@ -160,11 +162,11 @@ class DungeonFinderFeatures {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
             val name = stack.displayName.removeColor()
-            if (!checkIfPartyPattern.matches(name)) continue
+            if (!checkIfPartyPattern.find(name)) continue
             val lore = stack.getLore()
             val floor = lore.find { floorFloorPattern.matches(it.removeColor()) } ?: continue
             val dungeon = lore.find { dungeonFloorPattern.matches(it.removeColor()) } ?: continue
-            val floorNum = floorNumberPattern.matchMatcher(floor) {
+            val floorNum = floorNumberPattern.findMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
             }
             map[slot] = getFloorName(floor, dungeon, floorNum)
@@ -176,7 +178,7 @@ class DungeonFinderFeatures {
         inInventory = true
         inventoryItems[dungeonClassItemIndex]?.getLore()?.let {
             if (it.size > 3 && detectDungeonClassPattern.matches(it[0])) {
-                getDungeonClassPattern.matchMatcher(it[2].removeColor()) {
+                getDungeonClassPattern.findMatcher(it[2].removeColor()) {
                     selectedClass = group("class")
                 }
             }
@@ -185,8 +187,8 @@ class DungeonFinderFeatures {
         if (!config.floorAsStackSize) return
         for ((slot, stack) in inventoryItems) {
             val name = stack.displayName.removeColor()
-            if (!floorTypePattern.matches(name)) continue
-            val floorNum = floorNumberPattern.matchMatcher(name) {
+            if (!floorTypePattern.find(name)) continue
+            val floorNum = floorNumberPattern.findMatcher(name) {
                 group("floorNum").romanToDecimalIfNecessary()
             } ?: continue
             map[slot] = getFloorName(name, name, floorNum)
@@ -208,7 +210,7 @@ class DungeonFinderFeatures {
         inInventory = true
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
-            if (!checkIfPartyPattern.matches(stack.displayName)) continue
+            if (!checkIfPartyPattern.find(stack.displayName)) continue
             if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
                 map[slot] = LorenzColor.DARK_RED
                 continue
@@ -217,7 +219,7 @@ class DungeonFinderFeatures {
             if (config.markPaidCarries) {
                 val note = lore.filter { notePattern.matches(it) }.joinToString(" ").uppercase()
 
-                if (pricePattern.matches(note) && carryPattern.matches(note)) {
+                if (pricePattern.find(note) && carryPattern.find(note)) {
                     map[slot] = LorenzColor.RED
                     continue
                 }
@@ -226,20 +228,20 @@ class DungeonFinderFeatures {
             if (config.markNonPugs) {
                 val note = lore.filter { notePattern.matches(it) }.joinToString(" ").uppercase()
 
-                if (nonPugPattern.matches(note)) {
+                if (nonPugPattern.find(note)) {
                     map[slot] = LorenzColor.LIGHT_PURPLE
                     continue
                 }
             }
 
-            val members = lore.filter { memberPattern.matches(it) }
+            val members = lore.filter { memberPattern.find(it) }
             val memberLevels = members.map {
-                memberPattern.matchMatcher(it) {
+                memberPattern.findMatcher(it) {
                     group("level").toInt()
                 }
             }
             val memberClasses = members.map {
-                memberPattern.matchMatcher(it) {
+                memberPattern.findMatcher(it) {
                     group("className")
                 }
             }

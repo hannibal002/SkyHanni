@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,8 +26,8 @@ object NPCVisitorFix {
     private val staticVisitors = listOf("Jacob", "Anita")
 
     private val barnSkinChangePattern by RepoPattern.pattern(
-        "garden.barn.skin.change",
-        "§aChanging Barn skin to §r.*"
+        "garden.barn.skin.change.new",
+        "^§aChanging Barn skin to §r"
     )
 
     @SubscribeEvent
@@ -65,7 +65,7 @@ object NPCVisitorFix {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        barnSkinChangePattern.matchMatcher(event.message) {
+        barnSkinChangePattern.findMatcher(event.message) {
             GardenAPI.storage?.npcVisitorLocations?.clear()
         }
     }

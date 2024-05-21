@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
@@ -21,7 +22,7 @@ class BingoCardTips {
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
-    private val patternGroup = RepoPattern.group("bingo.card.tips")
+    private val patternGroup = RepoPattern.group("bingo.card.tips.new")
     private val inventoryPattern by patternGroup.pattern(
         "card",
         "Bingo Card"
@@ -32,11 +33,11 @@ class BingoCardTips {
     )
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
-        "§.§.§7Contribution Rewards.*"
+        "^§.§.§7Contribution Rewards"
     )
     private val rowNamePattern by patternGroup.pattern(
         "row.name",
-        "§o§.Row #.*"
+        "^§o§.Row #"
     )
 
     @SubscribeEvent
@@ -49,7 +50,7 @@ class BingoCardTips {
 
         val toolTip = event.toolTip
         // When hovering over a row
-        if (rowNamePattern.matches(toolTip.firstOrNull())) return
+        if (rowNamePattern.find(toolTip.firstOrNull())) return
         val bingoTip = goal.getData() ?: return
 
         val communityGoal = goal.type == GoalType.COMMUNITY
@@ -60,7 +61,7 @@ class BingoCardTips {
         var index = if (!communityGoal) {
             toolTip.indexOfFirst { rewardPattern.matches(it) }
         } else {
-            toolTip.indexOfFirst { contributionRewardsPattern.matches(it) }
+            toolTip.indexOfFirst { contributionRewardsPattern.find(it) }
         } - 1
 
         if (index == -2) {

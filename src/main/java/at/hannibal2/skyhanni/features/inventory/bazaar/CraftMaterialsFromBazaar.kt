@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -28,8 +28,8 @@ class CraftMaterialsFromBazaar {
 
     private val materialSlots = listOf(10, 11, 12, 19, 20, 21, 28, 29, 30)
     private val inventoryPattern by RepoPattern.pattern(
-        "inventory.recipe.title",
-        ".* Recipe"
+        "inventory.recipe.title.new",
+        "Recipe$"
     )
 
     private var inRecipeInventory = false
@@ -41,7 +41,7 @@ class CraftMaterialsFromBazaar {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        val correctInventoryName = inventoryPattern.matches(event.inventoryName)
+        val correctInventoryName = inventoryPattern.find(event.inventoryName)
         val items = event.inventoryItems
         val correctItem = items[23]?.name == "§aCrafting Table"
 

@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -39,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 object FarmingFortuneDisplay {
     private val config get() = GardenAPI.config.farmingFortunes
 
-    private val patternGroup = RepoPattern.group("garden.fortunedisplay")
+    private val patternGroup = RepoPattern.group("garden.fortunedisplay.new")
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal",
         " Farming Fortune: §r§6☘(?<fortune>\\d+)"
@@ -50,7 +51,7 @@ object FarmingFortuneDisplay {
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})☘ .*"
+        "^§7You have §6\\+(?<ff>\\d{1,3})☘"
     )
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
@@ -68,7 +69,7 @@ object FarmingFortuneDisplay {
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
-        "§7.*§7Grants §6(?<bonus>.*)☘.*"
+        "^§7.*§7Grants §6(?<bonus>.*)☘"
     )
 
     private var display = emptyList<Renderable>()
@@ -286,7 +287,7 @@ object FarmingFortuneDisplay {
 
     fun getCollectionFortune(tool: ItemStack?): Double {
         val string = tool?.getLore()?.nextAfter("§6Collection Analysis", 3) ?: return 0.0
-        return collectionPattern.matchMatcher(string) { group("ff").toDoubleOrNull() } ?: 0.0
+        return collectionPattern.findMatcher(string) { group("ff").toDoubleOrNull() } ?: 0.0
     }
 
     fun getCounterFortune(tool: ItemStack?): Double {
@@ -327,7 +328,7 @@ object FarmingFortuneDisplay {
                 pieces = group("pieces").toInt()
             }
 
-            armorAbilityFortunePattern.matchMatcher(line) {
+            armorAbilityFortunePattern.findMatcher(line) {
                 return if (pieces < 2) 0.0 else group("bonus").toDouble() / pieces
             }
         }

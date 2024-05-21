@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -14,10 +15,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class ComposterInventoryNumbers {
 
-    private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers")
+    private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers.new")
     private val valuePattern by patternGroup.pattern(
         "value",
-        ".* §e(?<having>.*)§6/(?<total>.*)"
+        "§e(?<having>.*)§6/(?<total>.*)"
     )
     private val amountPattern by patternGroup.pattern(
         "amount",
@@ -48,7 +49,7 @@ class ComposterInventoryNumbers {
 
         // Organic Matter or Fuel
         if (slotNumber == 46 || slotNumber == 52) {
-            stack.getLore().matchFirst(valuePattern) {
+            stack.getLore().findFirst(valuePattern) {
                 val having = group("having").removeColor().formatInt()
                 val havingFormat = NumberUtil.format(having)
                 val total = group("total").removeColor()

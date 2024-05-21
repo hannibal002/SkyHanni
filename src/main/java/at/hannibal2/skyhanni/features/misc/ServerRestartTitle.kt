@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -14,13 +14,17 @@ import kotlin.time.Duration.Companion.seconds
 object ServerRestartTitle {
 
     private val config get() = SkyHanniMod.feature.misc
-    private val patternGroup = RepoPattern.group("features.misc.serverrestart")
+    private val patternGroup = RepoPattern.group("features.misc.serverrestart.new")
     private val restartingPattern by patternGroup.pattern(
         "time",
-        "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) ?§8.*"
+        "^§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) ?§8"
     )
     val restartingGreedyPattern by patternGroup.pattern(
         "greedy",
+        "^§cServer closing"
+    )
+    val restartingGreedyMatchesPattern by patternGroup.pattern(
+        "greedymatch",
         "§cServer closing.*"
     )
 
@@ -29,7 +33,7 @@ object ServerRestartTitle {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.serverRestartTitle) return
 
-        ScoreboardData.sidebarLinesFormatted.matchFirst(restartingPattern) {
+        ScoreboardData.sidebarLinesFormatted.findFirst(restartingPattern) {
             val minutes = group("minutes").toInt().minutes
             val seconds = group("seconds").toInt().seconds
             val totalTime = minutes + seconds

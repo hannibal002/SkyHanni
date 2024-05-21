@@ -50,6 +50,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -73,10 +75,10 @@ object GardenVisitorFeatures {
 
     private var display = emptyList<List<Any>>()
 
-    private val patternGroup = RepoPattern.group("garden.visitor")
+    private val patternGroup = RepoPattern.group("garden.visitor.new")
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
-        ".* §r§ehas arrived on your §r§bGarden§r§e!"
+        "§r§ehas arrived on your §r§bGarden§r§e!$"
     )
     private val copperPattern by patternGroup.pattern(
         "copper",
@@ -88,7 +90,7 @@ object GardenVisitorFeatures {
     )
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*"
+        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r"
     )
     private val partialAcceptedPattern by patternGroup.pattern(
         "partialaccepted",
@@ -463,7 +465,7 @@ object GardenVisitorFeatures {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
+        if (config.hypixelArrivedMessage && visitorArrivePattern.find(event.message)) {
             event.blockedReason = "new_visitor_arrived"
         }
 
@@ -479,7 +481,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+    private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.findMatcher(message) {
         val color = group("color")
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 

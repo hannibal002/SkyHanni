@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -42,11 +43,11 @@ object PowderTracker {
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",
-        ".*§r§b§l2X POWDER STARTED!.*"
+        "§r§b§l2X POWDER STARTED!"
     )
     private val powderEndedPattern by patternGroup.pattern(
-        "powder.ended",
-        ".*§r§b§l2X POWDER ENDED!.*"
+        "powder.ended.new",
+        "§r§b§l2X POWDER ENDED!"
     )
     private val powderBossBarPattern by patternGroup.pattern(
         "powder.bossbar",
@@ -134,8 +135,8 @@ object PowderTracker {
             lastChestPicked = System.currentTimeMillis()
         }
 
-        powderStartedPattern.matchMatcher(msg) { doublePowder = true }
-        powderEndedPattern.matchMatcher(msg) { doublePowder = false }
+        powderStartedPattern.findMatcher(msg) { doublePowder = true }
+        powderEndedPattern.findMatcher(msg) { doublePowder = false }
 
         for (reward in PowderChestReward.entries) {
             reward.chatPattern.matchMatcher(msg) {

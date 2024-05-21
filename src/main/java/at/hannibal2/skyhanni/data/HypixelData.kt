@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -42,10 +43,10 @@ class HypixelData {
     private var lastLocRaw = SimpleTimeMark.farPast()
 
     companion object {
-        private val patternGroup = RepoPattern.group("data.hypixeldata")
+        private val patternGroup = RepoPattern.group("data.hypixeldata.new")
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
-            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
+            "^§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+)"
         )
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
@@ -138,7 +139,7 @@ class HypixelData {
             if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
             if (!TabListData.fullyLoaded) return
 
-            ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+            ScoreboardData.sidebarLinesFormatted.findFirst(serverIdScoreboardPattern) {
                 val serverType = if (group("servertype") == "M") "mega" else "mini"
                 serverId = "$serverType${group("serverid")}"
                 return
@@ -271,7 +272,7 @@ class HypixelData {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        event.tabList.matchFirst(UtilsPatterns.tabListProfilePattern) {
+        event.tabList.findFirst(UtilsPatterns.tabListProfilePattern) {
             var newProfile = group("profile").lowercase()
 
             // Hypixel shows the profile name reversed while in the Rift
@@ -340,7 +341,7 @@ class HypixelData {
     private fun checkProfileName() {
         if (profileName.isNotEmpty()) return
 
-        TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
+        TabListData.getTabList().findFirst(UtilsPatterns.tabListProfilePattern) {
             profileName = group("profile").lowercase()
             ProfileJoinEvent(profileName).postAndCatch()
         }

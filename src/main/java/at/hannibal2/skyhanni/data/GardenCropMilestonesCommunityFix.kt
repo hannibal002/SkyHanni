@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,8 +27,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object GardenCropMilestonesCommunityFix {
     private val amountPattern by RepoPattern.pattern(
-        "data.garden.milestonefix.amount",
-        ".*§e(?<having>.*)§6/§e(?<max>.*)"
+        "data.garden.milestonefix.amount.new",
+        "§e(?<having>.*)§6/§e(?<max>.*)^"
     )
 
     private var showWrongData = false
@@ -93,7 +93,7 @@ object GardenCropMilestonesCommunityFix {
 
         val guessNextMax = GardenCropMilestones.getCropsForTier(realTier + 1, crop) - GardenCropMilestones.getCropsForTier(realTier, crop)
 //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
-        val nextMax = amountPattern.matchMatcher(next) {
+        val nextMax = amountPattern.findMatcher(next) {
             group("max").formatLong()
         } ?: return
 //         debug("nextMax real: ${nextMax.addSeparators()}")
@@ -104,7 +104,7 @@ object GardenCropMilestonesCommunityFix {
 
         val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop) // no need to overflow here
 //         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
-        val totalMax = amountPattern.matchMatcher(total) {
+        val totalMax = amountPattern.findMatcher(total) {
             group("max").formatLong()
         } ?: return
 //         println("totalMax real: ${totalMax.addSeparators()}")

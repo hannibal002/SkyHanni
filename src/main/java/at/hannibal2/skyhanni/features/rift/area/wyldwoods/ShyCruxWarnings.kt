@@ -24,9 +24,6 @@ class ShyCruxWarnings {
         "Look away!",
     )
 
-    //TODO seraid
-    private val shyNames = arrayOf("I'm ugly! :(", "Eek!", "Don't look at me!", "Look away!")
-
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!RiftAPI.inRift() || !config.shyWarning) return

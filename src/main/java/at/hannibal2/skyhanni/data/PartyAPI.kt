@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -16,7 +17,7 @@ import kotlin.random.Random
 
 object PartyAPI {
 
-    private val patternGroup = RepoPattern.group("data.party")
+    private val patternGroup = RepoPattern.group("data.party.new")
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
         "§eYou have joined (?<name>.*)'s? §eparty!"
@@ -51,11 +52,11 @@ object PartyAPI {
     )
     private val transferVoluntaryPattern by patternGroup.pattern(
         "others.transfer.voluntary",
-        "The party was transferred to (?<newowner>.*) by .*"
+        "^The party was transferred to (?<newowner>.*) by "
     )
     private val disbandedPattern by patternGroup.pattern(
         "others.disband",
-        ".* §ehas disbanded the party!"
+        " §ehas disbanded the party!$"
     )
     private val kickedPattern by patternGroup.pattern(
         "you.kicked",
@@ -162,12 +163,12 @@ object PartyAPI {
             partyLeader = group("newowner").cleanPlayerName()
             partyMembers.remove(name)
         }
-        transferVoluntaryPattern.matchMatcher(message.removeColor()) {
+        transferVoluntaryPattern.findMatcher(message.removeColor()) {
             partyLeader = group("newowner").cleanPlayerName()
         }
 
         // party disbanded
-        disbandedPattern.matchMatcher(message) {
+        disbandedPattern.findMatcher(message) {
             partyLeft()
         }
         kickedPattern.matchMatcher(message) {

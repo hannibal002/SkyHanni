@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -28,10 +28,10 @@ object DianaProfitTracker {
     private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     private var allowedDrops = listOf<NEUInternalName>()
 
-    private val patternGroup = RepoPattern.group("diana.chat")
+    private val patternGroup = RepoPattern.group("diana.chat.new")
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*"
+        "^(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!)"
     )
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",
@@ -108,7 +108,7 @@ object DianaProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val message = event.message
-        if (chatDugOutPattern.matches(message)) {
+        if (chatDugOutPattern.find(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.burrowsDug++

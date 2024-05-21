@@ -50,6 +50,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -71,14 +72,14 @@ object GhostCounter {
     var ghostCounterV3File =
         File("." + File.separator + "config" + File.separator + "ChatTriggers" + File.separator + "modules" + File.separator + "GhostCounterV3" + File.separator + ".persistantData.json")
 
-    private val patternGroup = RepoPattern.group("combat.ghostcounter")
+    private val patternGroup = RepoPattern.group("combat.ghostcounter.new")
     private val skillXPPattern by patternGroup.pattern(
         "skillxp",
         "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)"
     )
     private val combatSectionPattern by patternGroup.pattern(
         "combatsection",
-        ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*"
+        "[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\)"
     )
     private val killComboExpiredPattern by patternGroup.pattern(
         "killcomboexpired",
@@ -90,11 +91,11 @@ object GhostCounter {
     )
     private val bestiaryPattern by patternGroup.pattern(
         "bestiary",
-        ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*"
+        "(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+)"
     )
     private val skillLevelPattern by patternGroup.pattern(
         "skilllevel",
-        ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*"
+        "§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+)"
     )
 
     private val format = NumberFormat.getInstance()
@@ -342,7 +343,7 @@ object GhostCounter {
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (!inMist) return
-        combatSectionPattern.matchMatcher(event.actionBar) {
+        combatSectionPattern.findMatcher(event.actionBar) {
             if (group("skillName").lowercase() != "combat") return
             parseCombatSection(event.actionBar)
         }
@@ -354,8 +355,8 @@ object GhostCounter {
         nf.maximumFractionDigits = 2
         if (lastParsedSkillSection == section) {
             sb.append(lastSkillProgressString)
-        } else if (combatSectionPattern.matcher(section).find()) {
-            combatSectionPattern.matchMatcher(section) {
+        } else {
+            combatSectionPattern.findMatcher(section) {
                 sb.append("+").append(group("gained"))
                 val skillName = group("skillName")
                 val skillPercent = group("percent") != null
@@ -388,9 +389,9 @@ object GhostCounter {
                 }
                 lastParsedSkillSection = section
                 lastSkillProgressString = sb.toString()
-            }
-            if (sb.toString().isNotEmpty()) {
-                skillText = sb.toString()
+                if (sb.toString().isNotEmpty()) {
+                    skillText = sb.toString()
+                }
             }
         }
     }
@@ -399,7 +400,7 @@ object GhostCounter {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.tabList) {
-            skillLevelPattern.matchMatcher(line) {
+            skillLevelPattern.findMatcher(line) {
                 currentSkill = group("skillName")
                 currentSkillLevel = group("skillLevel").toInt()
             }
@@ -451,7 +452,7 @@ object GhostCounter {
             update()
         }
         // replace with BestiaryLevelUpEvent ?
-        bestiaryPattern.matchMatcher(event.message) {
+        bestiaryPattern.findMatcher(event.message) {
             val currentLevel = group("nextLevel").toInt()
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {
                 26 -> {

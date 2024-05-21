@@ -22,7 +22,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -35,7 +37,7 @@ class CroesusChestTracker {
 
     private val config get() = SkyHanniMod.feature.dungeon.chest
 
-    private val patternGroup = RepoPattern.group("dungeon.croesus")
+    private val patternGroup = RepoPattern.group("dungeon.croesus.new")
 
     private val croesusPattern by patternGroup.pattern(
         "inventory",
@@ -59,7 +61,7 @@ class CroesusChestTracker {
     )
     private val masterPattern by patternGroup.pattern(
         "chest.master",
-        ".*Master.*"
+        "Master"
     )
     private val keyUsedPattern by patternGroup.pattern(
         "chest.state.keyused",
@@ -67,7 +69,7 @@ class CroesusChestTracker {
     )
     private val openedPattern by patternGroup.pattern(
         "chest.state.opened",
-        "§8Opened Chest:.*"
+        "^§8Opened Chest:"
     )
     private val unopenedPattern by patternGroup.pattern(
         "chest.state.unopened",
@@ -160,12 +162,12 @@ class CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null) run.floor =
-                (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
+                (if (masterPattern.find(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
                     floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                 } ?: "0")
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
-                openedPattern.anyMatches(lore) -> OpenedState.OPENED
+                openedPattern.anyFound(lore) -> OpenedState.OPENED
                 unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
                 else -> ErrorManager.logErrorStateWithData(
                     "Croesus Chest couldn't be read correctly.",

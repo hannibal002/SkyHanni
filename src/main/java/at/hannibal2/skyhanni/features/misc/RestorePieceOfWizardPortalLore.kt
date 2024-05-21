@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRecipientName
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
+import at.hannibal2.skyhanni.utils.StringUtils.anyFound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -17,8 +17,8 @@ class RestorePieceOfWizardPortalLore {
     private val item by lazy { "WIZARD_PORTAL_MEMENTO".asInternalName() }
 
     private val earnedPattern by RepoPattern.pattern(
-        "misc.restore.wizard.portal.earned",
-        "§7Earned by:.*"
+        "misc.restore.wizard.portal.earned.new",
+        "^§7Earned by:"
     )
 
     @SubscribeEvent
@@ -26,7 +26,7 @@ class RestorePieceOfWizardPortalLore {
         if (!config.restorePieceOfWizardPortalLore) return
         val stack = event.itemStack
         if (stack.getInternalName() != item) return
-        if (earnedPattern.anyMatches(stack.getLore())) return
+        if (earnedPattern.anyFound(stack.getLore())) return
         val recipient = stack.getRecipientName() ?: return
         event.toolTip.add(5, "§7Earned by: $recipient")
     }

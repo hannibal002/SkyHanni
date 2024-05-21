@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -37,7 +38,7 @@ object BestiaryData {
 
     private val config get() = SkyHanniMod.feature.combat.bestiary
 
-    private val patternGroup = RepoPattern.group("combat.bestiary.data")
+    private val patternGroup = RepoPattern.group("combat.bestiary.data.new")
 
     /**
      * REGEX-TEST: §7Progress to Tier 14: §b26%
@@ -79,35 +80,35 @@ object BestiaryData {
     )
     private val familiesFoundContainsPattern by patternGroup.pattern(
         "familiesfoundcontains",
-        ".*Families Found.*"
+        "Families Found"
     )
     private val familiesFoundStartsPattern by patternGroup.pattern(
         "familiesfoundstart",
-        "Families Found.*"
+        "^Families Found"
     )
     private val familiesCompletedPattern by patternGroup.pattern(
         "familiescompleted",
-        ".*Families Completed.*"
+        "Families Completed"
     )
     private val killsPattern by patternGroup.pattern(
         "kills",
-        "Kills:.*"
+        "^Kills:"
     )
     private val progressTierPattern by patternGroup.pattern(
         "progresstier",
-        ".*Progress to Tier.*"
+        "Progress to Tier"
     )
     private val progressOverallPattern by patternGroup.pattern(
         "progressoverall",
-        ".*Overall Progress.*"
+        "Overall Progress"
     )
     private val queryPattern by patternGroup.pattern(
         "query",
-        "§7Query: §a.*"
+        "^§7Query: §a"
     )
     private val resultsPattern by patternGroup.pattern(
         "results",
-        "§7Results: §a.*"
+        "^§7Results: §a"
     )
 
     private var display = emptyList<List<Any>>()
@@ -213,13 +214,13 @@ object BestiaryData {
                 if (!line.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = line.substring(line.lastIndexOf(' ') + 1)
-                if (familiesFoundContainsPattern.matches(previousLine)) {
+                if (familiesFoundContainsPattern.find(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         familiesFound = group("current").formatLong()
                         totalFamilies = group("needed").formatLong()
                     }
 
-                } else if (familiesCompletedPattern.matches(previousLine)) {
+                } else if (familiesCompletedPattern.find(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         familiesCompleted = group("current").formatLong()
                     }
@@ -243,20 +244,20 @@ object BestiaryData {
             var actualRealTotalKill: Long = 0
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
-                if (killsPattern.matches(loreLine)) {
+                if (killsPattern.find(loreLine)) {
                     actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatLong()
                         ?: 0
                 }
                 if (!loreLine.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
-                if (progressTierPattern.matches(previousLine)) {
+                if (progressTierPattern.find(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToTier = group("needed").formatLong()
                         currentKillToTier = group("current").formatLong()
                     }
 
-                } else if (progressOverallPattern.matches(previousLine)) {
+                } else if (progressOverallPattern.find(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToMax = group("needed").formatLong()
                         currentTotalKill = group("current").formatLong()
@@ -473,7 +474,7 @@ object BestiaryData {
             if ("Bestiary" != bestiaryGuiTitleMatcher.group(1)) {
                 var loreContainsFamiliesFound = false
                 for (line in stack.getLore()) {
-                    if (familiesFoundStartsPattern.matches(line.removeColor())) {
+                    if (familiesFoundStartsPattern.find(line.removeColor())) {
                         loreContainsFamiliesFound = true
                         break
                     }
@@ -485,8 +486,8 @@ object BestiaryData {
             return true
         } else if (name == "Search Results") {
             val loreList = stack.getLore()
-            if (loreList.size >= 2 && queryPattern.matches(loreList[0])
-                && resultsPattern.matches(loreList[1])
+            if (loreList.size >= 2 && queryPattern.find(loreList[0])
+                && resultsPattern.find(loreList[1])
             ) {
                 return true
             }

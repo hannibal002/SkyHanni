@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -20,8 +20,8 @@ class InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDate
 
     private val monthAndDatePattern by RepoPattern.pattern(
-        "misc.ingametime.date",
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*"
+        "misc.ingametime.date.new",
+        "((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?"
     )
     private var display = ""
 
@@ -48,7 +48,7 @@ class InGameDateDisplay {
         if (config.useScoreboard) {
             val list = ScoreboardData.sidebarLinesFormatted // we need this to grab the moon/sun symbol
             val year = "Year ${date.year}"
-            var monthAndDate = (list.find { monthAndDatePattern.matches(it) } ?: "??").trim()
+            var monthAndDate = (list.find { monthAndDatePattern.find(it) } ?: "??").trim()
             if (monthAndDate.last().isDigit()) {
                 monthAndDate = "${monthAndDate}${SkyBlockTime.daySuffix(monthAndDate.takeLast(2).trim().toInt())}"
             }
