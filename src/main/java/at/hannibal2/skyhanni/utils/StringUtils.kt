@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -100,15 +101,19 @@ object StringUtils {
 
     fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher"))
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher"))
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst"))
     inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
         toList().matchFirst(pattern, consumer)
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst"))
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.matches()) return consumer(it) }
@@ -116,6 +121,7 @@ object StringUtils {
         return null
     }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchAll"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.find()) consumer(it) }
@@ -143,6 +149,7 @@ object StringUtils {
         }
     }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatchers"))
     inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
         for (pattern in iterator()) {
             pattern.matchMatcher<T>(text) {
@@ -312,10 +319,16 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matches"))
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
+
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.anyMatches"))
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
+
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.anyMatches"))
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.find"))
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }

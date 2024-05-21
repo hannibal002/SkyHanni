@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.data.MayorAPI.foxyExtraEventPattern
 import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
 enum class Mayor(
     val mayorName: String,
