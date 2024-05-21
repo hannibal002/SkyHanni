@@ -40,9 +40,9 @@ object ChocolateFactoryInventory {
 
                 val upgrade = upgrades.last()
 
-                if (upgrade.isMaxed) continue
+                if (current.isMaxed) continue
 
-                val dif = upgrade.level - current.level + 1
+                val dif = upgrade.level - current.level
 
                 val color = LorenzColor.AQUA
                 event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, color.getChatColor() + dif, 1f)
