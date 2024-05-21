@@ -14,9 +14,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class SeaCreatureFeatures {
@@ -25,6 +27,7 @@ class SeaCreatureFeatures {
     private val damageIndicatorConfig get() = SkyHanniMod.feature.combat.damageIndicator
     private var rareSeaCreatures = listOf<EntityLivingBase>()
     private var lastRareCatch = SimpleTimeMark.farPast()
+    private var armorStandIds = TimeLimitedSet<Int>(6.minutes)
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -39,6 +42,9 @@ class SeaCreatureFeatures {
             event.mob.highlight(LorenzColor.GREEN.toColor())
             rareSeaCreatures += event.mob.baseEntity
         }
+        val id = event.mob.armorStand?.entityId ?: return
+        if (armorStandIds.contains(id)) return
+        armorStandIds.add(id)
 
         if (lastRareCatch.passedSince() < 1.seconds) return
         if (event.mob.name == "Water Hydra" && event.mob.baseEntity.health == (event.mob.baseEntity.baseMaxHealth.toFloat() / 2)) return
@@ -73,6 +79,7 @@ class SeaCreatureFeatures {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         rareSeaCreatures = listOf()
+        armorStandIds.clear()
     }
 
     @SubscribeEvent
