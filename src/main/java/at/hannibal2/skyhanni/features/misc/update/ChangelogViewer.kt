@@ -55,6 +55,15 @@ object ChangelogViewer {
         showChangelog(currentVersion.toVersionTag(), targetVersion.toVersionTag())
 
     private fun showChangelog(currentVersion: VersionTag, targetVersion: VersionTag) {
+        if (currentVersion > targetVersion) {
+            ErrorManager.logErrorStateWithData(
+                "Invalid versions for changelog",
+                "current version is larger than target version",
+                "current" to currentVersion,
+                "target" to targetVersion
+            )
+            return
+        }
         getChangelog(currentVersion, targetVersion)
         openChangelog()
     }
