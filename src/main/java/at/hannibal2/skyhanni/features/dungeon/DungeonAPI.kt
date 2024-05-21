@@ -50,6 +50,7 @@ object DungeonAPI {
     var playerClass: DungeonClass? = null
     var playerClassLevel = -1
     var isUniqueClass = false
+    var dungeonPhase: DungeonPhase? = null
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
     private val timePattern =
