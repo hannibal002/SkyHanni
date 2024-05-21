@@ -29,7 +29,7 @@ class SeaCreatureFeatures {
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
-        val creature = SeaCreatureManager.getSeaCreature(event.mob.name) ?: return
+        val creature = SeaCreatureManager.allFishingMobs[event.mob.name] ?: return
         if (!creature.rare) return
 
         if (config.highlight && !(damageIndicatorConfig.enabled && damageIndicatorConfig.bossesToShow.contains(
