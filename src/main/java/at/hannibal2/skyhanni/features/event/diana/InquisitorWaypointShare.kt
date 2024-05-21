@@ -41,7 +41,7 @@ object InquisitorWaypointShare {
      */
     private val partyOnlyCoordsPattern by patternGroup.pattern(
         "party.onlycoords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+),? y: (?<y>[^ ]+),? z: (?<z>[^ ]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
 
     //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
@@ -170,11 +170,13 @@ object InquisitorWaypointShare {
             sendInquisitor()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message =
-                "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
-            ChatUtils.clickableChat(message, onClick = {
-                sendInquisitor()
-            })
+            val message = "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+            ChatUtils.clickableChat(
+                message, onClick = {
+                    sendInquisitor()
+                },
+                oneTimeClick = true
+            )
         }
     }
 

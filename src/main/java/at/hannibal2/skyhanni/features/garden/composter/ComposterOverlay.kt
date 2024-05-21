@@ -517,11 +517,12 @@ object ComposterOverlay {
         }
 
         HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
-        if (itemsNeeded > havingInInventory - havingInSacks) {
+        val havingInTotal = havingInInventory + havingInSacks
+        if (itemsNeeded >= havingInTotal) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
-                ChatUtils.clickableChat(
+                ChatUtils.clickableChat( // TODO Add this as a separate feature, and then don't send any msg if the feature is disabled
                     "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     onClick = {
                         HypixelCommands.bazaar(itemName.removeColor())

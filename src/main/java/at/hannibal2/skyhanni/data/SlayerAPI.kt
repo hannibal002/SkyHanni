@@ -98,10 +98,8 @@ object SlayerAPI {
 
     private fun grabActiveSlayer(): SlayerType? {
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            for (type in SlayerType.entries) {
-                if (line.contains(type.displayName)) {
-                    return type
-                }
+            SlayerType.getByName(line)?.let {
+                return it
             }
         }
 

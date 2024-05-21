@@ -37,7 +37,7 @@ object OtherInventoryData {
     }
 
     @SubscribeEvent
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onInventoryDataReceiveEvent(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
 
         if (packet is S2EPacketCloseWindow) {

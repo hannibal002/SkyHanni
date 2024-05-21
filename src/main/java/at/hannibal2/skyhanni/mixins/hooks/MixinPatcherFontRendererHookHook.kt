@@ -11,7 +11,7 @@ class MixinPatcherFontRendererHookHook {
         fun overridePatcherFontRenderer(string: String, shadow: Boolean, cir: CallbackInfoReturnable<Boolean>) {
             if (!LorenzUtils.onHypixel) return
 
-            if (ChromaManager.config.enabled) {
+            if (ChromaManager.config.enabled.get()) {
                 cir.cancel()
                 cir.returnValue = false
             }

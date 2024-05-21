@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -15,6 +16,7 @@ class ChatFilter {
 
     private val generalConfig get() = SkyHanniMod.feature.chat
     private val config get() = SkyHanniMod.feature.chat.filterType
+    private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
 
     /// <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -347,6 +349,12 @@ class ChatFilter {
         "§f +§r§7You earned §r§.* Event Silver§r§7!".toPattern(),
         "§f +§r§.§k#§r§. LEVEL UP! §r§.§k#".toPattern(),
     )
+    private val factoryUpgradePatterns = listOf(
+        "§.* §r§7has been promoted to §r§7\\[.*§r§7] §r§.*§r§7!".toPattern(),
+        "§7Your §r§aRabbit Barn §r§7capacity has been increased to §r§a.* Rabbits§r§7!".toPattern(),
+        "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
+        "§7You upgraded to §r§d.*?§r§7!".toPattern(),
+    )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
         "§aYou received §r§f1 §r§aWishing Compass§r§a.",
@@ -362,6 +370,22 @@ class ChatFilter {
     )
     private val eventMessage = listOf(
         "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+    )
+
+    // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
+    private val soloClassPatterns = listOf(
+        "§6Your §r§a(Healer|Mage|Berserk|Archer|Tank) §r§6stats are doubled because you are the only player using this class!".toPattern()
+    )
+
+    private val soloStatsPatterns = listOf(
+        "§a\\[(Healer|Mage|Berserk|Archer|Tank)].*".toPattern()
+    )
+
+    // &r&dGenevieve the Fairy&r&f: You killed me! Take this &r&6Revive Stone &r&fso that my death is not in vain!&r
+    private val fairyPatterns = listOf(
+        "§d[\\w']+ the Fairy§r§f: You killed me! Take this §r§6Revive Stone §r§fso that my death is not in vain!".toPattern(),
+        "§d[\\w']+ the Fairy§r§f: You killed me! I'll revive you so that my death is not in vain!".toPattern(),
+        "§d[\\w']+ the Fairy§r§f: Have a great life!".toPattern()
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -380,6 +404,10 @@ class ChatFilter {
         "powder_mining" to powderMiningPatterns,
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
+        "factory_upgrade" to factoryUpgradePatterns,
+        "solo_class" to soloClassPatterns,
+        "solo_stats" to soloStatsPatterns,
+        "fairy" to fairyPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -436,8 +464,12 @@ class ChatFilter {
         config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
         config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+        config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
+        dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
+        dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
+        dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
 
         else -> ""
     }

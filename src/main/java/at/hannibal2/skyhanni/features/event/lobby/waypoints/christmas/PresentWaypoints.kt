@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointsJson
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -122,5 +123,5 @@ class PresentWaypoints {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints)
+        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints && WinterAPI.isDecember())
 }

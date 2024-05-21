@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class InGameDateDisplay {

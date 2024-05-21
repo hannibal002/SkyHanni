@@ -94,7 +94,7 @@ object ScoreboardPattern {
     private val dungeonSb = scoreboardGroup.group("dungeon")
     val m7dragonsPattern by dungeonSb.pattern(
         "m7dragons",
-        "^(§cNo Alive Dragons|§8- (§.)+[\\w\\s]+Dragon§a \\w+§.❤)$"
+        "^(§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+§.❤)$"
     )
     val keysPattern by dungeonSb.pattern(
         "keys",
@@ -235,6 +235,10 @@ object ScoreboardPattern {
         "fortunatefreezing.bonus",
         "Event Bonus: §6\\+\\d+☘"
     )
+    val fossilDustPattern by miningSb.pattern(
+        "fossildust",
+        "Fossil Dust: §f[\\d.,]+.*"
+    )
 
     // combat
     private val combatSb = scoreboardGroup.group("combat")
@@ -293,10 +297,6 @@ object ScoreboardPattern {
         "essence",
         "^\\s*.*Essence: §.(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$"
     )
-    val brokenRedstonePattern by miscSb.pattern(
-        "brokenredstone",
-        "\\s*(?:(?:§.)*⚡ (§.)*Redston|e: (?:§.)*\\d+%)\\s*"
-    )
     val redstonePattern by miscSb.pattern(
         "redstone",
         "\\s*(§.)*⚡ §cRedstone: (§.)*\\d{1,3}%$"
@@ -347,7 +347,7 @@ object ScoreboardPattern {
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern(
         "wtfarethoselines",
-        "^(§eMine 10 Rubies|§eKill 100 Automatons)$"
+        "^(§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King)$"
     )
     val darkAuctionCurrentItemPattern by miscSb.pattern(
         "darkauction.currentitem",
@@ -386,7 +386,7 @@ object ScoreboardPattern {
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
-        "(§.)*Your Total Damage: §.\\d+( §e\\(#\\d+\\)?)?$"
+        "(§.)*Your Total Damage: §.\\d+.*$"
     )
     val winterCubeDmgPattern by eventsSb.pattern(
         "wintereventcubedmg",
@@ -410,6 +410,14 @@ object ScoreboardPattern {
     val riftAveikxPattern by riftSb.pattern(
         "aveikx",
         "Time spent sitting|with Ävaeìkx: .*"
+    )
+    val riftHayEatenPattern by riftSb.pattern(
+        "hayeaten",
+        "^Hay Eaten: §.[\\d,.]+/[\\d,.]+\$"
+    )
+    val cluesPattern by riftSb.pattern(
+        "clues",
+        "Clues: §.\\d+/\\d+"
     )
 
     // Stats from the tablist
@@ -441,5 +449,9 @@ object ScoreboardPattern {
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
+    )
+    val eventTimeStartsPattern by tablistGroup.pattern(
+        "eventtimestarts",
+        "^\\s+Starts In: §r§e(?<time>.*)$"
     )
 }
