@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items
+package at.hannibal2.skyhanni.features.inventory.auctionhouse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -31,7 +31,7 @@ class AuctionHouseCopyUnderbidPrice {
     )
     private val allowedInventoriesPattern by patternGroup.pattern(
         "allowedinventories",
-        "(?:Auctions Browser|Manage Auctions|Auctions: \".*\"?)"
+        "Auctions Browser|Manage Auctions|Auctions: \".*\"?"
     )
 
     @SubscribeEvent

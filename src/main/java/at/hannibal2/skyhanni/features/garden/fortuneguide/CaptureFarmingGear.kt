@@ -125,6 +125,12 @@ object CaptureFarmingGear {
         ChatUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
     }
 
+    fun reverseCocoaBeansFortune() {
+        val storage = GardenAPI.storage?.fortune ?: return
+        storage.cocoaBeansFortune = !storage.cocoaBeansFortune
+        ChatUtils.chat("Toggled supreme chocolate bar fortune to: ${storage.cocoaBeansFortune}")
+    }
+
     private fun getUniqueVisitorsForTier(tier: Int): Int {
         return when {
             tier == 0 -> 0
@@ -353,6 +359,9 @@ object CaptureFarmingGear {
         if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
             storage.pumpkinFortune = true
         }
+        if (msg == "CHOCOLATE BARS EXPORTATION COMPLETE!") {
+            storage.cocoaBeansFortune = true
+        }
         if (msg == "[NPC] Carrolyn: Thank you for the carrots.") {
             storage.carrotFortune = true
             ChatUtils.chat("§aYou have already given Carrolyn enough Exportable Carrots.")
@@ -360,6 +369,10 @@ object CaptureFarmingGear {
         if (msg == "[NPC] Carrolyn: Thank you for the pumpkins.") {
             storage.pumpkinFortune = true
             ChatUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkins.")
+        }
+        if (msg == "[NPC] Carrolyn: Thank you for the chocolate.") {
+            storage.cocoaBeansFortune = true
+            ChatUtils.chat("§aYou have already given Carrolyn enough Supreme Chocolate Bars.")
         }
     }
 }

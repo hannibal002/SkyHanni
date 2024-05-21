@@ -41,7 +41,7 @@ object InquisitorWaypointShare {
      */
     private val partyOnlyCoordsPattern by patternGroup.pattern(
         "party.onlycoords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+),? y: (?<y>[^ ]+),? z: (?<z>[^ ]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
 
     //Support for https://www.chattriggers.com/modules/v/inquisitorchecker

@@ -257,7 +257,7 @@ object Commands {
             "Resets the Pest Profit Tracker"
         ) { PestProfitTracker.resetCommand() }
         registerCommand(
-            "shresetmythologicalcreatureracker",
+            "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker"
         ) { MythologicalCreatureTracker.resetCommand() }
         registerCommand(
@@ -378,6 +378,10 @@ object Commands {
             "shpumpkin",
             "Toggles receiving the 12 fortune from pumpkins"
         ) { CaptureFarmingGear.reversePumpkinFortune() }
+        registerCommand(
+            "shcocoabeans",
+            "Toggles receiving the 12 fortune from cocoa beans"
+        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
         registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"

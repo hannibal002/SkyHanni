@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
@@ -88,12 +88,9 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
-
         update()
-
         loadTestGriffinSpots()
     }
 
@@ -203,7 +200,9 @@ object GriffinBurrowHelper {
         GriffinBurrowParticleFinder.reset()
 
         BurrowWarpHelper.currentWarp = null
-        update()
+        if (isEnabled()) {
+            update()
+        }
     }
 
     @SubscribeEvent
