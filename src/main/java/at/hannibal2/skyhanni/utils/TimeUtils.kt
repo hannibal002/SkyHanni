@@ -132,10 +132,13 @@ object TimeUtils {
     fun SkyBlockTime.formatted(
         dayAndMonthElement: Boolean = true,
         yearElement: Boolean = true,
-        hoursAndMinutesElement: Boolean = true
+        hoursAndMinutesElement: Boolean = true,
+        timeFormat24h: Boolean = false
     ): String {
-        val hour = (this.hour + 11) % 12 + 1
-        val timeOfDay = if (this.hour > 11) "pm" else "am"
+        val hour = if (timeFormat24h) this.hour else (this.hour + 11) % 12 + 1
+        val timeOfDay = if (!timeFormat24h) {
+            if (this.hour > 11) "pm" else "am"
+        } else ""
         val minute = this.minute.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
         val day = this.day

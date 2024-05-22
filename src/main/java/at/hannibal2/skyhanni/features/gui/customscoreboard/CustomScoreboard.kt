@@ -1,20 +1,12 @@
 //
 // TODO LIST
 // V2 RELEASE
-//  - Soulflow API
 //  - Bank API (actually maybe not, I like the current design)
 //  - beacon power
-//  - skyblock level
-//  - more bg options (round, blurr, outline)
 //  - countdown events like fishing festival + fiesta when its not on tablist
-//  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
-//  - Rng meter display
-//  - option to hide coins earned
+//  - improve hide coin difference to also work with bits, motes, etc
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - more anchor points (alignment enums in renderutils)
-//  - 24h instead of 12h for skyblock time
-//  - only alert for lines that exist longer than 1s
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
@@ -33,9 +25,10 @@ import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
@@ -56,19 +49,26 @@ class CustomScoreboard {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
-        RenderBackground().renderBackground()
-
         val render =
             if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
                 cache
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(
-            render,
-            posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10
+
+        val textRenderable = Renderable.verticalContainer(
+            render.map { Renderable.string(it.first, horizontalAlign = it.second) },
+            0,
+            horizontalAlign = HorizontalAlignment.CENTER,
+            verticalAlign = VerticalAlignment.CENTER
         )
+
+        val finalRenderable = RenderBackground.addBackground(textRenderable)
+
+        RenderBackground.updatePosition(finalRenderable)
+
+        // TODO: change to renderRenderable when custom wardrobe gets merged
+        config.position.renderRenderables(listOf(finalRenderable), posLabel = guiName)
     }
 
     @SubscribeEvent
