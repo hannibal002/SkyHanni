@@ -142,9 +142,9 @@ object ChocolateFactoryDataLoader {
         processInventory(list, inventory)
 
         findBestUpgrades(list)
-        findAllBestUpgrades(list)
+        if (config.showAllBestUpgrades) findAllBestUpgrades(list)
 
-        // TODO: Remove
+        // TODO: Remove (ill leave it in for now since the bug still persists for now - flxwly)
         // -------------- Begin Test --------------
 //        val upgrades = ArrayList<ChocolateFactoryUpgrade>()
 //        profileStorage.currentChocolate = 20000L
@@ -473,6 +473,7 @@ object ChocolateFactoryDataLoader {
 
         // find the best current upgrade out of the current possible upgrades
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
+
 
         //  No best upgrade (all upgrades are maxed -> bestUpgrade = null) or cant afford best upgrade
         if (bestUpgrade == null || (bestUpgrade.price ?: Long.MAX_VALUE) > remainingChocolate) {
