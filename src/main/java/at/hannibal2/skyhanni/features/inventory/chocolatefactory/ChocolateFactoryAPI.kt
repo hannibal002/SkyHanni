@@ -122,8 +122,6 @@ object ChocolateFactoryAPI {
         upgradeCostPerLevel = data.upgradeCostsPerLevel
         maxUpgradeLevelPerPrestige = data.maxUpgradeLevelPerPrestige
 
-        println(maxUpgradeLevelPerPrestige)
-
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
 
