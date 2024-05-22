@@ -59,6 +59,11 @@ public class InventoryConfig {
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Compactor Overlay", desc = "Overlay for the Personal Compactor and Deletor.")
+    @Accordion
+    public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
+
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();

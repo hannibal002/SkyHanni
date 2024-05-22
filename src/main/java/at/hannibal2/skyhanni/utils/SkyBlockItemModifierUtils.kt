@@ -245,7 +245,7 @@ object SkyBlockItemModifierUtils {
         list
     }
 
-    private fun ItemStack.getAttributeString(label: String) =
+    fun ItemStack.getAttributeString(label: String) =
         getExtraAttributes()?.getString(label)?.takeUnless { it.isBlank() }
 
     private fun ItemStack.getAttributeInt(label: String) =

@@ -189,6 +189,7 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = listOf(),
             stack: ItemStack? = null,
             color: LorenzColor? = null,
+            spacedTitle: Boolean = false,
             bypassChecks: Boolean = false,
             snapsToTopIfToLong: Boolean = true,
             condition: () -> Boolean = { true },
@@ -219,6 +220,7 @@ interface Renderable {
                                 stack = stack,
                                 borderColor = color,
                                 snapsToTopIfToLong = snapsToTopIfToLong,
+                                spacedTitle = spacedTitle,
                             )
                             GlStateManager.popMatrix()
                         }
@@ -313,11 +315,12 @@ interface Renderable {
             item: ItemStack,
             scale: Double = NEUItems.itemFontSize,
             xSpacing: Int = 2,
+            ySpacing: Int = 0,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
         ) = object : Renderable {
-            override val width = (15.5 * scale + 1.5).toInt() + xSpacing
-            override val height = (15.5 * scale + 1.5).toInt()
+            override val width = (15.5 * scale + 0.5).toInt() + xSpacing
+            override val height = (15.5 * scale + 0.5).toInt() + ySpacing
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -591,6 +594,25 @@ interface Renderable {
             }
         }
 
+        fun paddingContainer(
+            content: Renderable,
+            topSpacing: Int = 0,
+            bottomSpacing: Int = 0,
+            leftSpacing: Int = 0,
+            rightSpacing: Int = 0,
+        ) = object : Renderable {
+            override val width = content.width + leftSpacing + rightSpacing
+            override val height = content.height + topSpacing + bottomSpacing
+            override val horizontalAlign = content.horizontalAlign
+            override val verticalAlign = content.verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                GlStateManager.translate(leftSpacing.toFloat(), topSpacing.toFloat(), 0f)
+                content.render(posX + leftSpacing, posY + topSpacing)
+                GlStateManager.translate(-leftSpacing.toFloat(), -topSpacing.toFloat(), 0f)
+            }
+        }
+
         fun scrollList(
             list: List<Renderable>,
             height: Int,
@@ -790,6 +812,33 @@ interface Renderable {
         ) = object : Renderable {
             override val width = input.width + padding * 2
             override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
+                Utils.drawTexturedRect(0f, 0f, width.toFloat(), height.toFloat(), GL11.GL_NEAREST)
+                GlStateManager.color(1f, 1f, 1f, 1f)
+
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideFixedSizedImage(
+            input: Renderable,
+            texture: ResourceLocation,
+            width: Int = input.width,
+            height: Int = input.height,
+            alpha: Int = 255,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
