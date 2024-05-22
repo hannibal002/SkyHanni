@@ -35,6 +35,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
+import kotlin.math.ceil
 import kotlin.math.max
 
 interface Renderable {
@@ -834,6 +835,10 @@ interface Renderable {
             height: Int = input.height,
             alpha: Int = 255,
             padding: Int = 2,
+            uMin: Float = 0f,
+            uMax: Float = 1f,
+            vMin: Float = 0f,
+            vMax: Float = 1f,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -845,7 +850,17 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(0f, 0f, width.toFloat(), height.toFloat(), GL11.GL_NEAREST)
+                Utils.drawTexturedRect(
+                    0f,
+                    0f,
+                    width.toFloat(),
+                    height.toFloat(),
+                    uMin,
+                    uMax,
+                    vMin,
+                    vMax,
+                    GL11.GL_NEAREST
+                )
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
                 GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
@@ -859,6 +874,10 @@ interface Renderable {
             width: Int,
             height: Int,
             alpha: Int = 255,
+            uMin: Float = 0f,
+            uMax: Float = 1f,
+            vMin: Float = 0f,
+            vMax: Float = 1f,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -870,8 +889,37 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(0f, 0f, width.toFloat(), height.toFloat(), GL11.GL_NEAREST)
+                Utils.drawTexturedRect(
+                    0f,
+                    0f,
+                    width.toFloat(),
+                    height.toFloat(),
+                    uMin,
+                    uMax,
+                    vMin,
+                    vMax,
+                    GL11.GL_NEAREST
+                )
                 GlStateManager.color(1f, 1f, 1f, 1f)
+            }
+        }
+
+        fun fakeInventory(
+            items: List<ItemStack?>,
+            maxItemsInRow: Int = 9,
+            scale: Double = 1.0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width =
+                (((if (items.size > maxItemsInRow) maxItemsInRow else items.size) * 18 + 2 * 4) * scale).toInt()
+            override val height = ((ceil(items.size.toDouble() / maxItemsInRow).toInt() * 18 + 2 * 4) * scale).toInt()
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+            val renderable = RenderableUtils.createFakeInventory(items, maxItemsInRow, scale)
+
+            override fun render(posX: Int, posY: Int) {
+                renderable.render(posX, posY)
             }
         }
     }

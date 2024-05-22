@@ -10,18 +10,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getInternalNameFromHypixelId
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PersonalCompactorOverlay {
+object PersonalCompactorOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.personalCompactor
 
@@ -38,10 +35,7 @@ class PersonalCompactorOverlay {
         4000 to 1
     )
 
-    private val slotTexture by lazy { ResourceLocation("skyhanni", "gui/slot.png") }
-    private val backgroundTexture by lazy { ResourceLocation("skyhanni", "gui/slot_background.png") }
-
-    private val MAX_ITEMS_PER_ROW = 7
+    private const val MAX_ITEMS_PER_ROW = 7
 
     private val compactorMap = mutableMapOf<String, Renderable>()
 
@@ -68,18 +62,14 @@ class PersonalCompactorOverlay {
 
         val uuid = itemStack.getItemUuid() ?: return
 
-        println(event.toolTip)
-
         val slotsRenderable = compactorMap.getOrPut(uuid) {
             val slots = slotsMap[tier] ?: return
-
             val itemList = (0 until slots).map { slot ->
                 val skyblockId = itemStack.getAttributeString(prefix + slot)
-                val insideItemstack = skyblockId?.let { getInternalNameFromHypixelId(it) }?.getItemStack()
-                createItemStackSlotRenderable(insideItemstack)
+                skyblockId?.let { getInternalNameFromHypixelId(it) }?.getItemStack()
             }
 
-            joinSlotRenderables(itemList)
+            Renderable.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)
         }
 
         val title = Renderable.string(name)
@@ -93,58 +83,6 @@ class PersonalCompactorOverlay {
         compactorMap.clear()
     }
 
-    private fun createItemStackSlotRenderable(stack: ItemStack?): Renderable {
-        val itemStack = stack?.let {
-            Renderable.itemStack(
-                it,
-                1.0,
-                0,
-                0
-            )
-        } ?: Renderable.placeholder(16, 16)
-        return Renderable.drawInsideFixedSizedImage(
-            itemStack,
-            slotTexture,
-            18,
-            18,
-            padding = 1,
-        )
-    }
-
-    private fun joinSlotRenderables(list: List<Renderable>): Renderable {
-        val renderable = Renderable.verticalContainer(
-            list.chunked(MAX_ITEMS_PER_ROW).map {
-                Renderable.horizontalContainer(
-                    it,
-                    0,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                )
-            },
-            0
-        )
-        /*val backgroundRenderable = Renderable.drawInsideRoundedRect(
-            renderable,
-            Color(200, 200, 200),
-            padding = 1,
-            2,
-        )*/
-
-        val backgroundRenderable = Renderable.drawInsideImage(
-            renderable,
-            backgroundTexture,
-            padding = 1,
-        )
-
-        val paddedRenderable = Renderable.paddingContainer(
-            backgroundRenderable,
-            2,
-            2,
-            2,
-            2
-        )
-
-        return paddedRenderable
-    }
 
     private fun shouldShow() = when (config.visibilityMode) {
         PersonalCompactorConfig.VisibilityMode.ALWAYS -> true
@@ -152,6 +90,7 @@ class PersonalCompactorOverlay {
         PersonalCompactorConfig.VisibilityMode.EXCEPT_KEYBIND -> !config.keybind.isKeyHeld()
         else -> false
     }
+
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
