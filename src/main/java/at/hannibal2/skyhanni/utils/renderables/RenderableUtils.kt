@@ -67,3 +67,10 @@ internal object RenderableUtils {
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
     }
 }
+
+internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
+    override val width = content.width
+    override val height = content.height
+    override val horizontalAlign = content.horizontalAlign
+    override val verticalAlign = content.verticalAlign
+}
