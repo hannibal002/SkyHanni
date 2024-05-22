@@ -49,8 +49,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.DragNDrop
+import at.hannibal2.skyhanni.utils.renderables.DropAble
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -518,6 +521,41 @@ class SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+    }
+
+    @SubscribeEvent
+    fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
+            dragAbleTest()
+        }
+    }
+
+    private fun dragAbleTest() {
+        val bone = ItemStack(Items.bone, 1).toDragItem()
+        val leave = ItemStack(Blocks.leaves, 1).toDragItem()
+
+        config.debugItemPos.renderRenderables(
+            listOf(
+                DragNDrop.dragAble(Renderable.string("A Bone"), { bone }),
+                Renderable.placeholder(0, 30),
+                DragNDrop.dragAble(Renderable.string("A Leave"), { leave }),
+                Renderable.placeholder(0, 30),
+                DragNDrop.dropAble(Renderable.string("Feed Dog"), object : DropAble {
+                    override fun handle(drop: Any?) {
+                        val unit = drop as ItemStack
+                        if (unit.item == Items.bone) {
+                            LorenzDebug.chatAndLog("Oh, a bone!")
+                        } else {
+                            LorenzDebug.chatAndLog("Disgusting that is not a bone!")
+                        }
+                    }
+
+                    override fun validTarget(item: Any?) = item is ItemStack
+
+                })
+            ), posLabel = "Item Debug"
+        )
     }
 
     private fun itemRenderDebug() {

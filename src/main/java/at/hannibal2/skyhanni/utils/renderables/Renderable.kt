@@ -227,7 +227,7 @@ interface Renderable {
             }
         }
 
-        private fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
+        internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
             val isGuiScreen = Minecraft.getMinecraft().currentScreen != null
             if (bypassChecks) {
                 return isGuiScreen

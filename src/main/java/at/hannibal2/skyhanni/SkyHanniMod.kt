@@ -463,6 +463,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import kotlinx.coroutines.CoroutineName
@@ -601,6 +602,7 @@ class SkyHanniMod {
         loadModule(FossilExcavatorAPI)
         loadModule(ChocolateFactoryAPI)
         loadModule(RenderableTooltips)
+        loadModule(DragNDrop)
 
         // features
         loadModule(BazaarOrderHelper())
