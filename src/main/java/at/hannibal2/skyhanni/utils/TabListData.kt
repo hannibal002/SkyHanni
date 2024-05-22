@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
@@ -14,6 +15,7 @@ import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
+import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.world.WorldSettings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
@@ -33,7 +35,7 @@ object TabListData {
     fun getHeader() = header
     fun getFooter() = footer
 
-    fun toggleDebugCommand() {
+    fun toggleDebug() {
         if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
             debugCache = null
@@ -48,7 +50,12 @@ object TabListData {
 
     fun copyCommand(args: Array<String>) {
         if (debugCache != null) {
-            ChatUtils.clickableChat("Tab list debug is enabled!", "shdebugtablist")
+            ChatUtils.clickableChat(
+                "Tab list debug is enabled!",
+                onClick = {
+                    toggleDebug()
+                }
+            )
             return
         }
 
@@ -101,9 +108,19 @@ object TabListData {
         return result.dropLast(1)
     }
 
+    var dirty = false
+
+    @SubscribeEvent(receiveCanceled = true)
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+        if (event.packet is S38PacketPlayerListItem) {
+            dirty = true
+        }
+    }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(2)) return
+        if (!dirty) return
+        dirty = false
 
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {

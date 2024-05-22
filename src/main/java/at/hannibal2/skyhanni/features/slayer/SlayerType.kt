@@ -1,18 +1,21 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.monster.EntityBlaze
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
 
-enum class SlayerType(val displayName: String, val clazz: Class<*>) {
-    REVENANT("Revenant Horror", EntityZombie::class.java),
-    TARANTULA("Tarantula Broodfather", EntitySpider::class.java),
-    SVEN("Sven Packmaster", EntityWolf::class.java),
-    VOID("Voidgloom Seraph", EntityEnderman::class.java),
-    INFERNO("Inferno Demonlord", EntityBlaze::class.java),
-    VAMPIRE("Riftstalker Bloodfiend", EntityOtherPlayerMP::class.java)
+enum class SlayerType(val displayName: String, val rngName: String, val clazz: Class<*>) {
+    REVENANT("Revenant Horror", "revenant", EntityZombie::class.java),
+    TARANTULA("Tarantula Broodfather", "tarantula", EntitySpider::class.java),
+    SVEN("Sven Packmaster", "sven", EntityWolf::class.java),
+    VOID("Voidgloom Seraph", "voidgloom", EntityEnderman::class.java),
+    INFERNO("Inferno Demonlord", "inferno", EntityBlaze::class.java),
+    VAMPIRE("Riftstalker Bloodfiend", "vampire", EntityZombie::class.java)
     ;
+
+    companion object {
+        fun getByName(name: String): SlayerType? = entries.firstOrNull {name.contains(it.displayName)}
+    }
 }

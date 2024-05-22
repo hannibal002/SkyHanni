@@ -4,19 +4,23 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.data.ChatClickActionManager
+import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
+import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -24,15 +28,12 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
-import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
-import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
-import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
@@ -56,6 +57,7 @@ import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
@@ -71,14 +73,18 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
@@ -155,6 +161,7 @@ object Commands {
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
             )
         }, DefaultConfigFeatures::onComplete)
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun usersNormal() {
@@ -192,24 +199,24 @@ object Commands {
             "Clear farming items saved for the Farming Fortune Guide"
         ) { clearFarmingItems() }
         registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
-        registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand(it) }
-        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerRngDropTracker.resetCommand(it) }
+        registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand() }
+        registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerRngDropTracker.resetCommand() }
         registerCommand(
             "shresetendernodetracker",
             "Resets the Ender Node Tracker"
-        ) { EnderNodeTracker.resetCommand(it) }
+        ) { EnderNodeTracker.resetCommand() }
         registerCommand(
             "shresetarmordroptracker",
             "Resets the Armor Drop Tracker"
-        ) { ArmorDropTracker.resetCommand(it) }
+        ) { ArmorDropTracker.resetCommand() }
         registerCommand(
             "shresetfrozentreasuretracker",
             "Resets the Frozen Treasure Tracker"
-        ) { FrozenTreasureTracker.resetCommand(it) }
+        ) { FrozenTreasureTracker.resetCommand() }
         registerCommand(
             "shresetfishingtracker",
             "Resets the Fishing Profit Tracker"
-        ) { FishingProfitTracker.resetCommand(it) }
+        ) { FishingProfitTracker.resetCommand() }
         registerCommand(
             "shresetvisitordrops",
             "Reset the Visitors Drop Statistics"
@@ -239,23 +246,23 @@ object Commands {
         registerCommand(
             "shresetvermintracker",
             "Resets the Vermin Tracker"
-        ) { VerminTracker.resetCommand(it) }
+        ) { VerminTracker.resetCommand() }
         registerCommand(
             "shresetdianaprofittracker",
             "Resets the Diana Profit Tracker"
-        ) { DianaProfitTracker.resetCommand(it) }
+        ) { DianaProfitTracker.resetCommand() }
         registerCommand(
             "shresetpestprofittracker",
             "Resets the Pest Profit Tracker"
-        ) { PestProfitTracker.resetCommand(it) }
+        ) { PestProfitTracker.resetCommand() }
         registerCommand(
-            "shresetmythologicalcreatureracker",
+            "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker"
-        ) { MythologicalCreatureTracker.resetCommand(it) }
+        ) { MythologicalCreatureTracker.resetCommand() }
         registerCommand(
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker"
-        ) { SeaCreatureTracker.resetCommand(it) }
+        ) { SeaCreatureTracker.resetCommand() }
         registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method."
@@ -289,6 +296,14 @@ object Commands {
             FarmingMilestoneCommand::onComplete
         )
         registerCommand0(
+            "shcropgoal",
+            "Define a custom milestone goal for a crop.",
+            {
+                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+            },
+            FarmingMilestoneCommand::onComplete
+        )
+        registerCommand0(
             "shskills",
             "Skills XP/Level related command",
             { SkillAPI.onCommand(it) },
@@ -301,11 +316,15 @@ object Commands {
         registerCommand(
             "shlimbo",
             "Warps you to Limbo."
-        ) { MiscFeatures().goToLimbo() }
+        ) { MiscFeatures.goToLimbo() }
         registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden"
         ) { FarmingLaneCreator.commandLaneDetection() }
+        registerCommand(
+            "shignore",
+            "Add/Remove a user from your"
+        ) { PartyChatCommands.blacklist(it) }
     }
 
     private fun usersBugFix() {
@@ -359,13 +378,29 @@ object Commands {
             "Toggles receiving the 12 fortune from pumpkins"
         ) { CaptureFarmingGear.reversePumpkinFortune() }
         registerCommand(
+            "shcocoabeans",
+            "Toggles receiving the 12 fortune from cocoa beans"
+        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
+        registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
+            "shclearksimet",
+            "Cleares the saved values of the applied kismet feathers in Croesus"
+        ) { CroesusChestTracker.resetChest() }
+        registerCommand(
             "shkingfix",
             "Reseting the local King Talisman Helper offset."
         ) { KingTalismanHelper.kingFix() }
+        registerCommand(
+            "shupdate",
+            "Updates the mod to the specified update stream."
+        ) { forceUpdate(it) }
+        registerCommand(
+            "shUpdateBazaarPrices",
+            "Forcefully updating the bazaar prices right now."
+        ) { HypixelBazaarFetcher.fetchNow() }
     }
 
     private fun developersDebugFeatures() {
@@ -390,6 +425,14 @@ object Commands {
             "shtestburrow",
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
+        registerCommand(
+            "shtestsackapi",
+            "Get the amount of an item in sacks according to internal feature SackAPI"
+        ) { SackAPI.testSackAPI(it) }
+        registerCommand(
+            "shtestgriffinspots",
+            "Show potential griffin spots around you."
+        ) { GriffinBurrowHelper.testGriffinSpots() }
     }
 
     private fun developersCodingHelp() {
@@ -404,7 +447,7 @@ object Commands {
             "Find config elements that are null and prints them into the console"
         ) { SkyHanniDebugsAndTests.findNullConfig(it) }
         registerCommand("shtestwaypoint", "Set a waypoint on that location") { SkyHanniDebugsAndTests.waypoint(it) }
-        registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebugCommand() }
+        registerCommand("shtesttablist", "Set your clipboard as a fake tab list.") { TabListData.toggleDebug() }
         registerCommand("shreloadlocalrepo", "Reloading the local repo data") { SkyHanniMod.repo.reloadLocalRepo() }
         registerCommand("shchathistory", "Show the unfiltered chat history") { ChatManager.openChatFilterGUI(it) }
         registerCommand(
@@ -473,9 +516,9 @@ object Commands {
             "Display a title on the screen with the specified settings."
         ) { TitleManager.command(it) }
         registerCommand(
-            "shconfigmanagerreset",
+            "shresetconfig",
             "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff)."
-        ) { SkyHanniDebugsAndTests.configManagerResetCommand(it) }
+        ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
             "readcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
@@ -491,12 +534,6 @@ object Commands {
     }
 
     private fun internalCommands() {
-        registerCommand("shshareinquis", "") { InquisitorWaypointShare.sendInquisitor() }
-        registerCommand("shcopyerror", "") { ErrorManager.command(it) }
-        registerCommand("shstopcityprojectreminder", "") { CityProjectFeatures.disable() }
-        registerCommand("shsendcontests", "") { GardenNextJacobContest.shareContestConfirmed(it) }
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
-        registerCommand("shstopaccountupgradereminder", "") { AccountUpgradeReminder.disable() }
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 
@@ -532,20 +569,36 @@ object Commands {
             val hoverText = buildList {
                 add("§e/$name")
                 if (command.description.isNotEmpty()) {
-                    add(" §7${command.description}")
+                    addDescription(command.description)
                 }
                 add("")
                 add("$color${category.categoryName}")
-                add("  §7${category.description}")
+                addDescription(category.description)
             }
 
-            val commandInfo = ChatUtils.createHoverableChat("$color/$name", hoverText, "/$name", false)
-
-            components.add(commandInfo)
+            components.add(Text.text("$color/$name") {
+                this.hover = Text.multiline(hoverText)
+                this.suggest = "/$name"
+            })
             components.add(ChatComponentText("§7, "))
         }
         components.add(ChatComponentText("\n "))
         ChatUtils.multiComponentMessage(components)
+    }
+
+    private fun MutableList<String>.addDescription(description: String) {
+        val lines = description.splitLines(200).removeSuffix("§r").replace("§r", "§7").addOptionalDot()
+        for (line in lines.split("\n")) {
+            add("  §7${line}")
+        }
+    }
+
+    private fun String.addOptionalDot(): String {
+        if (endsWith(".")) return this
+        if (endsWith("?")) return this
+        if (endsWith("!")) return this
+
+        return "$this."
     }
 
     @JvmStatic
@@ -574,8 +627,31 @@ object Commands {
         storage.outdatedItems.clear()
     }
 
-    private fun registerCommand(name: String, description: String, function: (Array<String>) -> Unit) {
-        if (commands.any { it.name.equals(name, ignoreCase = true) }) {
+    private fun forceUpdate(args: Array<String>) {
+        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val arg = args.firstOrNull() ?: "current"
+        val updateStream = when {
+            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            else -> currentStream
+        }
+
+        if (updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())) {
+            ChatUtils.clickableChat(
+                "Are you sure you want to switch to beta? These versions may be less stable.",
+                onClick = {
+                    UpdateManager.checkUpdate(true, updateStream)
+                },
+                oneTimeClick = true
+            )
+        } else {
+            UpdateManager.checkUpdate(true, updateStream)
+        }
+    }
+
+    private fun registerCommand(rawName: String, description: String, function: (Array<String>) -> Unit) {
+        val name = rawName.lowercase()
+        if (commands.any { it.name == name }) {
             error("The command '$name is already registered!'")
         }
         ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
@@ -592,7 +668,11 @@ object Commands {
             name,
             createCommand(function),
             object : SimpleCommand.TabCompleteRunnable {
-                override fun tabComplete(sender: ICommandSender?, args: Array<String>?, pos: BlockPos?): List<String> {
+                override fun tabComplete(
+                    sender: ICommandSender?,
+                    args: Array<String>?,
+                    pos: BlockPos?,
+                ): List<String> {
                     return autoComplete(args ?: emptyArray())
                 }
             }

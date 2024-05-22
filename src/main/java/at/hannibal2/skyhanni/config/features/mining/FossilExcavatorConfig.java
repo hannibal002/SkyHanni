@@ -20,8 +20,8 @@ public class FossilExcavatorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Profit Per",
-        desc = "Show profit/loss in chat after each excavation. Also include breakdown information on hover."
+        name = "Profit Per Excavation",
+        desc = "Show profit/loss in chat after each excavation. Also includes breakdown information on hover."
     )
     @ConfigEditorBoolean
     @FeatureToggle

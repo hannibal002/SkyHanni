@@ -38,7 +38,7 @@ class OwnInventoryData {
     )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onItemPickupReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val packet = event.packet

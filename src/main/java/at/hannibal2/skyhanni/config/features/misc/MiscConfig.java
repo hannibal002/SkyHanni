@@ -233,7 +233,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Lock Mouse Message",
-        desc = "Show a message in chat when toggling the /shmouselock.")
+        desc = "Show a message in chat when toggling §e/shmouselock§7.")
     @ConfigEditorBoolean
     public boolean lockMouseLookChatMessage = true;
 
@@ -251,4 +251,15 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
+
+    @Expose
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean replaceRomanNumerals = false;
+
+    @ConfigOption(name = "Hide Far Entities", desc = "")
+    @Accordion
+    @Expose
+    public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 }

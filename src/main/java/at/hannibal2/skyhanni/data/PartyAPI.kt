@@ -168,19 +168,16 @@ object PartyAPI {
 
         // party disbanded
         disbandedPattern.matchMatcher(message) {
-            partyMembers.clear()
-            partyLeader = null
+            partyLeft()
         }
         kickedPattern.matchMatcher(message) {
-            partyMembers.clear()
-            partyLeader = null
+            partyLeft()
         }
         if (message == "§eYou left the party." ||
             message == "§cThe party was disbanded because all invites expired and the party was empty." ||
             message == "§cYou are not currently in a party."
         ) {
-            partyMembers.clear()
-            partyLeader = null
+            partyLeft()
         }
 
         // party list
@@ -205,5 +202,10 @@ object PartyAPI {
         if (partyMembers.contains(playerName)) return
         if (playerName == LorenzUtils.getPlayerName()) return
         partyMembers.add(playerName)
+    }
+
+    private fun partyLeft() {
+        partyMembers.clear()
+        partyLeader = null
     }
 }
