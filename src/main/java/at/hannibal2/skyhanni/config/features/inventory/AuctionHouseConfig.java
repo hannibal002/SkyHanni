@@ -57,7 +57,7 @@ public class AuctionHouseConfig {
     public boolean openPriceWebsite = false;
 
     @Expose
-    @ConfigOption(name = "Outbid alert", desc = "Sends a warning when you're outbid on an auction")
+    @ConfigOption(name = "Outbid alert", desc = "Sends a warning when you're outbid on an auction.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean auctionOutbid = false;
