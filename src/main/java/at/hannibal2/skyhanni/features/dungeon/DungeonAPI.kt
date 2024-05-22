@@ -407,13 +407,13 @@ object DungeonAPI {
     )
 
     private fun handlePhaseMessage(message: String) {
-        if (dungeonFloor == "F6" || dungeonFloor == "M6") when {
+        if (dungeonFloor == "F6" || dungeonFloor == "M6") when {  //move to enum
             terracottaStartPattern.matches(message) -> changePhase(DungeonPhase.F6_TERRACOTTA)
             giantsStartPattern.matches(message) -> changePhase(DungeonPhase.F6_GIANTS)
             sadanStartPattern.matches(message) -> changePhase(DungeonPhase.F6_SADAN)
         }
 
-        if (dungeonFloor == "F7" || dungeonFloor == "M7") {
+        if (dungeonFloor == "F7" || dungeonFloor == "M7") { //move to enum
             goldorTerminalPattern.matchMatcher(message) {
                 val currentTerminal = group("currentTerminal").toIntOrNull() ?: return
                 val totalTerminals = group("total").toIntOrNull() ?: return
