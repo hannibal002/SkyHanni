@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.DungeonPhaseChangeEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -362,7 +363,6 @@ object DungeonAPI {
         M7_WITHER_KING
     }
 
-
     private val phasePatternGroup = RepoPattern.group("dungeon.boss.message")
     private val terracottaStartPattern by phasePatternGroup.pattern(
         "f6.terracotta",
@@ -408,9 +408,9 @@ object DungeonAPI {
 
     private fun handlePhaseMessage(message: String) {
         if (dungeonFloor == "F6" || dungeonFloor == "M6") when {
-            terracottaStartPattern.matches(message) -> dungeonPhase = DungeonPhase.F6_TERRACOTTA
-            giantsStartPattern.matches(message) -> dungeonPhase = DungeonPhase.F6_GIANTS
-            sadanStartPattern.matches(message) -> dungeonPhase = DungeonPhase.F6_SADAN
+            terracottaStartPattern.matches(message) -> changePhase(DungeonPhase.F6_TERRACOTTA)
+            giantsStartPattern.matches(message) -> changePhase(DungeonPhase.F6_GIANTS)
+            sadanStartPattern.matches(message) -> changePhase(DungeonPhase.F6_SADAN)
         }
 
         if (dungeonFloor == "F7" || dungeonFloor == "M7") {
@@ -418,21 +418,26 @@ object DungeonAPI {
                 val currentTerminal = group("currentTerminal").toIntOrNull() ?: return
                 val totalTerminals = group("total").toIntOrNull() ?: return
                 if (currentTerminal != totalTerminals) return
-                dungeonPhase = when (dungeonPhase) {
+                changePhase(when (dungeonPhase) {
                     DungeonPhase.F7_GOLDOR_1 -> DungeonPhase.F7_GOLDOR_2
                     DungeonPhase.F7_GOLDOR_2 -> DungeonPhase.F7_GOLDOR_3
                     DungeonPhase.F7_GOLDOR_3 -> DungeonPhase.F7_GOLDOR_4
                     else -> return
-                }
+                })
             }
             when {
-                maxorStartPattern.matches(message) -> dungeonPhase = DungeonPhase.F7_MAXOR
-                stormStartPattern.matches(message) -> dungeonPhase = DungeonPhase.F7_STORM
-                goldorStartPattern.matches(message) -> dungeonPhase = DungeonPhase.F7_GOLDOR_1
-                goldor5StartPattern.matches(message) -> dungeonPhase = DungeonPhase.F7_GOLDOR_5
-                necronStartPattern.matches(message) -> dungeonPhase = DungeonPhase.F7_NECRON
-                witherKingStartPattern.matches(message) -> if (dungeonPhase != null) dungeonPhase = DungeonPhase.M7_WITHER_KING
+                maxorStartPattern.matches(message) -> changePhase(DungeonPhase.F7_MAXOR)
+                stormStartPattern.matches(message) -> changePhase(DungeonPhase.F7_STORM)
+                goldorStartPattern.matches(message) -> changePhase(DungeonPhase.F7_GOLDOR_1)
+                goldor5StartPattern.matches(message) -> changePhase(DungeonPhase.F7_GOLDOR_5)
+                necronStartPattern.matches(message) -> changePhase(DungeonPhase.F7_NECRON)
+                witherKingStartPattern.matches(message) -> if (dungeonPhase != null) changePhase(DungeonPhase.M7_WITHER_KING)
             }
         }
+    }
+
+    private fun changePhase(newPhase: DungeonPhase) {
+        DungeonPhaseChangeEvent(newPhase)
+        dungeonPhase = newPhase
     }
 }
