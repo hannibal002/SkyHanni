@@ -46,8 +46,17 @@ class RareDropMessages {
         "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
     )
 
+    /**
+     * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §fBlue Whale Pet
+     * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §5Giraffe Pet
+     */
+    private val oringoPattern by chatGroup.pattern(
+        "pet.oringopattern",
+        "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)"
+    )
+
     private val patterns = listOf(
-        petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern
+        petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern, oringoPattern
     )
 
     private val config get() = SkyHanniMod.feature.chat.petRarityDropMessage
