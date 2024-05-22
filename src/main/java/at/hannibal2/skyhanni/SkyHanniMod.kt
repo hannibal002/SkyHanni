@@ -349,6 +349,7 @@ import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
 import at.hannibal2.skyhanni.features.misc.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.PetItemDisplay
+import at.hannibal2.skyhanni.features.misc.PetNametag
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.PrivateIslandNoPickaxeAbility
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
@@ -939,6 +940,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(PetNametag())
 
         init()
 
