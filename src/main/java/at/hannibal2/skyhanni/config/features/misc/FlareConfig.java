@@ -18,7 +18,7 @@ public class FlareConfig {
     public boolean overlayEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Alert", desc = "Send an alert when a flare is about to expire.")
+    @ConfigOption(name = "Alert Type", desc = "What type of alert should be sent when a flare is about to expire.")
     @ConfigEditorDropdown
     public AlertType alertType = AlertType.CHAT;
 
