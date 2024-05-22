@@ -124,13 +124,12 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonHideItems
 import at.hannibal2.skyhanni.features.dungeon.DungeonHighlightClickedBlocks
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
-import at.hannibal2.skyhanni.features.dungeon.DungeonPhaseHandler
+import at.hannibal2.skyhanni.features.dungeon.DungeonPhaseUtils
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonShadowAssassinNotification
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
 import at.hannibal2.skyhanni.features.dungeon.DungeonsRaceGuide
 import at.hannibal2.skyhanni.features.dungeon.HighlightDungeonDeathmite
-import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -886,7 +885,7 @@ class SkyHanniMod {
         loadModule(GlowingDroppedItems())
         loadModule(DungeonTeammateOutlines())
         loadModule(DungeonRankTabListColor())
-        loadModule(TerracottaPhase())
+        loadModule(DungeonPhaseUtils())
         loadModule(VolcanoExplosivityDisplay())
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
@@ -940,7 +939,6 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(DungeonPhaseHandler())
 
         init()
 
