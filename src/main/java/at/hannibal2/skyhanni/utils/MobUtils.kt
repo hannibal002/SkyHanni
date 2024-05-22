@@ -13,7 +13,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 
 object MobUtils {
-    val defaultArmorStandName by RepoPattern.pattern("armorstand.default", "Armou?r Stand")
+    val defaultArmorStandNamePattern by RepoPattern.pattern("armorstand.default", "Armou?r Stand")
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
     fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
@@ -30,7 +30,7 @@ object MobUtils {
         getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }
             .sortedBy { it.distanceTo(entity) }.firstOrNull()
 
-    fun EntityArmorStand.isDefaultValue() = defaultArmorStandName.matches(this.name)
+    fun EntityArmorStand.isDefaultValue() = defaultArmorStandNamePattern.matches(this.name)
 
     fun EntityArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
 

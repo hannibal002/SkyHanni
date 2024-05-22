@@ -44,7 +44,7 @@ class DungeonBossMessages {
         " Necron§r§c: ",
         " §r§4§kWither King§r§c:",
     )
-    private val messageEndsWithList by patternGroup.list(
+    private val messageEndsWithPatterns by patternGroup.list(
         "messageendswith",
         " Necron§r§c: That is enough, fool!$",
         " Necron§r§c: Adventurers! Be careful of who you are messing with..$",
@@ -70,19 +70,19 @@ class DungeonBossMessages {
      * @see excludedMessagesPattern
      * @see messagePattern
      * @see messageContainsPattern
-     * @see messageEndsWithList
+     * @see messageEndsWithPatterns
      */
     private fun isBoss(message: String): Boolean {
         // Cases that match below but should not be blocked
 
-        if (excludedMessagesPattern.any { it.matches(message) }) return false
+        if (excludedMessagesPatterns.any { it.matches(message) }) return false
 
         // Exact Matches
-        if (messagePattern.any { it.matches(message) }) return true
+        if (messagePatterns.any { it.matches(message) }) return true
 
         // Matches Regex for Boss Prefix
         bossPattern.matchMatcher(message) {
-            return messageContainsPattern.any { it.matches(message) } || messageEndsWithList.any { it.find(message) }
+            return messageContainsPatterns.any { it.matches(message) } || messageEndsWithPatterns.any { it.find(message) }
         }
         return false
     }

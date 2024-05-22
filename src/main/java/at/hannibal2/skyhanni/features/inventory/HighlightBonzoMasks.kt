@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -38,11 +39,11 @@ class HighlightBonzoMasks {
     private val redHue = Color.RGBtoHSB(255, 0, 0, null)[0].toDouble()
 
     private val patternGroup = RepoPattern.group("highlightbonzomask")
-    private val spiritMaskMessage by patternGroup.pattern(
+    private val spiritMaskMessagePattern by patternGroup.pattern(
         "spiritmask",
         "^Second Wind Activated! Your Spirit Mask saved your life!$"
     )
-    private val bonzoMaskMessage by patternGroup.pattern(
+    private val bonzoMaskMessagePattern by patternGroup.pattern(
         "bonzomask",
         "^Your (.*Bonzo's Mask) saved your life!$"
     )
@@ -74,9 +75,9 @@ class HighlightBonzoMasks {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val message = event.message.removeColor()
-        if (bonzoMaskMessage.toRegex().matches(message)) {
+        if (bonzoMaskMessagePattern.matches(message)) {
             maskTimers["BONZO_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), bonzoMaskCooldown)
-        } else if (spiritMaskMessage.toRegex().matches(message)) {
+        } else if (spiritMaskMessagePattern.matches(message)) {
             maskTimers["SPIRIT_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), spiritMaskCooldown)
         }
     }

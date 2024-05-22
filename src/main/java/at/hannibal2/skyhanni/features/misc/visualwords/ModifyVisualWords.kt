@@ -17,8 +17,6 @@ object ModifyVisualWords {
 
     var modifiedWords = mutableListOf<VisualWord>()
 
-    val reverseRegex = "(§.|^|[\\s:()+-])([^§\\s:()+-]*)".toRegex()
-
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText

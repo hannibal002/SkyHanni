@@ -42,7 +42,7 @@ class PestSpawn {
     /**
      * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aPlot §7- §b2§7!
      */
-    private val multiplePestsSpawn by patternGroup.pattern(
+    private val multiplePestsSpawnPattern by patternGroup.pattern(
         "multiple",
         "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!"
     )
@@ -50,7 +50,7 @@ class PestSpawn {
     /**
      * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aThe Barn§7!
      */
-    private val multiplePestsBarnSpawn by patternGroup.pattern(
+    private val multiplePestsBarnSpawnPattern by patternGroup.pattern(
         "multiplebarn",
         "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §a(?<plot>The Barn)§7!"
     )
@@ -58,7 +58,7 @@ class PestSpawn {
     /**
      * REGEX-TEST: §6§lGROSS! §7While you were offline, §6Pests §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
      */
-    private val offlinePestsSpawn by patternGroup.pattern(
+    private val offlinePestsSpawnPattern by patternGroup.pattern(
         "offline",
         "§6§l.*! §7While you were offline, §6Pests §7spawned in §aPlots (?<plots>.*)!"
     )
@@ -84,21 +84,21 @@ class PestSpawn {
             pestSpawn(1, plotNames, false)
             blocked = true
         }
-        multiplePestsSpawn.matchMatcher(message) {
+        multiplePestsSpawnPattern.matchMatcher(message) {
             val plotName = group("plot")
             plotNames.add(plotName)
             val amount = group("amount").toInt()
             pestSpawn(amount, plotNames, false)
             blocked = true
         }
-        multiplePestsBarnSpawn.matchMatcher(message) {
+        multiplePestsBarnSpawnPattern.matchMatcher(message) {
             val plotName = group("plot")
             plotNames.add(plotName)
             val amount = group("amount").toInt()
             pestSpawn(amount, plotNames, false)
             blocked = true
         }
-        offlinePestsSpawn.matchMatcher(message) {
+        offlinePestsSpawnPattern.matchMatcher(message) {
             val plots = group("plots")
             plotNames = plots.removeColor().split(", ", " and ").toMutableList()
             pestSpawn(0, plotNames, true)

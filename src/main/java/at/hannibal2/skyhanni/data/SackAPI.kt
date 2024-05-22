@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchAll
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -56,6 +57,10 @@ object SackAPI {
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
         " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?"
+    )
+    private val sackChangePattern by patternGroup.pattern(
+        "sackchange",
+        "(?<amount>[+-][\\d,]+) (?<item>.+) \\((?<sacks>.+)\\)"
     )
 
     private var isRuneSack = false
@@ -228,8 +233,6 @@ object SackAPI {
 
     data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
 
-    private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
-
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
@@ -252,13 +255,16 @@ object SackAPI {
         val otherItemsRemoved = sackRemoveText.contains("other items")
 
         val sackChanges = ArrayList<SackChange>()
-        for (match in sackChangeRegex.findAll(sackChangeText)) {
-            val delta = match.groups[1]!!.value.formatInt()
-            val item = match.groups[2]!!.value
-            val sacks = match.groups[3]!!.value.split(", ")
 
-            val internalName = NEUInternalName.fromItemName(item)
-            sackChanges.add(SackChange(delta, internalName, sacks))
+        for (line in sackChangeText.lines()) {
+            sackChangePattern.findMatcher(line) {
+                val amount = group("amount").formatInt()
+                val item = group("name")
+                val sacks = group("sacks").split(", ")
+
+                val internalName = NEUInternalName.fromItemName(item)
+                sackChanges.add(SackChange(amount, internalName, sacks))
+            }
         }
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)

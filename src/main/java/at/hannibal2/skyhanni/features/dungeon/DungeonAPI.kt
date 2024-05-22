@@ -43,7 +43,7 @@ object DungeonAPI {
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
     private val patternGroup = RepoPattern.group("dungeon.new")
-    private val dungeonComplete by patternGroup.pattern(
+    private val dungeonCompletePattern by patternGroup.pattern(
         "complete",
         "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
     )
@@ -247,7 +247,8 @@ object DungeonAPI {
             started = true
             DungeonStartEvent(floor).postAndCatch()
         }
-        if (event.message.removeColor().matches(uniqueClassBonusPattern.toRegex())) {
+
+        if (uniqueClassBonusPattern.matches(event.message.removeColor())) {
             isUniqueClass = true
         }
 
@@ -260,7 +261,7 @@ object DungeonAPI {
             }
             return
         }
-        dungeonComplete.matchMatcher(event.message) {
+        dungeonCompletePattern.matchMatcher(event.message) {
             DungeonCompleteEvent(floor).postAndCatch()
             return
         }

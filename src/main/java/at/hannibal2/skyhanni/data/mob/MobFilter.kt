@@ -47,14 +47,17 @@ import net.minecraft.entity.player.EntityPlayer
 @Suppress("RegExpRedundantEscape")
 object MobFilter {
 
-    private val repoGroup = RepoPattern.group("mob.detection.new")
+    private val patternGroup = RepoPattern.group("mob.detection.new")
 
     /** REGEX-TEST: Wither Husk 500M❤ */
-    val mobNameFilter by repoGroup.pattern(
+    val mobNamePattern by patternGroup.pattern(
         "filter.basic",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+"
     )
-    val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+")
+    val slayerNamePattern by patternGroup.pattern(
+        "filter.slayer",
+        "^. (?<name>.*) (?<tier>[IV]+) \\d+"
+    )
 
     /** REGEX-TEST: ﴾ Storm ﴿
      *  REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
@@ -65,28 +68,46 @@ object MobFilter {
      *  REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
      *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
      *  */
-    val bossMobNameFilter by repoGroup.pattern(
+    val bossMobNamePattern by patternGroup.pattern(
         "filter.boss",
         "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+|█+)? .$"
     )
-    val dungeonNameFilter by repoGroup.pattern(
+    val dungeonNamePattern by patternGroup.pattern(
         "filter.dungeon",
         "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$"
     )
-    val summonFilter by repoGroup.pattern("filter.summon", "^(?<owner>\\w+)'s (?<name>.*) \\d+")
-    val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$")
-    val jerryPattern by repoGroup.pattern(
+    val summonPattern by patternGroup.pattern(
+        "filter.summon",
+        "^(?<owner>\\w+)'s (?<name>.*) \\d+"
+    )
+    val dojoPattern by patternGroup.pattern(
+        "filter.dojo",
+        "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$"
+    )
+    val jerryPattern by patternGroup.pattern(
         "jerry",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits"
     )
-
-    val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)")
-    val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
-    val jerryMagmaCubePattern by repoGroup.pattern(
+    val petCareNamePattern by patternGroup.pattern(
+        "pattern.petcare",
+        "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)"
+    )
+    val wokeSleepingGolemPattern by patternGroup.pattern(
+        "pattern.dungeon.woke.golem",
+        "(?:§c§lWoke|§5§lSleeping) Golem§r"
+    )
+    val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
         "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤"
     )
-    val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", "Spawned by: (?<name>.*)")
+    val summonOwnerPattern by patternGroup.pattern(
+        "pattern.summon.owner",
+        "Spawned by: (?<name>.*)"
+    )
+    val isGuardianPattern by patternGroup.pattern(
+        "isgaurdian",
+        "^\\d+"
+    )
 
     internal const val RAT_SKULL =
         "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
@@ -125,7 +146,7 @@ object MobFilter {
         "anrrtqytsl", // Weaponsmith
     )
 
-    private val displayNPCCompressedNamePattern by repoGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
+    private val displayNPCCompressedNamePattern by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
 
     private fun displayNPCNameCheck(name: String) = name.startsWith('§')
         || displayNPCCompressedNamePattern.matches(name)
@@ -287,8 +308,7 @@ object MobFilter {
 
             baseEntity is EntityHorse && armorStand.name.endsWith("'s Horse") -> MobResult.illegal // Horse Pet
 
-            baseEntity is EntityGuardian && armorStand.cleanName()
-                .matches("^\\d+".toRegex()) -> MobResult.illegal // Wierd Sea Guardian Ability
+            baseEntity is EntityGuardian && isGuardianPattern.matches(armorStand.cleanName()) -> MobResult.illegal // Wierd Sea Guardian Ability
 
             else -> null
         }

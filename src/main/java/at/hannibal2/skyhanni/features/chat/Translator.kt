@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import kotlinx.coroutines.launch
 import net.minecraft.event.ClickEvent
@@ -23,7 +25,12 @@ import java.net.URLEncoder
 // TODO split into two classes: TranslatorCommand and GoogleTransaltor. only communicates via getTranslationFromEnglish and getTranslationToEnglish
 class Translator {
 
-    private val messageContentRegex = Regex(".*: (.*)")
+    private val patternGroup = RepoPattern.group("translator")
+    private val messageContentPattern by patternGroup.pattern(
+        "messagecontent",
+        ".*: (?<content>.*)"
+    )
+
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
@@ -43,7 +50,10 @@ class Translator {
     }
 
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
-        val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
+        //TODO seraid
+        val text = messageContentPattern.findMatcher(message) {
+            group("content").removeColor()
+        }
         style.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shtranslate $text"))
         style.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§bClick to translate!")))
         return style

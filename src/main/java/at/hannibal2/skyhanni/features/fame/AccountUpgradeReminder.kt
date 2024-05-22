@@ -12,12 +12,29 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class AccountUpgradeReminder {
+
+    private val patternGroup = RepoPattern.group("accountupgradereminder")
+    private val durationPattern by patternGroup.pattern(
+        "duration",
+        "§8Duration: (?<duration>\\d{1,3})d"
+    )
+    private val startedPattern by patternGroup.pattern(
+        "started",
+        "§eYou started the §r§a(?<upgrade>.+) §r§eupgrade!"
+    )
+    private val claimedPattern by patternGroup.pattern(
+        "claimed",
+        "§eYou claimed the §r§a.+ §r§eupgrade!"
+    )
 
     private var inInventory = false
     private var duration: Duration? = null
@@ -74,18 +91,22 @@ class AccountUpgradeReminder {
         if (!inInventory) return
         val clickedItemLore = event.slot?.stack?.getLore() ?: return
         if (clickedItemLore.getOrNull(0) != "§8Account Upgrade") return
-        val result = clickedItemLore.firstNotNullOfOrNull {
-            durationRegex.matchEntire(it)
+
+        clickedItemLore.firstNotNullOfOrNull {
+            durationPattern.matchMatcher(it) {
+                duration = group("duration").toInt().days
+            }
         } ?: return
-        duration = result.groups[1]!!.value.toInt().days
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (claimedRegex.matches(event.message)) {
+        if (claimedPattern.matches(event.message)) {
             clearUpgrade()
         } else {
-            val upgrade = startedRegex.matchEntire(event.message)?.groups?.get(1)?.value ?: return
+            val upgrade = startedPattern.matchMatcher(event.message) {
+                group("upgrade")
+            } ?: return
             startUpgrade(upgrade)
         }
     }
@@ -105,11 +126,6 @@ class AccountUpgradeReminder {
     }
 
     companion object {
-
-        private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
-        private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
-        private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()
-
         private fun isEnabled() = SkyHanniMod.feature.misc.accountUpgradeReminder
 
         fun disable() {

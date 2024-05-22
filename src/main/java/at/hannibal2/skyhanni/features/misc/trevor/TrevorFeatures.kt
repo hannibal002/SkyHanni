@@ -53,15 +53,15 @@ object TrevorFeatures {
         "trapper",
         "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*)."
     )
-    private val talbotPatternAbove by patternGroup.pattern(
+    private val talbotAbovePattern by patternGroup.pattern(
         "above",
         "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!"
     )
-    private val talbotPatternBelow by patternGroup.pattern(
+    private val talbotBelowPattern by patternGroup.pattern(
         "below",
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
     )
-    private val talbotPatternAt by patternGroup.pattern(
+    private val talbotAtPattern by patternGroup.pattern(
         "at",
         "You are at the exact height!",
     )
@@ -151,15 +151,15 @@ object TrevorFeatures {
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
-        talbotPatternAbove.matchMatcher(formattedMessage) {
+        talbotAbovePattern.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, true)
         }
-        talbotPatternBelow.matchMatcher(formattedMessage) {
+        talbotBelowPattern.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
             TrevorSolver.findMobHeight(height, false)
         }
-        talbotPatternAt.matchMatcher(formattedMessage) {
+        talbotAtPattern.matchMatcher(formattedMessage) {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 

@@ -65,7 +65,7 @@ object ItemDisplayOverlayFeatures {
         "masterskull",
         "(.*)Master Skull - Tier ."
     )
-    private val gardenVacuumPatterm by patternGroup.pattern(
+    private val gardenVacuumPattern by patternGroup.pattern(
         "vacuum",
         "§7Vacuum Bag: §6(?<amount>\\d*) Pests?"
     )
@@ -237,7 +237,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
-            lore.matchFirst(gardenVacuumPatterm) {
+            lore.matchFirst(gardenVacuumPattern) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
                     if (pests > 39) "§640+" else "$pests"

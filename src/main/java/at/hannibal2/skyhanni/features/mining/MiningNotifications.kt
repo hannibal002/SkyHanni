@@ -38,19 +38,19 @@ object MiningNotifications {
     }
 
     private val patternGroup = RepoPattern.group("mining.notifications")
-    private val mineshaftSpawn by patternGroup.pattern(
+    private val mineshaftSpawnPattern by patternGroup.pattern(
         "mineshaft.spawn",
         "§5§lWOW! §r§aYou found a §r§bGlacite Mineshaft §r§aportal!"
     )
-    private val scrapDrop by patternGroup.pattern(
+    private val scrapDropPattern by patternGroup.pattern(
         "scrapdrop",
         "§6§lEXCAVATOR! §r§fYou found a §r§9Suspicious Scrap§r§f!"
     )
-    val goldenGoblinSpawn by patternGroup.pattern(
+    val goldenGoblinSpawnPattern by patternGroup.pattern(
         "goblin.goldspawn",
         "§6A Golden Goblin has spawned!"
     )
-    val diamondGoblinSpawn by patternGroup.pattern(
+    val diamondGoblinSpawnPattern by patternGroup.pattern(
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!"
     )
@@ -69,10 +69,10 @@ object MiningNotifications {
         if (!config.enabled) return
         val message = event.message
         when {
-            mineshaftSpawn.matches(message) -> sendNotification(MiningNotificationList.MINESHAFT_SPAWN)
-            scrapDrop.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
-            goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
-            diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
+            mineshaftSpawnPattern.matches(message) -> sendNotification(MiningNotificationList.MINESHAFT_SPAWN)
+            scrapDropPattern.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
+            goldenGoblinSpawnPattern.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
+            diamondGoblinSpawnPattern.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
             frostbitePattern.matches(message) -> {
                 if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope) {
                     runDelayed(0.5.seconds) {

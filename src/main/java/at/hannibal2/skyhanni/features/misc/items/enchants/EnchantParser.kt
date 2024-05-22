@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
@@ -41,6 +42,9 @@ object EnchantParser {
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency)"
+    )
+    private val stackingPattern by patternGroup.pattern(
+        "stacking", "[\\d,]+\$"
     )
 
     private var currentItem: ItemStack? = null
@@ -240,7 +244,8 @@ object EnchantParser {
                 // Pull enchant, enchant level and stacking amount if applicable
                 val enchant = this.enchants.getFromLore(matcher.group("enchant"))
                 val level = matcher.group("levelNumeral").romanToDecimal()
-                val stacking = if (matcher.group("stacking").trimStart().matches("[\\d,]+\$".toRegex())) {
+
+                val stacking = if (stackingPattern.matches(matcher.group("stacking").trimStart())) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"

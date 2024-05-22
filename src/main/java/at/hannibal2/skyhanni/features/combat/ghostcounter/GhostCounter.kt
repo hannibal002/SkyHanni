@@ -97,6 +97,10 @@ object GhostCounter {
         "skilllevel",
         "§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+)"
     )
+    private val partPattern by patternGroup.pattern(
+        "part",
+        "(?<xp>[0-9]{3,}[^,]+)"
+    )
 
     private val format = NumberFormat.getInstance()
     private var percent: Float = 0.0f
@@ -163,7 +167,10 @@ object GhostCounter {
             xpHourFormatting.noData
         } else {
             xpInterp = interp(xpGainHour, xpGainHourLast, lastUpdate)
-            val part = "([0-9]{3,}[^,]+)".toRegex().find(format.format(xpInterp))?.groupValues?.get(1) ?: "N/A"
+
+            val part = partPattern.findMatcher(format.format(xpInterp)) {
+                group("xp")
+            } ?: "N/A"
             "$part ${if (isKilling) "" else xpHourFormatting.paused}"
         }
 

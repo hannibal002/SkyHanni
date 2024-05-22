@@ -31,6 +31,10 @@ object CruxTalismanDisplay {
         "bonuses",
         "^§7Total Bonuses"
     )
+    private val maxedPattern by patternGroup.pattern(
+        "maxed",
+        "(?<progress>\\d+)/\\d+"
+    )
 
     private val partialName = "CRUX_TALISMAN"
     private var display = emptyList<List<Any>>()
@@ -69,15 +73,17 @@ object CruxTalismanDisplay {
                 displayLine.forEach {
                     percent += if (config.compactWhenMaxed) {
                         if (!it.maxed) {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)
-                                ?.toInt() ?: 0
+                            maxedPattern.findMatcher(it.progress.removeColor()) {
+                                group("progress").toInt()
+                            } ?: 0
                         } else 100
                     } else {
                         if (it.progress.contains("MAXED"))
                             100
                         else {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)
-                                ?.toInt() ?: 0
+                            maxedPattern.findMatcher(it.progress.removeColor()) {
+                                group("progress").toInt()
+                            } ?: 0
                         }
                     }
                     addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")

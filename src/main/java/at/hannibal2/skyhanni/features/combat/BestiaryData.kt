@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.find
+import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -109,6 +110,22 @@ object BestiaryData {
     private val resultsPattern by patternGroup.pattern(
         "results",
         "^§7Results: §a"
+    )
+    private val namePattern by patternGroup.pattern(
+        "name",
+        " [IVX0-9]+$"
+    )
+    private val levelPattern by patternGroup.pattern(
+        "level",
+        " (?<level>[IVX0-9]+$)"
+    )
+    private val spacePattern by patternGroup.pattern(
+        "space",
+        "^ {20}"
+    )
+    private val actualRealTotalKillPattern by patternGroup.pattern(
+        "actualrealtotalkill",
+        "(?<kills>[0-9,.]+)"
     )
 
     private var display = emptyList<List<Any>>()
@@ -211,7 +228,7 @@ object BestiaryData {
             var familiesCompleted: Long = 0
             for ((lineIndex, loreLine) in stack.getLore().withIndex()) {
                 val line = loreLine.removeColor()
-                if (!line.startsWith("                    ")) continue
+                if (!spacePattern.find(loreLine)) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = line.substring(line.lastIndexOf(' ') + 1)
                 if (familiesFoundContainsPattern.find(previousLine)) {
@@ -235,8 +252,10 @@ object BestiaryData {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
             inInventory = true
-            val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
-            val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
+            val name = namePattern.matcher(stack.displayName).replaceFirst("")
+            val level = levelPattern.findMatcher(stack.displayName) {
+                group("level")
+            } ?: "0"
             var totalKillToMax: Long = 0
             var currentTotalKill: Long = 0
             var totalKillToTier: Long = 0
@@ -245,8 +264,9 @@ object BestiaryData {
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
                 if (killsPattern.find(loreLine)) {
-                    actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatLong()
-                        ?: 0
+                    actualRealTotalKill = actualRealTotalKillPattern.findMatcher(loreLine) {
+                        group("kills").formatLong()
+                    } ?: 0
                 }
                 if (!loreLine.startsWith("                    ")) continue
                 val previousLine = stack.getLore()[lineIndex - 1]

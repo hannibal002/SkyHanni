@@ -29,8 +29,8 @@ class GoldenGoblinHighlight {
     @SubscribeEvent
     fun onChatEvent(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (!MiningNotifications.goldenGoblinSpawn.matches(event.message) &&
-            !MiningNotifications.diamondGoblinSpawn.matches(event.message)
+        if (!MiningNotifications.goldenGoblinSpawnPattern.matches(event.message) &&
+            !MiningNotifications.diamondGoblinSpawnPattern.matches(event.message)
         ) return
         lastChatMessage = SimpleTimeMark.now()
         handle()

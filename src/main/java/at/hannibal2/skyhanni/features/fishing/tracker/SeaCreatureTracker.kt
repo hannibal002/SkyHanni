@@ -32,7 +32,7 @@ object SeaCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val trophyArmorNames by RepoPattern.pattern(
+    private val trophyArmorNamesPattern by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
         "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
     )
@@ -174,7 +174,7 @@ object SeaCreatureTracker {
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing && !LorenzUtils.inKuudraFight
 
     private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
-        trophyArmorNames.matches(it?.getInternalName()?.asString())
+        trophyArmorNamesPattern.matches(it?.getInternalName()?.asString())
     }
 
     @SubscribeEvent

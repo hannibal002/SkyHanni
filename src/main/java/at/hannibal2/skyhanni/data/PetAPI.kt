@@ -10,11 +10,11 @@ object PetAPI {
         "menu.title",
         "Pets(?: \\(\\d+/\\d+\\) )?"
     )
-    private val petItemName by patternGroup.pattern(
+    private val petItemNamePattern by patternGroup.pattern(
         "item.name",
         "(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)"
     )
-    private val neuRepoPetItemName by patternGroup.pattern(
+    private val neuRepoPetItemNamePattern by patternGroup.pattern(
         "item.name.neu.format",
         "(§f§f)?§7\\[Lvl 1➡(100|200)] (?<name>.*)"
     )
@@ -40,19 +40,20 @@ object PetAPI {
     fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false
 
     fun getCleanName(nameWithLevel: String): String? {
-        petItemName.matchMatcher(nameWithLevel) {
+        petItemNamePattern.matchMatcher(nameWithLevel) {
             return group("name")
         }
-        neuRepoPetItemName.matchMatcher(nameWithLevel) {
+        neuRepoPetItemNamePattern.matchMatcher(nameWithLevel) {
             return group("name")
         }
 
         return null
     }
 
-    fun getPetLevel(nameWithLevel: String): Int? = petItemName.matchMatcher(nameWithLevel) {
+    fun getPetLevel(nameWithLevel: String): Int? = petItemNamePattern.matchMatcher(nameWithLevel) {
         group("level").toInt()
     }
 
-    fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
+    fun hasPetName(name: String): Boolean =
+        petItemNamePattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 }

@@ -14,7 +14,7 @@ object MobFactories {
         armorStand: EntityArmorStand,
         extraEntityList: List<EntityLivingBase>
     ): Mob? =
-        MobFilter.slayerNameFilter.findMatcher(armorStand.cleanName()) {
+        MobFilter.slayerNamePattern.findMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.SLAYER,
@@ -31,7 +31,7 @@ object MobFactories {
         extraEntityList: List<EntityLivingBase> = emptyList(),
         overriddenName: String? = null
     ): Mob? =
-        MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.bossMobNamePattern.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.BOSS,
@@ -47,7 +47,7 @@ object MobFactories {
         armorStand: EntityArmorStand,
         extraEntityList: List<EntityLivingBase> = emptyList()
     ): Mob? =
-        MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.dungeonNamePattern.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.DUNGEON,
@@ -67,7 +67,7 @@ object MobFactories {
         armorStand: EntityArmorStand,
         extraEntityList: List<EntityLivingBase>? = null
     ): Mob? =
-        MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
+        MobFilter.mobNamePattern.findMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.BASIC,
@@ -89,7 +89,7 @@ object MobFactories {
         armorStand: EntityArmorStand,
         extraEntityList: List<EntityLivingBase>
     ): Mob? =
-        MobFilter.summonFilter.findMatcher(armorStand.cleanName()) {
+        MobFilter.summonPattern.findMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.SUMMON,
@@ -118,7 +118,7 @@ object MobFactories {
 
     private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
     fun dojo(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): Mob? =
-        MobFilter.dojoFilter.matchMatcher(armorStand.cleanName()) {
+        MobFilter.dojoPattern.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
                 mobType = Mob.Type.SPECIAL,

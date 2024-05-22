@@ -108,7 +108,7 @@ object MaxwellAPI {
         "gui.noselectedpower",
         "(?:§.)*Visit Maxwell in the Hub to learn"
     )
-    private val accessoryBagStack by patternGroup.pattern(
+    private val accessoryBagStackPattern by patternGroup.pattern(
         "stack.accessorybag",
         "§.Accessory Bag"
     )
@@ -164,7 +164,7 @@ object MaxwellAPI {
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
             for (stack in event.inventoryItems.values) {
-                if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
+                if (accessoryBagStackPattern.matches(stack.displayName)) processStack(stack)
             }
         }
         if (statsTuningGuiPattern.matches(event.inventoryName)) {

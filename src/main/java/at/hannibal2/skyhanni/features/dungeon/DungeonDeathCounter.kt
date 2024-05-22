@@ -19,7 +19,7 @@ class DungeonDeathCounter {
 
     private val patternGroup = RepoPattern.group("dungeondeathcounter")
 
-    private val deathPatternsList by patternGroup.list(
+    private val deathPatterns by patternGroup.list(
         "deathpatterns",
         "§c ☠ §r§7You were killed by (.*)§r§7 and became a ghost§r§7.",
         "§c ☠ §r§7(.*) was killed by (.*) and became a ghost§r§7.",
@@ -51,7 +51,7 @@ class DungeonDeathCounter {
     )
 
     private fun isDeathMessage(message: String): Boolean =
-        deathPatternsList.any { it.matches(message) }
+        deathPatterns.any { it.matches(message) }
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChat(event: LorenzChatEvent) {
