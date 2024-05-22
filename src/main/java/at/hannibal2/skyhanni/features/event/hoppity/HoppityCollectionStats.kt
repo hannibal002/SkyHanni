@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -144,7 +145,7 @@ object HoppityCollectionStats {
                 add("§7Duplicate Rabbits: §a$displayDuplicates")
                 add("§7Total Rabbits Found: §a${displayFound + displayDuplicates}")
                 add("")
-                add("§7Chocolate Per Second: §a$displayChocolatePerSecond")
+                add("§7Chocolate Per Second: §a${displayChocolatePerSecond.addSeparators()}")
                 add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
             }
             table.add(
@@ -194,6 +195,13 @@ object HoppityCollectionStats {
             val duplicates = duplicatesFound.coerceAtLeast(0)
             loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
         }
+        // For getting data for neu pv
+//         val rarityToRabbit = mutableMapOf<RabbitCollectionRarity, MutableList<String>>()
+//         loggedRabbits.forEach { (name, info) ->
+//             val formattedName = name.removeColor().lowercase().replace(" ", "_").replace("-", "_")
+//             rarityToRabbit.getOrPut(info.rarity) { mutableListOf() }.add("\"$formattedName\"")
+//         }
+//         println(rarityToRabbit)
         return totalAmount
     }
 
@@ -218,6 +226,7 @@ object HoppityCollectionStats {
         EPIC("§5Epic", 10, 0.005, "STAINED_GLASS-10".asInternalName()),
         LEGENDARY("§6Legendary", 0, 0.02, "STAINED_GLASS-1".asInternalName()),
         MYTHIC("§dMythic", 0, 0.0, "STAINED_GLASS-6".asInternalName()),
+        DIVINE("§bDivine", 0, 0.0, "STAINED_GLASS-3".asInternalName()),
         TOTAL("§cTotal", 0, 0.0, "STAINED_GLASS-14".asInternalName()),
         ;
 

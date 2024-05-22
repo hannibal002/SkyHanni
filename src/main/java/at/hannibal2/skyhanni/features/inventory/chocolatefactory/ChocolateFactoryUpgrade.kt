@@ -46,7 +46,8 @@ data class ChocolateFactoryUpgrade(
                 in (75..124) -> "§9$level"
                 in (125..174) -> "§5$level"
                 in (175..199) -> "§6$level"
-                200 -> "§d$level"
+                in (200..219) -> "§d$level"
+                in (220..225) -> "§b$level"
                 else -> "§c$level"
             }
 
