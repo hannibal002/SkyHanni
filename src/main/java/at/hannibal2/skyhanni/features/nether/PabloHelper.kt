@@ -33,7 +33,7 @@ class PabloHelper {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
-        val itemName = messagePattern.matchMatchers(event.message.removeColor()) {
+        val itemName = messagePatterns.matchMatchers(event.message.removeColor()) {
             group("flower")
         } ?: return
 

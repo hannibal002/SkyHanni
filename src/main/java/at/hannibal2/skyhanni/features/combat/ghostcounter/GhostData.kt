@@ -7,35 +7,6 @@ import kotlin.math.roundToInt
 object GhostData {
 
     private val patternGroup = RepoPattern.group("ghostdata")
-    private val sorrowPattern by patternGroup.pattern(
-        "sorrow",
-        "§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)"
-    )
-    private val voltaPattern by patternGroup.pattern(
-        "volta",
-        "§6§lRARE DROP! §r§9Volta §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)"
-    )
-    private val plasmaPattern by patternGroup.pattern(
-        "plasma",
-        "§6§lRARE DROP! §r§9Plasma §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)"
-    )
-    private val ghostlyPattern by patternGroup.pattern(
-        "ghostly",
-        "§6§lRARE DROP! §r§9Ghostly Boots §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)"
-    )
-    private val bagOfCashPattern by patternGroup.pattern(
-        "bagofcash",
-        "§eThe ghost's death materialized §r§61,000,000 coins §r§efrom the mists!"
-    )
-    private val killComboCoinsPattern by patternGroup.pattern(
-        "killcombocoins",
-        "[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill"
-    )
-    private val killComboPattern by patternGroup.pattern(
-        "killcombo",
-        "[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill"
-    )
-
 
     private var session = mutableMapOf(
         Option.KILLS to 0.0,
@@ -78,18 +49,19 @@ object GhostData {
 
     enum class Option(val pattern: Pattern? = null) {
         KILLS,
-        SORROWCOUNT(sorrowPattern),
-        VOLTACOUNT(voltaPattern),
-        PLASMACOUNT(plasmaPattern),
-        GHOSTLYBOOTS(ghostlyPattern),
-        BAGOFCASH(bagOfCashPattern),
-        KILLCOMBOCOINS(killComboCoinsPattern),
+        SORROWCOUNT("§6§lRARE DROP! §r§9Sorrow §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
+        VOLTACOUNT("§6§lRARE DROP! §r§9Volta §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
+        PLASMACOUNT("§6§lRARE DROP! §r§9Plasma §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
+        GHOSTLYBOOTS("§6§lRARE DROP! §r§9Ghostly Boots §r§b\\([+](?<mf>.*)% §r§b✯ Magic Find§r§b\\)".toPattern()),
+        BAGOFCASH("§eThe ghost's death materialized §r§61,000,000 coins §r§efrom the mists!".toPattern()),
+        KILLCOMBOCOINS("[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill".toPattern()),
         TOTALDROPS,
         GHOSTSINCESORROW,
         SCAVENGERCOINS,
         MAXKILLCOMBO,
-        KILLCOMBO(killComboPattern),
-        SKILLXPGAINED;
+        KILLCOMBO("[+]\\d+ Kill Combo [+](?<coin>.*) coins per kill".toPattern()),
+        SKILLXPGAINED,
+        ;
 
         fun add(i: Double, s: Boolean = false) {
             if (s)

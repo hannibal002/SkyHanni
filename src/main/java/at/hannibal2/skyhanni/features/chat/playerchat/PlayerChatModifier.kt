@@ -60,7 +60,7 @@ class PlayerChatModifier {
         var string = input
 
         if (config.playerRankHider) {
-            for (pattern in playerPattern) {
+            for (pattern in playerPatterns) {
                 string = pattern.replace(string, "§b$1")
             }
             string = type1Pattern.replace(string, "§b$1's")

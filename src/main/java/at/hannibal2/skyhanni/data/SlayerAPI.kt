@@ -130,7 +130,6 @@ object SlayerAPI {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 
-        //TODO seraid figure this out
         val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter({ slayerQuestPattern.matches(it) }) ?: ""
         if (slayerQuest != latestSlayerCategory) {
             val old = latestSlayerCategory

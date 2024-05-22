@@ -116,7 +116,6 @@ object VampireSlayerFeatures {
         if (name != "Bloodfiend ") return
 
         if (configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle) {
-            //TODO seraid fix later
             getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
                 if (twinclawsPattern.find(stand.name)) {
                     val coopList = configCoopBoss.coopMembers.split(",").toList()

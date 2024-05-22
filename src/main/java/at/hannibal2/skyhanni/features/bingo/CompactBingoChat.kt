@@ -108,7 +108,7 @@ class CompactBingoChat {
         }
 
 
-        if (inSkyBlockLevelUp && inSkyblockPattern.any { it.matches(message) }) return true
+        if (inSkyBlockLevelUp && inSkyblockPatterns.any { it.matches(message) }) return true
 
         return false
     }
@@ -122,7 +122,6 @@ class CompactBingoChat {
         if (inCollectionLevelUp) {
             if (tradeRecipePattern.matches(message)) {
                 val text = message.removeColor().replace(" ", "")
-                //TODO seraid
                 if (text == "Trade" || text == "Recipe") {
                     collectionLevelUpLastLine?.let { ChatUtils.chat(it, false) }
                 }

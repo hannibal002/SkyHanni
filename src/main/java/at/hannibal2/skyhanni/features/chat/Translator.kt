@@ -50,7 +50,6 @@ class Translator {
     }
 
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
-        //TODO seraid
         val text = messageContentPattern.findMatcher(message) {
             group("content").removeColor()
         }

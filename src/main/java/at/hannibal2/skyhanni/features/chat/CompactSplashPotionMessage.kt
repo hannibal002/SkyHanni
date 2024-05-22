@@ -49,7 +49,7 @@ class CompactSplashPotionMessage {
     }
 
     private fun String.isPotionMessage(): Boolean {
-        return potionEffectPattern.any {
+        return potionEffectPatterns.any {
             it.matchMatcher(this) {
                 val effectName = group("effectName")
                 // If splashed by a player, append their name.

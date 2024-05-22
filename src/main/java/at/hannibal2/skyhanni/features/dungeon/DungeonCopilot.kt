@@ -76,7 +76,7 @@ class DungeonCopilot {
 
         // Key Pickup
         var foundKeyOrDoor = false
-        keyPattern.any {
+        keyPatterns.any {
             it.matchMatcher(message) {
                 val key = group("key")
                 changeNextStep("Open $key Door")

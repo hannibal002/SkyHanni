@@ -57,7 +57,6 @@ object ArmorDropTracker {
         var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
     }
 
-    // TODO seraid use repo pattern
     enum class ArmorDropType(val dropName: String, private val chatMessage: String) {
         CROPIE("§9Cropie", "§6§lRARE CROP! §r§f§r§9Cropie §r§b(Armor Set Bonus)"),
         SQUASH("§5Squash", "§6§lRARE CROP! §r§f§r§5Squash §r§b(Armor Set Bonus)"),
@@ -65,7 +64,7 @@ object ArmorDropTracker {
         ;
 
         val chatPattern by patternGroup.pattern(
-            this.name,
+            this.name.lowercase(),
             this.chatMessage
         )
     }
