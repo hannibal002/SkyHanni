@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
@@ -149,6 +151,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() &&
                     shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
+                    && !NEUItems.neuHasFocus() && Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
                 ) {
                     onClick()
                 }
@@ -231,7 +234,7 @@ interface Renderable {
             }
             val isGuiPositionEditor = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
-                ToolTipData.lastSlot == null
+                ToolTipData.lastSlot == null || GuiData.preDrawEventCanceled
             } else true
             val isConfigScreen = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
 

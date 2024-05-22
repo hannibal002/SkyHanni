@@ -81,7 +81,7 @@ class TpsCounter {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!config.tpsDisplay) return
         hasPacketReceived = true
     }

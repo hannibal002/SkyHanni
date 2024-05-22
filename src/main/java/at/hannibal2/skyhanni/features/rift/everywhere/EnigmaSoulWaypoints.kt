@@ -98,13 +98,14 @@ object EnigmaSoulWaypoints {
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
             event.makePickblock()
-            if (soulLocations.contains(split.last())) {
-                if (!trackedSouls.contains(split.last())) {
-                    ChatUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
-                    trackedSouls.add(split.last())
+            val name = split.last()
+            if (soulLocations.contains(name)) {
+                if (!trackedSouls.contains(name)) {
+                    ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
+                    trackedSouls.add(name)
                 } else {
-                    trackedSouls.remove(split.last())
-                    ChatUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
+                    trackedSouls.remove(name)
+                    ChatUtils.chat("§5No longer tracking the $name Enigma Soul!", prefixColor = "§5")
                 }
             }
         }
@@ -136,7 +137,7 @@ object EnigmaSoulWaypoints {
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(y = 1), "§5$soul Soul", 1.5)
+                event.drawDynamicText(it.add(y = 1), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
             }
         }
     }

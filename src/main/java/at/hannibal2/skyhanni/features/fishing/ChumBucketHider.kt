@@ -7,16 +7,18 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class ChumBucketHider {
 
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
-    private val titleEntity = mutableListOf<Entity>()
-    private val hiddenEntities = mutableListOf<Entity>()
+    private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
+    private val hiddenEntities = TimeLimitedSet<Entity>(5.seconds)
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -50,7 +52,7 @@ class ChumBucketHider {
         // Second text line
         if (name.contains("/10 §aChums")) {
             val entityLocation = entity.getLorenzVec()
-            for (title in titleEntity) {
+            for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
                     event.isCanceled = true
@@ -62,7 +64,7 @@ class ChumBucketHider {
         // Chum Bucket
         if (config.hideBucket.get() && entity.inventory.any { it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket") }) {
             val entityLocation = entity.getLorenzVec()
-            for (title in titleEntity) {
+            for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
                     event.isCanceled = true
