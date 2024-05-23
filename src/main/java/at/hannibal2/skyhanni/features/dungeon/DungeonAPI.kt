@@ -389,7 +389,7 @@ object DungeonAPI {
         "f7.goldor.start",
         "§4\\[BOSS] Goldor§r§c: §r§cWho dares trespass into my domain\\?"
     )
-    private val goldorTerminalPattern by phasePatternGroup.pattern(
+    val goldorTerminalPattern by phasePatternGroup.pattern(
         "f7.goldor.terminalcomplete",
         "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)"
     )

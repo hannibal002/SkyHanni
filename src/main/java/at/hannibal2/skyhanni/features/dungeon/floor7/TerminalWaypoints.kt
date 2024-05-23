@@ -17,11 +17,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 
 class TerminalWaypoints {
     private val config get() = SkyHanniMod.feature.dungeon
-    private val goldorTerminalPattern by RepoPattern.pattern(
-        "dungeon.f7.goldor.terminalcomplete",
-        "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)"
-    )
-
     @SubscribeEvent
     fun onWorld(event: LorenzRenderWorldEvent) {
         if(!isEnabled()) return
@@ -37,7 +32,7 @@ class TerminalWaypoints {
     }
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        goldorTerminalPattern.matchMatcher(event.message){
+        DungeonAPI.goldorTerminalPattern.matchMatcher(event.message){
             val playerName = group("playerName")
 //             println("matched $playerName")
             val playerEntity = EntityUtils.getAllEntities().filter { it is EntityPlayer }.firstOrNull{ it.name == playerName } ?: return
