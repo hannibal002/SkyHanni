@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.skillprogress.EliteSkillsDisplayConfig.SkillDisplay
-import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteSkillGraphEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EliteAPISettingsJson
@@ -122,14 +122,34 @@ object SkillRankDisplay {
 
     @SubscribeEvent
     fun onSkillGained(event: SkillExpGainEvent) {
-        if (!skillRanks.containsKey(event.skill) && lastSkillGained != event.skill) {
+        val skillName = event.skill.name.lowercase()
+        println(SkillAPI.skillXPInfoMap)
+        val skillInfo = SkillAPI.skillXPInfoMap[event.skill] ?: return
+
+        println(lastSkillGained)
+        println(skillName)
+        if (lastSkillGained != skillName) {
+            lastSkillGained = skillName
+
+            println(skillName)
+
             SkyHanniMod.coroutineScope.launch {
-                getRanksForSkill(event.skill)
+                getRanksForSkill(skillName)
             }
         }
         lastXPGained = SimpleTimeMark.now()
-        lastSkillGained = event.skill
-        currentSkills[event.skill] = SkillExperience.getExpForSkill(event.skill)
+        currentSkills[skillName] = skillInfo.lastTotalXp.toLong()
+
+        //TODO make skill api useable even when skill progress feature is off
+
+//             if (!skillRanks.containsKey(event.skill) && lastSkillGained != event.skill) {
+//             SkyHanniMod.coroutineScope.launch {
+//                 getRanksForSkill(event.skill)
+//             }
+//         }
+//         lastXPGained = SimpleTimeMark.now()
+//         lastSkillGained = event.skill
+//         currentSkills[event.skill] = SkillExperience.getExpForSkill(event.skill)
     }
 
     @SubscribeEvent
