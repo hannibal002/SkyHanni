@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -75,20 +76,21 @@ object PestProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
-            val amount = group("amount").toInt()
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
-
-            tracker.addItem(internalName, amount)
-            addKill()
-            if (config.hideChat) event.blockedReason = "pest_drop"
-        }
         pestRareDropPattern.matchMatcher(event.message) {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
             tracker.addItem(internalName, 1)
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
+    }
+
+    @SubscribeEvent
+    fun onPestKill(event: PestKillEvent) {
+        if (!isEnabled()) return
+
+        tracker.addItem(event.item, event.amount)
+        addKill()
+        if (config.hideChat) event.blockedReason = "pest_drop"
     }
 
     private fun addKill() {

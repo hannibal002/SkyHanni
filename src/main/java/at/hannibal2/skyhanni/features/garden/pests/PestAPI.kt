@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -108,7 +110,7 @@ object PestAPI {
      * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
      * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
      */
-    val pestDeathChatPattern by patternGroup.pattern(
+    private val pestDeathChatPattern by patternGroup.pattern(
         "chat.pestdeath",
         "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
     )
@@ -223,13 +225,24 @@ object PestAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-        if (pestDeathChatPattern.matches(event.message)) {
-            lastPestKillTime = SimpleTimeMark.now()
-            removeNearestPest()
+        pestDeathChatPattern.matchMatcher(event.message) {
+            val pest = PestType.getByNameOrNull(group("pest")) ?: return
+            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val amount = group("amount").toInt()
+
+            val killEvent = PestKillEvent(pest, item, amount)
+            killEvent.postAndCatch()
+            killEvent.blockedReason?.let { event.blockedReason = it }
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }
+    }
+
+    @SubscribeEvent
+    fun onPestKill(event: PestKillEvent) {
+        lastPestKillTime = SimpleTimeMark.now()
+        removeNearestPest()
     }
 
     @SubscribeEvent

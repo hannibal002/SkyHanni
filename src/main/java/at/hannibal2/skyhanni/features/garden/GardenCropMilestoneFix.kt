@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -56,19 +56,6 @@ class GardenCropMilestoneFix {
             val crops = GardenCropMilestones.getCropsForTier(tier, crop)
             changedValue(crop, crops, "level up chat message", 0)
         }
-        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
-            val amount = group("amount").toInt()
-            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
-
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
-
-            cropType.setCounter(
-                cropType.getCounter() + (amount * multiplier.second)
-            )
-            GardenCropMilestoneDisplay.update()
-        }
         pestRareDropPattern.matchMatcher(event.message) {
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
@@ -81,6 +68,18 @@ class GardenCropMilestoneFix {
             )
             GardenCropMilestoneDisplay.update()
         }
+    }
+
+    @SubscribeEvent
+    fun onPestKill(event: PestKillEvent) {
+        val multiplier = NEUItems.getMultiplier(event.item)
+        val rawName = multiplier.first.itemNameWithoutColor
+        val cropType = CropType.getByNameOrNull(rawName) ?: return
+
+        cropType.setCounter(
+            cropType.getCounter() + (event.amount * multiplier.second)
+        )
+        GardenCropMilestoneDisplay.update()
     }
 
     @SubscribeEvent
