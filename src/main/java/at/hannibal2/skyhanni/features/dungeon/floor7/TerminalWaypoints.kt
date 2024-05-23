@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -10,6 +9,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
 class TerminalWaypoints {
@@ -20,7 +21,7 @@ class TerminalWaypoints {
 
     @SubscribeEvent
     fun onWorld(event: LorenzRenderWorldEvent) {
-        TerminalInfo.entries.forEach {
+        TerminalInfo.entries.filter { it.highlight }.forEach {
             event.drawWaypointFilled(it.location, LorenzColor.GREEN.toColor())
             event.drawDynamicText(it.location, it.text, 1.0)
         }
@@ -30,10 +31,13 @@ class TerminalWaypoints {
     fun onChat(event: LorenzChatEvent) {
         goldorTerminalPattern.matchMatcher(event.message){
             val playerName = group("playerName")
-            val playerEntity = EntityUtils.getPlayerEntities().firstOrNull{ it.name == playerName } ?: return
-            val closestTerminal = TerminalInfo.getClosestTerminal(playerEntity.position.toLorenzVec())
-            closestTerminal?.highlight = false
-            println("terminal $closestTerminal is nearest")
+//             println("matched $playerName")
+            val playerEntity = EntityUtils.getAllEntities().filter { it is EntityPlayer }.firstOrNull{ it.name == playerName } ?: return
+//             println("found $playerEntity")
+            val terminal = TerminalInfo.getClosestTerminal(playerEntity.position.toLorenzVec())
+//             println("$terminal is closest")
+            terminal?.highlight = false
+//             println(terminal?.highlight)
         }
     }
 }

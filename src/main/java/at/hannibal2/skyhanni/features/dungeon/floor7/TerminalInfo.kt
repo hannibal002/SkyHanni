@@ -42,7 +42,7 @@ enum class TerminalInfo(val location: LorenzVec, val phase: Int, val text: Strin
         fun resetTerminals() = entries.forEach { it.highlight = true }
 
         fun getClosestTerminal(input:LorenzVec): TerminalInfo? {
-            return entries.minByOrNull { it.location.distance(input) }
+            return entries.filter{ it.highlight }.minByOrNull { it.location.distance(input) }
         }
     }
 }
