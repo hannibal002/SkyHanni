@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonFloor
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -38,5 +39,5 @@ class TerminalWaypoints {
             terminal?.highlight = false
         }
     }
-    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.terminalWaypoints
+    private fun isEnabled(): Boolean = (dungeonFloor == "F7" || dungeonFloor == "M7") && DungeonAPI.inBossRoom && config.terminalWaypoints
 }
