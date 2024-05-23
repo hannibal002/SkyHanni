@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.events.DungeonPhaseChangeEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 
 
 class TerminalWaypoints {
@@ -21,7 +23,7 @@ class TerminalWaypoints {
 
     @SubscribeEvent
     fun onWorld(event: LorenzRenderWorldEvent) {
-        TerminalInfo.entries.filter { it.highlight }.forEach {
+        TerminalInfo.entries.filter { it.highlight && DungeonAPI.dungeonPhase == it.phase}.forEach {
             event.drawWaypointFilled(it.location, LorenzColor.GREEN.toColor())
             event.drawDynamicText(it.location, it.text, 1.0)
         }
