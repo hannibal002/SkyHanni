@@ -62,7 +62,7 @@ object PersonalCompactorOverlay {
 
         val uuid = itemStack.getItemUuid() ?: return
 
-        val slotsRenderable = compactorMap.getOrPut(uuid) {
+        val fakeInventory = compactorMap.getOrPut(uuid) {
             val slots = slotsMap[tier] ?: return
             val itemList = (0 until slots).map { slot ->
                 val skyblockId = itemStack.getAttributeString(prefix + slot)
@@ -74,7 +74,7 @@ object PersonalCompactorOverlay {
 
         val title = Renderable.string(name)
 
-        RenderableTooltips.setTooltipForRender(listOf(title, slotsRenderable), spacedTitle = true)
+        RenderableTooltips.setTooltipForRender(listOf(title, fakeInventory), spacedTitle = true)
         event.cancel()
     }
 
