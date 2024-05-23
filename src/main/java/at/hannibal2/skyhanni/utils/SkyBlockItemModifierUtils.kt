@@ -185,6 +185,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getNewYearCake() = getAttributeInt("new_years_cake")
 
+    fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
+
     fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
         val enchantments = this.getCompoundTag("enchantments")
         enchantments.keySet.associateWith { enchantments.getInteger(it) }
@@ -254,9 +256,11 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeLong(label: String) =
         getExtraAttributes()?.getLong(label)?.takeUnless { it == 0L }
 
-    private fun ItemStack.getAttributeBoolean(label: String): Boolean {
-        return getExtraAttributes()?.getBoolean(label) ?: false
-    }
+    private fun ItemStack.getAttributeBoolean(label: String) =
+        getExtraAttributes()?.getBoolean(label) ?: false
+
+    private fun ItemStack.getAttributeByte(label: String) =
+        getExtraAttributes()?.getByte(label) ?: 0
 
     fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
 

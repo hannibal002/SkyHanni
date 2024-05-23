@@ -4,7 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.PersonalCompactorConfig
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getInternalNameFromHypixelId
@@ -12,11 +15,14 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPersonalCompactorActive
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PersonalCompactorOverlay {
@@ -38,7 +44,8 @@ object PersonalCompactorOverlay {
 
     private const val MAX_ITEMS_PER_ROW = 7
 
-    private val compactorMap = mutableMapOf<String, Renderable>()
+    private val compactorRenderableMap = mutableMapOf<String, Renderable>()
+    private val compactorEnabledMap = mutableMapOf<String, Boolean>()
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -62,8 +69,9 @@ object PersonalCompactorOverlay {
         }
 
         val uuid = itemStack.getItemUuid() ?: return
+        val enabled = getPersonalCompactorEnabled(itemStack) ?: return
 
-        val fakeInventory = compactorMap.getOrPut(uuid) {
+        val fakeInventory = compactorRenderableMap.getOrPut(uuid) {
             val slots = slotsMap[tier] ?: return
             val itemList = (0 until slots).map { slot ->
                 val skyblockId = itemStack.getAttributeString(prefix + slot)
@@ -74,14 +82,36 @@ object PersonalCompactorOverlay {
         }
 
         val title = Renderable.string(name)
+        val status = Renderable.string(
+            "§7Status: " + if (enabled) "§aEnabled" else "§cDisabled"
+        )
 
-        RenderableTooltips.setTooltipForRender(listOf(title, fakeInventory), spacedTitle = true)
+        RenderableTooltips.setTooltipForRender(listOf(title, status, fakeInventory), spacedTitle = true)
         event.cancel()
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        compactorMap.clear()
+        compactorRenderableMap.clear()
+        compactorEnabledMap.clear()
+    }
+
+    @SubscribeEvent
+    fun onRenderItemTip(event: RenderItemTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.showToggle) return
+        val itemStack = event.stack
+        val internalName = itemStack.getInternalNameOrNull() ?: return
+        if (!internalNamePattern.matches(internalName.asString())) return
+
+        val enabled = getPersonalCompactorEnabled(itemStack) ?: return
+        val text = if (enabled) "§a✔" else "§c✖"
+        val renderObject = RenderObject(
+            text,
+            -8,
+            -10
+        )
+        event.renderObjects.add(renderObject)
     }
 
 
@@ -92,6 +122,10 @@ object PersonalCompactorOverlay {
         else -> false
     }
 
+    private fun getPersonalCompactorEnabled(itemStack: ItemStack): Boolean? {
+        val uuid = itemStack.getItemUuid() ?: return null
+        return compactorEnabledMap.getOrPut(uuid) { itemStack.getPersonalCompactorActive() }
+    }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
