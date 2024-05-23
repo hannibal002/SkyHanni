@@ -106,16 +106,7 @@ object DungeonAPI {
 
     private fun checkBossName(bossName: String): Boolean {
         val floor = dungeonFloor ?: return false
-        val correctBoss = when (floor) {
-            DungeonFloor.E -> "The Watcher"
-            DungeonFloor.F1, DungeonFloor.M1 -> "Bonzo"
-            DungeonFloor.F2, DungeonFloor.M2 -> "Scarf"
-            DungeonFloor.F3, DungeonFloor.M3 -> "The Professor"
-            DungeonFloor.F4, DungeonFloor.M4 -> "Thorn"
-            DungeonFloor.F5, DungeonFloor.M5 -> "Livid"
-            DungeonFloor.F6, DungeonFloor.M6 -> "Sadan"
-            DungeonFloor.F7, DungeonFloor.M7 -> "Maxor"
-        }
+        val correctBoss = floor.bossName
 
         // Livid has a prefix in front of the name, so we check ends with to cover all the livids
         return bossName.endsWith(correctBoss)

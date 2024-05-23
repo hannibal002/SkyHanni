@@ -250,8 +250,8 @@ object DiscordLocationKey {
         val island = LorenzUtils.skyBlockIsland
 
         DungeonAPI.dungeonFloor?.let {
-            if (it.isMaster) return "master-mode"
-            else  return "dungeon"
+            return if (it.isMaster) "master-mode"
+            else "dungeon"
         }
 
         return when (location) {

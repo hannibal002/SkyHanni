@@ -305,18 +305,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     }),
 
     DUNGEONS({
-        if (!DungeonAPI.inDungeon()) {
-            AutoStatus.DUNGEONS.placeholderText
-        } else {
-            val boss = DungeonAPI.dungeonFloor
-            if (boss == null) {
-                "Unknown dungeon boss"
-            } else {
-                val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
-                val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
+        if (DungeonAPI.inDungeon()) {
+            DungeonAPI.dungeonFloor?.let {
+                val amountKills = DungeonAPI.bossStorage?.get(it)?.addSeparators() ?: "Unknown"
                 val time = DungeonAPI.getTime()
-                "$floor Kills: $amountKills ($time)"
-            }
+                "$it Kills: $amountKills ($time)"
+            } ?: "Unknown dungeon floor"
+        } else {
+            AutoStatus.DUNGEONS.placeholderText
         }
     }),
 
