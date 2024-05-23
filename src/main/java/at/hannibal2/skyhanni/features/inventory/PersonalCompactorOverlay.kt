@@ -53,10 +53,12 @@ class PersonalCompactorOverlay {
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
         val name = event.toolTip.firstOrNull() ?: return
-        if (!name.contains("Personal")) return
         val (type, tier) = internalNamePattern.matchMatcher(internalName.asString()) {
             group("type") to group("tier").formatInt()
         } ?: return
+        // NEU using getTooltip triggers LorenzToolTipEvent, which makes it use the tooltip of a different item
+        // but the itemstack of a different one. this is a workaround until this issue is fixed
+        if (!name.contains("Personal")) return
 
         val prefix = when (type) {
             "COMPACTOR" -> "personal_compact_"
