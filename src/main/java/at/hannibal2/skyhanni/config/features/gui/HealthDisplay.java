@@ -16,7 +16,7 @@ public class HealthDisplay {
     public Boolean enabledBar = false;
 
     @Expose
-    @ConfigLink(owner = HealthDisplay.class, field = "enabled")
+    @ConfigLink(owner = HealthDisplay.class, field = "enabledBar")
     public Position positionBar = new Position(40, 40, 1.0f);
 
     @Expose
@@ -28,6 +28,6 @@ public class HealthDisplay {
     public Boolean enabledText = false;
 
     @Expose
-    @ConfigLink(owner = HealthDisplay.class, field = "enabled")
+    @ConfigLink(owner = HealthDisplay.class, field = "enabledText")
     public Position positionText = new Position(40, 40, 1.0f);
 }
