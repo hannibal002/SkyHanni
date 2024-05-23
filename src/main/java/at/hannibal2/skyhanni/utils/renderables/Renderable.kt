@@ -570,7 +570,9 @@ interface Renderable {
                     }
 
                     Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(posX, posY, textureX, textureY, width, height)
+                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
+                        posX, posY, textureX, textureY, width, height
+                    )
 
                     if (useChroma) {
                         ChromaShaderManager.begin(ChromaType.TEXTURED)
@@ -584,7 +586,11 @@ interface Renderable {
 
 
                         val drawEnd = minOf(rangeEnd, progress)
-                        GlStateManager.color(range.color.red / 255f, range.color.green / 255f, range.color.blue / 255f, 1f)
+                        if (useChroma) {
+                            GlStateManager.color(1f, 1f, 1f, 1f)
+                        } else {
+                            GlStateManager.color(range.color.red / 255f, range.color.green / 255f, range.color.blue / 255f, 1f)
+                        }
 
                         if (rangeStart < currentWidth) {
                             Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
