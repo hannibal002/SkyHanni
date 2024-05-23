@@ -7,7 +7,6 @@ When your PR is marked as ready for review, some of our maintainers will look th
 Make sure to only mark your PR as "Ready to review" when it is. If you still want to do major changes, you can keep a draft PR open until then.
 
 ## Dependencies
-
 - pr_number_or_link_here
 
 ## What
