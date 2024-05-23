@@ -24,6 +24,12 @@ public class EliteFarmingCollectionConfig {
     public Position pos = new Position(10, 60, false, true);
 
     @Expose
+    @ConfigOption(name = "Show Time Until Reached", desc = "Show the time until you pass the person in front, or " +
+        "time until §b#5000")
+    @ConfigEditorBoolean
+    public boolean showTimeUntilReached = true;
+
+    @Expose
     @ConfigOption(name = "Show Time Until Refresh", desc = "Show the time until the leaderboard updates.")
     @ConfigEditorBoolean
     public boolean showTimeUntilRefresh = true;

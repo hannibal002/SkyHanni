@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -38,6 +39,7 @@ import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object FarmingCollectionDisplay {
 
@@ -219,6 +221,20 @@ object FarmingCollectionDisplay {
             newDisplay.add(
                 Renderable.string("§e${difference.addSeparators()} §7behind §b#${nextRank.addSeparators()}")
             )
+        }
+        if (config.showTimeUntilReached) {
+            val speed = lastFetchedCrop?.getSpeed() ?: 0
+            if (speed != 0) {
+                val timeUntilReached = (difference / speed).seconds
+
+                newDisplay.add(
+                    Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
+                )
+            } else {
+                newDisplay.add(
+                    Renderable.string("§cPAUSED")
+                )
+            }
         }
         if (config.showTimeUntilRefresh) {
             val time = checkDuration - lastLeaderboardFetch.passedSince()

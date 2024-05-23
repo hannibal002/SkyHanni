@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.events.ActionBarBeforeUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
@@ -35,7 +35,7 @@ class SkillExperience {
     }
 
     @SubscribeEvent
-    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
+    fun onActionBarUpdate(event: ActionBarBeforeUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         actionBarPattern.matchMatcher(event.actionBar) {
