@@ -940,7 +940,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(PersonalCompactorOverlay())
+        loadModule(PersonalCompactorOverlay)
 
         init()
 
