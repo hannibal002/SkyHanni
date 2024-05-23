@@ -8,7 +8,10 @@ Make sure to only mark your PR as "Ready to review" when it is. If you still wan
 
 ## Dependencies
 
+<!--
 - pr_number_or_link_here
+-->
+
 
 ## What
 Describe what this pull request does, including technical details, screenshots, links to discord, etc.
