@@ -589,16 +589,31 @@ interface Renderable {
                         if (useChroma) {
                             GlStateManager.color(1f, 1f, 1f, 1f)
                         } else {
-                            GlStateManager.color(range.color.red / 255f, range.color.green / 255f, range.color.blue / 255f, 1f)
+                            GlStateManager.color(
+                                range.color.red / 255f,
+                                range.color.green / 255f,
+                                range.color.blue / 255f,
+                                1f
+                            )
                         }
 
                         if (rangeStart < currentWidth) {
                             Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                                posX + currentWidth, posY + 1, textureX + currentWidth, textureY + height, drawEnd - currentWidth, height - 2
+                                posX + currentWidth,
+                                posY + 1,
+                                textureX + currentWidth,
+                                textureY + height,
+                                drawEnd - currentWidth,
+                                height - 2
                             )
                         } else {
                             Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                                posX + rangeStart, posY + 1, textureX + rangeStart, textureY + height, drawEnd - rangeStart, height - 2
+                                posX + rangeStart,
+                                posY + 1,
+                                textureX + rangeStart,
+                                textureY + height,
+                                drawEnd - rangeStart,
+                                height - 2
                             )
                         }
                         currentWidth = drawEnd
