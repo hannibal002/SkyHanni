@@ -531,7 +531,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            private val progress = (percent * (width - 2)).toInt()
+            private val progress = (percent * width).toInt()
 
             override fun render(posX: Int, posY: Int) {
                 if (texture == null) {
@@ -546,8 +546,8 @@ interface Renderable {
 
                     var currentWidth = 1
                     for (range in colorRanges) {
-                        val rangeStart = (range.startPercent * (width - 2)).toInt()
-                        val rangeEnd = (range.endPercent * (width - 2)).toInt()
+                        val rangeStart = (range.startPercent * (width - 1)).toInt()
+                        val rangeEnd = (range.endPercent * (width - 1)).toInt()
                         if (currentWidth >= progress) break
 
                         val drawStart = maxOf(currentWidth, rangeStart)
