@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -69,7 +70,7 @@ object PersonalCompactorOverlay {
                 skyblockId?.let { getInternalNameFromHypixelId(it) }?.getItemStack()
             }
 
-            Renderable.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)
+            RenderableInventory.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)
         }
 
         val title = Renderable.string(name)
