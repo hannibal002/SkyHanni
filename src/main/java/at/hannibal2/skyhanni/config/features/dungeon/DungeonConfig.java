@@ -130,6 +130,12 @@ public class DungeonConfig {
     public boolean shadowAssassinJumpNotifier = false;
 
     @Expose
+    @ConfigOption(name = "Terminal Waypoints", desc = "Displays the Waypoints in the F7/M7 Boss Fight")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean terminalWaypoints = false;
+
+    @Expose
     @ConfigOption(name = "Dungeon Races Guide", desc = "")
     @Accordion
     public DungeonsRaceGuideConfig dungeonsRaceGuide = new DungeonsRaceGuideConfig();
