@@ -219,6 +219,7 @@ object EliteFarmingCollectionDisplay {
                 Renderable.string("§aNo players ahead of you!")
             )
         } else if (difference <= 0) {
+            //TODO add command to refresh too so it can be used in a neu button or assigned to a key
             newDisplay.add(
                 Renderable.clickAndHover(
                     "§7You have passed §b#${nextRank.addSeparators()}",
