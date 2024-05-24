@@ -42,6 +42,29 @@ public class FlareConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Display Type", desc = "Where to show the timer, as GUI element or in the world")
+    @ConfigEditorDropdown
+    public DisplayType displayType = DisplayType.GUI;
+
+    public enum DisplayType {
+        GUI("GUI Element"),
+        WORLD("In World"),
+        BOTH("Both"),
+        ;
+
+        private final String str;
+
+        DisplayType(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the Flare.")
     @ConfigEditorDropdown
     public OutlineType outlineType = OutlineType.NONE;

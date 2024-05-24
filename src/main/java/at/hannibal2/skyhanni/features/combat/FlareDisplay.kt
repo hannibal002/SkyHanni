@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -22,6 +24,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,13 +32,13 @@ object FlareDisplay {
 
     private val config get() = SkyHanniMod.feature.combat.flare
     private var display = emptyList<Renderable>()
-    private var flareList = mutableListOf<Flare>()
+    private var flares = mutableListOf<Flare>()
 
     class Flare(val type: FlareType, val entity: EntityArmorStand, val location: LorenzVec = entity.getLorenzVec())
 
     private val MAX_FLARE_TIME = 3.minutes
 
-    private val flares = mapOf(
+    private val flareSkins = mapOf(
         "ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMwNjIyMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjJlMmJmNmMxZWMzMzAyNDc5MjdiYTYzNDc5ZTU4NzJhYzY2YjA2OTAzYzg2YzgyYjUyZGFjOWYxYzk3MTQ1OCIKICAgIH0KICB9Cn0="
             to FlareType.WARNING,
         "ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMyNjQzMiwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQyYmY5ODY0NzIwZDg3ZmQwNmI4NGVmYTgwYjc5NWM0OGVkNTM5YjE2NTIzYzNiMWYxOTkwYjQwYzAwM2Y2YiIKICAgIH0KICB9Cn0="
@@ -47,26 +50,40 @@ object FlareDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (config.displayType == FlareConfig.DisplayType.WORLD) return
         config.position.renderRenderables(display, posLabel = "Flare Timer")
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
+        if (config.displayType == FlareConfig.DisplayType.GUI) return
+
+        for (flare in flares) {
+            val location = flare.location.add(-0.5, 0.0, -0.5)
+            val name = flare.type.displayName
+            val time = "§b${getRemainingTime(flare).format()}"
+            event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
+            event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+        }
     }
 
     @SubscribeEvent
     fun onSecondsPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        flareList.removeIf { !it.entity.isEntityAlive }
+        flares.removeIf { !it.entity.isEntityAlive }
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
+            if (!entity.canBeSeen()) continue
             if (entity.ticksExisted.ticks > MAX_FLARE_TIME) continue
             if (isAlreadyKnownFlare(entity)) continue
             getFlareTypeForTexuture(entity)?.let {
-                flareList.add(Flare(it, entity))
+                flares.add(Flare(it, entity))
             }
         }
         var newDisplay: List<Renderable>? = null
         for (type in FlareType.entries) {
             val flare = getFlareForType(type) ?: continue
-            val entity = flare.entity
-            val aliveTime = entity.ticksExisted.ticks
-            val remainingTime = (MAX_FLARE_TIME - aliveTime)
+            val remainingTime = getRemainingTime(flare)
 
             val name = type.displayName
             if (newDisplay == null) {
@@ -101,17 +118,24 @@ object FlareDisplay {
         display = newDisplay ?: emptyList()
     }
 
-    private fun getFlareForType(type: FlareType): Flare? = flareList.firstOrNull { it.type == type }
+    private fun getRemainingTime(flare: Flare): Duration {
+        val entity = flare.entity
+        val aliveTime = entity.ticksExisted.ticks
+        val remainingTime = (MAX_FLARE_TIME - aliveTime)
+        return remainingTime
+    }
+
+    private fun getFlareForType(type: FlareType): Flare? = flares.firstOrNull { it.type == type }
 
     private fun getFlareTypeForTexuture(entity: EntityArmorStand): FlareType? =
-        flares.entries.firstOrNull { entity.hasSkullTexture(it.key) }?.value
+        flareSkins.entries.firstOrNull { entity.hasSkullTexture(it.key) }?.value
 
     private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =
-        flareList.any { it.entity.entityId == entity.entityId }
+        flares.any { it.entity.entityId == entity.entityId }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        flareList.clear()
+        flares.clear()
         display = emptyList()
     }
 
@@ -120,7 +144,7 @@ object FlareDisplay {
         if (!isEnabled()) return
         if (config.outlineType == FlareConfig.OutlineType.NONE) return
 
-        for (flare in flareList) {
+        for (flare in flares) {
             val entity = flare.entity
             val location = flare.location
 
