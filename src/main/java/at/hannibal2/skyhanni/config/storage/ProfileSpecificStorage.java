@@ -116,6 +116,12 @@ public class ProfileSpecificStorage {
             @Expose
             public String lastLeaderboard = null;
         }
+
+        @Expose
+        public Long targetGoal = null;
+
+        @Expose
+        public String targetName = null;
     }
 
     @Expose
@@ -219,7 +225,8 @@ public class ProfileSpecificStorage {
         public Map<CropType, Double> latestTrueFarmingFortune = new HashMap<>();
 
         @Expose
-        public CropAccessory savedCropAccessory = null;
+        @Nullable
+        public CropAccessory savedCropAccessory = CropAccessory.NONE;
 
         @Expose
         public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();
@@ -340,6 +347,9 @@ public class ProfileSpecificStorage {
 
             @Expose
             public boolean pumpkinFortune = false;
+
+            @Expose
+            public boolean cocoaBeansFortune = false;
 
             @Expose
             public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();

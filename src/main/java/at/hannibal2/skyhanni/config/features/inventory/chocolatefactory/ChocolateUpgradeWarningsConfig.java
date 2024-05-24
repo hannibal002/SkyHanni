@@ -8,10 +8,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ChocolateUpgradeWarningsConfig {
     @Expose
-    @ConfigOption(name = "Upgrade Warning", desc = "Chat notification when you have an upgrade available to purchase.")
+    @ConfigOption(name = "Upgrade Warning", desc = "Chat notification when you have a chocolate factory upgrade available to purchase.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean upgradeWarning = true;
+    public boolean upgradeWarning = false;
 
     @Expose
     @ConfigOption(name = "Upgrade Warning Sound", desc = "Also plays a sound when an upgrade is available. " +

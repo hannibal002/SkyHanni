@@ -79,7 +79,8 @@ object InventoryUtils {
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
         val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
-        return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
+        val slotUnderMouse = screen.slotUnderMouse ?: return false
+        return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
     }
 
     fun isItemInInventory(name: NEUInternalName) = name.getAmountInInventory() > 0

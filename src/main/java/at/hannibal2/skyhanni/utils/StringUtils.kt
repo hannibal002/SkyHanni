@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
@@ -102,6 +105,9 @@ object StringUtils {
 
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
+
+    inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
+        toList().matchFirst(pattern, consumer)
 
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
@@ -313,8 +319,9 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
-    fun Pattern.matches(string: String?) = string?.let { matcher(it).matches() } ?: false
-    fun Pattern.anyMatches(list: List<String>?) = list?.any { this.matches(it) } ?: false
+    fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
+    fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
+    fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
@@ -413,6 +420,42 @@ object StringUtils {
                 return
             }
             foundCommands.add(message)
+        }
+    }
+
+    /**
+     * Applies a transformation on the message of a SystemMessageEvent if possible.
+     */
+    fun SystemMessageEvent.applyIfPossible(transform: (String) -> String) {
+        val original = chatComponent.formattedText
+        val new = transform(original)
+        if (new == original) return
+
+        val clickEvents = mutableListOf<ClickEvent>()
+        val hoverEvents = mutableListOf<HoverEvent>()
+        chatComponent.findAllEvents(clickEvents, hoverEvents)
+
+        if (clickEvents.size > 1 || hoverEvents.size > 1) return
+
+        chatComponent = ChatComponentText(new)
+        if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
+        if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
+    }
+
+    private fun IChatComponent.findAllEvents(
+        clickEvents: MutableList<ClickEvent>,
+        hoverEvents: MutableList<HoverEvent>,
+    ) {
+        siblings.forEach { it.findAllEvents(clickEvents, hoverEvents) }
+
+        val clickEvent = chatStyle.chatClickEvent
+        val hoverEvent = chatStyle.chatHoverEvent
+
+        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
+            clickEvents.add(clickEvent)
+        }
+        if (hoverEvent?.action != null && hoverEvents.none { it.value == hoverEvent.value }) {
+            hoverEvents.add(hoverEvent)
         }
     }
 

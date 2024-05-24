@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
-import at.hannibal2.skyhanni.data.ChatClickActionManager
 import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -47,6 +45,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -83,6 +82,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
@@ -159,6 +162,7 @@ object Commands {
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
             )
         }, DefaultConfigFeatures::onComplete)
+        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
     private fun usersNormal() {
@@ -253,7 +257,7 @@ object Commands {
             "Resets the Pest Profit Tracker"
         ) { PestProfitTracker.resetCommand() }
         registerCommand(
-            "shresetmythologicalcreatureracker",
+            "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker"
         ) { MythologicalCreatureTracker.resetCommand() }
         registerCommand(
@@ -296,7 +300,7 @@ object Commands {
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
             {
-            FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
+                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
             },
             FarmingMilestoneCommand::onComplete
         )
@@ -313,7 +317,7 @@ object Commands {
         registerCommand(
             "shlimbo",
             "Warps you to Limbo."
-        ) { MiscFeatures().goToLimbo() }
+        ) { MiscFeatures.goToLimbo() }
         registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden"
@@ -322,6 +326,10 @@ object Commands {
             "shignore",
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
+        registerCommand(
+            "shtpinfested",
+            "Teleports you to the nearest infested plot"
+        ) { PestFinder.teleportNearestInfestedPlot() }
     }
 
     private fun usersBugFix() {
@@ -375,6 +383,10 @@ object Commands {
             "Toggles receiving the 12 fortune from pumpkins"
         ) { CaptureFarmingGear.reversePumpkinFortune() }
         registerCommand(
+            "shcocoabeans",
+            "Toggles receiving the 12 fortune from cocoa beans"
+        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
+        registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
@@ -422,6 +434,10 @@ object Commands {
             "shtestsackapi",
             "Get the amount of an item in sacks according to internal feature SackAPI"
         ) { SackAPI.testSackAPI(it) }
+        registerCommand(
+            "shtestgriffinspots",
+            "Show potential griffin spots around you."
+        ) { GriffinBurrowHelper.testGriffinSpots() }
     }
 
     private fun developersCodingHelp() {
@@ -523,7 +539,6 @@ object Commands {
     }
 
     private fun internalCommands() {
-        registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
     }
 
@@ -566,9 +581,10 @@ object Commands {
                 addDescription(category.description)
             }
 
-            val commandInfo = ChatUtils.createHoverableChat("$color/$name", hoverText, "/$name", false)
-
-            components.add(commandInfo)
+            components.add(Text.text("$color/$name") {
+                this.hover = Text.multiline(hoverText)
+                this.suggest = "/$name"
+            })
             components.add(ChatComponentText("§7, "))
         }
         components.add(ChatComponentText("\n "))
@@ -630,7 +646,8 @@ object Commands {
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
                     UpdateManager.checkUpdate(true, updateStream)
-                }
+                },
+                oneTimeClick = true
             )
         } else {
             UpdateManager.checkUpdate(true, updateStream)

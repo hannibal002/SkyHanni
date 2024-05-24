@@ -65,6 +65,8 @@ object APIUtil {
                     try {
                         return parser.parse(retSrc)
                     } catch (e: JsonSyntaxException) {
+                        val name = e.javaClass.name
+                        val message = "$name: ${e.message}"
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
                             println("MalformedJsonException: Use JsonReader.setLenient(true)")
                             println(" - getJSONResponse: '$urlString'")
@@ -78,15 +80,17 @@ object APIUtil {
                                     }
                                 )
                             }
-                            ErrorManager.logErrorWithData(
-                                e, "502 Bad Gateway",
+                            ErrorManager.skyHanniError(
+                                "SkyHanni Connection Error",
+                                "error message" to "$message(502 Bad Gateway)",
                                 "apiName" to apiName,
                                 "urlString" to urlString,
                                 "returnedData" to retSrc
                             )
                         } else {
-                            ErrorManager.logErrorWithData(
-                                e, "$apiName error",
+                            ErrorManager.skyHanniError(
+                                "SkyHanni Connection Error",
+                                "error message" to message,
                                 "apiName" to apiName,
                                 "urlString" to urlString,
                                 "returnedData" to retSrc
@@ -95,16 +99,17 @@ object APIUtil {
                     }
                 }
             }
-        } catch (throwable: Throwable) {
+        } catch (e: Throwable) {
             if (silentError) {
-                throw throwable
-            } else {
-                ErrorManager.logErrorWithData(
-                    throwable, "$apiName error for url: '$urlString'",
-                    "apiName" to apiName,
-                    "urlString" to urlString,
-                )
+                throw e
             }
+            val name = e.javaClass.name
+            val message = "$name: ${e.message}"
+            ErrorManager.skyHanniError(
+                "SkyHanni Connection Error",
+                "error message" to message,
+                "urlString" to urlString,
+            )
         } finally {
             client.close()
         }
