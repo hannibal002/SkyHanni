@@ -63,10 +63,11 @@ object MobFilter {
      *  REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
      *  REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
      *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
+     *  REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
      *  */
     val bossMobNameFilter by repoGroup.pattern(
         "filter.boss",
-        "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+|█+)? .$"
+        "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$"
     )
     val dungeonNameFilter by repoGroup.pattern(
         "filter.dungeon",

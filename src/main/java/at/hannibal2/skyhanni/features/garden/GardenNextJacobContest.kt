@@ -67,9 +67,16 @@ object GardenNextJacobContest {
         "day",
         "§aDay (?<day>.*)"
     )
+
+    /**
+     * REGEX-TEST: Early Spring, Year 351
+     * REGEX-TEST: Late Summer, Year 351
+     * REGEX-TEST: Autumn, Year 351
+     */
+
     val monthPattern by patternGroup.pattern(
         "month",
-        "(?<month>.*), Year (?<year>.*)"
+        "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
@@ -187,11 +194,8 @@ object GardenNextJacobContest {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
-        if (!monthPattern.matches(event.inventoryName)) return
-
-        inCalendar = true
-
         monthPattern.matchMatcher(event.inventoryName) {
+            inCalendar = true
             val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
