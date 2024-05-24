@@ -18,6 +18,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
     @Expose
+    @ConfigOption(name = "Elite Bot Farming Collection", desc = "")
+    @Accordion
+    public EliteFarmingCollectionConfig eliteFarmingCollection = new EliteFarmingCollectionConfig();
+
+    @Expose
     @ConfigOption(name = "SkyMart", desc = "")
     @Accordion
     public SkyMartConfig skyMart = new SkyMartConfig();
@@ -59,11 +64,6 @@ public class GardenConfig {
     @ConfigOption(name = "Farming Weight", desc = "")
     @Accordion
     public EliteFarmingWeightConfig eliteFarmingWeights = new EliteFarmingWeightConfig();
-
-    @Expose
-    @ConfigOption(name = "Farming Collection", desc = "")
-    @Accordion
-    public EliteFarmingCollectionConfig eliteFarmingCollection = new EliteFarmingCollectionConfig();
 
     @Expose
     @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")

@@ -34,7 +34,7 @@ import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object SkillRankDisplay {
+object EliteSkillRankDisplay {
 
     private val config get() = SkyHanniMod.feature.skillProgress.rankDisplay
 

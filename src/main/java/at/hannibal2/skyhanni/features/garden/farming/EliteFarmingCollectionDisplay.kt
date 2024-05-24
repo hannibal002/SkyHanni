@@ -40,18 +40,16 @@ import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object FarmingCollectionDisplay {
+object EliteFarmingCollectionDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.eliteFarmingCollection
 
     private var checkDuration = 10.minutes
-    private var worldSwapRefresh = true
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EliteAPISettingsJson>("EliteAPISettings")
         checkDuration = data.refreshTime.minutes
-        worldSwapRefresh = data.worldSwapRefresh
     }
 
     private val eliteCollectionApiGson by lazy {
@@ -197,6 +195,25 @@ object FarmingCollectionDisplay {
                 }
             )
         )
+        if (config.showTimeUntilReached) {
+            val speed = lastFetchedCrop?.getSpeed() ?: 0
+            if (speed != 0) {
+                if (difference < 0) {
+                    newDisplay.add(
+                        Renderable.string("§a§Now")
+                    )
+                } else {
+                    val timeUntilReached = (difference / speed).seconds
+                    newDisplay.add(
+                        Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
+                    )
+                }
+            } else {
+                newDisplay.add(
+                    Renderable.string("§cPAUSED")
+                )
+            }
+        }
         if (nextRank <= 0) {
             newDisplay.add(
                 Renderable.string("§aNo players ahead of you!")
@@ -216,25 +233,6 @@ object FarmingCollectionDisplay {
             newDisplay.add(
                 Renderable.string("§e${difference.addSeparators()} §7behind §b#${nextRank.addSeparators()}")
             )
-        }
-        if (config.showTimeUntilReached) {
-            val speed = lastFetchedCrop?.getSpeed() ?: 0
-            if (speed != 0) {
-                if (difference < 0) {
-                    newDisplay.add(
-                        Renderable.string("§a§Now")
-                    )
-                } else {
-                    val timeUntilReached = (difference / speed).seconds
-                    newDisplay.add(
-                        Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
-                    )
-                }
-            } else {
-                newDisplay.add(
-                    Renderable.string("§cPAUSED")
-                )
-            }
         }
         if (config.showTimeUntilRefresh) {
             val time = checkDuration - lastLeaderboardFetch.passedSince()
