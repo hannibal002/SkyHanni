@@ -39,7 +39,7 @@ public class RepositoryConfig {
         @Expose
         @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: SkyHanni-Repo")
         @ConfigEditorText
-        public String name = "SkyHanni-Repo";
+        public String name = "SkyHanni-REPO";
 
         @Expose
         @ConfigOption(name = "Repository Branch", desc = "The Repository Branch, default: main")
