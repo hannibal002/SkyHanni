@@ -27,20 +27,19 @@ class DungeonRankTabListColor {
     fun onTabListText(event: TabListLineRenderEvent) {
         if (!isEnabled()) return
 
-        val (sbLevel, rank, playerName, className, classLevel) = pattern.matchMatcher(event.text.stripHypixelMessage()) {
-            listOf(
-                group("sbLevel"),
-                groupOrNull("rank") ?: "",
-                group("playerName"),
-                group("className"),
-                group("classLevel"),
-            )
-        } ?: return
+        pattern.matchMatcher(event.text.stripHypixelMessage()) {
+            val sbLevel = group("sbLevel")
+            val rank = groupOrNull("rank") ?: ""
+            val playerName = group("playerName")
+            //val symbols = group("symbols")
+            val className = group("className")
+            val classLevel = group("classLevel")
 
-        val cleanName = playerName.cleanPlayerName(true)
-        val color = DungeonAPI.getColor(classLevel.romanToDecimalIfNecessary())
+            val cleanName = playerName.cleanPlayerName(true)
+            val color = DungeonAPI.getColor(classLevel.romanToDecimalIfNecessary())
 
-        event.text = "§8$sbLevel $rank$cleanName §f(§d$className $color$classLevel§f)"
+            event.text = "§8$sbLevel $rank$cleanName §f(§d$className $color$classLevel§f)"
+        }
     }
 
     fun isEnabled() = DungeonAPI.inDungeon() && config.coloredClassLevel
