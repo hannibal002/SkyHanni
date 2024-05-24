@@ -693,6 +693,7 @@ class SkyHanniMod {
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
         loadModule(FerocityDisplay())
+        loadModule(FlareDisplay)
         loadModule(InGameDateDisplay())
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
@@ -944,7 +945,6 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(FlareDisplay)
 
         init()
 
