@@ -14,15 +14,9 @@ import org.lwjgl.input.Keyboard;
 public class DevConfig {
 
     @Expose
-    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" +
-        "§cOnly disable this if you know what you are doing!")
-    @ConfigEditorBoolean
-    public boolean repoAutoUpdate = true;
-
-    @Expose
-    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
-    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
-    public int logExpiryTime = 14;
+    @ConfigOption(name = "Repository", desc = "")
+    @Accordion
+    public RepositoryConfig repo = new RepositoryConfig();
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
@@ -33,6 +27,11 @@ public class DevConfig {
     @ConfigOption(name = "Repo Pattern", desc = "")
     @Accordion
     public RepoPatternConfig repoPattern = new RepoPatternConfig();
+
+    @Expose
+    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
+    public int logExpiryTime = 14;
 
     @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
@@ -64,11 +63,19 @@ public class DevConfig {
     @Expose
     @ConfigOption(
         name = "Fancy Contributors",
-        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
+        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list and nametags. " +
             "§eThose are the folks that coded the mod for you for free :)"
     )
     @ConfigEditorBoolean
     public boolean fancyContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Contributor Nametags",
+        desc = "Makes SkyHanni contributors' nametags fancy too. "
+    )
+    @ConfigEditorBoolean
+    public boolean contributorNametags = false;
 
     @Expose
     @ConfigOption(

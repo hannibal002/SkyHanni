@@ -197,7 +197,7 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
-        ContributorManager.getTabListSuffix(data.name)?.let {
+        ContributorManager.getSuffix(data.name)?.let {
             suffix += " $it"
         }
 
@@ -210,14 +210,8 @@ object AdvancedPlayerList {
 
     private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
-    private fun getRandomOrder(name: String): Int {
-        val saved = randomOrderCache.getOrNull(name)
-        if (saved != null) {
-            return saved
-        }
-        val r = (Random.nextDouble() * 500).toInt()
-        randomOrderCache.put(name, r)
-        return r
+    private fun getRandomOrder(name: String) = randomOrderCache.getOrPut(name) {
+        (Random.nextDouble() * 500).toInt()
     }
 
     private fun getSocialIcon(name: String) = when {
