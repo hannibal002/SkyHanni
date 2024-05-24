@@ -90,6 +90,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.combat.BestiaryData
 import at.hannibal2.skyhanni.features.combat.FerocityDisplay
+import at.hannibal2.skyhanni.features.combat.FlareDisplay
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
@@ -134,6 +135,7 @@ import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaFixChat
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
@@ -328,6 +330,7 @@ import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.ContributorManager
+import at.hannibal2.skyhanni.features.misc.CopyPlaytime
 import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
@@ -535,7 +538,7 @@ class SkyHanniMod {
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
         loadModule(UpdateManager)
-        loadModule(CropAccessoryData())
+        loadModule(CropAccessoryData)
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
@@ -706,6 +709,7 @@ class SkyHanniMod {
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
         loadModule(DianaProfitTracker)
+        loadModule(DianaFixChat())
         loadModule(MythologicalCreatureTracker)
         loadModule(ShiftClickNPCSell)
         loadModule(HighlightJerries())
@@ -715,7 +719,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowParticleFinder)
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
-        loadModule(HighlightBonzoMasks())
+        loadModule(HighlightBonzoMasks)
         loadModule(BazaarCancelledBuyOrderClipboard())
         loadModule(CompactSplashPotionMessage())
         loadModule(CroesusChestTracker())
@@ -907,7 +911,7 @@ class SkyHanniMod {
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
-        loadModule(PestFinder())
+        loadModule(PestFinder)
         loadModule(PestParticleWaypoint())
         loadModule(StereoHarmonyDisplay())
         loadModule(PestParticleLine())
@@ -931,7 +935,8 @@ class SkyHanniMod {
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures)
         loadModule(InfernoMinionFeatures())
-        loadModule(LimboPlaytime())
+        loadModule(LimboPlaytime)
+        loadModule(CopyPlaytime)
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
@@ -941,7 +946,7 @@ class SkyHanniMod {
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
         loadModule(TerminalWaypoints())
-
+        loadModule(FlareDisplay)
         init()
 
         // test stuff

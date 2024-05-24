@@ -80,6 +80,7 @@ object CaptureFarmingGear {
         "RANCHERS", "FARMER", "RABBIT"
     )
 
+    // TODO upadte armor on equpment/wardeobe update as well
     fun captureFarmingGear() {
         val farmingItems = farmingItems ?: return
         val itemStack = InventoryUtils.getItemInHand() ?: return
