@@ -38,9 +38,8 @@ object SlayerAPI {
         System.currentTimeMillis()
     } else latestProgressChangeTime
 
-    fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
-        val key = internalName to amount
-        return nameCache.getOrPut(key) {
+    fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> =
+        nameCache.getOrPut(internalName to amount) {
             val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
             val displayName = internalName.itemName
 
@@ -54,7 +53,6 @@ object SlayerAPI {
 
             "$amountFormat$displayName$priceFormat" to totalPrice
         }
-    }
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
