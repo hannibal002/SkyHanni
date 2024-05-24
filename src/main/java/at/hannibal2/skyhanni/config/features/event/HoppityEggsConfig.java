@@ -92,4 +92,10 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeInChat = true;
+
+    @Expose
+    @ConfigOption(name = "Compact Chat", desc = "Compact chat events when finding a Hoppity Egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactChat = false;
 }
