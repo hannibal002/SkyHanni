@@ -334,16 +334,23 @@ enum class ScoreboardElement(
     }
 }
 
-private fun getTitleDisplayPair(): List<ScoreboardElementType> =
-    if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-        listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-    } else {
+private fun getTitleDisplayPair(): List<ScoreboardElementType> {
+    val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
+
+    if (displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock && !LorenzUtils.inSkyBlock) {
+        return listOf(ScoreboardData.objectiveTitle to alignment)
+    }
+
+    return if (displayConfig.titleAndFooter.useCustomTitle) {
         listOf(displayConfig.titleAndFooter.customTitle.get().toString()
             .replace("&", "§")
             .split("\\n")
-            .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+            .map { it to alignment }
         ).flatten()
+    } else {
+        listOf(ScoreboardData.objectiveTitle to alignment)
     }
+}
 
 private fun getProfileDisplayPair() =
     listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)

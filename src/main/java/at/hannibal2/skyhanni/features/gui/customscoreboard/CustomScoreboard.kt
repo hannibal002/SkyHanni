@@ -295,5 +295,13 @@ class CustomScoreboard {
                 }
             )
         }
+
+        event.move(
+            46,
+            "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
+            "$displayPrefix.titleAndFooter.useCustomTitle"
+        ) {
+            JsonPrimitive(!it.asBoolean)
+        }
     }
 }
