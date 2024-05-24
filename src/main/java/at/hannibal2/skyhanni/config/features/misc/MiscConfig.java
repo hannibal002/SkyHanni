@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +111,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
+    public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")

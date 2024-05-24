@@ -178,7 +178,11 @@ class CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+        onToggle(
+            config.enabled,
+            displayConfig.hideVanillaScoreboard,
+            SkyHanniMod.feature.misc.showOutsideSB,
+        ) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
