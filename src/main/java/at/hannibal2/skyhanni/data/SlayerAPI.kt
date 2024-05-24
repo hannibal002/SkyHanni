@@ -40,24 +40,20 @@ object SlayerAPI {
 
     fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
         val key = internalName to amount
-        nameCache.getOrNull(key)?.let {
-            return it
+        return nameCache.getOrPut(key) {
+            val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
+            val displayName = internalName.itemName
+
+            val price = internalName.getPrice()
+            val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
+            val maxPrice = npcPrice.coerceAtLeast(price)
+            val totalPrice = maxPrice * amount
+
+            val format = NumberUtil.format(totalPrice)
+            val priceFormat = " §7(§6$format coins§7)"
+
+            "$amountFormat$displayName$priceFormat" to totalPrice
         }
-
-        val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-        val displayName = internalName.itemName
-
-        val price = internalName.getPrice()
-        val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
-        val maxPrice = npcPrice.coerceAtLeast(price)
-        val totalPrice = maxPrice * amount
-
-        val format = NumberUtil.format(totalPrice)
-        val priceFormat = " §7(§6$format coins§7)"
-
-        val result = "$amountFormat$displayName$priceFormat" to totalPrice
-        nameCache.put(key, result)
-        return result
     }
 
     @SubscribeEvent

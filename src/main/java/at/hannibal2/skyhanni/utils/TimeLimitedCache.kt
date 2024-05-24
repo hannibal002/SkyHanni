@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import com.google.common.cache.CacheBuilder
+import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
@@ -18,7 +19,11 @@ class TimeLimitedCache<K, V>(
 
     fun getOrNull(key: K): V? = cache.getIfPresent(key)
 
+    fun getOrPut(key: K, defaultValue: () -> V) = getOrNull(key) ?: defaultValue().also { put(key, it) }
+
     fun clear() = cache.invalidateAll()
+
+    fun asMap(): ConcurrentMap<K, V> = cache.asMap()
 
     fun values(): Collection<V> = cache.asMap().values
 
