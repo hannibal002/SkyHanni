@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.command.CommandBase
 
@@ -16,18 +18,18 @@ object FarmingMilestoneCommand {
             return
         }
 
-        val enteredCrop = CropType.entries.firstOrNull { it.simpleName == crop.lowercase() } ?: run {
+        val enteredCrop = CropType.getByName(crop) ?: run {
             ChatUtils.userError("Invalid crop type entered")
             return
         }
 
-        val currentMilestone = getValidNumber(current)
-        val targetMilestone = getValidNumber(target)
+        val currentMilestone = current?.toIntOrNull()
+        val targetMilestone = target?.toIntOrNull()
 
         if (currentMilestone == null) {
             val currentProgress = enteredCrop.getCounter()
-            val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, enteredCrop) + 1
-            val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop)
+            val currentCropMilestone = GardenCropMilestones.getTierForCropCount(currentProgress, enteredCrop, allowOverflow = true) + 1
+            val cropsForTier = GardenCropMilestones.getCropsForTier(currentCropMilestone, enteredCrop, allowOverflow = true)
             val output = (cropsForTier - currentProgress).formatOutput(needsTime, enteredCrop)
 
             ChatUtils.chat("§7$output needed to reach the next milestone")
@@ -35,22 +37,50 @@ object FarmingMilestoneCommand {
         }
 
         if (targetMilestone == null) {
-            val cropsForTier = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop)
+            val cropsForTier = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop, allowOverflow = true)
             val output = cropsForTier.formatOutput(needsTime, enteredCrop)
 
             ChatUtils.chat("§7$output needed for milestone §7$currentMilestone")
             return
         }
+
         if (currentMilestone >= targetMilestone) {
             ChatUtils.userError("Entered milestone is greater than or the same as target milestone")
             return
         }
 
-        val currentAmount = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop)
-        val targetAmount = GardenCropMilestones.getCropsForTier(targetMilestone, enteredCrop)
+        val currentAmount = GardenCropMilestones.getCropsForTier(currentMilestone, enteredCrop, allowOverflow = true)
+        val targetAmount = GardenCropMilestones.getCropsForTier(targetMilestone, enteredCrop, allowOverflow = true)
         val output = (targetAmount - currentAmount).formatOutput(needsTime, enteredCrop)
-
         ChatUtils.chat("§7$output needed for milestone §7$currentMilestone §a-> §7$targetMilestone")
+    }
+
+    fun setGoal(crop: String?, target: String?) {
+        val storage = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone ?: return
+
+        if (crop == null) {
+            ChatUtils.userError("No crop type entered.")
+            return
+        }
+
+        val enteredCrop = CropType.getByName(crop) ?: run {
+            ChatUtils.userError("Invalid crop type entered.")
+            return
+        }
+
+        val targetLevel = target?.formatIntOrUserError()
+        if (targetLevel == null) {
+            ChatUtils.userError("$target is not a valid number.")
+            return
+        }
+        val counter = enteredCrop.getCounter()
+        val level = GardenCropMilestones.getTierForCropCount(counter, enteredCrop)
+        if (targetLevel <= level && targetLevel != 0) {
+            ChatUtils.userError("Custom goal milestone ($targetLevel) must be greater than your current milestone ($level).")
+            return
+        }
+        storage[enteredCrop] = targetLevel
+        ChatUtils.chat("Custom goal milestone for §b${enteredCrop.cropName} §eset to §b$targetLevel.")
     }
 
     fun onComplete(strings: Array<String>): List<String> {
@@ -61,8 +91,6 @@ object FarmingMilestoneCommand {
             )
         } else listOf()
     }
-
-    private fun getValidNumber(entry: String?) = entry?.toIntOrNull()?.coerceIn(0, 46)
 
     private fun Long.formatOutput(needsTime: Boolean, crop: CropType): String {
         if (!needsTime) return "${this.addSeparators()} §a${crop.cropName}"

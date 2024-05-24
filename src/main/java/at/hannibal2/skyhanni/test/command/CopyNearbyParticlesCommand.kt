@@ -34,7 +34,7 @@ object CopyNearbyParticlesCommand {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!saveNextTick) return
         // command was sent in or around a tick so skipping the tick
         if (System.currentTimeMillis() <= searchTime + 5) return

@@ -56,7 +56,7 @@ object GriffinBurrowParticleFinder {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val packet = event.packet
@@ -67,7 +67,7 @@ object GriffinBurrowParticleFinder {
             if (particleType != null) {
 
                 val location = packet.toLorenzVec().toBlockPos().down().toLorenzVec()
-                if (recentlyDugParticleBurrows.contains(location)) return
+                if (location in recentlyDugParticleBurrows) return
                 val burrow = burrows.getOrPut(location) { Burrow(location) }
 
                 when (particleType) {

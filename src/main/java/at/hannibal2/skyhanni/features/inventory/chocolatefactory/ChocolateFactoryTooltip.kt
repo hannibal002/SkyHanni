@@ -34,7 +34,7 @@ object ChocolateFactoryTooltip {
         if (upgradeInfo.effectiveCost == null) return
 
         event.toolTip.add("§7Extra: §6${upgradeInfo.extraPerSecond?.round(2) ?: "N/A"} §7choc/s")
-        event.toolTip.add("§7Effective Cost: §6${upgradeInfo.effectiveCost?.addSeparators() ?: "N/A"}")
+        event.toolTip.add("§7Effective Cost: §6${upgradeInfo.effectiveCost.addSeparators() ?: "N/A"}")
 
         if (slotIndex == ChocolateFactoryAPI.timeTowerIndex) {
             event.toolTip.add("§7One charge will give: §6${chocPerTimeTower().addSeparators()}")

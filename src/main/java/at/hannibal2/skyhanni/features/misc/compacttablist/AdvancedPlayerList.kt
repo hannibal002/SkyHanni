@@ -202,7 +202,7 @@ object AdvancedPlayerList {
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
-            suffix += data.faction.icon
+            suffix += data.faction.icon ?: ""
         }
 
         return "$level $playerName ${suffix.trim()}"
@@ -240,10 +240,10 @@ object AdvancedPlayerList {
         var faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE
     }
 
-    enum class CrimsonIsleFaction(val icon: String) {
+    enum class CrimsonIsleFaction(val icon: String?) {
         BARBARIAN(" §c⚒"),
         MAGE(" §5ቾ"),
-        NONE("")
+        NONE(null)
     }
 
     enum class SocialIcon(val icon: () -> String, val score: Int) {

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -37,6 +38,18 @@ object ChocolateFactoryKeybinds {
                 Minecraft.getMinecraft().thePlayer
             )
             break
+        }
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+
+        // needed to not send duplicate clicks via keybind feature
+        if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) {
+            event.cancel()
         }
     }
 

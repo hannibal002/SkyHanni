@@ -54,8 +54,21 @@ object HypixelCommands {
         send("party transfer $player")
     }
 
+    fun particleQuality(quality: String) {
+        send("pq $quality")
+    }
+
     fun partyAllInvite() {
         send("party settings allinvite")
+    }
+
+    fun allChat(message: String) {
+        send("ac $message")
+    }
+
+    fun showRng(major: String? = null, minor: String? = null) = when {
+        major == null || minor == null -> send("rng")
+        else -> send("rng $major $minor")
     }
 
     private fun send(command: String) {
