@@ -23,7 +23,7 @@ object HoppityNpc {
 
     private val config get() = HoppityEggsManager.config
 
-    private val lastReminderSent = SimpleTimeMark.farPast()
+    private var lastReminderSent = SimpleTimeMark.farPast()
     private var hoppityYearOpened
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.hoppityShopYearOpened ?: -1
         set(value) {
@@ -45,15 +45,18 @@ object HoppityNpc {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (hoppityYearOpened == SkyBlockTime.now().year) return
-        if (lastReminderSent.passedSince() > 30.seconds) return
+        if (lastReminderSent.passedSince() <= 30.seconds) return
 
         ChatUtils.clickableChat(
             "New rabbits are available at §aHoppity's Shop§e! §c(Click to disable these reminders)",
             onClick = {
                 disableReminder()
+                ChatUtils.chat("§eReminders disabled.")
             },
             oneTimeClick = true
         )
+
+        lastReminderSent = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
