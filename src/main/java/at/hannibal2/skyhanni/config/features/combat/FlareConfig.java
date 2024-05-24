@@ -111,4 +111,9 @@ public class FlareConfig {
     @ConfigOption(name = "Show Buff", desc = "Show the mana regen buff next to the flare name.")
     @ConfigEditorBoolean
     public boolean showManaBuff = false;
+
+    @Expose
+    @ConfigOption(name = "Hide particles", desc = "Hide flame particles spawning around the flare.")
+    @ConfigEditorBoolean
+    public boolean hideParticles = false;
 }

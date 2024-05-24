@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -168,6 +170,20 @@ object FlareDisplay {
                 }
 
                 else -> {}
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
+        if (!isEnabled()) return
+        if (!config.hideParticles) return
+
+        val location = event.location
+        val distance = flares.minOfOrNull { it.location.distance(location) } ?: return
+        if (distance < 2.5) {
+            if (event.type == EnumParticleTypes.FLAME) {
+                event.cancel()
             }
         }
     }
