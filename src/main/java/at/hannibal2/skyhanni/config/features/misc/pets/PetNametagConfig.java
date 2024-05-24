@@ -7,17 +7,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class PetNametagConfig {
 
     @Expose
-    @ConfigOption(name = "Hide Player Name", desc = "Hide the player name above the pet")
+    @ConfigOption(name = "Hide Player Name", desc = "Hide the player name above the pet.")
     @ConfigEditorBoolean
     public boolean hidePlayerName = false;
 
     @Expose
-    @ConfigOption(name = "Hide Pet Level", desc = "Hide the pet level above the pet")
+    @ConfigOption(name = "Hide Pet Level", desc = "Hide the pet level above the pet.")
     @ConfigEditorBoolean
     public boolean hidePetLevel = false;
 
     @Expose
-    @ConfigOption(name = "Hide Max Pet Level", desc = "Hide the pet level above the pet if it is max level")
+    @ConfigOption(name = "Hide Max Pet Level", desc = "Hide the pet level above the pet if it is max level.")
     @ConfigEditorBoolean
     public boolean hideMaxPetLevel = false;
 
