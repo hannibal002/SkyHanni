@@ -35,6 +35,4 @@ public class GetFromSackConfig {
     @ConfigOption(name = "GfS Default Amount", desc = "The default amount of items to get when §e/gfs §7is used without amount.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 64f, minStep = 1f)
     public int gfsGetDefaultAmount = 1;
-    // 2240 = 35 stacks.
-
 }
