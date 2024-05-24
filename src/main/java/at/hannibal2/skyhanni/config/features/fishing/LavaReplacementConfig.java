@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc;
+package at.hannibal2.skyhanni.config.features.fishing;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
@@ -35,7 +35,7 @@ public class LavaReplacementConfig {
     @Expose
     @ConfigOption(name = "Lava Color", desc = "Color")
     @ConfigEditorColour
-    public String color = "0:199:100:0:88";
+    public String color = "0:255:255:13:0";
 
 
     @Expose
