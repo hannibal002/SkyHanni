@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -50,6 +51,7 @@ internal var unconfirmedUnknownLines = listOf<String>()
 internal var unknownLinesSet = TimeLimitedSet<String>(500.milliseconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
+    if (!LorenzUtils.inSkyBlock) return
     if (!unconfirmedUnknownLines.contains(line)) return
     unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
     confirmedUnknownLines.add(line)

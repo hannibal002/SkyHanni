@@ -21,6 +21,8 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
@@ -116,30 +118,36 @@ class CustomScoreboard {
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
-        for (element in config.scoreboardEntries) {
-            val lines = element.getVisiblePair()
-            if (lines.isEmpty()) continue
+        if (LorenzUtils.inSkyBlock) {
+            for (element in config.scoreboardEntries) {
+                val lines = element.getVisiblePair()
+                if (lines.isEmpty()) continue
 
-            // Hide consecutive empty lines
-            if (
-                informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
-            ) {
-                continue
+                // Hide consecutive empty lines
+                if (
+                    informationFilteringConfig.hideConsecutiveEmptyLines &&
+                    lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                ) {
+                    continue
+                }
+
+                // Adds empty lines
+                if (lines.first().first == "<empty>") {
+                    add("" to HorizontalAlignment.LEFT)
+                    continue
+                }
+
+                // Does not display this line
+                if (lines.any { it.first == "<hidden>" }) {
+                    continue
+                }
+
+                addAll(lines)
             }
-
-            // Adds empty lines
-            if (lines.first().first == "<empty>") {
-                add("" to HorizontalAlignment.LEFT)
-                continue
-            }
-
-            // Does not display this line
-            if (lines.any { it.first == "<hidden>" }) {
-                continue
-            }
-
-            addAll(lines)
+        } else {
+            addAll(ScoreboardElement.TITLE.getVisiblePair())
+            addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
+            addAll(ScoreboardElement.FOOTER.getVisiblePair())
         }
     }
 
@@ -178,7 +186,7 @@ class CustomScoreboard {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock) dirty = true
+            if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) dirty = true
         }
     }
 
@@ -200,7 +208,9 @@ class CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isEnabled() =
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
+
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent

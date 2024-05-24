@@ -18,7 +18,9 @@ enum class OutsideSbFeature(private val displayName: String) {
     FOLLOWING_LINE("Following Line"),
     ARROW_TRAIL("Arrow Trail"),
     HIGHLIGHT_PARTY_MEMBERS("Highlight Party Members"),
-    MOVEMENT_SPEED("Movement Speed");
+    MOVEMENT_SPEED("Movement Speed"),
+    CUSTOM_SCOREBOARD("Custom Scoreboard"),
+    ;
 
     override fun toString() = displayName
 
