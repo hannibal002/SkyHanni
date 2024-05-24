@@ -145,7 +145,7 @@ object GetFromSackAPI {
 
         when (result) {
             CommandResult.VALID -> getFromSack(stack ?: return)
-            CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
+            CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> [amount]")
             CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
             CommandResult.INTERNAL_ERROR -> {}
