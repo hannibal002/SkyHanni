@@ -88,7 +88,7 @@ object FFStats {
         cropPage.clear()
         cropPage[FortuneStats.BASE] = Pair(totalBaseFF[FFTypes.TOTAL] ?: 100.0, if (usingSpeedBoots) 1373.0 else 1377.0)
         cropPage[FortuneStats.CROP_UPGRADE] = Pair((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
-        cropPage[FortuneStats.ACCESSORY] = Pair(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
+        cropPage[FortuneStats.ACCESSORY] = Pair(CropAccessoryData.cropAccessory.getFortune(crop), 30.0)
         cropPage[FortuneStats.FFD] = Pair((tool.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
         cropPage[FortuneStats.TURBO] = Pair(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
         cropPage[FortuneStats.DEDICATION] = Pair(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0)
