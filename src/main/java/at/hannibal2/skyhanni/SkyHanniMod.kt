@@ -934,6 +934,7 @@ class SkyHanniMod {
         loadModule(SuperCraftFeatures)
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime)
+        loadModule(CopyPlaytime)
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
@@ -942,7 +943,6 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(CopyPlaytime)
 
         init()
 
