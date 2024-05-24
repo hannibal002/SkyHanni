@@ -200,7 +200,7 @@ object EliteFarmingCollectionDisplay {
             if (speed != 0) {
                 if (difference < 0) {
                     newDisplay.add(
-                        Renderable.string("§a§Now")
+                        Renderable.string("§7Time until reached: §a§lNow")
                     )
                 } else {
                     val timeUntilReached = (difference / speed).seconds

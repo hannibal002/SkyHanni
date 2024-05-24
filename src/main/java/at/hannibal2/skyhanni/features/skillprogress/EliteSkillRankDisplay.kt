@@ -185,16 +185,22 @@ object EliteSkillRankDisplay {
         val skillType = SkillType.getByNameOrNull(lastSkillFetched ?: "")
         if (config.showTimeUntilReached && skillType != null) {
             val speed = ((SkillAPI.skillXPInfoMap[skillType]?.xpGainHour ?: 0f) / 3600f).toInt()
-            if (speed != 0) {
-                val timeUntilReached = (difference / speed).seconds
-
+            if (difference < 0) {
                 newDisplay.add(
-                    Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
+                    Renderable.string("§7Time until reached: §a§lNow")
                 )
             } else {
-                newDisplay.add(
-                    Renderable.string("§cPAUSED")
-                )
+                if (speed != 0) {
+                    val timeUntilReached = (difference / speed).seconds
+
+                    newDisplay.add(
+                        Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
+                    )
+                } else {
+                    newDisplay.add(
+                        Renderable.string("§cPAUSED")
+                    )
+                }
             }
         }
         if (nextRank <= 0) {

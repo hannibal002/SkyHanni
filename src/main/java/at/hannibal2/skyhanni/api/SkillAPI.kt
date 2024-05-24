@@ -127,7 +127,7 @@ object SkillAPI {
                     skillMultiplierPattern -> handleSkillPatternMultiplier(matcher, skillType, skillInfo)
                 }
 
-                SkillExpGainEvent(skillType, matcher.group("gained").toDouble()).postAndCatch()
+                SkillExpGainEvent(skillType, matcher.group("gained").formatDouble()).postAndCatch()
 
                 showDisplay = true
                 lastUpdate = SimpleTimeMark.now()
