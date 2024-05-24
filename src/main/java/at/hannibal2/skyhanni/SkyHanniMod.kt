@@ -133,6 +133,7 @@ import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaFixChat
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
@@ -270,6 +271,8 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseCopyUnderbidPrice
+import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseOpenPriceWebsite
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
@@ -363,7 +366,6 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
@@ -487,7 +489,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.26",
+    version = "0.25",
 )
 class SkyHanniMod {
 
@@ -534,7 +536,7 @@ class SkyHanniMod {
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
         loadModule(UpdateManager)
-        loadModule(CropAccessoryData())
+        loadModule(CropAccessoryData)
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
@@ -633,6 +635,7 @@ class SkyHanniMod {
         loadModule(ShiftClickBrewing())
         loadModule(BazaarOpenPriceWebsite())
         loadModule(AuctionHouseCopyUnderbidPrice())
+        loadModule(AuctionHouseOpenPriceWebsite())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown)
@@ -704,6 +707,7 @@ class SkyHanniMod {
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
         loadModule(DianaProfitTracker)
+        loadModule(DianaFixChat())
         loadModule(MythologicalCreatureTracker)
         loadModule(ShiftClickNPCSell)
         loadModule(HighlightJerries())
@@ -713,7 +717,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowParticleFinder)
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
-        loadModule(HighlightBonzoMasks())
+        loadModule(HighlightBonzoMasks)
         loadModule(BazaarCancelledBuyOrderClipboard())
         loadModule(CompactSplashPotionMessage())
         loadModule(CroesusChestTracker())
@@ -905,7 +909,7 @@ class SkyHanniMod {
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
-        loadModule(PestFinder())
+        loadModule(PestFinder)
         loadModule(PestParticleWaypoint())
         loadModule(StereoHarmonyDisplay())
         loadModule(PestParticleLine())
