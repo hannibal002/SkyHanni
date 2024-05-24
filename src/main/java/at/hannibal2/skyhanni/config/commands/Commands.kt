@@ -329,7 +329,7 @@ object Commands {
         registerCommand(
             "shtpinfested",
             "Teleports you to the nearest infested plot"
-        ) { PestFinder.teleportNearestInfectedPlot() }
+        ) { PestFinder.teleportNearestInfestedPlot() }
     }
 
     private fun usersBugFix() {

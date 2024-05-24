@@ -163,10 +163,14 @@ object PestFinder {
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
-        teleportNearestInfectedPlot()
+        teleportNearestInfestedPlot()
     }
 
-    fun teleportNearestInfectedPlot() {
+    fun teleportNearestInfestedPlot() {
+        // need to check again for the command
+        if (!GardenAPI.inGarden()) {
+            ChatUtils.userError("This command only works while on the Garden!")
+        }
         val plot = PestAPI.getNearestInfestedPlot() ?: run {
             ChatUtils.userError("No infested plots detected to warp to!")
             return
