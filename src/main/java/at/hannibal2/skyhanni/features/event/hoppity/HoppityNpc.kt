@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyblockSeason
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,13 +46,14 @@ object HoppityNpc {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (hoppityYearOpened == SkyBlockTime.now().year) return
+        if (SkyblockSeason.getCurrentSeason() != SkyblockSeason.SPRING) return
         if (lastReminderSent.passedSince() <= 30.seconds) return
 
         ChatUtils.clickableChat(
-            "New rabbits are available at §aHoppity's Shop§e! §c(Click to disable these reminders)",
+            "New rabbits are available at §aHoppity's Shop§e! §c(Click to disable this reminder)",
             onClick = {
                 disableReminder()
-                ChatUtils.chat("§eReminders disabled.")
+                ChatUtils.chat("§eHoppity's Shop reminder disabled.")
             },
             oneTimeClick = true
         )
