@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -37,7 +38,9 @@ object ProfileStorageData {
         val sackPlayers = sackPlayers
         val profileName = event.name
         if (playerSpecific == null) {
-            workaroundIn10Seconds(profileName)
+            DelayedRun.runDelayed(10.seconds) {
+                workaroundIn10Seconds(profileName)
+            }
             ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
         }
         if (sackPlayers == null) {
