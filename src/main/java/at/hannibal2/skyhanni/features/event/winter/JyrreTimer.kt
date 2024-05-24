@@ -33,6 +33,7 @@ class JyrreTimer {
     }
 
     private fun resetDisplay() {
+        if (display.isEmpty()) return
         display = if (config.showInactive) drawDisplay() else emptyList()
         duration = 0.seconds
     }

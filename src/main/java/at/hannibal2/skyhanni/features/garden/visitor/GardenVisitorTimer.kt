@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -98,6 +99,9 @@ class GardenVisitorTimer {
                 }
                 millis = TimeUtils.getDuration(timeInfo)
             }
+        } ?: run {
+            display = "§cVisitor time info not in tab list"
+            return
         }
 
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
@@ -154,8 +158,8 @@ class GardenVisitorTimer {
             else -> "e"
         }
 
-        val extraSpeed = if (diff in 2.seconds..10.seconds) {
-            val duration = millis / 3
+        val extraSpeed = if (GardenAPI.isCurrentlyFarming()) {
+            val duration = (millis / 3) * (GardenCropSpeed.getRecentBPS() / 20)
             "§7/§$formatColor" + duration.format()
         } else ""
         if (config.newVisitorPing && millis < 10.seconds) {

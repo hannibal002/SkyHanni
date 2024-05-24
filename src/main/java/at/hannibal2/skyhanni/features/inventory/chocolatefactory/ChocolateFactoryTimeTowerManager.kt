@@ -21,6 +21,7 @@ object ChocolateFactoryTimeTowerManager {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
+    private var lastTimeTowerReminder = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -32,6 +33,10 @@ object ChocolateFactoryTimeTowerManager {
         }
 
         if (ChocolateFactoryAPI.inChocolateFactory) return
+
+        if (config.timeTowerReminder) {
+            timeTowerReminder()
+        }
 
         val nextCharge = SimpleTimeMark(profileStorage.nextTimeTower)
 
@@ -92,9 +97,40 @@ object ChocolateFactoryTimeTowerManager {
 
     fun timeTowerActive(): Boolean {
         val currentTime = profileStorage?.lastDataSave ?: 0
-        val endTime = profileStorage?.currentTimeTowerEnds ?: 0
+        val endTime = timeTowerEnds()
 
         return endTime > currentTime
+    }
+
+    private fun timeTowerEnds(): Long {
+        return profileStorage?.currentTimeTowerEnds ?: 0
+    }
+
+    private fun timeTowerReminder() {
+        if (lastTimeTowerReminder.passedSince() < 20.seconds) return
+
+        val timeUntil = SimpleTimeMark(timeTowerEnds()).timeUntil()
+        if (timeUntil < 1.minutes && timeUntil.isPositive()) {
+            ChatUtils.clickableChat(
+                "§cYour Time Tower is about to end! " +
+                    "Open the Chocolate Factory to avoid wasting the multiplier!",
+                onClick = {
+                    HypixelCommands.chocolateFactory()
+                }
+            )
+            SoundUtils.playBeepSound()
+            lastTimeTowerReminder = SimpleTimeMark.now()
+        }
+    }
+
+    fun timeTowerFullTimemark(): SimpleTimeMark {
+        val profileStorage = profileStorage ?: return SimpleTimeMark.farPast()
+        if (timeTowerFull()) return SimpleTimeMark.farPast()
+        val nextChargeDuration = SimpleTimeMark(profileStorage.nextTimeTower)
+        val remainingChargesAfter = profileStorage.maxTimeTowerUses - (profileStorage.currentTimeTowerUses + 1)
+        val endTime = nextChargeDuration + (profileStorage.timeTowerCooldown).hours * remainingChargesAfter
+
+        return endTime
     }
 
     fun timeTowerActiveDuration(): Duration {

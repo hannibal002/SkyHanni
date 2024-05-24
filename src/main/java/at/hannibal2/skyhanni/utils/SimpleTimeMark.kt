@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -30,6 +34,19 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     override fun toString(): String {
         if (millis == 0L) return "The Far Past"
         return Instant.ofEpochMilli(millis).toString()
+    }
+
+    fun formattedDate(pattern: String): String {
+        val newPattern = if (SkyHanniMod.feature.gui.timeFormat24h) {
+            pattern.replace("h", "H").replace("a", "")
+        } else {
+            pattern
+        }
+
+        val instant = Instant.ofEpochMilli(millis)
+        val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        val formatter = DateTimeFormatter.ofPattern(newPattern.trim())
+        return localDateTime.format(formatter)
     }
 
     fun toMillis() = millis
