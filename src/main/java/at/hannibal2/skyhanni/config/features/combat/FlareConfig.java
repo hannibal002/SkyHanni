@@ -81,7 +81,7 @@ public class FlareConfig {
     public String sosColor = "0:153:159:0:5";
 
     @Expose
-    @ConfigLink(owner = FlareConfig.class, field = "overlayEnabled")
+    @ConfigLink(owner = FlareConfig.class, field = "enabled")
     public Position position = new Position(150, 200, false, true);
 
     @Expose
