@@ -301,14 +301,35 @@ class RepoManager(private val configLocation: File) {
         NeuRepositoryReloadEvent().postAndCatch()
     }
 
-    fun resetRepositoryLocation() {
-        config.location.user = "hannibal002"
-        config.location.name = "SkyHanni-Repo"
-        config.location.branch = "main"
+    fun resetRepositoryLocation(manual: Boolean = false) {
+        val defaultUser = "hannibal002"
+        val defaultName = "SkyHanni-Repo"
+        val defaultBranch = "main"
+
+        with(config.location) {
+            if (user == defaultUser && name == defaultName && branch == defaultBranch) {
+                if (manual) {
+                    ChatUtils.chat("Repo settings are already on default!")
+                }
+                return
+            }
+
+            user = defaultUser
+            name = defaultName
+            branch = defaultBranch
+            if (manual) {
+                ChatUtils.clickableChat("Reset Repo settings to default. " +
+                    "Click §aUpdate Repo Now §ein config or run /shupdaterepo to update!",
+                    onClick = {
+                        updateRepo()
+                    })
+            }
+        }
     }
 
     private fun checkRepoLocation() {
         if (config.location.user.isEmpty() || config.location.name.isEmpty() || config.location.branch.isEmpty()) {
+            ChatUtils.userError("Invalid Repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }
     }

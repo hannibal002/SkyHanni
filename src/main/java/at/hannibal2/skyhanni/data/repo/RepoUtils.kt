@@ -112,6 +112,6 @@ object RepoUtils {
 
     @JvmStatic
     fun resetRepoLocation() {
-        SkyHanniMod.repo.resetRepositoryLocation()
+        SkyHanniMod.repo.resetRepositoryLocation(manual = true)
     }
 }
