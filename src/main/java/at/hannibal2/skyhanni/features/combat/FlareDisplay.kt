@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
@@ -28,7 +29,10 @@ object FlareDisplay {
 
     private val config get() = SkyHanniMod.feature.combat.flare
     private var display = emptyList<Renderable>()
-    private var flareList = mutableMapOf<FlareType, EntityArmorStand>()
+    private var flareList = mutableListOf<Flare>()
+
+    class Flare(val type: FlareType, val entity: EntityArmorStand, val location: LorenzVec = entity.getLorenzVec())
+
     private val MAX_FLARE_TIME = 3.minutes
 
     private val flares = mapOf(
@@ -49,28 +53,27 @@ object FlareDisplay {
     @SubscribeEvent
     fun onSecondsPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        flareList.values.removeIf { !it.isEntityAlive }
+        flareList.removeIf { !it.entity.isEntityAlive }
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
             if (entity.ticksExisted.ticks > MAX_FLARE_TIME) continue
-            for ((texture, flareType) in flares) {
-                if (flareList.contains(flareType)) continue
-                if (entity.hasSkullTexture(texture)) {
-                    flareList[flareType] = entity
-                }
+            if (isAlreadyKnownFlare(entity)) continue
+            getFlareTypeForTexuture(entity)?.let {
+                flareList.add(Flare(it, entity))
             }
         }
         var newDisplay: List<Renderable>? = null
-        for (flare in FlareType.entries) {
-            val entity = flareList[flare] ?: continue
+        for (type in FlareType.entries) {
+            val flare = getFlareForType(type) ?: continue
+            val entity = flare.entity
             val aliveTime = entity.ticksExisted.ticks
             val remainingTime = (MAX_FLARE_TIME - aliveTime)
 
-            val name = flare.displayName
+            val name = type.displayName
             if (newDisplay == null) {
                 newDisplay = buildList {
                     add(Renderable.string("$name: §b${remainingTime.format()}"))
                     if (config.showManaBuff) {
-                        flare.manaBuff?.let {
+                        type.manaBuff?.let {
                             add(Renderable.string(" §b$it §7mana regen"))
                         }
                     }
@@ -98,6 +101,14 @@ object FlareDisplay {
         display = newDisplay ?: emptyList()
     }
 
+    private fun getFlareForType(type: FlareType): Flare? = flareList.firstOrNull { it.type == type }
+
+    private fun getFlareTypeForTexuture(entity: EntityArmorStand): FlareType? =
+        flares.entries.firstOrNull { entity.hasSkullTexture(it.key) }?.value
+
+    private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =
+        flareList.any { it.entity.entityId == entity.entityId }
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         flareList.clear()
@@ -107,9 +118,13 @@ object FlareDisplay {
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        for ((flare, entity) in flareList) {
+        if (config.outlineType == FlareConfig.OutlineType.NONE) return
 
-            val color = when (flare) {
+        for (flare in flareList) {
+            val entity = flare.entity
+            val location = flare.location
+
+            val color = when (flare.type) {
                 FlareType.WARNING -> config.warningColor
                 FlareType.ALERT -> config.alertColor
                 FlareType.SOS -> config.sosColor
@@ -117,18 +132,18 @@ object FlareDisplay {
 
             when (config.outlineType) {
                 FlareConfig.OutlineType.FILLED -> {
-                    event.drawSphereInWorld(color, entity.getLorenzVec(), 40f)
+                    event.drawSphereInWorld(color, location, 40f)
                 }
 
                 FlareConfig.OutlineType.WIREFRAME -> {
-                    event.drawSphereWireframeInWorld(color, entity.getLorenzVec(), 40f)
+                    event.drawSphereWireframeInWorld(color, location, 40f)
                 }
 
                 FlareConfig.OutlineType.CIRCLE -> {
                     RenderUtils.drawCircle(entity, event.partialTicks, 40.0, color)
                 }
 
-                else -> return
+                else -> {}
             }
         }
     }
