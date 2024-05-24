@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -150,8 +149,6 @@ object ChocolateFactoryAPI {
         var needed = goal
         val profileStorage = profileStorage ?: return Duration.ZERO
 
-        val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
-
         val baseMultiplier = profileStorage.rawChocolateMultiplier
         val rawChocolatePerSecond = profileStorage.rawChocPerSecond
         val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
@@ -164,7 +161,7 @@ object ChocolateFactoryAPI {
 
         val secondsAtRate = needed / timeTowerChocPerSecond
         if (secondsAtRate < secondsUntilTowerExpires) {
-            return secondsAtRate.seconds - updatedAgo.seconds
+            return secondsAtRate.seconds
         }
 
         needed -= (secondsUntilTowerExpires * timeTowerChocPerSecond).toLong()

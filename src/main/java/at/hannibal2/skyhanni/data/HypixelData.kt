@@ -185,7 +185,9 @@ class HypixelData {
 
             return when (skyBlockIsland) {
                 IslandType.MINESHAFT -> 4
+                IslandType.CATACOMBS -> 5
                 IslandType.CRYSTAL_HOLLOWS -> 24
+                IslandType.CRIMSON_ISLE -> 24
                 else -> if (serverId?.startsWith("mega") == true) 80 else 26
             }
         }
@@ -281,6 +283,7 @@ class HypixelData {
     }
 
     @SubscribeEvent
+    // TODO rewrite everything in here
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             // Modified from NEU.
@@ -300,17 +303,19 @@ class HypixelData {
             }
         }
 
-        if (LorenzUtils.inSkyBlock) {
-            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                skyblockAreaPattern.matchMatcher(line) {
-                    val originalLocation = group("area")
-                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
-                    skyBlockAreaWithSymbol = line.trim()
-                    break@loop
+        if (LorenzUtils.onHypixel) {
+            if (LorenzUtils.inSkyBlock) {
+                loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                    skyblockAreaPattern.matchMatcher(line) {
+                        val originalLocation = group("area")
+                        skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                        skyBlockAreaWithSymbol = line.trim()
+                        break@loop
+                    }
                 }
-            }
 
-            checkProfileName()
+                checkProfileName()
+            }
         }
 
         if (!event.isMod(5)) return
