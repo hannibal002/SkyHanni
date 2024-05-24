@@ -35,16 +35,39 @@ object ProfileStorageData {
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val profileName = event.name
         if (playerSpecific == null) {
+            workaroundIn10Seconds(profileName)
             ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
         }
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
 
-        val profileName = event.name
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         ConfigLoadEvent().postAndCatch()
+    }
+
+    private fun workaroundIn10Seconds(profileName: String) {
+        val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
+
+        if (playerSpecific == null) {
+            ErrorManager.logErrorStateWithData(
+                "failed to load your profile data a second time",
+                "workaround in 10 seconds did not work"
+            )
+            ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
+        }
+        if (sackPlayers == null) {
+            ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
+        }
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        ConfigLoadEvent().postAndCatch()
+    }
+
+    private fun runWorkaround() {
+
     }
 
     @SubscribeEvent
