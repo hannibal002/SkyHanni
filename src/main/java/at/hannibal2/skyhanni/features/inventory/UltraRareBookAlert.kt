@@ -30,17 +30,16 @@ object UltraRareBookAlert {
     private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
     private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
 
-    private val superpairsGui by RepoPattern.pattern(
+    private val patternGroup = RepoPattern.group("data.enchanting")
+    private val superpairsGui by patternGroup.pattern(
         "inventory.experimentstable.gui",
         "Superpairs.*"
     )
-
-    private val ultraRarePattern by RepoPattern.pattern(
+    private val ultraRarePattern by patternGroup.pattern(
         "inventory.experimentstable.ultrarare",
         "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX"
     )
-
-    private val bookPattern by RepoPattern.pattern(
+    private val bookPattern by patternGroup.pattern(
         "inventory.experimentstable.book",
         "§9(?<enchant>.*)"
     )

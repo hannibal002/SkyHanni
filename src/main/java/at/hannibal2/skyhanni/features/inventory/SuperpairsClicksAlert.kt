@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -58,5 +59,10 @@ class SuperpairsClicksAlert {
             ChatUtils.chat("You have reached the maximum possible clicks!")
             roundsNeeded = -1
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(46, "misc.MiscConfig.superpairsClicksAlert", "inventory.helper.HelperConfig.superpairsClicksAlert")
     }
 }
