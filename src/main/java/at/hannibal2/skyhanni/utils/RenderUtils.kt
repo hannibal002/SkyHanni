@@ -1040,6 +1040,7 @@ object RenderUtils {
     }
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
+        if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
         val y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
         val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
