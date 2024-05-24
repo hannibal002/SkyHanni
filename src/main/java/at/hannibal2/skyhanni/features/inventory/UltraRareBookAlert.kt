@@ -71,7 +71,7 @@ object UltraRareBookAlert {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 125, gui.width,gui.height)
 
-        GlStateManager.translate(0f,150f,-500f)
+        GlStateManager.translate(0f, 150f, -500f)
         GlStateManager.popMatrix()
     }
 
