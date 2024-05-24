@@ -20,7 +20,7 @@ class PetNametag {
      */
     private val pattern by RepoPattern.pattern(
         "feature.pet.nametag",
-        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<player>[\\w_]+'s?) (?<pet>[\\w\\s]+)(?<skin>§. ✦)?"
+        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8\\]) (?<rarity>§.)(?<player>[\\w_]+'s?) (?<pet>[\\w\\s]+)(?<skin>§. ✦)?"
     )
 
     @SubscribeEvent
