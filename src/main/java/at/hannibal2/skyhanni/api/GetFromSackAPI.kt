@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUCalculator
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -165,16 +165,29 @@ object GetFromSackAPI {
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
-        if (args.size <= 1) {
-            return CommandResult.WRONG_ARGUMENT to null
+        var amountString: String
+        // If only 1 arg (item name due to how it is impl) -> (if disabled -> old way, enabled -> default), else amount = last
+        amountString = if (args.size <= 1) {
+            if (!config.gfsGetDefault) {
+                return CommandResult.WRONG_ARGUMENT to null
+            } else {
+                config.gfsGetDefaultAmount.toString()
+            }
+        } else {
+            args.last()
         }
 
-        var amountString = args.last()
         amountString = NEUCalculator.calculateOrNull(amountString)?.toString() ?: amountString
 
-        if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
+        if (!amountString.isInt()) return CommandResult.WRONG_AMOUNT to null
 
-        val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
+        // Handles negative amounts and 0 before sending to server
+        val amount = amountString.toInt()
+        if (amount <= 0) return CommandResult.WRONG_AMOUNT to null
+
+        // Again, due to the impl, 1 args -> item name, else remove last being the amount.
+        val itemStringAsList = if (args.size <= 1) args else args.dropLast(1)
+        val itemString = itemStringAsList.joinToString(" ").uppercase().replace(':', '-')
 
         val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
@@ -189,7 +202,6 @@ object GetFromSackAPI {
 
             else -> return CommandResult.WRONG_IDENTIFIER to null
         }
-
         return CommandResult.VALID to PrimitiveItemStack(item, amountString.toDouble().toInt())
     }
 
