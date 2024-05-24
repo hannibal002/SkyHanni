@@ -908,7 +908,7 @@ class SkyHanniMod {
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
-        loadModule(PestFinder())
+        loadModule(PestFinder)
         loadModule(PestParticleWaypoint())
         loadModule(StereoHarmonyDisplay())
         loadModule(PestParticleLine())
