@@ -27,8 +27,6 @@ object TrevorSolver {
     var mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
     var mobLocation = TrapperMobArea.NONE
     var averageHeight = (minHeight + maxHeight) / 2
-    var possibleNames = arrayOf("Trackable", "Untrackable", "Undetected", "Endangered", "Elusive")
-
 
     fun findMobHeight(height: Int, above: Boolean) {
         val playerPosition = LocationUtils.playerLocation().round(2)
@@ -51,20 +49,19 @@ object TrevorSolver {
     }
 
     fun findMob() {
-        var canSee = false
         Minecraft.getMinecraft().theWorld ?: return
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
-            val mob = MobData.entityToMob[entity]
-            val isTrevor = (mob != null && mob.name != name && isTrevorMob(mob))
+            val isTrevor = MobData.entityToMob[entity]?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) }
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
                 if (foundID == entity.entityId) {
                     val dist = entity.position.toLorenzVec().distanceToPlayer()
-                    if ((currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP) && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
-                    canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
+                    val isRabbitorSheep = currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP
+                    if (isRabbitorSheep && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
+                    val canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
                             LorenzUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
@@ -83,11 +80,10 @@ object TrevorSolver {
             foundID = -1
         }
     }
-    private fun isTrevorMob(mob: Mob) : Boolean{
-        val name = mob.name
-        val firstWord = name.substringBefore(" ")
-        return possibleNames.contains(firstWord)
-    }
+
+    private fun isTrevorMob(mob: Mob): Boolean =
+        TrevorTracker.TrapperMobRarity.entries.any { mob.name.startsWith(it.formattedName + " ", ignoreCase = true) }
+
     fun resetLocation() {
         maxHeight = 0.0
         minHeight = 0.0
