@@ -25,9 +25,9 @@ object HoppityNpc {
 
     private var lastReminderSent = SimpleTimeMark.farPast()
     private var hoppityYearOpened
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.hoppityShopYearOpened ?: -1
+        get() = ChocolateFactoryAPI.profileStorage?.hoppityShopYearOpened ?: -1
         set(value) {
-            ProfileStorageData.profileSpecific?.chocolateFactory?.hoppityShopYearOpened = value
+            ChocolateFactoryAPI.profileStorage?.hoppityShopYearOpened = value
         }
 
     private var slotsToHighlight = mutableSetOf<Int>()
