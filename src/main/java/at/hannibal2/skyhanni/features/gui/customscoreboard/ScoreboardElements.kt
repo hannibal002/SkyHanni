@@ -663,10 +663,14 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
         ).getChatColor()
     } else {
         ""
-    }) + when (arrowConfig.arrowAmountDisplay) {
-        ArrowAmountDisplay.NUMBER -> QuiverAPI.currentAmount.addSeparators()
-        ArrowAmountDisplay.PERCENTAGE -> "${QuiverAPI.currentAmount.asArrowPercentage()}%"
-        else -> QuiverAPI.currentAmount.addSeparators()
+    }) + if (QuiverAPI.wearingSkeletonMasterChestplate) {
+        "∞"
+    } else {
+        when (arrowConfig.arrowAmountDisplay) {
+            ArrowAmountDisplay.NUMBER -> QuiverAPI.currentAmount.addSeparators()
+            ArrowAmountDisplay.PERCENTAGE -> "${QuiverAPI.currentAmount.asArrowPercentage()}%"
+            else -> QuiverAPI.currentAmount.addSeparators()
+        }
     }
 
     return listOf(

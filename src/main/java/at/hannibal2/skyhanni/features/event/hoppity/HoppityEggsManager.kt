@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -36,9 +37,26 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
      */
-    private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!"
+    )
+
+    /**
+     * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
+     * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
+     */
+    val rabbitFoundPatttern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.found",
+        "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\((?<rarity>.*)§7\\)!"
+    )
+
+    /**
+     * REGEX-TEST: §d§lNEW RABBIT! §6+2 Chocolate §7and §6+0.003x Chocolate §7per second!
+     */
+    val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.found.new",
+        "§d§lNEW RABBIT! §6\\+(?<chocolate>.*) Chocolate §7and §6\\+(?<perSecond>.*)x Chocolate §7per second!"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -73,6 +91,21 @@ object HoppityEggsManager {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        hoppityEventNotOn.matchMatcher(event.message) {
+            val currentYear = SkyBlockTime.now().year
+
+            if (config.timeInChat) {
+                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
+                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+                event.blockedReason = "hoppity_egg"
+            }
+            return
+        }
+
+        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+
+        HoppityEggsCompactChat.handleChat(event)
 
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocator.eggFound()
@@ -109,17 +142,6 @@ object HoppityEggsManager {
             getEggType(event).markSpawned()
             return
         }
-
-        hoppityEventNotOn.matchMatcher(event.message) {
-            val currentYear = SkyBlockTime.now().year
-
-            if (config.timeInChat) {
-                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
-                event.blockedReason = "hoppity_egg"
-            }
-            return
-        }
     }
 
     internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
@@ -139,18 +161,21 @@ object HoppityEggsManager {
 
         val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
-            ChatUtils.clickableChat(
-                "Click here to share the location of this chocolate egg with the server!",
-                onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) },
-                expireAt = 30.seconds.fromNow(),
-                oneTimeClick = true
-            )
+            val onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) }
+            if (!HoppityEggsCompactChat.clickableCompact(onClick)) {
+                ChatUtils.clickableChat(
+                    "Click here to share the location of this chocolate egg with the server!",
+                    onClick = onClick,
+                    expireAt = 30.seconds.fromNow(),
+                    oneTimeClick = true
+                )
+            }
         }
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isActive()) return
         if (!config.showClaimedEggs) return
         if (isBuzy()) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
@@ -158,7 +183,7 @@ object HoppityEggsManager {
         val displayList = HoppityEggType.entries
             .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
             .toMutableList()
-        displayList.add(0, "§bUnfound Eggs:")
+        displayList.add(0, "§bUnclaimed Eggs:")
         if (displayList.size == 1) return
 
         config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
@@ -166,6 +191,7 @@ object HoppityEggsManager {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isActive()) return
         HoppityEggType.checkClaimed()
         checkWarn()
     }
@@ -189,7 +215,14 @@ object HoppityEggsManager {
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size
-        ChatUtils.chat("All $amount Hoppity Eggs are ready to be found.!")
+        val message = "All $amount Hoppity Eggs are ready to be found!"
+        if (config.warpUnclaimedEggs) {
+            ChatUtils.clickableChat(
+                message,
+                onClick = { HypixelCommands.warp(config.warpDestination) },
+                "§eClick to /warp ${config.warpDestination}!"
+            )
+        } else ChatUtils.chat(message)
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
@@ -206,4 +239,5 @@ object HoppityEggsManager {
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 
+    fun isActive() = LorenzUtils.inSkyBlock && ChocolateFactoryAPI.isHoppityEvent()
 }
