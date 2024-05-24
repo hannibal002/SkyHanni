@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,6 +25,7 @@ class PetNametag {
 
     @SubscribeEvent
     fun onNameTagRender(event: EntityDisplayNameEvent) {
+        if (!isEnabled()) return
         if (event.entity !is EntityArmorStand) return
 
         pattern.matchMatcher(event.chatComponent.unformattedText) {
@@ -40,10 +42,12 @@ class PetNametag {
             if (!config.hidePlayerName) text += "$player "
             text += pet + skin
 
-            //event.chatComponent = "test nametag".asComponent()
-
-            event.chatComponent.appendText(" test nametag")
+            event.chatComponent = text.asComponent()
         }
+    }
+
+    private fun isEnabled() = with(config) {
+        hidePetLevel || hideMaxPetLevel || hidePlayerName
     }
 
 }
