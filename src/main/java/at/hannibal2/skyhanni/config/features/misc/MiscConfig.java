@@ -108,11 +108,6 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
-    @ConfigOption(name = "Flare", desc = "")
-    @Accordion
-    public FlareConfig flare = new FlareConfig();
-
-    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();

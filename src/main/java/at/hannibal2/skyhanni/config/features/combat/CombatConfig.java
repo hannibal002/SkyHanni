@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
+import at.hannibal2.skyhanni.config.features.misc.FlareConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -48,6 +49,11 @@ public class CombatConfig {
     @ConfigOption(name = "Ferocity Display", desc = "")
     @Accordion
     public FerocityDisplayConfig ferocityDisplay = new FerocityDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Flare", desc = "")
+    @Accordion
+    public FlareConfig flare = new FlareConfig();
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
