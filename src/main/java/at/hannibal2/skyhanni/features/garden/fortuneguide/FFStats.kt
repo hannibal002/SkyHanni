@@ -56,7 +56,7 @@ object FFStats {
 
         FortuneStats.BASE.set(totalBaseFF[FFTypes.TOTAL] ?: 100.0, if (usingSpeedBoots) 1373.0 else 1377.0)
         FortuneStats.CROP_UPGRADE.set((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
-        FortuneStats.ACCESSORY.set(CropAccessoryData.cropAccessory?.getFortune(crop) ?: 0.0, 30.0)
+        FortuneStats.ACCESSORY.set(CropAccessoryData.cropAccessory.getFortune(crop), 30.0)
         FortuneStats.FFD.set((tool?.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
         FortuneStats.TURBO.set(FarmingFortuneDisplay.getTurboCropFortune(tool, crop), 25.0)
         FortuneStats.DEDICATION.set(FarmingFortuneDisplay.getDedicationFortune(tool, crop), 92.0)

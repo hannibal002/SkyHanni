@@ -90,6 +90,7 @@ object CaptureFarmingGear {
         }
     }
 
+    // TODO upadte armor on equpment/wardeobe update as well
     fun captureFarmingGear() {
         for (armor in InventoryUtils.getArmor()) {
             if (armor == null) continue
