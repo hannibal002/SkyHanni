@@ -535,7 +535,7 @@ class SkyHanniMod {
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
         loadModule(UpdateManager)
-        loadModule(CropAccessoryData())
+        loadModule(CropAccessoryData)
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
