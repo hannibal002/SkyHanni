@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.features.fishing.LavaReplacementConfig;
-import io.github.moulberry.notenoughupdates.util.SpecialColour;
+import at.hannibal2.skyhanni.mixins.hooks.BlockFluidRendererHookKt;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,14 +15,12 @@ public class MixinBlockFluidRenderer {
     private TextureAtlasSprite[] atlasSpritesWater;
 
     @ModifyVariable(method = "renderFluid", at = @At("STORE"))
-    private TextureAtlasSprite[] injected(TextureAtlasSprite[] textureAtlasSprites) {
-        return (SkyHanniMod.Companion.getFeature().fishing.lavaReplacementConfig.renderType.get() == LavaReplacementConfig.RenderType.TEXTURE)
-            ? atlasSpritesWater : textureAtlasSprites;
+    private TextureAtlasSprite[] modifySprite(TextureAtlasSprite[] textureAtlasSprites) {
+        return BlockFluidRendererHookKt.modifySprite(textureAtlasSprites, atlasSpritesWater);
     }
 
     @ModifyVariable(method = "renderFluid", at = @At("STORE"))
-    private int injected(int i) {
-        return (SkyHanniMod.Companion.getFeature().fishing.lavaReplacementConfig.renderType.get() == LavaReplacementConfig.RenderType.COLOR)
-                ? SpecialColour.specialToChromaRGB(SkyHanniMod.Companion.getFeature().fishing.lavaReplacementConfig.color) : i;
+    private int modifyColorMultiplier(int i) {
+        return BlockFluidRendererHookKt.modifyColorMultiplier(i);
     }
 }
