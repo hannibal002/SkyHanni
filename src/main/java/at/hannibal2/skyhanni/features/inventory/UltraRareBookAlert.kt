@@ -69,7 +69,7 @@ object UltraRareBookAlert {
             Color(Color.DARK_GRAY.withAlpha(0), true),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0,125,gui.width,gui.height)
+        ).renderXYAligned(0, 125, gui.width,gui.height)
 
         GlStateManager.translate(0f,150f,-500f)
         GlStateManager.popMatrix()
