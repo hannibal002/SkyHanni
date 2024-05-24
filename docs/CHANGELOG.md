@@ -1,5 +1,61 @@
 # SkyHanni - Change Log
 
+## Version 0.26 (In Beta)
+
+### New Features
+
+#### Combat Features
+
++ SOS/Alert/Warning Flare Display. - HiZe + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1803)
+    + Warn when the flare is about to despawn (chat, title or both).
+    + Change the display type (as a GUI element, in the world, or both).
+    + Show effective area (as a wireframe, filled or circle).
+    + Show mana regeneration buff next to the GUI element.
+    + Option to hide flare particles.
+
+#### Misc Features
+
++ Click on breakdown display in /playtimedetailed to copy the stats into the clipboard. - seraid (https://github.com/hannibal002/SkyHanni/pull/1807)
+
+### Improvements
+
+#### Farming Island Improvements
+
++ Trevor Mob Detection now works with Oasis mobs. - Awes (https://github.com/hannibal002/SkyHanni/pull/1812)
+
+#### Garden Improvements
+
++ Added `/shtpinfested` command to teleport to nearest infested plot. - Empa (https://github.com/hannibal002/SkyHanni/pull/1763)
+
+#### Hoppity Event Improvements
+
++ Renamed "Unfound Eggs" to "Unclaimed Eggs" for the Hoppity event. - Luna (https://github.com/hannibal002/SkyHanni/pull/1876)
++ Added Compact Hoppity Chat option. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1748)
+
+#### Mining Improvements
+
++ Highlight Treasure Hoarders during Treasure Hoarder Puncher commissions. - Luna (https://github.com/hannibal002/SkyHanni/pull/1852)
+
+#### Misc Improvements
+
++ Added a toggle for 24-hour time. - seraid (https://github.com/hannibal002/SkyHanni/pull/1804)
++ Improved the NEU missing/outdated warning. - Luna (https://github.com/hannibal002/SkyHanni/pull/1847)
+    + Link to the latest GitHub release instead of 2.2.0.
+    + Also link to Modrinth.
++ Improved performance with Slayer Items on Ground and Fished Item Names. - Empa (https://github.com/hannibal002/SkyHanni/pull/1875)
+
+### Fixes
+
+#### Mining Fixes
+
++ Fixed Tunnel Maps GUI position not saving. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1882)
++ Fixed Glacite Walkers not being highlighted during commissions. - Luna (https://github.com/hannibal002/SkyHanni/pull/1850)
+
+#### Garden Fixes
+
++ Fixed farming contests showing in the election GUI. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1871)
++ Fixed wrong icon for the rat crop type in Stereo Harmony display. - raven (https://github.com/hannibal002/SkyHanni/pull/1849)
+
 ## Version 0.25
 
 ### New Features
