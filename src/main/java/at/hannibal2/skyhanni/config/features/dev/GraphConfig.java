@@ -70,6 +70,7 @@ public class GraphConfig {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_M)
     public int throughBlocksKey = Keyboard.KEY_M;
 
+    @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
     public Position infoDisplay = new Position(20, 20);
 }
