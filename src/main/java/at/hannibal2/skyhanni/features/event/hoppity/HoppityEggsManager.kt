@@ -183,7 +183,7 @@ object HoppityEggsManager {
         val displayList = HoppityEggType.entries
             .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
             .toMutableList()
-        displayList.add(0, "§bUnfound Eggs:")
+        displayList.add(0, "§bUnclaimed Eggs:")
         if (displayList.size == 1) return
 
         config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
