@@ -71,8 +71,10 @@ class ToolTooltipTweaks {
 
                 val displayedFortune = FarmingFortuneDisplay.displayedFortune
                 val reforgeFortune = FarmingFortuneDisplay.reforgeFortune
+                val gemstoneFortune = FarmingFortuneDisplay.gemstoneFortune
                 val baseFortune = FarmingFortuneDisplay.itemBaseFortune
                 val greenThumbFortune = FarmingFortuneDisplay.greenThumbFortune
+                val pesterminatorFortune = FarmingFortuneDisplay.pesterminatorFortune
 
                 val totalFortune = displayedFortune + hiddenFortune
 
@@ -91,8 +93,10 @@ class ToolTooltipTweaks {
                     iterator.addStat("  §7Base: §6+", baseFortune)
                     iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
+                    iterator.addStat("  §7Gemstone: §d+", gemstoneFortune)
                     iterator.addStat("  §7Ability: §2+", abilityFortune)
                     iterator.addStat("  §7Green Thumb: §a+", greenThumbFortune)
+                    iterator.addStat("  §7Pesterminator: §a+", pesterminatorFortune)
                     iterator.addStat("  §7Sunder: §a+", sunderFortune)
                     iterator.addStat("  §7Harvesting: §a+", harvestingFortune)
                     iterator.addStat("  §7Cultivating: §a+", cultivatingFortune)
@@ -139,11 +143,6 @@ class ToolTooltipTweaks {
                     }
                 }
             }
-        }
-
-        // Fixing a hypixel bug. TODO remove once hypixel fixes it. use disabled features repo maybe?
-        if (internalName.contains("LOTUS")) {
-            event.toolTip.replaceAll { it.replace("Kills:", "Visitors:") }
         }
     }
 

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarDataOrError
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -64,9 +64,10 @@ class BazaarBestSellMethod {
         return "$name§7 sell difference: §6$result coins"
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
+    @SubscribeEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (display.isEmpty()) return
 
         config.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
     }
