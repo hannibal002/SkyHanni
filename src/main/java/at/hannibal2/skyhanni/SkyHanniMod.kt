@@ -90,6 +90,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.combat.BestiaryData
 import at.hannibal2.skyhanni.features.combat.FerocityDisplay
+import at.hannibal2.skyhanni.features.combat.FlareDisplay
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
@@ -328,6 +329,7 @@ import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.ContributorManager
+import at.hannibal2.skyhanni.features.misc.CopyPlaytime
 import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
@@ -488,7 +490,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25",
+    version = "0.26.Beta.1",
 )
 class SkyHanniMod {
 
@@ -535,7 +537,7 @@ class SkyHanniMod {
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
         loadModule(UpdateManager)
-        loadModule(CropAccessoryData())
+        loadModule(CropAccessoryData)
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
@@ -691,6 +693,7 @@ class SkyHanniMod {
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
         loadModule(FerocityDisplay())
+        loadModule(FlareDisplay)
         loadModule(InGameDateDisplay())
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
@@ -908,7 +911,7 @@ class SkyHanniMod {
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
-        loadModule(PestFinder())
+        loadModule(PestFinder)
         loadModule(PestParticleWaypoint())
         loadModule(StereoHarmonyDisplay())
         loadModule(PestParticleLine())
@@ -932,7 +935,8 @@ class SkyHanniMod {
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures)
         loadModule(InfernoMinionFeatures())
-        loadModule(LimboPlaytime())
+        loadModule(LimboPlaytime)
+        loadModule(CopyPlaytime)
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
