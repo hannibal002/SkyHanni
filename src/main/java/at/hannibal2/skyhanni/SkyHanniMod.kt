@@ -508,7 +508,7 @@ class SkyHanniMod {
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
-        loadModule(EntityData())
+        loadModule(EntityData)
         loadModule(MobData())
         loadModule(MobDetection())
         loadModule(EntityMovementData)
