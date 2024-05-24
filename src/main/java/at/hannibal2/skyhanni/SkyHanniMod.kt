@@ -494,7 +494,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25",
+    version = "0.26.Beta.1",
 )
 class SkyHanniMod {
 
@@ -698,6 +698,7 @@ class SkyHanniMod {
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
         loadModule(FerocityDisplay())
+        loadModule(FlareDisplay)
         loadModule(InGameDateDisplay())
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
