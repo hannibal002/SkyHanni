@@ -16,7 +16,6 @@ class DungeonRankTabListColor {
     private val patternGroup = RepoPattern.group("dungeon.tablist")
 
     /**
-     * Note:
      * REGEX-TEST: §8[§r§9319§r§8] §r§bEmpa_ §r§7α §r§f(§r§dMage XXXIV§r§f)
      */
     private val pattern by patternGroup.pattern(
