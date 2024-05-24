@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLinesGui
@@ -327,6 +328,10 @@ object Commands {
             "shignore",
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
+        registerCommand(
+            "shtpinfested",
+            "Teleports you to the nearest infested plot"
+        ) { PestFinder.teleportNearestInfestedPlot() }
     }
 
     private fun usersBugFix() {
