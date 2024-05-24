@@ -66,6 +66,13 @@ object GardenNextJacobContest {
         "day",
         "§aDay (?<day>.*)"
     )
+
+    /**
+     * REGEX-TEST: Early Spring, Year 351
+     * REGEX-TEST: Late Summer, Year 351
+     * REGEX-TEST: Autumn, Year 351
+     */
+
     val monthPattern by patternGroup.pattern(
         "month",
         "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
