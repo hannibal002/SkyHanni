@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.prefix
 import at.hannibal2.skyhanni.utils.chat.Text.url
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
@@ -125,6 +126,7 @@ object ChatUtils {
      * Sends a message to the user that they can click and run an action
      * @param message The message to be sent
      * @param onClick The runnable to be executed when the message is clicked
+     * @param hover The string to be shown when the message is hovered
      * @param expireAt When the click action should expire, default never
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
@@ -134,6 +136,7 @@ object ChatUtils {
     fun clickableChat(
         message: String,
         onClick: () -> Any,
+        hover: String = "§eClick here!",
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
         prefixColor: String = "§e",
@@ -143,6 +146,8 @@ object ChatUtils {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(Text.text(msgPrefix + message) {
             this.onClick(expireAt, oneTimeClick, onClick)
+            abc
+            this.hover = hover.asComponent()
             this.hover = hover?.joinToString("\n")?.asComponent() ?: "§eClick here!".asComponent()
         })
     }
@@ -268,5 +273,12 @@ object ChatUtils {
                 property.jumpToEditor()
             }
         )
+    }
+
+    fun IChatComponent.changeColor(color: LorenzColor): IChatComponent {
+        chatStyle = ChatStyle().also {
+            it.color = color.toChatFormatting()
+        }
+        return this
     }
 }

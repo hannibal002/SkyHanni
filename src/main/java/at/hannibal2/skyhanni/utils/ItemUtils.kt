@@ -111,7 +111,8 @@ object ItemUtils {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NEUInternalName.WISP_POTION
         }
-        return NEUItems.getInternalName(this)?.asInternalName()
+        val internalName = NEUItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
+        return internalName?.asInternalName()
     }
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
@@ -385,5 +386,24 @@ object ItemUtils {
             return "$it Pet"
         }
         return name
+    }
+
+    fun ItemStack.loreCosts(): MutableList<NEUInternalName> {
+        var found = false
+        val list = mutableListOf<NEUInternalName>()
+        for (lines in getLore()) {
+            if (lines == "§7Cost") {
+                found = true
+                continue
+            }
+
+            if (!found) continue
+            if (lines.isEmpty()) return list
+
+            NEUInternalName.fromItemNameOrNull(lines)?.let {
+                list.add(it)
+            }
+        }
+        return list
     }
 }

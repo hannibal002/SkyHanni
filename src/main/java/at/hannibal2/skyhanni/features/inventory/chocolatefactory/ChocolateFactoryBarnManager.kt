@@ -98,6 +98,8 @@ object ChocolateFactoryBarnManager {
             return
         }
 
+        if (config.rabbitCrushOnlyDuringHoppity && !ChocolateFactoryAPI.isHoppityEvent()) return
+
         ChatUtils.clickableChat(
             message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) {
                 "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"

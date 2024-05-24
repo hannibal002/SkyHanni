@@ -203,30 +203,8 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onDebugDataCollectCurrent(event: DebugDataCollectEvent) {
-        event.title("Current Skill")
-        val storage = storage
-        if (storage == null) {
-            event.addIrrelevant("SkillMap is empty")
-            return
-        }
-
-        val skillType = activeSkill
-        if (skillType == null) {
-            event.addIrrelevant("activeSkill is null")
-            return
-        }
-
-        event.addData {
-            storage[skillType]?.let { skillInfo ->
-                addDebug(skillType, skillInfo)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onDebugDataCollectAll(event: DebugDataCollectEvent) {
-        event.title("All Skills")
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Skills")
         val storage = storage
         if (storage == null) {
             event.addIrrelevant("SkillMap is empty")
@@ -234,6 +212,18 @@ object SkillAPI {
         }
 
         event.addIrrelevant {
+            val activeSkill = activeSkill
+            if (activeSkill == null) {
+                add("activeSkill is null")
+            } else {
+                add("active skill:")
+                storage[activeSkill]?.let { skillInfo ->
+                    addDebug(activeSkill, skillInfo)
+                }
+                add("")
+                add("")
+            }
+
             for ((skillType, skillInfo) in storage) {
                 addDebug(skillType, skillInfo)
             }
