@@ -71,6 +71,14 @@ public class DevConfig {
 
     @Expose
     @ConfigOption(
+        name = "Contributor Nametags",
+        desc = "Makes SkyHanni contributors fancy in nametags too. "
+    )
+    @ConfigEditorBoolean
+    public boolean contributorNametags = true;
+
+    @Expose
+    @ConfigOption(
         name = "Flip Contributors",
         desc = "Make SkyHanni contributors appear upside down in the world.")
     @ConfigEditorBoolean

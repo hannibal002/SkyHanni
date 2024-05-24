@@ -22,6 +22,7 @@ object ContributorManager {
 
     @SubscribeEvent
     fun onRenderNametag(event: EntityDisplayNameEvent) {
+        if (!config.contributorNametags) return
         (event.entity as? EntityPlayer)?.let { player ->
             if (player.isRealPlayer()) getSuffix(event.entity.name)?.let {
                 event.chatComponent.appendSibling(ChatComponentText(" $it"))
