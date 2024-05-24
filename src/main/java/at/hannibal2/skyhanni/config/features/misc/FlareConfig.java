@@ -44,7 +44,7 @@ public class FlareConfig {
     @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the Flare.")
     @ConfigEditorDropdown
-    public OutlineType outlineType = OutlineType.FILLED;
+    public OutlineType outlineType = OutlineType.NONE;
 
     public enum OutlineType {
         NONE("No Outline"),
@@ -83,4 +83,9 @@ public class FlareConfig {
     @Expose
     @ConfigLink(owner = FlareConfig.class, field = "overlayEnabled")
     public Position position = new Position(150, 200, false, true);
+
+    @Expose
+    @ConfigOption(name = "Show Buff", desc = "Show the mana regen buff next to the flare name.")
+    @ConfigEditorBoolean
+    public boolean showManaBuff = false;
 }

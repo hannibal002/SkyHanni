@@ -110,7 +110,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Flare", desc = "")
     @Accordion
-    public FlareConfig flareConfig = new FlareConfig();
+    public FlareConfig flare = new FlareConfig();
 
     @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")

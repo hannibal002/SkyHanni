@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -14,19 +15,21 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object FlareDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.flareConfig
+    private val config get() = SkyHanniMod.feature.misc.flare
     private var display = emptyList<Renderable>()
     private var flareList = mutableMapOf<FlareType, EntityArmorStand>()
-    private const val FLARE_TIME = 180_000
+    private val MAX_FLARE_TIME = 3.minutes
 
     private val flares = mapOf(
         "ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMwNjIyMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjJlMmJmNmMxZWMzMzAyNDc5MjdiYTYzNDc5ZTU4NzJhYzY2YjA2OTAzYzg2YzgyYjUyZGFjOWYxYzk3MTQ1OCIKICAgIH0KICB9Cn0="
@@ -47,40 +50,58 @@ object FlareDisplay {
     fun onSecondsPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         flareList.values.removeIf { !it.isEntityAlive }
-        EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().forEach { entity ->
-            if (entity.ticksExisted > FLARE_TIME) return@forEach
+        for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
+            if (entity.ticksExisted.ticks > MAX_FLARE_TIME) continue
             for ((texture, flareType) in flares) {
-                if (flareList.contains(flareType)) return@forEach
+                if (flareList.contains(flareType)) continue
                 if (entity.hasSkullTexture(texture)) {
                     flareList[flareType] = entity
                 }
             }
         }
-        display = buildList {
-            for ((flare, entity) in flareList) {
-                val time = (FLARE_TIME - entity.ticksExisted / 20 * 1000).milliseconds
+        var newDisplay: List<Renderable>? = null
+        for (flare in FlareType.entries) {
+            val entity = flareList[flare] ?: continue
+            val aliveTime = entity.ticksExisted.ticks
+            val remainingTime = (MAX_FLARE_TIME - aliveTime)
 
-                add(Renderable.string("§6${flare.displayName}: §e$time §b${flare.buff}"))
-                if (time <= 5.seconds) {
-                    when (config.alertType) {
-                        FlareConfig.AlertType.CHAT -> {
-                            ChatUtils.chat("§6${flare.displayName} expire in b${time.inWholeSeconds}")
+            val name = flare.displayName
+            if (newDisplay == null) {
+                newDisplay = buildList {
+                    add(Renderable.string("$name: §b${remainingTime.format()}"))
+                    if (config.showManaBuff) {
+                        flare.manaBuff?.let {
+                            add(Renderable.string(" §b$it §7mana regen"))
                         }
-
-                        FlareConfig.AlertType.TITLE -> {
-                            LorenzUtils.sendTitle("§6${flare.displayName} expire in §b${time.inWholeSeconds}", 1.seconds)
-                        }
-
-                        FlareConfig.AlertType.CHAT_TITLE -> {
-                            ChatUtils.chat("§6${flare.displayName} expire in §b${time.inWholeSeconds}")
-                            LorenzUtils.sendTitle("§6${flare.displayName} expire in §b${time.inWholeSeconds}", 1.seconds)
-                        }
-
-                        else -> return
                     }
                 }
             }
+            if (remainingTime > 5.seconds) continue
+            val message = "$name §eexpires in: §b${remainingTime.inWholeSeconds}s"
+            when (config.alertType) {
+                FlareConfig.AlertType.CHAT -> {
+                    ChatUtils.chat(message)
+                }
+
+                FlareConfig.AlertType.TITLE -> {
+                    LorenzUtils.sendTitle(message, 1.seconds)
+                }
+
+                FlareConfig.AlertType.CHAT_TITLE -> {
+                    ChatUtils.chat(message)
+                    LorenzUtils.sendTitle(message, 1.seconds)
+                }
+
+                else -> {}
+            }
         }
+        display = newDisplay ?: emptyList()
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        flareList.clear()
+        display = emptyList()
     }
 
     @SubscribeEvent
@@ -112,10 +133,11 @@ object FlareDisplay {
         }
     }
 
-    enum class FlareType(val displayName: String, val buff: String) {
-        WARNING("Warning Flare", ""),
-        ALERT("Alert Flare", "+50%"),
-        SOS("SOS Flare", "+150%")
+    enum class FlareType(val displayName: String, val manaBuff: String?) {
+        SOS("§5SOS Flare", "+125%"),
+        ALERT("§9Alert Flare", "+50%"),
+        WARNING("§aWarning Flare", null),
+        ;
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.overlayEnabled
