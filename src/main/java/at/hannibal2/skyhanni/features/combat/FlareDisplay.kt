@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.FlareConfig
+import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object FlareDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.flare
+    private val config get() = SkyHanniMod.feature.combat.flare
     private var display = emptyList<Renderable>()
     private var flareList = mutableMapOf<FlareType, EntityArmorStand>()
     private val MAX_FLARE_TIME = 3.minutes
@@ -140,5 +140,5 @@ object FlareDisplay {
         ;
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.overlayEnabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
