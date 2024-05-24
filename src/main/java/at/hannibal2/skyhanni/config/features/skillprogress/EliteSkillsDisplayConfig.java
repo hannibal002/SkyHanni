@@ -39,6 +39,12 @@ public class EliteSkillsDisplayConfig {
     public boolean showInGarden = false;
 
     @Expose
+    @ConfigOption(name = "Show Time Until Reached", desc = "Show the time until you pass the person in front, or " +
+        "time until §b#5000")
+    @ConfigEditorBoolean
+    public boolean showTimeUntilReached = true;
+
+    @Expose
     @ConfigOption(name = "Show Time Until Refresh", desc = "Show the time until the leaderboard updates.")
     @ConfigEditorBoolean
     public boolean showTimeUntilRefresh = true;

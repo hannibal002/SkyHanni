@@ -141,17 +141,17 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (event.repeatSeconds(2)) {
+            update()
+            updateSkillInfo()
+        }
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
         if (event.repeatSeconds(1)) {
             allDisplay = formatAllDisplay(drawAllDisplay())
             etaDisplay = drawETADisplay()
-        }
-
-        if (event.repeatSeconds(2)) {
-            update()
-            updateSkillInfo()
         }
     }
 

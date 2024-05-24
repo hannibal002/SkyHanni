@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.EliteAPISettingsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
@@ -40,14 +39,6 @@ object SkillRankDisplay {
     private val config get() = SkyHanniMod.feature.skillProgress.rankDisplay
 
     private var checkDuration = 10.minutes
-    private var worldSwapRefresh = true
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<EliteAPISettingsJson>("EliteAPISettings")
-        checkDuration = data.refreshTime.minutes
-        worldSwapRefresh = data.worldSwapRefresh
-    }
 
     private val eliteCollectionApiGson by lazy {
         ConfigManager.createBaseGsonBuilder()
@@ -73,19 +64,18 @@ object SkillRankDisplay {
     private var display = emptyList<Renderable>()
 
     @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<EliteAPISettingsJson>("EliteAPISettings")
+        checkDuration = data.refreshTime.minutes
+    }
+
+    @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (GardenAPI.hideExtraGuis()) return
         if (!isEnabled()) return
         if (!config.alwaysShow && lastXPGained.passedSince() > config.alwaysShowTime.seconds) return
 
         config.pos.renderRenderables(display, posLabel = "Skill Rank Display")
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (worldSwapRefresh) {
-            resetData()
-        }
     }
 
     @SubscribeEvent
@@ -117,9 +107,6 @@ object SkillRankDisplay {
         updateDisplay()
     }
 
-    //TODO
-//     why does farming xp only increase sometimes for people - maybe related to another feature being turned off? something messing with actionbar update maybe? could another mod be messing with it
-
     @SubscribeEvent
     fun onSkillGained(event: SkillExpGainEvent) {
         val skillName = event.skill.name.lowercase()
@@ -139,17 +126,6 @@ object SkillRankDisplay {
         }
         lastXPGained = SimpleTimeMark.now()
         currentSkills[skillName] = skillInfo.lastTotalXp.toLong()
-
-        //TODO make skill api useable even when skill progress feature is off
-
-//             if (!skillRanks.containsKey(event.skill) && lastSkillGained != event.skill) {
-//             SkyHanniMod.coroutineScope.launch {
-//                 getRanksForSkill(event.skill)
-//             }
-//         }
-//         lastXPGained = SimpleTimeMark.now()
-//         lastSkillGained = event.skill
-//         currentSkills[event.skill] = SkillExperience.getExpForSkill(event.skill)
     }
 
     @SubscribeEvent
@@ -206,6 +182,21 @@ object SkillRankDisplay {
                 }
             )
         )
+        val skillType = SkillType.getByNameOrNull(lastSkillFetched ?: "")
+        if (config.showTimeUntilReached && skillType != null) {
+            val speed = ((SkillAPI.skillXPInfoMap[skillType]?.xpGainHour ?: 0f) / 3600f).toInt()
+            if (speed != 0) {
+                val timeUntilReached = (difference / speed).seconds
+
+                newDisplay.add(
+                    Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
+                )
+            } else {
+                newDisplay.add(
+                    Renderable.string("§cPAUSED")
+                )
+            }
+        }
         if (nextRank <= 0) {
             newDisplay.add(
                 Renderable.string("§aNo players ahead of you!")

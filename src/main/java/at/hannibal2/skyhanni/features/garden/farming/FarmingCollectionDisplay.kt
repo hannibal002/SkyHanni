@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -95,13 +94,6 @@ object FarmingCollectionDisplay {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (worldSwapRefresh) {
-            resetData()
-        }
-    }
-
-    @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.crop.afterChange {
             lastLeaderboardFetch = SimpleTimeMark.farPast()
@@ -131,6 +123,7 @@ object FarmingCollectionDisplay {
         updateDisplay()
     }
 
+    //This uses the block click event instead of the crop click event, so it still works outside the garden.
     @SubscribeEvent
     fun onBlockClicked(event: BlockClickEvent) {
         if (event.clickType == ClickType.RIGHT_CLICK) return
@@ -139,6 +132,8 @@ object FarmingCollectionDisplay {
             SkyHanniMod.coroutineScope.launch {
                 getRanksForCollection(crop)
             }
+        } else {
+            lastFetchedCrop = crop
         }
         lastBrokenCrop = crop
     }
@@ -225,11 +220,16 @@ object FarmingCollectionDisplay {
         if (config.showTimeUntilReached) {
             val speed = lastFetchedCrop?.getSpeed() ?: 0
             if (speed != 0) {
-                val timeUntilReached = (difference / speed).seconds
-
-                newDisplay.add(
-                    Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
-                )
+                if (difference < 0) {
+                    newDisplay.add(
+                        Renderable.string("§a§Now")
+                    )
+                } else {
+                    val timeUntilReached = (difference / speed).seconds
+                    newDisplay.add(
+                        Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
+                    )
+                }
             } else {
                 newDisplay.add(
                     Renderable.string("§cPAUSED")
@@ -256,8 +256,6 @@ object FarmingCollectionDisplay {
 
         try {
             val data = eliteCollectionApiGson.fromJson<EliteLeaderboard>(response)
-
-            collectionPlacements.clear()
 
             collectionRanks[crop] = data.rank
             val placements = mutableMapOf<Int, Long>()
