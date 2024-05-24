@@ -141,14 +141,11 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
         oneTimeClick: Boolean = false,
-        hover: List<String>? = null,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(Text.text(msgPrefix + message) {
             this.onClick(expireAt, oneTimeClick, onClick)
-            abc
             this.hover = hover.asComponent()
-            this.hover = hover?.joinToString("\n")?.asComponent() ?: "§eClick here!".asComponent()
         })
     }
 
