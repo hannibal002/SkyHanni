@@ -59,7 +59,6 @@ object ChocolateFactoryBarnManager {
                 DelayedRun.runNextTick {
                     ChatUtils.chat("§7(§a+§b$format §aof production§7)")
                 }
-                ChocolateAmount.averageChocPerSecond()
             }
             ChocolateAmount.addToAll(amount)
             HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
