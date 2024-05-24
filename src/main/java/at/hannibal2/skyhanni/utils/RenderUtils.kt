@@ -446,7 +446,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Float): Double {
+    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
