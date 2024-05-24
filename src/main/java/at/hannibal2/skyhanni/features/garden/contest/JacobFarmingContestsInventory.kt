@@ -82,6 +82,7 @@ class JacobFarmingContestsInventory {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        // TODO add tooltip line "click + press <keybind> to open on elite website
         if (!config.openOnElite.isKeyHeld()) return
         if (!LorenzUtils.inSkyBlock) return
 
