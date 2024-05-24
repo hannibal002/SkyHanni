@@ -4,16 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.item.EntityItem
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -32,21 +31,20 @@ class ShowFishingItemName {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        for (entityItem in EntityUtils.getEntities<EntityItem>()) {
-            if (entityItem.position.toLorenzVec().distanceToPlayer() > 15) continue
+        for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
             val itemStack = entityItem.entityItem
-            var name = itemStack.name
             // Hypixel sometimes replaces the bait item mid air with a stone
-            if (name.removeColor() == "Stone") continue
+            if (itemStack.name.removeColor() == "Stone") continue
             var text = ""
 
-            if (itemStack.getSkullTexture() in cheapCoins) text = "§6Coins"
-            else {
-                text += if (itemStack.isBait()) {
-                    if (!config.showBaits) continue
-                    name = "§7" + name.removeColor()
-                    "§c§l- §r"
-                } else "§a§l+ §r"
+            val isBait = itemStack.isBait()
+            if (isBait && !config.showBaits) continue
+
+            if (itemStack.getSkullTexture() in cheapCoins) {
+                text = "§6Coins"
+            } else {
+                val name = itemStack.name.transformIf({isBait}) { "§7" + this.removeColor() }
+                text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
                 val size = itemStack.stackSize
                 if (size != 1) text += "§7x$size §r"
@@ -61,7 +59,7 @@ class ShowFishingItemName {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        for ((item, text) in itemsOnGround.asMap()) {
+        for ((item, text) in itemsOnGround) {
             val location = event.exactLocation(item).add(y = 0.8)
             event.drawString(location, text)
         }

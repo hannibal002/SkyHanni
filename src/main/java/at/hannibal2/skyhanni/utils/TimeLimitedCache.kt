@@ -5,10 +5,10 @@ import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-class TimeLimitedCache<K, V>(
+class TimeLimitedCache<K: Any, V: Any>(
     expireAfterWrite: Duration,
     private val removalListener: (K?, V?) -> Unit = { _, _ -> },
-) {
+): Iterable<Map.Entry<K, V>> {
 
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
@@ -30,4 +30,6 @@ class TimeLimitedCache<K, V>(
     fun keys(): Set<K> = cache.asMap().keys
 
     fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
+
+    override fun iterator(): Iterator<Map.Entry<K, V>> = entries().iterator()
 }

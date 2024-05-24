@@ -210,10 +210,9 @@ object AdvancedPlayerList {
 
     private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
-    private fun getRandomOrder(name: String) =
-        randomOrderCache.getOrPut(name) {
-            (Random.nextDouble() * 500).toInt()
-        }
+    private fun getRandomOrder(name: String) = randomOrderCache.getOrPut(name) {
+        (Random.nextDouble() * 500).toInt()
+    }
 
     private fun getSocialIcon(name: String) = when {
         LorenzUtils.getPlayerName() == name -> SocialIcon.ME
