@@ -15,8 +15,8 @@ import org.apache.logging.log4j.core.filter.AbstractFilter
 import org.apache.logging.log4j.message.Message
 
 class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFilter(
-    Filter.Result.ACCEPT,
-    Filter.Result.DENY,
+    /* onMatch = */ Filter.Result.ACCEPT,
+    /* onMismatch = */ Filter.Result.DENY,
 ) {
 
     private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
