@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -29,8 +30,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -53,7 +54,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -199,10 +199,12 @@ class MinionFeatures {
     }
 
     private fun removeBuggedMinions() {
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
         val removedEntities = mutableListOf<LorenzVec>()
         for (location in minions.keys) {
+            if (location.distanceToPlayer() > 30) continue
             val entitiesNearby = EntityUtils.getEntities<EntityArmorStand>().map { it.distanceTo(location) }
             if (!entitiesNearby.any { it == 0.0 }) {
                 removedEntities.add(location)
@@ -339,7 +341,7 @@ class MinionFeatures {
         val minions = minions ?: return
         for (minion in minions) {
             val location = minion.key.add(y = 1.0)
-            if (!location.canBeSeen()) continue
+            if (location.distanceToPlayer() > 50) continue
 
             val lastEmptied = minion.value.lastClicked
             if (playerLocation.distance(location) >= config.emptiedTime.distance) continue
@@ -384,8 +386,8 @@ class MinionFeatures {
 
     private fun enableWithHub() = isEnabled() || IslandType.HUB.isInIsland()
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: GuiScreenEvent.BackgroundDrawnEvent) {
+    @SubscribeEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!minionInventoryOpen) return
 

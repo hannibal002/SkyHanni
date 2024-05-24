@@ -257,7 +257,7 @@ object Commands {
             "Resets the Pest Profit Tracker"
         ) { PestProfitTracker.resetCommand() }
         registerCommand(
-            "shresetmythologicalcreatureracker",
+            "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker"
         ) { MythologicalCreatureTracker.resetCommand() }
         registerCommand(
@@ -317,7 +317,7 @@ object Commands {
         registerCommand(
             "shlimbo",
             "Warps you to Limbo."
-        ) { MiscFeatures().goToLimbo() }
+        ) { MiscFeatures.goToLimbo() }
         registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden"
@@ -383,6 +383,10 @@ object Commands {
             "Toggles receiving the 12 fortune from pumpkins"
         ) { CaptureFarmingGear.reversePumpkinFortune() }
         registerCommand(
+            "shcocoabeans",
+            "Toggles receiving the 12 fortune from cocoa beans"
+        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
+        registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
@@ -430,6 +434,10 @@ object Commands {
             "shtestsackapi",
             "Get the amount of an item in sacks according to internal feature SackAPI"
         ) { SackAPI.testSackAPI(it) }
+        registerCommand(
+            "shtestgriffinspots",
+            "Show potential griffin spots around you."
+        ) { GriffinBurrowHelper.testGriffinSpots() }
     }
 
     private fun developersCodingHelp() {

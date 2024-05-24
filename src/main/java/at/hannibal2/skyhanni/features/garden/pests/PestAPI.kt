@@ -123,28 +123,27 @@ object PestAPI {
     var firstScoreboardCheck = false
 
     private fun fixPests(loop: Int = 2) {
-        val accurateAmount = getPlotsWithAccuratePests().sumOf { it.pests }
-        val inaccurateAmount = getPlotsWithInaccuratePests().size
-        if (scoreboardPests == accurateAmount + inaccurateAmount) { // if we can assume all inaccurate plots have 1 pest each
-            for (plot in getPlotsWithInaccuratePests()) {
-                plot.pests = 1
-                plot.isPestCountInaccurate = false
-            }
-        } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
-            val plot = getPlotsWithInaccuratePests().firstOrNull() ?: return
-            plot.pests = scoreboardPests - accurateAmount
-            plot.isPestCountInaccurate = false
-        } else if (accurateAmount + inaccurateAmount > scoreboardPests) { // when logic fails and we reach impossible pest counts
-            getInfestedPlots().forEach {
-                it.pests = 0
-                it.isPestCountInaccurate = true
-            }
-            if (loop > 0) {
-                DelayedRun.runDelayed(2.seconds) {
-                    fixPests(loop - 1)
+        DelayedRun.runDelayed(2.seconds) {
+            val accurateAmount = getPlotsWithAccuratePests().sumOf { it.pests }
+            val inaccurateAmount = getPlotsWithInaccuratePests().size
+            if (scoreboardPests == accurateAmount + inaccurateAmount) { // if we can assume all inaccurate plots have 1 pest each
+                for (plot in getPlotsWithInaccuratePests()) {
+                    plot.pests = 1
+                    plot.isPestCountInaccurate = false
                 }
+            } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
+                val plot = getPlotsWithInaccuratePests().firstOrNull() ?: return@runDelayed
+                plot.pests = scoreboardPests - accurateAmount
+                plot.isPestCountInaccurate = false
+            } else if (accurateAmount + inaccurateAmount > scoreboardPests) { // when logic fails and we reach impossible pest counts
+                getInfestedPlots().forEach {
+                    it.pests = 0
+                    it.isPestCountInaccurate = true
+                }
+                if (loop > 0) {
+                    fixPests(loop - 1)
+                } else sendPestError()
             }
-            else sendPestError()
         }
     }
 
