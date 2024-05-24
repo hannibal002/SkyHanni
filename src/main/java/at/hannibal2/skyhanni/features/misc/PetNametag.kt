@@ -2,12 +2,11 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class PetNametag {
@@ -20,7 +19,7 @@ class PetNametag {
      */
     private val pattern by RepoPattern.pattern(
         "feature.pet.nametag",
-        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8\\]) (?<rarity>§.)(?<player>[\\w_]+'s?) (?<pet>[\\w\\s]+)(?<skin>§5 ✦)?"
+        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<player>[\\w_]+'s?) (?<pet>[\\w\\s]+)(?<skin>§. ✦)?"
     )
 
     @SubscribeEvent
@@ -33,27 +32,17 @@ class PetNametag {
             val rarity = group("rarity")
             val player = group("player")
             val pet = group("pet")
-            val skin = group("skin") ?: ""
+            val skin = groupOrNull("skin") ?: ""
 
-            val component = ChatComponentText("")
+            var text = ""
+            if (!config.hidePetLevel && (!config.hideMaxPetLevel || lvl == 100 || lvl == 200)) text += "$start "
+            text += rarity
+            if (!config.hidePlayerName) text += "$player "
+            text += pet + skin
 
-            if (config.hidePetLevel || config.hideMaxPetLevel) {
-                if (config.hideMaxPetLevel && !(lvl == 100 || lvl == 200)) {
-                    component.appendText("$start ")
-                }
-            } else {
-                component.appendText("$start ")
-            }
+            //event.chatComponent = "test nametag".asComponent()
 
-            if (!config.hidePlayerName) {
-                component.appendText(player)
-            }
-
-            component.appendText("$rarity$pet $skin")
-
-            ChatUtils.chat(component)
-
-            event.chatComponent = component
+            event.chatComponent.appendText(" test nametag")
         }
     }
 
