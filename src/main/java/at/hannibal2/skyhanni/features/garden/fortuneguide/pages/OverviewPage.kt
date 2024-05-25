@@ -16,13 +16,14 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
     private var equipmentFF = mutableMapOf<FFTypes, Double>()
     private var armorFF = mutableMapOf<FFTypes, Double>()
 
+    // TODO display armor stats for gemstones and pesterminator
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
         val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
 
         GuiRenderUtils.drawFarmingBar(
             "§6Universal Farming Fortune",
             "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-                "§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, 1277,
+                "§eSee on the grass block page", FFStats.totalBaseFF[FFTypes.TOTAL] ?: 0, if (FFStats.usingSpeedBoots) 1373 else 1377,
             FFGuideGUI.guiLeft + 15, FFGuideGUI.guiTop + 5, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
@@ -87,19 +88,20 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
 
         line = if (currentArmor == 0) "§7§2Total fortune from your armor\n§2Select a piece for more info"
         else "§7§2Total fortune from your\n${armorItem.getItem().displayName}"
-        var value = if (currentArmor == 0) {
-            325
-        } else if (FFStats.usingSpeedBoots) {
+        var value = if (FFStats.usingSpeedBoots) {
             when (currentArmor) {
-                1 -> 76.67
-                2, 3 -> 81.67
-                else -> 85
+                0 -> 421
+                1 -> 101.67
+                2, 3 -> 106.67
+                4 -> 106
+                else -> 0
             }
         } else {
             when (currentArmor) {
-                1 -> 78.75
-                2, 3 -> 83.75
-                else -> 78.75
+                0 -> 425
+                1, 4 -> 103.75
+                2, 3 -> 108.75
+                else -> 0
             }
         }
         GuiRenderUtils.drawFarmingBar(

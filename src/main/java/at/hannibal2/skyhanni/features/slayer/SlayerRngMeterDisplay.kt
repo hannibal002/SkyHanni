@@ -54,6 +54,13 @@ class SlayerRngMeterDisplay {
         "changeditem",
         "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
     )
+    /**
+     * REGEX-TEST: §aEnchanted Book (§d§lDuplex I§a)
+     */
+    private val bookFormatPattern by patternGroup.pattern(
+        "book.format",
+        "§aEnchanted Book \\((?<name>.*)§a\\)"
+    )
 
     private var display = emptyList<Renderable>()
     private var lastItemDroppedTime = 0L
@@ -159,8 +166,11 @@ class SlayerRngMeterDisplay {
 
         if (name != getCurrentSlayer()) return
 
-        val selectedItem = lore.nextAfter("§7Selected Drop") ?: return
-        val internalName = NEUInternalName.fromItemName(selectedItem)
+        val rawName = lore.nextAfter("§7Selected Drop") ?: return
+        val itemName = bookFormatPattern.matchMatcher(rawName) {
+            group("name")
+        } ?: rawName
+        val internalName = NEUInternalName.fromItemName(itemName)
         setNewGoal(internalName)
     }
 
