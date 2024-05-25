@@ -60,7 +60,10 @@ object HoppityEggsCompactChat {
 
         return if (duplicate) {
             val format = lastDuplicateAmount?.let { NumberUtil.format(it) } ?: "?"
-            val timeHumanized = lastDuplicateAmount?.let { ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2) } ?: "?"
+            val timeHumanized = lastDuplicateAmount?.let {
+                ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
+            } ?: "?"
+
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeHumanized§7" else ""
             "$mealName Egg! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
