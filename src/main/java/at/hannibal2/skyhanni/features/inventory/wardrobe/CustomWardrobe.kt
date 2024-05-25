@@ -99,7 +99,7 @@ class CustomWardrobe {
                 fullRenderable.height.toDouble() / gui.height
             ))).toInt()
             config.spacing.globalScale = newScale
-            ChatUtils.clickableUserError(
+            ChatUtils.clickableChat(
                 "Auto-set your Global Scale in custom wardrobe, as it was too tall/wide.",
                 onClick = { config::spacing.jumpToEditor() }
             )
