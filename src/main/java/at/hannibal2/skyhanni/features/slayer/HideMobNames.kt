@@ -5,15 +5,17 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
 
 class HideMobNames {
 
-    private val lastMobName = mutableMapOf<EntityArmorStand, String>()
+    private val lastMobName = TimeLimitedCache<EntityArmorStand, String>(2.minutes)
     private val mobNamesHidden = mutableListOf<EntityArmorStand>()
     private val patterns = mutableListOf<Pattern>()
 
@@ -56,14 +58,14 @@ class HideMobNames {
         if (!entity.hasCustomName()) return
 
         val name = entity.name
-        if (lastMobName.getOrDefault(entity, "abc") == name) {
+        if (lastMobName.getOrNull(entity) == name) {
             if (entity in mobNamesHidden) {
                 event.isCanceled = true
             }
             return
         }
 
-        lastMobName[entity] = name
+        lastMobName.put(entity, name)
         mobNamesHidden.remove(entity)
 
         if (shouldNameBeHidden(name)) {
