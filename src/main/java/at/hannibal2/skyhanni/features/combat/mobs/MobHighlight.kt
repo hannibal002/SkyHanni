@@ -102,7 +102,7 @@ class MobHighlight {
             }
         }
 
-        if (config.arachneBossHighlighter && entity is EntitySpider) {
+        if (entity is EntitySpider) {
             checkArachne(entity)
         }
     }
@@ -137,6 +137,8 @@ class MobHighlight {
     }
 
     private fun checkArachne(entity: EntitySpider) {
+        if (!config.arachneBossHighlighter && !config.lineToArachne) return
+
         if (!entity.hasNameTagWith(1, "[§7Lv300§8] §cArachne") &&
             !entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne") &&
             !entity.hasNameTagWith(1, "[§7Lv500§8] §cArachne") &&
@@ -146,6 +148,7 @@ class MobHighlight {
         if (entity is EntityCaveSpider) {
             markArachneMinis(entity)
         } else if (entity.baseMaxHealth == 20_000 || entity.baseMaxHealth == 100_000) {
+            this.arachne = entity
             markArachne(entity)
         }
     }
@@ -158,7 +161,5 @@ class MobHighlight {
     private fun markArachne(entity: EntityLivingBase) {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.RED.toColor().withAlpha(50))
         { config.arachneBossHighlighter }
-
-        this.arachne = entity
     }
 }
