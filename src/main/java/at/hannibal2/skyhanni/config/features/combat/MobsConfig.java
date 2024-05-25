@@ -61,7 +61,7 @@ public class MobsConfig {
     @ConfigOption(name = "Line to Arachne", desc = "Also draw a line pointing to where Arachne is currently at.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean lineToArachne = true;
+    public boolean lineToArachne = false;
 
     @Expose
     @ConfigOption(
