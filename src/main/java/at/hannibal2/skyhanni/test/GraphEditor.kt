@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
-import at.hannibal2.skyhanni.data.model.graphFromJson
 import at.hannibal2.skyhanni.data.model.toJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -160,7 +159,7 @@ object GraphEditor {
     }
 
     private fun chatAtDisable() =
-        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate", "shgraph")
+        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate", ::commandIn)
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
@@ -211,7 +210,7 @@ object GraphEditor {
             runBlocking {
                 OSUtils.readFromClipboard()?.let {
                     try {
-                        graphFromJson(it)
+                        Graph.fromJson(it)
                     } catch (e: Exception) {
                         ErrorManager.logErrorWithData(
                             e,
