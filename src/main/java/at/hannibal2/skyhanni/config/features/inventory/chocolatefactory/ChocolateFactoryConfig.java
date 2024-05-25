@@ -143,6 +143,12 @@ public class ChocolateFactoryConfig {
     public boolean tooltipMove = false;
 
     @Expose
+    @ConfigOption(name = "Highlight Not Found", desc = "Highlight any rabbits that haven't been found yet in the rabbit collection menu.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hightlightNotFoundRabbits = true;
+
+    @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "tooltipMove")
     public Position tooltipMovePosition = new Position(-380, 150, false, true);
 

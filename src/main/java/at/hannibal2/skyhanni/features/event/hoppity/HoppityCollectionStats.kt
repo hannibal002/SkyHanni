@@ -1,21 +1,26 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.item.ItemDye
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityCollectionStats {
@@ -81,6 +86,17 @@ object HoppityCollectionStats {
             extraSpace = 5,
             posLabel = "Hoppity's Collection Stats"
         )
+    }
+
+    @SubscribeEvent
+    fun onBackGroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!inInventory) return
+        if (!config.hightlightNotFoundRabbits) return
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            if (slot.stack.item is ItemDye) {
+                slot highlight LorenzColor.RED.addOpacity(120)
+            }
+        }
     }
 
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
