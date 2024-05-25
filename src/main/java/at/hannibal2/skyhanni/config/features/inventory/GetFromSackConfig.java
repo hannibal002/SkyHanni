@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GetFromSackConfig {
@@ -23,4 +24,16 @@ public class GetFromSackConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean superCraftGFS = true;
+
+    @Expose
+    @ConfigOption(name = "GfS Default", desc = "When enabled, using §e/gfs §7without specifying an amount will give a default amount of the item.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gfsGetDefault = false;
+
+    @Expose
+    @ConfigOption(name = "GfS Default Amount", desc = "The default amount of items to get when §e/gfs §7is used without amount.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 64f, minStep = 1f)
+    public int gfsGetDefaultAmount = 1;
+
 }
