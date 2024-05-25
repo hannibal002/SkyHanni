@@ -159,7 +159,10 @@ loom {
             }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
             arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
-            arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
+
+            val devenvModAbsolutePaths = devenvMod.map { it.absolutePath }
+
+            arg("--mods", devenvModAbsolutePaths.joinToString(",") { it })
         }
     }
     forge {
