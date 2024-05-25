@@ -58,7 +58,11 @@ class ExcavatorProfitTracker {
 
         @Expose
         var timesExcavated = 0L
+
+        @Expose
         var glacitePowderGained = 0L
+
+        @Expose
         var fossilDustGained = 0L
     }
 

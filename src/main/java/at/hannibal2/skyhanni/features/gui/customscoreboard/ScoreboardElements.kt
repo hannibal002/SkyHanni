@@ -33,17 +33,41 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import java.util.function.Supplier
+import kotlin.time.Duration.Companion.milliseconds
 
-internal var unknownLines = listOf<String>()
+internal var confirmedUnknownLines = mutableListOf<String>()
+internal var unconfirmedUnknownLines = listOf<String>()
+internal var unknownLinesSet = TimeLimitedSet<String>(500.milliseconds) { onRemoval(it) }
+
+private fun onRemoval(line: String) {
+    if (!unconfirmedUnknownLines.contains(line)) return
+    unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
+    confirmedUnknownLines.add(line)
+    if (!config.unknownLinesWarning) return
+    val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
+    val message = "CustomScoreboard detected $pluralize"
+    ErrorManager.logErrorWithData(
+        CustomScoreboardUtils.UndetectedScoreboardLines(message),
+        message,
+        "Unknown Lines" to confirmedUnknownLines,
+        "Island" to HypixelData.skyBlockIsland,
+        "Area" to HypixelData.skyBlockArea,
+        "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        noStackTrace = true,
+        betaOnly = true,
+    )
+}
+
 internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
@@ -251,9 +275,7 @@ enum class ScoreboardElement(
     ),
     ;
 
-    override fun toString(): String {
-        return configLine
-    }
+    override fun toString() = configLine
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf("<hidden>" to HorizontalAlignment.LEFT)
 
@@ -619,11 +641,11 @@ private fun getObjectiveDisplayPair() = buildList {
 private fun getObjectiveShowWhen(): Boolean =
     ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
-private fun getSlayerDisplayPair(): List<ScoreboardElementType> = listOf(
-    (if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT,
-    (" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT),
-    (" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
-)
+private fun getSlayerDisplayPair(): List<ScoreboardElementType> = buildList {
+    add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT)
+    add(" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT)
+    add(" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
+}
 
 private fun getSlayerShowWhen() =
     if (informationFilteringConfig.hideIrrelevantLines) SlayerAPI.isInCorrectArea else true
@@ -641,17 +663,21 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
         ).getChatColor()
     } else {
         ""
-    }) + when (arrowConfig.arrowAmountDisplay) {
-        ArrowAmountDisplay.NUMBER -> QuiverAPI.currentAmount.addSeparators()
-        ArrowAmountDisplay.PERCENTAGE -> "${QuiverAPI.currentAmount.asArrowPercentage()}%"
-        else -> QuiverAPI.currentAmount.addSeparators()
+    }) + if (QuiverAPI.wearingSkeletonMasterChestplate) {
+        "∞"
+    } else {
+        when (arrowConfig.arrowAmountDisplay) {
+            ArrowAmountDisplay.NUMBER -> QuiverAPI.currentAmount.addSeparators()
+            ArrowAmountDisplay.PERCENTAGE -> "${QuiverAPI.currentAmount.asArrowPercentage()}%"
+            else -> QuiverAPI.currentAmount.addSeparators()
+        }
     }
 
     return listOf(
         if (displayConfig.displayNumbersFirst) {
             "$amountString ${QuiverAPI.currentArrow?.arrow}s"
         } else {
-            "${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}: $amountString Arrows"
+            "Arrows: $amountString ${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}"
         } to HorizontalAlignment.LEFT
     )
 }
@@ -775,29 +801,15 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
     ).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
-    if (unknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    if (confirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    amountOfUnknownLines = confirmedUnknownLines.size
 
-    val size = unknownLines.size
-    if (amountOfUnknownLines != size && config.unknownLinesWarning) {
-        val message = "CustomScoreboard detected ${pluralize(unknownLines.size, "unknown line", withNumber = true)}"
-        ErrorManager.logErrorWithData(
-            CustomScoreboardUtils.UndetectedScoreboardLines(message),
-            message,
-            "Unknown Lines" to unknownLines,
-            "Island" to HypixelData.skyBlockIsland,
-            "Area" to HypixelData.skyBlockArea,
-            noStackTrace = true,
-            betaOnly = true,
-        )
-        amountOfUnknownLines = size
-    }
-
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unknownLines.map { it to HorizontalAlignment.LEFT }
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + confirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
 }
 
 private fun getExtraShowWhen(): Boolean {
-    if (unknownLines.isEmpty()) {
+    if (confirmedUnknownLines.isEmpty()) {
         amountOfUnknownLines = 0
     }
-    return unknownLines.isNotEmpty()
+    return confirmedUnknownLines.isNotEmpty()
 }

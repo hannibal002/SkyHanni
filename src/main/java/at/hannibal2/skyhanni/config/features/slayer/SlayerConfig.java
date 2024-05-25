@@ -19,6 +19,7 @@ public class SlayerConfig {
 
     @Expose
     @Category(name = "Blaze", desc = "Blaze Slayer Features")
+    // TODO rename to "blaze"
     public BlazeConfig blazes = new BlazeConfig();
 
     @Expose

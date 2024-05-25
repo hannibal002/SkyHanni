@@ -18,7 +18,7 @@ public class QuiverDisplayConfig {
 
     @Expose
     @ConfigLink(owner = QuiverDisplayConfig.class, field = "enabled")
-    public Position quiverDisplayPos = new Position(260, 80);
+    public Position quiverDisplayPos = new Position(260, -15);
 
     @Expose
     @ConfigOption(name = "Show arrow icon", desc = "Displays an icon next to the Quiver Display.")

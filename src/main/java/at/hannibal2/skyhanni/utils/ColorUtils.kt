@@ -9,6 +9,8 @@ object ColorUtils {
     fun String.toChromaColor() = Color(toChromaColorInt(), true)
     fun String.toChromaColorInt() = SpecialColour.specialToChromaRGB(this)
 
+    fun String.getFirstColorCode() = this.takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
+
     fun getRed(colour: Int) = colour shr 16 and 0xFF
 
     fun getGreen(colour: Int) = colour shr 8 and 0xFF
@@ -33,4 +35,6 @@ object ColorUtils {
     }
 
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+
+    fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 }

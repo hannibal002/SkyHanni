@@ -35,5 +35,5 @@ public class TimerConfig {
 
     @Expose
     @ConfigLink(owner = TimerConfig.class, field = "enabled")
-    public Position pos = new Position(390, 65, false, true);
+    public Position pos = new Position(-200, 40, false, true);
 }

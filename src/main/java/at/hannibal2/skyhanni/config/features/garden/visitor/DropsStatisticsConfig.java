@@ -35,7 +35,7 @@ public class DropsStatisticsConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(
