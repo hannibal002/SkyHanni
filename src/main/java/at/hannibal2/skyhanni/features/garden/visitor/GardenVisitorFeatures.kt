@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -205,9 +206,31 @@ object GardenVisitorFeatures {
                 }
 
                 if (config.shoppingList.showSackCount) {
+                    var amountInSacks = 0
                     internalName.getAmountInSacksOrNull()?.let {
+                        amountInSacks = it
                         val textColour = if (it >= amount) "a" else "e"
                         list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+                    }
+                    val ingredients = NEUItems.getRecipes(internalName)
+                        // TODO describe what this line does
+                        .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
+                        ?.allIngredients() ?: return
+                    val ingredientReqs = mutableMapOf<String, Int>()
+                    for (ingredient in ingredients) {
+                        val key = ingredient.internalItemId
+                        ingredientReqs[key] = ingredientReqs.getOrDefault(key, 0) + ingredient.count.toInt()
+                    }
+                    var hasIngredients = true
+                    for ((key, value) in ingredientReqs) {
+                        val sackItem = key.asInternalName().getAmountInSacks()
+                        if (sackItem < value * (amount - amountInSacks)) {
+                            hasIngredients = false
+                            break
+                        }
+                    }
+                    if (hasIngredients) {
+                        list.add(" §7(§aCraftable!§7)")
                     }
                 }
 
