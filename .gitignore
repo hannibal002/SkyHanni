@@ -4,11 +4,15 @@
 run/
 build/
 bin/
+deps/
 
 # gradle
 build
 gradle.properties
 .gradle
+./build.gradle.kts
+
+*_client.launch
 
 # other
 .DS_STORE
