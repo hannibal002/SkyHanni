@@ -227,7 +227,8 @@ public class ProfileSpecificStorage {
         public Map<CropType, Double> latestTrueFarmingFortune = new HashMap<>();
 
         @Expose
-        public CropAccessory savedCropAccessory = null;
+        @Nullable
+        public CropAccessory savedCropAccessory = CropAccessory.NONE;
 
         @Expose
         public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();
