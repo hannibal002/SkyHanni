@@ -51,6 +51,7 @@ object EliteSkillRankDisplay {
         }
 
     private var lastSkillFetched: String? = null
+    private var lastPassed = SimpleTimeMark.farPast()
     private var lastLeaderboardFetch = SimpleTimeMark.farPast()
     private var lastXPGained = SimpleTimeMark.farPast()
     private var hasSkillsBeenFetched = false
@@ -99,15 +100,10 @@ object EliteSkillRankDisplay {
     @SubscribeEvent
     fun onSkillGained(event: SkillExpGainEvent) {
         val skillName = event.skill.name.lowercase()
-        println(SkillAPI.skillXPInfoMap)
         val skillInfo = SkillAPI.skillXPInfoMap[event.skill] ?: return
 
-        println(lastSkillGained)
-        println(skillName)
         if (lastSkillGained != skillName) {
             lastSkillGained = skillName
-
-            println(skillName)
 
             SkyHanniMod.coroutineScope.launch {
                 getRanksForSkill(skillName)
@@ -167,7 +163,8 @@ object EliteSkillRankDisplay {
 
 
         } while (difference < 0 && (rankWhenLastFetched - nextRank) < placements.size)
-        if (rankWhenLastFetched - nextRank > placements.size && placements.isNotEmpty() && !EliteBotAPI.disableFetchingWhenPassed) {
+        if (rankWhenLastFetched - nextRank > placements.size && placements.isNotEmpty() && !EliteBotAPI.disableFetchingWhenPassed && lastPassed.passedSince() > 1.minutes) {
+            lastPassed = SimpleTimeMark.now()
             lastLeaderboardFetch = SimpleTimeMark.farPast()
         }
 
@@ -208,7 +205,7 @@ object EliteSkillRankDisplay {
             newDisplay.add(
                 Renderable.string("§aNo players ahead of you!")
             )
-        } else if (difference <= 0) {
+        } else if (difference < 0) {
             newDisplay.add(
                 Renderable.clickAndHover(
                     "§7You have passed §b#${nextRank.addSeparators()}",

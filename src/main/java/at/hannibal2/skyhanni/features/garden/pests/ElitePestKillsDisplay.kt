@@ -58,6 +58,7 @@ object ElitePestKillsDisplay {
 
     private var hasPestBeenFetched = false
     private var commandLastUsed = SimpleTimeMark.farPast()
+    private var lastPassed = SimpleTimeMark.farPast()
 
     private var lastKilledPest: PestType?
         get() = SkyHanniMod.feature.storage.lastPestKilled
@@ -161,6 +162,7 @@ object ElitePestKillsDisplay {
         var amountToBeat: Long
         var difference: Long
 
+
         do {
             rank = pestRanks[lastFetchedPest]?.let { if (it == -1) 5001 else it } ?: return
             nextRank = rank - 1
@@ -170,7 +172,8 @@ object ElitePestKillsDisplay {
 
 
         } while (difference < 0 && (rankWhenLastFetched - nextRank) < placements.size)
-        if (rankWhenLastFetched - nextRank > placements.size && placements.isNotEmpty() && !EliteBotAPI.disableFetchingWhenPassed) {
+        if (rankWhenLastFetched - nextRank > placements.size && placements.isNotEmpty() && !EliteBotAPI.disableFetchingWhenPassed && lastPassed.passedSince() > 1.minutes) {
+            lastPassed = SimpleTimeMark.now()
             lastLeaderboardFetch = SimpleTimeMark.farPast()
         }
 
@@ -179,7 +182,7 @@ object ElitePestKillsDisplay {
         val newDisplay = mutableListOf<Renderable>()
         newDisplay.add(
             Renderable.clickAndHover(
-                "§6§l$lastFetchedPest: §e${pests.addSeparators()} $displayPosition",
+                "§6§l${lastFetchedPest?.displayName}: §e${pests.addSeparators()} $displayPosition",
                 listOf("§eClick to open your Farming Profile."),
                 onClick = {
                     OSUtils.openBrowser("https://elitebot.dev/@${LorenzUtils.getPlayerName()}/")
@@ -191,10 +194,7 @@ object ElitePestKillsDisplay {
             newDisplay.add(
                 Renderable.string("§aNo players ahead of you!")
             )
-        } else if (difference <= 0) {
-            println(difference)
-            println(amountToBeat)
-            println(pests)
+        } else if (difference < 0) {
             newDisplay.add(
                 Renderable.clickAndHover(
                     "§7You have passed §b#${nextRank.addSeparators()}",
@@ -228,8 +228,8 @@ object ElitePestKillsDisplay {
     private fun getRanksForPest(pest: PestType) {
         if (EliteBotAPI.profileID == null) return
         val url =
-            "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-//             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
+//             "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
+            "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {

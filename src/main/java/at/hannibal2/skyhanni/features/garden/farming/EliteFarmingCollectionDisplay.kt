@@ -62,6 +62,7 @@ object EliteFarmingCollectionDisplay {
 
     private var hasCollectionBeenFetched = false
     private var commandLastUsed = SimpleTimeMark.farPast()
+    private var lastPassed = SimpleTimeMark.farPast()
 
     private var lastBrokenCrop: CropType?
         get() = SkyHanniMod.feature.storage.lastCropBroken
@@ -184,7 +185,8 @@ object EliteFarmingCollectionDisplay {
 
 
         } while (difference < 0 && (rankWhenLastFetched - nextRank) < placements.size)
-        if (rankWhenLastFetched - nextRank > placements.size && placements.isNotEmpty() && !EliteBotAPI.disableFetchingWhenPassed) {
+        if (rankWhenLastFetched - nextRank > placements.size && placements.isNotEmpty() && !EliteBotAPI.disableFetchingWhenPassed && lastPassed.passedSince() > 1.minutes) {
+            lastPassed = SimpleTimeMark.now()
             lastLeaderboardFetch = SimpleTimeMark.farPast()
         }
 
@@ -223,8 +225,7 @@ object EliteFarmingCollectionDisplay {
             newDisplay.add(
                 Renderable.string("§aNo players ahead of you!")
             )
-        } else if (difference <= 0) {
-            //TODO add command to refresh too so it can be used in a neu button or assigned to a key
+        } else if (difference < 0) {
             newDisplay.add(
                 Renderable.clickAndHover(
                     "§7You have passed §b#${nextRank.addSeparators()}",
