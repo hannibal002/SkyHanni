@@ -392,6 +392,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
     + Kill a mob with melee-hits to fix this hypixel bug
     + Only works while doing slayer
++ SOS/Alert/Warning Flare Display. - HiZe + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1803)
+    + Warn when the flare is about to despawn (chat, title or both).
+    + Change the display type (as a GUI element, in the world, or both).
+    + Show effective area (as a wireframe, filled or circle).
+    + Show mana regeneration buff next to the GUI element.
+    + Option to hide flare particles.
 + Title warning when picking up an expensive slayer item
 + **RNG Meter Display**
     + Display amount of bosses needed until the next RNG Meter item drops
@@ -1134,6 +1140,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Support for `/playtime` and  `/pt` while in Limbo.
     + Added your playtime to Hypixel's `/playtimedetailed`.
++ Click on breakdown display in /playtimedetailed to copy the stats into the clipboard. - seraid (https://github.com/hannibal002/SkyHanni/pull/1807)
 + Custom Scoreboard - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
     + Customizable; New, never seen before lines like the current mayor with perks, your party, and more!
     + Custom Title and Footer, align them on different sides of the scoreboard.
