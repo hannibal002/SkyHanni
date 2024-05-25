@@ -355,6 +355,10 @@ class ChatFilter {
         "§7You will now produce §r§6.* Chocolate §r§7per click!".toPattern(),
         "§7You upgraded to §r§d.*?§r§7!".toPattern(),
     )
+    /**
+     * REGEX-TEST: §c§lSACRIFICE! §r§6[MVP§r§d++§r§6] Mikecraft1224§r§f §r§eturned §r§6Young Dragon Boots §r§einto §r§d40 Dragon Essence§r§e!
+     * REGEX-TEST: §c§lBONUS LOOT! §r§eThey also received §r§5Ritual Residue §r§efrom their sacrifice!
+     */
     private val sacrificePatterns = listOf(
         "§c§lSACRIFICE! (.*) §r§eturned (.*) §r§einto (.*) Dragon Essence§r§e!".toPattern(),
         "§c§lBONUS LOOT! §r§eThey also received (.*) §r§efrom their sacrifice!".toPattern()
@@ -376,6 +380,9 @@ class ChatFilter {
         "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
 
+    /**
+     * REGEX-TEST: §6§lRARE REWARD! §r§bLeebys §r§efound a §r§6Recombobulator 3000 §r§ein their Obsidian Chest§r§e!
+     */
     private val rareDropsMessages = listOf(
         "§6§lRARE REWARD! (.*) §r§efound a (.*) §r§ein their (.*) Chest§r§e!".toPattern()
     )
