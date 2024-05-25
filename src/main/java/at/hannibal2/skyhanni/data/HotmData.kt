@@ -1,15 +1,19 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
+import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -20,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
@@ -373,6 +378,16 @@ enum class HotmData(
             "inventory.reset.token", "\\s+§8- §5(?<token>\\d+) Token of the Mountain"
         )
 
+        private val skymallPattern by repoGroup.pattern(
+            "skymall",
+            "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?<perk>.*)"
+        )
+
+        private val mayhemChatPattern by repoGroup.pattern(
+            "mayhem",
+            "§b§lMAYHEM! §r§7(?<perk>.*)"
+        )
+
         var inInventory = false
 
         var tokens: Int
@@ -394,6 +409,13 @@ enum class HotmData(
             HotmAPI.Powder.entries.forEach {
                 it.heartPattern
                 it.resetPattern
+            }
+            HotmAPI.SkymallPerk.entries.forEach {
+                it.chatPattern
+                it.itemPattern
+            }
+            HotmAPI.MayhemPerk.entries.forEach {
+                it.chatPattern
             }
         }
 
@@ -439,6 +461,8 @@ enum class HotmData(
                 return
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
+
+            if (entry == SKY_MALL) handelSkyMall(lore)
         }
 
         private fun Slot.handlePowder(): Boolean {
@@ -486,6 +510,34 @@ enum class HotmData(
             return true
         }
 
+        private val skyMallCurrentEffect by repoGroup.pattern("skymall.current", "§aYour Current Effect")
+
+        private fun handelSkyMall(lore: List<String>) {
+            if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
+            else {
+                val index = lore.indexOfFirstMatch(skyMallCurrentEffect)?.plus(1) ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from the hotm tree",
+                        "skyMallCurrentEffect didn't match",
+                        "lore" to lore
+                    )
+                    return
+                }
+                skymallPattern.matchMatcher(lore[index]) {
+                    val perk = group("perk")
+                    HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read the skymall effect from the hotm tree",
+                            "no itemPattern matched",
+                            "lore" to lore,
+                            "perk" to perk
+                        )
+                        null
+                    }
+                }
+            }
+        }
+
         @SubscribeEvent
         fun onScoreboardUpdate(event: ScoreboardChangeEvent) {
             if (!LorenzUtils.inSkyBlock) return
@@ -525,8 +577,46 @@ enum class HotmData(
         @SubscribeEvent
         fun onChat(event: LorenzChatEvent) {
             if (!LorenzUtils.inSkyBlock) return
-            if (!resetChatPattern.matches(event.message)) return
-            resetTree()
+            if (resetChatPattern.matches(event.message)) {
+                resetTree()
+                return
+            }
+            skymallPattern.matchMatcher(event.message) {
+                val perk = group("perk")
+                HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.chatPattern.matches(perk) } ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from chat",
+                        "no chatPattern matched",
+                        "chat" to event.message,
+                        "perk" to perk
+                    )
+                    null
+                }
+                ChatUtils.debug("setting skymall to ${HotmAPI.skymall}")
+                return
+            }
+            DelayedRun.runNextTick {
+                mayhemChatPattern.matchMatcher(event.message) {
+                    val perk = group("perk")
+                    HotmAPI.mineshaftMayhem = MayhemPerk.entries.firstOrNull { it.chatPattern.matches(perk) } ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read the mayhem effect from chat",
+                            "no chatPattern matched",
+                            "chat" to event.message,
+                            "perk" to perk
+                        )
+                        null
+                    }
+                    ChatUtils.debug("setting mineshaftMayhem to ${HotmAPI.mineshaftMayhem}")
+                }
+            }
+        }
+
+        @SubscribeEvent
+        fun onWorldSwitch(event: IslandChangeEvent) {
+            if (HotmAPI.mineshaftMayhem == null) return
+            HotmAPI.mineshaftMayhem = null
+            ChatUtils.debug("resetting mineshaftMayhem")
         }
 
         @SubscribeEvent
@@ -550,6 +640,8 @@ enum class HotmData(
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")
+                add("SkyMall: ${HotmAPI.skymall}")
+                add("Mineshaft Mayhem: ${HotmAPI.mineshaftMayhem}")
             }
             event.title("HotM - Tree")
             event.addIrrelevant(

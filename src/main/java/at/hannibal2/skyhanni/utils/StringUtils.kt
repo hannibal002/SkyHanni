@@ -116,6 +116,13 @@ object StringUtils {
         return null
     }
 
+    fun List<String>.indexOfFirstMatch(pattern: Pattern): Int? {
+        for ((index, line) in this.withIndex()) {
+            pattern.matcher(line).let { if (it.matches()) return index }
+        }
+        return null
+    }
+
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.find()) consumer(it) }

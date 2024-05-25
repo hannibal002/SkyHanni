@@ -18,17 +18,6 @@ class TimeLimitedCache<K: Any, V: Any>(
 
     fun getOrNull(key: K): V? = cache.getIfPresent(key)
 
-    fun getOrPut(key: K, defaultValue: () -> V): V {
-        val value = cache.getIfPresent(key)
-        return if (value == null) {
-            val answer = defaultValue()
-            put(key, answer)
-            answer
-        } else {
-            value
-        }
-    }
-
     fun getOrPut(key: K, defaultValue: () -> V) = getOrNull(key) ?: defaultValue().also { put(key, it) }
 
     fun clear() = cache.invalidateAll()
