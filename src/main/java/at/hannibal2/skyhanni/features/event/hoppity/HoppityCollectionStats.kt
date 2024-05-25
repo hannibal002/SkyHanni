@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuHoppityJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -39,6 +38,12 @@ object HoppityCollectionStats {
         "rabbit.notfound",
         "(?:§.)+You have not found this rabbit yet!"
     )
+
+    private val rabbitRequirementNotMetPattern by patternGroup.pattern(
+        "rabbit.reqnotmet",
+        "(?:§.)+You cannot find this rabbit until you"
+    )
+
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
@@ -84,10 +89,10 @@ object HoppityCollectionStats {
         newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
         newList.add(LorenzUtils.fillTable(getRabbitStats(), padding = 5))
 
-        val loggedRabbits = loggedRabbits.size
-        val foundRabbits = getFoundRabbits(event)
+        val loggedRabbitCount = loggedRabbits.size
+        val foundRabbitCount = getFoundRabbitsFromHypixel(event)
 
-        if (loggedRabbits != foundRabbits) {
+        if (loggedRabbitCount < foundRabbitCount) {
             newList.add(Renderable.string(""))
             newList.add(
                 Renderable.wrappedString(
@@ -172,7 +177,7 @@ object HoppityCollectionStats {
 
     // Gets the found rabbits according to the Hypixel progress bar
     // used to make sure that mod data is synchronized with Hypixel
-    private fun getFoundRabbits(event: InventoryFullyOpenedEvent): Int {
+    private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int {
         return event.inventoryItems.firstNotNullOf {
             it.value.getLore().matchFirst(rabbitsFoundPattern) {
                 group("current").formatInt()
@@ -181,26 +186,32 @@ object HoppityCollectionStats {
     }
 
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
-        for ((_, item) in event.inventoryItems) {
+        for ((idx, item) in event.inventoryItems) {
             val itemName = item.displayName?.removeColor() ?: continue
             val isRabbit = HoppityCollectionData.isKnownRabbit(itemName)
 
-            if (!isRabbit) {
-                // if they ever remove a rabbit this might be useful to re-sync?
-                loggedRabbits.remove(itemName)
-                return
-            }
+            if (!isRabbit) continue
 
             val itemLore = item.getLore()
-
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
+                && !rabbitRequirementNotMetPattern.anyMatches(itemLore)
+
+            if (!found) continue
 
             val duplicates = itemLore.matchFirst(duplicatesFoundPattern) {
                 group("duplicates").formatInt()
             } ?: 0
 
-            loggedRabbits[itemName] = if (found) duplicates + 1 else 0
+            loggedRabbits[itemName] = duplicates + 1
         }
+    }
+
+
+    // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
+    fun clearSavedRabbits() {
+        loggedRabbits.clear()
+        ChatUtils.chat("Cleared saved rabbit data.")
+
     }
 
     // checks special rabbits whenever loggedRabbits is modified to update misc stored values
