@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.DataWatcherAPI
+import at.hannibal2.skyhanni.api.EliteBotAPI
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -228,6 +229,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotMenuHighlighting
+import at.hannibal2.skyhanni.features.garden.pests.ElitePestKillsDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestParticleLine
@@ -943,6 +945,8 @@ class SkyHanniMod {
         loadModule(QuiverWarning())
         loadModule(EliteFarmingCollectionDisplay)
         loadModule(EliteSkillRankDisplay)
+        loadModule(ElitePestKillsDisplay)
+        loadModule(EliteBotAPI)
 
         init()
 

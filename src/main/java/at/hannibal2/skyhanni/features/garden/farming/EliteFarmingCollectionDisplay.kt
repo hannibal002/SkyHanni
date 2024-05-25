@@ -1,17 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EliteBotAPI
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingCollectionConfig.CropDisplay
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteCollectionGraphEntry
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboard
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EliteAPISettingsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
@@ -36,21 +35,12 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object EliteFarmingCollectionDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.eliteFarmingCollection
-
-    private var checkDuration = 10.minutes
-
-    @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<EliteAPISettingsJson>("EliteAPISettings")
-        checkDuration = data.refreshTime.minutes
-    }
 
     private val eliteCollectionApiGson by lazy {
         ConfigManager.createBaseGsonBuilder()
@@ -65,13 +55,13 @@ object EliteFarmingCollectionDisplay {
             .create()
     }
 
-    private var profileID: UUID? = null
-    private val collectionPlacements = mutableMapOf<CropType, Map<Int, Long>>()
+    private val collectionPlacements = mutableMapOf<CropType, Map<Int, Pair<String, Long>>>()
     private val collectionRanks = mutableMapOf<CropType, Int>()
     private var currentCollections = mutableMapOf<CropType, Long>()
     private var lastFetchedCrop: CropType? = null
 
     private var hasCollectionBeenFetched = false
+    private var commandLastUsed = SimpleTimeMark.farPast()
 
     private var lastBrokenCrop: CropType?
         get() = SkyHanniMod.feature.storage.lastCropBroken
@@ -101,9 +91,9 @@ object EliteFarmingCollectionDisplay {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (profileID == null) return
+        if (EliteBotAPI.profileID == null) return
 
-        if (lastLeaderboardFetch.passedSince() > checkDuration) {
+        if (lastLeaderboardFetch.passedSince() > EliteBotAPI.checkDuration) {
             lastLeaderboardFetch = SimpleTimeMark.now()
             val crop = if (config.crop.get() == CropDisplay.AUTO) {
                 lastBrokenCrop ?: CropType.WHEAT
@@ -137,18 +127,19 @@ object EliteFarmingCollectionDisplay {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (event.message.startsWith("§8Profile ID: ")) {
-            val id = event.message.removePrefix("§8Profile ID: ")
-            val newID = try {
-                UUID.fromString(id)
-            } catch (_: Exception) {
-                null
-            }
-            if (profileID != newID) {
-                resetData()
-                profileID = newID
-            }
+    fun onProfileChange(event: ProfileJoinEvent) {
+        resetData()
+    }
+
+    fun onCommand(args: Array<String>) {
+        if (EliteBotAPI.disableRefreshCommand) {
+            ChatUtils.userError("§eCommand has been disabled")
+        } else if (commandLastUsed.passedSince() < 1.minutes) {
+            ChatUtils.userError("Command is on cooldown")
+        } else {
+            commandLastUsed = SimpleTimeMark.now()
+            lastLeaderboardFetch = SimpleTimeMark.farPast()
+            ChatUtils.chat("Farming Collection Display refreshing...")
         }
     }
 
@@ -174,15 +165,30 @@ object EliteFarmingCollectionDisplay {
             return
         }
 
-        val rank = collectionRanks[lastFetchedCrop] ?: return
-        val nextRank = if (rank == -1) 5000 else rank - 1
-
         val placements = collectionPlacements[lastFetchedCrop] ?: return
         val collection = currentCollections[lastFetchedCrop] ?: 0
-        val amountToBeat = placements[nextRank] ?: 0
 
-        val difference = amountToBeat - collection
-        val displayPosition = if (config.showPosition && rank != -1) "§7[§b#$rank§7]" else ""
+        val rankWhenLastFetched = collectionRanks[lastFetchedCrop]?.let { if (it == -1) 5001 else it } ?: return
+        var rank: Int
+        var nextRank: Int
+        var personToBeat: String
+        var amountToBeat: Long
+        var difference: Long
+
+        do {
+            rank = collectionRanks[lastFetchedCrop]?.let { if (it == -1) 5001 else it } ?: return
+            nextRank = rank - 1
+            personToBeat = placements[nextRank]?.first ?: ""
+            amountToBeat = placements[nextRank]?.second ?: 0
+            difference = amountToBeat - collection
+
+
+        } while (difference < 0 && (rankWhenLastFetched - nextRank) < placements.size)
+        if (rankWhenLastFetched - nextRank > placements.size && placements.isNotEmpty() && !EliteBotAPI.disableFetchingWhenPassed) {
+            lastLeaderboardFetch = SimpleTimeMark.farPast()
+        }
+
+        val displayPosition = if (config.showPosition && rank != 5001) "§7[§b#$rank§7]" else ""
 
         val newDisplay = mutableListOf<Renderable>()
         newDisplay.add(
@@ -197,17 +203,16 @@ object EliteFarmingCollectionDisplay {
         )
         if (config.showTimeUntilReached) {
             val speed = lastFetchedCrop?.getSpeed() ?: 0
-            if (speed != 0) {
-                if (difference < 0) {
-                    newDisplay.add(
-                        Renderable.string("§7Time until reached: §a§lNow")
-                    )
-                } else {
-                    val timeUntilReached = (difference / speed).seconds
-                    newDisplay.add(
-                        Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
-                    )
-                }
+            if (difference < 0) {
+                newDisplay.add(
+                    Renderable.string("§7Time until reached: §a§lNow")
+                )
+            } else if (speed != 0) {
+                val timeUntilReached = (difference / speed).seconds
+
+                newDisplay.add(
+                    Renderable.string("§7Time until reached: §b${timeUntilReached.format()}")
+                )
             } else {
                 newDisplay.add(
                     Renderable.string("§cPAUSED")
@@ -230,13 +235,17 @@ object EliteFarmingCollectionDisplay {
                     }
                 )
             )
+        } else if (config.showPersonToBeat) {
+            newDisplay.add(
+                Renderable.string("§e${difference.addSeparators()} §7behind §b#${nextRank.addSeparators()} §7(§b$personToBeat§7)")
+            )
         } else {
             newDisplay.add(
                 Renderable.string("§e${difference.addSeparators()} §7behind §b#${nextRank.addSeparators()}")
             )
         }
         if (config.showTimeUntilRefresh) {
-            val time = checkDuration - lastLeaderboardFetch.passedSince()
+            val time = EliteBotAPI.checkDuration - lastLeaderboardFetch.passedSince()
             val timedisplay = if (time.isNegative()) "Now" else time.format()
 
             newDisplay.add(
@@ -247,9 +256,9 @@ object EliteFarmingCollectionDisplay {
     }
 
     private fun getRanksForCollection(crop: CropType) {
-        if (profileID == null) return
+        if (EliteBotAPI.profileID == null) return
         val url =
-            "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}?includeUpcoming=true"
+            "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
 //             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
         val response = APIUtil.getJSONResponseAsElement(url)
 
@@ -257,11 +266,11 @@ object EliteFarmingCollectionDisplay {
             val data = eliteCollectionApiGson.fromJson<EliteLeaderboard>(response)
 
             collectionRanks[crop] = data.rank
-            val placements = mutableMapOf<Int, Long>()
+            val placements = mutableMapOf<Int, Pair<String, Long>>()
             var rank = data.upcomingRank
             data.upcomingPlayers.forEach {
                 //weight is amount
-                placements[rank] = it.weight.toLong()
+                placements[rank] = it.name to it.weight.toLong()
                 rank--
             }
             collectionPlacements[crop] = placements
@@ -290,9 +299,9 @@ object EliteFarmingCollectionDisplay {
     }
 
     private fun getCurrentCollection() {
-        if (profileID == null) return
+        if (EliteBotAPI.profileID == null) return
         val url =
-            "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${profileID!!.toDashlessUUID()}/crops?days=1"
+            "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/crops?days=1"
 //         "https://api.elitebot.dev/Graph/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30/crops?days=1"
         val response = APIUtil.getJSONResponseAsElement(url)
 

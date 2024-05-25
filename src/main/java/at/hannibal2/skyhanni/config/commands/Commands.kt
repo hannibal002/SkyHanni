@@ -40,11 +40,13 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
+import at.hannibal2.skyhanni.features.garden.farming.EliteFarmingCollectionDisplay
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.ElitePestKillsDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -60,6 +62,7 @@ import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatur
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.skillprogress.EliteSkillRankDisplay
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
@@ -325,6 +328,18 @@ object Commands {
             "shignore",
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
+        registerCommand(
+            "shrefreshfc",
+            "Refresh the Farming Collection Display"
+        ) { EliteFarmingCollectionDisplay.onCommand(it) }
+        registerCommand(
+            "shrefreshsl",
+            "Refresh the Skill Leaderboard Display"
+        ) { EliteSkillRankDisplay.onCommand(it) }
+        registerCommand(
+            "shrefreshpl",
+            "Refresh the Pest Kills Leaderboard Display"
+        ) { ElitePestKillsDisplay.onCommand(it) }
     }
 
     private fun usersBugFix() {

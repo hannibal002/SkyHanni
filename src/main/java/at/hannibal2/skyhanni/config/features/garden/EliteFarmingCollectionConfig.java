@@ -32,7 +32,7 @@ public class EliteFarmingCollectionConfig {
     @Expose
     @ConfigOption(name = "Show Time Until Refresh", desc = "Show the time until the leaderboard updates.")
     @ConfigEditorBoolean
-    public boolean showTimeUntilRefresh = true;
+    public boolean showTimeUntilRefresh = false;
 
     @Expose
     @ConfigOption(name = "Estimate Collection", desc = "Estimates how many crops you have broken between leaderboard refreshes. " +
@@ -87,7 +87,10 @@ public class EliteFarmingCollectionConfig {
     @Expose
     @ConfigOption(name = "Show Position", desc = "Show your current position next to the collection amount if below §b#5000")
     @ConfigEditorBoolean
-    public boolean showPosition = false;
+    public boolean showPosition = true;
 
-
+    @Expose
+    @ConfigOption(name = "Show Person To Beat", desc = "Show the person in front of you to be passed")
+    @ConfigEditorBoolean
+    public boolean showPersonToBeat = true;
 }

@@ -23,6 +23,11 @@ public class GardenConfig {
     public EliteFarmingCollectionConfig eliteFarmingCollection = new EliteFarmingCollectionConfig();
 
     @Expose
+    @ConfigOption(name = "Elite Bot Pest Kills", desc = "")
+    @Accordion
+    public ElitePestKillsDisplayConfig elitePestKillsDisplayConfig = new ElitePestKillsDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "SkyMart", desc = "")
     @Accordion
     public SkyMartConfig skyMart = new SkyMartConfig();

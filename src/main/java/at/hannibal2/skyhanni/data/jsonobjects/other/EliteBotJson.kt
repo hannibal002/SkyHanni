@@ -56,4 +56,11 @@ data class EliteSkillGraphEntry(
     @Expose val skills: Map<String, Long>,
 )
 
+data class EliteProfileMember(
+    @Expose val farmingWeight: EliteProfileMemberFarmingWeight
+)
+
+data class EliteProfileMemberFarmingWeight(
+    @Expose val pests: Map<PestType, Int>
+)
 

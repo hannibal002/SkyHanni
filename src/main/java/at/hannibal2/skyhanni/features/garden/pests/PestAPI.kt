@@ -226,7 +226,7 @@ object PestAPI {
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
         pestDeathChatPattern.matchMatcher(event.message) {
-            val pest = PestType.getByNameOrNull(group("pest")) ?: return
+            val pest = PestType.getByNameOrNull(group("pest").lowercase()) ?: return
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
             val amount = group("amount").toInt()
 
