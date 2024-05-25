@@ -161,7 +161,7 @@ object HoppityCollectionStats {
                 DisplayTableEntry(
                     title,
                     "§a$displayFound§7/§a$displayTotal",
-                    displayFound.toDouble(),
+                    displayTotal.toDouble(),
                     rarity.item,
                     hover
                 )
