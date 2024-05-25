@@ -192,7 +192,9 @@ object ElitePestKillsDisplay {
                 Renderable.string("§aNo players ahead of you!")
             )
         } else if (difference <= 0) {
-            //TODO add command to refresh too so it can be used in a neu button or assigned to a key
+            println(difference)
+            println(amountToBeat)
+            println(pests)
             newDisplay.add(
                 Renderable.clickAndHover(
                     "§7You have passed §b#${nextRank.addSeparators()}",
