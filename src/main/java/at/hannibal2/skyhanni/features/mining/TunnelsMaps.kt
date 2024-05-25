@@ -267,7 +267,7 @@ class TunnelsMaps {
     }
 
     private fun generateLocationsDisplay() = buildList {
-        add(Renderable.string("§6Loactions:"))
+        add(Renderable.string("§6Locations:"))
         add(
             Renderable.multiClickAndHover(
                 campfire.name!!, listOf(
