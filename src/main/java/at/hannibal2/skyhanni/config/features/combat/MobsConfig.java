@@ -58,7 +58,7 @@ public class MobsConfig {
     public boolean arachneBossHighlighter = true;
 
     @Expose
-    @ConfigOption(name = "Line to Arachne", desc = "Also draw a line pointing to where Arachne is currently at.")
+    @ConfigOption(name = "Line to Arachne", desc = "Draw a line pointing to where Arachne is currently at.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean lineToArachne = false;
