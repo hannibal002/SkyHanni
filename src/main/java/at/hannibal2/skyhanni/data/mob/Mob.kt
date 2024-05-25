@@ -118,7 +118,7 @@ class Mob(
     /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
     fun highlight(color: Color?) {
         if (color == highlightColor) return
-        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+        highlightColor = color?.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         if (color == null) {
             internalRemoveColor()
         } else {
