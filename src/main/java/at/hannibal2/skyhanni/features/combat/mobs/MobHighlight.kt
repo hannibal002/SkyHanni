@@ -3,14 +3,20 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntityCaveSpider
@@ -22,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class MobHighlight {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
+    private var arachne: EntityLivingBase? = null
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
@@ -100,6 +107,35 @@ class MobHighlight {
         }
     }
 
+    @SubscribeEvent
+    fun onWorldRender(event: LorenzRenderWorldEvent) {
+        if (!LorenzUtils.inSkyBlock || !config.lineToArachne) return
+
+        arachne?.let {
+            if (it.isDead || it.health <= 0) {
+                arachne = null
+                return
+            }
+
+            if (it.distanceToPlayer() > 10) {
+                return
+            }
+
+            event.draw3DLine(
+                event.exactPlayerEyeLocation(),
+                it.getLorenzVec().add(y = 1),
+                LorenzColor.RED.toColor(),
+                5,
+                true
+            )
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        arachne = null
+    }
+
     private fun checkArachne(entity: EntitySpider) {
         if (!entity.hasNameTagWith(1, "[§7Lv300§8] §cArachne") &&
             !entity.hasNameTagWith(1, "[§7Lv300§8] §lArachne") &&
@@ -122,5 +158,7 @@ class MobHighlight {
     private fun markArachne(entity: EntityLivingBase) {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.RED.toColor().withAlpha(50))
         { config.arachneBossHighlighter }
+
+        this.arachne = entity
     }
 }
