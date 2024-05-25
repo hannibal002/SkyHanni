@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.ElitePestKillsDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
@@ -329,6 +330,10 @@ object Commands {
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
         registerCommand(
+            "shtpinfested",
+            "Teleports you to the nearest infested plot"
+        ) { PestFinder.teleportNearestInfestedPlot() }
+        registerCommand(
             "shrefreshfc",
             "Refresh the Farming Collection Display"
         ) { EliteFarmingCollectionDisplay.onCommand(it) }
@@ -392,6 +397,10 @@ object Commands {
             "shpumpkin",
             "Toggles receiving the 12 fortune from pumpkins"
         ) { CaptureFarmingGear.reversePumpkinFortune() }
+        registerCommand(
+            "shcocoabeans",
+            "Toggles receiving the 12 fortune from cocoa beans"
+        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
         registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
