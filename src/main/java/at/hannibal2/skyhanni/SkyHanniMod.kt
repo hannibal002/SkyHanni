@@ -348,7 +348,6 @@ import at.hannibal2.skyhanni.features.misc.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.features.misc.ParticleHider
 import at.hannibal2.skyhanni.features.misc.PartyMemberOutlines
 import at.hannibal2.skyhanni.features.misc.PatcherSendCoordinates
-import at.hannibal2.skyhanni.features.misc.PetNametag
 import at.hannibal2.skyhanni.features.misc.PocketSackInASackDisplay
 import at.hannibal2.skyhanni.features.misc.PrivateIslandNoPickaxeAbility
 import at.hannibal2.skyhanni.features.misc.QuickModMenuSwitch
@@ -375,6 +374,7 @@ import at.hannibal2.skyhanni.features.misc.pets.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.pets.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.pets.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.pets.PetItemDisplay
+import at.hannibal2.skyhanni.features.misc.pets.PetNametag
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
