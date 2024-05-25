@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
@@ -48,7 +48,7 @@ class PetNametag {
     }
 
     private fun isEnabled() = with(config) {
-        hidePetLevel || hideMaxPetLevel || hidePlayerName
-    } && LorenzUtils.inSkyblock
+        (hidePetLevel || hideMaxPetLevel || hidePlayerName) && LorenzUtils.inSkyBlock
+    }
 
 }
