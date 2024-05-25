@@ -12,7 +12,7 @@ public class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Display", desc = "Display your farming weight on screen. " +
         "The calculation and API is provided by The Elite SkyBlock farmers. " +
-        "See §ehttps://elitebot.dev/info §7for more info.")
+        "See §celitebot.dev/info §7for more info.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = true;

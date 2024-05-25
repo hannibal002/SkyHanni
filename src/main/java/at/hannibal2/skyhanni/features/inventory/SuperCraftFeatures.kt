@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SuperCraftFeatures {
-    private val craftedPattern by RepoPattern.pattern(
+object SuperCraftFeatures {
+    val craftedPattern by RepoPattern.pattern(
         "inventory.supercrafting.craft.new",
         "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[\\d,]+))?§r§e!"
     )
@@ -23,7 +23,7 @@ class SuperCraftFeatures {
     fun onChat(event: LorenzChatEvent) {
         if (!config.superCraftGFS) return
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
-            NEUInternalName.fromItemName(this.group("item")) to (this.group("amount")?.formatInt() ?: 1)
+            NEUInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)
         } ?: return
         if (!SackAPI.sackListInternalNames.contains(internalName.asString())) return
         DelayedRun.runNextTick {

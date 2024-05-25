@@ -111,6 +111,29 @@ class ComponentMatcher internal constructor(
         if (start < 0) return null
         return this.span.slice(start, matcher.end(name))
     }
+
+    /**
+     * Return a span equivalent to the group with the given name found by [matches] or [find]
+     */
+    fun component(name: String): IChatComponent? {
+        return group(name)?.intoComponent()
+    }
+
+    /**
+     * Return a span equivalent to the group with the given name found by [matches] or [find].
+     * Returns not nullable object, or throws an error.
+     */
+    fun groupOrThrow(name: String): ComponentSpan {
+        return group(name) ?: error("group '$name' not found in ComponentSpan!")
+    }
+
+    /**
+     * Return a IChatComponent equivalent to the group with the given name found by [matches] or [find].
+     * Returns not nullable object, or throws an error.
+     */
+    fun componentOrThrow(name: String): IChatComponent {
+        return groupOrThrow(name).intoComponent()
+    }
 }
 
 /**
@@ -124,7 +147,7 @@ class ComponentMatcher internal constructor(
 class ComponentSpan internal constructor(
     val textComponent: IChatComponent,
     private val cachedText: String,
-    val start: Int, val end: Int
+    val start: Int, val end: Int,
 ) {
     init {
         require(start <= end)
@@ -140,10 +163,10 @@ class ComponentSpan internal constructor(
     /**
      * Slice this component span. This is equivalent to the [String.substring] operation on the [text][getText].
      */
-    fun slice(start: Int, end: Int): ComponentSpan {
-        require(0 <= start)
-        require(start <= end)
-        require(end <= length)
+    fun slice(start: Int = 0, end: Int = length): ComponentSpan {
+        require(0 <= start) { "start is bigger than 0: start=$start, cachedText=$cachedText" }
+        require(start <= end) { "start is bigger than length: start=$start, length=$length, cachedText=$cachedText" }
+        require(end <= length) { "end is bigger than length: end=$end, length=$length, cachedText=$cachedText" }
         return ComponentSpan(textComponent, cachedText, this.start + start, this.start + end)
     }
 
@@ -239,6 +262,57 @@ class ComponentSpan internal constructor(
      */
     fun sampleStyles(): List<ChatStyle> {
         return sampleComponents().map { it.chatStyle }
+    }
+
+    /**
+     * Strip extra `§r` color codes from the beginning / end of this span.
+     */
+    fun stripHypixelMessage(): ComponentSpan {
+        var start = 0
+        var newString = getText()
+        var end = this.length
+        while (newString.startsWith("§r")) {
+            start += 2
+            newString = newString.substring(2)
+        }
+        while (newString.endsWith("§r")) {
+            newString = newString.substring(0, newString.length - 2)
+            end -= 2
+        }
+        return slice(start, end)
+    }
+
+    /**
+     * Remove a prefix from this span if it exists. Otherwise, return this unchanged.
+     */
+    fun removePrefix(prefix: String): ComponentSpan {
+        if (!getText().startsWith(prefix)) return this
+        return slice(prefix.length)
+    }
+
+    /**
+     * Remove a suffix from this span if it exists. Otherwise, return this unchanged.
+     */
+    fun removeSuffix(suffix: String): ComponentSpan {
+        if (!getText().endsWith(suffix)) return this
+        return slice(end = length - suffix.length)
+    }
+
+    /**
+     * Append another [ComponentSpan] to this one to create a new one. This will [flatten][intoComponent] the hierarchy
+     * of the underlying [IChatComponent] but preserve formatting.
+     */
+    operator fun plus(other: ComponentSpan): ComponentSpan {
+        val left = this.intoComponent()
+        val right = other.intoComponent()
+        left.appendSibling(right)
+        return left.intoSpan()
+    }
+
+    companion object {
+        fun empty(): ComponentSpan {
+            return ComponentSpan(ChatComponentText(""), "", 0, 0)
+        }
     }
 
 }

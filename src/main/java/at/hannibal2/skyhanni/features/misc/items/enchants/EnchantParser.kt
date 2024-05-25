@@ -7,8 +7,12 @@ import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -19,6 +23,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
@@ -37,6 +42,8 @@ object EnchantParser {
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
     )
 
+    private var currentItem: ItemStack? = null
+
     private var indexOfLastGrayEnchant = -1
     private var startEnchant = -1
     private var endEnchant = -1
@@ -52,6 +59,8 @@ object EnchantParser {
     private var orderedEnchants: TreeSet<FormattedEnchant> = TreeSet()
 
     private val loreCache: Cache = Cache()
+
+    val isSbaLoaded by lazy { Loader.isModLoaded("skyblockaddons") }
 
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()
@@ -74,6 +83,7 @@ object EnchantParser {
             config.commaFormat,
             config.hideVanillaEnchants,
             config.hideEnchantDescriptions,
+            ChromaManager.config.enabled,
         ) {
             markCacheDirty()
         }
@@ -83,6 +93,8 @@ object EnchantParser {
     fun onTooltipEvent(event: LorenzToolTipEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
+
+        currentItem = event.itemStack
 
         // The enchants we expect to find in the lore, found from the items NBT data
         val enchants = event.itemStack.getEnchantments() ?: return
@@ -103,6 +115,9 @@ object EnchantParser {
 
         val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
 
+        // Check for any vanilla gray enchants at the top of the tooltip
+        indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(lore, null)
+
         // Since we don't get given an item stack from /show, we pass an empty enchants map and
         // use all enchants from the Enchants class instead
         parseEnchants(lore, mapOf(), event.component)
@@ -116,7 +131,11 @@ object EnchantParser {
         // Check if the lore is already cached so continuous hover isn't 1 fps
         if (loreCache.isCached(loreList)) {
             loreList.clear()
-            loreList.addAll(loreCache.cachedLoreAfter)
+            if (loreCache.cachedLoreAfter.isNotEmpty()) {
+                loreList.addAll(loreCache.cachedLoreAfter)
+            } else {
+                loreList.addAll(loreCache.cachedLoreBefore)
+            }
             // Need to still set replacement component even if its cached
             if (chatComponent != null) editChatComponent(chatComponent, loreList)
             return
@@ -147,16 +166,32 @@ object EnchantParser {
         // If we have color parsing off and hide enchant descriptions on, remove them and return from method
         if (!config.colorParsing.get()) {
             if (config.hideEnchantDescriptions.get()) {
+                if (itemIsBook()) {
+                    loreCache.updateAfter(loreList)
+                    return
+                }
                 loreList.removeAll(loreLines)
                 loreCache.updateAfter(loreList)
                 if (chatComponent != null) editChatComponent(chatComponent, loreList)
                 return
             }
+            loreCache.updateAfter(loreList)
             return
         }
 
         // Remove enchantment lines so we can insert ours
-        loreList.subList(startEnchant, endEnchant + 1).clear()
+        try {
+            loreList.subList(startEnchant, endEnchant + 1).clear()
+        } catch (e: IndexOutOfBoundsException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Error parsing enchantment info from item",
+                "loreList" to loreList,
+                "startEnchant" to startEnchant,
+                "endEnchant" to endEnchant,
+            )
+            return
+        }
 
         val insertEnchants: MutableList<String> = mutableListOf()
 
@@ -238,10 +273,10 @@ object EnchantParser {
         // Normal is leaving the formatting as Hypixel provides it
         if (config.format.get() == EnchantParsingConfig.EnchantFormat.NORMAL) {
             normalFormatting(insertEnchants)
-        // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
+            // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
         } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
             compressedFormatting(insertEnchants)
-        // Stacked is always forcing 1 enchant per line
+            // Stacked is always forcing 1 enchant per line
         } else {
             stackedFormatting(insertEnchants)
         }
@@ -261,7 +296,7 @@ object EnchantParser {
                 insertEnchants.add(builder.toString())
 
                 // This will only add enchant descriptions if there were any to begin with
-                if (!config.hideEnchantDescriptions.get()) insertEnchants.addAll(orderedEnchant.getLore())
+                if (!config.hideEnchantDescriptions.get() || itemIsBook()) insertEnchants.addAll(orderedEnchant.getLore())
 
                 builder = StringBuilder()
             }
@@ -290,7 +325,7 @@ object EnchantParser {
     }
 
     private fun stackedFormatting(insertEnchants: MutableList<String>) {
-        if (!config.hideEnchantDescriptions.get()) {
+        if (!config.hideEnchantDescriptions.get() || itemIsBook()) {
             for (enchant: FormattedEnchant in orderedEnchants) {
                 insertEnchants.add(enchant.getFormattedString())
                 insertEnchants.addAll(enchant.getLore())
@@ -302,7 +337,11 @@ object EnchantParser {
         }
     }
 
-    private fun finishFormatting(insertEnchants: MutableList<String>, builder: StringBuilder, commaFormat: CommaFormat) {
+    private fun finishFormatting(
+        insertEnchants: MutableList<String>,
+        builder: StringBuilder,
+        commaFormat: CommaFormat,
+    ) {
         if (builder.isNotEmpty()) insertEnchants.add(builder.toString())
 
         // Check if there is a trailing space (therefore also a comma) and remove the last 2 chars
@@ -322,15 +361,24 @@ object EnchantParser {
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
 
-    private fun accountForAndRemoveGrayEnchants(loreList: MutableList<String>, item: ItemStack): Int {
-        // If the item has no enchantmentTagList then there will be no gray enchants
-        if (!item.isEnchanted() || item.enchantmentTagList.tagCount() == 0) return -1
+    /**
+     * Finds where the gray enchants (vanilla) end and optionally remove them from the tooltip.
+     *
+     * Allow for a null item stack in odd situations like when other mods add them in chat components, i.e,
+     * Skytils party finder feature showing a players inventory in chat
+     */
+    private fun accountForAndRemoveGrayEnchants(loreList: MutableList<String>, item: ItemStack?): Int {
+        if (item != null) {
+            // If the item has no enchantmentTagList then there will be no gray enchants
+            if (!item.isEnchanted() || item.enchantmentTagList.tagCount() == 0) return -1
+        }
 
         var lastGrayEnchant = -1
         val removeGrayEnchants = config.hideVanillaEnchants.get()
 
         var i = 1
-        for (total in 0 until (1 + item.enchantmentTagList.tagCount())) {
+        for (total in 0 until 2) { // Using the fact that there should be at most 2 vanilla enchants
+            if (i + 1 >= loreList.size) break // In case the tooltip is very short (i.e, hovering over a short chat component)
             val line = loreList[i]
             if (grayEnchantPattern.matcher(line).matches()) {
                 lastGrayEnchant = i
@@ -342,6 +390,10 @@ object EnchantParser {
         }
 
         return if (removeGrayEnchants) -1 else lastGrayEnchant
+    }
+
+    private fun itemIsBook(): Boolean {
+        return currentItem?.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
     }
 
     // We don't check if the main toggle here since we still need to go into

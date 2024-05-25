@@ -133,4 +133,9 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shadowAssassinJumpNotifier = false;
+
+    @Expose
+    @ConfigOption(name = "Dungeon Races Guide", desc = "")
+    @Accordion
+    public DungeonsRaceGuideConfig dungeonsRaceGuide = new DungeonsRaceGuideConfig();
 }

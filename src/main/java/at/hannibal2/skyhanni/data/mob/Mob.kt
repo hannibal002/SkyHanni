@@ -19,6 +19,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
+import java.util.UUID
 
 /**
  * Represents a Mob in Hypixel Skyblock.
@@ -56,6 +57,7 @@ import java.awt.Color
  * Gives back the second additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
+ * @property id Unique identifier for each Mob instance
  */
 class Mob(
     var baseEntity: EntityLivingBase,
@@ -68,6 +70,8 @@ class Mob(
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
 ) {
+
+    private val id: UUID = UUID.randomUUID()
 
     val owner: MobUtils.OwnerShip?
 
@@ -205,16 +209,14 @@ class Mob(
         }
     }
 
-    override fun hashCode() = baseEntity.hashCode()
+    override fun hashCode() = id.hashCode()
 
     override fun toString(): String = "$name - ${baseEntity.entityId}"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other !is Mob) return false
 
-        other as Mob
-
-        return baseEntity == other.baseEntity
+        return id == other.id
     }
 }

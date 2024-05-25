@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
@@ -183,8 +182,14 @@ class HypixelData {
             ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
                 return group("maxamount").toInt()
             }
-            if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) return 24
-            return if (serverId?.startsWith("mega") == true) 80 else 26
+
+            return when (skyBlockIsland) {
+                IslandType.MINESHAFT -> 4
+                IslandType.CATACOMBS -> 5
+                IslandType.CRYSTAL_HOLLOWS -> 24
+                IslandType.CRIMSON_ISLE -> 24
+                else -> if (serverId?.startsWith("mega") == true) 80 else 26
+            }
         }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
@@ -278,6 +283,7 @@ class HypixelData {
     }
 
     @SubscribeEvent
+    // TODO rewrite everything in here
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             // Modified from NEU.
@@ -297,17 +303,19 @@ class HypixelData {
             }
         }
 
-        if (LorenzUtils.inSkyBlock) {
-            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                skyblockAreaPattern.matchMatcher(line) {
-                    val originalLocation = group("area")
-                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
-                    skyBlockAreaWithSymbol = line.trim()
-                    break@loop
+        if (LorenzUtils.onHypixel) {
+            if (LorenzUtils.inSkyBlock) {
+                loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                    skyblockAreaPattern.matchMatcher(line) {
+                        val originalLocation = group("area")
+                        skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                        skyBlockAreaWithSymbol = line.trim()
+                        break@loop
+                    }
                 }
-            }
 
-            checkProfileName()
+                checkProfileName()
+            }
         }
 
         if (!event.isMod(5)) return
