@@ -141,6 +141,7 @@ import at.hannibal2.skyhanni.features.event.diana.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggDisplayManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
@@ -676,6 +677,7 @@ class SkyHanniMod {
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
         loadModule(HoppityEggDisplayManager)
+        loadModule(HoppityCollectionData)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
