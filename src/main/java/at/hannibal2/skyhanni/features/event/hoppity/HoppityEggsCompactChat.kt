@@ -70,7 +70,7 @@ object HoppityEggsCompactChat {
             compactChat(event)
         }
 
-        HoppityEggsManager.rabbitFoundPatttern.matchMatcher(event.message) {
+        HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
             lastName = group("name")
             lastRarity = group("rarity")
             compactChat(event)
