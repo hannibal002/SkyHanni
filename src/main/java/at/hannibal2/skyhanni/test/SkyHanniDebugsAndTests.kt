@@ -103,7 +103,7 @@ class SkyHanniDebugsAndTests {
             position.renderRenderables(
                 listOf(
                     Renderable.verticalSlider(
-                        100,
+                        108,
                         handler = {},
                         scrollValue
                     ).renderBounds(),

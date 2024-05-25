@@ -609,7 +609,7 @@ interface Renderable {
                 0,
                 virtualHeight - height,
                 velocity,
-                button
+                dragScrollMouseButton = button
             )
 
             private val end get() = scroll.asInt() + height
@@ -671,7 +671,7 @@ interface Renderable {
                 if (hasHeader) yOffsets[1] else 0,
                 virtualHeight - height,
                 velocity,
-                button
+                dragScrollMouseButton = button
             )
 
             override fun render(posX: Int, posY: Int) {
@@ -720,12 +720,13 @@ interface Renderable {
 
         fun verticalSlider(
             height: Int,
-            handler: (Int) -> Unit,
+            handler: (Double) -> Unit,
             scrollValue: ScrollValue = ScrollValue(),
             width: Int = 11,
-            minValue: Int = 0,
-            maxValue: Int = 100,
-            velocity: Double = 2.0,
+            sliderHeadThickness: Int = 6,
+            minValue: Double = 0.0,
+            maxValue: Double = 100.0,
+            stepSize: Double = 1.0,
             button: Int? = 0,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
@@ -735,31 +736,36 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
+            val trueMin = minValue / stepSize
+            val trueMax = maxValue / stepSize
+
+            // TODO fix offset bug
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
-                minValue,
-                maxValue,
-                velocity,
-                button,
+                trueMin,
+                trueMax,
+                1.0,
+                0.0,
+                dragScrollMouseButton = button,
                 inverseDrag = false
             )
 
-            private val sliderPos get() = ((scroll.asInt() - minValue).fractionOf(maxValue) * (height - 8)).toInt() + 1
+            private val sliderPos get() = ((scroll.asInt() - trueMin).fractionOf(trueMax) * (height - sliderHeadThickness - 2)).toInt() + 1
 
             override fun render(posX: Int, posY: Int) {
-                val lastScroll = scroll.asInt()
+                val lastScroll = scroll.asDouble()
                 scroll.update(isHovered(posX, posY))
-                val newScroll = scroll.asInt()
+                val newScroll = scroll.asDouble()
 
                 Gui.drawRect(4, 0, width - 4, height, Color.GRAY.darker().rgb)
                 Gui.drawRect(5, 1, width - 5, height - 1, Color.GRAY.rgb)
 
                 val slider = sliderPos
-                Gui.drawRect(0, slider, width, slider + 6, Color.GRAY.darker().rgb)
-                Gui.drawRect(1, slider + 1, width - 1, slider + 5, Color.GRAY.rgb)
+                Gui.drawRect(0, slider, width, slider + sliderHeadThickness, Color.GRAY.darker().rgb)
+                Gui.drawRect(1, slider + 1, width - 1, slider + sliderHeadThickness - 1, Color.GRAY.rgb)
 
                 if (lastScroll != newScroll) {
-                    handler(newScroll)
+                    handler(newScroll * stepSize)
                 }
             }
 
