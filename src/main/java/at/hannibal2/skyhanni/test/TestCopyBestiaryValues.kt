@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TestCopyBestiaryValues {
 
-    class BestiarityObject {
+    class BestiarityObject { // TODO fix typo
 
         @Expose
         var name: String = ""

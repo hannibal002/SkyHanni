@@ -178,7 +178,7 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
+        if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 

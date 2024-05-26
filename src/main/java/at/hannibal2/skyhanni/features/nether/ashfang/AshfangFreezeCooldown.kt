@@ -52,7 +52,7 @@ object AshfangFreezeCooldown {
         }
     }
 
-    fun iscurrentlyFrozen(): Boolean {
+    fun isCurrentlyFrozen(): Boolean {
         val passedSince = lastHit.passedSince()
         val maxDuration = 3.seconds
         val duration = maxDuration - passedSince

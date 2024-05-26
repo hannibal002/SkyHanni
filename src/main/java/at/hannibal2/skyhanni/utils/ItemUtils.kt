@@ -344,13 +344,13 @@ object ItemUtils {
 
     fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 
-    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
+    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val ItemStack.itemName: String
         get() = getInternalName().itemName
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
-    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
+    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val NEUInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
