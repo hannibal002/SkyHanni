@@ -27,6 +27,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
@@ -351,8 +352,10 @@ object LorenzUtils {
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
      */
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
     fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun inAdvancedMiningIsland() =
@@ -362,4 +365,13 @@ object LorenzUtils {
         || inAdvancedMiningIsland()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+
+    fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
+        val cornerOne = LorenzVec(minX, y, minZ)
+        val cornerTwo = LorenzVec(minX, y, maxZ)
+        val cornerThree = LorenzVec(maxX, y, maxZ)
+        val cornerFour = LorenzVec(maxX, y, minZ)
+
+        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
+    }
 }

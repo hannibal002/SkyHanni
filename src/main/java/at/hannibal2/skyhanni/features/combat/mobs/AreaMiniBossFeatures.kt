@@ -123,7 +123,7 @@ class AreaMiniBossFeatures {
             LorenzVec(-565.0, 41.0, -307.1),
             LorenzVec(-573.2, 51.0, -353.4),
         ),
-        MILLENIA_AGED_BLAZE(
+        MILLENNIA_AGED_BLAZE(
             EntityBlaze::class.java, 30_000_000, LorenzColor.DARK_RED, 60,
             LorenzVec(-292.5, 97.0, -999.7),
             LorenzVec(-232.3, 77.0, -951.1),
