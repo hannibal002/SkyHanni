@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -75,7 +75,7 @@ class CorpseAPI {
              */
             ItemUtils.readItemAmount(group("item"))
         } ?: return
-        // Workaround: If it is a enchanted book, we assume it is a paleontologist I book
+        // Workaround: If it is an enchanted book, we assume it is a paleontologist I book
         if (pair.first.let { it == "§fEnchanted" || it == "§fEnchanted Book" }) {
 //             pair = "Paleontologist I" to pair.second
             pair = "§9Ice Cold I" to pair.second
