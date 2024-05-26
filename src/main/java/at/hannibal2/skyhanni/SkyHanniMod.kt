@@ -649,7 +649,7 @@ class SkyHanniMod {
         loadModule(AshfangHideParticles())
         loadModule(AshfangHideDamageIndicator())
         loadModule(ItemStars())
-        loadModule(MinionFeatures())
+        loadModule(MinionFeatures)
         loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
         loadModule(WikiManager)
