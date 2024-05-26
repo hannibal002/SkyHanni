@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 class SummoningSoulsName {
 
@@ -27,8 +29,8 @@ class SummoningSoulsName {
             "NjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ"
 
     private val souls = mutableMapOf<EntityArmorStand, String>()
-    private val mobsLastLocation = mutableMapOf<EntityLiving, LorenzVec>()
-    private val mobsName = mutableMapOf<EntityLiving, String>()
+    private val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
+    private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -45,7 +47,7 @@ class SummoningSoulsName {
             if (entity.hasSkullTexture(texture)) {
                 val soulLocation = entity.getLorenzVec()
 
-                val map = mutableMapOf<EntityLiving, Double>()
+                val map = mutableMapOf<Int, Double>()
                 for ((mob, loc) in mobsLastLocation) {
                     val distance = loc.distance(soulLocation)
                     map[mob] = distance
@@ -53,16 +55,17 @@ class SummoningSoulsName {
 
                 val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
                 if (nearestMob != null) {
-                    souls[entity] = mobsName[nearestMob]!!
+                    souls[entity] = mobsName.getOrNull(nearestMob)!!
                 }
             }
         }
 
         for (entity in EntityUtils.getEntities<EntityLiving>()) {
+            val id = entity.entityId
             val consumer = entity.getNameTagWith(2, "§c❤")
             if (consumer != null && !consumer.name.contains("§e0")) {
-                mobsLastLocation[entity] = entity.getLorenzVec()
-                mobsName[entity] = consumer.name
+                mobsLastLocation.put(id, entity.getLorenzVec())
+                mobsName.put(id, consumer.name)
             }
         }
 
