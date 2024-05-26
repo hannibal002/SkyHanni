@@ -57,7 +57,7 @@ object ChocolateFactoryStats {
             "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
         }
 
-        val timeTowerFull = ChocolateFactoryTimeTowerManager.timeTowerFullTimemark()
+        val timeTowerFull = ChocolateFactoryTimeTowerManager.timeTowerFullTimeMark()
 
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
         val chocolateUntilPrestigeCalculation =

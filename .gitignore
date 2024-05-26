@@ -1,5 +1,6 @@
 .idea/*
 !.idea/icon.svg
+!.idea/dictionaries/default_user.xml
 .vscode/
 run/
 build/

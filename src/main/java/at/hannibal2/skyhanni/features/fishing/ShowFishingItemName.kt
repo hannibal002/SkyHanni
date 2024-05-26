@@ -4,12 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -21,8 +20,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class ShowFishingItemName {
 
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
-    private var hasRodInHand = false
-    private var cache = TimeLimitedCache<EntityItem, Pair<LorenzVec, String>>(750.milliseconds)
+    private var itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
 
     // Taken from Skytils
     private val cheapCoins = setOf(
@@ -33,53 +31,39 @@ class ShowFishingItemName {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
+            val itemStack = entityItem.entityItem
+            // Hypixel sometimes replaces the bait item midair with a stone
+            if (itemStack.name.removeColor() == "Stone") continue
+            var text = ""
 
-        if (event.isMod(10)) {
-            hasRodInHand = isFishingRod()
+            val isBait = itemStack.isBait()
+            if (isBait && !config.showBaits) continue
+
+            if (itemStack.getSkullTexture() in cheapCoins) {
+                text = "§6Coins"
+            } else {
+                val name = itemStack.name.transformIf({ isBait }) { "§7" + this.removeColor() }
+                text += if (isBait) "§c§l- §r" else "§a§l+ §r"
+
+                val size = itemStack.stackSize
+                if (size != 1) text += "§7x$size §r"
+                text += name
+            }
+
+            itemsOnGround.put(entityItem, text)
         }
     }
-
-    private fun isFishingRod() = InventoryUtils.getItemInHand()?.name?.contains("Rod") ?: false
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (hasRodInHand) {
-            for (entityItem in EntityUtils.getEntities<EntityItem>()) {
-                val location = event.exactLocation(entityItem).add(y = 0.8)
-                if (location.distance(LocationUtils.playerLocation()) > 15) continue
-                val itemStack = entityItem.entityItem
-                var name = itemStack.name
 
-                // Hypixel sometimes replaces the bait item mid air with a stone
-                if (name.removeColor() == "Stone") continue
-
-                val size = itemStack.stackSize
-                val prefix = if (!itemStack.isBait()) {
-                    "§a§l+"
-                } else {
-                    if (!config.showBaits) continue
-                    name = "§7" + name.removeColor()
-                    "§c§l-"
-                }
-
-                itemStack?.tagCompound?.getTag("SkullOwner")?.toString()?.let {
-                    for (coin in cheapCoins) {
-                        if (it.contains(coin)) {
-                            name = "§6Coins"
-                        }
-                    }
-                }
-
-                val sizeText = if (size != 1) "§7x$size §r" else ""
-                cache.put(entityItem, location to "$prefix §r$sizeText$name")
-            }
-        }
-
-        for ((location, text) in cache.values()) {
+        for ((item, text) in itemsOnGround) {
+            val location = event.exactLocation(item).add(y = 0.8)
             event.drawString(location, text)
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.holdingRod
 }

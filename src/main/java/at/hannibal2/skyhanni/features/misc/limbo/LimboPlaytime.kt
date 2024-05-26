@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class LimboPlaytime {
+object LimboPlaytime {
     private lateinit var modifiedList: MutableList<String>
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
@@ -30,6 +30,8 @@ class LimboPlaytime {
         "hours",
         "§5§o§b([\\d.,]+) hours.+\$"
     )
+
+    var tooltipPlaytime = mutableListOf<String>()
 
     private var wholeMinutes = 0
     private var hoursString: String = ""
@@ -161,6 +163,8 @@ class LimboPlaytime {
             toolTip.addAll(modifiedList)
         }
         toolTip.addAll(lastList)
+
+        tooltipPlaytime = toolTip
     }
 
     private fun findFloatDecimalPlace(input: Float): Int {
