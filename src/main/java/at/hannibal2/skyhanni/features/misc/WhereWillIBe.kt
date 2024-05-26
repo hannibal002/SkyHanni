@@ -14,11 +14,25 @@ import kotlin.math.pow
 import kotlin.random.Random
 
 object WhereWillIBe {
-    private val nonIslands = listOf(IslandType.NONE, IslandType.UNKNOWN, IslandType.MINESHAFT)
+    private val nonIslands =
+        listOf(
+            IslandType.NONE,
+            IslandType.UNKNOWN,
+            IslandType.MINESHAFT
+        )
     private val privateOrGuest =
-        listOf(IslandType.PRIVATE_ISLAND_GUEST, IslandType.PRIVATE_ISLAND, IslandType.GARDEN_GUEST)
+        listOf(
+            IslandType.PRIVATE_ISLAND_GUEST,
+            IslandType.PRIVATE_ISLAND,
+            IslandType.GARDEN_GUEST
+        )
     private val onceOnlyIslands =
-        listOf(IslandType.DARK_AUCTION, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.THE_RIFT)
+        listOf(
+            IslandType.DARK_AUCTION,
+            IslandType.KUUDRA_ARENA,
+            IslandType.CATACOMBS,
+            IslandType.THE_RIFT
+        )
 
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
@@ -26,7 +40,8 @@ object WhereWillIBe {
         if (event.message.lowercase() != "/wherewillibe") return
         event.cancel()
         val islandsAsList = IslandType.entries.toList().filter { it !in nonIslands }.toMutableList()
-        if (SkyBlockTime.now().month != 12) islandsAsList.remove(IslandType.WINTER)
+        if (SkyBlockTime.now().month != 12)
+            islandsAsList.remove(IslandType.WINTER)
         var lastUsedMillis = SimpleTimeMark.now().toMillis()
         var lastIsland = IslandType.NONE
         var chosenIsland = IslandType.NONE
