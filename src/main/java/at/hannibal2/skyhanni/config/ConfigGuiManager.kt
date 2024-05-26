@@ -11,6 +11,10 @@ object ConfigGuiManager {
     private val replacedSearchTerms = mapOf(
         "color" to "colour",
         "armor" to "armour",
+        "endermen" to "enderman",
+        "enderman" to "endermen",
+        "hotkey" to "keybind",
+        "gray" to "grey"
     )
 
     fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also {
