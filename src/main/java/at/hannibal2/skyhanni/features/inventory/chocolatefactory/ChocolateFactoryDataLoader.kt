@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.item.ItemStack
@@ -50,9 +50,14 @@ object ChocolateFactoryDataLoader {
         "chocolate.multiplier",
         "§7Total Multiplier: §6(?<amount>[\\d.]+)x"
     )
+
+    /**
+     * REGEX-TEST: §7You are §8#§b114
+     * REGEX-TEST: §7§7You are §8#§b5,139 §7in all-time Chocolate.
+     */
     private val leaderboardPlacePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.place",
-        "§7You are §8#§b(?<position>[\\d,]+)"
+        "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time Chocolate\\.)?"
     )
     private val leaderboardPercentilePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.percentile",
