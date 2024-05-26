@@ -33,21 +33,38 @@ object WhereWillIBe {
         ChatUtils.chat("§aYour future servers:", false)
         repeat(Random.nextInt(2, 11)) {
             val chosenIslands =
-                if (Random.nextBoolean()) islandsAsList.filter { it !in privateOrGuest } else islandsAsList
+                if (Random.nextBoolean()) islandsAsList.filter { it !in privateOrGuest }
+                else islandsAsList
             val randomMillis =
-                Random.nextLong(lastUsedMillis, lastUsedMillis + Random.nextLong(10000, 2.0.pow(26).toLong()))
+                Random.nextLong(
+                    lastUsedMillis,
+                    lastUsedMillis + Random.nextLong(
+                        10000,
+                        2.0.pow(26).toLong()
+                    )
+                )
             lastUsedMillis = randomMillis
             while (chosenIsland == lastIsland) chosenIsland = chosenIslands.shuffled().first()
             lastIsland = chosenIsland
-            if (chosenIsland in onceOnlyIslands) islandsAsList.remove(chosenIsland)
-            val serverType = if (chosenIsland == IslandType.HUB) listOf("mini", "mega").random() else "mini"
-            val randInt = if (serverType == "mini") Random.nextInt(10, 100) else Random.nextInt(10, 401)
-            val randLetter =
-                if (Random.nextBoolean()) "${('A'..'Z').random()}" else "${('A'..'Z').random()}${('A'..'Z').random()}"
-            val randomServerID = "$serverType${randInt}$randLetter"
+            if (chosenIsland in onceOnlyIslands)
+                islandsAsList.remove(chosenIsland)
+            val randomServerID = "${miniOrMega(chosenIsland)}${randServerNumber()}${oneOrTwoLetters()}"
             val randomIsland = "SkyBlock (${chosenIsland.displayName})"
-            val formatted = SimpleDateFormat("HH:mm:ss dd-MM-yy").format(Date(randomMillis))
-            ChatUtils.chat("§e$formatted - $randomServerID - $randomIsland", false)
+            ChatUtils.chat("§e${formattedDate(Date(randomMillis))} - $randomServerID - $randomIsland", false)
         }
     }
+
+    private fun miniOrMega(chosenIsland: IslandType): String =
+        if (chosenIsland == IslandType.HUB) listOf("mini", "mega").random()
+        else "mini"
+
+    private fun randServerNumber(): Int =
+        Random.nextInt(10, 401)
+
+    private fun oneOrTwoLetters(): String =
+        if (Random.nextBoolean()) "${('A'..'Z').random()}"
+        else "${('A'..'Z').random()}${('A'..'Z').random()}"
+
+    private fun formattedDate(date: Date): String =
+        SimpleDateFormat("HH:mm:ss dd-MM-yy").format(date)
 }
