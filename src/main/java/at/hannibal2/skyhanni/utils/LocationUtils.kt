@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
 import kotlin.math.max
 import kotlin.math.min
 
@@ -84,17 +83,14 @@ object LocationUtils {
             if (aabb.maxZ > maxZ) maxZ = aabb.maxZ
         }
 
-        val combinedMin = BlockPos(minX, minY, minZ)
-        val combinedMax = BlockPos(maxX, maxY, maxZ)
-
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    fun AxisAlignedBB.getEdgeLengths() = this.maxBox() - this.minBox()
+    fun AxisAlignedBB.getEdgeLengths() = maxBox() - minBox()
 
-    fun AxisAlignedBB.getCenter() = this.getEdgeLengths() * 0.5 + this.minBox()
+    fun AxisAlignedBB.getCenter() = getEdgeLengths() * 0.5 + minBox()
 
-    fun AxisAlignedBB.getTopCenter() = this.getCenter().add(y = (maxY - minY) / 2)
+    fun AxisAlignedBB.getTopCenter() = getCenter().add(y = (maxY - minY) / 2)
 
     fun AxisAlignedBB.clampTo(other: AxisAlignedBB): AxisAlignedBB {
         val minX = max(this.minX, other.minX)

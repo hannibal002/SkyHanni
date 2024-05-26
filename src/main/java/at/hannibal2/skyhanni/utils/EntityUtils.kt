@@ -50,13 +50,8 @@ object EntityUtils {
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = 3)
-        val found = getArmorStandsInRadius(center, radius)
-        return found.filter {
-            val result = it.name.contains(contains)
-            result
-        }
+    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().add(y = 3), radius).filter {
+        it.name.contains(contains)
     }
 
     fun EntityLivingBase.getNameTagWith(
@@ -75,8 +70,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): List<EntityArmorStand> {
         val center = getLorenzVec().add(y = y)
-        val found = getArmorStandsInRadius(center, inaccuracy)
-        return found.filter {
+        return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
                 LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
