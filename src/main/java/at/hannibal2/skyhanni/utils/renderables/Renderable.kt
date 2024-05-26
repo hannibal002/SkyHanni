@@ -620,7 +620,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY)
+                    isHovered(posX, posY), posX to posY
                 )
 
                 var renderY = 0
@@ -680,7 +680,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY)
+                    isHovered(posX, posY), posX to posY
                 )
 
                 var renderY = 0
