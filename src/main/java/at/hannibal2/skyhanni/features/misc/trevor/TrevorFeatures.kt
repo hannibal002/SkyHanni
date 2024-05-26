@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.trevor.TrevorMobDiedEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -26,14 +27,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -52,13 +53,12 @@ object TrevorFeatures {
         "trapper",
         "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*)."
     )
-    private val talbotPatternAbove by patternGroup.pattern(
-        "above",
-        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!"
-    )
-    private val talbotPatternBelow by patternGroup.pattern(
-        "below",
-        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
+    /**
+     * REGEX-TEST: The target is around 15 blocks below, at a 5 degrees angle!
+     */
+    val talbotPatternTarget by patternGroup.pattern(
+        "target",
+        "The target is around (?<height>.*) blocks (?<direction>above|below), at a (?<angle>.*) degrees angle!"
     )
     private val talbotPatternAt by patternGroup.pattern(
         "at",
@@ -123,6 +123,7 @@ object TrevorFeatures {
         val formattedMessage = event.message.removeColor()
 
         mobDiedPattern.matchMatcher(event.message) {
+            TrevorMobDiedEvent().postAndCatch()
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
                 LorenzUtils.sendTitle("§2Mob Died ", 5.seconds)
@@ -150,13 +151,10 @@ object TrevorFeatures {
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
-        talbotPatternAbove.matchMatcher(formattedMessage) {
+        talbotPatternTarget.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
-            TrevorSolver.findMobHeight(height, true)
-        }
-        talbotPatternBelow.matchMatcher(formattedMessage) {
-            val height = group("height").toInt()
-            TrevorSolver.findMobHeight(height, false)
+            val above = group("direction") == "above"
+            TrevorSolver.findMobHeight(height, above)
         }
         talbotPatternAt.matchMatcher(formattedMessage) {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y

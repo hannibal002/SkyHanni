@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.misc.trevor.TalbotTheodoliteSolver
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -91,7 +92,7 @@ class SkyHanniDebugsAndTests {
             LorenzDebug.log(text)
         }
 
-        private var testLocation: LorenzVec? = null
+        var testLocation: LorenzVec? = null
 
         @SubscribeEvent
         fun onRenderWorld(event: LorenzRenderWorldEvent) {
@@ -118,6 +119,9 @@ class SkyHanniDebugsAndTests {
 
         fun testCommand(args: Array<String>) {
             SoundUtils.playBeepSound()
+
+            TalbotTheodoliteSolver.test(args)
+
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()

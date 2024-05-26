@@ -376,6 +376,7 @@ import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
+import at.hannibal2.skyhanni.features.misc.trevor.TalbotTheodoliteSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorSolver
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker
@@ -810,6 +811,7 @@ class SkyHanniMod {
         loadModule(ChumBucketHider())
         loadModule(InquisitorWaypointShare)
         loadModule(TrevorFeatures)
+        loadModule(TalbotTheodoliteSolver)
         loadModule(TrevorSolver)
         loadModule(TrevorTracker)
         loadModule(BingoCardTips())

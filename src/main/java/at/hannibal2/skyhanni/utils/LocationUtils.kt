@@ -11,7 +11,7 @@ object LocationUtils {
     fun canSee(a: LorenzVec, b: LorenzVec) =
         Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
 
-    fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+    fun playerLocation(): LorenzVec = Minecraft.getMinecraft().thePlayer.getLorenzVec()
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 

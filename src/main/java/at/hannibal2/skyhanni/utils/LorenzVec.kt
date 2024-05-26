@@ -74,7 +74,7 @@ data class LorenzVec(
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
     @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
@@ -97,7 +97,8 @@ data class LorenzVec(
     @Deprecated("Use operator fun minus instead", ReplaceWith("this - other"))
     fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
 
-    fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
+    fun normalize(): LorenzVec = length().let { LorenzVec(x / it, y / it, z / it) }
+    fun normalized(): LorenzVec = normalize()
 
     fun inverse() = LorenzVec(1.0 / x, 1.0 / y, 1.0 / z)
 
