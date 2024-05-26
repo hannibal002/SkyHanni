@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.item.ItemStack
@@ -50,9 +50,14 @@ object ChocolateFactoryDataLoader {
         "chocolate.multiplier",
         "§7Total Multiplier: §6(?<amount>[\\d.]+)x"
     )
+
+    /**
+     * REGEX-TEST: §7You are §8#§b114
+     * REGEX-TEST: §7§7You are §8#§b5,139 §7in all-time Chocolate.
+     */
     private val leaderboardPlacePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.place",
-        "§7You are §8#§b(?<position>[\\d,]+)"
+        "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time Chocolate\\.)?"
     )
     private val leaderboardPercentilePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.percentile",
@@ -90,11 +95,9 @@ object ChocolateFactoryDataLoader {
         "rabbit.unemployed",
         "Rabbit \\w+ - Unemployed"
     )
-
-    // todo get coach jackrabbit when prestige 4
     private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "other.upgrade",
-        "Rabbit Shrine"
+        "Rabbit Shrine|Coach Jackrabbit"
     )
 
     @SubscribeEvent
@@ -127,20 +130,20 @@ object ChocolateFactoryDataLoader {
 
         val chocolateItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.infoIndex) ?: return
         val prestigeItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.prestigeIndex) ?: return
+        val timeTowerItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.timeTowerIndex) ?: return
         val productionInfoItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.productionInfoIndex) ?: return
         val leaderboardItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.leaderboardIndex) ?: return
         val barnItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.barnIndex) ?: return
-        val timeTowerItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.timeTowerIndex) ?: return
 
         ChocolateFactoryAPI.factoryUpgrades = emptyList()
 
         processChocolateItem(chocolateItem)
         val list = mutableListOf<ChocolateFactoryUpgrade>()
         processPrestigeItem(list, prestigeItem)
+        processTimeTowerItem(timeTowerItem)
         processProductionItem(productionInfoItem)
         processLeaderboardItem(leaderboardItem)
         processBarnItem(barnItem)
-        processTimeTowerItem(timeTowerItem)
 
         profileStorage.rawChocPerSecond =
             (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
@@ -359,7 +362,8 @@ object ChocolateFactoryDataLoader {
         val profileStorage = profileStorage ?: return
 
         // removing time tower here as people like to determine when to buy it themselves
-        val notMaxed = list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex }
+        val notMaxed =
+            list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt?.toMillis() ?: 0

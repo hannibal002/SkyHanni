@@ -10,15 +10,16 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.hasGroup
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -41,7 +42,7 @@ object InquisitorWaypointShare {
      */
     private val partyOnlyCoordsPattern by patternGroup.pattern(
         "party.onlycoords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+),? y: (?<y>[^ ]+),? z: (?<z>[^ ]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
 
     //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
@@ -170,11 +171,13 @@ object InquisitorWaypointShare {
             sendInquisitor()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message =
-                "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
-            ChatUtils.clickableChat(message, onClick = {
-                sendInquisitor()
-            })
+            val message = "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+            ChatUtils.clickableChat(
+                message, onClick = {
+                    sendInquisitor()
+                },
+                oneTimeClick = true
+            )
         }
     }
 
@@ -209,7 +212,7 @@ object InquisitorWaypointShare {
             return
         }
         inquisitor = -1
-        ChatUtils.sendCommandToServer("pc Inquisitor dead!")
+        HypixelCommands.partyChat("Inquisitor dead!")
     }
 
     fun sendInquisitor() {
@@ -236,7 +239,7 @@ object InquisitorWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        ChatUtils.sendCommandToServer("pc x: $x, y: $y, z: $z ")
+        HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)

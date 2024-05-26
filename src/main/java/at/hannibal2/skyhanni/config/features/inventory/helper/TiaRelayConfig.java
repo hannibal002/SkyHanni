@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class TiaRelayConfig {
 
     @Expose
-    @ConfigOption(name = "Sound Puzzle Helper", desc = "Helps with solving the sound puzzle for Tia (The 9 Operator Chips to do maintainance for the Abiphone Network).")
+    @ConfigOption(name = "Sound Puzzle Helper", desc = "Helps with solving the sound puzzle for Tia (The 9 Operator Chips to do maintenance for the Abiphone Network).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean soundHelper = true;

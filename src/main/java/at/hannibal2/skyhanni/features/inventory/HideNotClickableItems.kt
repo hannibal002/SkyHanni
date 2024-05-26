@@ -31,12 +31,12 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -135,7 +135,7 @@ class HideNotClickableItems {
                 ChatUtils.error("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
-                if (config.itemsBypass) {
+                if (config.itemsBypass && !hideReason.contains("SkyBlock Menu")) {
                     event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
                 }
             }
@@ -440,7 +440,7 @@ class HideNotClickableItems {
             return true
         }
 
-        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy") return false
+        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy" || stack.cleanName() == "Dark Candy") return false
 
         hideReason = "This item is not a spooky candy!"
         return true

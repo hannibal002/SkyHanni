@@ -12,9 +12,10 @@ import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigi
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
@@ -113,7 +114,9 @@ enum class ScoreboardEvents(
     SPOOKY(
         ::getSpookyLines,
         ::getSpookyShowWhen,
-        "§7(All Spooky Event Lines)"
+        "§6Spooky Festival§f 50:54\n" +
+            "§7Your Candy:\n" +
+            "§a1 Green§7, §50 Purple §7(§61 §7pts.)"
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
@@ -384,6 +387,12 @@ private fun getTablistEvent(): String? =
 
 private fun getActiveEventLine(): List<String> {
     val currentActiveEvent = getTablistEvent() ?: return emptyList()
+
+    // Some Active Events are better not shown from the tablist,
+    // but from other locations like the scoreboard
+    val blockedEvents = listOf("Spooky Festival")
+    if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
+
     val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
         ?.let {
             SbPattern.eventTimeEndsPattern.matchMatcher(it) {
@@ -503,6 +512,8 @@ private fun getRiftLines() = getSbLines().filter { line ->
         || SbPattern.timeLeftPattern.matches(line)
         || SbPattern.riftHotdogEatenPattern.matches(line)
         || SbPattern.riftAveikxPattern.matches(line)
+        || SbPattern.riftHayEatenPattern.matches(line)
+        || SbPattern.cluesPattern.matches(line)
 }
 
 private fun getEssenceLines(): List<String> = listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
