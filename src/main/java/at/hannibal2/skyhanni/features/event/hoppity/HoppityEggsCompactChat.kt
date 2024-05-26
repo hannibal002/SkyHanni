@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggTyp
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
