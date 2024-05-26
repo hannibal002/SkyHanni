@@ -45,7 +45,10 @@ object WhereWillIBe {
         var lastUsedMillis = SimpleTimeMark.now().toMillis()
         var lastIsland = IslandType.NONE
         var chosenIsland = IslandType.NONE
-        ChatUtils.chat("§aYour future servers:", false)
+        ChatUtils.chat(
+            "§aYour future servers:",
+            false
+        )
         repeat(Random.nextInt(2, 11)) {
             val chosenIslands =
                 if (Random.nextBoolean())
@@ -66,11 +69,16 @@ object WhereWillIBe {
             lastIsland = chosenIsland
             if (chosenIsland in onceOnlyIslands)
                 islandsAsList.remove(chosenIsland)
-            val randomServerID = "${miniOrMega(chosenIsland)}${randServerNumber()}${oneOrTwoLetters()}"
             val randomIsland = "SkyBlock (${chosenIsland.displayName})"
-            ChatUtils.chat("§e${formattedDate(Date(randomMillis))} - $randomServerID - $randomIsland", false)
+            ChatUtils.chat(
+                "§e${formattedDate(Date(randomMillis))} - ${randomServerID(chosenIsland)} - $randomIsland",
+                false
+            )
         }
     }
+
+    private fun randomServerID(chosenIsland: IslandType): String =
+        "${miniOrMega(chosenIsland)}${randServerNumber()}${oneOrTwoLetters()}"
 
     private fun miniOrMega(chosenIsland: IslandType): String =
         if (chosenIsland == IslandType.HUB)
