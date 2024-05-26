@@ -111,24 +111,21 @@ class MobHighlight {
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock || !config.lineToArachne) return
 
-        arachne?.let {
-            if (it.isDead || it.health <= 0) {
-                arachne = null
-                return
-            }
-
-            if (it.distanceToPlayer() > 10) {
-                return
-            }
-
-            event.draw3DLine(
-                event.exactPlayerEyeLocation(),
-                it.getLorenzVec().add(y = 1),
-                LorenzColor.RED.toColor(),
-                5,
-                true
-            )
+        val arachne = arachne ?: return
+        if (arachne.isDead || arachne.health <= 0) {
+            this.arachne = null
+            return
         }
+
+        if (arachne.distanceToPlayer() > 10) return
+
+        event.draw3DLine(
+            event.exactPlayerEyeLocation(),
+            arachne.getLorenzVec().add(y = 1),
+            LorenzColor.RED.toColor(),
+            5,
+            true
+        )
     }
 
     @SubscribeEvent
