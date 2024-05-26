@@ -12,13 +12,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class FishingTimer {
@@ -28,7 +30,7 @@ class FishingTimer {
 
     private var rightLocation = false
     private var currentCount = 0
-    private var startTime = 0L
+    private var startTime = SimpleTimeMark.farPast()
     private var inHollows = false
 
     @SubscribeEvent
@@ -45,16 +47,16 @@ class FishingTimer {
         if (event.isMod(5)) checkMobs()
         if (event.isMod(7)) tryPlaySound()
         if (config.manualResetTimer.isKeyHeld() && Minecraft.getMinecraft().currentScreen == null) {
-            startTime = System.currentTimeMillis()
+            startTime = SimpleTimeMark.now()
         }
     }
 
     private fun tryPlaySound() {
         if (currentCount == 0) return
 
-        val duration = System.currentTimeMillis() - startTime
-        val barnTimerAlertTime = config.alertTime * 1_000
-        if (duration > barnTimerAlertTime && duration < barnTimerAlertTime + 3_000) {
+        val passedSince = startTime.passedSince()
+        val barnTimerAlertTime = (config.alertTime * 1_000).milliseconds
+        if (passedSince in barnTimerAlertTime..(barnTimerAlertTime + 3.seconds)) {
             SoundUtils.playBeepSound()
         }
     }
@@ -63,12 +65,12 @@ class FishingTimer {
         val newCount = countMobs()
 
         if (currentCount == 0 && newCount > 0) {
-            startTime = System.currentTimeMillis()
+            startTime = SimpleTimeMark.now()
         }
 
         currentCount = newCount
         if (newCount == 0) {
-            startTime = 0
+            startTime = SimpleTimeMark.farPast()
         }
 
         if (inHollows && newCount >= 60 && config.wormLimitAlert) {
@@ -109,10 +111,10 @@ class FishingTimer {
         if (currentCount == 0) return
         if (!FishingAPI.isFishing()) return
 
-        val duration = System.currentTimeMillis() - startTime
-        val barnTimerAlertTime = config.alertTime * 1_000
-        val color = if (duration > barnTimerAlertTime) "§c" else "§e"
-        val timeFormat = TimeUtils.formatDuration(duration, biggestUnit = TimeUnit.MINUTE)
+        val passedSince = startTime.passedSince()
+        val barnTimerAlertTime = (config.alertTime * 1_000).milliseconds
+        val color = if (passedSince > barnTimerAlertTime) "§c" else "§e"
+        val timeFormat = passedSince.format(TimeUnit.MINUTE)
         val name = StringUtils.pluralize(currentCount, "sea creature")
         val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
 
