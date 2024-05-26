@@ -15,7 +15,7 @@ public class ArrowTrailConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Hide Nonplayer Arrows", desc = "Only shows for arrows the player has shot.")
+    @ConfigOption(name = "Hide Non-player Arrows", desc = "Only shows for arrows the player has shot.")
     @ConfigEditorBoolean
     public boolean hideOtherArrows = true;
 
