@@ -352,8 +352,10 @@ object LorenzUtils {
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
      */
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
     fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun inAdvancedMiningIsland() =

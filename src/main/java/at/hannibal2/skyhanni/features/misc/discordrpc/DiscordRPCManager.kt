@@ -85,8 +85,8 @@ object DiscordRPCManager : IPCListener {
             logger.warn("Failed to connect to RPC!", ex)
             ChatUtils.clickableChat(
                 "Discord Rich Presence was unable to start! " +
-                            "This usually happens when you join SkyBlock when Discord is not started. " +
-                            "Please run /shrpcstart to retry once you have launched Discord.",
+                    "This usually happens when you join SkyBlock when Discord is not started. " +
+                    "Please run /shrpcstart to retry once you have launched Discord.",
                 onClick = {
                     startCommand()
                 }
@@ -164,7 +164,7 @@ object DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        // the mod has already started the connection process. this variable is my way of running a function when
+        // The mod has already started the connection process. This variable is my way of running a function when
         // the player joins SkyBlock but only running it again once they join and leave.
         if (started || !isEnabled()) return
         if (LorenzUtils.inSkyBlock) {
