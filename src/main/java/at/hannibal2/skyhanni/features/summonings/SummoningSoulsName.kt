@@ -29,8 +29,8 @@ class SummoningSoulsName {
             "NjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ"
 
     private val souls = mutableMapOf<EntityArmorStand, String>()
-    private val mobsLastLocation = TimeLimitedCache<EntityLiving, LorenzVec>(6.minutes)
-    private val mobsName = TimeLimitedCache<EntityLiving, String>(6.minutes)
+    private val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
+    private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -47,7 +47,7 @@ class SummoningSoulsName {
             if (entity.hasSkullTexture(texture)) {
                 val soulLocation = entity.getLorenzVec()
 
-                val map = mutableMapOf<EntityLiving, Double>()
+                val map = mutableMapOf<Int, Double>()
                 for ((mob, loc) in mobsLastLocation) {
                     val distance = loc.distance(soulLocation)
                     map[mob] = distance
@@ -61,10 +61,11 @@ class SummoningSoulsName {
         }
 
         for (entity in EntityUtils.getEntities<EntityLiving>()) {
+            val id = entity.entityId
             val consumer = entity.getNameTagWith(2, "§c❤")
             if (consumer != null && !consumer.name.contains("§e0")) {
-                mobsLastLocation.put(entity, entity.getLorenzVec())
-                mobsName.put(entity, consumer.name)
+                mobsLastLocation.put(id, entity.getLorenzVec())
+                mobsName.put(id, consumer.name)
             }
         }
 

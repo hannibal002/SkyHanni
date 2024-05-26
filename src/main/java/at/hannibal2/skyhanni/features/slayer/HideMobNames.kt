@@ -15,8 +15,8 @@ import kotlin.time.Duration.Companion.minutes
 
 class HideMobNames {
 
-    private val lastMobName = TimeLimitedCache<EntityArmorStand, String>(2.minutes)
-    private val mobNamesHidden = mutableListOf<EntityArmorStand>()
+    private val lastMobName = TimeLimitedCache<Int, String>(2.minutes)
+    private val mobNamesHidden = mutableListOf<Int>()
     private val patterns = mutableListOf<Pattern>()
 
     init {
@@ -58,19 +58,20 @@ class HideMobNames {
         if (!entity.hasCustomName()) return
 
         val name = entity.name
-        if (lastMobName.getOrNull(entity) == name) {
-            if (entity in mobNamesHidden) {
+        val id = entity.entityId
+        if (lastMobName.getOrNull(id) == name) {
+            if (id in mobNamesHidden) {
                 event.isCanceled = true
             }
             return
         }
 
-        lastMobName.put(entity, name)
-        mobNamesHidden.remove(entity)
+        lastMobName.put(id, name)
+        mobNamesHidden.remove(id)
 
         if (shouldNameBeHidden(name)) {
             event.isCanceled = true
-            mobNamesHidden.add(entity)
+            mobNamesHidden.add(id)
         }
     }
 
