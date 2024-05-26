@@ -15,10 +15,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 object TalbotTheodoliteSolver {
 
@@ -125,52 +123,7 @@ object TalbotTheodoliteSolver {
         return list
     }
 
-    data class SkyHanniCircle(val center: LorenzVec, val radius: Double, val normal: LorenzVec = LorenzVec(0, 1, 0)) {
-
-        fun intersect(other: SkyHanniCircle): List<LorenzVec> {
-            // Ensure circles are in parallel planes (same Y)
-            require(center.y == other.center.y) { "Circles must be in parallel planes." }
-
-            // Distance between circle centers in the XZ plane
-            val dCenterXZ = center.distance(other.center)
-
-            // Check if circles intersect
-            if (dCenterXZ > radius + other.radius) {
-                return emptyList() // Circles too far apart
-            }
-            if (dCenterXZ < abs(radius - other.radius)) {
-                return emptyList() // One circle is inside the other
-            }
-
-            // Special case: Circles are identical
-            if (dCenterXZ == 0.0 && radius == other.radius) {
-                return listOf(center) // Infinite intersection points
-            }
-
-            // Find the midpoint between the circle centers (in XZ)
-            val midpointXZ = LorenzVec(
-                (center.x + other.center.x) / 2,
-                center.y, // Use the common y-coordinate
-                (center.z + other.center.z) / 2
-            )
-
-            // Calculate the distance from the midpoint to an intersection point (in XZ)
-            val dMidpointToIntersection = sqrt(radius * radius - (dCenterXZ / 2) * (dCenterXZ / 2))
-
-            // Find the unit vector from the first center to the second (in XZ)
-            val unitVectorCenterToCenter = other.center.minus(center).normalize()
-
-            // Rotate unit vector by 90 degrees to get a vector perpendicular to it (in XZ)
-            val perpendicularUnitVector = LorenzVec(-unitVectorCenterToCenter.z, 0.0, unitVectorCenterToCenter.x)
-
-            // Calculate the two intersection points (in XZ)
-            val intersection1XZ = midpointXZ.plus(perpendicularUnitVector.times(dMidpointToIntersection))
-            val intersection2XZ = midpointXZ.minus(perpendicularUnitVector.times(dMidpointToIntersection))
-
-            // Add back the y-coordinate to get the final 3D intersection points
-            return listOf(intersection1XZ.copy(y = center.y), intersection2XZ.copy(y = center.y))
-        }
-    }
+    data class SkyHanniCircle(val center: LorenzVec, val radius: Double, val normal: LorenzVec = LorenzVec(0, 1, 0))
 
     infix fun LorenzVec.dot(other: LorenzVec): Double {
         return this.x * other.x + this.y * other.y + this.z * other.z
