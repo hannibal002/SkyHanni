@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -174,7 +173,7 @@ object TrevorFeatures {
             event.chatComponent.siblings.forEach { sibling ->
                 if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
-                    lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
+                    lastChatPrompt = sibling.chatStyle.chatClickEvent.value.substringAfter(" ")
                 }
             }
         }
@@ -293,7 +292,7 @@ object TrevorFeatures {
             val timeSince = lastChatPromptTime.passedSince()
             if (timeSince > 200.milliseconds && timeSince < 5.seconds) {
                 lastChatPromptTime = SimpleTimeMark.farPast()
-                ChatUtils.sendCommandToServer(lastChatPrompt)
+                HypixelCommands.chatPrompt(lastChatPrompt)
                 lastChatPrompt = ""
                 timeLastWarped = SimpleTimeMark.now()
                 return
