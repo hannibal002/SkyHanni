@@ -681,7 +681,7 @@ class SkyHanniMod {
         loadModule(HoppityEggDisplayManager)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
-        loadModule(MarkedPlayerManager())
+        loadModule(MarkedPlayerManager)
         loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
         loadModule(HighlightDungeonDeathmite())
