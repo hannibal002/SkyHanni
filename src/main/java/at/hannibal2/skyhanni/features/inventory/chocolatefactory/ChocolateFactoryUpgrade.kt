@@ -41,14 +41,15 @@ data class ChocolateFactoryUpgrade(
             isMaxed -> "§a✔"
 
             isRabbit -> when (level) {
-                in (0..9) -> "$level"
-                in (10..74) -> "§a$level"
-                in (75..124) -> "§9$level"
-                in (125..174) -> "§5$level"
-                in (175..199) -> "§6$level"
-                200 -> "§d$level"
-                else -> "§c$level"
-            }
+                in (0..9) -> ""
+                in (10..74) -> "§a"
+                in (75..124) -> "§9"
+                in (125..174) -> "§5"
+                in (175..199) -> "§6"
+                in (200..219) -> "§d"
+                in (220..225) -> "§b"
+                else -> "§c"
+            } + level
 
             else -> "$level"
         }
