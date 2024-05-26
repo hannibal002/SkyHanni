@@ -202,17 +202,17 @@ class SoopyGuessBurrow {
                         val xOff = dist * sin(y)
                         val zOff = dist * cos(y)
 
-                        val dencity = 5
+                        val density = 5
 
-                        for (o in 0..dencity) {
-                            lastPos[0] += xOff / dencity
-                            lastPos[2] += zOff / dencity
+                        for (o in 0..density) {
+                            lastPos[0] += xOff / density
+                            lastPos[2] += zOff / density
 
-                            lastPos[1] += ySpeed * dist / dencity
-                            lastPos2[1] += ySpeed * dist / dencity
+                            lastPos[1] += ySpeed * dist / density
+                            lastPos2[1] += ySpeed * dist / density
 
-                            lastPos2[0] -= xOff / dencity
-                            lastPos2[2] -= zOff / dencity
+                            lastPos2[0] -= xOff / density
+                            lastPos2[2] -= zOff / density
 
                             pr1.add(lastPos.toLorenzVec())
                             pr2.add(lastPos2.toLorenzVec())

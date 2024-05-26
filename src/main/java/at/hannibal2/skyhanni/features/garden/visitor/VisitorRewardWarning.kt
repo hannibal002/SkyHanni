@@ -52,7 +52,7 @@ class VisitorRewardWarning {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         val stack = event.slot?.stack ?: return
 
@@ -68,7 +68,7 @@ class VisitorRewardWarning {
             return
         }
 
-        // all but shift clicktypes work for accepting visitor
+        // all but shift click types work for accepting visitor
         if (event.clickTypeEnum == GuiContainerEvent.ClickType.SHIFT) return
         if (isRefuseSlot) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")

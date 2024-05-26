@@ -45,6 +45,16 @@ public class CombatConfig {
     public EnderNodeConfig enderNodeTracker = new EnderNodeConfig();
 
     @Expose
+    @ConfigOption(name = "Ferocity Display", desc = "")
+    @Accordion
+    public FerocityDisplayConfig ferocityDisplay = new FerocityDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Flare", desc = "")
+    @Accordion
+    public FlareConfig flare = new FlareConfig();
+
+    @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle

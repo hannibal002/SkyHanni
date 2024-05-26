@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.items
+package at.hannibal2.skyhanni.features.inventory.auctionhouse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -31,7 +31,7 @@ class AuctionHouseCopyUnderbidPrice {
     )
     private val allowedInventoriesPattern by patternGroup.pattern(
         "allowedinventories",
-        "(?:Auctions Browser|Manage Auctions|Auctions: \".*\"?)"
+        "Auctions Browser|Manage Auctions|Auctions: \".*\"?"
     )
 
     @SubscribeEvent

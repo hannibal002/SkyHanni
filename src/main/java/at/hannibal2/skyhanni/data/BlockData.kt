@@ -10,7 +10,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 class BlockData {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onBlockReceivePacket(event: PacketEvent.ReceiveEvent) {
+
         @Suppress("USELESS_ELVIS")
         val packet = event.packet ?: return
 

@@ -14,4 +14,8 @@ enum class SlayerType(val displayName: String, val rngName: String, val clazz: C
     INFERNO("Inferno Demonlord", "inferno", EntityBlaze::class.java),
     VAMPIRE("Riftstalker Bloodfiend", "vampire", EntityZombie::class.java)
     ;
+
+    companion object {
+        fun getByName(name: String): SlayerType? = entries.firstOrNull {name.contains(it.displayName)}
+    }
 }
