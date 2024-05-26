@@ -216,7 +216,7 @@ class ConfigManager {
         }
     }
 
-    // Some position elements dont need config links as they dont have a config option.
+    // Some position elements don't need config links as they don't have a config option.
     private val ignoredMissingConfigLinks = listOf(
         // commands
         "features.garden.GardenConfig.cropSpeedMeterPos",
@@ -225,6 +225,7 @@ class ConfigManager {
 
         // debug features
         "features.dev.DebugConfig.trackSoundPosition",
+        "features.dev.DebugConfig.trackParticlePosition",
         "features.dev.DevConfig.debugPos",
         "features.dev.DevConfig.debugLocationPos",
         "features.dev.DevConfig.debugItemPos",
@@ -292,7 +293,7 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             e.printStackTrace()
-                            LorenzUtils.shutdownMinecraft("Config is corrupt inside developement enviroment.")
+                            LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
                         }
                     } else {
                         run()
@@ -304,7 +305,7 @@ class ConfigManager {
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
                 e.printStackTrace()
-                val backupFile = file.resolveSibling("$fileName-${System.currentTimeMillis()}-backup.json")
+                val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
                 logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
                 logger.log("Exception was $e")
                 try {
