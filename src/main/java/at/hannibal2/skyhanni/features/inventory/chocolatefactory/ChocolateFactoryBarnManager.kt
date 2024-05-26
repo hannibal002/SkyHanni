@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 object ChocolateFactoryBarnManager {
 
     private val config get() = ChocolateFactoryAPI.config
-    private val eventConfig get() = HoppityEggsManager.config
+    private val hoppityConfig get() = HoppityEggsManager.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private val newRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
@@ -55,7 +55,7 @@ object ChocolateFactoryBarnManager {
         rabbitDuplicatePattern.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
             val amount = group("amount").formatLong()
-            if (config.showDuplicateTime && !eventConfig.compactChat) {
+            if (config.showDuplicateTime && !hoppityConfig.compactChat) {
                 val format = ChocolateFactoryAPI.timeUntilNeed(amount).format(maxUnits = 2)
                 DelayedRun.runNextTick {
                     ChatUtils.chat("§7(§a+§b$format §aof production§7)")
