@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -66,6 +67,13 @@ class HypixelData {
         private val playerAmountGuestingPattern by patternGroup.pattern(
             "playeramount.guesting",
             "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        /**
+         * REGEX-TEST:           §r§b§lParty §r§f(4)
+         */
+        private val dungeonPartyAmountPattern by patternGroup.pattern(
+            "playeramount.dungeonparty",
+            "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
         )
         private val soloProfileAmountPattern by patternGroup.pattern(
             "solo.profile.amount",
@@ -159,11 +167,14 @@ class HypixelData {
 
         fun getPlayersOnCurrentServer(): Int {
             var amount = 0
-            val playerPatternList = listOf(
+            val playerPatternList = mutableListOf(
                 playerAmountPattern,
                 playerAmountCoopPattern,
-                playerAmountGuestingPattern
+                playerAmountGuestingPattern,
             )
+            if (DungeonAPI.inDungeon()) {
+                playerPatternList.add(dungeonPartyAmountPattern)
+            }
 
             out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
