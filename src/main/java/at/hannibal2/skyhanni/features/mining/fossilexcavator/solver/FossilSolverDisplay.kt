@@ -184,7 +184,7 @@ object FossilSolverDisplay {
         if (!isEnabled()) return
 
         if (inExcavatorMenu) {
-            // render here so they can move it around. As if you press key while doing the excavator you lose the scrap
+            // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
             config.position.renderString("§eExcavator solver gui", posLabel = "Fossil Excavator Solver")
             return
         }

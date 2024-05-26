@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import kotlin.time.Duration
 
-class TimeLimitedSet<T>(
+class TimeLimitedSet<T: Any>(
     expireAfterWrite: Duration,
     private val removalListener: (T) -> Unit = {},
 ) {

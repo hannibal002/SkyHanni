@@ -216,7 +216,7 @@ class ConfigManager {
         }
     }
 
-    // Some position elements dont need config links as they dont have a config option.
+    // Some position elements don't need config links as they don't have a config option.
     private val ignoredMissingConfigLinks = listOf(
         // commands
         "features.garden.GardenConfig.cropSpeedMeterPos",
@@ -292,7 +292,7 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             e.printStackTrace()
-                            LorenzUtils.shutdownMinecraft("Config is corrupt inside developement enviroment.")
+                            LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
                         }
                     } else {
                         run()
