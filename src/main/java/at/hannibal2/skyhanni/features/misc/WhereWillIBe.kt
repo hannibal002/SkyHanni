@@ -32,10 +32,10 @@ object WhereWillIBe {
         repeat(Random.nextInt(2, 11)) {
             val chosenIslands = if (Random.nextBoolean()) islandsAsList.filter { it !in privateOrGuest } else islandsAsList
             val randomMillis = Random.nextLong(lastUsedMillis, lastUsedMillis + Random.nextLong(10000, 2.0.pow(26).toLong()))
-            lastUsedMillis = randomMillis // make sure all timestamps are advancing forward
+            lastUsedMillis = randomMillis
             while (chosenIsland == lastIsland) chosenIsland = chosenIslands.shuffled().first()
             lastIsland = chosenIsland
-            if (chosenIsland in onceOnlyIslands) islandsAsList.remove(chosenIsland) // prevent islands from appearing more than once
+            if (chosenIsland in onceOnlyIslands) islandsAsList.remove(chosenIsland)
             val serverType = if (chosenIsland == IslandType.HUB) listOf("mini", "mega").random() else "mini"
             val randInt = if (serverType == "mini") Random.nextInt(10, 100) else Random.nextInt(10, 401)
             val randLetter = if (Random.nextBoolean()) "${('A'..'Z').random()}" else "${('A'..'Z').random()}${('A'..'Z').random()}"
