@@ -16,11 +16,12 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class ComposterDisplay {
@@ -84,7 +85,7 @@ class ComposterDisplay {
 
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
-            GardenAPI.storage?.composterEmptyTime = System.currentTimeMillis() + emptyTime.inWholeMilliseconds
+            GardenAPI.storage?.composterEmptyTime = (SimpleTimeMark.now() + emptyTime).toMillis()
             val format = emptyTime.format()
             listOf(bucket, "§b$format")
         } else {
@@ -159,13 +160,14 @@ class ComposterDisplay {
 
     private fun checkWarningsAndOutsideGarden() {
         val format = GardenAPI.storage?.let {
-            if (it.composterEmptyTime != 0L) {
-                val duration = it.composterEmptyTime - System.currentTimeMillis()
-                if (duration > 0) {
-                    if (duration < 1000 * 60 * 20) {
+            val composterEmpty = SimpleTimeMark(it.composterEmptyTime)
+            if (!composterEmpty.isFarPast()) {
+                val timeUntilEmpty = composterEmpty.timeUntil()
+                if (timeUntilEmpty.isPositive()) {
+                    if (timeUntilEmpty < 20.minutes) {
                         warn("Your composter in the garden is almost empty!")
                     }
-                    TimeUtils.formatDuration(duration, maxUnits = 3)
+                    timeUntilEmpty.format(maxUnits = 3)
                 } else {
                     warn("Your composter is empty!")
                     "§cComposter is empty!"

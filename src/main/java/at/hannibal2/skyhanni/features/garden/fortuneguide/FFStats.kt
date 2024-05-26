@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI.Companion.getItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
@@ -22,7 +23,7 @@ object FFStats {
 
     private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
-    var cakeExpireTime = 0L
+    var cakeExpireTime = SimpleTimeMark.farPast()
 
     val necklaceFF = mutableMapOf<FFTypes, Double>()
     val cloakFF = mutableMapOf<FFTypes, Double>()
@@ -50,7 +51,8 @@ object FFStats {
     val cropPage = mutableMapOf<FortuneStats, Pair<Double, Double>>()
 
     fun loadFFData() {
-        cakeExpireTime = GardenAPI.storage?.fortune?.cakeExpiring ?: -1L
+        val cakeExpiryMillis = GardenAPI.storage?.fortune?.cakeExpiring ?: 0
+        cakeExpireTime = SimpleTimeMark(cakeExpiryMillis)
 
         getEquipmentFFData(FarmingItems.NECKLACE.getItem(), necklaceFF)
         getEquipmentFFData(FarmingItems.CLOAK.getItem(), cloakFF)
@@ -197,7 +199,7 @@ object FFStats {
         out[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
         out[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
         out[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
-        if (cakeExpireTime - System.currentTimeMillis() > 0 || cakeExpireTime == -1L) {
+        if (cakeExpireTime.isInFuture() || cakeExpireTime.isFarPast()) {
             out[FFTypes.CAKE] = 5.0
         } else {
             out[FFTypes.CAKE] = 0.0

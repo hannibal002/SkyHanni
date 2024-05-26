@@ -17,13 +17,14 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
+import kotlin.time.Duration.Companion.milliseconds
 
-class KingTalismanHelper {
+object KingTalismanHelper {
 
     private val config get() = SkyHanniMod.feature.mining.kingTalisman
     private val storage get() = ProfileStorageData.profileSpecific?.mining
@@ -33,22 +34,19 @@ class KingTalismanHelper {
         "§6§lKing (?<name>.*)"
     )
 
-    companion object {
+    private var currentOffset: Int? = null
+    private var skyblockYear = 0
 
-        private var currentOffset: Int? = null
-        private var skyblockYear = 0
-
-        private fun getCurrentOffset(): Int? {
-            if (SkyBlockTime.now().year != skyblockYear) {
-                return null
-            }
-            return currentOffset
+    private fun getCurrentOffset(): Int? {
+        if (SkyBlockTime.now().year != skyblockYear) {
+            return null
         }
+        return currentOffset
+    }
 
-        fun kingFix() {
-            currentOffset = null
-            ChatUtils.chat("Reset internal offset of King Talisman Helper.")
-        }
+    fun kingFix() {
+        currentOffset = null
+        ChatUtils.chat("Reset internal offset of King Talisman Helper.")
     }
 
     private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
@@ -92,7 +90,7 @@ class KingTalismanHelper {
 
     private fun checkOffset() {
         val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
-            .filter { it.name.startsWith("§6§lKing ") }.firstOrNull() ?: return
+            .firstOrNull { it.name.startsWith("§6§lKing ") } ?: return
         val foundKing = kingPattern.matchMatcher(king.name) {
             group("name")
         } ?: return
@@ -141,10 +139,11 @@ class KingTalismanHelper {
                 val current = king == currentKing
 
                 val missingTimeFormat = if (current) {
-                    val time = TimeUtils.formatDuration(timeUntil - 1000 * 60 * 20 * (kingCircles.size - 1))
+                    val changedTime = timeUntil - 1000 * 60 * 20 * (kingCircles.size - 1)
+                    val time = changedTime.milliseconds.format(maxUnits = 2)
                     "§7(§b$time remaining§7)"
                 } else {
-                    val time = TimeUtils.formatDuration(timeUntil, maxUnits = 2)
+                    val time = timeUntil.milliseconds.format(maxUnits = 2)
                     "§7(§bin $time§7)"
                 }
 
@@ -165,7 +164,7 @@ class KingTalismanHelper {
         val storage = storage ?: error("profileSpecific is null")
         val kingsTalkedTo = storage.kingsTalkedTo
         val (nextKing, until) = getKingTimes().filter { it.key !in kingsTalkedTo }.sorted().firstNotNullOf { it }
-        val time = TimeUtils.formatDuration(until, maxUnits = 2)
+        val time = until.milliseconds.format(maxUnits = 2)
 
         return "§cNext missing king: §7$nextKing §7(§bin $time§7)"
     }

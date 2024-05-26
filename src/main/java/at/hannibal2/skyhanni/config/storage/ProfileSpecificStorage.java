@@ -173,7 +173,7 @@ public class ProfileSpecificStorage {
         public String displayName = "";
 
         @Expose
-        public long lastClicked = -1;
+        public long lastClicked = 0;
 
         @Override
         public String toString() {
@@ -341,7 +341,7 @@ public class ProfileSpecificStorage {
             public int plotsUnlocked = -1;
 
             @Expose
-            public long cakeExpiring = -1L;
+            public long cakeExpiring = 0;
 
             @Expose
             public boolean carrotFortune = false;

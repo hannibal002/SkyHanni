@@ -44,8 +44,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -355,8 +356,8 @@ class MinionFeatures {
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
-                val duration = System.currentTimeMillis() - lastEmptied
-                val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
+                val passedSince = SimpleTimeMark(lastEmptied).passedSince()
+                val format = passedSince.format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
                 event.drawString(location.add(y = 1.15), text, true)
             }

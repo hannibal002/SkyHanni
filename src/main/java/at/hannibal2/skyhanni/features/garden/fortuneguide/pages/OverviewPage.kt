@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 class OverviewPage : FFGuideGUI.FFGuidePage() {
 
@@ -18,7 +18,7 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
 
     // TODO display armor stats for gemstones and pesterminator
     override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        val timeUntilCakes = TimeUtils.formatDuration(FFStats.cakeExpireTime - System.currentTimeMillis())
+        val timeUntilCakes = FFStats.cakeExpireTime.timeUntil().format()
 
         GuiRenderUtils.drawFarmingBar(
             "§6Universal Farming Fortune",
@@ -57,11 +57,12 @@ class OverviewPage : FFGuideGUI.FFGuidePage() {
             FFGuideGUI.guiTop + 105, 90, mouseX, mouseY, FFGuideGUI.tooltipToDisplay
         )
 
-        line = when (FFStats.cakeExpireTime) {
-            -1L -> "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
-            else -> "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n§2Time until cake buff runs out: $timeUntilCakes"
+        line = if (FFStats.cakeExpireTime.isFarPast()) {
+            "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
+        } else {
+            "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n§2Time until cake buff runs out: $timeUntilCakes"
         }
-        if (FFStats.cakeExpireTime - System.currentTimeMillis() < 0 && FFStats.cakeExpireTime != -1L) {
+        if (FFStats.cakeExpireTime.isInPast() && !FFStats.cakeExpireTime.isFarPast()) {
             line = "§cYour cake buff has run out\nGo eat some cake!"
         }
         GuiRenderUtils.drawFarmingBar(

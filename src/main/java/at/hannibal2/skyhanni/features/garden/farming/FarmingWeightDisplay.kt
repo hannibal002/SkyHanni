@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
@@ -320,8 +320,8 @@ class FarmingWeightDisplay {
             }
 
             val timeFormat = if (weightPerSecond != -1.0) {
-                val timeTillOvertake = (weightUntilOvertake / weightPerSecond) * 1000
-                val format = TimeUtils.formatDuration(timeTillOvertake.toLong())
+                val timeTillOvertake = (weightUntilOvertake / weightPerSecond).minutes
+                val format = timeTillOvertake.format()
                 " §7(§b$format§7)"
             } else ""
 
