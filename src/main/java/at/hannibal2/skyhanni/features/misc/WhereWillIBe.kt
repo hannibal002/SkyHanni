@@ -28,9 +28,9 @@ object WhereWillIBe {
         )
     private val onceOnlyIslands =
         listOf(
+            IslandType.CATACOMBS,
             IslandType.DARK_AUCTION,
             IslandType.KUUDRA_ARENA,
-            IslandType.CATACOMBS,
             IslandType.THE_RIFT
         )
 
