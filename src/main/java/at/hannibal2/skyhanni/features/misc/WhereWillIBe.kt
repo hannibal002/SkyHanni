@@ -15,9 +15,11 @@ import kotlin.random.Random
 
 object WhereWillIBe {
     private val nonIslands = listOf(IslandType.NONE, IslandType.UNKNOWN, IslandType.MINESHAFT)
-    private val privateOrGuest = listOf(IslandType.PRIVATE_ISLAND_GUEST, IslandType.PRIVATE_ISLAND, IslandType.GARDEN_GUEST)
+    private val privateOrGuest =
+        listOf(IslandType.PRIVATE_ISLAND_GUEST, IslandType.PRIVATE_ISLAND, IslandType.GARDEN_GUEST)
     private val onceOnlyIslands =
         listOf(IslandType.DARK_AUCTION, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.THE_RIFT)
+
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.onHypixel) return
@@ -30,15 +32,18 @@ object WhereWillIBe {
         var chosenIsland = IslandType.NONE
         ChatUtils.chat("§aYour future servers:", false)
         repeat(Random.nextInt(2, 11)) {
-            val chosenIslands = if (Random.nextBoolean()) islandsAsList.filter { it !in privateOrGuest } else islandsAsList
-            val randomMillis = Random.nextLong(lastUsedMillis, lastUsedMillis + Random.nextLong(10000, 2.0.pow(26).toLong()))
+            val chosenIslands =
+                if (Random.nextBoolean()) islandsAsList.filter { it !in privateOrGuest } else islandsAsList
+            val randomMillis =
+                Random.nextLong(lastUsedMillis, lastUsedMillis + Random.nextLong(10000, 2.0.pow(26).toLong()))
             lastUsedMillis = randomMillis
             while (chosenIsland == lastIsland) chosenIsland = chosenIslands.shuffled().first()
             lastIsland = chosenIsland
             if (chosenIsland in onceOnlyIslands) islandsAsList.remove(chosenIsland)
             val serverType = if (chosenIsland == IslandType.HUB) listOf("mini", "mega").random() else "mini"
             val randInt = if (serverType == "mini") Random.nextInt(10, 100) else Random.nextInt(10, 401)
-            val randLetter = if (Random.nextBoolean()) "${('A'..'Z').random()}" else "${('A'..'Z').random()}${('A'..'Z').random()}"
+            val randLetter =
+                if (Random.nextBoolean()) "${('A'..'Z').random()}" else "${('A'..'Z').random()}${('A'..'Z').random()}"
             val randomServerID = "$serverType${randInt}$randLetter"
             val randomIsland = "SkyBlock (${chosenIsland.displayName})"
             val formatted = SimpleDateFormat("HH:mm:ss dd-MM-yy").format(Date(randomMillis))
