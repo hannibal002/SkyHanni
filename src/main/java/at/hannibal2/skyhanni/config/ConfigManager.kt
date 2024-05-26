@@ -225,6 +225,7 @@ class ConfigManager {
 
         // debug features
         "features.dev.DebugConfig.trackSoundPosition",
+        "features.dev.DebugConfig.trackParticlePosition",
         "features.dev.DevConfig.debugPos",
         "features.dev.DevConfig.debugLocationPos",
         "features.dev.DevConfig.debugItemPos",
