@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.Commands.init
+import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BitsAPI
@@ -962,7 +962,9 @@ class SkyHanniMod {
         loadModule(SkyHanniDebugsAndTests)
         loadModule(WorldEdit)
         loadModule(MobDebug())
-        init()
+
+        Commands.init()
+
         PreInitFinishedEvent().postAndCatch()
     }
 
