@@ -52,6 +52,10 @@ interface Renderable {
      */
     fun render(posX: Int, posY: Int)
 
+    fun relativeMouse(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x - posX to y - posY
+    }
+
     companion object {
 
         val logger = LorenzLogger("debug/renderable")
@@ -754,7 +758,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val lastScroll = scroll.asDouble()
-                scroll.update(isHovered(posX, posY))
+                scroll.update(isHovered(posX, posY), relativeMouse(posX, posY))
                 val newScroll = scroll.asDouble()
 
                 Gui.drawRect(4, 0, width - 4, height, Color.GRAY.darker().rgb)
