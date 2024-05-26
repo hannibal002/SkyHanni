@@ -1,45 +1,26 @@
 package at.hannibal2.skyhanni.config.features.fishing;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import io.github.notenoughupdates.moulconfig.observer.Property;
 import net.minecraft.client.Minecraft;
 
 public class LavaReplacementConfig {
 
     @Expose
-    @ConfigOption(name = "Render Type", desc = "")
-    @ConfigEditorDropdown
-    public Property<RenderType> renderType = Property.of(RenderType.COLOR);
-
-    public enum RenderType {
-        NONE("Disabled"),
-        TEXTURE("Texture"),
-        COLOR("Color")
-        ;
-
-        private final String str;
-        RenderType(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    @ConfigOption(name = "Enabled", desc = "Replace the lava texture with the water texture.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Lava Color", desc = "Color")
-    @ConfigEditorColour
-    public String color = "0:255:255:13:0";
+    @ConfigOption(name = "Only In Crimson Isle", desc = "Enable the water texture only in Crimson Isle.")
+    @ConfigEditorBoolean
+    public boolean onlyInCrimsonIsle = false;
 
-
-    @Expose
-    @ConfigOption(name = "Reload", desc = "Reload renderers\n§cMay freeze your game for a few seconds!")
+    @ConfigOption(name = "Reload", desc = "Reload renderers.\n§eUse if the lava still appear when the feature is enabled.\n§cMay freeze your game for a few seconds!")
     @ConfigEditorButton(buttonText = "RELOAD")
-    public Runnable reload = () -> Minecraft.getMinecraft().renderGlobal.loadRenderers();
+    public Runnable loadListeners = Minecraft.getMinecraft().renderGlobal::loadRenderers;
 }
