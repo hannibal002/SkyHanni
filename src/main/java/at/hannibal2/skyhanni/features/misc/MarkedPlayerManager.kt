@@ -17,7 +17,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object MarkedPlayerManager {
-    private val config get() = SkyHanniMod.feature.gui.markedPlayers
+    val config get() = SkyHanniMod.feature.gui.markedPlayers
 
     private val playerNamesToMark = mutableListOf<String>()
     private val markedPlayers = mutableMapOf<String, EntityOtherPlayerMP>()
