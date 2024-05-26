@@ -217,13 +217,13 @@ object GardenVisitorFeatures {
                         // TODO describe what this line does
                         .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
                         ?.allIngredients() ?: return
-                    val ingredientReqs = mutableMapOf<String, Int>()
+                    val requiredIngredients = mutableMapOf<String, Int>()
                     for (ingredient in ingredients) {
                         val key = ingredient.internalItemId
-                        ingredientReqs[key] = ingredientReqs.getOrDefault(key, 0) + ingredient.count.toInt()
+                        requiredIngredients[key] = requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
                     }
                     var hasIngredients = true
-                    for ((key, value) in ingredientReqs) {
+                    for ((key, value) in requiredIngredients) {
                         val sackItem = key.asInternalName().getAmountInSacks()
                         if (sackItem < value * (amount - amountInSacks)) {
                             hasIngredients = false
