@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -71,9 +72,9 @@ import at.hannibal2.skyhanni.test.command.CopyActionBarCommand
 import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -325,6 +326,10 @@ object Commands {
             "shignore",
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
+        registerCommand(
+            "shtpinfested",
+            "Teleports you to the nearest infested plot"
+        ) { PestFinder.teleportNearestInfestedPlot() }
     }
 
     private fun usersBugFix() {
@@ -471,6 +476,10 @@ object Commands {
             "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
         ) { TrackSoundsCommand.command(it) }
         registerCommand(
+            "shtrackparticles",
+            "Tracks the particles for the specified duration (in seconds) and copies it to the clipboard"
+        ) { TrackParticlesCommand.command(it) }
+        registerCommand(
             "shcopytablist",
             "Copies the tab list data to the clipboard"
         ) { TabListData.copyCommand(it) }
@@ -490,10 +499,6 @@ object Commands {
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
         ) { CopyItemCommand.command() }
-        registerCommand(
-            "shcopyparticles",
-            "Copied information about the particles that spawn in the next 50ms to the clipboard"
-        ) { CopyNearbyParticlesCommand.command(it) }
         registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.command(it) }
         registerCommand(
             "shtestmessage",

@@ -80,7 +80,7 @@ object FortuneUpgrades {
     }
 
     private fun getTalismanUpgrade() {
-        val currentTalismanTier = CropAccessoryData.cropAccessory?.ordinal ?: return
+        val currentTalismanTier = CropAccessoryData.cropAccessory.ordinal
         if (currentTalismanTier < 3) {
             val nextTalisman = CropAccessory.entries[currentTalismanTier + 1]
             genericUpgrades.add(

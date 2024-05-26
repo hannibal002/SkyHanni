@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
