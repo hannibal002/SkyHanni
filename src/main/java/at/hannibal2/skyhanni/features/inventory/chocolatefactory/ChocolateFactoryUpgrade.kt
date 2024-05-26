@@ -49,7 +49,7 @@ data class ChocolateFactoryUpgrade(
                 in (200..219) -> "§d"
                 in (220..225) -> "§b"
                 else -> "§c"
-            } + "$level"
+            } + level
 
             else -> "$level"
         }
