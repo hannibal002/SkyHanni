@@ -184,8 +184,8 @@ class SoopyGuessBurrow {
                     val pr2 = mutableListOf<LorenzVec>()
 
                     val start = slopeThing.size - 1
-                    val lastPos = locs[start].multiply(1).toDoubleArray()
-                    val lastPos2 = locs[start].multiply(1).toDoubleArray()
+                    val lastPos = locs[start].toDoubleArray()
+                    val lastPos2 = locs[start].toDoubleArray()
 
                     var distCovered = 0.0
 
