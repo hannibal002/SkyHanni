@@ -33,8 +33,10 @@ object WhereWillIBe {
         ChatUtils.chat("§aYour future servers:", false)
         repeat(Random.nextInt(2, 11)) {
             val chosenIslands =
-                if (Random.nextBoolean()) islandsAsList.filter { it !in privateOrGuest }
-                else islandsAsList
+                if (Random.nextBoolean())
+                    islandsAsList.filter { it !in privateOrGuest }
+                else
+                    islandsAsList
             val randomMillis =
                 Random.nextLong(
                     lastUsedMillis,
@@ -44,7 +46,8 @@ object WhereWillIBe {
                     )
                 )
             lastUsedMillis = randomMillis
-            while (chosenIsland == lastIsland) chosenIsland = chosenIslands.shuffled().first()
+            while (chosenIsland == lastIsland)
+                chosenIsland = chosenIslands.shuffled().first()
             lastIsland = chosenIsland
             if (chosenIsland in onceOnlyIslands)
                 islandsAsList.remove(chosenIsland)
@@ -55,16 +58,27 @@ object WhereWillIBe {
     }
 
     private fun miniOrMega(chosenIsland: IslandType): String =
-        if (chosenIsland == IslandType.HUB) listOf("mini", "mega").random()
-        else "mini"
+        if (chosenIsland == IslandType.HUB)
+            listOf("mini", "mega").random()
+        else
+            "mini"
 
     private fun randServerNumber(): Int =
-        Random.nextInt(10, 401)
+        Random.nextInt(
+            10,
+            401
+        )
 
-    private fun oneOrTwoLetters(): String =
-        if (Random.nextBoolean()) "${('A'..'Z').random()}"
-        else "${('A'..'Z').random()}${('A'..'Z').random()}"
+    private fun oneOrTwoLetters(charRange: CharRange = ('A'..'Z')): String =
+        if (Random.nextBoolean())
+            "${charRange.random()}"
+        else
+            "${charRange.random()}${charRange.random()}"
 
     private fun formattedDate(date: Date): String =
-        SimpleDateFormat("HH:mm:ss dd-MM-yy").format(date)
+        SimpleDateFormat(
+            "HH:mm:ss dd-MM-yy"
+        ).format(
+            date
+        )
 }
