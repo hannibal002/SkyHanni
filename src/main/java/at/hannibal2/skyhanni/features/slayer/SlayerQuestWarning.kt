@@ -80,7 +80,7 @@ class SlayerQuestWarning {
     }
 
     private var needSlayerQuest = false
-    private var lastWarning = 0L
+    private var lastWarning = SimpleTimeMark.farPast()
     private var currentReason = ""
 
     private fun needNewQuest(reason: String) {
@@ -95,13 +95,13 @@ class SlayerQuestWarning {
 
     private fun warn(titleMessage: String, chatMessage: String) {
         if (!config.questWarning) return
-        if (lastWarning + 10_000 > System.currentTimeMillis()) return
+        if (lastWarning.passedSince() < 10.seconds) return
 
         if (DianaAPI.isDoingDiana()) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
-
-        lastWarning = System.currentTimeMillis()
+      
+        lastWarning = SimpleTimeMark.now()
         ChatUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
@@ -128,7 +128,7 @@ class SlayerQuestWarning {
             if (slayerType != activeSlayer) {
                 val activeSlayerName = activeSlayer.displayName
                 val slayerName = slayerType.displayName
-                SlayerAPI.latestWrongAreaWarning = System.currentTimeMillis()
+                SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
                     "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
