@@ -19,7 +19,7 @@ public class HideFarEntitiesConfig {
     public int minDistance = 10;
 
     @Expose
-    @ConfigOption(name = "Max Amount", desc = "Not showing more than this amount of nearest entities.")
+    @ConfigOption(name = "Max Amount", desc = "Maximum amount of entities to be shown at one time.")
     @ConfigEditorSlider(minValue = 1, maxValue = 150, minStep = 1)
     public int maxAmount = 30;
 

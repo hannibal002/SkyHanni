@@ -25,7 +25,7 @@ public class ArrowTrailConfig {
     public String arrowColor = "0:200:85:255:85";
 
     @Expose
-    @ConfigOption(name = "Player Arrows", desc = "Different colour for the line of arrows that you have shot.")
+    @ConfigOption(name = "Player Arrows", desc = "Different colour for arrows that you have shot.")
     @ConfigEditorBoolean
     public boolean handlePlayerArrowsDifferently = false;
 

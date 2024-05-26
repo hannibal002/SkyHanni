@@ -9,13 +9,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class MatriarchHelperConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable features around the Matriarch helper.")
+    @ConfigOption(name = "Enabled", desc = "Enable Matriarch helper features.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Highlight", desc = "Highlight the pearls in a colour of your choosing.")
+    @ConfigOption(name = "Highlight", desc = "Highlight the pearls.")
     @ConfigEditorBoolean
     public boolean highlight = true;
 

@@ -31,15 +31,10 @@ import static at.hannibal2.skyhanni.config.features.combat.damageindicator.Damag
 public class DamageIndicatorConfig {
 
     @Expose
-    @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the boss' remaining health.")
+    @ConfigOption(name = "Damage Indicator Enabled", desc = "Show the bosses remaining health.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
-
-    @Expose
-    @ConfigOption(name = "Healing Chat Message", desc = "Sends a chat message when a boss heals themself.")
-    @ConfigEditorBoolean
-    public boolean healingMessage = false;
 
     @Expose
     @ConfigOption(

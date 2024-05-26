@@ -7,8 +7,8 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ComposterConfig {
     @Expose
@@ -97,7 +97,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Composter Display",
-        desc = "Displays the Composter data from the tab list as GUI element."
+        desc = "Displays the Composter data from the tab list as a GUI element."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -106,7 +106,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Outside Garden",
-        desc = "Show Time till Composter is empty outside Garden"
+        desc = "Show Time till Composter is empty outside Garden."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -115,7 +115,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Composter Warning",
-        desc = "Warn when the Composter gets close to empty, even outside Garden."
+        desc = "Warn when the Composter gets close to empty, even outside the Garden."
     )
     @ConfigEditorBoolean
     public boolean warnAlmostClose = false;

@@ -16,12 +16,12 @@ public class ShoppingListConfig {
     public boolean display = true;
 
     @Expose
-    // TODO renmae "postion"
+    // TODO rename "position"
     @ConfigLink(owner = ShoppingListConfig.class, field = "display")
     public Position pos = new Position(180, 170, false, true);
 
     @Expose
-    @ConfigOption(name = "Only when Close", desc = "Only show the shopping list when close to the visitors.")
+    @ConfigOption(name = "Only when Close", desc = "Only show the shopping list when close to visitors.")
     @ConfigEditorBoolean
     public boolean onlyWhenClose = false;
 
@@ -49,7 +49,7 @@ public class ShoppingListConfig {
     public boolean showSackCount = true;
 
     @Expose
-    @ConfigOption(name = "Show Super Craft", desc = "Show super craft button if there are enough materials to make in the sack.")
+    @ConfigOption(name = "Show Super Craft", desc = "Show the super craft button if there are enough materials in your sack.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showSuperCraft = false;

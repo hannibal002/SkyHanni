@@ -14,14 +14,14 @@ public class HideNotClickableConfig {
     public boolean items = false;
 
     @Expose
-    @ConfigOption(name = "Block Clicks", desc = "Block the clicks on these items.")
+    @ConfigOption(name = "Block Clicks", desc = "Block clicks on these items.")
     @ConfigEditorBoolean
     public boolean itemsBlockClicks = true;
 
     @Expose
     @ConfigOption(
         name = "Opacity",
-        desc = "How strong should the items be grayed out?"
+        desc = "How strong should the items be greyed out?"
     )
     @ConfigEditorSlider(
         minValue = 0,

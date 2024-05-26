@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class SeaCreatureTrackerConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Count the different sea creatures you catch.")
+    @ConfigOption(name = "Enabled", desc = "Track the different sea creatures you catch.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -21,7 +21,7 @@ public class SeaCreatureTrackerConfig {
     public Position position = new Position(20, 20, false, true);
 
     @Expose
-    @ConfigOption(name = "Show Percentage", desc = "Show percentage how often what sea creature got catched.")
+    @ConfigOption(name = "Show Percentage", desc = "Show percentage how often what sea creature got caught.")
     @ConfigEditorBoolean
     public Property<Boolean> showPercentage = Property.of(false);
 

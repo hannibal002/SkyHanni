@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CrimsonIsleConfig {
 
-    @Category(name = "Ashfang", desc = "Ashfang settings")
+    @Category(name = "Ashfang", desc = "Ashfang settings.")
     @Expose
     public AshfangConfig ashfang = new AshfangConfig();
 

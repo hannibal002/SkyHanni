@@ -71,7 +71,7 @@ public class DisplayConfig {
     public boolean showMaxIslandPlayers = true;
 
     @Expose
-    @ConfigOption(name = "Number Format", desc = "")
+    @ConfigOption(name = "Number Format", desc = "Format numbers in the scoreboard will be displayed as.")
     @ConfigEditorDropdown
     public NumberFormat numberFormat = NumberFormat.LONG;
 

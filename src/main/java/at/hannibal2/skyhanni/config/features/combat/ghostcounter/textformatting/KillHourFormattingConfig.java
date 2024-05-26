@@ -11,13 +11,13 @@ public class KillHourFormattingConfig {
     public String base = "  &6Kill/h: &b%value%";
 
     @Expose
-    @ConfigOption(name = "No Data", desc = "Start killing some ghosts !")
+    @ConfigOption(name = "No Data", desc = "Start killing some ghosts!")
     @ConfigEditorText
     public String noData = "&bN/A";
 
     @Expose
     @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
-        "when you are doing nothing for a given amount of seconds")
+        "when you are doing nothing for a given amount of seconds.")
     @ConfigEditorText
     public String paused = "&c(PAUSED)";
 }

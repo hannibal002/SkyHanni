@@ -124,7 +124,7 @@ public class TrevorTheTrapperConfig {
     public boolean trapperMobDiedMessage = true;
 
     @Expose
-    @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den. Works only inside the Farming Islands.")
+    @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den. Only works while in the Farming Islands.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warpToTrapper = false;
@@ -136,8 +136,8 @@ public class TrevorTheTrapperConfig {
     public boolean acceptQuest = false;
 
     @Expose
-    @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
-        "§eRequires the relevant above settings to be toggled")
+    @ConfigOption(name = "Trapper Keybind", desc = "Keybind to warp to Trevor's Den or to accept the quest. " +
+        "§eRequires the relevant above settings to be toggled.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindWarpTrapper = Keyboard.KEY_NONE;
 

@@ -23,7 +23,7 @@ public class GardenConfig {
     public SkyMartConfig skyMart = new SkyMartConfig();
 
     @Expose
-    @Category(name = "Visitor", desc = "Visitor Settings")
+    @Category(name = "Visitor", desc = "Visitor Settings.")
     public VisitorConfig visitors = new VisitorConfig();
 
     @Expose
@@ -32,7 +32,7 @@ public class GardenConfig {
     public NumbersConfig number = new NumbersConfig();
 
     @Expose
-    @Category(name = "Crop Milestones", desc = "Crop Milestones Settings")
+    @Category(name = "Crop Milestones", desc = "Crop Milestones Settings.")
     public CropMilestonesConfig cropMilestones = new CropMilestonesConfig();
 
     // TODO moulconfig runnable support
@@ -42,7 +42,7 @@ public class GardenConfig {
     public KeyBindConfig keyBind = new KeyBindConfig();
 
     @Expose
-    @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
+    @Category(name = "Optimal Speed", desc = "Optimal Speed Settings.")
     public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
 
     @Expose
@@ -79,7 +79,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Armour Drop Tracker", desc = "")
     @Accordion
-    // TODO renmae to armorDropTracker
+    // TODO rename to armorDropTracker
     public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose
@@ -88,11 +88,11 @@ public class GardenConfig {
     public AnitaShopConfig anitaShop = new AnitaShopConfig();
 
     @Expose
-    @Category(name = "Composter", desc = "Composter Settings")
+    @Category(name = "Composter", desc = "Composter Settings.")
     public ComposterConfig composters = new ComposterConfig();
 
     @Expose
-    @Category(name = "Pests", desc = "Pests Settings")
+    @Category(name = "Pests", desc = "Pests Settings.")
     public PestsConfig pests = new PestsConfig();
 
     @Expose
@@ -222,7 +222,7 @@ public class GardenConfig {
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 
     @Expose
-    @ConfigOption(name = "Enable Plot Borders", desc = "Enable the use of F3 + G hotkey to show Garden plot borders. Similar to how later Minecraft version render chunk borders.")
+    @ConfigOption(name = "Enable Plot Borders", desc = "Enable the use of F3 + G keybind to show Garden plot borders. Similar to how newer Minecraft version render chunk borders.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean plotBorders = true;

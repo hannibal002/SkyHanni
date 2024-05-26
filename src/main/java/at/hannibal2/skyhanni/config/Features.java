@@ -105,7 +105,7 @@ public class Features extends Config {
     // Skills
 
     @Expose
-    @Category(name = "Fishing", desc = "Fishing stuff.")
+    @Category(name = "Fishing", desc = "Features related to fishing.")
     public FishingConfig fishing = new FishingConfig();
 
     @Expose
@@ -133,7 +133,7 @@ public class Features extends Config {
     public InventoryConfig inventory = new InventoryConfig();
 
     @Expose
-    @Category(name = "Events", desc = "Stuff that is not always available.")
+    @Category(name = "Events", desc = "Features for limited time events.")
     public EventConfig event = new EventConfig();
 
     @Expose

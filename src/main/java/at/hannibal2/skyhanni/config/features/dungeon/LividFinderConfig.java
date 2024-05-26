@@ -14,7 +14,7 @@ public class LividFinderConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Hide Wrong Livids", desc = "Hide wrong livids entirely.")
+    @ConfigOption(name = "Hide Fake Livids", desc = "Hide fake livids entirely.")
     @ConfigEditorBoolean
     public boolean hideWrong = false;
 }

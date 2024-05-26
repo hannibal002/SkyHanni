@@ -126,18 +126,18 @@ public class ChocolateFactoryConfig {
     public Position position = new Position(163, 160, false, true);
 
     @Expose
-    @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate.")
+    @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactOnClick = true;
 
     @Expose
-    @ConfigOption(name = "Always Compact", desc = "Always Compact the item toolip on the chocolate. Requires the above option to be enabled.")
+    @ConfigOption(name = "Always Compact", desc = "Always Compact the item tooltip on the chocolate. Requires the above option to be enabled.")
     @ConfigEditorBoolean
     public boolean compactOnClickAlways = false;
 
     @Expose
-    @ConfigOption(name = "Tooltip Move", desc = "Move Tooltip away from the item you hover over while inside the Chocolate Factory.")
+    @ConfigOption(name = "Tooltip Move", desc = "Move tooltip away from the item you hover over while inside the Chocolate Factory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tooltipMove = false;
@@ -147,7 +147,7 @@ public class ChocolateFactoryConfig {
     public Position tooltipMovePosition = new Position(-380, 150, false, true);
 
     @Expose
-    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
+    @ConfigOption(name = "Hoppity Collection Stats", desc = "Show info about your hoppity rabbit collection.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityCollectionStats = true;

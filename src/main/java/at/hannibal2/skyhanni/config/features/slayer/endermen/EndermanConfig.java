@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.config.features.slayer.endermen;
+//TODO rename the folder to enderman
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;

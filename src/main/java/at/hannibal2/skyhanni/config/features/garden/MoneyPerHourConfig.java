@@ -29,7 +29,7 @@ public class MoneyPerHourConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only Show Top", desc = "Only show the best # items.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the highest money per hour items.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 25,

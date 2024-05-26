@@ -19,7 +19,7 @@ public class XPHourFormattingConfig {
 
     @Expose
     @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
-        "when you are doing nothing for a given amount of seconds")
+        "when you are doing nothing for a given amount of seconds.")
     @ConfigEditorText
     public String paused = "&c(PAUSED)";
 }

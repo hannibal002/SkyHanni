@@ -58,7 +58,7 @@ public class PlayerMessagesConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hide Level Brackets", desc = "Hide the gray brackets in front of and behind the level numbers.")
+    @ConfigOption(name = "Hide Level Brackets", desc = "Hide the grey brackets in front of and behind the level numbers.")
     @ConfigEditorBoolean
     public boolean hideLevelBrackets = false;
 
@@ -79,7 +79,7 @@ public class PlayerMessagesConfig {
     public boolean ignoreYouTube = false;
 
     @Expose
-    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found.")
+    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and grey out the message if any are found.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean chatFilter = false;

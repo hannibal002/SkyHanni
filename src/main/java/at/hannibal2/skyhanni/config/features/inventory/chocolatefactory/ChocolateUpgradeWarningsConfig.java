@@ -22,7 +22,7 @@ public class ChocolateUpgradeWarningsConfig {
     @Expose
     @ConfigOption(
         name = "Upgrade Warning Interval",
-        desc = "How often the warning an upgrade is available is repeated in minutes."
+        desc = "How often the warning an upgrade is available is repeated, in minutes."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 10, minStep = 0.25f)
     public float timeBetweenWarnings = 1;

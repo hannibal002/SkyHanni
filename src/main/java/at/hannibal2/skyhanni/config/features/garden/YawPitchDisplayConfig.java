@@ -49,7 +49,7 @@ public class YawPitchDisplayConfig {
     public boolean showWithoutTool = false;
 
     @Expose
-    @ConfigOption(name = "Show Outside Garden", desc = "The overlay will work outside of the Garden.")
+    @ConfigOption(name = "Show Outside Garden", desc = "The overlay will show outside of the Garden.")
     @ConfigEditorBoolean
     public boolean showOutsideGarden = false;
 

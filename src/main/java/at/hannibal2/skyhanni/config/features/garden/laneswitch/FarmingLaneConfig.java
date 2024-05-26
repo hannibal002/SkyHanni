@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class FarmingLaneConfig {
 
     @Expose
-    @ConfigOption(name = "Create Lanes", desc = "In order for those features to work, you first need to create a lane with §e/shlanedetection§7!")
+    @ConfigOption(name = "Create Lanes", desc = "In order for these features to work, you first need to create a lane with §e/shlanedetection§7!")
     @ConfigEditorInfoText(infoTitle = "Tutorial")
     public boolean tutorial = false;
 

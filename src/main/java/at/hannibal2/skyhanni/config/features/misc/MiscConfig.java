@@ -22,7 +22,7 @@ import java.util.List;
 public class MiscConfig {
 
     @Expose
-    @Category(name = "Pets", desc = "Pets Settings")
+    @Category(name = "Pets", desc = "Pets Settings.")
     public PetConfig pets = new PetConfig();
 
     @Expose

@@ -30,17 +30,17 @@ public class DiscordRPCConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "First Line", desc = "Decide what to show in the first line.")
+    @ConfigOption(name = "First Line", desc = "What will be in the first line.")
     @ConfigEditorDropdown
     public Property<LineEntry> firstLine = Property.of(NOTHING);
 
     @Expose
-    @ConfigOption(name = "Second Line", desc = "Decide what to show in the second line.")
+    @ConfigOption(name = "Second Line", desc = "What will be in the second line.")
     @ConfigEditorDropdown
     public Property<LineEntry> secondLine = Property.of(NOTHING);
 
     @Expose
-    @ConfigOption(name = "Custom", desc = "What should be displayed if you select \"Custom\" above.")
+    @ConfigOption(name = "Custom", desc = "What is displayed \"Custom\" field selected above.")
     @ConfigEditorText
     public Property<String> customText = Property.of("");
 
@@ -88,7 +88,7 @@ public class DiscordRPCConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Dynamic Fallback", desc = "What to show when none of your \"Dynamic Priority\" statuses are active.")
+    @ConfigOption(name = "Dynamic Fallback", desc = "Fallback shown when none of your \"Dynamic Priority\" statuses are active.")
     @ConfigEditorDropdown
     public Property<LineEntry> auto = Property.of(NOTHING);
 

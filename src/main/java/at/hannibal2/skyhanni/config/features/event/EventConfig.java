@@ -11,15 +11,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class EventConfig {
 
-    @Category(name = "Bingo", desc = "Monthly Bingo Event settings")
+    @Category(name = "Bingo", desc = "Monthly Bingo Event settings.")
     @Expose
     public BingoConfig bingo = new BingoConfig();
 
-    @Category(name = "Diana", desc = "Diana's Mythological Burrows")
+    @Category(name = "Diana", desc = "Diana's Mythological Burrows.")
     @Expose
     public DianaConfig diana = new DianaConfig();
 
-    @Category(name = "Winter", desc = "Winter Season on Jerry's Island")
+    @Category(name = "Winter", desc = "Winter Season on Jerry's Island.")
     @Expose
     public WinterConfig winter = new WinterConfig();
 
@@ -48,7 +48,7 @@ public class EventConfig {
     @Expose
     public CenturyConfig century = new CenturyConfig();
 
-    @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
+    @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings.")
     @Expose
     public LobbyWaypointsConfig lobbyWaypoints = new LobbyWaypointsConfig();
 

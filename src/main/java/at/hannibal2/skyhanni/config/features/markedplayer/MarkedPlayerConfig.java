@@ -20,11 +20,11 @@ public class MarkedPlayerConfig {
     public boolean highlightInChat = true;
 
     @Expose
-    @ConfigOption(name = "Mark Own Name", desc = "Mark own player name.")
+    @ConfigOption(name = "Mark Your Name", desc = "Mark your player name.")
     @ConfigEditorBoolean
     public Property<Boolean> markOwnName = Property.of(false);
 
-    @ConfigOption(name = "Marked Chat Colour", desc = "Marked Chat Colour. §eIf Chroma is gray, enable Chroma in Chroma settings.")
+    @ConfigOption(name = "Marked Chat Colour", desc = "Marked Chat Colour. §eIf Chroma is grey, enable Chroma in Chroma settings.")
     @Expose
     @ConfigEditorDropdown
     public LorenzColor chatColor = LorenzColor.YELLOW;

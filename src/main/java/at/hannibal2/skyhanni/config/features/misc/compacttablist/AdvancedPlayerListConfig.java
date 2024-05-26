@@ -71,7 +71,7 @@ public class AdvancedPlayerListConfig {
     public boolean hideLevel = false;
 
     @Expose
-    @ConfigOption(name = "Hide Level Brackets", desc = "Hide the gray brackets in front of and behind the level numbers.")
+    @ConfigOption(name = "Hide Level Brackets", desc = "Hide the grey brackets in front of and behind the level numbers.")
     @ConfigEditorBoolean
     public boolean hideLevelBrackets = false;
 
@@ -81,7 +81,7 @@ public class AdvancedPlayerListConfig {
     public boolean useLevelColorForName = false;
 
     @Expose
-    @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familar with bingo.")
+    @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon.")
     @ConfigEditorBoolean
     public boolean showBingoRankNumber = false;
 

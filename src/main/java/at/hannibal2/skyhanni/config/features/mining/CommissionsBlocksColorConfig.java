@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CommissionsBlocksColorConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Change the color of ores on mining island depending on your active commissions. Gray out irrelevant ores.")
+    @ConfigOption(name = "Enabled", desc = "Change the colour of ores on mining island depending on your active commissions. Grey out irrelevant ores.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -21,7 +21,7 @@ public class CommissionsBlocksColorConfig {
     public Property<Boolean> sneakQuickToggle = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Change the highlight color.")
+    @ConfigOption(name = "Colour", desc = "Change the highlight colour.")
     @ConfigEditorDropdown
     public Property<LorenzColor> color = Property.of(LorenzColor.GREEN);
 }

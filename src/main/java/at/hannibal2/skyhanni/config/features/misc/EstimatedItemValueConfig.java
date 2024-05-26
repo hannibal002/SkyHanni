@@ -19,12 +19,12 @@ public class EstimatedItemValueConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
+    @ConfigOption(name = "Estimated Item Keybind", desc = "Keybind to show the Estimated Item Value.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int hotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
+    @ConfigOption(name = "Show Always", desc = "Ignore the keybind and always display the item value.")
     @ConfigEditorBoolean
     public boolean alwaysEnabled = true;
 

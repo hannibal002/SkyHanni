@@ -36,7 +36,7 @@ public class EnderNodeConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Tracks all of your drops from mining Ender Nodes in the End.\n" +
-            "Also tracks drops from Endermen."
+            "Also tracks drops from Enderman."
     )
     @ConfigEditorBoolean
     @FeatureToggle

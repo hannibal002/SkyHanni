@@ -73,7 +73,7 @@ public class DianaConfig {
     @Expose
     @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
-    // TODO renmae
+    // TODO rename
     public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
 
     @Expose

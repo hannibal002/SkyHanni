@@ -96,7 +96,7 @@ public class VisitorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Accept Hotkey",
+        name = "Accept Keybind",
         desc = "Accept a visitor when you press this keybind while in the visitor GUI. " +
             "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
     )

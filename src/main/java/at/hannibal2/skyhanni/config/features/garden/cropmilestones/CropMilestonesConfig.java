@@ -148,7 +148,7 @@ public class CropMilestonesConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimals displayed in blocks/second.")
+    @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimal places displayed in blocks/second.")
     @ConfigEditorSlider(
         minValue = 0,
         maxValue = 6,
@@ -157,7 +157,7 @@ public class CropMilestonesConfig {
     public int blocksBrokenPrecision = 2;
 
     @Expose
-    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds without farming until blocks/second resets.")
+    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds without farming until blocks per second resets.")
     @ConfigEditorSlider(
         minValue = 2,
         maxValue = 60,

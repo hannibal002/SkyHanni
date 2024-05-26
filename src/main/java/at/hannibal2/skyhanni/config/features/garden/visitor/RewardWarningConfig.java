@@ -108,7 +108,7 @@ public class RewardWarningConfig {
     @Expose
     @ConfigOption(
         name = "Opacity",
-        desc = "How much the offer buttons should be grayed out when blocked."
+        desc = "How much the offer buttons should be greyed out when blocked."
     )
     @ConfigEditorSlider(
         minValue = 0,

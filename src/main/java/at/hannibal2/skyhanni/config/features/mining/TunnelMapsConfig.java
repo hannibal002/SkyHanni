@@ -30,7 +30,7 @@ public class TunnelMapsConfig {
     public boolean autoCommission = false;
 
     @Expose
-    @ConfigOption(name = "Campfire Hotkey", desc = "Hotkey to warp to the campfire, if the travel scroll is not unlocked shows a path to the campfire.")
+    @ConfigOption(name = "Campfire Keybind", desc = "Keybind to warp to the campfire, if the travel scroll is not unlocked shows a path to the campfire.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int campfireKey = Keyboard.KEY_NONE;
 
@@ -40,12 +40,12 @@ public class TunnelMapsConfig {
     public boolean travelScroll = false;
 
     @Expose
-    @ConfigOption(name = "Next Spot Hotkey", desc = "Hotkey to select the next spot.")
+    @ConfigOption(name = "Next Spot Keybind", desc = "Keybind to select the next spot.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int nextSpotHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Dynamic Path Colour", desc = "Instead of the selected color use the color of the target as line colour.")
+    @ConfigOption(name = "Dynamic Path Colour", desc = "Instead of the selected colour use the colour of the target as line colour.")
     @ConfigEditorBoolean
     public boolean dynamicPathColour = true;
 

@@ -15,7 +15,7 @@ import org.lwjgl.input.Keyboard;
 public class ReputationHelperConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable features around Reputation features in the Crimson Isle.")
+    @ConfigOption(name = "Enabled", desc = "Enable Reputation Helper features in the Crimson Isle.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -26,12 +26,12 @@ public class ReputationHelperConfig {
     public Property<Boolean> hideComplete = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Use Hotkey", desc = "Only show the Reputation Helper while pressing the hotkey.")
+    @ConfigOption(name = "Use Keybind", desc = "Only show the Reputation Helper while pressing the keybind.")
     @ConfigEditorBoolean
     public boolean useHotkey = false;
 
     @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this hotkey to show the Reputation Helper.")
+    @ConfigOption(name = "Keybind", desc = "Press this keybind to show the Reputation Helper.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int hotkey = Keyboard.KEY_NONE;
 
@@ -46,7 +46,7 @@ public class ReputationHelperConfig {
 
     public enum ShowLocationEntry implements HasLegacyId {
         ALWAYS("Always", 0),
-        ONLY_HOTKEY("Only With Hotkey", 1),
+        ONLY_HOTKEY("Only With Keybind", 1),
         NEVER("Never", 2);
         private final String str;
         private final int legacyId;

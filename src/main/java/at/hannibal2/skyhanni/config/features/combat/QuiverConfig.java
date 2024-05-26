@@ -26,8 +26,7 @@ public class QuiverConfig {
     @Expose
     @ConfigOption(
         name = "Reminder After Run",
-        desc = "Reminds you to buy arrows after\n" +
-            "a Dungeons/Kuudra run if you're low."
+        desc = "Reminds you to buy arrows after a Dungeons/Kuudra run if you're low."
     )
     @ConfigEditorBoolean
     @FeatureToggle

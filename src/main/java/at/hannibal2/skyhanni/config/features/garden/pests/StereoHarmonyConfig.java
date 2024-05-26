@@ -44,7 +44,7 @@ public class StereoHarmonyConfig {
     @Expose
     @ConfigOption(
         name = "Hide when None",
-        desc = "Hide when no vinyl selected."
+        desc = "Hide when no vinyl is selected."
     )
     @ConfigEditorBoolean
     public boolean hideWhenNone = false;

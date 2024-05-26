@@ -42,7 +42,7 @@ public class FlareConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Display Type", desc = "Where to show the timer, as GUI element or in the world")
+    @ConfigOption(name = "Display Type", desc = "Where to show the timer, as GUI element or in the world.")
     @ConfigEditorDropdown
     public DisplayType displayType = DisplayType.GUI;
 
@@ -89,17 +89,17 @@ public class FlareConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Warning Flare Color", desc = "Color for Warning Flare.")
+    @ConfigOption(name = "Warning Flare Colour", desc = "Colour for Warning Flare.")
     @ConfigEditorColour
     public String warningColor = "0:153:29:255:136";
 
     @Expose
-    @ConfigOption(name = "Alert Flare Color", desc = "Color for Alert Flare.")
+    @ConfigOption(name = "Alert Flare Colour", desc = "Colour for Alert Flare.")
     @ConfigEditorColour
     public String alertColor = "0:153:0:159:137";
 
     @Expose
-    @ConfigOption(name = "SOS Flare Color", desc = "Color for SOS Flare.")
+    @ConfigOption(name = "SOS Flare Colour", desc = "Colour for SOS Flare.")
     @ConfigEditorColour
     public String sosColor = "0:153:159:0:5";
 

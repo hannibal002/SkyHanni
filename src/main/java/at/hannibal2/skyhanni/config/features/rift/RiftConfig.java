@@ -26,12 +26,12 @@ public class RiftConfig {
     @Expose
     public EnigmaSoulConfig enigmaSoulWaypoints = new EnigmaSoulConfig();
 
-    @Category(name = "Rift Areas", desc = "Rift Area Settings")
+    @Category(name = "Rift Areas", desc = "Rift Area Settings.")
     @Expose
     public RiftAreasConfig area = new RiftAreasConfig();
 
     @Expose
-    @Category(name = "Motes", desc = "Motes Sell Price")
+    @Category(name = "Motes", desc = "Motes Sell Price.")
     public MotesConfig motes = new MotesConfig();
 
     @Expose

@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MobsConfig {
     @Expose
-    @ConfigOption(name = "Area Boss Highlighter", desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist, Millenia-Aged Blaze and Soul of the Alpha.")
+    @ConfigOption(name = "Area Boss Highlighter", desc = "Highlight Golden Ghouls, Old Wolfs, Voidling Extremists, Millenia-Aged Blazes and Soul of the Alpha.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean areaBossHighlight = true;
@@ -84,7 +84,7 @@ public class MobsConfig {
     public boolean endermanTeleportationHider = true;
 
     @Expose
-    @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametag above Arachne minis.")
+    @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametags above Arachne minis.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideNameTagArachneMinis = true;

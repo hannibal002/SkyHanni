@@ -23,12 +23,12 @@ import org.lwjgl.input.Keyboard;
 public class GUIConfig {
 
     @Expose
-    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
+    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings.")
     @Accordion
     public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
     @Expose
-    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
+    @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings.")
     public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
 
     @Expose
@@ -41,17 +41,17 @@ public class GUIConfig {
     public Runnable positions = () -> GuiEditManager.openGuiPositionEditor(true);
 
     @Expose
-    @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
+    @ConfigOption(name = "Open Keybind", desc = "Keybind to open the GUI Editor.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindOpen = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Global GUI Scale", desc = "Globally scale all SkyHanni GUIs.")
+    @ConfigOption(name = "Global GUI Scale", desc = "Global scale for all SkyHanni GUIs.")
     @ConfigEditorSlider(minValue = 0.1F, maxValue = 10, minStep = 0.05F)
     public float globalScale = 1F;
 
     @Expose
-    @ConfigOption(name = "Time Format", desc = "Change Skyhanni to use 24h time instead of 12h time.")
+    @ConfigOption(name = "Time Format", desc = "Use 24h time instead of 12h time.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeFormat24h = false;
@@ -97,7 +97,7 @@ public class GUIConfig {
     public Position realTimePosition = new Position(10, 10, false, true);
 
     @Expose
-    @Category(name = "Cosmetic", desc = "Cosmetics Settings")
+    @Category(name = "Cosmetic", desc = "Cosmetics Settings.")
     public CosmeticConfig cosmetic = new CosmeticConfig();
 
     @Expose
