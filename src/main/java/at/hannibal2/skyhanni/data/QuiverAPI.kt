@@ -90,7 +90,7 @@ object QuiverAPI {
         "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!"
     )
 
-    // Bows that don't use the players arrows, checked using the SkyBlock Id
+    // Bows that don't use the players arrows, checked using the SkyBlock ID
     private val fakeBowsPattern by group.pattern("fakebows", "^(BOSS_SPIRIT_BOW|CRYPT_BOW)$")
     private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
     private val quiverInventoryPattern by group.pattern(
