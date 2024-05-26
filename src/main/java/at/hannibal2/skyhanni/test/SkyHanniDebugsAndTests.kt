@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -44,19 +43,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -93,24 +85,6 @@ class SkyHanniDebugsAndTests {
         }
 
         private var testLocation: LorenzVec? = null
-
-        val position = Position(20, 20)
-
-        val scrollValue = ScrollValue()
-
-        @SubscribeEvent
-        fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-            position.renderRenderables(
-                listOf(
-                    Renderable.verticalSlider(
-                        108,
-                        handler = {},
-                        scrollValue
-                    ).renderBounds(),
-                    Renderable.string("${scrollValue.getValue()}")
-                ), posLabel = "Test"
-            )
-        }
 
         @SubscribeEvent
         fun onRenderWorld(event: LorenzRenderWorldEvent) {
@@ -519,11 +493,6 @@ class SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf")
-        if (false) {
-            itemRenderDebug()
-        }
-
         if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
@@ -537,34 +506,6 @@ class SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
-    }
-
-    private fun itemRenderDebug() {
-        val scale = 0.1
-        val renderables = listOf(
-            ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block)
-        ).map { item ->
-            generateSequence(scale) { it + 0.1 }.take(25).map {
-                Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
-            }.toList()
-        }.editCopy {
-            this.add(
-                0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList()
-            )
-        }
-        config.debugItemPos.renderRenderables(
-            listOf(
-                Renderable.table(renderables),
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.string("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds()
-                    ), spacing = 1
-                )
-            ), posLabel = "Item Debug"
-        )
     }
 
     @SubscribeEvent

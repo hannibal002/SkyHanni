@@ -437,6 +437,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.HighlightMissingRepoItems
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.ParkourWaypointSaver
+import at.hannibal2.skyhanni.test.RenderableTestSuit
 import at.hannibal2.skyhanni.test.ShowItemUuid
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -951,6 +952,9 @@ class SkyHanniMod {
         loadModule(WorldEdit)
         PreInitFinishedEvent().postAndCatch()
         loadModule(MobDebug())
+        if (LorenzUtils.isInDevEnvironment()) {
+            loadModule(RenderableTestSuit)
+        }
     }
 
     @Mod.EventHandler

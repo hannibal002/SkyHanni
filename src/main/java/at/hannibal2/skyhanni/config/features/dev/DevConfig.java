@@ -57,10 +57,6 @@ public class DevConfig {
     @Expose
     public Position debugLocationPos = new Position(1, 160, false, true);
 
-    // Does not have a config element!
-    @Expose
-    public Position debugItemPos = new Position(90, 70);
-
     @Expose
     @ConfigOption(
         name = "Fancy Contributors",
