@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -107,7 +107,7 @@ class GardenVisitorSupercraft {
         if (event.slotId != 31) return
         event.isCanceled = true
         if (lastClick.passedSince() > 0.3.seconds) {
-            ChatUtils.sendCommandToServer("recipe $lastSuperCraftMaterial")
+            HypixelCommands.recipe(lastSuperCraftMaterial)
             lastClick = SimpleTimeMark.now()
         }
     }

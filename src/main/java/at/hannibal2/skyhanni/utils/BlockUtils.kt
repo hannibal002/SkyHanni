@@ -41,8 +41,8 @@ object BlockUtils {
     }
 
     fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
-        val help = direction.normalize().multiply(distance)
-        val target = start.add(help)
+        val help = direction.normalize() * distance
+        val target = start + help
         val result = Minecraft.getMinecraft().theWorld.rayTraceBlocks(start.toVec3(), target.toVec3())
 
         return result?.blockPos?.toLorenzVec()

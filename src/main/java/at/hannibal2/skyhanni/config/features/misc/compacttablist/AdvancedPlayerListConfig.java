@@ -81,7 +81,7 @@ public class AdvancedPlayerListConfig {
     public boolean useLevelColorForName = false;
 
     @Expose
-    @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familar with bingo.")
+    @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familiar with bingo.")
     @ConfigEditorBoolean
     public boolean showBingoRankNumber = false;
 

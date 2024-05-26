@@ -10,14 +10,15 @@ class SendCoordinatedCommand {
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         val message = event.message
-        if (message == "/sendcoords") {
+        if (message.startsWith("/sendcoords")) {
             event.isCanceled = true
-            ChatUtils.sendMessageToServer(getCoordinates())
-        } else if (message.startsWith("/sendcoords ")) {
-            event.isCanceled = true
-            val description = message.split(" ").drop(1).joinToString(" ")
-            ChatUtils.sendMessageToServer("${getCoordinates()} $description")
+            val description = message.substringAfter("/sendcoords").trim()
+            sendCoordinates(description)
         }
+    }
+
+    private fun sendCoordinates(description: String) {
+        ChatUtils.sendMessageToServer(getCoordinates() + " $description")
     }
 
     private fun getCoordinates(): String {
