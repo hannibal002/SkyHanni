@@ -52,6 +52,7 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
+    private var maxPrestige = 5
 
     var inChocolateFactory = false
     var chocolateFactoryPaused = false
@@ -106,6 +107,7 @@ object ChocolateFactoryAPI {
         shrineIndex = data.shrineIndex
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
+        maxPrestige = data.maxPrestige
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
@@ -145,13 +147,16 @@ object ChocolateFactoryAPI {
 
     fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
 
+    fun isMaxPrestige() = currentPrestige >= maxPrestige
+
     fun timeUntilNeed(goal: Long): Duration {
         var needed = goal
         val profileStorage = profileStorage ?: return Duration.ZERO
 
         val baseMultiplier = profileStorage.rawChocolateMultiplier
         val rawChocolatePerSecond = profileStorage.rawChocPerSecond
-        val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
+        var timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
+        if (profileStorage.hasMuRabbit) timeTowerMultiplier += 0.7
 
         if (rawChocolatePerSecond == 0) return Duration.INFINITE
 

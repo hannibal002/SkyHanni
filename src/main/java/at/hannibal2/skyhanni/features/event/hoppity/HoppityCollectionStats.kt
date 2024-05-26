@@ -116,6 +116,7 @@ object HoppityCollectionStats {
             val filtered = loggedRabbits.filter { it.value.rarity == rarity }
 
             val isTotal = rarity == RabbitCollectionRarity.TOTAL
+            if (filtered.isEmpty() && !isTotal) continue
 
             val title = "${rarity.displayName} Rabbits"
             val amountFound = filtered.filter { it.value.found }.size
@@ -192,6 +193,10 @@ object HoppityCollectionStats {
                 ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
             }
 
+            if (itemName == "§dMu" && found) {
+                ChocolateFactoryAPI.profileStorage?.hasMuRabbit = true
+            }
+
             val duplicates = duplicatesFound.coerceAtLeast(0)
             loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
         }
@@ -226,7 +231,7 @@ object HoppityCollectionStats {
         EPIC("§5Epic", 10, 0.005, "STAINED_GLASS-10".asInternalName()),
         LEGENDARY("§6Legendary", 0, 0.02, "STAINED_GLASS-1".asInternalName()),
         MYTHIC("§dMythic", 0, 0.0, "STAINED_GLASS-6".asInternalName()),
-        DIVINE("§bDivine", 0, 0.0, "STAINED_GLASS-3".asInternalName()),
+        DIVINE("§bDivine", 0, 0.025, "STAINED_GLASS-3".asInternalName()),
         TOTAL("§cTotal", 0, 0.0, "STAINED_GLASS-14".asInternalName()),
         ;
 

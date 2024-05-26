@@ -52,7 +52,7 @@ object ChocolateFactoryDataLoader {
     )
     private val leaderboardPlacePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.place",
-        "§7§7You are §8#§b(?<position>[\\d,]+) §7in all-time Chocolate\\."
+        "§7You are §8#§b(?<position>[\\d,]+)"
     )
     private val leaderboardPercentilePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.percentile",
