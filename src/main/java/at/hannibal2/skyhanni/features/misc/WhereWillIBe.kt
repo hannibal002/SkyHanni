@@ -1,0 +1,46 @@
+package at.hannibal2.skyhanni.features.misc
+
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.text.SimpleDateFormat
+import java.util.Date
+import kotlin.math.pow
+import kotlin.random.Random
+
+object WhereWillIBe {
+    private val nonIslands = listOf(IslandType.NONE, IslandType.UNKNOWN, IslandType.MINESHAFT) // IslandType.MINESHAFT == pain
+    private val privateOrGuest = listOf(IslandType.PRIVATE_ISLAND_GUEST, IslandType.PRIVATE_ISLAND, IslandType.GARDEN_GUEST)
+    private val onceOnlyIslands = listOf(IslandType.DARK_AUCTION, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.THE_RIFT) // add/remove islands as you see fit, but DARK_AUCTION should stay in here
+    private val islandsAsList = IslandType.entries.toList().filter { it !in nonIslands }.toMutableList()
+    @SubscribeEvent
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
+        if (!LorenzUtils.onHypixel) return
+        if (event.message.lowercase() != "/wherewillibe") return
+        event.setCanceled(true)
+        if (SkyBlockTime.now().month != 12) islandsAsList.remove(IslandType.WINTER)
+        var lastUsedMillis = SimpleTimeMark.now().toMillis()
+        var lastIsland = IslandType.NONE // to prevent an island from proccing consecutively
+        var chosenIsland = IslandType.NONE // to prevent an island from proccing consecutively
+        ChatUtils.chat("§aYour future servers:", false)
+        for (i in 2..Random.nextInt(2,11)) {
+            val chosenIslands = if (Random.nextBoolean()) islandsAsList.filter { it !in privateOrGuest } else islandsAsList
+            val randomMillis = Random.nextLong(lastUsedMillis, lastUsedMillis + Random.nextLong(10000, 2.0.pow(26).toLong()))
+            lastUsedMillis = randomMillis // make sure all timestamps are advancing forward
+            while (chosenIsland == lastIsland) chosenIsland = chosenIslands.shuffled().first()
+            lastIsland = chosenIsland
+            if (chosenIsland in onceOnlyIslands) islandsAsList.remove(chosenIsland) // prevent islands from appearing more than once
+            val serverType = if (chosenIsland == IslandType.HUB) listOf("mini", "mega").random() else "mini"
+            val randInt = if (serverType == "mini") Random.nextInt(10, 99) else Random.nextInt(10, 100) * Random.nextInt(1, 4)
+            val randLetter = if (Random.nextBoolean()) "${('A'..'Z').random()}" else "${('A'..'Z').random()}${('A'..'Z').random()}"
+            val randomServerID = "$serverType${randInt}$randLetter"
+            val randomIsland = "SkyBlock (${chosenIsland.displayName})"
+            val formatted = SimpleDateFormat("HH:mm:ss dd-MM-yy").format(Date(randomMillis))
+            ChatUtils.chat("§e$formatted - $randomServerID - $randomIsland", false)
+        }
+    }
+}
