@@ -46,7 +46,7 @@ object HoppityNpc {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (hoppityYearOpened == SkyBlockTime.now().year) return
-        if (SkyblockSeason.getCurrentSeason() != SkyblockSeason.SPRING) return
+        if (!ChocolateFactoryAPI.isHoppityEvent()) return
         if (lastReminderSent.passedSince() <= 30.seconds) return
 
         ChatUtils.clickableChat(
