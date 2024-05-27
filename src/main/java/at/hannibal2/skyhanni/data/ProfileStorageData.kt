@@ -41,7 +41,7 @@ object ProfileStorageData {
             DelayedRun.runDelayed(10.seconds) {
                 workaroundIn10SecondsProfileStorage(profileName)
             }
-            ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
+            return
         }
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
@@ -61,7 +61,7 @@ object ProfileStorageData {
                 "failed to load your profile data a second time",
                 "workaround in 10 seconds did not work"
             )
-            ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
+            ErrorManager.skyHanniError("playerSpecific is still null in ProfileJoinEvent!")
         }
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
