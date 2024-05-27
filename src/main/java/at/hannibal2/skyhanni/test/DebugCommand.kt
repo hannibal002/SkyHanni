@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -61,6 +62,11 @@ object DebugCommand {
         event.title("Profile Type")
         if (!LorenzUtils.inSkyBlock) {
             event.addIrrelevant("Not on SkyBlock")
+            return
+        }
+
+        if (ProfileStorageData.playerSpecific == null) {
+            event.addData("playerSpecific is null!")
             return
         }
 
