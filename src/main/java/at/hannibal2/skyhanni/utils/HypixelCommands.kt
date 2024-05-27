@@ -127,10 +127,6 @@ object HypixelCommands {
         else -> send("rng $major $minor")
     }
 
-    fun island() {
-        send("is")
-    }
-
     fun hub() {
         send("hub")
     }
