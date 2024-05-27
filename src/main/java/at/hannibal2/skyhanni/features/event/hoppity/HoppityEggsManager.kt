@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -37,9 +37,26 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
      */
-    private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!"
+    )
+
+    /**
+     * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
+     * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
+     */
+    val rabbitFoundPatttern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.found",
+        "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\((?<rarity>.*)§7\\)!"
+    )
+
+    /**
+     * REGEX-TEST: §d§lNEW RABBIT! §6+2 Chocolate §7and §6+0.003x Chocolate §7per second!
+     */
+    val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.found.new",
+        "§d§lNEW RABBIT! §6\\+(?<chocolate>.*) Chocolate §7and §6\\+(?<perSecond>.*)x Chocolate §7per second!"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -87,6 +104,8 @@ object HoppityEggsManager {
         }
 
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
+
+        HoppityEggsCompactChat.handleChat(event)
 
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocator.eggFound()
@@ -142,12 +161,15 @@ object HoppityEggsManager {
 
         val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
-            ChatUtils.clickableChat(
-                "Click here to share the location of this chocolate egg with the server!",
-                onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) },
-                expireAt = 30.seconds.fromNow(),
-                oneTimeClick = true
-            )
+            val onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) }
+            if (!HoppityEggsCompactChat.clickableCompact(onClick)) {
+                ChatUtils.clickableChat(
+                    "Click here to share the location of this chocolate egg with the server!",
+                    onClick = onClick,
+                    expireAt = 30.seconds.fromNow(),
+                    oneTimeClick = true
+                )
+            }
         }
     }
 
@@ -161,7 +183,7 @@ object HoppityEggsManager {
         val displayList = HoppityEggType.entries
             .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
             .toMutableList()
-        displayList.add(0, "§bUnfound Eggs:")
+        displayList.add(0, "§bUnclaimed Eggs:")
         if (displayList.size == 1) return
 
         config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")

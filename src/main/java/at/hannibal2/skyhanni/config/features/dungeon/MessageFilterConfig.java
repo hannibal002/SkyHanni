@@ -7,6 +7,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MessageFilterConfig {
     @Expose
+    @ConfigOption(name = "Rare Drops", desc = "Hides the chat message when other players get rare drops from chests.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean rareDrops = false;
+
+    @Expose
     @ConfigOption(name = "Keys and Doors", desc = "Hides the chat message when picking up keys or opening doors in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
