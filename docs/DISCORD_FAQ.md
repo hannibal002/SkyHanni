@@ -59,5 +59,6 @@ _Frequently Asked Questions_
 > If you are using [Apec](https://github.com/BananaFructa/Apec/) and want to remove their Scoreboard, you need to remove Apec since they don't have an option to disable their Scoreboard.
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
+
 *This FAQ was last updated on May 27th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
