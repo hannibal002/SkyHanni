@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NEUCalculator
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -143,7 +142,6 @@ object GetFromSackAPI {
         if (event.senderIsSkyhanni()) return
 
         val (result, stack) = commandValidator(event.splitMessage.drop(1))
-        ChatUtils.debug("Item: ${stack?.amount}x ${stack?.itemName} ")
 
         when (result) {
             CommandResult.VALID -> getFromSack(stack ?: return)
@@ -177,11 +175,7 @@ object GetFromSackAPI {
             args.last()
         }
 
-        ChatUtils.debug("AmountString pre: $amountString")
-
         amountString = NEUCalculator.calculateOrNull(amountString)?.toString() ?: amountString
-
-        ChatUtils.debug("AmountString post: $amountString")
 
         if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
@@ -189,10 +183,13 @@ object GetFromSackAPI {
         if (amount <= 0) return CommandResult.WRONG_AMOUNT to null
 
         val itemStringAsList = if (args.size <= 1) args else args.dropLast(1)
-        val itemString = itemStringAsList.joinToString(" ").uppercase().replace(':', '-')
-        itemString.replace("_GEMSTONE", "_GEM")
-        // TODO: /gfs ANY_GEMSTONE will error.
-        ChatUtils.debug("Amount: $amount§7 of §9$itemString§7")
+        var itemString = itemStringAsList.joinToString(" ").uppercase().replace(':', '-')
+
+        // Band-aid fix for gemstone types
+        // HERE: If any other items are like this just add it under this
+        if (itemString.contains("GEMSTONE")) {
+            itemString = itemString.replace("GEMSTONE", "GEM")
+        }
 
         val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
