@@ -39,7 +39,7 @@ object ProfileStorageData {
         val profileName = event.name
         if (playerSpecific == null) {
             DelayedRun.runDelayed(10.seconds) {
-                workaroundIn10Seconds(profileName)
+                workaroundIn10SecondsProfileStorage(profileName)
             }
             ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
         }
@@ -51,7 +51,8 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    private fun workaroundIn10Seconds(profileName: String) {
+    private fun workaroundIn10SecondsProfileStorage(profileName: String) {
+        println("workaroundIn10SecondsProfileStorage")
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
 
