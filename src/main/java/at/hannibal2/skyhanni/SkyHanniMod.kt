@@ -272,6 +272,8 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeOverlay
 import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseOpenPriceWebsite
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -593,6 +595,7 @@ class SkyHanniMod {
         loadModule(BitsAPI)
         loadModule(MayorAPI)
         loadModule(SkillAPI)
+        loadModule(AttributeAPI)
         loadModule(VisitorAPI)
         loadModule(KuudraAPI)
         loadModule(PetAPI)
@@ -880,6 +883,7 @@ class SkyHanniMod {
         loadModule(AuctionHousePriceComparison())
         loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
+        loadModule(AttributeOverlay())
         loadModule(Translator())
         loadModule(CosmeticFollowingLine())
         loadModule(SuperpairsClicksAlert())
