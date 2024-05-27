@@ -51,8 +51,6 @@ object WhereWillIBe {
         repeat(Random.nextInt(2, 11)) {
             lastUsedMillis = randomMillis(lastUsedMillis)
             lastIsland = chooseIsland(lastIsland, chooseIslandsList(islandsAsList))
-            if (lastIsland in onceOnlyIslands)
-                islandsAsList.remove(lastIsland)
             ChatUtils.chat(
                 "§e${formattedDate(Date(lastUsedMillis))} - ${randomServerID(lastIsland)} - ${randomIsland(lastIsland)}",
                 false
@@ -93,7 +91,21 @@ object WhereWillIBe {
             islandToReturn in nonIslands
         )
             islandToReturn = chosenIslandsList.shuffled().first()
+        removeIfNecessary(
+            islandToReturn,
+            chosenIslandsList.toMutableList()
+        )
         return islandToReturn
+    }
+
+    private fun removeIfNecessary(
+        lastIsland: IslandType,
+        islandsAsList: MutableList<IslandType>
+    ) {
+        if (lastIsland in onceOnlyIslands)
+            islandsAsList.remove(
+                lastIsland
+            )
     }
 
     private fun randomIsland(
