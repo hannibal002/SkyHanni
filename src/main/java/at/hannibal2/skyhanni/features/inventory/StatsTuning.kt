@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority

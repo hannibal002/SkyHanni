@@ -12,11 +12,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -154,7 +155,7 @@ object HoppityCollectionStats {
                 add("§7Duplicate Rabbits: §a$displayDuplicates")
                 add("§7Total Rabbits Found: §a${displayFound + displayDuplicates}")
                 add("")
-                add("§7Chocolate Per Second: §a$displayChocolatePerSecond")
+                add("§7Chocolate Per Second: §a${displayChocolatePerSecond.addSeparators()}")
                 add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
             }
             table.add(
@@ -186,7 +187,7 @@ object HoppityCollectionStats {
     }
 
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
-        for ((idx, item) in event.inventoryItems) {
+        for ((_, item) in event.inventoryItems) {
             val itemName = item.displayName?.removeColor() ?: continue
             val isRabbit = HoppityCollectionData.isKnownRabbit(itemName)
 
@@ -211,16 +212,22 @@ object HoppityCollectionStats {
     fun clearSavedRabbits() {
         loggedRabbits.clear()
         ChatUtils.chat("Cleared saved rabbit data.")
-
     }
+
 
     // checks special rabbits whenever loggedRabbits is modified to update misc stored values
     // TODO: make this better than hard-coded checks
     private fun checkSpecialRabbits() {
-        if ((loggedRabbits["einstein"] ?: 0) > 0) {
+        if (hasFoundRabbit("Einstein")) {
             ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
         }
+
+        if (hasFoundRabbit("Mu")) {
+            ChocolateFactoryAPI.profileStorage?.hasMuRabbit = true
+        }
     }
+
+    private fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 

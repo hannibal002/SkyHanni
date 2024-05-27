@@ -94,6 +94,9 @@ public class ProfileSpecificStorage {
         public int maxTimeTowerUses = 3;
 
         @Expose
+        public boolean hasMuRabbit = false;
+
+        @Expose
         public long bestUpgradeAvailableAt = 0;
 
         @Expose

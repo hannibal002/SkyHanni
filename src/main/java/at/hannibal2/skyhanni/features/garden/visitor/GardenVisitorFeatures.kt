@@ -43,14 +43,16 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -205,9 +207,31 @@ object GardenVisitorFeatures {
                 }
 
                 if (config.shoppingList.showSackCount) {
+                    var amountInSacks = 0
                     internalName.getAmountInSacksOrNull()?.let {
+                        amountInSacks = it
                         val textColour = if (it >= amount) "a" else "e"
                         list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+                    }
+                    val ingredients = NEUItems.getRecipes(internalName)
+                        // TODO describe what this line does
+                        .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
+                        ?.allIngredients() ?: return
+                    val requiredIngredients = mutableMapOf<String, Int>()
+                    for (ingredient in ingredients) {
+                        val key = ingredient.internalItemId
+                        requiredIngredients[key] = requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
+                    }
+                    var hasIngredients = true
+                    for ((key, value) in requiredIngredients) {
+                        val sackItem = key.asInternalName().getAmountInSacks()
+                        if (sackItem < value * (amount - amountInSacks)) {
+                            hasIngredients = false
+                            break
+                        }
+                    }
+                    if (hasIngredients) {
+                        list.add(" §7(§aCraftable!§7)")
                     }
                 }
 
@@ -284,7 +308,7 @@ object GardenVisitorFeatures {
         VisitorAcceptEvent(event.visitor).postAndCatch()
         update()
         GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
-        GardenVisitorDropStatistics.lastAccept = System.currentTimeMillis()
+        GardenVisitorDropStatistics.lastAccept = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
