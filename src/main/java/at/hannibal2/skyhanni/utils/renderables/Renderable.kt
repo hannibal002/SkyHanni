@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
-import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -740,13 +739,12 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            val trueMin = minValue / stepSize
-            val trueMax = maxValue / stepSize
+            val trueMax = (height - sliderHeadThickness - 2) / stepSize
 
             // TODO fix offset bug
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
-                trueMin,
+                0,
                 trueMax,
                 1.0,
                 0.0,
@@ -754,7 +752,7 @@ interface Renderable {
                 inverseDrag = false
             )
 
-            private val sliderPos get() = ((scroll.asInt() - trueMin).fractionOf(trueMax) * (height - sliderHeadThickness - 2)).toInt() + 1
+            private val sliderPos get() = (scroll.asDouble() * stepSize).toInt() + 1
 
             override fun render(posX: Int, posY: Int) {
                 val lastScroll = scroll.asDouble()
@@ -769,7 +767,7 @@ interface Renderable {
                 Gui.drawRect(1, slider + 1, width - 1, slider + sliderHeadThickness - 1, Color.GRAY.rgb)
 
                 if (lastScroll != newScroll) {
-                    handler(newScroll * stepSize)
+                    handler((newScroll / trueMax) * (maxValue - minValue) + minValue)
                 }
             }
 

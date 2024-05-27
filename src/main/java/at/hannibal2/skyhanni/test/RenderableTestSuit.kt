@@ -20,8 +20,10 @@ enum class RenderableTestSuit(private val where: RenderIn) {
 
         private val scrollValue = ScrollValue()
 
+        private var extracted = 0.0
+
         private val staticRenderable = Renderable.verticalSlider(
-            50, handler = {}, scrollValue
+            50, handler = { extracted = it }, scrollValue
         ).renderBounds()
 
         override fun run() {
@@ -30,12 +32,12 @@ enum class RenderableTestSuit(private val where: RenderIn) {
                     Renderable.horizontalContainer(
                         listOf(
                             Renderable.verticalSlider(
-                                50, handler = {}, scrollValue
+                                50, handler = { extracted = it }, scrollValue
                             ).renderBounds(), staticRenderable
                         ),
                         5
                     ),
-                    Renderable.string("${scrollValue.getValue()}"),
+                    Renderable.string("$extracted"),
                 ), posLabel = "Test"
             )
         }
