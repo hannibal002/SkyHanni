@@ -60,18 +60,26 @@ object WhereWillIBe {
         }
     }
 
-    private fun chooseIslandsList(islandsAsList: MutableList<IslandType>) =
+    private fun chooseIslandsList(
+        islandsAsList: MutableList<IslandType>
+    ) =
         if (Random.nextBoolean())
-            islandsAsList.filter { it !in privateOrGuest }
+            islandsAsList.filter {
+                it !in privateOrGuest
+            }
         else
             islandsAsList
 
-    private fun randomMillis(lastUsedMillis: Long): Long =
+    private fun randomMillis(
+        lastUsedMillis: Long
+    ): Long =
         Random.nextLong(
             lastUsedMillis,
             lastUsedMillis + Random.nextLong(
                 10000,
-                2.0.pow(26).toLong()
+                2.0.pow(
+                    26
+                ).toLong()
             )
         )
 
@@ -80,20 +88,34 @@ object WhereWillIBe {
         chosenIslandsList: List<IslandType>
     ): IslandType {
         var islandToReturn = IslandType.NONE
-        while (islandToReturn == lastIsland || islandToReturn in nonIslands)
+        while (
+            islandToReturn == lastIsland ||
+            islandToReturn in nonIslands
+        )
             islandToReturn = chosenIslandsList.shuffled().first()
         return islandToReturn
     }
 
-    private fun randomIsland(chosenIsland: IslandType): String =
-        "SkyBlock (${chosenIsland.displayName})"
+    private fun randomIsland(
+        chosenIsland: IslandType
+    ): String =
+        "SkyBlock (${
+            chosenIsland.displayName
+        })"
 
-    private fun randomServerID(chosenIsland: IslandType): String =
+    private fun randomServerID(
+        chosenIsland: IslandType
+    ): String =
         "${miniOrMega(chosenIsland)}${randServerNumber()}${oneOrTwoLetters()}"
 
-    private fun miniOrMega(chosenIsland: IslandType): String =
-        if (chosenIsland == IslandType.HUB)
-            listOf("mini", "mega").random()
+    private fun miniOrMega(
+        chosenIsland: IslandType
+    ): String =
+        if (
+            chosenIsland == IslandType.HUB &&
+            Random.nextBoolean()
+        )
+            "mega"
         else
             "mini"
 
@@ -103,13 +125,17 @@ object WhereWillIBe {
             401
         )
 
-    private fun oneOrTwoLetters(charRange: CharRange = ('A'..'Z')): String =
+    private fun oneOrTwoLetters(
+        charRange: CharRange = ('A'..'Z')
+    ): String =
         if (Random.nextBoolean())
             "${charRange.random()}"
         else
             "${charRange.random()}${charRange.random()}"
 
-    private fun formattedDate(date: Date): String =
+    private fun formattedDate(
+        date: Date
+    ): String =
         SimpleDateFormat(
             "HH:mm:ss dd-MM-yy"
         ).format(
