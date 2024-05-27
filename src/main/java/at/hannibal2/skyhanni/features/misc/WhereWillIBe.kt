@@ -44,38 +44,49 @@ object WhereWillIBe {
             islandsAsList.remove(IslandType.WINTER)
         var lastUsedMillis = SimpleTimeMark.now().toMillis()
         var lastIsland = IslandType.NONE
-        var chosenIsland = IslandType.NONE
         ChatUtils.chat(
             "§aYour future servers:",
             false
         )
         repeat(Random.nextInt(2, 11)) {
-            val chosenIslands =
-                if (Random.nextBoolean())
-                    islandsAsList.filter { it !in privateOrGuest }
-                else
-                    islandsAsList
-            val randomMillis =
-                Random.nextLong(
-                    lastUsedMillis,
-                    lastUsedMillis + Random.nextLong(
-                        10000,
-                        2.0.pow(26).toLong()
-                    )
-                )
-            lastUsedMillis = randomMillis
-            while (chosenIsland == lastIsland)
-                chosenIsland = chosenIslands.shuffled().first()
-            lastIsland = chosenIsland
-            if (chosenIsland in onceOnlyIslands)
-                islandsAsList.remove(chosenIsland)
-            val randomIsland = "SkyBlock (${chosenIsland.displayName})"
+            lastUsedMillis = randomMillis(lastUsedMillis)
+            lastIsland = chooseIsland(lastIsland, chooseIslandsList(islandsAsList))
+            if (lastIsland in onceOnlyIslands)
+                islandsAsList.remove(lastIsland)
             ChatUtils.chat(
-                "§e${formattedDate(Date(randomMillis))} - ${randomServerID(chosenIsland)} - $randomIsland",
+                "§e${formattedDate(Date(lastUsedMillis))} - ${randomServerID(lastIsland)} - ${randomIsland(lastIsland)}",
                 false
             )
         }
     }
+
+    private fun chooseIslandsList(islandsAsList: MutableList<IslandType>) =
+        if (Random.nextBoolean())
+            islandsAsList.filter { it !in privateOrGuest }
+        else
+            islandsAsList
+
+    private fun randomMillis(lastUsedMillis: Long): Long =
+        Random.nextLong(
+            lastUsedMillis,
+            lastUsedMillis + Random.nextLong(
+                10000,
+                2.0.pow(26).toLong()
+            )
+        )
+
+    private fun chooseIsland(
+        lastIsland: IslandType,
+        chosenIslandsList: List<IslandType>
+    ): IslandType {
+        var islandToReturn = IslandType.NONE
+        while (islandToReturn == lastIsland || islandToReturn in nonIslands)
+            islandToReturn = chosenIslandsList.shuffled().first()
+        return islandToReturn
+    }
+
+    private fun randomIsland(chosenIsland: IslandType): String =
+        "SkyBlock (${chosenIsland.displayName})"
 
     private fun randomServerID(chosenIsland: IslandType): String =
         "${miniOrMega(chosenIsland)}${randServerNumber()}${oneOrTwoLetters()}"
