@@ -35,9 +35,14 @@ object HoppityCollectionStats {
         "duplicates.found",
         "§7Duplicates Found: §a(?<duplicates>[\\d,]+)"
     )
+
+    /**
+     * REGEX-TEST: §7§8You cannot find this rabbit until you
+     * REGEX-TEST: §7§8You have not found this rabbit yet!
+     */
     private val rabbitNotFoundPattern by patternGroup.pattern(
         "rabbit.notfound",
-        "(?:§.)+You have not found this rabbit yet!"
+        "(?:§.)+You (?:have not found this rabbit yet!|cannot find this rabbit until you)"
     )
 
     private val rabbitRequirementNotMetPattern by patternGroup.pattern(
