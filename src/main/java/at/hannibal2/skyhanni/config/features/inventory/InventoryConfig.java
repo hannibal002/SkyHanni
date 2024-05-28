@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
+import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -107,10 +107,10 @@ public class InventoryConfig {
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
-            NEW_YEAR_CAKE,
-            RANCHERS_BOOTS_SPEED,
-            LARVA_HOOK,
-            VACUUM_GARDEN));
+        NEW_YEAR_CAKE,
+        RANCHERS_BOOTS_SPEED,
+        LARVA_HOOK,
+        VACUUM_GARDEN));
 
     public enum ItemNumberEntry implements HasLegacyId {
         MASTER_STAR_TIER("§bMaster Star Tier", 0),
@@ -168,9 +168,8 @@ public class InventoryConfig {
     public boolean vacuumBagCap = true;
 
     @Expose
-    @ConfigOption(name = "Quick Craft Confirmation", desc = "Require Ctrl+Click to craft items that aren't often quick crafted "
-            +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally.")
+    @ConfigOption(name = "Quick Craft Confirmation", desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+        "(e.g. armor, weapons, accessories). Sack items can be crafted normally.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean quickCraftingConfirmation = false;
@@ -195,16 +194,14 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
-    // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide",
-    // "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
+    // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
     @ConfigOption(name = "Power Stone Guide", desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
-    // TODO move( , "inventory.powerStoneGuide",
-    // "inventory.skyblockGuideConfig.powerStoneGuide")
+    // TODO move( , "inventory.powerStoneGuide", "inventory.skyblockGuideConfig.powerStoneGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powerStoneGuide = true;
