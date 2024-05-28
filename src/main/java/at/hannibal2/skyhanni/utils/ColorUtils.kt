@@ -5,7 +5,7 @@ import kotlin.math.max
 
 object ColorUtils {
 
-    /** transfer string colors from the config to java.awt.Color */
+    /** Transfer string colors from the config to java.awt.Color */
     fun String.toChromaColor() = Color(toChromaColorInt(), true)
     fun String.toChromaColorInt() = SpecialColour.specialToChromaRGB(this)
 
@@ -35,4 +35,6 @@ object ColorUtils {
     }
 
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+
+    fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 }

@@ -54,6 +54,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Powder Mining messages hider
 - Winter gift messages hider
 - Many other messages (Not separated into own categories yet)
++ Added new chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
+    + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 
 </details>
 <details open><summary>
@@ -182,6 +184,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       purse.
 + Copy Underbid Keybind. - Obsidian
     + Copies the price of the hovered item in Auction House minus 1 coin into the clipboard for easier under-bidding.
++ Option in the Auction House search browser to search for the item on coflnet.com. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1743)
 + Gfs message after super crafting. — Zickles
     + Adding a clickable message to pick up the super crafted items from sacks.
 + Added Inferno Minion Fuel pickup prevention. - Zickles (https://github.com/hannibal002/SkyHanni/pull/1103)
@@ -391,6 +394,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Warns when right-clicking with a Wither Impact weapon (e.g. Hyperion) no longer gains combat exp
     + Kill a mob with melee-hits to fix this hypixel bug
     + Only works while doing slayer
++ SOS/Alert/Warning Flare Display. - HiZe + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1803)
+    + Warn when the flare is about to despawn (chat, title or both).
+    + Change the display type (as a GUI element, in the world, or both).
+    + Show effective area (as a wireframe, filled or circle).
+    + Show mana regeneration buff next to the GUI element.
+    + Option to hide flare particles.
 + Title warning when picking up an expensive slayer item
 + **RNG Meter Display**
     + Display amount of bosses needed until the next RNG Meter item drops
@@ -434,6 +443,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.
 + Customizable Inquisitor Highlight color. - Empa (https://github.com/hannibal002/SkyHanni/pull/1323)
 + Mobs since last Inquisitor to Mythological Creature Tracker. - CuzImClicks (https://github.com/hannibal002/SkyHanni/pull/1346)
++ Blaze Slayer fire pillar display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1766)
+    + Shows a large display with a timer when the Fire Pillar is about to explode.
+    + Also displays for other players' bosses.
 
 </details>
 <details open><summary>
@@ -481,6 +493,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
++ "Line to Arachne" setting, just like with slayer minibosses. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/1888)
 + Countdown for Arachne spawn. - Cad
     + Supports quick spawns.
 + Option to hide the vanilla particles around enderman
@@ -683,6 +696,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Super Craft button to visitors for ease of access. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1173)
     + Checks if you have enough materials to craft the items and depending on that shows the button or not.
 + Overflow Garden crop milestones. - Luna & HiZe (https://github.com/hannibal002/SkyHanni/pull/997)
++ New "Craftable!" message when Visitor Items Needed are craftable. - Paloys (https://github.com/hannibal002/SkyHanni/pull/1891)
 
 </details>
 <details open><summary>
@@ -874,6 +888,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Amount of chocolate until next prestige to stats display. - seraid (https://github.com/hannibal002/SkyHanni/pull/1638)
 + Ability to adjust the opacity of players near shared and guessed egg waypoints. - RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1582)
 + Time until the next Hoppity event in chat message for egg locator. - seraid (https://github.com/hannibal002/SkyHanni/pull/1625)
++ Warning before the Time Tower in the Chocolate Factory ends. - seraid (https://github.com/hannibal002/SkyHanni/pull/1816)
 
 </details>
 <details open><summary>
@@ -1129,6 +1144,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Support for `/playtime` and  `/pt` while in Limbo.
     + Added your playtime to Hypixel's `/playtimedetailed`.
++ Click on breakdown display in /playtimedetailed to copy the stats into the clipboard. - seraid (https://github.com/hannibal002/SkyHanni/pull/1807)
 + Custom Scoreboard - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/893)
     + Customizable; New, never seen before lines like the current mayor with perks, your party, and more!
     + Custom Title and Footer, align them on different sides of the scoreboard.
@@ -1156,6 +1172,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Inventory background to GUI editor. - seraid (https://github.com/hannibal002/SkyHanni/pull/1622)
 +  Added option to hide item tooltips inside the Harp. - raven (https://github.com/hannibal002/SkyHanni/pull/1700)
 + Option to Replace Roman Numerals. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1722)
++ Simple Ferocity Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1765)
+    + Shows the Ferocity stat as a single GUI element.
+    + Requires the Tab List widget to be enabled and Ferocity to be selected to work.
 
 </details>
 <details open><summary>
