@@ -33,7 +33,7 @@ import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
@@ -816,8 +816,8 @@ interface Renderable {
             }
         }
 
-        fun player(
-            entity: EntityLivingBase,
+        fun fakePlayer(
+            entity: EntityPlayer,
             followMouse: Boolean = false,
             eyesX: Float = 0f,
             eyesY: Float = 0f,
@@ -832,12 +832,12 @@ interface Renderable {
             override val height = height + 2 * padding
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
+            val playerWidth = entityScale
+            val playerHeight = entityScale * 2
+            val playerX = width / 2 + padding
+            val playerY = height / 2 + playerHeight / 2 + padding
 
             override fun render(posX: Int, posY: Int) {
-                val playerWidth = entityScale
-                val playerHeight = entityScale * 2
-                val playerX = width / 2 + padding
-                val playerY = height / 2 + playerHeight / 2 + padding
 
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, colorCondition)
