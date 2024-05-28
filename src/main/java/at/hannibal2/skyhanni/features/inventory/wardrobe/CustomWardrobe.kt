@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentWardrobeSlot
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inCustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -45,25 +46,32 @@ class CustomWardrobe {
 
     private var displayRenderable: Renderable? = null
     private var buttonsRenderable: Renderable? = null
+    private var inventoryButton: Renderable? = null
     private var editMode = false
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
-        if (!isEnabled()) return
+        if (!isEnabled() || editMode) return
         event.cancel()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-
+        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+        if (editMode) {
+            val renderable = inventoryButton ?: addReEnableButton()
+            val accessorGui = gui as AccessorGuiContainer
+            val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
+            val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
+            Position(posX, posY).renderRenderable(renderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
+            return
+        }
         if (displayRenderable == null) {
             update()
         }
         val renderable = displayRenderable ?: return
         val button = buttonsRenderable ?: return
-
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         val fullRenderable = Renderable.drawInsideRoundedRect(
             Renderable.doubleLayered(
@@ -111,7 +119,7 @@ class CustomWardrobe {
         val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
 
         GlStateManager.translate(0f, 0f, 100f)
-        pos.renderRenderable(fullRenderable, posLabel = "Wardrobe Overlay", addToGuiManager = false)
+        pos.renderRenderable(fullRenderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
         GlStateManager.translate(0f, 0f, -100f)
     }
 
@@ -126,10 +134,9 @@ class CustomWardrobe {
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || editMode) return
         update()
     }
-
 
     private fun update() {
         displayRenderable = createRenderables()
@@ -239,7 +246,7 @@ class CustomWardrobe {
                         Color.GRAY.withAlpha(100)
                     } else null
 
-                    val playerRenderable = Renderable.player(
+                    val playerRenderable = Renderable.fakePlayer(
                         fakePlayer,
                         config.eyesFollowMouse,
                         width = containerWidth,
@@ -274,6 +281,7 @@ class CustomWardrobe {
         editMode = false
         displayRenderable = null
         buttonsRenderable = null
+        inventoryButton = null
     }
 
     private fun addButtons(): Renderable {
@@ -331,6 +339,20 @@ class CustomWardrobe {
         )
 
         return total
+    }
+
+    private fun addReEnableButton(): Renderable {
+        val color = Color(116, 150, 255, 200)
+        return createLabeledButton(
+            "§bEdit",
+            hoveredColor = color,
+            unhoveredColor = color.darker(0.8),
+            onClick = {
+                inCustomWardrobe = false
+                editMode = false
+                update()
+            }
+        )
     }
 
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
@@ -520,5 +542,5 @@ class CustomWardrobe {
         return Color(color.withAlpha(170), true)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe() && !editMode
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()
 }
