@@ -45,11 +45,6 @@ object HoppityCollectionStats {
         "(?:§.)+You (?:have not found this rabbit yet!|cannot find this rabbit until you)"
     )
 
-    private val rabbitRequirementNotMetPattern by patternGroup.pattern(
-        "rabbit.reqnotmet",
-        "(?:§.)+You cannot find this rabbit until you"
-    )
-
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
@@ -200,7 +195,6 @@ object HoppityCollectionStats {
 
             val itemLore = item.getLore()
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
-                && !rabbitRequirementNotMetPattern.anyMatches(itemLore)
 
             if (!found) continue
 
