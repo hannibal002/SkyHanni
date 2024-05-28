@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -53,6 +53,12 @@ class BazaarCancelledBuyOrderClipboard {
             latestAmount = group("amount").formatInt()
             return
         }
+
+        // nothing to cancel
+        if (lore.firstOrNull() == "§7Cannot cancel order while there are") {
+            return
+        }
+
         ErrorManager.logErrorStateWithData(
             "BazaarCancelledBuyOrderClipboard error",
             "lastAmountPattern can not find latestAmount",

@@ -11,14 +11,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HoppityCollectionStats {
+object HoppityCollectionStats {
 
     private val config get() = ChocolateFactoryAPI.config
 
@@ -46,7 +47,8 @@ class HoppityCollectionStats {
 
     private var display = emptyList<Renderable>()
     private val loggedRabbits = mutableMapOf<String, RabbitCollectionInfo>()
-    private var inInventory = false
+    private var totalRabbits = 0
+    var inInventory = false
     private var currentPage = 0
 
     @SubscribeEvent
@@ -55,7 +57,112 @@ class HoppityCollectionStats {
         if (!pagePattern.matches(event.inventoryName)) return
 
         inInventory = true
+        display = buildDisplay(event)
+    }
 
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inInventory = false
+    }
+
+    @SubscribeEvent
+    fun onProfileChange(event: ProfileJoinEvent) {
+        display = emptyList()
+        loggedRabbits.clear()
+        currentPage = 0
+        inInventory = false
+    }
+
+    @SubscribeEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!inInventory) return
+
+        config.hoppityStatsPosition.renderRenderables(
+            display,
+            extraSpace = 5,
+            posLabel = "Hoppity's Collection Stats"
+        )
+    }
+
+    private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
+        val totalAmount = logRabbits(event)
+
+        val newList = mutableListOf<Renderable>()
+        newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
+        newList.add(LorenzUtils.fillTable(getRabbitStats(), padding = 5))
+
+        if (totalAmount != totalRabbits) {
+            newList.add(Renderable.string(""))
+            newList.add(
+                Renderable.wrappedString(
+                    "§cPlease Scroll through \n" +
+                        "§call pages!",
+                    width = 200,
+                )
+            )
+        }
+        return newList
+    }
+
+    private fun getRabbitStats(): MutableList<DisplayTableEntry> {
+        var totalAmountFound = 0
+        var totalDuplicates = 0
+        var totalChocolatePerSecond = 0
+        var totalChocolateMultiplier = 0.0
+        totalRabbits = 0
+
+        val table = mutableListOf<DisplayTableEntry>()
+        for (rarity in RabbitCollectionRarity.entries) {
+            val filtered = loggedRabbits.filter { it.value.rarity == rarity }
+
+            val isTotal = rarity == RabbitCollectionRarity.TOTAL
+            if (filtered.isEmpty() && !isTotal) continue
+
+            val title = "${rarity.displayName} Rabbits"
+            val amountFound = filtered.filter { it.value.found }.size
+            val totalOfRarity = filtered.size
+            val duplicates = filtered.values.sumOf { it.duplicates }
+            val chocolatePerSecond = rarity.chocolatePerSecond * amountFound
+            val chocolateMultiplier = (rarity.chocolateMultiplier * amountFound)
+
+            if (!isTotal) {
+                totalAmountFound += amountFound
+                totalRabbits += totalOfRarity
+                totalDuplicates += duplicates
+                totalChocolatePerSecond += chocolatePerSecond
+                totalChocolateMultiplier += chocolateMultiplier
+            }
+
+            val displayFound = if (isTotal) totalAmountFound else amountFound
+            val displayTotal = if (isTotal) totalRabbits else totalOfRarity
+            val displayDuplicates = if (isTotal) totalDuplicates else duplicates
+            val displayChocolatePerSecond = if (isTotal) totalChocolatePerSecond else chocolatePerSecond
+            val displayChocolateMultiplier = if (isTotal) totalChocolateMultiplier else chocolateMultiplier
+
+            val hover = buildList {
+                add(title)
+                add("")
+                add("§7Unique Rabbits: §a$displayFound§7/§a$displayTotal")
+                add("§7Duplicate Rabbits: §a$displayDuplicates")
+                add("§7Total Rabbits Found: §a${displayFound + displayDuplicates}")
+                add("")
+                add("§7Chocolate Per Second: §a${displayChocolatePerSecond.addSeparators()}")
+                add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
+            }
+            table.add(
+                DisplayTableEntry(
+                    title,
+                    "§a$displayFound§7/§a$displayTotal",
+                    displayFound.toDouble(),
+                    rarity.item,
+                    hover
+                )
+            )
+        }
+        return table
+    }
+
+    private fun logRabbits(event: InventoryFullyOpenedEvent): Int {
         var totalAmount = 0
 
         for ((_, item) in event.inventoryItems) {
@@ -86,104 +193,21 @@ class HoppityCollectionStats {
                 ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
             }
 
+            if (itemName == "§dMu" && found) {
+                ChocolateFactoryAPI.profileStorage?.hasMuRabbit = true
+            }
+
             val duplicates = duplicatesFound.coerceAtLeast(0)
             loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
         }
-
-        var totalAmountFound = 0
-        var totalRabbits = 0
-        var totalDuplicates = 0
-        var totalChocolatePerSecond = 0
-        var totalChocolateMultiplier = 0.0
-
-        val table = mutableListOf<DisplayTableEntry>()
-        for (rarity in RabbitCollectionRarity.entries) {
-            val filtered = loggedRabbits.filter { it.value.rarity == rarity }
-
-            val isTotal = rarity == RabbitCollectionRarity.TOTAL
-
-            val title = "${rarity.displayName} Rabbits"
-            val amountFound = filtered.filter { it.value.found }.size
-            val totalOfRarity = filtered.size
-            val duplicates = filtered.values.sumOf { it.duplicates }
-            val chocolatePerSecond = rarity.chocolatePerSecond * amountFound
-            val chocolateMultiplier = (rarity.chocolateMultiplier * amountFound)
-
-            if (!isTotal) {
-                totalAmountFound += amountFound
-                totalRabbits += totalOfRarity
-                totalDuplicates += duplicates
-                totalChocolatePerSecond += chocolatePerSecond
-                totalChocolateMultiplier += chocolateMultiplier
-            }
-
-            val displayFound = if (isTotal) totalAmountFound else amountFound
-            val displayTotal = if (isTotal) totalRabbits else totalOfRarity
-            val displayDuplicates = if (isTotal) totalDuplicates else duplicates
-            val displayChocolatePerSecond = if (isTotal) totalChocolatePerSecond else chocolatePerSecond
-            val displayChocolateMultiplier = if (isTotal) totalChocolateMultiplier else chocolateMultiplier
-
-            val hover = buildList {
-                add(title)
-                add("")
-                add("§7Unique Rabbits: §a$displayFound§7/§a$displayTotal")
-                add("§7Duplicate Rabbits: §a$displayDuplicates")
-                add("§7Total Rabbits Found: §a${displayFound + displayDuplicates}")
-                add("")
-                add("§7Chocolate Per Second: §a$displayChocolatePerSecond")
-                add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
-            }
-            table.add(
-                DisplayTableEntry(
-                    title,
-                    "§a$displayFound§7/§a$displayTotal",
-                    displayFound.toDouble(),
-                    rarity.item,
-                    hover
-                )
-            )
-        }
-
-        val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5))
-
-        if (totalAmount != totalRabbits) {
-            newList.add(Renderable.string(""))
-            newList.add(
-                Renderable.wrappedString(
-                    "§cPlease Scroll through \n" +
-                        "§call pages!",
-                    width = 200,
-                )
-            )
-        }
-
-        display = newList
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
-    }
-
-    @SubscribeEvent
-    fun onProfileChange(event: ProfileJoinEvent) {
-        display = emptyList()
-        loggedRabbits.clear()
-        currentPage = 0
-        inInventory = false
-    }
-
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!inInventory) return
-
-        config.hoppityStatsPosition.renderRenderables(
-            display,
-            extraSpace = 5,
-            posLabel = "Hoppity's Collection Stats"
-        )
+        // For getting data for neu pv
+//         val rarityToRabbit = mutableMapOf<RabbitCollectionRarity, MutableList<String>>()
+//         loggedRabbits.forEach { (name, info) ->
+//             val formattedName = name.removeColor().lowercase().replace(" ", "_").replace("-", "_")
+//             rarityToRabbit.getOrPut(info.rarity) { mutableListOf() }.add("\"$formattedName\"")
+//         }
+//         println(rarityToRabbit)
+        return totalAmount
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
@@ -207,6 +231,7 @@ class HoppityCollectionStats {
         EPIC("§5Epic", 10, 0.005, "STAINED_GLASS-10".asInternalName()),
         LEGENDARY("§6Legendary", 0, 0.02, "STAINED_GLASS-1".asInternalName()),
         MYTHIC("§dMythic", 0, 0.0, "STAINED_GLASS-6".asInternalName()),
+        DIVINE("§bDivine", 0, 0.025, "STAINED_GLASS-3".asInternalName()),
         TOTAL("§cTotal", 0, 0.0, "STAINED_GLASS-14".asInternalName()),
         ;
 

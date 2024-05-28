@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 
@@ -14,6 +14,10 @@ object ItemNameResolver {
         val lowercase = itemName.lowercase()
         itemNameCache[lowercase]?.let {
             return it
+        }
+
+        getInternalNameOrNullIgnoreCase(itemName)?.let {
+            return itemNameCache.getOrPut(lowercase) { it }
         }
 
         if (itemName == "§cmissing repo item") {
@@ -56,8 +60,6 @@ object ItemNameResolver {
                     // TODO remove workaround when this is fixed in neu
                     val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
                     rawInternalName.asInternalName()
-                } ?: run {
-                    getInternalNameOrNullIgnoreCase(itemName)
                 } ?: return null
             }
         }
@@ -71,7 +73,7 @@ object ItemNameResolver {
         UtilsPatterns.enchantmentNamePattern.matchMatcher(enchantmentName) {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
-            ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
+                ((if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else "")
                 + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
                 + ";" + group("level").romanToDecimal())
         }
@@ -95,7 +97,7 @@ object ItemNameResolver {
     }
 
     private fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
-        val lowercase = itemName.removeColor().lowercase()
+        val lowercase = itemName.lowercase()
         itemNameCache[lowercase]?.let {
             return it
         }
@@ -104,11 +106,14 @@ object ItemNameResolver {
             NEUItems.allItemsCache = NEUItems.readAllNeuItems()
         }
 
+        // supports colored names, rarities
         NEUItems.allItemsCache[lowercase]?.let {
             itemNameCache[lowercase] = it
             return it
         }
 
-        return null
+        // if nothing got found with colors, try without colors
+        val removeColor = lowercase.removeColor()
+        return NEUItems.allItemsCache.filter { it.key.removeColor() == removeColor }.values.firstOrNull()
     }
 }

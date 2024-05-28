@@ -6,8 +6,11 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -15,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -72,7 +76,7 @@ class PestParticleLine {
         return newList
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         // TODO time in config
@@ -84,6 +88,17 @@ class PestParticleLine {
         for (list in locations) {
             draw(event, list)
         }
+        showMiddle(event)
+    }
+
+    private fun showMiddle(event: LorenzRenderWorldEvent) {
+        if (locations.size <= 0) return
+        val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        val middle = plot.middle.copy(y = LocationUtils.playerLocation().y)
+        if (middle.distanceToPlayer() > 15) return
+
+        event.drawWaypointFilled(middle, LorenzColor.GRAY.toColor())
+        event.drawDynamicText(middle, "Middle", 1.0)
     }
 
     private fun draw(event: LorenzRenderWorldEvent, list: List<ParticleLocation>) {

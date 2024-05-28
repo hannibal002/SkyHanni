@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.TabCompletionEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -15,6 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 object PartyChatCommands {
 
     private val config get() = SkyHanniMod.feature.misc.partyCommands
+    private val storage get() = SkyHanniMod.feature.storage
 
     data class PartyChatCommand(
         val names: List<String>,
@@ -32,7 +34,7 @@ object PartyChatCommands {
             { config.transferCommand },
             requiresPartyLead = true,
             executable = {
-                ChatUtils.sendCommandToServer("party transfer ${it.cleanedAuthor}")
+                HypixelCommands.partyTransfer(it.cleanedAuthor)
             }
         ),
         PartyChatCommand(
@@ -41,7 +43,7 @@ object PartyChatCommands {
             requiresPartyLead = true,
             executable = {
                 lastWarp = SimpleTimeMark.now()
-                ChatUtils.sendCommandToServer("party warp")
+                HypixelCommands.partyWarp()
             }
         ),
         PartyChatCommand(
@@ -50,7 +52,7 @@ object PartyChatCommands {
             requiresPartyLead = true,
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
-                ChatUtils.sendCommandToServer("party settings allinvite")
+                HypixelCommands.partyAllInvite()
             }
         ),
     )
@@ -75,6 +77,10 @@ object PartyChatCommands {
 
     private val commandPrefixes = ".!?".toSet()
 
+    private fun isBlockedUser(name: String): Boolean {
+        return storage.blacklistedUsers.any { it.equals(name, ignoreCase = true) }
+    }
+
     @SubscribeEvent
     fun onPartyCommand(event: PartyChatEvent) {
         if (event.message.firstOrNull() !in commandPrefixes) return
@@ -85,8 +91,21 @@ object PartyChatCommands {
         if (name == LorenzUtils.getPlayerName()) return
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) return
+        if (isBlockedUser(name)) {
+            if (config.showIgnoredReminder) ChatUtils.clickableChat(
+                "§cIgnoring chat command from ${event.author}. " +
+                    "Unignore them using /shignore remove <player> or click here!",
+                onClick = { blacklistModify(event.author) }
+            )
+            return
+        }
         if (!isTrustedUser(name)) {
-            ChatUtils.chat("§cIgnoring chat command from $name. Change your party chat command settings or /friend (best) them.")
+            if (config.showIgnoredReminder) {
+                ChatUtils.chat(
+                    "§cIgnoring chat command from $name. " +
+                        "Change your party chat command settings or /friend (best) them."
+                )
+            }
             return
         }
         command.executable(event)
@@ -103,5 +122,99 @@ object PartyChatCommands {
             .filter { it.startsWith(commandText) }
             .map { "$prefix$it" }
             .forEach(event::addSuggestion)
+    }
+
+    /**
+     * TODO use a utils function for add/remove/list/clear
+     * function(args: Array<String>, list: List<String>, listName: String,
+     * precondition(string): () -> Boolean, onAdd(string), onRemove(string), onList(list))
+     */
+    fun blacklist(input: Array<String>) {
+        if (input.size !in 1..2) {
+            ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
+            return
+        }
+        when (val firstArg = input[0]) {
+            "add" -> {
+                if (input.size != 2) {
+                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
+                    return
+                }
+                if (isBlockedUser(input[1])) {
+                    ChatUtils.userError("${input[1]} is already ignored!")
+                } else blacklistModify(input[1])
+            }
+
+            "remove" -> {
+                if (input.size != 2) {
+                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
+                    return
+                }
+                if (!isBlockedUser(input[1])) {
+                    ChatUtils.userError("${input[1]} isn't ignored!")
+                } else blacklistModify(input[1])
+            }
+
+            "list" -> {
+                if (input.size == 2) {
+                    blacklistView(input[1])
+                } else blacklistView()
+            }
+
+            "clear" -> {
+                ChatUtils.clickableChat(
+                    "Are you sure you want to do this? Click here to confirm.",
+                    onClick = {
+                        storage.blacklistedUsers.clear()
+                        ChatUtils.chat("Cleared your ignored players list!")
+                    },
+                    oneTimeClick = true
+                )
+            }
+
+            else -> blacklistModify(firstArg)
+        }
+    }
+
+    private fun blacklistModify(player: String) {
+        if (player !in storage.blacklistedUsers) {
+            ChatUtils.chat("§cNow ignoring §b$player§e!")
+            storage.blacklistedUsers.add(player)
+            return
+        }
+        ChatUtils.chat("§aStopped ignoring §b$player§e!")
+        storage.blacklistedUsers.remove(player)
+        return
+    }
+
+    private fun blacklistView() {
+        val blacklist = storage.blacklistedUsers
+        if (blacklist.size <= 0) {
+            ChatUtils.chat("Your ignored players list is empty!")
+            return
+        }
+        var message = "Ignored player list:"
+        if (blacklist.size > 15) {
+            message += "\n§e"
+            blacklist.forEachIndexed { i, it ->
+                message += it
+                if (i < blacklist.size - 1) {
+                    message += ", "
+                }
+            }
+        } else {
+            blacklist.forEach {
+                message += "\n§e$it"
+            }
+        }
+        ChatUtils.chat(message)
+    }
+
+    private fun blacklistView(player: String) {
+        if (isBlockedUser(player)) {
+            ChatUtils.chat("$player §ais §eignored.")
+        } else {
+            ChatUtils.chat("$player §cisn't §eignored.")
+        }
     }
 }

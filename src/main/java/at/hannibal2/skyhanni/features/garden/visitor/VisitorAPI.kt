@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -217,7 +217,7 @@ object VisitorAPI {
         RARE_REWARD("§aRare visitor reward found", true),
         CHEAP_COPPER("§aCheap copper", true),
         EXPENSIVE_COPPER("§cExpensive copper", false),
-        LOW_LOSS("§cLow Loss", true),
-        HIGH_LOSS("§aHigh Loss", false)
+        LOW_LOSS("§aLow Loss", true),
+        HIGH_LOSS("§cHigh Loss", false)
     }
 }

@@ -50,7 +50,9 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
         ChocolateFactoryStat.TIME_TOWER,
-        ChocolateFactoryStat.LEADERBOARD_POS
+        ChocolateFactoryStat.TIME_TOWER_FULL,
+        ChocolateFactoryStat.LEADERBOARD_POS,
+        ChocolateFactoryStat.TIME_TO_BEST_UPGRADE
     ));
 
     @Expose
@@ -82,30 +84,55 @@ public class ChocolateFactoryConfig {
     public int barnCapacityThreshold = 6;
 
     @Expose
+    @ConfigOption(
+        name = "Rabbit Crush During Hoppity",
+        desc = "Only warn about rabbit crush when the Hoppity event is active."
+    )
+    @ConfigEditorBoolean
+    public boolean rabbitCrushOnlyDuringHoppity = false;
+
+    @Expose
     @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean extraTooltipStats = true;
 
     @Expose
-    @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
+    @ConfigOption(name = "Duplicate Rabbit Time", desc = "Show the production time of chocolate gained from duplicate rabbits.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showDuplicateTime = false;
+
+    @Expose
+    @ConfigOption(name = "Time Tower Usage Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeTowerWarning = false;
 
     @Expose
+    @ConfigOption(name = "Time Tower Reminder", desc = "Notification a minute before the time tower ends.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeTowerReminder = true;
+
+    @Expose
+    @ConfigOption(name = "Upgrade Warnings", desc = "")
+    @Accordion
+    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
+
+    @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
     public Position position = new Position(163, 160, false, true);
 
     @Expose
-    @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate.")
+    @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactOnClick = true;
 
     @Expose
-    @ConfigOption(name = "Always Compact", desc = "Always Compact the item toolip on the chocolate. Requires the above option to be enabled.")
+    @ConfigOption(name = "Always Compact", desc = "Always Compact the item tooltip on the chocolate. Requires the above option to be enabled.")
     @ConfigEditorBoolean
     public boolean compactOnClickAlways = false;
 
@@ -130,6 +157,15 @@ public class ChocolateFactoryConfig {
     public Position hoppityStatsPosition = new Position(163, 160, false, true);
 
     @Expose
+    @ConfigOption(name = "Leaderboard Change",
+        desc = "Show the change of your chocolate leaderboard over time in chat. " +
+            "This updates every time you first open the /cf menu on a new server."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean leaderboardChange = false;
+
+    @Expose
     @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -139,5 +175,15 @@ public class ChocolateFactoryConfig {
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
     public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
+
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Keybinds", desc = "")
+    @Accordion
+    public ChocolateFactoryKeybindsConfig keybinds = new ChocolateFactoryKeybindsConfig();
+
+    @Expose
+    @ConfigOption(name = "Chocolate Factory Custom Reminder", desc = "")
+    @Accordion
+    public ChocolateFactoryCustomReminderConfig customReminder = new ChocolateFactoryCustomReminderConfig();
 
 }

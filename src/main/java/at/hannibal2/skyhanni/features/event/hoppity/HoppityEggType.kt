@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
+import kotlin.time.Duration
 
 enum class HoppityEggType(
     val mealName: String,
@@ -9,10 +11,19 @@ enum class HoppityEggType(
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
 ) {
-    BREAKFAST("Breakfast", 7, "§a"),
+    BREAKFAST("Breakfast", 7, "§6"),
     LUNCH("Lunch", 14, "§9"),
-    DINNER("Dinner", 21, "§6"),
+    DINNER("Dinner", 21, "§a"),
     ;
+
+    fun timeUntil(): Duration {
+        val now = SkyBlockTime.now()
+        if (now.hour >= resetsAt) {
+            return now.copy(day = now.day + 1, hour = resetsAt, minute = 0, second = 0)
+                .asTimeMark().timeUntil()
+        }
+        return now.copy(hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
+    }
 
     fun markClaimed() {
         claimed = true
@@ -23,7 +34,8 @@ enum class HoppityEggType(
     }
 
     fun isClaimed() = claimed
-    val formattedName by lazy { "$mealColour$mealName" }
+    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColour}$mealName:$mealColour"
+    val coloredName get() = "$mealColour$mealName"
 
     companion object {
         fun allFound() = entries.forEach { it.markClaimed() }
@@ -41,6 +53,7 @@ enum class HoppityEggType(
                 eggType.lastResetDay = currentSbDay
                 if (HoppityEggLocator.currentEggType == eggType) {
                     HoppityEggLocator.currentEggType = null
+                    HoppityEggLocator.currentEggNote = null
                     HoppityEggLocator.sharedEggLocation = null
                 }
             }
