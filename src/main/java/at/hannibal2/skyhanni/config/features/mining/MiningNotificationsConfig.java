@@ -55,9 +55,8 @@ public class MiningNotificationsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Get Ascension Rope",
-        desc = "Click on a chat message to get an Ascension Rope when you're at a certain amount of Cold and in the §bMineshaft§7. " +
-            "§cOnly works if you have an Ascension Rope in your sacks."
+        name = "Cold Amount to Show Message",
+        desc = "Customise the amount of Cold you need to have to get the Ascension Rope message."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 100, minStep = 1)
     public int coldAmount = 90;
