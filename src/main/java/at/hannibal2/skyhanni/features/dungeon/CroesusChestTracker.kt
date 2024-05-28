@@ -227,8 +227,13 @@ class CroesusChestTracker {
         if (event.floor == "E") return
         croesusChests?.add(0, DungeonRunInfo(event.floor))
         currentRunIndex = 0
+        val size = croesusChests?.size ?: 0
         if ((croesusChests?.size ?: 0) > maxChests) {
             croesusChests?.dropLast(1)
+        }
+
+        if (config.croesusLimit && size >= 55) {
+            ChatUtils.chat("You are close to the Croesus Limit. Please open your chests!")
         }
     }
 
