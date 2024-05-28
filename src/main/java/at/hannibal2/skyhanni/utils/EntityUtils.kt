@@ -37,33 +37,6 @@ object EntityUtils {
         return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
     }
 
-    fun EntityLivingBase.getAllNameTagsWith(
-        y: Int,
-        contains: String,
-        debugRightEntity: Boolean = false,
-        inaccuracy: Double = 1.6,
-        debugWrongEntity: Boolean = false,
-    ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = y)
-        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlockPos()
-        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
-        val clazz = EntityArmorStand::class.java
-        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-        return found.filter {
-            val result = it.name.contains(contains)
-            if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
-            }
-            if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
-            }
-            result
-        }
-    }
-
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
         for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
@@ -77,17 +50,8 @@ object EntityUtils {
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = 3)
-        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
-        val b = center.add(radius, radius + 3, radius).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
-        val clazz = EntityArmorStand::class.java
-        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-        return found.filter {
-            val result = it.name.contains(contains)
-            result
-        }
+    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().add(y = 3), radius).filter {
+        it.name.contains(contains)
     }
 
     fun EntityLivingBase.getNameTagWith(
@@ -96,14 +60,17 @@ object EntityUtils {
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
-    ): EntityArmorStand? {
+    ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
+
+    fun EntityLivingBase.getAllNameTagsWith(
+        y: Int,
+        contains: String,
+        debugRightEntity: Boolean = false,
+        inaccuracy: Double = 1.6,
+        debugWrongEntity: Boolean = false,
+    ): List<EntityArmorStand> {
         val center = getLorenzVec().add(y = y)
-        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlockPos()
-        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
-        val clazz = EntityArmorStand::class.java
-        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-        return found.find {
+        return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
                 LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
@@ -111,10 +78,19 @@ object EntityUtils {
             if (debugRightEntity && result) {
                 LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
                 LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
+                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }
+    }
+
+    private fun getArmorStandsInRadius(center: LorenzVec, radius: Double): List<EntityArmorStand> {
+        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
+        val b = center.add(radius, radius + 3, radius).toBlockPos()
+        val alignedBB = AxisAlignedBB(a, b)
+        val clazz = EntityArmorStand::class.java
+        val worldObj = Minecraft.getMinecraft()?.theWorld ?: return emptyList()
+        return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
     }
 
     fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)

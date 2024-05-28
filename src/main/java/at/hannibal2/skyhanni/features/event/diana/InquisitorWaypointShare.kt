@@ -10,15 +10,16 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.hasGroup
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -28,6 +29,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object InquisitorWaypointShare {
@@ -57,13 +59,14 @@ object InquisitorWaypointShare {
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
     )
 
-    private var time = 0L
-    private var testTime = 0L
+    private var inquisitorTime = SimpleTimeMark.farPast()
+    private var testTime = SimpleTimeMark.farPast()
     private var lastInquisitorMessage = ""
     private var inquisitor = -1
     private var lastInquisitor = -1
-    private var lastShareTime = 0L
+    private var lastShareTime = SimpleTimeMark.farPast()
     private var inquisitorsNearby = emptyList<EntityOtherPlayerMP>()
+    private val soonRange = (-500).milliseconds..1.5.seconds
 
     private val logger = LorenzLogger("diana/waypoints")
 
@@ -104,26 +107,25 @@ object InquisitorWaypointShare {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message
+        // TODO repo pattern
         if (message.contains("§eYou dug out")) {
-            testTime = System.currentTimeMillis()
+            testTime = SimpleTimeMark.now()
             lastInquisitorMessage = message
 
-            val diff = System.currentTimeMillis() - time
+            val passedSince = inquisitorTime.passedSince()
 
-            if (diff < 10_000) {
+            if (passedSince < 10.seconds) {
                 logger.log(" ")
                 logger.log("reverse!")
-                logger.log("diff: $diff")
+                logger.log("diff: $passedSince")
             }
-            if (diff > 1500 || diff < -500) {
-                return
-            }
+            if (passedSince in soonRange) return
             foundInquisitor(lastInquisitor)
         }
 
         // TODO: Change the check to only one line once we have a confirmed inquis message line
         if (message.contains("§r§eYou dug out ") && message.contains("Inquis")) {
-            time = System.currentTimeMillis()
+            inquisitorTime = SimpleTimeMark.now()
             logger.log("found Inquisitor")
         }
     }
@@ -144,15 +146,15 @@ object InquisitorWaypointShare {
         inquisitorsNearby = inquisitorsNearby.editCopy { add(entity) }
         GriffinBurrowHelper.update()
 
-        val diff = System.currentTimeMillis() - time
-        time = System.currentTimeMillis()
+        val passedSince = inquisitorTime.passedSince()
+        inquisitorTime = SimpleTimeMark.now()
         lastInquisitor = entity.entityId
 
-        logger.log("diff: $diff")
-        if (diff > 1500 || diff < -500) {
-            val testDiff = System.currentTimeMillis() - testTime
-            if (testDiff > 1500 || testDiff < -500) {
-                logger.log("testDiff: $diff")
+        logger.log("diff: $passedSince")
+        if (passedSince in soonRange) {
+            val testDiff = testTime.passedSince()
+            if (testDiff in soonRange) {
+                logger.log("testDiff: $passedSince")
                 return
             } else {
                 logger.log("wrong Inquisitor message!")
@@ -203,21 +205,21 @@ object InquisitorWaypointShare {
 
     private fun sendDeath() {
         if (!isEnabled()) return
-        if (lastShareTime + 5000 > System.currentTimeMillis()) return
-        lastShareTime = System.currentTimeMillis()
+        if (lastShareTime.passedSince() > 5.seconds) return
+        lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
             logger.log("Inquisitor is already null!")
             return
         }
         inquisitor = -1
-        ChatUtils.sendCommandToServer("pc Inquisitor dead!")
+        HypixelCommands.partyChat("Inquisitor dead!")
     }
 
     fun sendInquisitor() {
         if (!isEnabled()) return
-        if (lastShareTime + 5000 > System.currentTimeMillis()) return
-        lastShareTime = System.currentTimeMillis()
+        if (lastShareTime.passedSince() > 5.seconds) return
+        lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
             ChatUtils.error("No Inquisitor Found!")
@@ -238,7 +240,7 @@ object InquisitorWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        ChatUtils.sendCommandToServer("pc x: $x, y: $y, z: $z ")
+        HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)

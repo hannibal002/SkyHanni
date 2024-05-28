@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
+import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -47,19 +49,19 @@ object TrevorSolver {
     }
 
     fun findMob() {
-        var canSee = false
         Minecraft.getMinecraft().theWorld ?: return
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is EntityOtherPlayerMP) continue
             val name = entity.name
+            val isTrevor = MobData.entityToMob[entity]?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) }
-            if (animalHealths.any { it == entityHealth } && currentMob != null) {
+            if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
                 if (foundID == entity.entityId) {
                     val dist = entity.position.toLorenzVec().distanceToPlayer()
-                    if ((currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP) && mobLocation == TrapperMobArea.OASIS) return
-
-                    canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
+                    val isOasisMob = currentMob == TrevorMob.RABBIT || currentMob == TrevorMob.SHEEP
+                    if (isOasisMob && mobLocation == TrapperMobArea.OASIS && !isTrevor) return
+                    val canSee = entity.canBeSeen() && dist < currentMob!!.renderDistance
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
                             LorenzUtils.sendTitle("§2Saw ${currentMob!!.mobName}!", 3.seconds)
@@ -78,6 +80,9 @@ object TrevorSolver {
             foundID = -1
         }
     }
+
+    private fun isTrevorMob(mob: Mob): Boolean =
+        TrevorTracker.TrapperMobRarity.entries.any { mob.name.startsWith(it.formattedName + " ", ignoreCase = true) }
 
     fun resetLocation() {
         maxHeight = 0.0
