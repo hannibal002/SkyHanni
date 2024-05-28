@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -81,7 +82,7 @@ object CorpseLocator {
                 val z = location.z.toInt()
                 val type = corpse.waypointType.displayText
 
-                ChatUtils.sendCommandToServer("pc x: $x, y: $y, z: $z | ($type)")
+                HypixelCommands.partyChat("x: $x, y: $y, z: $z | ($type)")
                 corpse.shared = true
             }
     }
@@ -89,7 +90,7 @@ object CorpseLocator {
     @Suppress("UNUSED_PARAMETER")
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        parsedLocations.clear()
+        if (parsedLocations.isNotEmpty()) parsedLocations.clear()
     }
 
     @Suppress("UNUSED_PARAMETER")
