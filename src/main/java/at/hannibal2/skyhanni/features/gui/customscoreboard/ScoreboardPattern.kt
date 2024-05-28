@@ -38,6 +38,10 @@ object ScoreboardPattern {
         "date",
         "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?.*"
     )
+    /*
+      * REGEX-TEST:  §78:50am
+      * REGEX-TEST:  §75:50am §b☽
+    */
     val timePattern by mainSb.pattern(
         "time",
         "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm)\\s*(?<symbol>(§b☽|§e☀|§.⚡|§.☔))?.*$"
