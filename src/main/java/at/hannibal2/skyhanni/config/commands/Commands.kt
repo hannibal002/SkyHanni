@@ -387,7 +387,7 @@ object Commands {
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
-            "shclearksimet",
+            "shclearkismet",
             "Cleares the saved values of the applied kismet feathers in Croesus"
         ) { CroesusChestTracker.resetChest() }
         registerCommand(
