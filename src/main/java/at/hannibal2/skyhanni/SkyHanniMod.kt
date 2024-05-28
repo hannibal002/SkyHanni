@@ -949,7 +949,6 @@ class SkyHanniMod {
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
         loadModule(CustomWardrobe())
-        loadModule(FlareDisplay)
 
         init()
 
