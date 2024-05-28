@@ -167,7 +167,7 @@ object HolographicEntities {
         GlStateManager.pushMatrix()
         val viewerPosition = getViewerPos(partialTicks)
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
-        val renderingOffset = mobPosition.subtract(viewerPosition)
+        val renderingOffset = mobPosition - viewerPosition
         renderingOffset.applyTranslationToGL()
         GlStateManager.disableCull()
         GlStateManager.enableRescaleNormal()

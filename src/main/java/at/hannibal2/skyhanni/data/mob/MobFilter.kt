@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -63,10 +63,11 @@ object MobFilter {
      *  REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
      *  REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
      *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
+     *  REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
      *  */
     val bossMobNameFilter by repoGroup.pattern(
         "filter.boss",
-        "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+|█+)? .$"
+        "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$"
     )
     val dungeonNameFilter by repoGroup.pattern(
         "filter.dungeon",

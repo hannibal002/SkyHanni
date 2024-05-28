@@ -2,12 +2,10 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
@@ -43,7 +41,6 @@ object RenderableTooltips {
         val tooltip = tooltip ?: return
         val tips = tooltip.tips
         if (tips.isEmpty()) return
-        if (NEUItems.neuHasFocus() || Minecraft.getMinecraft().currentScreen is GuiIngameMenu) return
 
         val x = Utils.getMouseX() + 12
         val y = Utils.getMouseY() - if (tips.size > 1) 2 else -7

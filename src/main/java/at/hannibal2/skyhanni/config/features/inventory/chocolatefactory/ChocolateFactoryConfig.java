@@ -126,13 +126,13 @@ public class ChocolateFactoryConfig {
     public Position position = new Position(163, 160, false, true);
 
     @Expose
-    @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate.")
+    @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactOnClick = true;
 
     @Expose
-    @ConfigOption(name = "Always Compact", desc = "Always Compact the item toolip on the chocolate. Requires the above option to be enabled.")
+    @ConfigOption(name = "Always Compact", desc = "Always Compact the item tooltip on the chocolate. Requires the above option to be enabled.")
     @ConfigEditorBoolean
     public boolean compactOnClickAlways = false;
 
