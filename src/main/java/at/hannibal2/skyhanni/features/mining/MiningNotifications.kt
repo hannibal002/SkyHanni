@@ -54,10 +54,6 @@ object MiningNotifications {
         "goblin.diamondspawn",
         "§6A §r§bDiamond Goblin §r§6has spawned!"
     )
-    private val frostbitePattern by patternGroup.pattern(
-        "cold.frostbite",
-        "§9§lBRRR! §r§bYou're freezing! All you can think about is getting out of here to a warm campfire\\.\\.\\."
-    )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
 
@@ -73,13 +69,6 @@ object MiningNotifications {
             scrapDrop.matches(message) -> sendNotification(MiningNotificationList.SCRAP)
             goldenGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.GOLDEN_GOBLIN)
             diamondGoblinSpawn.matches(message) -> sendNotification(MiningNotificationList.DIAMOND_GOBLIN)
-            frostbitePattern.matches(message) -> {
-                if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope) {
-                    runDelayed(0.5.seconds) {
-                        GetFromSackAPI.getFromChatMessageSackItems(ASCENSION_ROPE)
-                    }
-                }
-            }
         }
     }
 
@@ -92,6 +81,11 @@ object MiningNotifications {
         if (event.cold >= config.coldThreshold.get() && !hasSentCold) {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
+        }
+        if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope && config.coldAmount == event.cold) {
+            runDelayed(0.5.seconds) {
+                GetFromSackAPI.getFromChatMessageSackItems(ASCENSION_ROPE)
+            }
         }
     }
 
