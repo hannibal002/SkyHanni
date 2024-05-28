@@ -230,6 +230,10 @@ class CroesusChestTracker {
         if ((croesusChests?.size ?: 0) > maxChests) {
             croesusChests?.dropLast(1)
         }
+
+        if (config.croesusLimit && getLastActiveChest() >= 55) {
+            ChatUtils.chat("You are close to the Croesus Limit. Please open your chests!")
+        }
     }
 
     private fun Int.getRun() = getRun0(this)
