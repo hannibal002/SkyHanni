@@ -1,31 +1,29 @@
 package at.hannibal2.skyhanni.data.jsonobjects.local;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.utils.fromJson
+import com.google.gson.Gson
+import com.google.gson.annotations.Expose
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class HotmTree {
+class HotmTree {
 
     @Expose
-    public Map<String, HotmPerk> perks = new HashMap<>();
+    val perks = mutableMapOf<String, HotmPerk>();
 
-    public HotmTree deepCopy() {
-        Gson gson = new Gson();
-        String json = gson.toJson(this);
-        return gson.fromJson(json, HotmTree.class);
+    fun deepCopy(): HotmTree {
+        val gson = Gson();
+        val json = gson.toJson(this);
+        return gson.fromJson<HotmTree>(json)
     }
 
-    public static class HotmPerk {
+    class HotmPerk {
 
         @Expose
-        public int level = 0;
+        var level: Int = 0
 
         @Expose
-        public boolean enabled = false;
+        var enabled: Boolean = false
 
         @Expose
-        public boolean isUnlocked = false;
+        var isUnlocked: Boolean = false
     }
 }
