@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -122,6 +123,11 @@ object ChocolateFactoryDataLoader {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(46, "inventory.chocolateFactory.rabbitWarning", "inventory.chocolateFactory.chocolateFactoryRabbitWarningConfig.rabbitWarning")
     }
 
     private fun clearData() {
