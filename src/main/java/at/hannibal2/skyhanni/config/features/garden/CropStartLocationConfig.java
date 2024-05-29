@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CropStartLocationConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Show waypoints for the farm of your current tool in hand. ")
+    @ConfigOption(name = "Enable", desc = "Show waypoints for the farm of your current tool in hand.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
