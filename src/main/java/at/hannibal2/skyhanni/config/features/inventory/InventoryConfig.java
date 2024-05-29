@@ -231,8 +231,8 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Held Time in Lore", desc = "Shows the held time for Bottle of Jyrre and Dark Cacao Truffle in lore.")
+    @ConfigOption(name = "Time Held in Lore", desc = "Shows time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean heldTimeInLore = false;
+    public boolean timeHeldInLore = false;
 }
