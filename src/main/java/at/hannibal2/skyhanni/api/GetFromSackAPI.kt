@@ -168,7 +168,7 @@ object GetFromSackAPI {
         if (args.isEmpty()) return CommandResult.WRONG_ARGUMENT to null
 
         val arguments = args.toMutableList()
-        val argsNull = args.last().toIntOrNull() == null
+        val argsNull = args.last().last().toString().toIntOrNull() == null
 
         if (argsNull) {
             if (!config.defaultGFS) return CommandResult.WRONG_ARGUMENT to null
@@ -184,9 +184,8 @@ object GetFromSackAPI {
         val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
         val replacedString = itemString.replace("_"," ")
 
-        var item = when {
+        val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
-            SackAPI.sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString)
             SackAPI.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString)
 
             else -> return CommandResult.WRONG_IDENTIFIER to null
