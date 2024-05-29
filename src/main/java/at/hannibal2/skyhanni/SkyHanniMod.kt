@@ -299,7 +299,6 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPr
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
