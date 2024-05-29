@@ -145,8 +145,8 @@ class TrophyFishDisplay {
             val recentlyDropped = rarity == recentlyDroppedRarity
             val format = if (config.showCross.get() && amount == 0) "§c✖" else {
                 val color = if (recentlyDropped) "§a" else rarity.formatCode
-                val numberformat = if (config.showCheckmark.get()) "§l✔" else amount.addSeparators()
-                "$color$numberformat"
+                val numberFormat = if (config.showCheckmark.get() && amount >= 1) "§l✔" else amount.addSeparators()
+                "$color$numberFormat"
             }
             row[get(rarity)] = string(format)
         }
