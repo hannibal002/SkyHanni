@@ -122,7 +122,7 @@ class TrophyFishDisplay {
         table: MutableList<List<Renderable>>,
     ) {
         get(config.onlyShowMissing.get())?.let { atLeast ->
-            val list = TrophyRarity.entries.filter { it <= atLeast }
+            val list = TrophyRarity.entries.filter { it == atLeast }
             if (list.all { (data[it] ?: 0) > 0 }) {
                 return
             }
