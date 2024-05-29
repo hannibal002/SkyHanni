@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -290,7 +292,7 @@ object ChocolateFactoryDataLoader {
                 SoundUtils.playBeepSound()
             }
 
-            if (config.specialRabbitWarning && isGoldenRabbit) {
+            if (config.specialRabbitWarning && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)) {
                 SoundUtils.repeatSound(100, 20, SoundUtils.plingSound)
             }
 

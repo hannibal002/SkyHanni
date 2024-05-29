@@ -69,9 +69,7 @@ object ChocolateFactoryAPI {
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
-    val specialRabbitTexture = listOf(
-        "ewogICJ0aW1lc3RhbXAiIDogMTcxNDk1ODk5MjUzNywKICAicHJvZmlsZUlkIiA6ICI4YmM3MjdlYThjZjA0YWUzYTI4MDVhY2YzNjRjMmQyNCIsCiAgInByb2ZpbGVOYW1lIiA6ICJub3RpbnZlbnRpdmUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGI4Yzc3ODllYzkzNmQxMWU1NDFjNjk1Y2U1M2QwNWNmODNmOGMwNGMxNDhhMGIwZDg1Njc5Y2NhMTE0YTBmOSIKICAgIH0KICB9Cn0"
-    )
+    var specialRabbitTextures = listOf<String>()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -112,6 +110,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        specialRabbitTextures = data.specialRabbitTextures
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
