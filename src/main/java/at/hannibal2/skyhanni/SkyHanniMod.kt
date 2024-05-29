@@ -954,7 +954,6 @@ class SkyHanniMod {
         loadModule(CustomWardrobe())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(CustomWardrobe())
         loadModule(AuctionOutbidWarning)
 
         // test stuff
