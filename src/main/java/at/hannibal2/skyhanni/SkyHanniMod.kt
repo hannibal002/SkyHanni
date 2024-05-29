@@ -929,7 +929,7 @@ class SkyHanniMod {
         loadModule(SulphurSkitterBox())
         loadModule(HighlightInquisitors())
         loadModule(VerminTracker)
-        loadModule(TerminalWaypoints())
+        loadModule(TerminalWaypoints)
         loadModule(VerminHighlighter())
         loadModule(SkillProgress)
         loadModule(GardenInventoryTooltipOverflow())

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TerminalWaypoints {
+object TerminalWaypoints {
     private val config get() = SkyHanniMod.feature.dungeon
     @SubscribeEvent
     fun onWorld(event: LorenzRenderWorldEvent) {
