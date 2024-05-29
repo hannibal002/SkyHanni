@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HotmFeatures {
 
-    val config get() = SkyHanniMod.feature.mining.hotmConfig
+    val config get() = SkyHanniMod.feature.mining.hotm
 
     fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory
 
