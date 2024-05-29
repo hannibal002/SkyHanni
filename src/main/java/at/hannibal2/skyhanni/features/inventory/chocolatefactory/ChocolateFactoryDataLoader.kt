@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -84,6 +82,10 @@ object ChocolateFactoryDataLoader {
     private val clickMeRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.clickme",
         "§e§lCLICK ME!"
+    )
+    private val clickMeGoldenRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.clickme.golden",
+        "§6§lGolden Rabbit §8- §a(?<name>.*)"
     )
     private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.amount",
@@ -282,12 +284,13 @@ object ChocolateFactoryDataLoader {
 
     private fun processItem(list: MutableList<ChocolateFactoryUpgrade>, item: ItemStack, slotIndex: Int) {
         if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
-        if (clickMeRabbitPattern.matches(item.name)) {
+        val isGoldenRabbit = clickMeGoldenRabbitPattern.matches(item.name)
+        if (clickMeRabbitPattern.matches(item.name) || isGoldenRabbit) {
             if (config.rabbitWarning) {
                 SoundUtils.playBeepSound()
             }
 
-            if (config.specialRabbitWarning && item.getSkullTexture() in specialRabbitTexture) {
+            if (config.specialRabbitWarning && isGoldenRabbit) {
                 SoundUtils.repeatSound(100, 20, SoundUtils.plingSound)
             }
 
