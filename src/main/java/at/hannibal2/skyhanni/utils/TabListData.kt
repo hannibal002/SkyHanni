@@ -20,6 +20,7 @@ import net.minecraft.world.WorldSettings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+import kotlin.time.Duration.Companion.seconds
 
 object TabListData {
     private var tablistCache = emptyList<String>()
@@ -126,6 +127,9 @@ object TabListData {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateEvent(getTabList()).postAndCatch()
+            if (!LorenzUtils.onHypixel) {
+                workaroundDelayedTabListUpdateAgain()
+            }
         }
 
         val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
@@ -136,5 +140,14 @@ object TabListData {
             TablistFooterUpdateEvent(tabFooter).postAndCatch()
         }
         footer = tabFooter
+    }
+
+    private fun workaroundDelayedTabListUpdateAgain() {
+        DelayedRun.runDelayed(2.seconds) {
+            if (LorenzUtils.onHypixel) {
+                println("workaroundDelayedTabListUpdateAgain")
+                TabListUpdateEvent(getTabList()).postAndCatch()
+            }
+        }
     }
 }

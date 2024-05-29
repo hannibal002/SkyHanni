@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.Commands.init
+import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BitsAPI
@@ -143,6 +143,7 @@ import at.hannibal2.skyhanni.features.event.diana.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggDisplayManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
@@ -177,6 +178,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishDisplay
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
@@ -253,6 +255,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning
+import at.hannibal2.skyhanni.features.inventory.AuctionOutbidWarning
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
@@ -295,6 +298,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
@@ -454,8 +458,8 @@ import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
-import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -492,7 +496,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.1",
+    version = "0.26.Beta.2",
 )
 class SkyHanniMod {
 
@@ -682,6 +686,7 @@ class SkyHanniMod {
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
         loadModule(HoppityEggDisplayManager)
+        loadModule(HoppityCollectionData)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
@@ -737,6 +742,7 @@ class SkyHanniMod {
         loadModule(SharkFishCounter())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
+        loadModule(TrophyFishDisplay)
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
         loadModule(BasketWaypoints())
@@ -946,17 +952,16 @@ class SkyHanniMod {
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning)
         loadModule(ColdOverlay())
+        loadModule(CustomWardrobe())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(CustomWardrobe())
-
-        init()
+        loadModule(AuctionOutbidWarning)
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
         loadModule(FixGhostEntities)
-        loadModule(CopyNearbyParticlesCommand)
         loadModule(TrackSoundsCommand)
+        loadModule(TrackParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest)
         loadModule(TestBingo)
@@ -967,8 +972,11 @@ class SkyHanniMod {
         loadModule(TestShowSlotNumber())
         loadModule(SkyHanniDebugsAndTests)
         loadModule(WorldEdit)
-        PreInitFinishedEvent().postAndCatch()
         loadModule(MobDebug())
+
+        Commands.init()
+
+        PreInitFinishedEvent().postAndCatch()
     }
 
     @Mod.EventHandler

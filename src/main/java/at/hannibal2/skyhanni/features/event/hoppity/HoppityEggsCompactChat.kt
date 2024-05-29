@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -20,6 +22,7 @@ object HoppityEggsCompactChat {
     private var newRabbit = false
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
+    private val config get() = ChocolateFactoryAPI.config
 
     fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
@@ -57,7 +60,12 @@ object HoppityEggsCompactChat {
 
         return if (duplicate) {
             val format = lastDuplicateAmount?.let { NumberUtil.format(it) } ?: "?"
-            "$mealName Egg! §7Duplicate $lastName §7(§6+$format Chocolate§7)"
+            val timeFormatted = lastDuplicateAmount?.let {
+                ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
+            } ?: "?"
+
+            val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
+            "$mealName Egg! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
             "$mealName Egg! §d§lNEW $lastName §7(${lastProfit}§7)"
         } else "?"
@@ -70,7 +78,7 @@ object HoppityEggsCompactChat {
             compactChat(event)
         }
 
-        HoppityEggsManager.rabbitFoundPatttern.matchMatcher(event.message) {
+        HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
             lastName = group("name")
             lastRarity = group("rarity")
             compactChat(event)

@@ -33,7 +33,7 @@ class ShowFishingItemName {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
             val itemStack = entityItem.entityItem
-            // Hypixel sometimes replaces the bait item mid air with a stone
+            // Hypixel sometimes replaces the bait item midair with a stone
             if (itemStack.name.removeColor() == "Stone") continue
             var text = ""
 
@@ -43,7 +43,7 @@ class ShowFishingItemName {
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name = itemStack.name.transformIf({isBait}) { "§7" + this.removeColor() }
+                val name = itemStack.name.transformIf({ isBait }) { "§7" + this.removeColor() }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
                 val size = itemStack.stackSize
@@ -51,7 +51,7 @@ class ShowFishingItemName {
                 text += name
             }
 
-            itemsOnGround.put(entityItem, text)
+            itemsOnGround[entityItem] = text
         }
     }
 
