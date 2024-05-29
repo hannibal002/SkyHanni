@@ -48,7 +48,7 @@ class CustomWardrobe {
     private var buttonsRenderable: Renderable? = null
     private var inventoryButton: Renderable? = null
     private var editMode = false
-    private var waitingForInventoryUpdate = true
+    private var waitingForInventoryUpdate = false
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -87,7 +87,7 @@ class CustomWardrobe {
                         horizontalAlign = HorizontalAlignment.RIGHT,
                         verticalAlign = VerticalAlignment.BOTTOM,
                         scale = 1.0 * (config.spacing.globalScale / 100.0)
-                    ),
+                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
                     onClick = {
                         config::enabled.jumpToEditor()
                         reset()
@@ -118,6 +118,12 @@ class CustomWardrobe {
 
         val (width, height) = fullRenderable.width to fullRenderable.height
         val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
+        if (waitingForInventoryUpdate && config.loadingText) {
+            val loadingRenderable = Renderable.string("§cLoading...")
+            val loadingPos =
+                Position(pos.rawX + (width - loadingRenderable.width) / 2, pos.rawY - loadingRenderable.height)
+            loadingPos.renderRenderable(loadingRenderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
+        }
 
         GlStateManager.translate(0f, 0f, 100f)
         pos.renderRenderable(fullRenderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
@@ -126,6 +132,7 @@ class CustomWardrobe {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        waitingForInventoryUpdate = false
         DelayedRun.runDelayed(500.milliseconds) {
             if (!inWardrobe()) {
                 reset()
@@ -135,9 +142,7 @@ class CustomWardrobe {
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
-        waitingForInventoryUpdate = false
-        if (editMode) return
+        if (!isEnabled() || editMode) return
         update()
     }
 
