@@ -38,8 +38,7 @@ class PetNametag {
 
             var text = ""
             if (!config.hidePetLevel && (!config.hideMaxPetLevel || lvl == 100 || lvl == 200)) text += "$start "
-            text += rarity
-            text += pet + skin
+            text += rarity + pet + skin
 
             event.chatComponent = text.asComponent()
         }
