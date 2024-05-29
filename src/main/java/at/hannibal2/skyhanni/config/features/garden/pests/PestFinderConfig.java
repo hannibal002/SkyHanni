@@ -87,4 +87,9 @@ public class PestFinderConfig {
     @ConfigOption(name = "Always Teleport", desc = "Allow teleporting with the Teleport Hotkey even when you're already in an infested plot.")
     @ConfigEditorBoolean
     public boolean alwaysTp = false;
+
+    @Expose
+    @ConfigOption(name = "Back to Garden", desc = "Make the Teleport Hotkey warp you to Garden if you don't have any pests.")
+    @ConfigEditorBoolean
+    public boolean backToGarden = false;
 }
