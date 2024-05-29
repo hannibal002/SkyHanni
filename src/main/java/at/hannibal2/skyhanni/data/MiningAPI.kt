@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
@@ -200,10 +201,7 @@ object MiningAPI {
             return
         }
 
-        val extraBlocks = surroundingMinedBlocks
-            .filter { it.confirmed }
-            .groupBy({ it.ore }, { 1 })
-            .mapValues { it.value.size }
+        val extraBlocks = surroundingMinedBlocks.filter { it.confirmed }.countBy { it.ore }
 
         OreMinedEvent(originalBlock.ore, extraBlocks).postAndCatch()
 

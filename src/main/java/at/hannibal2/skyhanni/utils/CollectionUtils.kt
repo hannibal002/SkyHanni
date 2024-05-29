@@ -90,6 +90,16 @@ object CollectionUtils {
         }
     }
 
+    /** Returns a map containing the count of occurrences of each distinct result of the [selector] function. */
+    inline fun <T, K> Iterable<T>.countBy(selector: (T) -> K): Map<K, Int> {
+        val map = mutableMapOf<K, Int>()
+        for (item in this) {
+            val key = selector(item)
+            map[key] = map.getOrDefault(key, 0) + 1
+        }
+        return map
+    }
+
     fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
     fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
@@ -182,9 +192,7 @@ object CollectionUtils {
         }
     }
 
-    /**
-     * Removes the first element that matches the given [predicate] in the list.
-     */
+    /** Removes the first element that matches the given [predicate] in the list. */
     fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
         val mutableList = this.toMutableList()
         val iterator = mutableList.iterator()
