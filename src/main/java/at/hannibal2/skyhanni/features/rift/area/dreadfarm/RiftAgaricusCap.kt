@@ -11,13 +11,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class RiftAgaricusCap {
 
     private val config get() = RiftAPI.config.area.dreadfarm
-    private var startTime = 0L
+    private var startTime = SimpleTimeMark.farPast()
     private var location: LorenzVec? = null
 
     @SubscribeEvent
@@ -36,11 +37,11 @@ class RiftAgaricusCap {
         when (currentLocation.getBlockStateAt().toString()) {
             "minecraft:brown_mushroom" -> {
                 return if (location != currentLocation) {
-                    startTime = System.currentTimeMillis()
+                    startTime = SimpleTimeMark.now()
                     currentLocation
                 } else {
-                    if (startTime == -1L) {
-                        startTime = System.currentTimeMillis()
+                    if (startTime.isFarFuture()) {
+                        startTime = SimpleTimeMark.now()
                     }
                     location
                 }
@@ -48,7 +49,7 @@ class RiftAgaricusCap {
 
             "minecraft:red_mushroom" -> {
                 if (location == currentLocation) {
-                    startTime = -1L
+                    startTime = SimpleTimeMark.farFuture()
                     return location
                 }
             }
@@ -62,13 +63,12 @@ class RiftAgaricusCap {
 
         val location = location?.add(y = 0.6) ?: return
 
-        if (startTime == -1L) {
+        if (startTime.isFarFuture()) {
             event.drawDynamicText(location, "§cClick!", 1.5)
             return
         }
 
-        val countDown = System.currentTimeMillis() - startTime
-        val format = TimeUtils.formatDuration(countDown - 1000, showMilliSeconds = true)
+        val format = startTime.passedSince().format(showMilliSeconds = true)
         event.drawDynamicText(location, "§b$format", 1.5)
     }
 

@@ -22,7 +22,7 @@ object ChocolateFactoryKeybinds {
 
         val chest = event.guiContainer as? GuiChest ?: return
 
-        for (index in 0..4) {
+        for (index in 0..6) {
             val key = getKey(index) ?: error("no key for index $index")
             if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
@@ -32,7 +32,7 @@ object ChocolateFactoryKeybinds {
 
             Minecraft.getMinecraft().playerController.windowClick(
                 chest.inventorySlots.windowId,
-                29 + index,
+                28 + index,
                 2,
                 3,
                 Minecraft.getMinecraft().thePlayer
@@ -59,6 +59,8 @@ object ChocolateFactoryKeybinds {
         2 -> config.key3
         3 -> config.key4
         4 -> config.key5
+        5 -> config.key6
+        6 -> config.key7
         else -> null
     }
 }

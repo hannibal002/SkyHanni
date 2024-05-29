@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -18,6 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 object ChocolateFactoryBarnManager {
 
     private val config get() = ChocolateFactoryAPI.config
+    private val hoppityConfig get() = HoppityEggsManager.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private val newRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
@@ -54,7 +55,7 @@ object ChocolateFactoryBarnManager {
         rabbitDuplicatePattern.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
             val amount = group("amount").formatLong()
-            if (config.showDuplicateTime) {
+            if (config.showDuplicateTime && !hoppityConfig.compactChat) {
                 val format = ChocolateFactoryAPI.timeUntilNeed(amount).format(maxUnits = 2)
                 DelayedRun.runNextTick {
                     ChatUtils.chat("§7(§a+§b$format §aof production§7)")
