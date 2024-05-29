@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class InWaterDisplay {
+object InWaterDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.stranded
 

@@ -921,7 +921,7 @@ class SkyHanniMod {
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(MiningEventTracker())
-        loadModule(InWaterDisplay())
+        loadModule(InWaterDisplay)
         loadModule(MiningNotifications)
         loadModule(JyrreTimer())
         loadModule(TotemOfCorruption())
