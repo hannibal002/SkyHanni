@@ -9,13 +9,14 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
@@ -31,10 +32,22 @@ object MineshaftPityDisplay {
 
     private val profileStorage get() = ProfileStorageData.profileSpecific?.mining?.mineshaft
 
-    private var minedBlocks: MutableMap<PityBlocks, Int>
-        get() = profileStorage?.blocksBroken ?: mutableMapOf()
+    private var minedBlocks: List<PityData>
+        get() = profileStorage?.blocksBroken ?: mutableListOf()
         set(value) {
             profileStorage?.blocksBroken = value
+        }
+
+    private var PityBlock.efficientMiner: Int
+        get() = minedBlocks.firstOrNull { it.pityBlock == this }?.efficientMiner ?: 0
+        set(value) {
+            minedBlocks.firstOrNull { it.pityBlock == this }?.efficientMiner = value
+        }
+
+    private var PityBlock.blocksBroken: Int
+        get() = minedBlocks.firstOrNull { it.pityBlock == this }?.blocksBroken ?: 0
+        set(value) {
+            minedBlocks.firstOrNull { it.pityBlock == this }?.blocksBroken = value
         }
 
     private var mineshaftTotalBlocks: Long
@@ -58,11 +71,16 @@ object MineshaftPityDisplay {
     @SubscribeEvent
     fun onOreMined(event: OreMinedEvent) {
         if (!isEnabled()) return
-        val oreType = event.originalOre.getOreType() ?: return
-        val pityBlock = PityBlocks.entries.firstOrNull {
-            it.oreTypes.contains(oreType)
-        } ?: return
-        minedBlocks.addOrPut(pityBlock, 1)
+
+        val oreType = event.originalOre.getOreType()
+        val effMinerBlocks = event.extraBlocks.map { (block, amount) ->
+            block.getOreType() to amount
+        }.removeFirst { it.first == oreType } // extraBlocks also contains the original block mined
+
+        oreType?.addMined(1, false)
+        effMinerBlocks.forEach { (ore, amount) ->
+            ore?.addMined(amount, true)
+        }
         update()
     }
 
@@ -73,7 +91,8 @@ object MineshaftPityDisplay {
             val pityCounter = calculateCounter()
             val chance = calculateChance(pityCounter)
             val counterUntilPity = MAX_COUNTER - pityCounter
-            val totalBlocks = minedBlocks.values.sum()
+            val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.efficientMiner }
+            //val totalBlocks = minedBlocks.sumOf { it.efficientMiner + it.blocksBroken }
 
             mineshaftTotalBlocks += totalBlocks
             mineshaftTotalCount++
@@ -83,12 +102,23 @@ object MineshaftPityDisplay {
             val hover = mutableListOf<String>()
             hover.add("§7Blocks mined: §e$totalBlocks")
             hover.add("§7Pity Counter: §e$pityCounter")
-            hover.add("§7Chance: §e1§6/§e${chance.round(1)} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)")
+            hover.add(
+                "§7Chance: " +
+                    "§e1§6/§e${chance.round(1)} " +
+                    "§7(§b${((1.0 / chance) * 100).addSeparators()}%§7)"
+            )
             minedBlocks.forEach {
-                hover.add("    §7${it.key.displayName} mined: §e${it.value} (${(it.value * it.key.multiplier)}/$counterUntilPity)")
+                hover.add(
+                    "    §7${it.pityBlock.displayName} mined: " +
+                        "§e${it.blocksBroken.addSeparators()} §6[${it.efficientMiner.addSeparators()}] " +
+                        "§e(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})"
+                )
             }
             hover.add("")
-            hover.add("§7Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}")
+            hover.add(
+                "§7Average Blocks/Mineshaft: " +
+                    "§e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}"
+            )
 
             if (!lastMineshaftSpawn.isFarPast()) {
                 hover.add("")
@@ -112,15 +142,15 @@ object MineshaftPityDisplay {
         update()
     }
 
-    private fun calculateCounter(): Int {
-        if (minedBlocks.isEmpty()) return MAX_COUNTER
-        var counter = MAX_COUNTER
-        minedBlocks.forEach { counter -= it.key.multiplier * it.value }
-        return counter
+    private fun calculateCounter(): Double {
+        val counter = MAX_COUNTER.toDouble()
+        if (minedBlocks.isEmpty()) return counter
+        val difference = minedBlocks.sumOf { it.pityBlock.getPity() }
+        return counter - difference
     }
 
     // if the chance is 1/1500, it will return 1500
-    private fun calculateChance(counter: Int): Double {
+    private fun calculateChance(counter: Double): Double {
         // TODO: use HotmAPI to get values
         val surveyorPercent = 0.0
         val peakMountainPercent = 0.0
@@ -133,22 +163,24 @@ object MineshaftPityDisplay {
         val chance = calculateChance(pityCounter)
         val counterUntilPity = MAX_COUNTER - pityCounter
 
-        val multipliers = PityBlocks.entries.map { it.multiplier }.toSet().sorted()
-        val blocksToPityList = mutableListOf<Renderable>()
+        val blocksToPityList = buildList {
+            val multipliers = PityBlock.entries.map { it.multiplier }.toSet().sorted()
 
-        multipliers.forEach { multiplier ->
-            val iconsList = PityBlocks.entries
-                .filter { it.multiplier == multiplier }
-                .map { Renderable.itemStack(it.displayItem) }
-            blocksToPityList.add(
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.horizontalContainer(iconsList),
-                        Renderable.string("§b${pityCounter / multiplier}")
-                    ), 2
+            multipliers.forEach { multiplier ->
+                val iconsList = PityBlock.entries
+                    .filter { it.multiplier == multiplier }
+                    .map { Renderable.itemStack(it.displayItem) }
+                add(
+                    Renderable.horizontalContainer(
+                        listOf(
+                            Renderable.horizontalContainer(iconsList),
+                            Renderable.string("§b${pityCounter / multiplier}")
+                        ), 2
+                    )
                 )
-            )
+            }
         }
+
 
         val neededToPityRenderable = Renderable.verticalContainer(
             listOf(
@@ -195,7 +227,7 @@ object MineshaftPityDisplay {
     }
 
     fun resetCounter() {
-        minedBlocks = mutableMapOf()
+        profileStorage?.blocksBroken = mutableListOf()
         update()
     }
 
@@ -221,7 +253,15 @@ object MineshaftPityDisplay {
         }
     }
 
-    enum class PityBlocks(
+    private fun OreType.addMined(amount: Int, efficientMiner: Boolean) {
+        val block = PityBlock.getByOreTypeOrNull(this) ?: return
+        if (efficientMiner) block.efficientMiner += amount
+        else block.blocksBroken += amount
+    }
+
+    data class PityData(val pityBlock: PityBlock, var blocksBroken: Int, var efficientMiner: Int)
+
+    enum class PityBlock(
         val displayName: String,
         val oreTypes: List<OreType>,
         val multiplier: Int,
@@ -268,6 +308,15 @@ object MineshaftPityDisplay {
             listOf(OreType.TITANIUM),
             8,
             ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata)
-        )
+        ),
+
+        ;
+
+        companion object {
+
+            fun getByOreTypeOrNull(oreType: OreType) = entries.firstOrNull { oreType in it.oreTypes }
+
+            fun PityBlock.getPity() = (blocksBroken + efficientMiner / 2.0) * multiplier
+        }
     }
 }

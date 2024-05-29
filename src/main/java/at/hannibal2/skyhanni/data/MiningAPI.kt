@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
@@ -187,27 +187,25 @@ object MiningAPI {
 
         // if somehow you take more than 20 seconds to mine a single block, congrats
         recentClickedBlocks.removeIf { it.time.passedSince() > 20.seconds }
-        surroundingMinedBlocks.removeIf { it.time.passedSince() > 20.seconds }
+        surroundingMinedBlocks.removeIf { it.time.passedSince() > 5.seconds }
 
         if (surroundingMinedBlocks.isEmpty()) return
         if (lastInitSound.passedSince() < 200.milliseconds) return
 
-        lastInitSound = SimpleTimeMark.farPast()
+        resetOreEvent()
 
-        waitingForInitBlock = false
-        waitingForInitSound = true
-        waitingForInitBlockPos = null
-        waitingForEffMinerSound = true
-        waitingForEffMinerBlock = true
+        val originalBlock = surroundingMinedBlocks.firstOrNull { it.confirmed } ?: run {
+            surroundingMinedBlocks = mutableListOf()
+            recentClickedBlocks = mutableListOf()
+            return
+        }
 
-        val originalBlock = surroundingMinedBlocks.firstOrNull { it.confirmed } ?: return
-
-        val blocksMinedMap = surroundingMinedBlocks
+        val extraBlocks = surroundingMinedBlocks
             .filter { it.confirmed }
             .groupBy({ it.ore }, { 1 })
             .mapValues { it.value.size }
 
-        OreMinedEvent(originalBlock.ore, blocksMinedMap).postAndCatch()
+        OreMinedEvent(originalBlock.ore, extraBlocks).postAndCatch()
 
         surroundingMinedBlocks = mutableListOf()
         recentClickedBlocks.removeIf { it.time.passedSince() >= originalBlock.time.passedSince() }
@@ -220,7 +218,10 @@ object MiningAPI {
         recentClickedBlocks = mutableListOf()
         surroundingMinedBlocks = mutableListOf()
         currentAreaOreBlocks = mutableListOf()
+        resetOreEvent()
+    }
 
+    private fun resetOreEvent() {
         lastInitSound = SimpleTimeMark.farPast()
         waitingForInitBlock = false
         waitingForInitSound = true

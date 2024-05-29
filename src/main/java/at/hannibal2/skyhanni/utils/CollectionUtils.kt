@@ -182,6 +182,21 @@ object CollectionUtils {
         }
     }
 
+    /**
+     * Removes the first element that matches the given [predicate] in the list.
+     */
+    fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
+        val mutableList = this.toMutableList()
+        val iterator = mutableList.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableList.toList()
+    }
+
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
         this.remove(newValue)

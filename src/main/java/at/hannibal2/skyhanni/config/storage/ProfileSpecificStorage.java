@@ -489,7 +489,7 @@ public class ProfileSpecificStorage {
             public int mineshaftTotalCount = 0;
 
             @Expose
-            public Map<MineshaftPityDisplay.PityBlocks, Integer> blocksBroken = new HashMap<>();
+            public List<MineshaftPityDisplay.PityData> blocksBroken = new ArrayList<>();
         }
     }
 
