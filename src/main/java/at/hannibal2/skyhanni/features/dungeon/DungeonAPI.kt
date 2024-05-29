@@ -46,6 +46,7 @@ object DungeonAPI {
 
     var dungeonFloor: String? = null
     var started = false
+    var completed = false
     var inBossRoom = false
     var playerClass: DungeonClass? = null
     var playerClassLevel = -1
@@ -206,6 +207,7 @@ object DungeonAPI {
         isUniqueClass = false
         playerClass = null
         playerClassLevel = -1
+        completed = false
         DungeonBlessings.reset()
     }
 
@@ -230,6 +232,7 @@ object DungeonAPI {
             return
         }
         dungeonComplete.matchMatcher(event.message) {
+            completed = true
             DungeonCompleteEvent(floor).postAndCatch()
             return
         }

@@ -224,6 +224,14 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Limbo Playtime Detailed",
+        desc = "Show your total time in limbo in the detailed /playtime.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLimboTimeInPlaytimeDetailed = true;
+
+    @Expose
+    @ConfigOption(
         name = "Lesser Orb of Healing Hider",
         desc = "Hides the Lesser Orb of Healing.")
     @ConfigEditorBoolean

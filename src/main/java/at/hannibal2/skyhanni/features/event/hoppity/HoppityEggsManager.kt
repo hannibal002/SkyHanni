@@ -46,7 +46,7 @@ object HoppityEggsManager {
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
      */
-    val rabbitFoundPatttern by ChocolateFactoryAPI.patternGroup.pattern(
+    val rabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found",
         "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\((?<rarity>.*)§7\\)!"
     )
@@ -141,6 +141,10 @@ object HoppityEggsManager {
         eggSpawnedPattern.matchMatcher(event.message) {
             getEggType(event).markSpawned()
             return
+        }
+
+        rabbitFoundPattern.matchMatcher(event.message) {
+            HoppityCollectionStats.incrementRabbit(group("name"))
         }
     }
 
