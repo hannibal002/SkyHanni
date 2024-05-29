@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.transform
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -13,8 +14,6 @@ class MovableHotBar {
     private val config get() = SkyHanniMod.feature.gui.hotbar
 
     private var post = false
-
-    fun isEnabled(): Boolean = config.editable && (config.showOutsideSkyblock || LorenzUtils.inSkyBlock)
 
     @SubscribeEvent
     fun onRenderHotbar(event: RenderGameOverlayEvent.Pre) {
@@ -35,4 +34,8 @@ class MovableHotBar {
         GlStateManager.popMatrix()
         post = false
     }
+
+    fun isEnabled(): Boolean =
+        (LorenzUtils.inSkyBlock || (Minecraft.getMinecraft().thePlayer != null && config.showOutsideSkyblock))
+            && config.editable
 }
