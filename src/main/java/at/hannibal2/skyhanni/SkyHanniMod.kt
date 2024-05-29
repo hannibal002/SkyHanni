@@ -143,6 +143,7 @@ import at.hannibal2.skyhanni.features.event.diana.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggDisplayManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
@@ -177,6 +178,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishDisplay
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
@@ -253,6 +255,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning
+import at.hannibal2.skyhanni.features.inventory.AuctionOutbidWarning
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
@@ -490,7 +493,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.2",
+    version = "0.26.Beta.3",
 )
 class SkyHanniMod {
 
@@ -679,6 +682,7 @@ class SkyHanniMod {
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
         loadModule(HoppityEggDisplayManager)
+        loadModule(HoppityCollectionData)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
@@ -734,6 +738,7 @@ class SkyHanniMod {
         loadModule(SharkFishCounter())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
+        loadModule(TrophyFishDisplay)
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
         loadModule(BasketWaypoints())
@@ -945,6 +950,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(AuctionOutbidWarning)
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
