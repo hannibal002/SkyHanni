@@ -88,8 +88,20 @@ public class HoppityEggsConfig {
     public boolean highlightHoppityShop = true;
 
     @Expose
+    @ConfigOption(name = "Hoppity Shop Reminder", desc = "Reminds you to open the Hoppity Shop each year.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityShopReminder = true;
+
+    @Expose
     @ConfigOption(name = "Time in Chat", desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeInChat = true;
+
+    @Expose
+    @ConfigOption(name = "Compact Chat", desc = "Compact chat events when finding a Hoppity Egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactChat = false;
 }

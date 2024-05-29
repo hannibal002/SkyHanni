@@ -21,14 +21,14 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -67,9 +67,16 @@ object GardenNextJacobContest {
         "day",
         "§aDay (?<day>.*)"
     )
+
+    /**
+     * REGEX-TEST: Early Spring, Year 351
+     * REGEX-TEST: Late Summer, Year 351
+     * REGEX-TEST: Autumn, Year 351
+     */
+
     val monthPattern by patternGroup.pattern(
         "month",
-        "(?<month>.*), Year (?<year>.*)"
+        "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
@@ -187,11 +194,8 @@ object GardenNextJacobContest {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
-        if (!monthPattern.matches(event.inventoryName)) return
-
-        inCalendar = true
-
         monthPattern.matchMatcher(event.inventoryName) {
+            inCalendar = true
             val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
