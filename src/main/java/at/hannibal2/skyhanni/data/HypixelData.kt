@@ -329,8 +329,6 @@ class HypixelData {
             }
         }
 
-        if (!event.isMod(5)) return
-
         if (!LorenzUtils.onHypixel) {
             checkHypixel()
             if (LorenzUtils.onHypixel) {
@@ -339,6 +337,8 @@ class HypixelData {
             }
         }
         if (!LorenzUtils.onHypixel) return
+
+        if (!event.isMod(5)) return
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
