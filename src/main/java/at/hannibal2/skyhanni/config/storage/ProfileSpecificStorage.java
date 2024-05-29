@@ -128,6 +128,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<String, Integer> rabbitCounts = new HashMap();
+
+        @Expose
+        public Integer hoppityShopYearOpened = null;
     }
 
     @Expose
