@@ -15,13 +15,16 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class BlazeSlayerDaggerHelper {
 
@@ -36,8 +39,8 @@ class BlazeSlayerDaggerHelper {
     private var textTop = ""
     private var textBottom = ""
 
-    private var lastDaggerCheck = 0L
-    private var lastNearestCheck = 0L
+    private var lastDaggerCheck = SimpleTimeMark.farPast()
+    private var lastNearestCheck = SimpleTimeMark.farPast()
     private var lastNearest: HellionShield? = null
 
     @SubscribeEvent
@@ -80,8 +83,8 @@ class BlazeSlayerDaggerHelper {
     private fun findNearest(): HellionShield? {
         if (!config.markRightHellionShield) return null
 
-        if (lastNearestCheck + 100 > System.currentTimeMillis()) return lastNearest
-        lastNearestCheck = System.currentTimeMillis()
+        if (lastNearestCheck.passedSince() < 100.milliseconds) return lastNearest
+        lastNearestCheck = SimpleTimeMark.now()
 
         val playerLocation = LocationUtils.playerLocation()
         return HellionShieldHelper.hellionShieldMobs
@@ -124,8 +127,8 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun checkActiveDagger() {
-        if (lastDaggerCheck + 1_000 > System.currentTimeMillis()) return
-        lastDaggerCheck = System.currentTimeMillis()
+        if (lastDaggerCheck.passedSince() < 1.seconds) return
+        lastDaggerCheck = SimpleTimeMark.now()
 
         for (dagger in Dagger.entries) {
             if (dagger.updated) continue

@@ -177,9 +177,9 @@ class PestParticleWaypoint {
         val list = locations.toList()
         var pos = LorenzVec(0.0, 0.0, 0.0)
         for ((i, particle) in list.withIndex()) {
-            pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))
+            pos += (particle - firstParticle) / (i.toDouble() + 1.0)
         }
-        return firstParticle.add(pos.multiply(120.0 / list.size))
+        return firstParticle + pos * (120.0 / list.size)
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
