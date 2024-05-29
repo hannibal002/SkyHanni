@@ -45,6 +45,18 @@ public class HoppityEggsConfig {
     public boolean showClaimedEggs = false;
 
     @Expose
+    @ConfigOption(name = "Highlight Duplicate Egg Locations in Red", desc = "Marks egg locations which you have already found in red.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightDuplicateEggLocations = false;
+
+    @Expose
+    @ConfigOption(name = "Show Nearby Duplicate Egg Locations", desc = "Always show duplicate eggs when nearby.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showNearbyDuplicateEggLocations = false;
+
+    @Expose
     @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
     @ConfigEditorBoolean
     @FeatureToggle

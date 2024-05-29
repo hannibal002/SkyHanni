@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -99,12 +101,14 @@ object HoppityEggLocator {
                 }
             }
         }
+
         if (drawLocations) {
             for ((index, eggLocation) in possibleEggLocations.withIndex()) {
-                val eggLabel = "§aGuess #${index + 1}"
+                var eggLabel = "§aGuess #${index + 1}"
+                if (shouldAddDuplicateText(eggLocation)) eggLabel += "§c(Duplicate Location!)"
                 event.drawWaypointFilled(
                     eggLocation,
-                    LorenzColor.GREEN.toColor(),
+                    getEggColor(eggLocation),
                     seeThroughBlocks = true,
                 )
                 event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
@@ -117,26 +121,52 @@ object HoppityEggLocator {
 
         sharedEggLocation?.let {
             if (config.sharedWaypoints) {
-                event.drawWaypointFilled(it, LorenzColor.GREEN.toColor(), seeThroughBlocks = true,)
+                var eggLabel = "§aShared Egg"
+                if (shouldAddDuplicateText(it)) eggLabel += "§c(Duplicate Location!)"
+                event.drawWaypointFilled(it, getEggColor(it), seeThroughBlocks = true,)
                 event.drawDynamicText(it.add(y = 1), "§aShared Egg", 1.5)
                 return
             }
         }
 
-        if (!config.showAllWaypoints) return
-        if (hasLocatorInHotbar()) return
-        if (!HoppityEggType.eggsRemaining()) return
-
         val islandEggsLocations = getCurrentIslandEggLocations() ?: return
-        for (eggLocation in islandEggsLocations) {
-            event.drawWaypointFilled(
-                eggLocation,
-                LorenzColor.GREEN.toColor(),
-                seeThroughBlocks = true,
-            )
-            event.drawDynamicText(eggLocation.add(y = 1), "§aEgg", 1.5)
+
+        if (shouldShowAllEggs()) {
+            for (eggLocation in islandEggsLocations) {
+                var eggLabel = "§aEgg"
+                if (shouldAddDuplicateText(eggLocation)) eggLabel += "§c(Duplicate Location!)"
+                event.drawWaypointFilled(
+                    eggLocation,
+                    getEggColor(eggLocation),
+                    seeThroughBlocks = true,
+                )
+                event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
+            }
+        } else if (config.highlightDuplicateEggLocations && config.showNearbyDuplicateEggLocations) {
+            for (eggLocation in islandEggsLocations) {
+                if (eggLocation.distanceSqToPlayer() < 100 && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)) {
+                    event.drawWaypointFilled(
+                        eggLocation,
+                        LorenzColor.RED.toColor(),
+                        seeThroughBlocks = true,
+                    )
+                    event.drawDynamicText(eggLocation.add(y = 1), "§cDuplicate Location!", 1.5)
+                }
+            }
         }
     }
+
+    private fun shouldAddDuplicateText(eggLocation: LorenzVec) =
+        config.highlightDuplicateEggLocations && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)
+
+    private fun shouldShowAllEggs() =
+        config.showAllWaypoints && !hasLocatorInHotbar() && HoppityEggType.eggsRemaining()
+
+    private fun getEggColor(location: LorenzVec) =
+        if (config.highlightDuplicateEggLocations && HoppityUniqueEggLocations.hasCollectedEgg(location)) {
+            LorenzColor.RED.toColor()
+        } else LorenzColor.GREEN.toColor()
+
 
     fun eggFound() {
         resetData()
