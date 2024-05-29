@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getInternalNameFromHypixelId
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPersonalCompactorActive
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
@@ -59,9 +59,6 @@ object PersonalCompactorOverlay {
         val (type, tier) = internalNamePattern.matchMatcher(internalName.asString()) {
             group("type") to group("tier").formatInt()
         } ?: return
-        // NEU using getTooltip triggers LorenzToolTipEvent, which makes it use the tooltip of a different item
-        // but the itemstack of a different one. this is a workaround until this issue is fixed
-        if (!name.contains("Personal")) return
 
         val prefix = when (type) {
             "COMPACTOR" -> "personal_compact_"
