@@ -162,11 +162,14 @@ object PartyChatCommands {
             }
 
             "clear" -> {
-                ChatUtils.clickableChat("Are you sure you want to do this? Click here to confirm.",
+                ChatUtils.clickableChat(
+                    "Are you sure you want to do this? Click here to confirm.",
                     onClick = {
                         storage.blacklistedUsers.clear()
                         ChatUtils.chat("Cleared your ignored players list!")
-                    })
+                    },
+                    oneTimeClick = true
+                )
             }
 
             else -> blacklistModify(firstArg)

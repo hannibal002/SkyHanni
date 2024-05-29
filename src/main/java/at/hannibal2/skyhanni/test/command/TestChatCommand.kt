@@ -18,40 +18,56 @@ object TestChatCommand {
 
         SkyHanniMod.launchCoroutine {
             val mutArgs = args.toMutableList()
+            val multiLines = mutArgs.remove("-lines")
             val isComplex = mutArgs.remove("-complex")
-            val isClipboard = mutArgs.remove("-clipboard")
+            // cant use multi lines without clipboard
+            val isClipboard = mutArgs.remove("-clipboard") || multiLines
             val isHidden = mutArgs.remove("-s")
             val text = if (isClipboard) {
                 OSUtils.readFromClipboard()
                     ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
             } else mutArgs.joinToString(" ")
-            val component =
-                if (isComplex)
-                    try {
-                        IChatComponent.Serializer.jsonToComponent(text)
-                    } catch (ex: Exception) {
-                        ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
-                        return@launchCoroutine
-                    }
-                else ChatComponentText(text.replace("&", "§"))
-            if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
-            test(component)
+            if (multiLines) {
+                for (line in text.split("\n")) {
+                    extracted(isComplex, line, isHidden)
+                }
+            } else {
+                extracted(isComplex, text, isHidden)
+            }
         }
     }
 
-    private fun test(componentText: IChatComponent) {
+    private fun extracted(isComplex: Boolean, text: String, isHidden: Boolean) {
+        val component =
+            if (isComplex)
+                try {
+                    IChatComponent.Serializer.jsonToComponent(text)
+                } catch (ex: Exception) {
+                    ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
+                    return
+                }
+            else ChatComponentText(text.replace("&", "§"))
+        if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
+        test(component, isHidden)
+    }
+
+    private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
         val event = LorenzChatEvent(message, componentText)
         event.postAndCatch()
 
         if (event.blockedReason != "") {
-            ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
+            if (!isHidden) {
+                ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
+            }
         } else {
             val finalMessage = event.chatComponent
             if (finalMessage.formattedText.stripHypixelMessage() != message) {
-                ChatUtils.chat("§eChat modified!")
+                if (!isHidden) {
+                    ChatUtils.chat("§eChat modified!")
+                }
             }
-            ChatUtils.chatComponent(finalMessage)
+            ChatUtils.chat(finalMessage)
         }
     }
 }

@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.MayorAPI.foxyExtraEventPattern
-import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
 enum class Mayor(
     val mayorName: String,
@@ -43,7 +43,7 @@ enum class Mayor(
 
         fun getMayorFromName(name: String): Mayor? = entries.firstOrNull { it.mayorName == name }
 
-        fun setAssumeMayorJson(name: String, perksJson: ArrayList<MayorJson.Perk>): Mayor? {
+        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): Mayor? {
             val mayor = getMayorFromName(name)
             if (mayor == null) {
                 ErrorManager.logErrorStateWithData(
@@ -72,7 +72,7 @@ enum class Mayor(
             }
         }
 
-        private fun MayorJson.Perk.renameIfFoxyExtraEventPerkFound(): String? {
+        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String? {
             val foxyExtraEventPairs = mapOf(
                 "Spooky Festival" to "Extra Event (Spooky)",
                 "Mining Fiesta" to "Extra Event (Mining)",

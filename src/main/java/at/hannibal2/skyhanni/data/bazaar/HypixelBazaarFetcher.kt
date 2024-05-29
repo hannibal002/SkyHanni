@@ -62,8 +62,13 @@ object HypixelBazaarFetcher {
         val internalName = NEUItems.transHypixelNameToInternalName(key)
         val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
         val insantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
+
+        if (product.quickStatus.isEmpty()) {
+            return@mapNotNull null
+        }
+
         if (internalName.getItemStackOrNull() == null) {
-            // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in in the ingame bazaar).
+            // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
             if (LorenzUtils.debug)
                 println("Unknown bazaar product: $key/$internalName")
@@ -71,6 +76,17 @@ object HypixelBazaarFetcher {
         }
         internalName to BazaarData(internalName.itemName, sellOfferPrice, insantBuyPrice, product)
     }.toMap()
+
+    private fun BazaarQuickStatus.isEmpty(): Boolean = with(this) {
+        sellPrice == 0.0 &&
+            sellVolume == 0L &&
+            sellMovingWeek == 0L &&
+            sellOrders == 0L &&
+            buyPrice == 0.0 &&
+            buyVolume == 0L &&
+            buyMovingWeek == 0L &&
+            buyOrders == 0L
+    }
 
     private fun onError(fetchType: String, e: Exception, rawResponse: String? = null) {
         val userMessage = "Failed fetching bazaar price data from hypixel"

@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 class TiaRelayHelper {
 
@@ -20,7 +22,7 @@ class TiaRelayHelper {
     private var inInventory = false
 
     private var lastClickSlot = 0
-    private var lastClickTime = 0L
+    private var lastClickTime = SimpleTimeMark.farPast()
     private var sounds = mutableMapOf<Int, Sound>()
 
     private var resultDisplay = mutableMapOf<Int, Int>()
@@ -41,8 +43,7 @@ class TiaRelayHelper {
         if (distance >= 2) return
 
         if (lastClickSlot == 0) return
-        val duration = System.currentTimeMillis() - lastClickTime
-        if (duration > 1_000) return
+        if (lastClickTime.passedSince() > 1.minutes) return
         if (sounds.contains(lastClickSlot)) return
 
         sounds[lastClickSlot] = Sound(soundName, event.pitch)
@@ -136,7 +137,7 @@ class TiaRelayHelper {
         if (event.clickedButton != 1) return
 
         lastClickSlot = event.slotId
-        lastClickTime = System.currentTimeMillis()
+        lastClickTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent

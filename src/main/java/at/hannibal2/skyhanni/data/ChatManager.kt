@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -152,9 +153,7 @@ object ChatManager {
         // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
         if (chatEvent.chatLineId != 0) {
             event.isCanceled = true
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(
-                event.message, chatEvent.chatLineId
-            )
+            event.message.send(chatEvent.chatLineId)
         }
     }
 
