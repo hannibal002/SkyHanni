@@ -847,6 +847,7 @@ interface Renderable {
                 val mouseYRelativeToPlayer =
                     if (followMouse) (posY + playerY - (mouse?.second
                         ?: Utils.getMouseY()) - 1.62 * entityScale).toFloat() else eyesY
+                GlStateManager.translate(0f, 0f, 500f)
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -855,6 +856,7 @@ interface Renderable {
                     mouseYRelativeToPlayer,
                     entity
                 )
+                GlStateManager.translate(0f, 0f, -500f)
             }
         }
     }

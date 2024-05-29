@@ -951,9 +951,9 @@ class SkyHanniMod {
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning)
         loadModule(ColdOverlay())
+        loadModule(CustomWardrobe())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(CustomWardrobe())
         loadModule(AuctionOutbidWarning)
 
         // test stuff

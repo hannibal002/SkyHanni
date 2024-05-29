@@ -29,12 +29,18 @@ public class CustomWardrobeConfig {
     @ConfigEditorBoolean
     public boolean hideLockedSlots = false;
 
+    @Expose
     public boolean onlyFavorites = false;
 
     @Expose
     @ConfigOption(name = "Estimated Value", desc = "Show a §2$ §7sign you can hover to see the wardrobe slot value.")
     @ConfigEditorBoolean
     public boolean estimatedValue = true;
+
+    @Expose
+    @ConfigOption(name = "Loading text", desc = "Shows a \"§cLoading...\" §7text when the wardrobe page hasn't fully loaded in yet.")
+    @ConfigEditorBoolean
+    public boolean loadingText = true;
 
     @Expose
     @ConfigOption(name = "Colors", desc = "Change the color settings.")
