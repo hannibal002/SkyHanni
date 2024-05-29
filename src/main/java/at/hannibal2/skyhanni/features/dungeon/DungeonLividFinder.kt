@@ -117,7 +117,7 @@ object DungeonLividFinder {
 
         if (entity != livid && entity != lividArmorStand) {
             if (entity.name.contains("Livid")) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

@@ -35,7 +35,7 @@ object MinecraftData {
                 packet.volume
             ).postAndCatch()
         ) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -61,7 +61,7 @@ object MinecraftData {
                 packet.particleArgs,
             ).postAndCatch()
         ) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

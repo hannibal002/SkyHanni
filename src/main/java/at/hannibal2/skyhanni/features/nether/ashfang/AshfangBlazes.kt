@@ -93,7 +93,7 @@ class AshfangBlazes {
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
         if (entity in blazeArmorStand.values) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

@@ -17,7 +17,7 @@ class HideDamageSplash {
         if (!SkyHanniMod.feature.combat.hideDamageSplash) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

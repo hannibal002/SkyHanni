@@ -95,7 +95,7 @@ class HighlightVisitorsOutsideOfGarden {
         val packet = event.packet as? C02PacketUseEntity ?: return
         val entity = packet.getEntityFromWorld(world) ?: return
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
-            event.isCanceled = true
+            event.cancel()
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
                 ChatUtils.chatAndOpenConfig("Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                     GardenAPI.config.visitors::blockInteracting

@@ -50,12 +50,12 @@ class LivingCaveDefenseBlocks {
         // Ignore particles around blocks
         if (staticBlocks.any { it.location.distance(location) < 3 }) {
             if (config.hideParticles) {
-                event.isCanceled = true
+                event.cancel()
             }
             return
         }
         if (config.hideParticles && movingBlocks.keys.any { it.location.distance(location) < 3 }) {
-            event.isCanceled = true
+            event.cancel()
         }
 
         if (event.type == EnumParticleTypes.CRIT_MAGIC) {
@@ -84,7 +84,7 @@ class LivingCaveDefenseBlocks {
 
             movingBlocks = movingBlocks.editCopy { this[defenseBlock] = System.currentTimeMillis() + 250 }
             if (config.hideParticles) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

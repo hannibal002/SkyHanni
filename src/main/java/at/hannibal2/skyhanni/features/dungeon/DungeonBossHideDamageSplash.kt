@@ -16,7 +16,7 @@ class DungeonBossHideDamageSplash {
         if (!DungeonAPI.inBossRoom) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 }

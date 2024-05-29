@@ -255,13 +255,13 @@ object InquisitorWaypointShare {
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
         partyOnlyCoordsPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
         diedPattern.matchMatcher(message) {

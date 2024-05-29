@@ -105,7 +105,7 @@ object GetFromSackAPI {
         if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
         inventoryMap.remove(event.slotId)
-        event.isCanceled = true
+        event.cancel()
     }
 
     @SubscribeEvent
@@ -128,11 +128,11 @@ object GetFromSackAPI {
         queuedHandler(replacedEvent)
         bazaarHandler(replacedEvent)
         if (replacedEvent.isCanceled) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
         if (replacedEvent !== event) {
-            event.isCanceled = true
+            event.cancel()
             ChatUtils.sendMessageToServer(replacedEvent.message)
         }
     }
@@ -150,7 +150,7 @@ object GetFromSackAPI {
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
             CommandResult.INTERNAL_ERROR -> {}
         }
-        event.isCanceled = true
+        event.cancel()
     }
 
     private fun bazaarHandler(event: MessageSendToServerEvent) {

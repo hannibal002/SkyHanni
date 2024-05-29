@@ -377,7 +377,7 @@ class MinionFeatures {
         if (entity.customNameTag.contains("§c❤")) {
             val loc = entity.getLorenzVec()
             if (minions.any { it.key.distance(loc) < 5 }) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

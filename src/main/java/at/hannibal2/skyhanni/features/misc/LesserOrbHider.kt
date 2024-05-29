@@ -35,7 +35,7 @@ class LesserOrbHider {
         if (!isEnabled()) return
 
         if (event.entity in hiddenEntities) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -47,7 +47,7 @@ class LesserOrbHider {
         for (armorStand in hiddenEntities) {
             val distance = armorStand.distanceTo(event.location)
             if (distance < 4) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

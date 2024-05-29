@@ -36,7 +36,7 @@ object WikiManager {
         val message = event.message.lowercase()
         if (!(message.startsWith("/wiki"))) return
 
-        event.isCanceled = true
+        event.cancel()
         if (message == "/wiki") {
             sendWikiMessage()
             return

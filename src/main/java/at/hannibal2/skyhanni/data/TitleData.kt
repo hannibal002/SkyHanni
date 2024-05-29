@@ -15,7 +15,7 @@ class TitleData {
         val message = packet.message ?: return
         val formattedText = message.formattedText
         if (TitleReceivedEvent(formattedText).postAndCatch()) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 }

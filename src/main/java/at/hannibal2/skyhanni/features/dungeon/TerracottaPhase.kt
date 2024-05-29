@@ -31,14 +31,14 @@ class TerracottaPhase {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (isActive() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isActive() && config.hideParticles) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

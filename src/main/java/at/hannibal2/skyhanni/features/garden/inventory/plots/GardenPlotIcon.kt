@@ -88,7 +88,7 @@ object GardenPlotIcon {
         if (!isEnabled()) return
         lastClickedSlotId = event.slotId
         if (event.slotId == 53) {
-            event.isCanceled = true
+            event.cancel()
             if (event.clickedButton == 0) {
                 if (editMode == 2)
                     editMode = 0
@@ -104,7 +104,7 @@ object GardenPlotIcon {
         }
         if (editMode != 0) {
             if (event.slotId in 54..89) {
-                event.isCanceled = true
+                event.cancel()
                 copyStack = event.slot?.stack?.copy()?.also {
                     it.stackSize = 1
                 } ?: return
@@ -115,7 +115,7 @@ object GardenPlotIcon {
             if (event.slotId != 53) {
                 val plotList = plotList ?: return
                 if (!whitelistedSlot.contains(event.slotId)) return
-                event.isCanceled = true
+                event.cancel()
                 if (editMode == 2) {
                     plotList.remove(event.slotId)
                     return

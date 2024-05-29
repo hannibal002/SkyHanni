@@ -11,7 +11,7 @@ class SendCoordinatedCommand {
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         val message = event.message
         if (message.startsWith("/sendcoords")) {
-            event.isCanceled = true
+            event.cancel()
             val description = message.substringAfter("/sendcoords").trim()
             sendCoordinates(description)
         }

@@ -38,7 +38,7 @@ class BlazeSlayerClearView {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isEnabled()) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -47,7 +47,7 @@ class BlazeSlayerClearView {
         if (isEnabled()) {
             val entity = event.entity
             if (entity is EntityFireball) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

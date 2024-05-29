@@ -23,7 +23,7 @@ class AshfangMinisNametagHider {
 
         val name = entity.name
         if (name.contains("§cArachne's Brood§r")) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 }

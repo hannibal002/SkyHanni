@@ -40,7 +40,7 @@ class EndermanSlayerHideParticles {
 
         val distance = event.location.distanceToNearestEnderman() ?: return
         if (distance < 9) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
