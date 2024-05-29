@@ -48,6 +48,7 @@ class CustomWardrobe {
     private var buttonsRenderable: Renderable? = null
     private var inventoryButton: Renderable? = null
     private var editMode = false
+    private var waitingForInventoryUpdate = true
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -134,7 +135,9 @@ class CustomWardrobe {
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!isEnabled() || editMode) return
+        if (!isEnabled()) return
+        waitingForInventoryUpdate = false
+        if (editMode) return
         update()
     }
 
@@ -496,15 +499,18 @@ class CustomWardrobe {
         val wardrobePage = currentPage ?: return
         val windowId = getWindowId() ?: -1
         if (wardrobeSlot.isInCurrentPage()) {
+            if (wardrobeSlot.isEmpty() || wardrobeSlot.locked || waitingForInventoryUpdate) return
             currentWardrobeSlot = if (wardrobeSlot.isCurrentSlot()) null
             else wardrobeSlot.id
             clickSlot(wardrobeSlot.inventorySlot, windowId)
         } else {
             if (wardrobeSlot.page < wardrobePage) {
                 currentPage = wardrobePage - 1
+                waitingForInventoryUpdate = true
                 clickSlot(previousPageSlot, windowId)
             } else if (wardrobeSlot.page > wardrobePage) {
                 currentPage = wardrobePage + 1
+                waitingForInventoryUpdate = true
                 clickSlot(nextPageSlot, windowId)
             }
         }
