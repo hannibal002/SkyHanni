@@ -289,12 +289,15 @@ object ChocolateFactoryDataLoader {
         if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
         val isGoldenRabbit = clickMeGoldenRabbitPattern.matches(item.name)
         if (clickMeRabbitPattern.matches(item.name) || isGoldenRabbit) {
-            if (config.rabbitWarning) {
+            if (config.chocolateFactoryRabbitWarningConfig.rabbitWarning) {
                 SoundUtils.playBeepSound()
             }
 
-            if (config.specialRabbitWarning && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)) {
-                SoundUtils.repeatSound(100, 20, SoundUtils.plingSound)
+            val warningConfig = config.chocolateFactoryRabbitWarningConfig
+            if (warningConfig.specialRabbitWarning
+                && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
+            ) {
+                SoundUtils.repeatSound(100, warningConfig.repeatSound, SoundUtils.createSound(warningConfig.specialRabbitSound, 1f))
             }
 
             ChocolateFactoryAPI.clickRabbitSlot = slotIndex
