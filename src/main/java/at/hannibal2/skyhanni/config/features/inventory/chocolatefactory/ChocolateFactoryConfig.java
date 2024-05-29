@@ -76,6 +76,11 @@ public class ChocolateFactoryConfig {
     public boolean rabbitWarning = true;
 
     @Expose
+    @ConfigOption(name = "Special Rabbit Warning", desc = "Warn when a special rabbit that needs to be clicked appears. (Rabbit The Fish and El Dorado")
+    @ConfigEditorBoolean
+    public boolean specialRabbitWarning = true;
+
+    @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
         desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
