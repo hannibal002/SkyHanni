@@ -35,9 +35,8 @@ class SeaCreatureFeatures {
         val creature = SeaCreatureManager.allFishingMobs[event.mob.name] ?: return
         if (!creature.rare) return
 
-        if (config.highlight && !(damageIndicatorConfig.enabled && damageIndicatorConfig.bossesToShow.contains(
-                DamageIndicatorConfig.BossCategory.SEA_CREATURES
-            ))
+        if (config.highlight && !(damageIndicatorConfig.enabled &&
+                DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow)
         ) {
             event.mob.highlight(LorenzColor.GREEN.toColor())
             rareSeaCreatures += event.mob.baseEntity
