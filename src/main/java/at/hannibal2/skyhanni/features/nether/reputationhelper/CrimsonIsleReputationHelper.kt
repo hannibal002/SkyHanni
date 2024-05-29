@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.nether.RescueMissionWaypoints
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
@@ -35,6 +36,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val questHelper = DailyQuestHelper(this)
     val miniBossHelper = DailyMiniBossHelper(this)
     val kuudraBossHelper = DailyKuudraBossHelper(this)
+    val rescueMissionWaypoints = RescueMissionWaypoints(this)
 
     var factionType = FactionType.NONE
 
@@ -58,6 +60,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         skyHanniMod.loadModule(questHelper)
         skyHanniMod.loadModule(miniBossHelper)
         skyHanniMod.loadModule(kuudraBossHelper)
+        skyHanniMod.loadModule(rescueMissionWaypoints)
     }
 
     @SubscribeEvent
