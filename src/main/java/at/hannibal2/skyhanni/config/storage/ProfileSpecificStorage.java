@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
@@ -123,6 +124,12 @@ public class ProfileSpecificStorage {
 
         @Expose
         public String targetName = null;
+
+        @Expose
+        public Map<String, Integer> rabbitCounts = new HashMap();
+
+        @Expose
+        public Integer hoppityShopYearOpened = null;
     }
 
     @Expose
@@ -316,6 +323,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
+
+        @Expose
+        public Map<CropType, LorenzVec> cropLastFarmedLocations = new HashMap<>();
 
         @Expose
         public Map<CropType, FarmingLane> farmingLanes = new HashMap<>();

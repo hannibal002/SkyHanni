@@ -74,6 +74,7 @@ object TrophyFishManager {
                 ChatUtils.debug("Updated trophy fishing data from NEU PV:  $name $rarity: $current -> $newValue")
             }
         }
+        TrophyFishDisplay.update()
         ChatUtils.chat("Updated Trophy Fishing data via NEU PV!")
     }
 

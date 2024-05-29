@@ -143,6 +143,7 @@ import at.hannibal2.skyhanni.features.event.diana.HighlightInquisitors
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.diana.SoopyGuessBurrow
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggDisplayManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
@@ -254,6 +255,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning
+import at.hannibal2.skyhanni.features.inventory.AuctionOutbidWarning
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
@@ -263,6 +265,7 @@ import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
 import at.hannibal2.skyhanni.features.inventory.ItemStars
 import at.hannibal2.skyhanni.features.inventory.MaxPurseItems
+import at.hannibal2.skyhanni.features.inventory.PersonalCompactorOverlay
 import at.hannibal2.skyhanni.features.inventory.PersonalCompactorOverlay
 import at.hannibal2.skyhanni.features.inventory.PowerStoneGuideFeatures
 import at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures
@@ -681,6 +684,7 @@ class SkyHanniMod {
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
         loadModule(HoppityEggDisplayManager)
+        loadModule(HoppityCollectionData)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
         loadModule(MarkedPlayerManager())
@@ -736,7 +740,7 @@ class SkyHanniMod {
         loadModule(SharkFishCounter())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
-        loadModule(TrophyFishDisplay())
+        loadModule(TrophyFishDisplay)
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
         loadModule(BasketWaypoints())
@@ -869,6 +873,7 @@ class SkyHanniMod {
         loadModule(LivingCaveLivingMetalHelper())
         loadModule(RiftMotesOrb())
         loadModule(ChestValue())
+        loadModule(PersonalCompactorOverlay)
         loadModule(SlayerBossSpawnSoon())
         loadModule(RiftBloodEffigies)
         loadModule(RiftWiltedBerberisHelper())
@@ -948,7 +953,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(PersonalCompactorOverlay)
+        loadModule(AuctionOutbidWarning)
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
