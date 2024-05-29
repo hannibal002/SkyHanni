@@ -32,12 +32,12 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         }
 
         if (symbol !is KSClassDeclaration) {
-            logger.error("@LoadModule is only valid on class declarations", symbol)
+            logger.error("@SkyHanniModule is only valid on class declarations", symbol)
             return null
         }
 
         if (symbol.classKind != ClassKind.OBJECT) {
-            logger.error("@LoadModule is only valid on kotlin objects", symbol)
+            logger.error("@SkyHanniModule is only valid on kotlin objects", symbol)
             return null
         }
 
