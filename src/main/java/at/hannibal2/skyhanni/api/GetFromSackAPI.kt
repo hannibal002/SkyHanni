@@ -167,14 +167,12 @@ object GetFromSackAPI {
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
         if (args.isEmpty()) return CommandResult.WRONG_ARGUMENT to null
 
-        val arguments = args.toMutableList()
         val argsNull = args.last().last().toString().toIntOrNull() == null
-
-        if (argsNull) {
+        val arguments = if (argsNull) {
             if (!config.defaultGFS) return CommandResult.WRONG_ARGUMENT to null
 
-            arguments.add(config.defaultAmountGFS.toString())
-        }
+            args + config.defaultAmountGFS.toString()
+        } else args
 
         var amountString = arguments.last()
         amountString = NEUCalculator.calculateOrNull(amountString)?.toString() ?: amountString
@@ -186,18 +184,16 @@ object GetFromSackAPI {
 
         val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
-            SackAPI.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString)
+            SackAPI.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Couldn't resolve item name",
+                    "Query failed",
+                    "itemName" to itemString
+                )
+                return CommandResult.INTERNAL_ERROR to null
+            }
 
             else -> return CommandResult.WRONG_IDENTIFIER to null
-        }
-
-        if (item == null) run {
-            ErrorManager.logErrorStateWithData(
-                "Couldn't resolve item name",
-                "Query failed",
-                "itemName" to itemString
-            )
-            return CommandResult.INTERNAL_ERROR to null
         }
 
         return CommandResult.VALID to PrimitiveItemStack(item, amountString.toDouble().toInt())

@@ -26,7 +26,7 @@ public class GetFromSackConfig {
     public boolean superCraftGFS = true;
 
     @Expose
-    @ConfigOption(name = "Default GfS", desc = "If you don't provide an amount, a default one will be used instead.")
+    @ConfigOption(name = "Default GfS", desc = "If you don't provide an amount, a default one will be used instead. Queued GfS needs to be on in order for this to work.")
     @ConfigEditorBoolean
     public boolean defaultGFS = false;
 
