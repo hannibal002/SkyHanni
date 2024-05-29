@@ -24,14 +24,13 @@ object HeldTimeInLore {
         if (!LorenzUtils.inSkyBlock) return
         val stack = event.itemStack
         val internalName = stack.getInternalName()
-        val timeHeld = (
-            when (internalName) {
-                jyrreBottle -> stack.getBottleOfJyrreSeconds() ?: return
-                cacaoTruffle -> stack.getSecondsHeld() ?: return
-                else -> return
-            }
-            ).toDuration(DurationUnit.SECONDS).format()
-
-        event.toolTip.add(10, "§7Time Held: §b$timeHeld")
+        val timeHeld = when (internalName) {
+            jyrreBottle -> stack.getBottleOfJyrreSeconds()
+            cacaoTruffle -> stack.getSecondsHeld()
+            else -> return
+        } ?: return
+        val formatted = timeHeld.seconds.format()
+        
+        event.toolTip.add(10, "§7Time Held: §b$formatted")
     }
 }
