@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -37,6 +38,7 @@ object LimboPlaytime {
     private var hoursString: String = ""
 
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
+    private val enabled get() = SkyHanniMod.feature.misc.showLimboTimeInPlaytimeDetailed
 
     private val itemID = "ENDER_PEARL".asInternalName()
     private val itemName = "§aLimbo"
@@ -45,6 +47,7 @@ object LimboPlaytime {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
+        if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
         if (event.inventory.name != "Detailed /playtime") return
         if (event.slotNumber != 43) return
@@ -76,6 +79,7 @@ object LimboPlaytime {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (!enabled) return
         if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
         val playtime = storage?.playtime ?: 0
