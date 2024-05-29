@@ -153,7 +153,6 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() &&
                     shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
-                    && !NEUItems.neuHasFocus() && Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
                 ) {
                     onClick()
                 }
@@ -236,6 +235,7 @@ interface Renderable {
             if (bypassChecks) {
                 return isGuiScreen
             }
+            val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
                 ToolTipData.lastSlot == null || GuiData.preDrawEventCanceled
@@ -244,10 +244,11 @@ interface Renderable {
 
             val openGui = Minecraft.getMinecraft().currentScreen?.javaClass?.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
+            val neuFocus = NEUItems.neuHasFocus()
             val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
-            val result = isGuiScreen && isGuiPositionEditor && isNotInSignAndOnSlot && isConfigScreen &&
-                !isInNeuPv && !isInSkyTilsPv
+            val result = isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen &&
+                !isInNeuPv && !isInSkyTilsPv && !neuFocus
 
             if (debug) {
                 if (!result) {
@@ -255,9 +256,11 @@ interface Renderable {
                     logger.log("blocked link because:")
                     if (!isGuiScreen) logger.log("isGuiScreen")
                     if (!isGuiPositionEditor) logger.log("isGuiPositionEditor")
+                    if (!inMenu) logger.log("inMenu")
                     if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
                     if (!isConfigScreen) logger.log("isConfigScreen")
                     if (isInNeuPv) logger.log("isInNeuPv")
+                    if (neuFocus) logger.log("neuFocus")
                     if (isInSkyTilsPv) logger.log("isInSkyTilsPv")
                     logger.log("")
                 } else {
@@ -619,6 +622,7 @@ interface Renderable {
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
             button: Int? = null,
+            bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -641,7 +645,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY)
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks)
                 )
 
                 var renderY = 0
@@ -675,6 +679,7 @@ interface Renderable {
             xPadding: Int = 1,
             yPadding: Int = 0,
             hasHeader: Boolean = false,
+            bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -701,7 +706,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY)
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks)
                 )
 
                 var renderY = 0

@@ -41,13 +41,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
