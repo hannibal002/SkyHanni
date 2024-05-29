@@ -201,11 +201,11 @@ object HoppityEggsManager {
 
     private fun checkWarn() {
         if (!warningActive) {
-            warningActive = HoppityEggType.entries.all { it.isClaimed() }
+            warningActive = !HoppityEggType.allEggsRemaining()
         }
 
         if (warningActive) {
-            if (HoppityEggType.entries.all { !it.isClaimed() }) {
+            if (HoppityEggType.allEggsRemaining()) {
                 warn()
             }
         }
@@ -220,11 +220,19 @@ object HoppityEggsManager {
         val amount = HoppityEggType.entries.size
         val message = "All $amount Hoppity Eggs are ready to be found!"
         if (config.warpUnclaimedEggs) {
-            ChatUtils.clickableChat(
-                message,
-                onClick = { HypixelCommands.warp(config.warpDestination) },
-                "§eClick to /warp ${config.warpDestination}!"
-            )
+            if (LorenzUtils.inSkyBlock) {
+                ChatUtils.clickableChat(
+                    message,
+                    onClick = { HypixelCommands.warp(config.warpDestination) },
+                    "§eClick to /warp ${config.warpDestination}!"
+                )
+            } else {
+                ChatUtils.clickableChat(
+                    message,
+                    onClick = { HypixelCommands.skyblock() },
+                    "§eClick to join /skyblock!"
+                )
+            }
         } else ChatUtils.chat(message)
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
