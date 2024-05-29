@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ContestSummaryConfig {
     @Expose
     @ConfigOption(
-        name = "Ênabled",
+        name = "Enabled",
         desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
     )
     @ConfigEditorBoolean
