@@ -8,6 +8,7 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,7 +21,7 @@ public class DownloadSourceChecker {
     private static final String[] PASSWORD_POPUP = {
         "If someone asks you to type in here,",
         "",
-        "the likelihood of them rating you is high!",
+        "the likelihood of them ratting you is high!",
         "",
         "Enter the password:"
     };
@@ -39,13 +40,13 @@ public class DownloadSourceChecker {
 
     public static void init() {
         if (!TweakerUtils.isOnWindows()) return;
-        String host = isAllowedFile();
+        URI host = getDangerousHost();
         if (host != null) {
             openMenu(host);
         }
     }
 
-    private static void openMenu(String host) {
+    private static void openMenu(URI host) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -95,7 +96,7 @@ public class DownloadSourceChecker {
 
         JOptionPane.showOptionDialog(
             frame,
-            String.format(String.join("\n", SECURITY_POPUP), host),
+            String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)),
             "SkyHanni Security Error",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,
@@ -108,29 +109,30 @@ public class DownloadSourceChecker {
         TweakerUtils.exit();
     }
 
-    private static String isAllowedFile() {
+    private static String uriToSimpleString(URI uri) {
+        return uri.getScheme() + "://" + uri.getHost() + uri.getPath();
+    }
+
+    private static URI getDangerousHost() {
         try {
             URL url = DownloadSourceChecker.class.getProtectionDomain().getCodeSource().getLocation();
             File file = new File(url.getFile());
             if (!file.isFile()) return null;
-            URL host = getHost(file);
+            URI host = getHost(file);
             if (host == null) return null;
+
             if (host.getHost().equals("objects.githubusercontent.com") && host.getPath().contains(GITHUB_REPO_TEXT)) {
                 return null;
             } else if (host.getHost().equals("cdn.modrinth.com") && host.getPath().startsWith(MODRINTH_URL)) {
                 return null;
             }
-            String hostString = host.toString();
-            if (hostString.contains("?")) {
-                return hostString.substring(0, hostString.indexOf("?"));
-            }
-            return hostString;
+            return host;
         } catch (Exception ignored) {
             return null;
         }
     }
 
-    private static URL getHost(File file) throws Exception {
+    private static URI getHost(File file) throws Exception {
         final File adsFile = new File(file.getAbsolutePath() + ":Zone.Identifier:$DATA");
         String host = null;
         try(BufferedReader reader = new BufferedReader(new FileReader(adsFile))) {
@@ -143,6 +145,6 @@ public class DownloadSourceChecker {
                 line = reader.readLine();
             }
         }
-        return host != null ? new URL(host) : null;
+        return host != null ? new URI(host) : null;
     }
 }
