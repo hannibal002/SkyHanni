@@ -22,6 +22,48 @@
 
 + Added new chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
+=======
++ Added crop last farmed waypoint. - appable (https://github.com/hannibal002/SkyHanni/pull/1335)
+    + Accessible in the Crop Start Locations section.
+
+#### Dungeon Features
+
++ Added Croesus Limit Warning. - saga (https://github.com/hannibal002/SkyHanni/pull/1908)
+    + Sends a warning when you are close to the Croesus Chest Limit.
+
+#### Command Features
+
++ Option to toggle limbo time in detailed /playtime. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1863)
+
+#### Chat Features
+
++ Added new chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
+    + Filters for rare dungeon chest rewards and sacrifice messages from other players.
+
+#### Event Features
+
++ Chat reminder to check Hoppity Shop each year. - appable (https://github.com/hannibal002/SkyHanni/pull/1843)
+
+#### Mining Features
+
++ Configurable cold amount for the ascension rope message in Glacite Mines. - nopo (https://github.com/hannibal002/SkyHanni/pull/1905)
+
+#### Inventory Features
+
++ Warning when outbid on an auction. - seraid (https://github.com/hannibal002/SkyHanni/pull/1818)
+
+#### Fishing Features
+
++ Added Trophy Fishing Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1754)
+    + Similar to Skytils, but with more options.
+    + Option to sort by item rarity, total amount, rarity amount, the highest rarity, or name alphabetically.
+    + Option to change what information is displayed (rarity, name, icon, total caught).
+    + Option to show only missing trophies.
+    + Option to highlight new catches in green.
+    + Options for when to show the display: always in Crimson Isle, in inventory, with rod in hand, or on keybind press.
+    + Option to show only when wearing a full hunter armor set.
+    + Options to show checkmarks or crosses instead of numbers.
+    + Hover over a trophy fish to see the percentage caught and how to gain progress.
 
 #### Misc Features
 
@@ -36,11 +78,16 @@
 #### Garden Improvements
 
 + Added `/shtpinfested` command to teleport to nearest infested plot. - Empa (https://github.com/hannibal002/SkyHanni/pull/1763)
++ Warp to Infested Plot warps to garden home when no pests are found. - saga (https://github.com/hannibal002/SkyHanni/pull/1910)
+    + Affects both hotkey and command.
 
 #### Hoppity Event Improvements
 
 + Renamed "Unfound Eggs" to "Unclaimed Eggs" for the Hoppity event. - Luna (https://github.com/hannibal002/SkyHanni/pull/1876)
 + Added Compact Hoppity Chat option. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1748)
++ Hoppity Collection Stats are now persistent. - appable (https://github.com/hannibal002/SkyHanni/pull/1836)
+    + No longer reset on profile swap or game restart.
++ Merged duplicate times in compacted Hoppity's messages. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/1887)
 
 #### Mining Improvements
 
@@ -51,6 +98,19 @@
 + Updated /shcommands. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1720)
     + Now has pages for better navigation.
     + Improved visual appearance.
+
+#### Dungeon Improvements
+
++ Changed reminders to show at the end of a dungeon run. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1917)
+    + E.g. Composter empty, Hoppity Eggs ready, New Year Cake, etc.
+
+#### Chat Improvements
+
++ Added Pet Rarity to Oringo Abiphone messages. - Empa (https://github.com/hannibal002/SkyHanni/pull/1862)
+
+#### Inventory Improvements
+
++ Adjusted and added Rabbit Uncle & Dog Keybinds. - raven (https://github.com/hannibal002/SkyHanni/pull/1907)
 
 #### Misc Improvements
 
@@ -66,6 +126,8 @@
 
 + Fixed Tunnel Maps GUI position not saving. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1882)
 + Fixed Glacite Walkers not being highlighted during commissions. - Luna (https://github.com/hannibal002/SkyHanni/pull/1850)
++ Fixed warping to Base in Glacite Tunnels when pressing the keybind while inside any GUI. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1911)
++ Fixed Custom Scoreboard error in Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1909)
 
 #### Garden Fixes
 
@@ -75,6 +137,7 @@
 #### Chocolate Factory Fixes
 
 + Fixed some Chocolate Factory issues caused by a Hypixel update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1860)
++ Fixed a bug where the chocolate factory leaderboard position was not showing when the position had many digits. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/1918)
 
 #### Custom Scoreboard Fixes
 
@@ -88,6 +151,10 @@
 #### Mining Fixes
 
 + Fixed a typo in Tunnels Maps. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1883)
+
+#### Commands Fixes
+
++ Fixed typo in /shclearkismet command. - fahr-plan (https://github.com/hannibal002/SkyHanni/pull/1912)
 
 #### Performance Fixes
 
