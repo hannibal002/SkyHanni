@@ -67,6 +67,12 @@ public class HoppityEggsConfig {
     public boolean showDuringContest = false;
 
     @Expose
+    @ConfigOption(name = "Show outside Skyblock", desc = "Show on Hypixel even when not playing Skyblock.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showOutsideSkyblock = false;
+
+    @Expose
     @ConfigOption(name = "Shared Hoppity Waypoints", desc = "Enable being able to share and receive egg waypoints in your lobby.")
     @ConfigEditorBoolean
     @FeatureToggle
