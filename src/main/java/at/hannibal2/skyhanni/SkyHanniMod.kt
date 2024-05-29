@@ -495,7 +495,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.2",
+    version = "0.26.Beta.3",
 )
 class SkyHanniMod {
 
@@ -954,6 +954,7 @@ class SkyHanniMod {
         loadModule(CustomWardrobe())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(CustomWardrobe())
         loadModule(AuctionOutbidWarning)
 
         // test stuff
