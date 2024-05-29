@@ -95,7 +95,8 @@ object PartyChatCommands {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +
                     "Unignore them using /shignore remove <player> or click here!",
-                onClick = { blacklistModify(event.author) }
+                onClick = { blacklistModify(event.author) },
+                "§eClick to ignore ${event.author}!"
             )
             return
         }
@@ -168,6 +169,7 @@ object PartyChatCommands {
                         storage.blacklistedUsers.clear()
                         ChatUtils.chat("Cleared your ignored players list!")
                     },
+                    "§eClick to confirm.",
                     oneTimeClick = true
                 )
             }

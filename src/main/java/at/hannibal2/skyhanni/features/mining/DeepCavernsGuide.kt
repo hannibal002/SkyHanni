@@ -110,6 +110,7 @@ class DeepCavernsGuide {
                 onClick = {
                     SkyHanniMod.repo.updateRepo()
                 },
+                "§eClick to update the repo!",
                 prefixColor = "§c"
             )
         }

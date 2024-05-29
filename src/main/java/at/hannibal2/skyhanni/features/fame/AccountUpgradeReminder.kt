@@ -50,9 +50,8 @@ class AccountUpgradeReminder {
 
         ChatUtils.clickableChat(
             "The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
-            onClick = {
-                disable()
-            },
+            onClick = { disable() },
+            "§eClick to disable!",
             oneTimeClick = true
         )
     }

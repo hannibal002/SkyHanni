@@ -266,9 +266,8 @@ object ChatUtils {
     fun chatAndOpenConfig(message: String, property: KMutableProperty0<*>) {
         clickableChat(
             message,
-            onClick = {
-                property.jumpToEditor()
-            }
+            onClick = { property.jumpToEditor() },
+            "§eClick to find setting in the config!"
         )
     }
 

@@ -100,7 +100,8 @@ object ProfileStorageData {
                         "This is needed for the mod to function! And therefore this warning cannot be disabled",
                     onClick = {
                         HypixelCommands.widget()
-                    }
+                    },
+                    "§eClick to run /widget!"
                 )
             } else {
                 ChatUtils.chat(

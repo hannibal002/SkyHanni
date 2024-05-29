@@ -220,9 +220,8 @@ object FarmingFortuneDisplay {
             ChatUtils.clickableChat(
                 "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing the Farming Fortune stat.",
-                onClick = {
-                    HypixelCommands.widget()
-                }
+                onClick = { HypixelCommands.widget() },
+                "§eClick to run /widget!"
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
@@ -231,9 +230,8 @@ object FarmingFortuneDisplay {
             ChatUtils.clickableChat(
                 "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing latest Crop Fortune.",
-                onClick = {
-                    HypixelCommands.widget()
-                }
+                onClick = { HypixelCommands.widget() },
+                "§eClick to run /widget!"
             )
             lastCropFortuneMissingError = SimpleTimeMark.now()
         }

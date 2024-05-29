@@ -78,7 +78,7 @@ class TiaRelayHelper {
                 ChatUtils.error("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
                 ChatUtils.clickableChat("Click here to run /togglemusic", onClick = {
                     HypixelCommands.toggleMusic()
-                })
+                }, "§eClick to run /togglemusic!")
                 sounds.clear()
                 return
             }

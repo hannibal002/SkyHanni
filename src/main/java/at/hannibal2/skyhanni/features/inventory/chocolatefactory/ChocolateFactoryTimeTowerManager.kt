@@ -50,9 +50,8 @@ object ChocolateFactoryTimeTowerManager {
             ChatUtils.clickableChat(
                 "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
                     "Click here to use one",
-                onClick = {
-                    HypixelCommands.chocolateFactory()
-                }
+                onClick = { HypixelCommands.chocolateFactory() },
+                "§eClick to run /cf!"
             )
             SoundUtils.playBeepSound()
             lastTimeTowerWarning = SimpleTimeMark.now()
@@ -73,9 +72,8 @@ object ChocolateFactoryTimeTowerManager {
         ChatUtils.clickableChat(
             "§cYour Time Tower is full §7(${timeTowerCharges()})§c, " +
                 "Use one to avoid wasting time tower usages!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            }
+            onClick = { HypixelCommands.chocolateFactory() },
+            "§eClick to run /cf!"
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()
@@ -114,9 +112,8 @@ object ChocolateFactoryTimeTowerManager {
             ChatUtils.clickableChat(
                 "§cYour Time Tower is about to end! " +
                     "Open the Chocolate Factory to avoid wasting the multiplier!",
-                onClick = {
-                    HypixelCommands.chocolateFactory()
-                }
+                onClick = { HypixelCommands.chocolateFactory() },
+                "§eClick to run /cf!"
             )
             SoundUtils.playBeepSound()
             lastTimeTowerReminder = SimpleTimeMark.now()

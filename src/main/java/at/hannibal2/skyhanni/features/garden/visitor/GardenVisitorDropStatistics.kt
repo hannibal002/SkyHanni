@@ -260,7 +260,7 @@ object GardenVisitorDropStatistics {
             storage.rewardsCount = mapOf<VisitorReward, Int>()
             ChatUtils.chat("Visitor Drop Statistics reset!")
             saveAndUpdate()
-        })
+        }, "§eClick to reset!")
     }
 
     @SubscribeEvent

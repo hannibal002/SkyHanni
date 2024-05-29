@@ -87,9 +87,8 @@ object DiscordRPCManager : IPCListener {
                 "Discord Rich Presence was unable to start! " +
                     "This usually happens when you join SkyBlock when Discord is not started. " +
                     "Please run /shrpcstart to retry once you have launched Discord.",
-                onClick = {
-                    startCommand()
-                }
+                onClick = { startCommand() },
+                "§eClick to run /shrpcstart!"
             )
         }
     }

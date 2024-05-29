@@ -37,7 +37,7 @@ class PabloHelper {
 
         ChatUtils.clickableChat("Click here to grab an $itemName from sacks!", onClick = {
             HypixelCommands.getFromSacks(itemName, 1)
-        })
+        }, "§eClick to get from sacks!")
         lastSentMessage = SimpleTimeMark.now()
     }
 

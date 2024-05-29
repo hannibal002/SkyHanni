@@ -148,9 +148,8 @@ object ErrorManager {
 
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
-            onClick = {
-                copyError(randomId)
-            },
+            onClick = { copyError(randomId) },
+            "§eClick to copy!",
             prefix = false
         )
     }

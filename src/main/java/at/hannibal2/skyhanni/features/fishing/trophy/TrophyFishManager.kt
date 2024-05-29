@@ -58,6 +58,7 @@ object TrophyFishManager {
                 "Click here to load data from NEU PV!", onClick = {
                     updateFromNeuPv(savedFishes, neuData)
                 },
+                "§eClick to load!",
                 oneTimeClick = true
             )
         }

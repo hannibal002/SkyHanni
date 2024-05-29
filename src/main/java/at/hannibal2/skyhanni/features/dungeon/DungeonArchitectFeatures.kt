@@ -47,7 +47,8 @@ class DungeonArchitectFeatures {
         ChatUtils.clickableChat(
             "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle. \n" +
                 "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)",
-            { HypixelCommands.getFromSacks("ARCHITECT_FIRST_DRAFT", 1) },
+            onClick = { HypixelCommands.getFromSacks("ARCHITECT_FIRST_DRAFT", 1) },
+            "§eClick to get from sacks!",
             prefix = false
         )
         LorenzUtils.sendTitle("§c§lPUZZLE FAILED!", 3.seconds)

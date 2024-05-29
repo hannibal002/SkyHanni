@@ -59,7 +59,7 @@ object GetFromSackAPI {
     ) =
         ChatUtils.clickableChat(text, onClick = {
             HypixelCommands.getFromSacks(item.internalName.asString(), item.amount)
-        })
+        }, "§eClick to get from sacks!")
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
@@ -161,7 +161,7 @@ object GetFromSackAPI {
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
         "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
-        onClick = { HypixelCommands.bazaar(item.removeColor()) }
+        onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!"
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {

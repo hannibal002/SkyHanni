@@ -96,9 +96,8 @@ class GardenLevelDisplay {
             ChatUtils.clickableChat(
                 " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                     " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                onClick = {
-                    HypixelCommands.gardenLevels()
-                },
+                onClick = { HypixelCommands.gardenLevels() },
+                "§eClick to view your Garden Level progress and rewards!",
                 prefix = false
             )
 

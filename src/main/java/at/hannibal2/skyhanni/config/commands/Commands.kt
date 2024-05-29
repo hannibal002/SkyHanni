@@ -588,6 +588,7 @@ object Commands {
                 onClick = {
                     UpdateManager.checkUpdate(true, updateStream)
                 },
+                "§eClick to confirm!",
                 oneTimeClick = true
             )
         } else {
