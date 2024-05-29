@@ -43,6 +43,9 @@ object ChocolateShopPrice {
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!"
     )
+    /**
+     * REGEX-TEST: §7Chocolate Spent: §60
+     */
     private val chocolateSpentPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.spent",
         "§7Chocolate Spent: §6(?<amount>[\\d,]+)"
@@ -143,15 +146,15 @@ object ChocolateShopPrice {
             )
         }
 
-        val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§e§lCoins per million chocolate§f:"))
-        // TODO update this value every second
-        // TODO add time until can afford
-        newList.add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
-        // TODO add chocolate spend needed for next milestone
-        newList.add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
-        display = newList
+        display = buildList {
+            add(Renderable.string("§e§lCoins per million chocolate§f:"))
+            // TODO update this value every second
+            // TODO add time until can afford
+            add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
+            // TODO add chocolate spend needed for next milestone
+            add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
+            add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
+        }
     }
 
     @SubscribeEvent
