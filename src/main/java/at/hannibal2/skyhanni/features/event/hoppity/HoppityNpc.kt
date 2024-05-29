@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyblockSeason
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,6 +36,9 @@ object HoppityNpc {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Hoppity") return
+        // TODO maybe we could add an annoying chat message that tells you how many years you have skipped
+        //  or the last year you have opened the shop before.
+        //  that way we verbally punish non active users in a funny and non harmful way
         hoppityYearOpened = SkyBlockTime.now().year
         inShop = true
     }
