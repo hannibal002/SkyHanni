@@ -94,6 +94,9 @@ public class ProfileSpecificStorage {
         public int maxTimeTowerUses = 3;
 
         @Expose
+        public boolean hasMuRabbit = false;
+
+        @Expose
         public long bestUpgradeAvailableAt = 0;
 
         @Expose
@@ -224,7 +227,8 @@ public class ProfileSpecificStorage {
         public Map<CropType, Double> latestTrueFarmingFortune = new HashMap<>();
 
         @Expose
-        public CropAccessory savedCropAccessory = null;
+        @Nullable
+        public CropAccessory savedCropAccessory = CropAccessory.NONE;
 
         @Expose
         public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();

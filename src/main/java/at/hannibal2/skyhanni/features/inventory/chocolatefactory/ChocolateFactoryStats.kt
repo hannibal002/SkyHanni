@@ -57,7 +57,7 @@ object ChocolateFactoryStats {
             "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
         }
 
-        val timeTowerFull = ChocolateFactoryTimeTowerManager.timeTowerFullTimemark()
+        val timeTowerFull = ChocolateFactoryTimeTowerManager.timeTowerFullTimeMark()
 
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
         val chocolateUntilPrestigeCalculation =
@@ -166,9 +166,9 @@ object ChocolateFactoryStats {
         TIME_TOWER_FULL(
             "§eTime Tower Full Charges: §b5h 13m 59s\n§bHappens at: Monday, May 13 5:32 AM",
             { ChocolateFactoryTimeTowerManager.currentCharges() != -1 || ChocolateFactoryTimeTowerManager.timeTowerFull() }),
-        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { !ChocolateFactoryAPI.isMaxPrestige() }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
-        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { !ChocolateFactoryAPI.isMaxPrestige() }),
         TIME_TO_BEST_UPGRADE(
             "§eBest Upgrade: §b 59m 4s",
             { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L }),
