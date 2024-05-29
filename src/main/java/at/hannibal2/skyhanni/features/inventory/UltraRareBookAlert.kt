@@ -48,7 +48,7 @@ object UltraRareBookAlert {
 
     private var lastNotificationTime = SimpleTimeMark.farPast()
 
-    fun notification(enchantsName: String) {
+    private fun notification(enchantsName: String) {
         lastNotificationTime = SimpleTimeMark.now()
         dragonSound.playSound()
         ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE BOOK! §d§kXX§e! You found: §9$enchantsName")
