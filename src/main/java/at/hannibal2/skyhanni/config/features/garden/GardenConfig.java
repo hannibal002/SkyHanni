@@ -77,6 +77,11 @@ public class GardenConfig {
     public NextJacobContestConfig nextJacobContests = new NextJacobContestConfig();
 
     @Expose
+    @ConfigOption(name = "Contest Summary", desc = "")
+    @Accordion
+    public ContestSummaryConfig contestSummaryConfig = new ContestSummaryConfig();
+
+    @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
     // TODO renmae to armorDropTracker
@@ -207,15 +212,6 @@ public class GardenConfig {
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
     public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
-
-    @Expose
-    @ConfigOption(
-        name = "Contest Summary",
-        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean jacobContestSummary = true;
 
     // Does not have a config element!
     @Expose
