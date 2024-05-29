@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
-import net.minecraft.network.play.server.S3BPacketScoreboardObjective
+import net.minecraft.network.play.server.S3CPacketUpdateScore
+import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -72,8 +73,15 @@ class ScoreboardData {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
-        if (event.packet is S3BPacketScoreboardObjective) {
-            dirty = true
+        if (event.packet is S3CPacketUpdateScore) {
+            if (event.packet.objectiveName == "update") {
+                dirty = true
+            }
+        }
+        if (event.packet is S3EPacketTeams) {
+            if (event.packet.name.startsWith("team_")) {
+                dirty = true
+            }
         }
     }
 
