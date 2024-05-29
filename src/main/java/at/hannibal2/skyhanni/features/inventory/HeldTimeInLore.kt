@@ -22,7 +22,6 @@ object HeldTimeInLore {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!config.timeHeldInLore) return
         if (!LorenzUtils.inSkyBlock) return
-        if (event.toolTip.size < 10) return // Fixes conflict with NEU's sort warning
         val stack = event.itemStack
         val internalName = stack.getInternalName()
         val timeHeld = (
