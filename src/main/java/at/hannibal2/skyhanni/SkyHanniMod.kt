@@ -257,6 +257,7 @@ import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
 import at.hannibal2.skyhanni.features.inventory.HarpFeatures
+import at.hannibal2.skyhanni.features.inventory.HeldTimeInLore
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
@@ -934,6 +935,7 @@ class SkyHanniMod {
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures)
+        loadModule(HeldTimeInLore())
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime)
         loadModule(CopyPlaytime)
