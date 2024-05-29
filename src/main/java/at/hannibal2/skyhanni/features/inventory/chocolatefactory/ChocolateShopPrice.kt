@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -51,8 +52,8 @@ object ChocolateShopPrice {
     private var callUpdate = false
     var inventoryItems = emptyMap<Int, ItemStack>()
 
-    var milestoneIndex = 50
-    var chocolateSpent = 0
+    private const val MILESTONE_INDEX = 50
+    private var chocolateSpent = 0
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -83,15 +84,14 @@ object ChocolateShopPrice {
     private fun updateProducts() {
         val newProducts = mutableListOf<Product>()
         for ((slot, item) in inventoryItems) {
-            if (slot == milestoneIndex) {
-                for (line in item.getLore()) {
-                    chocolateSpentPattern.matchMatcher(line) {
-                        chocolateSpent = group("amount").formatInt()
-                    }
+            val lore = item.getLore()
+
+            if (slot == MILESTONE_INDEX) {
+                lore.matchFirst(chocolateSpentPattern) {
+                    chocolateSpent = group("amount").formatInt()
                 }
             }
 
-            val lore = item.getLore()
             val chocolate = ChocolateFactoryAPI.getChocolateBuyCost(lore) ?: continue
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
