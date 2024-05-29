@@ -255,6 +255,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning
+import at.hannibal2.skyhanni.features.inventory.AuctionOutbidWarning
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
@@ -949,6 +950,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(AuctionOutbidWarning)
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
