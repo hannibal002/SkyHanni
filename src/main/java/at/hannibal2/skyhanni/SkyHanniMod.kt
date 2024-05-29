@@ -177,6 +177,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishDisplay
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
@@ -734,6 +735,7 @@ class SkyHanniMod {
         loadModule(SharkFishCounter())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
+        loadModule(TrophyFishDisplay())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
         loadModule(BasketWaypoints())

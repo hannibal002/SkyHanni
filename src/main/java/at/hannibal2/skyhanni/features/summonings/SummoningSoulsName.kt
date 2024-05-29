@@ -64,8 +64,8 @@ class SummoningSoulsName {
             val id = entity.entityId
             val consumer = entity.getNameTagWith(2, "§c❤")
             if (consumer != null && !consumer.name.contains("§e0")) {
-                mobsLastLocation.put(id, entity.getLorenzVec())
-                mobsName.put(id, consumer.name)
+                mobsLastLocation[id] = entity.getLorenzVec()
+                mobsName[id] = consumer.name
             }
         }
 
