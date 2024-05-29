@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -49,6 +49,7 @@ object UltraRareBookAlert {
     private var lastNotificationTime = SimpleTimeMark.farPast()
 
     fun notification(enchantsName: String) {
+        lastNotificationTime = SimpleTimeMark.now()
         dragonSound.playSound()
         ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE BOOK! §d§kXX§e! You found: §9$enchantsName")
     }
@@ -69,7 +70,7 @@ object UltraRareBookAlert {
             Color(Color.DARK_GRAY.withAlpha(0), true),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 125, gui.width,gui.height)
+        ).renderXYAligned(0, 125, gui.width, gui.height)
 
         GlStateManager.translate(0f, 150f, -500f)
         GlStateManager.popMatrix()
@@ -82,15 +83,14 @@ object UltraRareBookAlert {
         if (enchantsFound) return
         if (!superpairsGui.matches(event.inventoryName)) return
 
-        for ((slotId, item) in event.inventoryItems) {
-            val firstLine = item.getLore().firstOrNull() ?: continue
+        for (lore in event.inventoryItems.map { it.value.getLore() }) {
+            val firstLine = lore.firstOrNull() ?: continue
             if (!ultraRarePattern.matches(firstLine)) continue
-            val bookNameLine = item.getLore().getOrNull(2) ?: continue
-            bookPattern.matchMatcher(bookNameLine){
-                val enchantsName = group ("enchant")
+            val bookNameLine = lore.getOrNull(2) ?: continue
+            bookPattern.matchMatcher(bookNameLine) {
+                val enchantsName = group("enchant")
                 notification(enchantsName)
                 enchantsFound = true
-                lastNotificationTime = SimpleTimeMark.now()
             }
         }
     }
