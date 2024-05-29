@@ -20,8 +20,11 @@ public class MixinGuiScreen {
         GuiScreenHookKt.renderToolTip(stack);
     }
 
-    @Inject(method = "renderToolTip", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getRarity()Lnet/minecraft/item/EnumRarity;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "renderToolTip", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getRarity()Lnet/minecraft/item/EnumRarity;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     public void getTooltip(ItemStack stack, int x, int y, CallbackInfo ci, List<String> list, int i) {
         ToolTipData.getTooltip(stack, list);
+        if (list.isEmpty()) {
+            ci.cancel();
+        }
     }
 }
