@@ -24,6 +24,7 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.opengl.GL11
 import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -54,7 +55,7 @@ class GuiEditManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
     }
 
     @SubscribeEvent
@@ -78,7 +79,7 @@ class GuiEditManager {
                 name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
                 position.internalName = name
             }
-            currentPositions.put(name, position)
+            currentPositions[name] = position
             currentBorderSize[posLabel] = Pair(x, y)
         }
 

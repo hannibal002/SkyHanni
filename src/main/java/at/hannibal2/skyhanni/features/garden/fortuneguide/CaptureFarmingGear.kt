@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -80,6 +80,7 @@ object CaptureFarmingGear {
         "RANCHERS", "FARMER", "RABBIT"
     )
 
+    // TODO upadte armor on equpment/wardeobe update as well
     fun captureFarmingGear() {
         val farmingItems = farmingItems ?: return
         val itemStack = InventoryUtils.getItemInHand() ?: return
@@ -123,6 +124,12 @@ object CaptureFarmingGear {
         val storage = GardenAPI.storage?.fortune ?: return
         storage.pumpkinFortune = !storage.pumpkinFortune
         ChatUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
+    }
+
+    fun reverseCocoaBeansFortune() {
+        val storage = GardenAPI.storage?.fortune ?: return
+        storage.cocoaBeansFortune = !storage.cocoaBeansFortune
+        ChatUtils.chat("Toggled supreme chocolate bar fortune to: ${storage.cocoaBeansFortune}")
     }
 
     private fun getUniqueVisitorsForTier(tier: Int): Int {
@@ -353,6 +360,9 @@ object CaptureFarmingGear {
         if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
             storage.pumpkinFortune = true
         }
+        if (msg == "CHOCOLATE BARS EXPORTATION COMPLETE!") {
+            storage.cocoaBeansFortune = true
+        }
         if (msg == "[NPC] Carrolyn: Thank you for the carrots.") {
             storage.carrotFortune = true
             ChatUtils.chat("§aYou have already given Carrolyn enough Exportable Carrots.")
@@ -360,6 +370,10 @@ object CaptureFarmingGear {
         if (msg == "[NPC] Carrolyn: Thank you for the pumpkins.") {
             storage.pumpkinFortune = true
             ChatUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkins.")
+        }
+        if (msg == "[NPC] Carrolyn: Thank you for the chocolate.") {
+            storage.cocoaBeansFortune = true
+            ChatUtils.chat("§aYou have already given Carrolyn enough Supreme Chocolate Bars.")
         }
     }
 }

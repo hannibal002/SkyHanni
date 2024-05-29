@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -76,6 +77,7 @@ object ChocolateFactoryCustomReminder {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inChocolateMenu()) return
+        if (ReminderUtils.isBusy()) return
 
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
@@ -85,6 +87,7 @@ object ChocolateFactoryCustomReminder {
         if (!isEnabled()) return
         if (!configReminder.always) return
         if (Minecraft.getMinecraft().currentScreen is GuiChest) return
+        if (ReminderUtils.isBusy()) return
 
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
@@ -133,7 +136,10 @@ object ChocolateFactoryCustomReminder {
         if (configUpgradeWarnings.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        ChatUtils.chat("You can now purchase §f$targetName §ein Chocolate factory!")
+        ChatUtils.clickableChat("You can now purchase §f$targetName §ein Chocolate factory!",
+            onClick = {
+                HypixelCommands.chocolateFactory()
+            })
     }
 
     private fun reset() {

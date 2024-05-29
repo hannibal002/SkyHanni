@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.Commands.init
+import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BitsAPI
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.EventCounter
 import at.hannibal2.skyhanni.data.FameRanks
 import at.hannibal2.skyhanni.data.FixedRateTimerManager
 import at.hannibal2.skyhanni.data.FriendAPI
@@ -88,6 +89,8 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.combat.BestiaryData
+import at.hannibal2.skyhanni.features.combat.FerocityDisplay
+import at.hannibal2.skyhanni.features.combat.FlareDisplay
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
@@ -131,6 +134,7 @@ import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaFixChat
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowParticleFinder
@@ -173,6 +177,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishDisplay
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages
@@ -268,6 +273,8 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
+import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseCopyUnderbidPrice
+import at.hannibal2.skyhanni.features.inventory.auctionhouse.AuctionHouseOpenPriceWebsite
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarBestSellMethod
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarCancelledBuyOrderClipboard
@@ -323,6 +330,7 @@ import at.hannibal2.skyhanni.features.misc.BrewingStandOverlay
 import at.hannibal2.skyhanni.features.misc.ButtonOnPause
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.ContributorManager
+import at.hannibal2.skyhanni.features.misc.CopyPlaytime
 import at.hannibal2.skyhanni.features.misc.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.CustomTextBox
 import at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider
@@ -360,7 +368,6 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader
 import at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.misc.items.AuctionHouseCopyUnderbidPrice
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
@@ -446,8 +453,8 @@ import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
-import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -484,7 +491,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.25.Beta.25",
+    version = "0.26.Beta.2",
 )
 class SkyHanniMod {
 
@@ -508,7 +515,7 @@ class SkyHanniMod {
         loadModule(EntityData())
         loadModule(MobData())
         loadModule(MobDetection())
-        loadModule(EntityMovementData())
+        loadModule(EntityMovementData)
         loadModule(TestExportTools)
         loadModule(ItemClickData())
 //        loadModule(Year300RaffleEvent)
@@ -522,7 +529,7 @@ class SkyHanniMod {
         loadModule(RenderData())
         loadModule(GardenCropMilestones)
         loadModule(GardenCropMilestonesCommunityFix)
-        loadModule(GardenCropUpgrades())
+        loadModule(GardenCropUpgrades)
         loadModule(VisitorListener())
         loadModule(VisitorRewardWarning())
         loadModule(OwnInventoryData())
@@ -531,7 +538,7 @@ class SkyHanniMod {
         loadModule(GuiEditManager())
         loadModule(GetFromSackAPI)
         loadModule(UpdateManager)
-        loadModule(CropAccessoryData())
+        loadModule(CropAccessoryData)
         loadModule(GardenComposterUpgradesData())
         loadModule(ActionBarStatsData)
         loadModule(GardenCropMilestoneInventory())
@@ -562,6 +569,7 @@ class SkyHanniMod {
         loadModule(ContributorManager)
         loadModule(TabComplete)
         loadModule(HypixelBazaarFetcher)
+        loadModule(EventCounter)
 
         // APIs
         loadModule(BazaarApi())
@@ -629,6 +637,7 @@ class SkyHanniMod {
         loadModule(ShiftClickBrewing())
         loadModule(BazaarOpenPriceWebsite())
         loadModule(AuctionHouseCopyUnderbidPrice())
+        loadModule(AuctionHouseOpenPriceWebsite())
         loadModule(AnvilCombineHelper())
         loadModule(SeaCreatureMessageShortener())
         loadModule(AshfangFreezeCooldown)
@@ -684,6 +693,8 @@ class SkyHanniMod {
         loadModule(FireVeilWandParticles())
         loadModule(HideMobNames())
         loadModule(HideDamageSplash())
+        loadModule(FerocityDisplay())
+        loadModule(FlareDisplay)
         loadModule(InGameDateDisplay())
         loadModule(ThunderSparksHighlight())
         loadModule(BlazeSlayerDaggerHelper())
@@ -699,6 +710,7 @@ class SkyHanniMod {
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
         loadModule(DianaProfitTracker)
+        loadModule(DianaFixChat())
         loadModule(MythologicalCreatureTracker)
         loadModule(ShiftClickNPCSell)
         loadModule(HighlightJerries())
@@ -708,7 +720,7 @@ class SkyHanniMod {
         loadModule(GriffinBurrowParticleFinder)
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
-        loadModule(HighlightBonzoMasks())
+        loadModule(HighlightBonzoMasks)
         loadModule(BazaarCancelledBuyOrderClipboard())
         loadModule(CompactSplashPotionMessage())
         loadModule(CroesusChestTracker())
@@ -723,6 +735,7 @@ class SkyHanniMod {
         loadModule(SharkFishCounter())
         loadModule(PowerStoneGuideFeatures())
         loadModule(OdgerWaypoint())
+        loadModule(TrophyFishDisplay())
         loadModule(TiaRelayHelper())
         loadModule(TiaRelayWaypoints())
         loadModule(BasketWaypoints())
@@ -732,7 +745,7 @@ class SkyHanniMod {
         loadModule(MinionCraftHelper())
         loadModule(TpsCounter())
         loadModule(ParticleHider())
-        loadModule(MiscFeatures())
+        loadModule(MiscFeatures)
         loadModule(ReplaceRomanNumerals())
         loadModule(GardenPlotMenuHighlighting())
         loadModule(SkyMartCopperPrice())
@@ -900,7 +913,7 @@ class SkyHanniMod {
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)
-        loadModule(PestFinder())
+        loadModule(PestFinder)
         loadModule(PestParticleWaypoint())
         loadModule(StereoHarmonyDisplay())
         loadModule(PestParticleLine())
@@ -922,9 +935,10 @@ class SkyHanniMod {
         loadModule(GardenInventoryTooltipOverflow())
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
-        loadModule(SuperCraftFeatures())
+        loadModule(SuperCraftFeatures)
         loadModule(InfernoMinionFeatures())
-        loadModule(LimboPlaytime())
+        loadModule(LimboPlaytime)
+        loadModule(CopyPlaytime)
         loadModule(RareDropMessages())
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
@@ -934,13 +948,11 @@ class SkyHanniMod {
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
 
-        init()
-
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
         loadModule(FixGhostEntities)
-        loadModule(CopyNearbyParticlesCommand)
         loadModule(TrackSoundsCommand)
+        loadModule(TrackParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest)
         loadModule(TestBingo)
@@ -951,8 +963,11 @@ class SkyHanniMod {
         loadModule(TestShowSlotNumber())
         loadModule(SkyHanniDebugsAndTests)
         loadModule(WorldEdit)
-        PreInitFinishedEvent().postAndCatch()
         loadModule(MobDebug())
+
+        Commands.init()
+
+        PreInitFinishedEvent().postAndCatch()
     }
 
     @Mod.EventHandler

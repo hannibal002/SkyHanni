@@ -9,20 +9,19 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkyMartCopperPrice {
@@ -38,25 +37,6 @@ class SkyMartCopperPrice {
     companion object {
 
         var inInventory = false
-    }
-
-    private fun ItemStack.loreCosts(): MutableList<NEUInternalName> {
-        var found = false
-        val list = mutableListOf<NEUInternalName>()
-        for (lines in getLore()) {
-            if (lines == "§7Cost") {
-                found = true
-                continue
-            }
-
-            if (!found) continue
-            if (lines.isEmpty()) return list
-
-            NEUInternalName.fromItemNameOrNull(lines)?.let {
-                list.add(it)
-            }
-        }
-        return list
     }
 
     @SubscribeEvent

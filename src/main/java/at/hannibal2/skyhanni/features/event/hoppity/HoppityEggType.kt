@@ -35,6 +35,7 @@ enum class HoppityEggType(
 
     fun isClaimed() = claimed
     val formattedName get() = "${if (isClaimed()) "§7§m" else mealColour}$mealName:$mealColour"
+    val coloredName get() = "$mealColour$mealName"
 
     companion object {
         fun allFound() = entries.forEach { it.markClaimed() }
