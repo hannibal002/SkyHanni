@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSec
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import kotlin.time.Duration.Companion.seconds
 
 object HeldTimeInLore {
     private val config get() = SkyHanniMod.feature.inventory
