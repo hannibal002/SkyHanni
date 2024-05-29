@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class RescueMissionConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show a path to the hostage based on your quest rank once you talk to the NPC near the rescue mission area.")
+    @ConfigOption(name = "Enabled", desc = "Show a path to the hostage based on your quest rank once you talk to the NPC near the rescue mission area. (You must hover over the book that gives you the quest and stand near the agent for the solver to work).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
