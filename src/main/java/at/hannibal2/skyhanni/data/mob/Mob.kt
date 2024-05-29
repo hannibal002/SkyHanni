@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -117,11 +117,7 @@ class Mob(
 
     /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
     fun highlight(color: Color) {
-        highlightColor = if (color.alpha == 255) {
-            color.addAlpha(127)
-        } else {
-            color
-        }
+        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         internalHighlight()
     }
 

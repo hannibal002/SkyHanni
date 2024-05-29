@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -81,14 +79,9 @@ object TrophyFishManager {
 
     private var trophyFishInfo = mapOf<String, TrophyFishInfo>()
 
-    fun getInfo(internalName: String) = trophyFishInfo[internalName]
+    fun getInfo(internalName: String): TrophyFishInfo? = trophyFishInfo[internalName]
 
     fun getInfoByName(name: String) = trophyFishInfo.values.find { it.displayName == name }
-
-    private fun formatCount(counts: Map<TrophyRarity, Int>, rarity: TrophyRarity): String {
-        val count = counts.getOrDefault(rarity, 0)
-        return if (count > 0) "§6${count.addSeparators()}" else "§c✖"
-    }
 
     fun TrophyFishInfo.getFilletValue(rarity: TrophyRarity): Int {
         if (fillet == null) {
@@ -103,20 +96,8 @@ object TrophyFishManager {
         return fillet.getOrDefault(rarity, -1)
     }
 
-    fun TrophyFishInfo.getTooltip(counts: Map<TrophyRarity, Int>): ChatStyle {
-        val bestFishObtained = counts.keys.maxOrNull() ?: TrophyRarity.BRONZE
-        val rateString = if (rate != null) "§8[§7$rate%§8]" else ""
-        val display = """
-            |$displayName $rateString
-            |${description.splitLines(150)}
-            |
-            |${TrophyRarity.DIAMOND.formattedString}: ${formatCount(counts, TrophyRarity.DIAMOND)}
-            |${TrophyRarity.GOLD.formattedString}: ${formatCount(counts, TrophyRarity.GOLD)}
-            |${TrophyRarity.SILVER.formattedString}: ${formatCount(counts, TrophyRarity.SILVER)}
-            |${TrophyRarity.BRONZE.formattedString}: ${formatCount(counts, TrophyRarity.BRONZE)}
-            |
-            |§7Total: ${bestFishObtained.formatCode}${counts.values.sum().addSeparators()}
-        """.trimMargin()
+    fun getTooltip(internalName: String): ChatStyle? {
+        val display = TrophyFishAPI.hoverInfo(internalName) ?: return null
         return ChatStyle().setChatHoverEvent(
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(display))
         )
