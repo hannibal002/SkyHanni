@@ -21,13 +21,11 @@ import kotlin.time.Duration.Companion.milliseconds
 object MineshaftWaypoints {
     private val config get() = SkyHanniMod.feature.mining.mineshaftWaypoints
 
-    @Suppress("ConstPropertyName")
     private const val blocksForward: Int = 7
 
     val waypoints: MutableList<Waypoint> = mutableListOf()
     private var timeLastShared = SimpleTimeMark.farPast()
 
-    @Suppress("UNUSED_PARAMETER")
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         waypoints.clear()
@@ -40,8 +38,7 @@ object MineshaftWaypoints {
         val playerLocation = LocationUtils.playerLocation().round(0).add(y = -1)
 
         if (config.entranceLocation) {
-            val waypointType = WaypointsType.ENTRANCE
-            waypoints.add(Waypoint(waypointType = waypointType, location = playerLocation, shared = true))
+            waypoints.add(Waypoint(waypointType = WaypointsType.ENTRANCE, location = playerLocation, shared = true))
         }
 
         if (config.ladderLocation) {
@@ -66,9 +63,7 @@ object MineshaftWaypoints {
             .forEach {
                 timeLastShared = SimpleTimeMark.now()
                 val location = it.location
-                val x = location.x.toInt()
-                val y = location.y.toInt()
-                val z = location.z.toInt()
+                val (x, y, z) = location.toDoubleArray().map { it.toInt() }
                 val type = it.waypointType.displayText
 
                 val messagePrefix = if (PartyAPI.partyMembers.isEmpty()) "" else "/pc"
