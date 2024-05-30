@@ -348,6 +348,7 @@ import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.HideFarEntities
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
+import at.hannibal2.skyhanni.features.misc.InWaterDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -937,6 +938,7 @@ class SkyHanniMod {
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(MiningEventTracker())
+        loadModule(InWaterDisplay)
         loadModule(MiningNotifications)
         loadModule(JyrreTimer())
         loadModule(TotemOfCorruption())
