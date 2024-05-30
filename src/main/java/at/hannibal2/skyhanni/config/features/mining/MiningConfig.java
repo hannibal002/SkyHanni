@@ -61,11 +61,6 @@ public class MiningConfig {
     public MineshaftConfig mineshaft = new MineshaftConfig();
 
     @Expose
-    @ConfigOption(name = "Professor Robot", desc = "")
-    @Accordion
-    public ProfessorRobotConfig professorRobot = new ProfessorRobotConfig();
-
-    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -76,6 +71,12 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsNamesInCore = false;
+
+    @Expose
+    @ConfigOption(name = "Professor Robot Helper", desc = "Sends a clickable message in chat if you don't have the component in your inventory to get it from sack.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean professorRobotHelper = false;
 
     @Expose
     @ConfigOption(name = "Private Island Ability Block", desc = "Blocks the mining ability when on private island.")

@@ -16,13 +16,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrystalHollowsProfessorRobot {
 
-    private val config get() = SkyHanniMod.feature.mining.professorRobot;
-
     private val pattern by RepoPattern.pattern(
         "mining.robot.missing.gfs",
         "\\[NPC\\] Professor Robot: That's not one of the components I need! Bring me one of the missing components:"
     )
-    private var robotMessage = false
     private val robotParts = setOf(
         "Electron Transmitter",
         "FTX 3070",
@@ -35,19 +32,16 @@ class CrystalHollowsProfessorRobot {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
+
         val cleanMessage = event.message.removeColor()
-        if (pattern.matches(cleanMessage)) {
-            robotMessage = true;
-            return
-        }
-        if (!robotMessage) return
+
+        if (!pattern.matches(cleanMessage)) return
 
         val itemName = event.message.removeColor().trimStart()
         if (InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) } > 0 || !robotParts.contains(itemName)) return
 
         GetFromSackAPI.getFromChatMessageSackItems(PrimitiveItemStack(itemName.asInternalName(), 1))
-        robotMessage = false
     }
 
-    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
+    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && SkyHanniMod.feature.mining.professorRobotHelper;
 }
