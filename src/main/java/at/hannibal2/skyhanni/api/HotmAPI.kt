@@ -97,8 +97,10 @@ object HotmAPI {
         TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a+15% §7more Powder while mining.")
         ;
 
-        val chatPattern by RepoPattern.pattern("mining.hotm.skymall.chat.$name", chat)
-        val itemPattern by RepoPattern.pattern("mining.hotm.skymall.item.$name", itemString)
+        private val patternName = name.lowercase().replace("_", ".")
+
+        val chatPattern by RepoPattern.pattern("mining.hotm.skymall.chat.$patternName", chat)
+        val itemPattern by RepoPattern.pattern("mining.hotm.skymall.item.$patternName", itemString)
     }
 
     enum class MayhemPerk(chat: String) {
@@ -108,6 +110,8 @@ object HotmAPI {
         COLD_RESISTANCE("You received a §r§a§r§b❄ Cold Resistance §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
         ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!");
 
-        val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.$name", chat)
+        private val patternName = name.lowercase().replace("_", ".")
+
+        val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.$patternName", chat)
     }
 }
