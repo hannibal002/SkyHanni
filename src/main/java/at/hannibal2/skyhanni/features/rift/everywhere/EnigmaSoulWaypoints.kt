@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -65,8 +66,8 @@ object EnigmaSoulWaypoints {
         if (!isEnabled()) return
 
         if (inventoryUnfound.isEmpty()) return
-        if (event.inventory is ContainerLocalMenu && inInventory && event.slotNumber == 31) {
-            event.replaceWith(item)
+        if (event.inventory is ContainerLocalMenu && inInventory && event.slot == 31) {
+            event.replace(item)
         }
     }
 

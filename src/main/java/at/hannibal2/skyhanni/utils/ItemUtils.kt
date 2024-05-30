@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -112,7 +114,8 @@ object ItemUtils {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NEUInternalName.WISP_POTION
         }
-        return NEUItems.getInternalName(this)?.asInternalName()
+        val internalName = NEUItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
+        return internalName?.asInternalName()
     }
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
@@ -344,13 +347,13 @@ object ItemUtils {
 
     fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 
-    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
+    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val ItemStack.itemName: String
         get() = getInternalName().itemName
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
-    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
+    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val NEUInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 

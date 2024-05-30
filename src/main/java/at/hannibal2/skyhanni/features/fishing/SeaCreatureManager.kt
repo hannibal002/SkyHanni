@@ -23,7 +23,7 @@ class SeaCreatureManager {
             }
             doubleHook = true
         } else {
-            val seaCreature = getSeaCreature(event.message)
+            val seaCreature = getSeaCreatureFromMessage(event.message)
             if (seaCreature != null) {
                 SeaCreatureFishEvent(seaCreature, event, doubleHook).postAndCatch()
             }
@@ -75,7 +75,7 @@ class SeaCreatureManager {
             "§eIt's a §r§aDouble Hook§r§e!( Woot woot!)?"
         )
 
-        fun getSeaCreature(message: String): SeaCreature? {
+        fun getSeaCreatureFromMessage(message: String): SeaCreature? {
             return seaCreatureMap.getOrDefault(message, null)
         }
     }

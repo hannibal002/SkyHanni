@@ -368,6 +368,14 @@ class ChatFilter {
         "§7You will now produce §r§6.* Chocolate §r§7per click!",
         "§7You upgraded to §r§d.*?§r§7!",
     )
+    /**
+     * REGEX-TEST: §c§lSACRIFICE! §r§6[MVP§r§d++§r§6] Mikecraft1224§r§f §r§eturned §r§6Young Dragon Boots §r§einto §r§d40 Dragon Essence§r§e!
+     * REGEX-TEST: §c§lBONUS LOOT! §r§eThey also received §r§5Ritual Residue §r§efrom their sacrifice!
+     */
+    private val sacrificePatterns = listOf(
+        "§c§lSACRIFICE! (.*) §r§eturned (.*) §r§einto (.*) Dragon Essence§r§e!".toPattern(),
+        "§c§lBONUS LOOT! §r§eThey also received (.*) §r§efrom their sacrifice!".toPattern()
+    )
     private val powderMiningMessagesPatterns by patternGroup.list(
         "powderminingmessages",
         "§aYou uncovered a treasure chest!",
@@ -387,6 +395,7 @@ class ChatFilter {
         "eventmessage",
         "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
+
     // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
     private val soloClassPatterns by patternGroup.list(
         "soloclass",
@@ -420,6 +429,8 @@ class ChatFilter {
         "fire_sale" to fireSaleMessagesPatterns,
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
+        "sacrifice" to sacrificePatterns,
+        "rare_drops" to rareDropsMessages,
         "solo_class" to soloClassPatterns,
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
@@ -479,8 +490,10 @@ class ChatFilter {
         config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
+        config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && skymallPerkPattern.matches(message) -> "skymall"
+        dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"

@@ -42,7 +42,7 @@ object GriffinBurrowParticleFinder {
         "§cDefeat all the burrow defenders in order to dig it!"
     )
 
-    // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
+    // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
     private var fakeBurrow: LorenzVec? = null
 
     @SubscribeEvent
@@ -182,7 +182,7 @@ object GriffinBurrowParticleFinder {
 
         if (location == fakeBurrow) {
             fakeBurrow = null
-            // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
+            // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
             tryDig(location, ignoreFound = true)
             return
         }

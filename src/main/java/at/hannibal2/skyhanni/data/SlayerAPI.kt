@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -27,12 +28,11 @@ object SlayerAPI {
 
     private var nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
 
-    var questStartTime = 0L
+    var questStartTime = SimpleTimeMark.farPast()
     var isInCorrectArea = false
     var isInAnyArea = false
     var latestSlayerCategory = ""
-    private var latestProgressChangeTime = 0L
-    var latestWrongAreaWarning = 0L
+    var latestWrongAreaWarning = SimpleTimeMark.farPast()
     var latestSlayerProgress = ""
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
@@ -55,27 +55,21 @@ object SlayerAPI {
         System.currentTimeMillis()
     } else latestProgressChangeTime
 
-    fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> {
-        val key = internalName to amount
-        nameCache.getOrNull(key)?.let {
-            return it
+    fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> =
+        nameCache.getOrPut(internalName to amount) {
+            val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
+            val displayName = internalName.itemName
+
+            val price = internalName.getPrice()
+            val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
+            val maxPrice = npcPrice.coerceAtLeast(price)
+            val totalPrice = maxPrice * amount
+
+            val format = NumberUtil.format(totalPrice)
+            val priceFormat = " §7(§6$format coins§7)"
+
+            "$amountFormat$displayName$priceFormat" to totalPrice
         }
-
-        val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-        val displayName = internalName.itemName
-
-        val price = internalName.getPrice()
-        val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
-        val maxPrice = npcPrice.coerceAtLeast(price)
-        val totalPrice = maxPrice * amount
-
-        val format = NumberUtil.format(totalPrice)
-        val priceFormat = " §7(§6$format coins§7)"
-
-        val result = "$amountFormat$displayName$priceFormat" to totalPrice
-        nameCache.put(key, result)
-        return result
-    }
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
@@ -99,7 +93,7 @@ object SlayerAPI {
         if (!LorenzUtils.inSkyBlock) return
 
         if (slayerQuestStartedPattern.find(event.message)) {
-            questStartTime = System.currentTimeMillis()
+            questStartTime = SimpleTimeMark.now()
         }
 
         if (slayerQuestCompletePattern.matches(event.message)) {
@@ -141,7 +135,6 @@ object SlayerAPI {
         if (latestSlayerProgress != slayerProgress) {
             SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
             latestSlayerProgress = slayerProgress
-            latestProgressChangeTime = System.currentTimeMillis()
         }
 
         if (event.isMod(5)) {

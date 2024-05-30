@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
@@ -199,7 +200,7 @@ class ItemAbilityCooldown {
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
+        if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 

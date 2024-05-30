@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -66,7 +66,7 @@ object MobUtils {
         rayTraceForMobs(entity, partialTicks, offset)?.firstOrNull()
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
-        val pos = entity.getPositionEyes(partialTicks).toLorenzVec().add(offset)
+        val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         val possibleEntities = MobData.entityToMob.filterKeys {
             it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(

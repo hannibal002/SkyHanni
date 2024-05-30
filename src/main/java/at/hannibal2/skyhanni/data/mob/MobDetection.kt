@@ -270,7 +270,7 @@ class MobDetection {
                         + "DistanceC: ${
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     }\n"
-                        + "Relative Position: ${entity.getLorenzVec().subtract(LocationUtils.playerLocation())}\n " +
+                        + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
                         "}"
                 )
                 // Uncomment this to make it closed a loop

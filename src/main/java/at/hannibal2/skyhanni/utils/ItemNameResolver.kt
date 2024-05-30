@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
@@ -80,7 +80,7 @@ object ItemNameResolver {
         UtilsPatterns.enchantmentNamePattern.matchMatcher(enchantmentName) {
             val name = group("name").trim { it <= ' ' }
             val ultimate = group("format").lowercase().contains("§l")
-            ((if (ultimate && name != "Ultimate Wise") "ULTIMATE_" else "")
+                ((if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else "")
                 + turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
                 + ";" + group("level").romanToDecimal())
         }

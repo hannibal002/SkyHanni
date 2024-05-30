@@ -51,9 +51,15 @@ object ChocolateFactoryDataLoader {
         "chocolate.multiplier",
         "§7Total Multiplier: §6(?<amount>[\\d.]+)x"
     )
+
+    /**
+     * REGEX-TEST: §7You are §8#§b114
+     * REGEX-TEST: §7§7You are §8#§b5,139 §7in all-time Chocolate.
+     * REGEX-TEST: §7§7You are §8#§b5,139 §7in all-time
+     */
     private val leaderboardPlacePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.place",
-        "§7You are §8#§b(?<position>[\\d,]+)"
+        "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time)?(?: Chocolate\\.)?"
     )
     private val leaderboardPercentilePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.percentile",
