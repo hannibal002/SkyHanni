@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -14,6 +15,8 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class DianaFixChat {
+
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private var hasSetParticleQuality = false
     private var hasSetToggleMusic = false
@@ -34,7 +37,7 @@ class DianaFixChat {
             lastErrorTime = SimpleTimeMark.farPast()
             return
         }
-        // particles dont work if a valid target point is close
+        // particles don't work if a valid target point is close
         if (GriffinBurrowHelper.targetLocation != null) return
         val spadeUse = lastSpadeUse.passedSince()
         if (spadeUse <= 3.seconds) return
@@ -71,7 +74,7 @@ class DianaFixChat {
                     lastToggleMusicPrompt = SimpleTimeMark.now()
                     ChatUtils.clickableChat(
                         "§cError detecting Diana Guess! Changing the Particle Quality has not worked :( " +
-                                "§eClick here to disable hypixel music!",
+                            "§eClick here to disable hypixel music!",
                         onClick = {
                             hasSetToggleMusic = true
                             HypixelCommands.toggleMusic()
@@ -117,5 +120,5 @@ class DianaFixChat {
         errorCounter = 0
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana()
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsSoopyGuess
 }
