@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 enum class CarrolynTable(val crop: CropType, val label: String, completeMessage: String, thxMessage: String) {
@@ -36,6 +37,11 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
 
     fun get() = GardenAPI.storage?.fortune?.carrolyn?.get(crop) ?: false
     fun set(value: Boolean) = GardenAPI.storage?.fortune?.carrolyn?.set(crop, value)
+
+    fun setVisibleActive(value: Boolean) {
+        set(value)
+        ChatUtils.chat("Toggled $label fortune to: ${get()}")
+    }
 
     companion object {
         fun getByCrop(crop: CropType?) = if (crop == null) null else entries.firstOrNull { it.crop == crop }

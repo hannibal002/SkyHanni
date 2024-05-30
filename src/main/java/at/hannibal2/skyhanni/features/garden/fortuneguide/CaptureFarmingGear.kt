@@ -123,8 +123,7 @@ object CaptureFarmingGear {
             ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string").run { return }
         val carrolyn = CarrolynTable.getByCrop(crop)
             ?: ChatUtils.userError("Invalid Argument, crop is not valid").run { return }
-        carrolyn.set(!carrolyn.get())
-        ChatUtils.chat("Toggled ${carrolyn.label} fortune to: ${carrolyn.get()}")
+        carrolyn.setVisibleActive(!carrolyn.get())
     }
 
     private fun getUniqueVisitorsForTier(tier: Int): Int {

@@ -51,7 +51,9 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
 
     private fun FortuneStats.getFarmingBar(
         width: Int = 90,
-    ) = GuiRenderUtils.getFarmingBar(label(crop), tooltip(crop), current, max, width)
+    ) = Renderable.clickable(
+        GuiRenderUtils.getFarmingBar(label(crop), tooltip(crop), current, max, width),
+        { onClick(crop) })
 
     private fun toolLines(): List<Renderable> =
         FortuneStats.entries.filter { it.isActive() && it !in headers }.map { it.getFarmingBar() }

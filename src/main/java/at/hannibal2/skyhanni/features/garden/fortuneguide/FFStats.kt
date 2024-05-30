@@ -16,9 +16,10 @@ import kotlin.math.floor
 
 object FFStats {
 
-    private val mathCrops =
+    private val mathCrops by lazy {
         listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
-    private val dicerCrops = listOf(CropType.PUMPKIN, CropType.MELON)
+    }
+    private val dicerCrops by lazy { listOf(CropType.PUMPKIN, CropType.MELON) }
 
     private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
@@ -54,7 +55,7 @@ object FFStats {
     fun getCropStats(crop: CropType, tool: ItemStack?) {
         FortuneStats.reset()
 
-        FortuneStats.BASE.set(totalBaseFF[FFTypes.TOTAL] ?: 100.0, if (usingSpeedBoots) 1373.0 else 1377.0)
+        FortuneStats.BASE.set(FFInfos.UNIVERSAL.current, FFInfos.UNIVERSAL.max)
         FortuneStats.CROP_UPGRADE.set((crop.getUpgradeLevel()?.toDouble() ?: 0.0) * 5.0, 45.0)
         FortuneStats.ACCESSORY.set(CropAccessoryData.cropAccessory.getFortune(crop), 30.0)
         FortuneStats.FFD.set((tool?.getFarmingForDummiesCount() ?: 0).toDouble(), 5.0)
