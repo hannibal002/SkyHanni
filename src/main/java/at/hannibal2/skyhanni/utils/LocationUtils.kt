@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
 import kotlin.math.max
 import kotlin.math.min
 
@@ -55,8 +54,8 @@ object LocationUtils {
     fun AxisAlignedBB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
         // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
-        val t1 = (this.minBox().subtract(origin)).multiply(rayDirectionInverse)
-        val t2 = (this.maxBox().subtract(origin)).multiply(rayDirectionInverse)
+        val t1 = (this.minBox() - origin) * rayDirectionInverse
+        val t2 = (this.maxBox() - origin) * rayDirectionInverse
 
         val tmin = max(t1.minOfEachElement(t2).max(), Double.NEGATIVE_INFINITY)
         val tmax = min(t1.maxOfEachElement(t2).min(), Double.POSITIVE_INFINITY)
@@ -84,17 +83,14 @@ object LocationUtils {
             if (aabb.maxZ > maxZ) maxZ = aabb.maxZ
         }
 
-        val combinedMin = BlockPos(minX, minY, minZ)
-        val combinedMax = BlockPos(maxX, maxY, maxZ)
-
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    fun AxisAlignedBB.getEdgeLengths() = this.maxBox().subtract(this.minBox())
+    fun AxisAlignedBB.getEdgeLengths() = maxBox() - minBox()
 
-    fun AxisAlignedBB.getCenter() = this.getEdgeLengths().multiply(0.5).add(this.minBox())
+    fun AxisAlignedBB.getCenter() = getEdgeLengths() * 0.5 + minBox()
 
-    fun AxisAlignedBB.getTopCenter() = this.getCenter().add(y = (maxY - minY) / 2)
+    fun AxisAlignedBB.getTopCenter() = getCenter().add(y = (maxY - minY) / 2)
 
     fun AxisAlignedBB.clampTo(other: AxisAlignedBB): AxisAlignedBB {
         val minX = max(this.minX, other.minX)
@@ -106,4 +102,3 @@ object LocationUtils {
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 }
-

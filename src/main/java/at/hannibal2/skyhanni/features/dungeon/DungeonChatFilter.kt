@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -130,8 +130,7 @@ class DungeonChatFilter {
         "§d(.*) the Fairy§r§f: You killed me! I'll revive you so that my death is not in vain!".toPattern(),
         "§d(.*) the Fairy§r§f: You killed me! I'll revive your friend §r(.*) §r§fso that my death is not in vain!".toPattern(),
         "§d(.*) the Fairy§r§f: Have a great life!".toPattern(),
-        "§c(.*) §r§eYou picked up a Ability Damage Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +§r§c(.*)% §r§eAbility Damage for §r§b10 §r§eseconds.".toPattern(),
-        "§c(.*) §r§eYou picked up a Damage Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +§r§c(.*)% §r§eDamage for §r§b10 §r§eseconds.".toPattern(),
+        "§c(.*) §r§eYou picked up a (.*) Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +(.*)% §r§e(.*) for §r§b10 §r§eseconds.".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Premium Flesh§r§e!".toPattern(),
         "§6§lRARE DROP! §r§9Beating Heart §r§b(.*)".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!".toPattern()
