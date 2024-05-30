@@ -54,6 +54,11 @@ public class InventoryConfig {
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @Expose
+    @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
+    @Accordion
+    public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();

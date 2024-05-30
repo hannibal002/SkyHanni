@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands
+import at.hannibal2.skyhanni.config.features.inventory.ItemPickupLog
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BitsAPI
@@ -945,6 +946,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(ItemPickupLog)
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
