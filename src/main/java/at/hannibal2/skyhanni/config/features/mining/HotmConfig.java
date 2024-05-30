@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HotmConfig {
@@ -26,21 +24,4 @@ public class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tokenStackSize = true;
-
-    @Expose
-    @ConfigOption(name = "Powder Spent", desc = "Shows the amount of powder spent on a perk.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean powderSpent = true;
-
-    @Expose
-    @ConfigOption(name = "Powder Spent Design", desc = "Changes the design of the powder spent display.")
-    @ConfigEditorDropdown
-    public PowderSpentDesign powderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE;
-
-    @Expose
-    @ConfigOption(name = "Powder for 10 Levels", desc = "Shows the amount of powder needed to level a perk 10 times when pressing shift.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean powderFor10Levels = true;
 }

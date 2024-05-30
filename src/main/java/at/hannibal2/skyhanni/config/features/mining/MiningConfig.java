@@ -15,7 +15,7 @@ public class MiningConfig {
 
     @Expose
     @Category(name = "HotM", desc = "Settings for Heart of the Mountain")
-    public HotmConfig hotmConfig = new HotmConfig();
+    public HotmConfig hotm = new HotmConfig();
 
     @Expose
     @ConfigOption(name = "Powder Tracker", desc = "")

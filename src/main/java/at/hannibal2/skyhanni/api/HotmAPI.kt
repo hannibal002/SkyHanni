@@ -15,18 +15,11 @@ import kotlin.time.Duration.Companion.seconds
 
 object HotmAPI {
 
-    private val repoGroup = RepoPattern.group("data.hotmapi")
-
-    private val hotmGuiPattern by repoGroup.pattern(
-        "gui.name",
-        "Heart of the Mountain"
-    )
-
     fun copyCurrentTree() = HotmData.storage?.deepCopy()
 
     val activeMiningAbility get() = HotmData.abilities.firstOrNull { it.enabled }
 
-    private val blueGoblinEgg = "goblin_omelette_blue_cheese".asInternalName()
+    private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".asInternalName()
 
     private val blueEggCache = TimeLimitedCache<ItemStack, Boolean>(10.0.seconds)
     val isBlueEggActive
@@ -46,11 +39,11 @@ object HotmAPI {
 
         val lowName = name.lowercase().firstLetterUppercase()
 
-        val heartPattern by repoGroup.pattern(
+        val heartPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.heart",
             "§7$lowName Powder: §a§.(?<powder>[\\d,]+)"
         )
-        val resetPattern by repoGroup.pattern(
+        val resetPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.reset",
             "\\s+§8- §.(?<powder>[\\d,]+) $lowName Powder"
         )
@@ -96,16 +89,18 @@ object HotmAPI {
     var mineshaftMayhem: MayhemPerk? = null
 
     enum class SkymallPerk(chat: String, itemString: String) {
-        MINING_SPEED("Gain §r§a+100 §r§6⸕ Mining Speed§r§f.", "Gain §a+100 §6⸕ Mining Speed§7."),
-        MINING_FORTUNE("Gain §r§a+50 §r§6☘ Mining Fortune§r§f.", "Gain §a+50 §6☘ Mining Fortune§7."),
-        EXTRA_POWDER("Gain §r§a+15% §r§fmore Powder while mining.", "Gain §a+15% §7more Powder while mining."),
-        ABILITY_COOLDOWN("Reduce Pickaxe Ability cooldown by §r§a20%§r§f.", "Reduce Pickaxe Ability cooldown by"),
-        GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins.", "§a10x §7chance to find Golden and"),
-        TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a+15% §7more Powder while mining.")
+        MINING_SPEED("Gain §r§a\\+100 §r§6⸕ Mining Speed§r§f\\.", "Gain §a\\+100 §6⸕ Mining Speed§7\\."),
+        MINING_FORTUNE("Gain §r§a\\+50 §r§6☘ Mining Fortune§r§f\\.", "Gain §a\\+50 §6☘ Mining Fortune§7\\."),
+        EXTRA_POWDER("Gain §r§a\\+15% §r§fmore Powder while mining\\.", "Gain §a\\+15% §7more Powder while mining\\."),
+        ABILITY_COOLDOWN("Reduce Pickaxe Ability cooldown by §r§a20%§r§f\\.", "Reduce Pickaxe Ability cooldown by"),
+        GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins\\.", "§a10x §7chance to find Golden and"),
+        TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a\\+15% §7more Powder while mining\\.")
         ;
 
-        val chatPattern by RepoPattern.pattern("mining.hotm.skymall.chat.$name", chat)
-        val itemPattern by RepoPattern.pattern("mining.hotm.skymall.item.$name", itemString)
+        private val patternName = name.lowercase().replace("_", ".")
+
+        val chatPattern by RepoPattern.pattern("mining.hotm.skymall.chat.$patternName", chat)
+        val itemPattern by RepoPattern.pattern("mining.hotm.skymall.item.$patternName", itemString)
     }
 
     enum class MayhemPerk(chat: String) {
@@ -115,6 +110,8 @@ object HotmAPI {
         COLD_RESISTANCE("You received a §r§a§r§b❄ Cold Resistance §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
         ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!");
 
-        val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.$name", chat)
+        private val patternName = name.lowercase().replace("_", ".")
+
+        val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.$patternName", chat)
     }
 }

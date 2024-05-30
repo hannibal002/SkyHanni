@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.api.HotmAPI;
 import at.hannibal2.skyhanni.api.SkillAPI;
+import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ProfileSpecificStorage {
 
@@ -129,6 +131,12 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<String, Integer> rabbitCounts = new HashMap();
+
+        @Expose
+        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap();
+
+        @Expose
+        public Integer hoppityShopYearOpened = null;
     }
 
     @Expose

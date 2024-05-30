@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HotmFeatures {
 
-    val config get() = SkyHanniMod.feature.mining.hotmConfig
+    val config get() = SkyHanniMod.feature.mining.hotm
 
     fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory
 
@@ -39,7 +39,8 @@ class HotmFeatures {
             event.stack == it.slot?.stack
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else
-                it.activeLevel.toString()
+                "§e${it.activeLevel}"
+            it.activeLevel.toString()
         }
     }
 
