@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -144,7 +143,7 @@ class GoldenFishTimer {
 
         val location = event.exactLocation(entity).add(y = 2.5)
         if (location.distanceToPlayer() > 20) return
-        event.drawString(location.add(y = 0.5), "§b${goldenFishDespawnTimer.timeUntil().format()}", false)
+        event.drawString(location.add(y = 0.5), "§b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}", false)
         if (interactions == MAX_INTERACTIONS) event.drawString(location.add(y = 0.25), "§cPULL", false)
         event.drawString(location, "§6Golden Fish §a($interactions/$MAX_INTERACTIONS)", false)
     }
@@ -182,11 +181,11 @@ class GoldenFishTimer {
             else {
                 text.add("§7Can spawn since: §b${timePossibleSpawn.passedSince().format()}")
                 val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / 5.minutes.inWholeSeconds
-                text.add("§7Chance: §b${NumberUtil.format(chance * 100)}%")
+                text.add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}%")
             }
         } else {
             text.add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
-            text.add("§7Despawn in: §b${goldenFishDespawnTimer.timeUntil().format()}")
+            text.add("§7Despawn in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}")
         }
         list.add(
             Renderable.verticalContainer(
