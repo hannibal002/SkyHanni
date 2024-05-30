@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -47,15 +47,13 @@ object CorpseLocator {
         Minecraft.getMinecraft().theWorld ?: return
 
         EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()
-            .filterNot { corpse ->
-                MineshaftWaypoints.waypoints.any { it.location.distance(corpse.getLorenzVec()) <= 3 }
-            }
+            .filterNot { corpse -> MineshaftWaypoints.waypoints.any { it.location.distance(corpse.getLorenzVec()) <= 3 } }
             .filter { entity ->
                 entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
             }
             .forEach { entity ->
                 val helmetDisplayName = StringUtils.stripControlCodes(entity.getCurrentArmor(3).displayName)
-                val corpseType = WaypointsType.entries.firstOrNull { it.helmetName == helmetDisplayName }
+                val corpseType = MineshaftWaypointType.entries.firstOrNull { it.helmetName == helmetDisplayName }
                 corpseType?.let { type ->
                     for (offset in -1..3) {
                         val canSee = entity.getLorenzVec().add(y = offset).canBeSeen()
@@ -93,7 +91,6 @@ object CorpseLocator {
         if (parsedLocations.isNotEmpty()) parsedLocations.clear()
     }
 
-    @Suppress("UNUSED_PARAMETER")
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return

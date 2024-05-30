@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 import at.hannibal2.skyhanni.utils.LorenzColor
 
 // could merge with CorpseAPI (besides the last 3 types)
-enum class WaypointsType(val displayText: String, val helmetName: String, val color: LorenzColor) {
+enum class MineshaftWaypointType(val displayText: String, val helmetName: String, val color: LorenzColor) {
     LAPIS("Lapis Corpse", "Lapis Armor Helmet", LorenzColor.DARK_BLUE),
     UMBER("Umber Corpse", "Yog Helmet", LorenzColor.GOLD),
     TUNGSTEN("Tungsten Corpse", "Mineral Helmet", LorenzColor.GRAY),

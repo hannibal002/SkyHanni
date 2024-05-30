@@ -38,11 +38,11 @@ object MineshaftWaypoints {
         val playerLocation = LocationUtils.playerLocation().round(0).add(y = -1)
 
         if (config.entranceLocation) {
-            waypoints.add(Waypoint(waypointType = WaypointsType.ENTRANCE, location = playerLocation, shared = true))
+            waypoints.add(Waypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = playerLocation, shared = true))
         }
 
         if (config.ladderLocation) {
-            val waypointType = WaypointsType.LADDER
+            val waypointType = MineshaftWaypointType.LADDER
             val vec = Minecraft.getMinecraft().thePlayer.horizontalFacing.directionVec
             val location = playerLocation
                 // Move 7 blocks in front of the player to be in the ladder shaft
