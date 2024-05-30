@@ -99,6 +99,14 @@ object LorenzUtils {
         return originalMessage.stripHypixelMessage()
     }
 
+    /**
+     * Only shows decimal places if necessary.
+     */
+    fun Double.prettyRound(decimals: Int): String {
+        val rounded = this.round(decimals)
+        return (if (rounded % 1 == 0.0) rounded else rounded.toInt()).toString()
+    }
+
     fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }

@@ -8,26 +8,29 @@ import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.prettyRound
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 class JacobContestStatsSummary {
     private val config get() = GardenAPI.config.jacobContestStats
     private var blocksBroken = 0
-    private var startTime = SimpleTimeMark.farPast()
-    private var startTimeIntoContest: Long? = null
-    private var percent = -1.0
+    private var startTimeIrl = SimpleTimeMark.farPast()
+    private var startTimeRelative: Long? = null
+    private var startScore: Long? = null
+    private var predictedScore: Long? = null
+    private var percent: Double? = null
     private var medalColor = ""
-    private var predictedScore = 0L
     private var contestStats = mutableListOf<String>()
 
     private val tabContestPattern by RepoPattern.pattern(
@@ -61,11 +64,10 @@ class JacobContestStatsSummary {
 
         for (line in event.tabList) {
             tabContestPattern.matchMatcher(line) {
-                if (group("crop") == FarmingContestAPI.contestCrop?.cropName) {
-                    percent = group("percent").toDouble() / 100
-                    medalColor = group("color")
-                    update()
-                }
+                if (group("crop") != FarmingContestAPI.contestCrop?.cropName) return
+                percent = group("percent").toDouble() / 100
+                medalColor = group("color")
+                update()
             }
         }
     }
@@ -76,7 +78,7 @@ class JacobContestStatsSummary {
         if (!FarmingContestAPI.inContest) return
 
         var timeLeft = 0L
-        var amount = 0.0
+        var amount = 0L
 
         for (line in event.newList) {
             scoreboardContestTimeLeftPattern.matchMatcher(line) {
@@ -86,36 +88,38 @@ class JacobContestStatsSummary {
                 amount = group("amount").fixScoreAmount()
             }
         }
-        if (timeLeft == 0L && amount == 0.0) return
 
-        val fixedStartTime = startTimeIntoContest
-        if (fixedStartTime == null) {
-            startTimeIntoContest = 1200 - timeLeft
-            predictedScore = amount.toLong()
+        val fixedStartTime = startTimeRelative
+        val fixedStartScore = startScore
+        if (fixedStartTime == null || fixedStartScore == null) {
+            startTimeRelative = 1200 - timeLeft
+            startScore = amount
+            predictedScore = null
         } else {
-            predictedScore = if (1200 - timeLeft - fixedStartTime > 5) {
-                ((amount / (1200 - timeLeft - fixedStartTime)) * (1200 - fixedStartTime)).toLong()
-            } else amount.toLong()
+            val amountGained = amount - fixedStartScore
+            val timeParticipated = 1200 - timeLeft - fixedStartTime
+            predictedScore = amount + amountGained / timeParticipated * (1200 - fixedStartTime)
         }
         update()
     }
 
-    private fun String.fixScoreAmount(): Double =
+    private fun String.fixScoreAmount(): Long =
         this.formatLong() * when (this.split(',').last().length) {
-            2 -> 10.0
-            1 -> 100.0
-            else -> 1.0
+            2 -> 10
+            1 -> 100
+            else -> 1
         }
 
     fun update() {
-        val formattedStartTime = TimeUtils.formatDuration(((startTimeIntoContest ?: return) * 1000 - 999))
+        val formattedStartTime = ((startTimeRelative ?: return) * 1000 - 999).seconds.format()
         contestStats.clear()
         val cropName = FarmingContestAPI.contestCrop?.cropName
-        val duration = startTime.passedSince()
+        val duration = startTimeIrl.passedSince()
         val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
         val timeParticipated = duration.format()
         val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
-        val position = if (percent == -1.0) "§eNo data yet" else "Top $medalColor${(percent * 100).round(1)}%"
+        val formattedPercent = (percent?.times(100))?.prettyRound(1)
+        val position = if (percent == null) "§eNo data yet" else "Top $medalColor$formattedPercent%"
 
         val unsortedList = mutableListOf<String>()
         unsortedList.add("§e§l$cropName Contest Stats")
@@ -124,7 +128,7 @@ class JacobContestStatsSummary {
         unsortedList.add("§7Blocks Broken: §e${blocksBroken.addSeparators()}")
         unsortedList.add("§7Blocks per Second: §c$blocksPerSecond")
         unsortedList.add("§7Position: $position")
-        unsortedList.add("§7Predicted Score: §e${predictedScore.addSeparators()}")
+        unsortedList.add("§7Predicted Score: §e${predictedScore?.addSeparators() ?: "Calculating..."}")
 
 
         for (index in config.text) {
@@ -147,17 +151,17 @@ class JacobContestStatsSummary {
         when (event.phase) {
             FarmingContestPhase.START -> {
                 ChatUtils.chat("Started tracking your Jacob Contest Blocks Per Second!")
-                startTime = SimpleTimeMark.now()
-                startTimeIntoContest = null
+                startTimeIrl = SimpleTimeMark.now()
             }
 
             FarmingContestPhase.STOP -> {
                 val cropName = event.crop.cropName
-                val duration = startTime.passedSince()
+                val duration = startTimeIrl.passedSince()
                 val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
                 val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
-                val time = startTime.passedSince().format()
-                val position = if (percent == -1.0) "§eNo data" else "§fTop $medalColor${(percent * 100).round(1)}%"
+                val time = startTimeIrl.passedSince().format()
+                val formattedPercent = (percent?.times(100))?.prettyRound(1)
+                val position = if (percent == null) "§eNo data yet" else "Top $medalColor$formattedPercent%"
 
                 ChatUtils.chat("§l$cropName Contest Stats")
                 ChatUtils.chat("§7Participated for §b$time")
@@ -168,12 +172,12 @@ class JacobContestStatsSummary {
 
             FarmingContestPhase.CHANGE -> {
                 ChatUtils.chat("You changed the crop during the contest, resetting the Blocks Per Second calculation..")
-                startTime = SimpleTimeMark.now()
-                startTimeIntoContest = null
+                startTimeIrl = SimpleTimeMark.now()
             }
         }
+        startTimeRelative = null
+        percent = null
         blocksBroken = 0
-        percent = -1.0
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.jacobContestSummary
