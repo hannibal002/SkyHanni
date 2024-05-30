@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import net.minecraft.client.renderer.GlStateManager
@@ -66,4 +67,16 @@ internal object RenderableUtils {
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
     }
+
+    internal fun ErrorManager.renderableOutOfSpec(
+        message: String,
+        vararg extraData: Pair<String, Any?>,
+    ) = this.logErrorStateWithData(
+        "Renderable error",
+        message,
+        *extraData,
+        ignoreErrorCache = false,
+        noStackTrace = false,
+        betaOnly = true
+    )
 }

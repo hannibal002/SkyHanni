@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOf
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderableOutOfSpec
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -721,38 +723,67 @@ interface Renderable {
             }
         }
 
+        /** @param stepSize can min be ([maxValue] - [minValue]) / [sheight]
+         * @param maxValue is only reachable if ([maxValue] - [minValue]) % [stepSize] == 0*/
         fun verticalSlider(
-            height: Int,
+            sheight: Int,
             handler: (Double) -> Unit,
             scrollValue: ScrollValue = ScrollValue(),
             width: Int = 11,
             sliderHeadThickness: Int = 6,
             minValue: Double = 0.0,
             maxValue: Double = 100.0,
-            stepSize: Double = 1.0,
+            stepSize: Double = (maxValue - minValue) / sheight,
             button: Int? = 0,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             override val width = width
-            override val height = height
+            override val height = sheight + sliderHeadThickness + 2
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            val trueMax = (height - sliderHeadThickness - 2) / stepSize
+            init {
+                if (minValue > maxValue) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Bigger min than max for slider",
+                        "sliderType" to "verticalSlider",
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                    )
+                }
+                if (stepSize < (maxValue - minValue) / sheight) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Wrong StepSize for slider",
+                        "sliderType" to "verticalSlider",
+                        "stepSize" to stepSize,
+                        "calculated min" to (maxValue - minValue) / sheight,
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                        "sheight" to sheight,
+                    )
+                }
+            }
 
-            // TODO fix offset bug
+            /** @param value is in scroll value space
+             * @return is in the handler range */
+            private fun snap(value: Double): Double =
+                value - ((maxValue - minValue) * (value / sheight)) % stepSize
+
+            private fun snapScroll(value: Double): Int =
+                ((snap(value) - minValue) / (maxValue - minValue) * sheight).toInt()
+
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
                 0,
-                trueMax,
+                sheight,
                 1.0,
                 0.0,
                 dragScrollMouseButton = button,
                 inverseDrag = false
             )
 
-            private val sliderPos get() = (scroll.asDouble() * stepSize).toInt() + 1
+            private val sliderPos get() = snapScroll(scroll.asDouble()) + 1
 
             override fun render(posX: Int, posY: Int) {
                 val lastScroll = scroll.asDouble()
@@ -767,7 +798,7 @@ interface Renderable {
                 Gui.drawRect(1, slider + 1, width - 1, slider + sliderHeadThickness - 1, Color.GRAY.rgb)
 
                 if (lastScroll != newScroll) {
-                    handler((newScroll / trueMax) * (maxValue - minValue) + minValue)
+                    handler(snap(newScroll))
                 }
             }
 

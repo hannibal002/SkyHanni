@@ -32,7 +32,7 @@ enum class RenderableTestSuit(private val where: RenderIn) {
                     Renderable.horizontalContainer(
                         listOf(
                             Renderable.verticalSlider(
-                                50, handler = { extracted = it }, scrollValue
+                                50, handler = { extracted = it }, scrollValue, stepSize = 4.5
                             ).renderBounds(), staticRenderable
                         ),
                         5
