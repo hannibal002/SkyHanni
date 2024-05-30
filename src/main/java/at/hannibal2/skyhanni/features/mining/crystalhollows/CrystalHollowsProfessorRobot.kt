@@ -20,7 +20,7 @@ class CrystalHollowsProfessorRobot {
 
     private val pattern by RepoPattern.pattern(
         "mining.robot.missing.gfs",
-        "\\[NPC\\] Professor Robot: That's not one of the components I need! Bring me one of the missing components:".
+        "\\[NPC\\] Professor Robot: That's not one of the components I need! Bring me one of the missing components:"
     )
     private var robotMessage = false
     private val robotParts = setOf(
