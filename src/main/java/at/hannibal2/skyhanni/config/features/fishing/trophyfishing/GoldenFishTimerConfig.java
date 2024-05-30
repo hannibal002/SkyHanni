@@ -32,6 +32,11 @@ public class GoldenFishTimerConfig {
     public boolean throwRodWarning = false;
 
     @Expose
+    @ConfigOption(name = "Show Head", desc = "Show the Golden Fish head in the Golden Fish Timer GUI.")
+    @ConfigEditorBoolean
+    public boolean showHead = true;
+
+    @Expose
     @ConfigOption(name = "Throw Rod Warning Time", desc = "The time in seconds before the throw rod warning appears.")
     @ConfigEditorSlider(minValue = 1, maxValue = 60, minStep = 1)
     public int throwRodWarningTime = 20;

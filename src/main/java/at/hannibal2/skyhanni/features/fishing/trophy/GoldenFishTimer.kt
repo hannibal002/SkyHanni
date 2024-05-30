@@ -107,7 +107,7 @@ class GoldenFishTimer {
     private var possibleGoldenFishEntity: EntityLivingBase? = null
     private var confirmedGoldenFishEntity: EntityLivingBase? = null
 
-    private var display: Renderable? = null
+    private var display = listOf<Renderable>()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -151,7 +151,8 @@ class GoldenFishTimer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        val renderable = display ?: return
+        val list = display.takeIf { it.isNotEmpty() } ?: return
+        val renderable = Renderable.horizontalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         config.position.renderRenderables(listOf(renderable), posLabel = "Golden Fish Timer")
     }
 
@@ -159,43 +160,48 @@ class GoldenFishTimer {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): Renderable {
-        val list = mutableListOf<Renderable>()
-        list.add(Renderable.itemStack(goldenFishSkullItem, 2.5, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
-        val text = mutableListOf<String>()
-        text.add("§6§lGolden Fish Timer")
-        if (!isGoldenFishActive()) {
-            if (lastGoldenFishTime.isFarPast()) text.add("§7Last Golden Fish: §cNone this session")
-            else text.add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().format()}")
-            if (lastRodThrowTime.isFarPast()) text.add("§7Last Row Throw: §cNone yet")
-            else text.add(
-                "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().format()} " +
-                    "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().format()})"
-            )
-            if (timePossibleSpawn.isFarFuture()) text.add("§7Can spawn in: §cUnknown")
-            else if (timePossibleSpawn.isInFuture()) text.add(
-                "§7Can spawn in: §b${
-                    (timePossibleSpawn + 1.seconds).timeUntil().format()
-                }"
-            )
-            else {
-                text.add("§7Can spawn since: §b${timePossibleSpawn.passedSince().format()}")
-                val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / 5.minutes.inWholeSeconds
-                text.add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}%")
+    private fun drawDisplay() = buildList {
+        val text = buildList {
+            add("§6§lGolden Fish Timer")
+            if (!isGoldenFishActive()) {
+                if (lastGoldenFishTime.isFarPast()) add("§7Last Golden Fish: §cNone this session")
+                else add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().format()}")
+                if (lastRodThrowTime.isFarPast()) add("§7Last Row Throw: §cNone yet")
+                else add(
+                    "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().format()} " +
+                        "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().format()})"
+                )
+                if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
+                else if (timePossibleSpawn.isInFuture()) add(
+                    "§7Can spawn in: §b${
+                        (timePossibleSpawn + 1.seconds).timeUntil().format()
+                    }"
+                )
+                else {
+                    add("§7Can spawn since: §b${timePossibleSpawn.passedSince().format()}")
+                    val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / 5.minutes.inWholeSeconds
+                    add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}%")
+                }
+            } else {
+                add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
+                add("§7Despawn in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}")
             }
-        } else {
-            text.add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
-            text.add("§7Despawn in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}")
         }
-        list.add(
+
+        add(
             Renderable.verticalContainer(
                 text.map { Renderable.string(it) },
                 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER
             )
         )
-        val renderable = Renderable.horizontalContainer(list, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
-        return renderable
+        if (config.showHead) add(
+            Renderable.itemStack(
+                goldenFishSkullItem,
+                2.5,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+            )
+        )
     }
 
     @SubscribeEvent
@@ -260,7 +266,7 @@ class GoldenFishTimer {
         lastRodThrowTime = SimpleTimeMark.farPast()
         timePossibleSpawn = SimpleTimeMark.farFuture()
         interactions = 0
-        display = null
+        display = listOf()
         removeGoldenFish()
     }
 
