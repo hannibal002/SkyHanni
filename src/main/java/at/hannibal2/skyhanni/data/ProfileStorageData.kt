@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -39,9 +39,9 @@ object ProfileStorageData {
         val profileName = event.name
         if (playerSpecific == null) {
             DelayedRun.runDelayed(10.seconds) {
-                workaroundIn10Seconds(profileName)
+                workaroundIn10SecondsProfileStorage(profileName)
             }
-            ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
+            return
         }
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
@@ -51,16 +51,19 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    private fun workaroundIn10Seconds(profileName: String) {
+    private fun workaroundIn10SecondsProfileStorage(profileName: String) {
+        println("workaroundIn10SecondsProfileStorage")
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
 
         if (playerSpecific == null) {
-            ErrorManager.logErrorStateWithData(
-                "failed to load your profile data a second time",
-                "workaround in 10 seconds did not work"
+            ErrorManager.skyHanniError(
+                "failed to load your profile data delayed ",
+                "onHypixel" to LorenzUtils.onHypixel,
+                "HypixelData.hypixelLive" to HypixelData.hypixelLive,
+                "HypixelData.hypixelAlpha" to HypixelData.hypixelAlpha,
+                "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
             )
-            ErrorManager.skyHanniError("playerSpecific is null in ProfileJoinEvent!")
         }
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")

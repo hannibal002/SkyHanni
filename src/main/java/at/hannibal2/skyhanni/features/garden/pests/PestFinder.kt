@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -81,7 +82,7 @@ object PestFinder {
                     "Runs /desk."
                 ),
                 onClick = {
-                    ChatUtils.sendCommandToServer("desk")
+                    HypixelCommands.gardenDesk()
                 }
             ))
         }
@@ -171,7 +172,10 @@ object PestFinder {
         if (!GardenAPI.inGarden()) {
             ChatUtils.userError("This command only works while on the Garden!")
         }
+
         val plot = PestAPI.getNearestInfestedPlot() ?: run {
+            if (config.backToGarden) return HypixelCommands.warp("garden")
+
             ChatUtils.userError("No infested plots detected to warp to!")
             return
         }

@@ -14,11 +14,14 @@ class TimeLimitedCache<K: Any, V: Any>(
         .removalListener { removalListener(it.key, it.value) }
         .build<K, V>()
 
-    fun put(key: K, value: V) = cache.put(key, value)
+    // TODO IntelliJ cant replace this, find another way?
+//     @Deprecated("outdated", ReplaceWith("[key] = value"))
+    @Deprecated("outdated", ReplaceWith("set(key, value)"))
+    fun put(key: K, value: V) = set(key, value)
 
     fun getOrNull(key: K): V? = cache.getIfPresent(key)
 
-    fun getOrPut(key: K, defaultValue: () -> V) = getOrNull(key) ?: defaultValue().also { put(key, it) }
+    fun getOrPut(key: K, defaultValue: () -> V) = getOrNull(key) ?: defaultValue().also { set(key, it) }
 
     fun clear() = cache.invalidateAll()
 
@@ -31,8 +34,9 @@ class TimeLimitedCache<K: Any, V: Any>(
     fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
 
     override fun iterator(): Iterator<Map.Entry<K, V>> = entries().iterator()
+
     operator fun set(key: K, value: V) {
-        put(key, value)
+        cache.put(key, value)
     }
 
     operator fun get(key: K): V? = getOrNull(key)
