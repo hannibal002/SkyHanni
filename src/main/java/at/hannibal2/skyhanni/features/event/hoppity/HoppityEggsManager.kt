@@ -180,6 +180,7 @@ object HoppityEggsManager {
         }
     }
 
+    // TODO move logic into second passed event and cache
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
@@ -191,7 +192,7 @@ object HoppityEggsManager {
             .toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
 
-        if (config.showCollectedLocationCount) {
+        if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
             val totalEggs = HoppityEggLocator.getCurrentIslandEggLocations()?.size
             if (totalEggs != null) {
                 val collectedEggs = HoppityUniqueEggLocations.collectedEggsThisIsland()
@@ -270,5 +271,6 @@ object HoppityEggsManager {
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 
-    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) && ChocolateFactoryAPI.isHoppityEvent()
+    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&
+        ChocolateFactoryAPI.isHoppityEvent()
 }
