@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityUniqueEggLocations {
 
@@ -30,11 +28,11 @@ object HoppityUniqueEggLocations {
     fun saveNearestEgg() {
         val location = islandEggLocations?.minByOrNull { it.distanceSqToPlayer() } ?: return
         if (location.distanceSqToPlayer() > 100) {
-            ChatUtils.debug("""
-                Player too far from any known egg location! 
-                Player location: ${LocationUtils.playerLocation()}
-                Closest egg: $location
-            """.trimIndent())
+            ErrorManager.skyHanniError("Player far from any known egg location!",
+                "island" to LorenzUtils.skyBlockIsland,
+                "playerLocation" to LocationUtils.playerLocation(),
+                "closestKnownEgg" to location
+            )
             return
         }
 

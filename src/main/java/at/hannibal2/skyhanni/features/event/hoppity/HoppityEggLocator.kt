@@ -14,8 +14,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -23,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -104,14 +104,7 @@ object HoppityEggLocator {
 
         if (drawLocations) {
             for ((index, eggLocation) in possibleEggLocations.withIndex()) {
-                var eggLabel = "§aGuess #${index + 1}"
-                if (shouldAddDuplicateText(eggLocation)) eggLabel += "§c(Duplicate Location!)"
-                event.drawWaypointFilled(
-                    eggLocation,
-                    getEggColor(eggLocation),
-                    seeThroughBlocks = true,
-                )
-                event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
+                drawEggWaypoint(event, eggLocation, "§aGuess #${index + 1}")
                 if (config.showLine) {
                     event.draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
                 }
@@ -121,10 +114,7 @@ object HoppityEggLocator {
 
         sharedEggLocation?.let {
             if (config.sharedWaypoints) {
-                var eggLabel = "§aShared Egg"
-                if (shouldAddDuplicateText(it)) eggLabel += "§c(Duplicate Location!)"
-                event.drawWaypointFilled(it, getEggColor(it), seeThroughBlocks = true,)
-                event.drawDynamicText(it.add(y = 1), "§aShared Egg", 1.5)
+                drawEggWaypoint(event, it, "§aShared Egg")
                 return
             }
         }
@@ -133,40 +123,37 @@ object HoppityEggLocator {
 
         if (shouldShowAllEggs()) {
             for (eggLocation in islandEggsLocations) {
-                var eggLabel = "§aEgg"
-                if (shouldAddDuplicateText(eggLocation)) eggLabel += "§c(Duplicate Location!)"
-                event.drawWaypointFilled(
-                    eggLocation,
-                    getEggColor(eggLocation),
-                    seeThroughBlocks = true,
-                )
-                event.drawDynamicText(eggLocation.add(y = 1), eggLabel, 1.5)
+                drawEggWaypoint(event, eggLocation, "§aEgg")
             }
-        } else if (config.highlightDuplicateEggLocations && config.showNearbyDuplicateEggLocations) {
+            return
+        }
+
+        if (config.highlightDuplicateEggLocations && config.showNearbyDuplicateEggLocations) {
             for (eggLocation in islandEggsLocations) {
-                if (eggLocation.distanceSqToPlayer() < 100 && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)) {
-                    event.drawWaypointFilled(
-                        eggLocation,
-                        LorenzColor.RED.toColor(),
-                        seeThroughBlocks = true,
-                    )
+                val dist = eggLocation.distanceToPlayer()
+                if (dist < 10 && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)) {
+                    val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
+                    event.drawColor(eggLocation, LorenzColor.RED, false, alpha)
                     event.drawDynamicText(eggLocation.add(y = 1), "§cDuplicate Location!", 1.5)
                 }
             }
         }
     }
 
-    private fun shouldAddDuplicateText(eggLocation: LorenzVec) =
-        config.highlightDuplicateEggLocations && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)
+    private fun drawEggWaypoint(event: LorenzRenderWorldEvent, location: LorenzVec, label: String) {
+        val shouldMarkDuplicate = config.highlightDuplicateEggLocations
+            && HoppityUniqueEggLocations.hasCollectedEgg(location)
+        val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
+        if (!shouldMarkDuplicate) {
+            event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks = true)
+        } else {
+            event.drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
+        }
+        event.drawDynamicText(location.add(y = 1), possibleDuplicateLabel, 1.5)
+    }
 
     private fun shouldShowAllEggs() =
         config.showAllWaypoints && !hasLocatorInHotbar() && HoppityEggType.eggsRemaining()
-
-    private fun getEggColor(location: LorenzVec) =
-        if (config.highlightDuplicateEggLocations && HoppityUniqueEggLocations.hasCollectedEgg(location)) {
-            LorenzColor.RED.toColor()
-        } else LorenzColor.GREEN.toColor()
-
 
     fun eggFound() {
         resetData()
