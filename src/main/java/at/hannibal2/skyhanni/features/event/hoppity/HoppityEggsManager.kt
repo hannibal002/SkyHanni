@@ -192,9 +192,11 @@ object HoppityEggsManager {
 
         if (config.showCollectedLocationCount) {
             val totalEggs = HoppityEggLocator.getCurrentIslandEggLocations()?.size
-            val collectedEggs = HoppityUniqueEggLocations.collectedEggsThisIsland()
-            val collectedFormat = formatEggsCollected(collectedEggs)
-            displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
+            if (totalEggs != null) {
+                val collectedEggs = HoppityUniqueEggLocations.collectedEggsThisIsland()
+                val collectedFormat = formatEggsCollected(collectedEggs)
+                displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
+            }
         }
         if (displayList.size == 1) return
 
