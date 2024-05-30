@@ -114,7 +114,6 @@ class GoldenFishTimer {
         if (!isEnabled()) return
         if (spawnPattern.matches(event.message)) {
             lastChatMessage = SimpleTimeMark.now()
-            timePossibleSpawn = SimpleTimeMark.now() + minimumSpawnTime
             handle()
             return
         }
@@ -124,12 +123,14 @@ class GoldenFishTimer {
             return
         }
         if (despawnPattern.matches(event.message)) {
+            timePossibleSpawn = SimpleTimeMark.now() + minimumSpawnTime
             removeGoldenFish()
             return
         }
         TrophyFishMessages.trophyFishPattern.matchMatcher(event.message) {
             val internalName = TrophyFishMessages.getInternalName(group("displayName"))
             if (internalName != "goldenfish") return@matchMatcher
+            timePossibleSpawn = SimpleTimeMark.now() + minimumSpawnTime
             removeGoldenFish()
             return
         }
