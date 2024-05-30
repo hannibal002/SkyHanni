@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.HotmData
+import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -11,6 +13,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -41,13 +45,31 @@ object MineshaftPityDisplay {
     private var PityBlock.efficientMiner: Int
         get() = minedBlocks.firstOrNull { it.pityBlock == this }?.efficientMiner ?: 0
         set(value) {
-            minedBlocks.firstOrNull { it.pityBlock == this }?.efficientMiner = value
+            minedBlocks.firstOrNull {
+                ChatUtils.chat("is value: ${it.pityBlock} == $this")
+                it.pityBlock == this
+            }?.let {
+                ChatUtils.chat("setting value: ${it.efficientMiner} = $value")
+                it.efficientMiner = value
+            } ?: run {
+                ChatUtils.chat("adding value: $this")
+                minedBlocks = minedBlocks.editCopy { add(PityData(this@efficientMiner, 0, value)) }
+            }
         }
 
     private var PityBlock.blocksBroken: Int
         get() = minedBlocks.firstOrNull { it.pityBlock == this }?.blocksBroken ?: 0
         set(value) {
-            minedBlocks.firstOrNull { it.pityBlock == this }?.blocksBroken = value
+            minedBlocks.firstOrNull {
+                ChatUtils.chat("is value: ${it.pityBlock} == $this")
+                it.pityBlock == this
+            }?.let {
+                ChatUtils.chat("setting value: ${it.efficientMiner} = $value")
+                it.blocksBroken = value
+            } ?: run {
+                ChatUtils.chat("adding value: $this")
+                minedBlocks = minedBlocks.editCopy { add(PityData(this@blocksBroken, value, 0)) }
+            }
         }
 
     private var mineshaftTotalBlocks: Long
@@ -71,11 +93,13 @@ object MineshaftPityDisplay {
     @SubscribeEvent
     fun onOreMined(event: OreMinedEvent) {
         if (!isEnabled()) return
+        ChatUtils.chat("a")
 
         val oreType = event.originalOre.getOreType()
         val effMinerBlocks = event.extraBlocks.map { (block, amount) ->
             block.getOreType() to amount
         }.removeFirst { it.first == oreType } // extraBlocks also contains the original block mined
+        ChatUtils.chat("b")
 
         oreType?.addMined(1, false)
         effMinerBlocks.forEach { (ore, amount) ->
@@ -151,9 +175,8 @@ object MineshaftPityDisplay {
 
     // if the chance is 1/1500, it will return 1500
     private fun calculateChance(counter: Double): Double {
-        // TODO: use HotmAPI to get values
-        val surveyorPercent = 0.0
-        val peakMountainPercent = 0.0
+        val surveyorPercent = HotmData.SURVEYOR.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
+        val peakMountainPercent = HotmData.PEAK_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
         val chance = counter / (1 + surveyorPercent / 100 + peakMountainPercent / 100)
         return chance
     }
@@ -255,6 +278,7 @@ object MineshaftPityDisplay {
 
     private fun OreType.addMined(amount: Int, efficientMiner: Boolean) {
         val block = PityBlock.getByOreTypeOrNull(this) ?: return
+        ChatUtils.chat("a")
         if (efficientMiner) block.efficientMiner += amount
         else block.blocksBroken += amount
     }

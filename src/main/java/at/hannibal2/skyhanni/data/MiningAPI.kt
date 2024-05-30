@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -188,10 +190,12 @@ object MiningAPI {
 
         // if somehow you take more than 20 seconds to mine a single block, congrats
         recentClickedBlocks.removeIf { it.time.passedSince() > 20.seconds }
-        surroundingMinedBlocks.removeIf { it.time.passedSince() > 5.seconds }
+        surroundingMinedBlocks.removeIf { it.time.passedSince() > 20.seconds }
 
         if (surroundingMinedBlocks.isEmpty()) return
         if (lastInitSound.passedSince() < 200.milliseconds) return
+
+        ChatUtils.chat("d")
 
         resetOreEvent()
 
@@ -202,6 +206,7 @@ object MiningAPI {
         }
 
         val extraBlocks = surroundingMinedBlocks.filter { it.confirmed }.countBy { it.ore }
+        ChatUtils.chat("c")
 
         OreMinedEvent(originalBlock.ore, extraBlocks).postAndCatch()
 
@@ -224,7 +229,7 @@ object MiningAPI {
         waitingForInitBlock = false
         waitingForInitSound = true
         waitingForInitBlockPos = null
-        waitingForEffMinerSound = true
+        waitingForEffMinerSound = false
         waitingForEffMinerBlock = true
     }
 
@@ -237,14 +242,13 @@ object MiningAPI {
         }
 
         event.addData {
-            add("inGlacite: $inGlacite")
-            add("inDwarvenMines: $inDwarvenMines")
-            add("inCrystalHollows: $inCrystalHollows")
-            add("inCrimsonIsle: $inCrimsonIsle")
-            add("inEnd: $inEnd")
-            add("inSpidersDen: $inSpidersDen")
-            add("")
-            add("current area blocks: ${currentAreaOreBlocks.joinToString { it.name }}")
+            add("lastInitSound: ${lastInitSound.passedSince().format()}")
+            add("waitingForInitBlock: $waitingForInitBlock")
+            add("waitingForInitBlockPos: $waitingForInitBlockPos")
+            add("waitingForInitSound: $waitingForInitSound")
+            add("waitingForEffMinerSound: $waitingForEffMinerSound")
+            add("waitingForEffMinerBlock: $waitingForEffMinerBlock")
+            add("recentClickedBlocks: ${recentClickedBlocks.joinToString { it.position.toCleanStringWithSeparator() }}")
         }
     }
 

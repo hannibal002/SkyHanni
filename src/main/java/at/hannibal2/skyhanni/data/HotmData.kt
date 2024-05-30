@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -166,7 +167,20 @@ enum class HotmData(
         )
     }),
 
-    PEAK_OF_THE_MOUNTAIN("Peak of the Mountain", 10, { null }, { emptyMap() }),
+    PEAK_OF_THE_MOUNTAIN("Peak of the Mountain", 10, { null }, { level ->
+        buildMap {
+            for (i in 1..level) when (i) {
+                1, 5, 7 -> addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+                2 -> addOrPut(HotmReward.EXTRA_FORGE_SLOTS, 1.0)
+                3 -> addOrPut(HotmReward.EXTRA_COMMISSION_SLOTS, 1.0)
+                4 -> addOrPut(HotmReward.MORE_BASE_MITHRIL_POWER, 1.0)
+                6 -> addOrPut(HotmReward.MORE_BASE_GEMSTONE_POWER, 2.0)
+                8 -> addOrPut(HotmReward.MORE_BASE_GLACITE_POWER, 3.0)
+                9 -> addOrPut(HotmReward.MINESHAFT_CHANCE, 10.0)
+                10 -> addOrPut(HotmReward.EXTRA_TOKENS, 2.0)
+            }
+        }
+    }),
 
     // Mining V3
     DAILY_GRIND("Daily Grind",
@@ -199,7 +213,7 @@ enum class HotmData(
     SURVEYOR("Surveyor",
         20,
         { currentLevel -> (currentLevel + 1.0).pow(4) },
-        { level -> mapOf(HotmReward.UNKNOWN to 0.75 * level) }),
+        { level -> mapOf(HotmReward.MINESHAFT_CHANCE to 0.75 * level) }),
     EAGER_ADVENTURER("Eager Adventurer",
         100,
         { currentLevel -> floor((currentLevel + 1.0).pow(2.3)) },
@@ -241,7 +255,7 @@ enum class HotmData(
         get() = storage?.perks?.get(this.name)?.level ?: 0
 
     var activeLevel: Int
-        get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
+        get() = if (enabled) storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0 else 0
         private set(value) {
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
         }
@@ -265,7 +279,7 @@ enum class HotmData(
 
     fun getLevelUpCost() = costFun(rawLevel)
 
-    fun getReward() = rewardFun(activeLevel)
+    fun getReward() = if (enabled) rewardFun(activeLevel) else emptyMap()
 
     companion object {
 
@@ -348,6 +362,21 @@ enum class HotmData(
             }
             HotmAPI.MayhemPerk.entries.forEach {
                 it.chatPattern
+            }
+            (0..PEAK_OF_THE_MOUNTAIN.maxLevel).forEach { level ->
+                val map = mutableMapOf<HotmReward, Double>()
+                if (level >= 1) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+                if (level >= 2) map.addOrPut(HotmReward.EXTRA_FORGE_SLOTS, 1.0)
+                if (level >= 3) map.addOrPut(HotmReward.EXTRA_COMMISSION_SLOTS, 1.0)
+                if (level >= 4) map.addOrPut(HotmReward.MORE_BASE_MITHRIL_POWER, 1.0)
+                if (level >= 5) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+                if (level >= 6) map.addOrPut(HotmReward.MORE_BASE_GEMSTONE_POWER, 2.0)
+                if (level >= 7) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+                if (level >= 8) map.addOrPut(HotmReward.MORE_BASE_GLACITE_POWER, 3.0)
+                if (level >= 9) map.addOrPut(HotmReward.MINESHAFT_CHANCE, 10.0)
+                if (level >= 10) map.addOrPut(HotmReward.EXTRA_TOKENS, 2.0)
+
+                peakOfTheMountainPerks[level] = map
             }
         }
 
@@ -583,6 +612,8 @@ enum class HotmData(
     }
 }
 
+private val peakOfTheMountainPerks = mutableMapOf<Int, Map<HotmReward, Double>>()
+
 private val patternGroup = RepoPattern.group("mining.hotm")
 
 enum class HotmReward {
@@ -594,6 +625,7 @@ enum class HotmReward {
     DAILY_POWDER,
     MORE_BASE_MITHRIL_POWER,
     MORE_BASE_GEMSTONE_POWER,
+    MORE_BASE_GLACITE_POWER,
     MORE_MITHRIL_POWER,
     MORE_GEMSTONE_POWER,
     COMBAT_STAT_BOOST,
@@ -607,6 +639,10 @@ enum class HotmReward {
     ABILITY_RADIUS,
     ABILITY_COOLDOWN,
     FOSSIL_DUST,
+    MINESHAFT_CHANCE,
+    EXTRA_TOKENS,
+    EXTRA_FORGE_SLOTS,
+    EXTRA_COMMISSION_SLOTS,
     UNKNOWN,
     COLD_RESISTANCE
 }
