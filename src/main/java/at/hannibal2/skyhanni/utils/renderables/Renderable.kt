@@ -767,8 +767,10 @@ interface Renderable {
 
             /** @param value is in scroll value space
              * @return is in the handler range */
-            private fun snap(value: Double): Double =
-                value - ((maxValue - minValue) * (value / sheight)) % stepSize
+            private fun snap(value: Double): Double {
+                val translated = (maxValue - minValue) * (value / sheight)
+                return translated - (translated) % stepSize
+            }
 
             private fun snapScroll(value: Double): Int =
                 ((snap(value) - minValue) / (maxValue - minValue) * sheight).toInt()
@@ -796,6 +798,89 @@ interface Renderable {
                 val slider = sliderPos
                 Gui.drawRect(0, slider, width, slider + sliderHeadThickness, Color.GRAY.darker().rgb)
                 Gui.drawRect(1, slider + 1, width - 1, slider + sliderHeadThickness - 1, Color.GRAY.rgb)
+
+                if (lastScroll != newScroll) {
+                    handler(snap(newScroll))
+                }
+            }
+
+        }
+
+        /** @param stepSize can min be ([maxValue] - [minValue]) / [swidth]
+         * @param maxValue is only reachable if ([maxValue] - [minValue]) % [stepSize] == 0*/
+        fun hotizontalSlider(
+            swidth: Int,
+            handler: (Double) -> Unit,
+            scrollValue: ScrollValue = ScrollValue(),
+            height: Int = 11,
+            sliderHeadThickness: Int = 6,
+            minValue: Double = 0.0,
+            maxValue: Double = 100.0,
+            stepSize: Double = (maxValue - minValue) / swidth,
+            button: Int? = 0,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = swidth + sliderHeadThickness + 2
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            init {
+                if (minValue > maxValue) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Bigger min than max for slider",
+                        "sliderType" to "horizontalSlider",
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                    )
+                }
+                if (stepSize < (maxValue - minValue) / swidth) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Wrong StepSize for slider",
+                        "sliderType" to "horizontalSlider",
+                        "stepSize" to stepSize,
+                        "calculated min" to (maxValue - minValue) / swidth,
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                        "sheight" to swidth,
+                    )
+                }
+            }
+
+            /** @param value is in scroll value space
+             * @return is in the handler range */
+            private fun snap(value: Double): Double {
+                val translated = (maxValue - minValue) * (value / swidth)
+                return translated - (translated) % stepSize
+            }
+
+            private fun snapScroll(value: Double): Int =
+                ((snap(value) - minValue) / (maxValue - minValue) * swidth).toInt()
+
+            private val scroll = ScrollInput.Companion.Horizontal(
+                scrollValue,
+                0,
+                swidth,
+                1.0,
+                0.0,
+                dragScrollMouseButton = button,
+                inverseDrag = false
+            )
+
+            private val sliderPos get() = snapScroll(scroll.asDouble()) + 1
+
+            override fun render(posX: Int, posY: Int) {
+                val lastScroll = scroll.asDouble()
+                scroll.update(isHovered(posX, posY), relativeMouse(posX, posY))
+                val newScroll = scroll.asDouble()
+
+                Gui.drawRect(0, 4, width, height - 4, Color.GRAY.darker().rgb)
+                Gui.drawRect(1, 5, width - 1, height - 5, Color.GRAY.rgb)
+
+                val slider = sliderPos
+                Gui.drawRect(slider, 0, slider + sliderHeadThickness, height, Color.GRAY.darker().rgb)
+                Gui.drawRect(slider + 1, 1, slider + sliderHeadThickness - 1, height - 1, Color.GRAY.rgb)
 
                 if (lastScroll != newScroll) {
                     handler(snap(newScroll))

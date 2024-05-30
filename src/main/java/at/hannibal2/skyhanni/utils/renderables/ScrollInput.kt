@@ -40,6 +40,36 @@ abstract class ScrollInput(
     abstract fun update(isValid: Boolean, mouse: Pair<Int, Int>? = null)
 
     companion object {
+        class Horizontal(
+            scrollValue: ScrollValue,
+            minWidth: Number,
+            maxWidth: Number,
+            private val velocityDrag: Double,
+            private val velocityScroll: Double = velocityDrag * 2.5,
+            dragScrollMouseButton: Int?,
+            inverseDrag: Boolean = true,
+            startValue: Double? = null,
+        ) : ScrollInput(
+            scrollValue,
+            minWidth.toDouble(),
+            maxWidth.toDouble(),
+            dragScrollMouseButton,
+            inverseDrag,
+            startValue
+        ) {
+            override fun update(isValid: Boolean, mouse: Pair<Int, Int>?) {
+                if (maxValue < minValue) return
+                if (!isValid || !isMouseEventValid()) return
+                if (dragScrollMouseButton != null && mouse != null && Mouse.isButtonDown(dragScrollMouseButton)) {
+                    val diff = mouseDiff(mouse)
+                    scroll += diff.first * velocityDrag * if (inverseDrag) 1 else -1
+                }
+                val deltaWheel = Mouse.getEventDWheel()
+                scroll += -deltaWheel.coerceIn(-1, 1) * velocityScroll
+                coerceInLimit()
+            }
+
+        }
 
         class Vertical(
             scrollValue: ScrollValue,

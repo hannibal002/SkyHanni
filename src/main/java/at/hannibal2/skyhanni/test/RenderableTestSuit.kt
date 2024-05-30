@@ -22,7 +22,11 @@ enum class RenderableTestSuit(private val where: RenderIn) {
 
         private var extracted = 0.0
 
-        private val staticRenderable = Renderable.verticalSlider(
+        private val staticVertical = Renderable.verticalSlider(
+            50, handler = { extracted = it }, scrollValue
+        ).renderBounds()
+
+        private val staticHorizontal = Renderable.hotizontalSlider(
             50, handler = { extracted = it }, scrollValue
         ).renderBounds()
 
@@ -33,11 +37,15 @@ enum class RenderableTestSuit(private val where: RenderIn) {
                         listOf(
                             Renderable.verticalSlider(
                                 50, handler = { extracted = it }, scrollValue, stepSize = 4.5
-                            ).renderBounds(), staticRenderable
+                            ).renderBounds(), staticVertical
                         ),
                         5
                     ),
                     Renderable.string("$extracted"),
+                    Renderable.hotizontalSlider(
+                        50, handler = { extracted = it }, scrollValue, stepSize = 4.5
+                    ).renderBounds(),
+                    staticHorizontal
                 ), posLabel = "Test"
             )
         }
