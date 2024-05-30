@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.network.play.server.S13PacketDestroyEntities
@@ -52,6 +54,14 @@ object FixGhostEntities {
                     }
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+        if (!LorenzUtils.inSkyBlock || !config.hideTemporaryArmorstands) return
+        with(event.entity) {
+            if (ticksExisted < 10 && name == "Armor Stand" && inventory.all { it == null }) event.cancel()
         }
     }
 
