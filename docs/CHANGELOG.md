@@ -37,14 +37,26 @@
 #### Event Features
 
 + Chat reminder to check Hoppity Shop each year. - appable (https://github.com/hannibal002/SkyHanni/pull/1843)
++ Highlight rabbits that have requirements in the Hoppity's Collection menu. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1874)
+    + Green: Requirement met.
+    + Red: Requirement not met.
++ Mark duplicate egg locations in red for unlocking some of the new rabbits. - appable (https://github.com/hannibal002/SkyHanni/pull/1929)
+    + Option to always mark nearby duplicate egg locations.
++ Added "Collected Locations" line to the Unclaimed Eggs Display. - appable (https://github.com/hannibal002/SkyHanni/pull/1929)
+    + This may be inaccurate if you've already collected eggs on an island.
++ Show total amount of chocolate spent in the Chocolate Shop. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/1921)
 
 #### Mining Features
 
 + Configurable cold amount for the ascension rope message in Glacite Mines. - nopo (https://github.com/hannibal002/SkyHanni/pull/1905)
++ Added HOTM perks level and Enable Display. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1059)
 
 #### Inventory Features
 
 + Warning when outbid on an auction. - seraid (https://github.com/hannibal002/SkyHanni/pull/1818)
++ Added option to show time held in lore for Jyrre Bottles and Cacao Truffles. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1916)
++ Added Dark Cacao Truffle hours held as stack size. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1916)
++ Added ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
 
 #### Fishing Features
 
@@ -62,6 +74,8 @@
 #### Misc Features
 
 + Click on breakdown display in /playtimedetailed to copy the stats into the clipboard. - seraid (https://github.com/hannibal002/SkyHanni/pull/1807)
++ Added Editable Hotbar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1903)
+    + Allows for moving and scaling in the SkyHanni GUI editor.
 
 ### Improvements
 
@@ -82,10 +96,12 @@
 + Hoppity Collection Stats are now persistent. - appable (https://github.com/hannibal002/SkyHanni/pull/1836)
     + No longer reset on profile swap or game restart.
 + Merged duplicate times in compacted Hoppity's messages. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/1887)
++ Option to show Hoppity Eggs timer outside of SkyBlock. - maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/1926)
 
 #### Mining Improvements
 
 + Highlight Treasure Hoarders during Treasure Hoarder Puncher commissions. - Luna (https://github.com/hannibal002/SkyHanni/pull/1852)
++ Added Mining Event Icons. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1305)
 
 #### Commands Improvements
 
@@ -105,6 +121,10 @@
 #### Inventory Improvements
 
 + Adjusted and added Rabbit Uncle & Dog Keybinds. - raven (https://github.com/hannibal002/SkyHanni/pull/1907)
+
+#### Fishing Improvements
+
++ Added option to show the name of the sea creature in the title notification. - Empa (https://github.com/hannibal002/SkyHanni/pull/1858)
 
 #### Misc Improvements
 
@@ -128,10 +148,12 @@
 + Fixed farming contests showing in the election GUI. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1871)
 + Fixed wrong icon for the rat crop type in Stereo Harmony display. - raven (https://github.com/hannibal002/SkyHanni/pull/1849)
 
-#### Chocolate Factory Fixes
+#### Chocolate Factory & Hoppity Hunt Fixes
 
 + Fixed some Chocolate Factory issues caused by a Hypixel update. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1860)
 + Fixed a bug where the chocolate factory leaderboard position was not showing when the position had many digits. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/1918)
++ Fixed compact chat sometimes breaking when obtaining legendary or higher tier rabbits. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1923)
++ Fixed Sigma Rabbit bonuses not counting in collection stats display. - appable (https://github.com/hannibal002/SkyHanni/pull/1925)
 
 #### Custom Scoreboard Fixes
 
@@ -149,10 +171,19 @@
 #### Commands Fixes
 
 + Fixed typo in /shclearkismet command. - fahr-plan (https://github.com/hannibal002/SkyHanni/pull/1912)
++ Fixed 'viewrecipe' lowercase not working. - Obsidian + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1939)
+
+#### Fishing Fixes
+
++ Fixed Thunder and Jawbus not being highlighted by Highlight Rare Sea Creatures. - Empa (https://github.com/hannibal002/SkyHanni/pull/1858)
 
 #### Performance Fixes
 
 + Fixed small memory leaks when staying in one island for extended periods. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1890)
+
+#### Misc Fixes
+
++ Fixed LorenzToolTipEvent triggering when not actually hovering over an item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1920)
 
 ### Technical Details
 
