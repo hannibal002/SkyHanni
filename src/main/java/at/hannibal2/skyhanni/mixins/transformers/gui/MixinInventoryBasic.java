@@ -18,11 +18,6 @@ public class MixinInventoryBasic {
     @Inject(method = "getStackInSlot", at = @At("HEAD"), cancellable = true)
     public void getStackInSlot(int index, CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = index >= 0 && index < this.inventoryContents.length ? this.inventoryContents[index] : null;
-        if (stack == null) return;
-        ReplaceItemEvent event = new ReplaceItemEvent((InventoryBasic) (Object) this, stack, index);
-        event.postAndCatch();
-        if (event.getReplacement() != null) {
-            cir.setReturnValue(event.getReplacement());
-        }
+        ReplaceItemEvent.postEvent((InventoryBasic) (Object) this, stack, index, cir);
     }
 }
