@@ -21,13 +21,14 @@ object HeldTimeInLore {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.timeHeldInLore) return
+
         val stack = event.itemStack
-        val internalName = stack.getInternalName()
-        val timeHeld = when (internalName) {
+        val timeHeld = when (stack.getInternalName()) {
             jyrreBottle -> stack.getBottleOfJyrreSeconds()
             cacaoTruffle -> stack.getSecondsHeld()
             else -> return
         } ?: return
+
         val formatted = timeHeld.seconds.format()
         
         event.toolTip.add(10, "§7Time Held: §b$formatted")
