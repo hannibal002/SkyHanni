@@ -22,7 +22,7 @@ class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, v
             slot: Int,
             cir: CallbackInfoReturnable<ItemStack>,
         ) {
-            var originalItem = inventoryContents.getOrNull(slot) ?: return
+            val originalItem = inventoryContents.getOrNull(slot) ?: return
             val event = ReplaceItemEvent(inventory, originalItem, slot)
             event.postAndCatch()
             event.replacement?.let { cir.returnValue = it }
