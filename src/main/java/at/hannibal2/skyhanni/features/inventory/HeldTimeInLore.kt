@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,15 +23,15 @@ object HeldTimeInLore {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.timeHeldInLore) return
 
-        val stack = event.itemStack
-        val timeHeld = when (stack.getInternalName()) {
-            jyrreBottle -> stack.getBottleOfJyrreSeconds()
-            cacaoTruffle -> stack.getSecondsHeld()
-            else -> return
-        } ?: return
+        val seconds = event.itemStack.getSeconds() ?: return
+        val formatted = seconds.seconds.format()
 
-        val formatted = timeHeld.seconds.format()
-        
         event.toolTip.add(10, "§7Time Held: §b$formatted")
+    }
+
+    private fun ItemStack.getSeconds(): Int? = when (getInternalName()) {
+        jyrreBottle -> getBottleOfJyrreSeconds()
+        cacaoTruffle -> getSecondsHeld()
+        else -> null
     }
 }
