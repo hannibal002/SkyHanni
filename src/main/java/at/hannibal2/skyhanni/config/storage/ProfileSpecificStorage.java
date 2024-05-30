@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.api.HotmAPI;
 import at.hannibal2.skyhanni.api.SkillAPI;
+import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ProfileSpecificStorage {
 
@@ -125,6 +128,15 @@ public class ProfileSpecificStorage {
 
         @Expose
         public String targetName = null;
+
+        @Expose
+        public Map<String, Integer> rabbitCounts = new HashMap();
+
+        @Expose
+        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap();
+
+        @Expose
+        public Integer hoppityShopYearOpened = null;
     }
 
     @Expose
@@ -318,6 +330,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<CropType, LorenzVec> cropStartLocations = new HashMap<>();
+
+        @Expose
+        public Map<CropType, LorenzVec> cropLastFarmedLocations = new HashMap<>();
 
         @Expose
         public Map<CropType, FarmingLane> farmingLanes = new HashMap<>();
