@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -40,8 +40,8 @@ object MiningAPI {
     fun getCold() = cold
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        val newCold = event.newList.matchFirst(ScoreboardPattern.coldPattern) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        val newCold = event.scoreboard.matchFirst(ScoreboardPattern.coldPattern) {
             group("cold").toInt().absoluteValue
         } ?: return
 

@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
+import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S3CPacketUpdateScore
@@ -93,14 +93,14 @@ class ScoreboardData {
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }
         if (semiFormatted != sidebarLines) {
-            ScoreboardRawChangeEvent(sidebarLines, semiFormatted).postAndCatch()
+            RawScoreboardUpdateEvent(semiFormatted).postAndCatch()
             sidebarLines = semiFormatted
         }
 
         sidebarLinesRaw = list
         val new = formatLines(list)
         if (new != sidebarLinesFormatted) {
-            ScoreboardChangeEvent(sidebarLinesFormatted, new).postAndCatch()
+            ScoreboardUpdateEvent(new).postAndCatch()
             sidebarLinesFormatted = new
         }
     }
