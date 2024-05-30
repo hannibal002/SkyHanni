@@ -37,7 +37,7 @@ class CrystalHollowsProfessorRobot {
 
         if (!pattern.matches(cleanMessage)) return
 
-        val itemName = event.message.removeColor().trimStart()
+        val itemName = cleanMessage.trimStart()
         if (InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) } > 0 || !robotParts.contains(itemName)) return
 
         GetFromSackAPI.getFromChatMessageSackItems(PrimitiveItemStack(itemName.asInternalName(), 1))
