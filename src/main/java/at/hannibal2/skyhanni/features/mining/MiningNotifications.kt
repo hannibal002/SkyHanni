@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.runDelayed
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -83,7 +83,7 @@ object MiningNotifications {
             sendNotification(MiningNotificationList.COLD)
         }
         if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope && config.coldAmount == event.cold) {
-            runDelayed(0.5.seconds) {
+            DelayedRun.runDelayed(0.5.seconds) {
                 GetFromSackAPI.getFromChatMessageSackItems(ASCENSION_ROPE)
             }
         }
