@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -15,8 +18,10 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -49,6 +54,22 @@ object HoppityCollectionStats {
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
     )
+    /**
+     * REGEX-TEST: §a✔ §7Requirement
+     */
+    private val requirementMet by patternGroup.pattern(
+        "rabbit.requirement.met",
+        "§a✔ §7Requirement"
+    )
+    /**
+     * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
+     * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
+     * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
+     */
+    private val requirementNotMet by patternGroup.pattern(
+        "rabbit.requirement.notmet",
+        "§c✖ §7Requirement.*",
+    )
 
     private var display = emptyList<Renderable>()
     private val loggedRabbits
@@ -63,7 +84,6 @@ object HoppityCollectionStats {
 
         inInventory = true
         display = buildDisplay(event)
-        checkSpecialRabbits()
     }
 
     @SubscribeEvent
@@ -81,6 +101,21 @@ object HoppityCollectionStats {
             extraSpace = 5,
             posLabel = "Hoppity's Collection Stats"
         )
+    }
+
+    // TODO cache with inventory update event
+    @SubscribeEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!config.highlightRabbitsWithRequirement) return
+        if (!inInventory) return
+
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val lore = slot.stack.getLore()
+            if (lore.any { requirementMet.find(it) } && !config.onlyHighlightRequirementNotMet)
+                slot highlight LorenzColor.GREEN
+            if (lore.any { requirementNotMet.find(it) })
+                slot highlight LorenzColor.RED
+        }
     }
 
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
@@ -107,7 +142,7 @@ object HoppityCollectionStats {
     }
 
     private fun getRabbitStats(): MutableList<DisplayTableEntry> {
-        var totalAmountFound = 0
+        var totalUniquesFound = 0
         var totalDuplicates = 0
         var totalChocolatePerSecond = 0
         var totalChocolateMultiplier = 0.0
@@ -121,8 +156,8 @@ object HoppityCollectionStats {
             }
 
             val title = "${rarity.displayName} Rabbits"
-            val amountFound = foundOfRarity.size
-            val duplicates = foundOfRarity.values.sum() - amountFound
+            val uniquesFound = foundOfRarity.size
+            val duplicates = foundOfRarity.values.sum() - uniquesFound
 
             val chocolateBonuses = foundOfRarity.keys.map {
                 HoppityCollectionData.getChocolateBonuses(it)
@@ -131,14 +166,18 @@ object HoppityCollectionStats {
             val chocolatePerSecond = chocolateBonuses.sumOf { it.chocolate }
             val chocolateMultiplier = chocolateBonuses.sumOf { it.multiplier }
 
+            if (hasFoundRabbit("Sigma") && rarity == RabbitCollectionRarity.MYTHIC) {
+                totalChocolatePerSecond += uniquesFound * 5
+            }
+
             if (!isTotal) {
-                totalAmountFound += amountFound
+                totalUniquesFound += uniquesFound
                 totalDuplicates += duplicates
                 totalChocolatePerSecond += chocolatePerSecond
                 totalChocolateMultiplier += chocolateMultiplier
             }
 
-            val displayFound = if (isTotal) totalAmountFound else amountFound
+            val displayFound = if (isTotal) totalUniquesFound else uniquesFound
             val displayTotal = if (isTotal) {
                 HoppityCollectionData.knownRabbitCount
             } else {
@@ -175,7 +214,6 @@ object HoppityCollectionStats {
         val rabbit = name.removeColor()
         if (!HoppityCollectionData.isKnownRabbit(rabbit)) return
         loggedRabbits[rabbit] = (loggedRabbits[rabbit] ?: 0) + 1
-        checkSpecialRabbits()
     }
 
     // Gets the found rabbits according to the Hypixel progress bar
@@ -215,20 +253,7 @@ object HoppityCollectionStats {
         ChatUtils.chat("Cleared saved rabbit data.")
     }
 
-
-    // checks special rabbits whenever loggedRabbits is modified to update misc stored values
-    // TODO: make this better than hard-coded checks
-    private fun checkSpecialRabbits() {
-        if (hasFoundRabbit("Einstein")) {
-            ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
-        }
-
-        if (hasFoundRabbit("Mu")) {
-            ChocolateFactoryAPI.profileStorage?.hasMuRabbit = true
-        }
-    }
-
-    private fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
+    fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 
