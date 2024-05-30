@@ -23,13 +23,13 @@ object HoppityUniqueEggLocations {
             ErrorManager.skyHanniError(
                 "Player far from any known egg location!",
                 "island" to LorenzUtils.skyBlockIsland,
+                "distanceSqToPlayer" to location.distanceSqToPlayer(),
                 "playerLocation" to LocationUtils.playerLocation(),
-                "closestKnownEgg" to location
+                "closestKnownEgg" to location,
             )
         }
 
-        val collectedEggs = getCurrentIslandCollectedEggs() ?: return
-        collectedEggs.add(location)
+        getCurrentIslandCollectedEggs()?.add(location)
     }
 
     fun collectedEggsThisIsland() = getCurrentIslandCollectedEggs()?.size ?: 0
