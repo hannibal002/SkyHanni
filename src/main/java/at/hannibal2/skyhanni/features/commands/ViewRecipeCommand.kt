@@ -17,7 +17,7 @@ object ViewRecipeCommand {
         if (!message.startsWith("/viewrecipe ", ignoreCase = true)) return
 
         if (message == message.uppercase()) return
-        val item = message.uppercase().substringAfter("viewrecipe").trim()
+        val item = message.uppercase().substringAfter("VIEWRECIPE").trim()
         if (item.isEmpty()) return
         event.isCanceled = true
         HypixelCommands.viewRecipe(item)
