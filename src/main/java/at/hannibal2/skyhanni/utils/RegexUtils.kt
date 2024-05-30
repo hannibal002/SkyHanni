@@ -20,11 +20,17 @@ object RegexUtils {
         return null
     }
 
-    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
+    inline fun <T> List<String>.findFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
+        for (line in this) {
+            pattern.matcher(line).let { if (it.find()) return consumer(it) }
+        }
+        return null
+    }
+
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T) {
         for (line in this) {
             pattern.matcher(line).let { if (it.find()) consumer(it) }
         }
-        return null
     }
 
     inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {

@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.RegexUtils.findFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.anyFound
-import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

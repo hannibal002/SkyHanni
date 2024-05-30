@@ -17,11 +17,11 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.findFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns

@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.findFirst
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.findFirst
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraftforge.fml.common.eventhandler.EventPriority
