@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -55,7 +55,7 @@ class TpsCounter {
                 "§eTPS: §f(${current}s)"
             } else {
                 val sum = tpsList.sum().toDouble()
-                var tps = (sum / tpsList.size).round(1)
+                var tps = (sum / tpsList.size).roundTo(1)
                 if (tps > 20) tps = 20.0
                 val color = getColor(tps)
                 "§eTPS: $color$tps"

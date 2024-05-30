@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -103,11 +103,11 @@ class BurrowWarpHelper {
             debug?.add("warpPoint: ${warpPoint.displayName}")
 
             val playerDistance = playerLocation.distance(target)
-            debug?.add("playerDistance: ${playerDistance.round(1)}")
+            debug?.add("playerDistance: ${playerDistance.roundTo(1)}")
             val warpDistance = warpPoint.distance(target)
-            debug?.add("warpDistance: ${warpDistance.round(1)}")
+            debug?.add("warpDistance: ${warpDistance.roundTo(1)}")
             val difference = playerDistance - warpDistance
-            debug?.add("difference: ${difference.round(1)}")
+            debug?.add("difference: ${difference.roundTo(1)}")
             val setWarpPoint = difference > 10
             debug?.add("setWarpPoint: $setWarpPoint")
             currentWarp = if (setWarpPoint) warpPoint else null

@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -292,7 +292,7 @@ object ChocolateFactoryDataLoader {
         val lore = item.getLore()
         val upgradeCost = ChocolateFactoryAPI.getChocolateBuyCost(lore)
 
-        val averageChocolate = ChocolateAmount.averageChocPerSecond().round(2)
+        val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)
         val isMaxed = upgradeCost == null
 
         var isRabbit = false
@@ -352,8 +352,8 @@ object ChocolateFactoryDataLoader {
         }
         if (level == null || newAverageChocolate == null || upgradeCost == null) return
 
-        val extra = (newAverageChocolate - averageChocolate).round(2)
-        val effectiveCost = (upgradeCost / extra).round(2)
+        val extra = (newAverageChocolate - averageChocolate).roundTo(2)
+        val effectiveCost = (upgradeCost / extra).roundTo(2)
 
         val upgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)

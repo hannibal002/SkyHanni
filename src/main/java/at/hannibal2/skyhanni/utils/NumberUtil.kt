@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.NumberFormat
 import java.util.TreeMap
@@ -73,20 +72,21 @@ object NumberUtil {
      * @link https://stackoverflow.com/a/22186845
      * @author jpdymond
      */
-    fun Double.roundToPrecision(precision: Int): Double { // TODO is this the same as LorenzUtils.round() ?
+    fun Double.roundTo(precision: Int): Double {
         val scale = 10.0.pow(precision).toInt()
         return (this * scale).roundToInt().toDouble() / scale
     }
 
-    /**
-     * This code was unmodified and taken under CC BY-SA 3.0 license
-     * @link https://stackoverflow.com/a/22186845
-     * @author jpdymond
-     */
-    fun Float.roundToPrecision(precision: Int): Float {
+    fun Float.roundTo(precision: Int): Float {
         val scale = 10.0.pow(precision).toInt()
         return (this * scale).roundToInt().toFloat() / scale
     }
+
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    fun Double.roundToPrecision(precision: Int) = this.roundTo(precision)
+
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    fun Float.roundToPrecision(precision: Int) = this.roundTo(precision)
 
     fun Number.ordinal(): String {
         val long = this.toLong()
@@ -194,7 +194,7 @@ object NumberUtil {
     fun Number.percentWithColorCode(max: Number, round: Int = 1): String {
         val fraction = this.fractionOf(max)
         val color = percentageColor(fraction)
-        val amount = (fraction * 100.0).round(round)
+        val amount = (fraction * 100.0).roundTo(round)
         return "${color.getChatColor()}$amount%"
     }
 

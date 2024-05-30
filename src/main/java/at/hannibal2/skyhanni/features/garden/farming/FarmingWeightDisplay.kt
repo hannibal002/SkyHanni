@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -245,7 +245,7 @@ class FarmingWeightDisplay {
             }
 
             val totalWeight = (localWeight + weight)
-            return "§e" + totalWeight.round(2).addSeparators()
+            return "§e" + totalWeight.roundTo(2).addSeparators()
         }
 
         private fun getRankGoal(): Int {
@@ -325,7 +325,7 @@ class FarmingWeightDisplay {
                 " §7(§b$format§7)"
             } else ""
 
-            val weightFormat = weightUntilOvertake.round(2).addSeparators()
+            val weightFormat = weightUntilOvertake.roundTo(2).addSeparators()
             val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
             return if (showRankGoal) {
                 Renderable.string(text)

@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -59,7 +59,7 @@ class MovementSpeedDisplay {
         }
         usingSoulsandSpeed = movingOnSoulsand && soulsandSpeeds.size == 6
         if (isEnabled()) {
-            display = "Movement Speed: ${speed.round(2)}"
+            display = "Movement Speed: ${speed.roundTo(2)}"
         }
     }
 

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
@@ -26,7 +26,7 @@ class ReceiveParticleEvent(
                 1
             )
         }, longDistance=$longDistance, particleArgs=${particleArgs.contentToString()}, distanceToPlayer=${
-            distanceToPlayer.round(
+            distanceToPlayer.roundTo(
                 1
             )
         })"

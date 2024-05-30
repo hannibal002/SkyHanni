@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -77,7 +77,7 @@ class RiftMotesOrb {
             val ageInSeconds = (System.currentTimeMillis() - orb.startTime).toDouble() / 1000
             if (ageInSeconds < 0.5) continue
 
-            val particlesPerSecond = (orb.counter.toDouble() / ageInSeconds).round(1)
+            val particlesPerSecond = (orb.counter.toDouble() / ageInSeconds).roundTo(1)
             if (particlesPerSecond < 60 || particlesPerSecond > 90) continue
             orb.isOrb = true
 

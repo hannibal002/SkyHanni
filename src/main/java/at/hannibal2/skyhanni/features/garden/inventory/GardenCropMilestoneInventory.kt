@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -33,7 +33,7 @@ class GardenCropMilestoneInventory {
             val tier = GardenCropMilestones.getTierForCropCount(counter, cropType, allowOverflow)
             tiers.add(tier.toDouble())
         }
-        average = (tiers.sum() / CropType.entries.size).round(2)
+        average = (tiers.sum() / CropType.entries.size).roundTo(2)
     }
 
     @SubscribeEvent
