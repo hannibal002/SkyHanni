@@ -169,7 +169,7 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(name = "Rabbit Warning", desc = "")
     @Accordion
-    public ChocolateFactoryRabbitWarningConfig chocolateFactoryRabbitWarningConfig = new ChocolateFactoryRabbitWarningConfig();
+    public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
