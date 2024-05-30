@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderableOutOfSpec
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiIngameMenu
@@ -644,7 +643,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),  posX to posY
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY)
                 )
 
                 var renderY = 0
@@ -705,7 +704,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks) , posX to posY
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY)
                 )
 
                 var renderY = 0
@@ -759,6 +758,7 @@ interface Renderable {
             maxValue: Double = 100.0,
             stepSize: Double = (maxValue - minValue) / sheight,
             button: Int? = 0,
+            bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -813,7 +813,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val lastScroll = scroll.asDouble()
-                scroll.update(isHovered(posX, posY), relativeMouse(posX, posY))
+                scroll.update(isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY))
                 val newScroll = scroll.asDouble()
 
                 Gui.drawRect(4, 0, width - 4, height, Color.GRAY.darker().rgb)
@@ -842,6 +842,7 @@ interface Renderable {
             maxValue: Double = 100.0,
             stepSize: Double = (maxValue - minValue) / swidth,
             button: Int? = 0,
+            bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -896,7 +897,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val lastScroll = scroll.asDouble()
-                scroll.update(isHovered(posX, posY), relativeMouse(posX, posY))
+                scroll.update(isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY))
                 val newScroll = scroll.asDouble()
 
                 Gui.drawRect(0, 4, width, height - 4, Color.GRAY.darker().rgb)
