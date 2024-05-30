@@ -19,5 +19,5 @@ object InWaterDisplay {
         config.inWaterPosition.renderStrings(listOf(text), posLabel = "In Water Display")
     }
 
-    private fun isEnabled() = config.inWaterDisplay && LorenzUtils.inSkyBlock
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.inWaterDisplay
 }
