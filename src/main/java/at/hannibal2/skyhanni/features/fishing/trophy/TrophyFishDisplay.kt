@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class TrophyFishDisplay {
+object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
     private var recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
@@ -89,6 +89,7 @@ class TrophyFishDisplay {
         }
     }
 
+
     fun update() {
         if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
@@ -122,7 +123,7 @@ class TrophyFishDisplay {
         table: MutableList<List<Renderable>>,
     ) {
         get(config.onlyShowMissing.get())?.let { atLeast ->
-            val list = TrophyRarity.entries.filter { it <= atLeast }
+            val list = TrophyRarity.entries.filter { it == atLeast }
             if (list.all { (data[it] ?: 0) > 0 }) {
                 return
             }
