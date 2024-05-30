@@ -159,13 +159,6 @@ object StringUtils {
         return null
     }
 
-    inline fun <T> List<String>.findFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
-        for (line in this) {
-            pattern.matcher(line).let { if (it.find()) return consumer(it) }
-        }
-        return null
-    }
-
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchAll(pattern, consumer)"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
