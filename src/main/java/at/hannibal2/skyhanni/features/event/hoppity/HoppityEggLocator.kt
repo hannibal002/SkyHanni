@@ -80,41 +80,16 @@ object HoppityEggLocator {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val eyeLocation = event.exactPlayerEyeLocation()
-
-        if (config.waypointsImmediately && lastClick.passedSince() < 5.seconds) {
-            lastParticlePositionForever?.let {
-                if (lastChange.passedSince() < 300.milliseconds) {
-                    if (eyeLocation.distance(it) > 2) {
-                        event.drawWaypointFilled(
-                            it,
-                            LorenzColor.GREEN.toColor(),
-                            seeThroughBlocks = true,
-                        )
-                        event.drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
-                    }
-                    if (!drawLocations) {
-                        if (config.showLine) {
-                            event.draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
-                        }
-                    }
-                }
-            }
-        }
+        event.drawGuessImmediately()
 
         if (drawLocations) {
-            for ((index, eggLocation) in possibleEggLocations.withIndex()) {
-                drawEggWaypoint(event, eggLocation, "§aGuess #${index + 1}")
-                if (config.showLine) {
-                    event.draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
-                }
-            }
+            event.drawGuessLocations()
             return
         }
 
         sharedEggLocation?.let {
             if (config.sharedWaypoints) {
-                drawEggWaypoint(event, it, "§aShared Egg")
+                event.drawEggWaypoint(it, "§aShared Egg")
                 return
             }
         }
@@ -123,33 +98,69 @@ object HoppityEggLocator {
 
         if (shouldShowAllEggs()) {
             for (eggLocation in islandEggsLocations) {
-                drawEggWaypoint(event, eggLocation, "§aEgg")
+                event.drawEggWaypoint(eggLocation, "§aEgg")
             }
             return
         }
 
-        if (config.highlightDuplicateEggLocations && config.showNearbyDuplicateEggLocations) {
-            for (eggLocation in islandEggsLocations) {
-                val dist = eggLocation.distanceToPlayer()
-                if (dist < 10 && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)) {
-                    val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
-                    event.drawColor(eggLocation, LorenzColor.RED, false, alpha)
-                    event.drawDynamicText(eggLocation.add(y = 1), "§cDuplicate Location!", 1.5)
+        event.drawDuplicateEggs(islandEggsLocations)
+    }
+
+    private fun LorenzRenderWorldEvent.drawGuessLocations() {
+        val eyeLocation = exactPlayerEyeLocation()
+        for ((index, eggLocation) in possibleEggLocations.withIndex()) {
+            drawEggWaypoint(eggLocation, "§aGuess #${index + 1}")
+            if (config.showLine) {
+                draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+            }
+        }
+    }
+
+    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: List<LorenzVec>, ) {
+        if (!config.highlightDuplicateEggLocations || !config.showNearbyDuplicateEggLocations) return
+        for (eggLocation in islandEggsLocations) {
+            val dist = eggLocation.distanceToPlayer()
+            if (dist < 10 && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)) {
+                val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
+                drawColor(eggLocation, LorenzColor.RED, false, alpha)
+                drawDynamicText(eggLocation.add(y = 1), "§cDuplicate Location!", 1.5)
+            }
+        }
+    }
+
+    private fun LorenzRenderWorldEvent.drawGuessImmediately() {
+        if (config.waypointsImmediately && lastClick.passedSince() < 5.seconds) {
+            lastParticlePositionForever?.let {
+                if (lastChange.passedSince() < 300.milliseconds) {
+                    val eyeLocation = exactPlayerEyeLocation()
+                    if (eyeLocation.distance(it) > 2) {
+                        drawWaypointFilled(
+                            it,
+                            LorenzColor.GREEN.toColor(),
+                            seeThroughBlocks = true,
+                        )
+                        drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
+                    }
+                    if (!drawLocations) {
+                        if (config.showLine) {
+                            draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                        }
+                    }
                 }
             }
         }
     }
 
-    private fun drawEggWaypoint(event: LorenzRenderWorldEvent, location: LorenzVec, label: String) {
+    private fun LorenzRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
         val shouldMarkDuplicate = config.highlightDuplicateEggLocations
             && HoppityUniqueEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
-            event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks = true)
+            drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks = true)
         } else {
-            event.drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
+            drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
         }
-        event.drawDynamicText(location.add(y = 1), possibleDuplicateLabel, 1.5)
+        drawDynamicText(location.add(y = 1), possibleDuplicateLabel, 1.5)
     }
 
     private fun shouldShowAllEggs() =
