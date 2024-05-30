@@ -25,6 +25,17 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
     CHROMA('Z', Color(0, 0, 0, 0), "§ZChroma") // If chroma, go transparent instead of color code.
     ;
 
+    val next by lazy {
+        when (this) {
+            WHITE -> BLACK
+            CHROMA -> BLACK
+            else -> {
+                val index = entries.indexOf(this)
+                entries[index + 1]
+            }
+        }
+    }
+
     fun getChatColor(): String = "§$chatColorCode"
 
     fun toColor(): Color = color
