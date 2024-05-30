@@ -307,6 +307,7 @@ object MobFilter {
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.CRIMSON_ISLE -> when {
                 (baseEntity is EntitySlime && extraEntityList.firstOrNull() is EntityPig) -> MobResult.illegal // Matriach Stomach (Heavy Pearl fix)
+                (baseEntity is EntityPig && extraEntityList.firstOrNull() is EntityPig) -> MobResult.illegal // Matriach Tongue
                 else -> null
             }
 
