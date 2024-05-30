@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Items
@@ -70,15 +70,15 @@ object GardenPlotIcon {
         }
 
         if (event.inventory is ContainerLocalMenu) {
-            if (event.slotNumber == 53) {
-                event.replaceWith(editStack)
+            if (event.slot == 53) {
+                event.replace(editStack)
             }
-            if (plotList.isNotEmpty() && plotList.contains(event.slotNumber)) {
-                if (lastClickedSlotId == event.slotNumber) {
+            if (plotList.isNotEmpty() && plotList.contains(event.slot)) {
+                if (lastClickedSlotId == event.slot) {
                     lastClickedSlotId = -1
                     return
                 }
-                event.replaceWith(cachedStack[event.slotNumber])
+                event.replace(cachedStack[event.slot])
             }
         }
     }
