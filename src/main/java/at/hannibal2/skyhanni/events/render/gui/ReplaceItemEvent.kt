@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events.render.gui
 
 import at.hannibal2.skyhanni.events.LorenzEvent
 import net.minecraft.inventory.IInventory
+import net.minecraft.inventory.InventoryBasic
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
@@ -16,12 +17,12 @@ class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, v
     companion object {
         @JvmStatic
         fun postEvent(
-            inventory: IInventory,
-            originalItem: ItemStack?,
+            inventory: InventoryBasic,
+            inventoryContents: Array<ItemStack?>,
             slot: Int,
-            cir: CallbackInfoReturnable<ItemStack>
+            cir: CallbackInfoReturnable<ItemStack>,
         ) {
-            originalItem ?: return
+            var originalItem = inventoryContents.getOrNull(slot) ?: return
             val event = ReplaceItemEvent(inventory, originalItem, slot)
             event.postAndCatch()
             event.replacement?.let { cir.returnValue = it }
