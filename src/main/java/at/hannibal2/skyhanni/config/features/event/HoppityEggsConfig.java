@@ -39,7 +39,7 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Mark Duplicate Eggs", desc = "Marks egg location waypoints which you have already found in red.")
+    @ConfigOption(name = "Mark Duplicate Locations", desc = "Marks egg location waypoints which you have already found in red.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightDuplicateEggLocations = false;
@@ -55,6 +55,12 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Show Collected Locations", desc = "Shows the number of found egg locations on this island. §eThis is not retroactive and may not be fully synced with Hypixel's count.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showCollectedLocationCount = false;
 
     @Expose
     @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")

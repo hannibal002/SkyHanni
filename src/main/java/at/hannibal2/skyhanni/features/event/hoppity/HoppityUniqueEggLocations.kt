@@ -40,6 +40,8 @@ object HoppityUniqueEggLocations {
         collectedEggs.add(location)
     }
 
+    fun collectedEggsThisIsland() = getCurrentIslandCollectedEggs()?.size ?: 0
+
     fun hasCollectedEgg(location: LorenzVec) =
         getCurrentIslandCollectedEggs()?.contains(location) ?: false
 
