@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
-import kotlinx.coroutines.launch
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 
 object TestChatCommand {
 
@@ -15,36 +16,57 @@ object TestChatCommand {
             return
         }
 
-        val last = args.last()
-        if (last == "-clipboard") {
-            SkyHanniMod.coroutineScope.launch {
-                OSUtils.readFromClipboard()?.let {
-                    test(it)
-                } ?: run {
-                    ChatUtils.userError("Clipboard does not contain a string!")
+        SkyHanniMod.launchCoroutine {
+            val mutArgs = args.toMutableList()
+            val isComplex = mutArgs.remove("-complex")
+            val isClipboard = mutArgs.remove("-clipboard")
+            val isHidden = mutArgs.remove("-s")
+            val multiLines = mutArgs.remove("-lines")
+            val text = if (isClipboard) {
+                OSUtils.readFromClipboard()
+                    ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
+            } else mutArgs.joinToString(" ")
+            if (multiLines) {
+                for (line in text.split("\n")) {
+                    extracted(isComplex, line, isHidden)
                 }
+            } else {
+                extracted(isComplex, text, isHidden)
             }
-            return
         }
-        val hidden = last == "-s"
-        var rawMessage = args.toList().joinToString(" ")
-        if (!hidden) ChatUtils.chat("Testing message: §7$rawMessage", prefixColor = "§a")
-        if (hidden) rawMessage = rawMessage.replace(" -s", "")
-        test(rawMessage.replace("&", "§"))
     }
 
-    private fun test(message: String) {
-        val event = LorenzChatEvent(message, ChatComponentText(message))
+    private fun extracted(isComplex: Boolean, text: String, isHidden: Boolean) {
+        val component =
+            if (isComplex)
+                try {
+                    IChatComponent.Serializer.jsonToComponent(text)
+                } catch (ex: Exception) {
+                    ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
+                    return
+                }
+            else ChatComponentText(text.replace("&", "§"))
+        if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
+        test(component, isHidden)
+    }
+
+    private fun test(componentText: IChatComponent, isHidden: Boolean) {
+        val message = componentText.formattedText.stripHypixelMessage()
+        val event = LorenzChatEvent(message, componentText)
         event.postAndCatch()
 
         if (event.blockedReason != "") {
-            ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
-        } else {
-            val finalMessage = event.chatComponent.formattedText
-            if (finalMessage != message) {
-                ChatUtils.chat("§eChat modified!")
+            if (!isHidden) {
+                ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
             }
-            ChatUtils.chat(finalMessage, false)
+        } else {
+            val finalMessage = event.chatComponent
+            if (finalMessage.formattedText.stripHypixelMessage() != message) {
+                if (!isHidden) {
+                    ChatUtils.chat("§eChat modified!")
+                }
+            }
+            ChatUtils.chat(finalMessage)
         }
     }
 }

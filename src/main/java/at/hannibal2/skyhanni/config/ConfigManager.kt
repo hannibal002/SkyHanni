@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.utils.FeatureTogglesByDefaultAdapter
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -152,10 +154,22 @@ class ConfigManager {
         }
 
         val gson: Gson = createBaseGsonBuilder()
-            .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
+            // TODO reenable with toggle that is default disabled
+//             .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
             .create()
 
         var configDirectory = File("config/skyhanni")
+
+        inline fun <reified T> GsonBuilder.registerTypeAdapter(
+            crossinline write: (JsonWriter, T) -> Unit,
+            crossinline read: (JsonReader) -> T,
+        ): GsonBuilder {
+            this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
+                override fun write(out: JsonWriter, value: T) = write(out, value)
+                override fun read(reader: JsonReader) = read(reader)
+            }.nullSafe())
+            return this
+        }
     }
 
     val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
@@ -202,12 +216,28 @@ class ConfigManager {
         }
     }
 
+    // Some position elements don't need config links as they don't have a config option.
+    private val ignoredMissingConfigLinks = listOf(
+        // commands
+        "features.garden.GardenConfig.cropSpeedMeterPos",
+        "features.misc.MiscConfig.collectionCounterPos",
+        "features.misc.MiscConfig.lockedMouseDisplay",
+
+        // debug features
+        "features.dev.DebugConfig.trackSoundPosition",
+        "features.dev.DebugConfig.trackParticlePosition",
+        "features.dev.DevConfig.debugPos",
+        "features.dev.DevConfig.debugLocationPos",
+        "features.dev.DevConfig.debugItemPos",
+    )
+
     private fun findPositionLinks(obj: Any?, slog: MutableSet<IdentityCharacteristics<Any>>) {
         if (obj == null) return
         if (!obj.javaClass.name.startsWith("at.hannibal2.skyhanni.")) return
         val ic = IdentityCharacteristics(obj)
         if (ic in slog) return
         slog.add(ic)
+        var missingConfigLink = false
         for (field in obj.javaClass.fields) {
             field.isAccessible = true
             if (field.type != Position::class.java) {
@@ -219,12 +249,26 @@ class ConfigManager {
                 if (LorenzUtils.isInDevEnvironment()) {
                     var name = "${field.declaringClass.name}.${field.name}"
                     name = name.replace("at.hannibal2.skyhanni.config.", "")
-                    println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
+                    if (name !in ignoredMissingConfigLinks) {
+                        println("WEE WOO WEE WOO HIER FEHLT EIN @CONFIGLINK: $name")
+                        missingConfigLink = true
+                    }
                 }
                 continue
             }
             val position = field.get(obj) as Position
             position.setLink(configLink)
+        }
+        if (missingConfigLink) {
+            println("")
+            println("This crash is here to remind you to fix the missing @ConfigLink annotation over your new config position config element.")
+            println("")
+            println("Steps to fix:")
+            println("1. Search for `WEE WOO WEE WOO` in the console output.")
+            println("2. Either add the Config Link.")
+            println("3. Or add the name to ignoredMissingConfigLinks.")
+            println("")
+            LorenzUtils.shutdownMinecraft("Missing Config Link")
         }
     }
 
@@ -249,7 +293,7 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             e.printStackTrace()
-                            LorenzUtils.shutdownMinecraft("Config is corrupt inside developement enviroment.")
+                            LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
                         }
                     } else {
                         run()
@@ -261,7 +305,7 @@ class ConfigManager {
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
                 e.printStackTrace()
-                val backupFile = file.resolveSibling("$fileName-${System.currentTimeMillis()}-backup.json")
+                val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
                 logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
                 logger.log("Exception was $e")
                 try {
@@ -298,15 +342,34 @@ class ConfigManager {
                 writer.write(gson.toJson(data))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
+            move(unit, file, reason)
+        } catch (e: IOException) {
+            logger.log("Could not save $fileName file to $file")
+            e.printStackTrace()
+        }
+    }
+
+    private fun move(unit: File, file: File, reason: String, loop: Int = 0) {
+        try {
             Files.move(
                 unit.toPath(),
                 file.toPath(),
                 StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.ATOMIC_MOVE
             )
-        } catch (e: IOException) {
-            logger.log("Could not save $fileName file to $file")
-            e.printStackTrace()
+        } catch (e: AccessDeniedException) {
+            if (loop == 5) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "could not save config.",
+                    "config save reason" to reason,
+                )
+                return
+            }
+            ChatUtils.debug("config save AccessDeniedException! (loop $loop)")
+            DelayedRun.runNextTick {
+                move(unit, file, reason, loop + 1)
+            }
         }
     }
 

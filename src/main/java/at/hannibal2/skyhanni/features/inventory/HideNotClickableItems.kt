@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.borderLine
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -33,10 +31,13 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -46,6 +47,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class HideNotClickableItems {
 
@@ -54,8 +56,7 @@ class HideNotClickableItems {
     private var hideReason = ""
     private var showGreenLine = false
 
-    private var lastClickTime = 0L
-    private var bypassUntil = 0L
+    private var lastClickTime = SimpleTimeMark.farPast()
 
     private val hideNpcSellFilter = MultiFilter()
     private val hideInStorageFilter = MultiFilter()
@@ -93,32 +94,29 @@ class HideNotClickableItems {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (isDisabled()) return
-        if (bypasssActive()) return
+        if (!isEnabled()) return
+        if (bypassActive()) return
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
         val chestName = chest.getInventoryName()
 
-        for ((_, stack) in chest.getLowerItems()) {
+        for ((slot, stack) in chest.getLowerItems()) {
             if (hide(chestName, stack)) {
-                val opacity = config.opacity
-                val color = LorenzColor.DARK_GRAY.addOpacity(opacity)
-                stack.background = color.rgb
+                slot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
             } else if (showGreenLine && config.itemsGreenLine) {
-                val color = LorenzColor.GREEN.addOpacity(200)
-                stack.borderLine = color.rgb
+                slot drawBorder LorenzColor.GREEN.addOpacity(200)
             }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (isDisabled()) return
+        if (!isEnabled()) return
         if (event.toolTip == null) return
-        if (bypasssActive()) return
+        if (bypassActive()) return
 
         val guiChest = Minecraft.getMinecraft().currentScreen
         if (guiChest !is GuiChest) return
@@ -138,7 +136,7 @@ class HideNotClickableItems {
                 ChatUtils.error("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
-                if (config.itemsBypass) {
+                if (config.itemsBypass && !hideReason.contains("SkyBlock Menu")) {
                     event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
                 }
             }
@@ -147,9 +145,9 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (isDisabled()) return
+        if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
-        if (bypasssActive()) return
+        if (bypassActive()) return
         if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
 
@@ -163,20 +161,14 @@ class HideNotClickableItems {
         if (hide(chestName, stack)) {
             event.isCanceled = true
 
-            if (System.currentTimeMillis() > lastClickTime + 5_000) {
-                lastClickTime = System.currentTimeMillis()
+            if (lastClickTime.passedSince() > 5.seconds) {
+                lastClickTime = SimpleTimeMark.now()
             }
             return
         }
     }
 
-    private fun bypasssActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown()
-
-    private fun isDisabled(): Boolean {
-        if (bypassUntil > System.currentTimeMillis()) return true
-
-        return !config.items
-    }
+    private fun bypassActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown()
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
         hideReason = ""
@@ -271,7 +263,7 @@ class HideNotClickableItems {
 
     private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
         if (!RiftAPI.inRift()) return false
-        if (chestName != "Motes Grubber") return false
+        if (chestName != "Motes Grubber" && !ShiftClickNPCSell.inInventory) return false
 
         showGreenLine = true
 
@@ -386,7 +378,6 @@ class HideNotClickableItems {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
-        val name = stack.cleanName()
         showGreenLine = true
         if (ItemUtils.isSack(stack)) return false
 
@@ -444,7 +435,7 @@ class HideNotClickableItems {
             return true
         }
 
-        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy") return false
+        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy" || stack.cleanName() == "Dark Candy") return false
 
         hideReason = "This item is not a spooky candy!"
         return true
@@ -477,6 +468,7 @@ class HideNotClickableItems {
     }
 
     private fun hideNpcSell(stack: ItemStack): Boolean {
+        if (RiftAPI.inRift()) return false
         if (!ShiftClickNPCSell.inInventory) return false
         if (VisitorAPI.inInventory) return false
         showGreenLine = true
@@ -605,6 +597,8 @@ class HideNotClickableItems {
         if (result) hideReason = "This item cannot be auctioned!"
         return result
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.items
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

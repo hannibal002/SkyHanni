@@ -13,17 +13,19 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -51,8 +53,8 @@ object FarmingFortuneDisplay {
         "§7You have §6\\+(?<ff>\\d{1,3})☘ .*"
     )
     private val tooltipFortunePattern by patternGroup.pattern(
-        "tooltip",
-        "^§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?\$"
+        "tooltip.new",
+        "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$"
     )
     private val armorAbilityPattern by patternGroup.pattern(
         "armorability",
@@ -82,8 +84,10 @@ object FarmingFortuneDisplay {
 
     var displayedFortune = 0.0
     var reforgeFortune = 0.0
+    var gemstoneFortune = 0.0
     var itemBaseFortune = 0.0
     var greenThumbFortune = 0.0
+    var pesterminatorFortune = 0.0
 
     private var foundTabUniversalFortune = false
     private var foundTabCropFortune = false
@@ -135,11 +139,12 @@ object FarmingFortuneDisplay {
     }
 
     private fun update() {
-        display = if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
-            drawMissingFortuneDisplay(false)
-        } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-            drawMissingFortuneDisplay(true)
-        } else drawDisplay()
+        display =
+            if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
+                drawMissingFortuneDisplay(false)
+            } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
+                drawMissingFortuneDisplay(true)
+            } else drawDisplay()
     }
 
     private fun drawDisplay() = buildList {
@@ -157,11 +162,13 @@ object FarmingFortuneDisplay {
             }
         } else getCurrentFarmingFortune()
 
-        list.add(Renderable.string(
-            "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                farmingFortune.round(0).addSeparators()
-            } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
-        ))
+        list.add(
+            Renderable.string(
+                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
+                    farmingFortune.round(0).addSeparators()
+                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
+            )
+        )
         add(Renderable.horizontalContainer(list))
 
         val ffReduction = getPestFFReduction()
@@ -187,7 +194,7 @@ object FarmingFortuneDisplay {
                     "§cshowing latest Crop Fortune."
                 ),
                 onClick = {
-                    ChatUtils.sendCommandToServer("widget")
+                    HypixelCommands.widget()
                 }
             ))
         } else {
@@ -198,7 +205,7 @@ object FarmingFortuneDisplay {
                     "§cshowing the Farming Fortune stat."
                 ),
                 onClick = {
-                    ChatUtils.sendCommandToServer("widget")
+                    HypixelCommands.widget()
                 }
             ))
         }
@@ -212,8 +219,10 @@ object FarmingFortuneDisplay {
             if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
                 "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
-                "and showing the Farming Fortune stat.",
-                command = "widget"
+                    "and showing the Farming Fortune stat.",
+                onClick = {
+                    HypixelCommands.widget()
+                }
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
@@ -222,7 +231,9 @@ object FarmingFortuneDisplay {
             ChatUtils.clickableChat(
                 "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
                     "and showing latest Crop Fortune.",
-                command = "widget"
+                onClick = {
+                    HypixelCommands.widget()
+                }
             )
             lastCropFortuneMissingError = SimpleTimeMark.now()
         }
@@ -297,6 +308,7 @@ object FarmingFortuneDisplay {
     fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
     fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
     fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
+    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 1.0
 
     fun getAbilityFortune(item: ItemStack?) = item?.let {
         getAbilityFortune(it.getInternalName(), it.getLore())
@@ -326,22 +338,25 @@ object FarmingFortuneDisplay {
     fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
         displayedFortune = 0.0
         reforgeFortune = 0.0
+        gemstoneFortune = 0.0
         itemBaseFortune = 0.0
         greenThumbFortune = 0.0
+        pesterminatorFortune = getPesterminatorFortune(tool)
 
-        //TODO code cleanup
+        // TODO code cleanup (after ff rework)
 
         for (line in tool?.getLore()!!) {
             tooltipFortunePattern.matchMatcher(line) {
-                displayedFortune = group(1)!!.toDouble()
-                reforgeFortune = group(2)?.toDouble() ?: 0.0
+                displayedFortune = group("display")?.toDouble() ?: 0.0
+                reforgeFortune = groupOrNull("reforge")?.toDouble() ?: 0.0
+                gemstoneFortune = groupOrNull("gemstone")?.toDouble() ?: 0.0
             } ?: continue
 
             itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
                 5.0
             } else {
                 val dummiesFF = (tool.getFarmingForDummiesCount() ?: 0) * 1.0
-                displayedFortune - reforgeFortune - enchantmentFortune - dummiesFF
+                displayedFortune - reforgeFortune - gemstoneFortune - pesterminatorFortune - enchantmentFortune - dummiesFF
             }
             greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
                 displayedFortune - reforgeFortune - itemBaseFortune

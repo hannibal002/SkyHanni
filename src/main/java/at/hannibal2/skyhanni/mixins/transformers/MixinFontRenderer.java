@@ -52,7 +52,7 @@ public abstract class MixinFontRenderer {
      */
     @Inject(method = "renderStringAtPos", at = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0, shift = At.Shift.BY, by = 2), locals = LocalCapture.CAPTURE_FAILHARD)
     public void toggleChromaCondition(String text, boolean shadow, CallbackInfo ci, int i, char c0, int i1) {
-        if (FontRendererHook.toggleChromaCondition_shouldResetStyles(text, shadow, ci, i, c0, i1)) {
+        if (FontRendererHook.toggleChromaAndResetStyle(i1)) {
             this.resetStyles();
         }
     }

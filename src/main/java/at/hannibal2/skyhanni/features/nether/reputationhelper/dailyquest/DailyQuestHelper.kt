@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -53,6 +54,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     var greatSpook = false
+
+    /**
+     * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
+     * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
+     * REGEX-TEST: §7miniboss §a1 §7time!
+     */
+    val minibossAmountPattern by RepoPattern.pattern(
+        "crimson.reputationhelper.quest.minibossamount",
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+    )
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
@@ -175,19 +186,20 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
-        if (quests.any {
-                it.state == QuestState.READY_TO_COLLECT ||
-                it.state == QuestState.NOT_ACCEPTED ||
-                (it is RescueMissionQuest && it.state == QuestState.ACCEPTED) }) {
-            val location = when (reputationHelper.factionType) {
-                FactionType.BARBARIAN -> townBoardBarbarian
-                FactionType.MAGE -> townBoardMage
+        if (!quests.any { it.needsTownBoardLocation() }) return
+        val location = when (reputationHelper.factionType) {
+            FactionType.BARBARIAN -> townBoardBarbarian
+            FactionType.MAGE -> townBoardMage
 
-                FactionType.NONE -> return
-            }
-            event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
-            event.drawDynamicText(location, "Town Board", 1.5)
+            FactionType.NONE -> return
         }
+        event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
+        event.drawDynamicText(location, "Town Board", 1.5)
+    }
+
+    private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
+        state == QuestState.READY_TO_COLLECT || state == QuestState.NOT_ACCEPTED ||
+            (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
     fun render(display: MutableList<List<Any>>) {

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -49,16 +49,18 @@ object RepoPatternManager {
 
     private val insideTest = Launch.blackboard == null
 
+    var inTestDuplicateUsage = true
+
     private val config
         get() = if (!insideTest) {
             SkyHanniMod.feature.dev.repoPattern
         } else {
             RepoPatternConfig().apply {
-                tolerateDuplicateUsage = true
+                tolerateDuplicateUsage = inTestDuplicateUsage
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || LorenzUtils.isInDevEnvironment()
+    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && LorenzUtils.isInDevEnvironment())
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.
@@ -86,8 +88,12 @@ object RepoPatternManager {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
+        loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
+    }
+
+    fun loadPatternsFromDump(dump: RepoPatternDump) {
         regexes = null
-        regexes = event.getConstant<RepoPatternDump>("regexes")
+        regexes = dump
         reloadPatterns()
     }
 

@@ -23,6 +23,10 @@ public class EventConfig {
     @Expose
     public WinterConfig winter = new WinterConfig();
 
+    @Expose
+    @Category(name = "Hoppity Eggs", desc = "Features for the Hoppity event that happens every SkyBlock spring.")
+    public HoppityEggsConfig hoppityEggs = new HoppityEggsConfig();
+
     @ConfigOption(name = "City Project", desc = "")
     @Accordion
     @Expose

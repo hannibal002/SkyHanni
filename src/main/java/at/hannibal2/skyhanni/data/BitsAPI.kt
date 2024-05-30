@@ -8,16 +8,15 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -153,10 +152,10 @@ object BitsAPI {
                 if (amount == bits) return
 
                 if (amount > bits) {
-                    bitsAvailable -= amount - bits
-                    ChatUtils.debug("You have gained §3${amount - bits} Bits §7according to the scoreboard!")
+                    val difference = amount - bits
+                    bitsAvailable -= difference
                     bits = amount
-                    sendBitsGainEvent()
+                    sendBitsGainEvent(difference)
                 } else {
                     bits = amount
                     sendBitsSpentEvent()
@@ -225,6 +224,11 @@ object BitsAPI {
                 if (bitsAvailable != amount) {
                     bitsAvailable = amount
                     sendBitsAvailableGainedEvent()
+
+                    val difference = bits - bitsAvailable
+                    if (difference > 0) {
+                        bits += difference
+                    }
                 }
             }
             lore.matchFirst(cookieDurationPattern) {
@@ -302,7 +306,7 @@ object BitsAPI {
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
-    private fun sendBitsGainEvent() = BitsUpdateEvent.BitsGain(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsGainEvent(difference: Int) = BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
     private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
     private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
 

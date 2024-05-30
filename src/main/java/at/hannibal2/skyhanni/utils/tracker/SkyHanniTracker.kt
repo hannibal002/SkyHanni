@@ -50,17 +50,13 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun isInventoryOpen() = inventoryOpen
 
-    fun resetCommand(args: Array<String>, command: String) {
-        if (args.size == 1 && args[0].lowercase() == "confirm") {
+    fun resetCommand() = ChatUtils.clickableChat(
+        "Are you sure you want to reset your total $name? Click here to confirm.",
+        onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
-            return
-        }
-
-        ChatUtils.clickableChat(
-            "Are you sure you want to reset your total $name? Click here to confirm.",
-            "$command confirm"
-        )
-    }
+        },
+        oneTimeClick = true
+    )
 
     fun modify(modifyFunction: (Data) -> Unit) {
         getSharedTracker()?.let {

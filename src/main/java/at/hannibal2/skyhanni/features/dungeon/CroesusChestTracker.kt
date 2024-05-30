@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonChest
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -20,10 +21,10 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -260,6 +261,15 @@ class CroesusChestTracker {
         val maxChests = 60
 
         private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
+
+        fun resetChest() = croesusChests?.let {
+            it.clear()
+            it.addAll(generateMaxChest())
+            ChatUtils.chat("Kismet State was cleared!")
+        }
+
+        fun generateMaxChest() = generateSequence { DungeonRunInfo() }.take(maxChests)
+        fun generateMaxChestAsList() = generateMaxChest().toList()
 
         fun getLastActiveChest(includeDungeonKey: Boolean = false) =
             (croesusChests?.indexOfLast {

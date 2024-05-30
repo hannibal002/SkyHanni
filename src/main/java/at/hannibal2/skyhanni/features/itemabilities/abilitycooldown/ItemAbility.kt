@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -48,6 +47,7 @@ enum class ItemAbility(
     VOODOO_DOLL_WILTED(3),
     FIRE_FURY_STAFF(20),
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
+    ROYAL_PIGEON(5),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 5, "Ender Bow"),

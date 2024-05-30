@@ -81,7 +81,7 @@ public class AdvancedPlayerListConfig {
     public boolean useLevelColorForName = false;
 
     @Expose
-    @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familar with bingo.")
+    @ConfigOption(name = "Bingo Rank Number", desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familiar with bingo.")
     @ConfigEditorBoolean
     public boolean showBingoRankNumber = false;
 
@@ -94,13 +94,4 @@ public class AdvancedPlayerListConfig {
     @ConfigOption(name = "Mark Special Persons", desc = "Show special icons behind the name of guild members, party members, friends, and marked players.")
     @ConfigEditorBoolean
     public boolean markSpecialPersons = false;
-
-    @Expose
-    @ConfigOption(
-        name = "Mark SkyHanni Devs",
-        desc = "Adds a §c:O §7behind the tablist name of §cSkyHanni's contributors§7. " +
-            "§eThose are the folks that coded the mod for you for free :)"
-    )
-    @ConfigEditorBoolean
-    public boolean markSkyHanniDevs = true;
 }

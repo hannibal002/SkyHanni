@@ -20,11 +20,20 @@ public class FossilExcavatorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Profit Per",
-        desc = "Show profit/loss in chat after each excavation. Also include breakdown information on hover."
+        name = "Profit Per Excavation",
+        desc = "Show profit/loss in chat after each excavation. Also includes breakdown information on hover."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean profitPerExcavation = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Glacite Powder Stack",
+        desc = "Show Glacite Powder as stack size in the Fossil Excavator."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean glacitePowderStack = false;
 
 }
