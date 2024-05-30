@@ -311,6 +311,7 @@ import at.hannibal2.skyhanni.features.mining.MiningNotifications
 import at.hannibal2.skyhanni.features.mining.TunnelsMaps
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsProfessorRobot
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
@@ -951,6 +952,7 @@ class SkyHanniMod {
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
         loadModule(AuctionOutbidWarning)
+        loadModule(CrystalHollowsProfessorRobot())
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())

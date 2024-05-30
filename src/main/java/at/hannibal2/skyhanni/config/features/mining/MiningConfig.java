@@ -61,6 +61,11 @@ public class MiningConfig {
     public MineshaftConfig mineshaft = new MineshaftConfig();
 
     @Expose
+    @ConfigOption(name = "Professor Robot", desc = "")
+    @Accordion
+    public ProfessorRobotConfig professorRobot = new ProfessorRobotConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
