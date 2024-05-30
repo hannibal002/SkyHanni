@@ -180,7 +180,7 @@ class GoldenFishTimer {
                 else {
                     add("§7Can spawn since: §b${timePossibleSpawn.passedSince().format()}")
                     val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / 5.minutes.inWholeSeconds
-                    add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}%")
+                    add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}")
                 }
             } else {
                 add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
