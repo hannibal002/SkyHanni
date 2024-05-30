@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -54,10 +54,18 @@ object HoppityCollectionStats {
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
     )
+    /**
+     * REGEX-TEST: §a✔ §7Requirement
+     */
     private val requirementMet by patternGroup.pattern(
         "rabbit.requirement.met",
         "§a✔ §7Requirement"
     )
+    /**
+     * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
+     * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
+     * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
+     */
     private val requirementNotMet by patternGroup.pattern(
         "rabbit.requirement.notmet",
         "§c✖ §7Requirement.*",
@@ -95,6 +103,7 @@ object HoppityCollectionStats {
         )
     }
 
+    // TODO cache with inventory update event
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.highlightRabbitsWithRequirement) return
@@ -106,8 +115,6 @@ object HoppityCollectionStats {
                 slot highlight LorenzColor.GREEN
             if (lore.any { requirementNotMet.find(it) })
                 slot highlight LorenzColor.RED
-
-
         }
     }
 
