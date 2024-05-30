@@ -93,6 +93,11 @@ public class MiscConfig {
     public TrackerConfig tracker = new TrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Island Leave/Join Messages", desc = "")
+    @Accordion
+    public LeaveJoinMsgsConfig leaveJoinMsgs = new LeaveJoinMsgsConfig();
+
+    @Expose
     @ConfigOption(name = "Pet Candy Display", desc = "")
     @Accordion
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();

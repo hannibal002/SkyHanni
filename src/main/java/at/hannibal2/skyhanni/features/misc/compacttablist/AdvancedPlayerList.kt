@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.KnownPlayersCustomization.IsFriendsKnown
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
@@ -194,7 +195,7 @@ object AdvancedPlayerList {
             if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(it) } ?: ""
         } else data.nameSuffix
 
-        if (config.markSpecialPersons) {
+        if (config.markKnownPlayers) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
         ContributorManager.getTabListSuffix(data.name)?.let {
@@ -214,12 +215,18 @@ object AdvancedPlayerList {
         (Random.nextDouble() * 500).toInt()
     }
 
-    private fun getSocialIcon(name: String) = when {
+    fun getSocialIcon(name: String) = when {
         LorenzUtils.getPlayerName() == name -> SocialIcon.ME
-        MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
-        PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
-        FriendAPI.getAllFriends().any { it.name.contains(name) } -> SocialIcon.FRIEND
-        GuildAPI.isInGuild(name) -> SocialIcon.GUILD
+        config.knownPlayersCustomization.isMarkedPlayersKnown &&
+            MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
+        !config.knownPlayersCustomization.isFriendsKnown.equals(IsFriendsKnown.NO_FRIENDS) &&
+            FriendAPI.isFriend(name, onlyBest = true) -> SocialIcon.BEST_FRIEND
+        config.knownPlayersCustomization.isPartyKnown &&
+            PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
+        config.knownPlayersCustomization.isFriendsKnown.equals(IsFriendsKnown.ALL_FRIENDS) &&
+            FriendAPI.isFriend(name) -> SocialIcon.FRIEND
+        config.knownPlayersCustomization.isGuildKnown &&
+            GuildAPI.isInGuild(name) -> SocialIcon.GUILD
         else -> SocialIcon.OTHER
     }
 
@@ -243,6 +250,7 @@ object AdvancedPlayerList {
     enum class SocialIcon(val icon: () -> String, val score: Int) {
         ME("", 10),
         MARKED({ "${MarkedPlayerManager.config.chatColor.getChatColor()}§lMARKED" }, 8),
+        BEST_FRIEND("§d§lBF", 6),
         PARTY("§9§lP", 5),
         FRIEND("§d§lF", 4),
         GUILD("§2§lG", 3),
@@ -257,5 +265,10 @@ object AdvancedPlayerList {
         event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
             ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)
         }
+        event.move(
+            24,
+            "misc.compactTabList.advancedPlayerList.markSpecialPersons",
+            "misc.compactTabList.advancedPlayerList.markKnownPlayers"
+        )
     }
 }

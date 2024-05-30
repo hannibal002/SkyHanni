@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.utils.LorenzUtils
+
 enum class IslandType(val displayName: String) {
     // TODO USE SH-REPO (for displayName only)
     PRIVATE_ISLAND("Private Island"),
@@ -35,5 +37,9 @@ enum class IslandType(val displayName: String) {
         fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
 
         fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
+
+        fun onPrivateWorld(guesting: Boolean = false) = if (guesting) {
+            LorenzUtils.skyBlockIsland == PRIVATE_ISLAND_GUEST || LorenzUtils.skyBlockIsland == GARDEN_GUEST
+        } else LorenzUtils.skyBlockIsland == PRIVATE_ISLAND || LorenzUtils.skyBlockIsland == GARDEN
     }
 }

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.misc.compacttablist;
 
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.misc.KnownPlayersCustomization;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -91,7 +93,12 @@ public class AdvancedPlayerListConfig {
     public boolean hideFactions = false;
 
     @Expose
-    @ConfigOption(name = "Mark Special Persons", desc = "Show special icons behind the name of guild members, party members, friends, and marked players.")
+    @ConfigOption(name = "Mark Known Players", desc = "Show special icons after the name of known players.")
     @ConfigEditorBoolean
-    public boolean markSpecialPersons = false;
+    public boolean markKnownPlayers = false;
+
+    @Expose
+    @ConfigOption(name = "Known Players Customization", desc = "")
+    @Accordion
+    public KnownPlayersCustomization knownPlayersCustomization = new KnownPlayersCustomization();
 }

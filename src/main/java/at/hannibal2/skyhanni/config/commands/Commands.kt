@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
@@ -432,8 +433,12 @@ object Commands {
             "Sets a test burrow waypoint at your location"
         ) { GriffinBurrowHelper.setTestBurrow(it) }
         registerCommand(
+            "shsimulateworldchange",
+            "Triggers the LorenzWorldChangeEvent."
+        ) { LorenzWorldChangeEvent().postAndCatch() }
+        registerCommand(
             "shtestsackapi",
-            "Get the amount of an item in sacks according to internal feature SackAPI"
+            "Get sack data from the internal SackAPI Feature."
         ) { SackAPI.testSackAPI(it) }
         registerCommand(
             "shtestgriffinspots",
