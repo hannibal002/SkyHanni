@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.Commands.init
+import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BitsAPI
@@ -452,8 +452,8 @@ import at.hannibal2.skyhanni.test.TestCopyRngMeterValues
 import at.hannibal2.skyhanni.test.TestExportTools
 import at.hannibal2.skyhanni.test.TestShowSlotNumber
 import at.hannibal2.skyhanni.test.WorldEdit
-import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -490,7 +490,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.1",
+    version = "0.26.Beta.2",
 )
 class SkyHanniMod {
 
@@ -946,13 +946,11 @@ class SkyHanniMod {
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
 
-        init()
-
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
         loadModule(FixGhostEntities)
-        loadModule(CopyNearbyParticlesCommand)
         loadModule(TrackSoundsCommand)
+        loadModule(TrackParticlesCommand)
         loadModule(ButtonOnPause())
         loadModule(PacketTest)
         loadModule(TestBingo)
@@ -963,8 +961,11 @@ class SkyHanniMod {
         loadModule(TestShowSlotNumber())
         loadModule(SkyHanniDebugsAndTests)
         loadModule(WorldEdit)
-        PreInitFinishedEvent().postAndCatch()
         loadModule(MobDebug())
+
+        Commands.init()
+
+        PreInitFinishedEvent().postAndCatch()
     }
 
     @Mod.EventHandler

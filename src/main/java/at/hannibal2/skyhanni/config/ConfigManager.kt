@@ -226,6 +226,7 @@ class ConfigManager {
 
         // debug features
         "features.dev.DebugConfig.trackSoundPosition",
+        "features.dev.DebugConfig.trackParticlePosition",
         "features.dev.DevConfig.debugPos",
         "features.dev.DevConfig.debugLocationPos",
         "features.dev.DevConfig.debugItemPos",
@@ -305,7 +306,7 @@ class ConfigManager {
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
                 e.printStackTrace()
-                val backupFile = file.resolveSibling("$fileName-${System.currentTimeMillis()}-backup.json")
+                val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
                 logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
                 logger.log("Exception was $e")
                 try {
