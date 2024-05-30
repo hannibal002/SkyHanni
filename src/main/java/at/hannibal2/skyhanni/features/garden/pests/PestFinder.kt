@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
