@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ChickenHeadConfig {
 
     @Expose
-    @ConfigOption(name = "Checken Head Timer", desc = "Show the cooldown until the next time you can lay an egg with the Chicken Head.")
+    @ConfigOption(name = "Chicken Head Timer", desc = "Show the cooldown until the next time you can lay an egg with the Chicken Head.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean displayTimer = false;

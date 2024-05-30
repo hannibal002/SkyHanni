@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -45,6 +47,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -72,24 +75,19 @@ import at.hannibal2.skyhanni.test.command.CopyActionBarCommand
 import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyParticlesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
+import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
-import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.ClientCommandHandler
 
 object Commands {
@@ -156,7 +154,7 @@ object Commands {
         registerCommand("sh", "Opens the main SkyHanni config", openMainMenu)
         registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
-        registerCommand("shcommands", "Shows this list") { commandHelp(it) }
+        registerCommand("shcommands", "Shows this list") { HelpCommand.onCommand(it, commands) }
         registerCommand0("shdefaultoptions", "Select default options", {
             DefaultConfigFeatures.onCommand(
                 it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null"
@@ -257,7 +255,7 @@ object Commands {
             "Resets the Pest Profit Tracker"
         ) { PestProfitTracker.resetCommand() }
         registerCommand(
-            "shresetmythologicalcreatureracker",
+            "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker"
         ) { MythologicalCreatureTracker.resetCommand() }
         registerCommand(
@@ -317,7 +315,7 @@ object Commands {
         registerCommand(
             "shlimbo",
             "Warps you to Limbo."
-        ) { MiscFeatures().goToLimbo() }
+        ) { MiscFeatures.goToLimbo() }
         registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden"
@@ -326,6 +324,10 @@ object Commands {
             "shignore",
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
+        registerCommand(
+            "shtpinfested",
+            "Teleports you to the nearest infested plot"
+        ) { PestFinder.teleportNearestInfestedPlot() }
     }
 
     private fun usersBugFix() {
@@ -379,11 +381,15 @@ object Commands {
             "Toggles receiving the 12 fortune from pumpkins"
         ) { CaptureFarmingGear.reversePumpkinFortune() }
         registerCommand(
+            "shcocoabeans",
+            "Toggles receiving the 12 fortune from cocoa beans"
+        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
+        registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
-            "shclearksimet",
+            "shclearkismet",
             "Cleares the saved values of the applied kismet feathers in Croesus"
         ) { CroesusChestTracker.resetChest() }
         registerCommand(
@@ -398,6 +404,10 @@ object Commands {
             "shUpdateBazaarPrices",
             "Forcefully updating the bazaar prices right now."
         ) { HypixelBazaarFetcher.fetchNow() }
+        registerCommand(
+            "shclearsavedrabbits",
+            "Clears the saved rabbits on this profile."
+        ) { HoppityCollectionStats.clearSavedRabbits() }
     }
 
     private fun developersDebugFeatures() {
@@ -431,6 +441,10 @@ object Commands {
                 RenderableTestSuit.commandHandler(it)
             }
         }
+        registerCommand(
+            "shtestgriffinspots",
+            "Show potential griffin spots around you."
+        ) { GriffinBurrowHelper.testGriffinSpots() }
     }
 
     private fun developersCodingHelp() {
@@ -469,6 +483,10 @@ object Commands {
             "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
         ) { TrackSoundsCommand.command(it) }
         registerCommand(
+            "shtrackparticles",
+            "Tracks the particles for the specified duration (in seconds) and copies it to the clipboard"
+        ) { TrackParticlesCommand.command(it) }
+        registerCommand(
             "shcopytablist",
             "Copies the tab list data to the clipboard"
         ) { TabListData.copyCommand(it) }
@@ -488,10 +506,6 @@ object Commands {
             "shcopyitem",
             "Copies information about the item in hand to the clipboard"
         ) { CopyItemCommand.command() }
-        registerCommand(
-            "shcopyparticles",
-            "Copied information about the particles that spawn in the next 50ms to the clipboard"
-        ) { CopyNearbyParticlesCommand.command(it) }
         registerCommand("shtestpacket", "Logs incoming and outgoing packets to the console") { PacketTest.command(it) }
         registerCommand(
             "shtestmessage",
@@ -542,61 +556,6 @@ object Commands {
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
         registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
-    }
-
-    private fun commandHelp(args: Array<String>) {
-        var filter: (String) -> Boolean = { true }
-        val title: String
-        if (args.size == 1) {
-            val searchTerm = args[0].lowercase()
-            filter = { it.lowercase().contains(searchTerm) }
-            title = "SkyHanni commands with '§e$searchTerm§7'"
-        } else {
-            title = "All SkyHanni commands"
-        }
-
-        val components = mutableListOf<ChatComponentText>()
-        components.add(ChatComponentText(" \n§7$title:\n"))
-
-        for (command in commands) {
-            if (!filter(command.name) && !filter(command.description)) continue
-            val category = command.category
-            val name = command.name
-            val color = category.color
-
-            val hoverText = buildList {
-                add("§e/$name")
-                if (command.description.isNotEmpty()) {
-                    addDescription(command.description)
-                }
-                add("")
-                add("$color${category.categoryName}")
-                addDescription(category.description)
-            }
-
-            components.add(Text.text("$color/$name") {
-                this.hover = Text.multiline(hoverText)
-                this.suggest = "/$name"
-            })
-            components.add(ChatComponentText("§7, "))
-        }
-        components.add(ChatComponentText("\n "))
-        ChatUtils.multiComponentMessage(components)
-    }
-
-    private fun MutableList<String>.addDescription(description: String) {
-        val lines = description.splitLines(200).removeSuffix("§r").replace("§r", "§7").addOptionalDot()
-        for (line in lines.split("\n")) {
-            add("  §7${line}")
-        }
-    }
-
-    private fun String.addOptionalDot(): String {
-        if (endsWith(".")) return this
-        if (endsWith("?")) return this
-        if (endsWith("!")) return this
-
-        return "$this."
     }
 
     @JvmStatic

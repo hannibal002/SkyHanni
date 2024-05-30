@@ -195,8 +195,8 @@ object RenderUtils {
 
     fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
 
-    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(n))
-    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(-n))
+    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
+    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -216,7 +216,7 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.enableCull()
         GlStateManager.enableTexture2D()
-        GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, 1, 1, 0)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         val time = Minecraft.getMinecraft().theWorld.totalWorldTime + partialTicks.toDouble()
@@ -433,7 +433,7 @@ object RenderUtils {
         GlStateManager.scale(finalScale, finalScale, finalScale)
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableTexture2D()
         minecraft.fontRendererObj.drawString(
             finalText,
@@ -446,7 +446,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Float): Double {
+    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
@@ -675,7 +675,7 @@ object RenderUtils {
         GlStateManager.enableBlend()
         GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
 
@@ -733,7 +733,7 @@ object RenderUtils {
         GlStateManager.enableBlend()
         GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
         color.bindColor()
@@ -785,7 +785,7 @@ object RenderUtils {
         GlStateManager.enableBlend()
         GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
         color.bindColor()
@@ -986,7 +986,7 @@ object RenderUtils {
         }
         GlStateManager.pushMatrix()
         GlStateManager.enableBlend()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
 
         val minecraft = Minecraft.getMinecraft()
         val fontRenderer = minecraft.fontRendererObj
@@ -1036,10 +1036,11 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
-        return exactLocation(player).add(add)
+        return exactLocation(player) + add
     }
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
+        if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
         val y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
         val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
@@ -1049,7 +1050,7 @@ object RenderUtils {
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.disableTexture2D()
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
@@ -1374,7 +1375,7 @@ object RenderUtils {
             worldRenderer.pos(sidePoint1).endVertex()
             worldRenderer.pos(middlePoint).endVertex()
             worldRenderer.pos(sidePoint2).endVertex()
-            worldRenderer.pos(sidePoint1.add(sidePoint2).subtract(middlePoint)).endVertex()
+            worldRenderer.pos(sidePoint1 + sidePoint2 - middlePoint).endVertex()
             tessellator.draw()
         }
 
@@ -1533,7 +1534,7 @@ object RenderUtils {
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GL11.glLineWidth(lineWidth.toFloat())
         if (!depth) {
             GL11.glDisable(GL11.GL_DEPTH_TEST)
@@ -1732,7 +1733,7 @@ object RenderUtils {
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.shadeModel(7425)
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer

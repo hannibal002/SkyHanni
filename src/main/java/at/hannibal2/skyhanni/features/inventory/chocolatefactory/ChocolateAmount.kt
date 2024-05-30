@@ -68,6 +68,13 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
             }
         }
 
+        fun addToCurrent(amount: Long) {
+            profileStorage?.let {
+                it.currentChocolate += amount
+                updateBestUpgrade()
+            }
+        }
+
         private fun updateBestUpgrade() {
             profileStorage?.let {
                 if (it.bestUpgradeAvailableAt == 0L || it.bestUpgradeCost == 0L) return
