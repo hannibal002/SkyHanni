@@ -59,6 +59,14 @@ object InquisitorWaypointShare {
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
     )
 
+    /**
+     * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
+     */
+    private val inquisitorFoundChatPattern by patternGroup.pattern(
+        "inquisitor.dug",
+        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
+    )
+
     private var inquisitor = -1
     private var lastInquisitor = -1
     private var lastShareTime = SimpleTimeMark.farPast()
@@ -128,8 +136,7 @@ object InquisitorWaypointShare {
         if (!isEnabled()) return
         val message = event.message
 
-        val pattern = ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!".toPattern()
-        if (pattern.matches(message)) {
+        if (inquisitorFoundChatPattern.matches(message)) {
             checkInquisFound()
         }
     }
