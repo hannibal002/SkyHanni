@@ -49,4 +49,11 @@ object RegexUtils {
     fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
 
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
+
+    fun List<String>.indexOfFirstMatch(pattern: Pattern): Int? {
+        for ((index, line) in this.withIndex()) {
+            pattern.matcher(line).let { if (it.matches()) return index }
+        }
+        return null
+    }
 }
