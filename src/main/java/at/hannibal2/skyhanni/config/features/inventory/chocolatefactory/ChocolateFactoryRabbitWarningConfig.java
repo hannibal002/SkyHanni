@@ -10,7 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ChocolateFactoryRabbitWarningConfig {
 
-
     @Expose
     @ConfigOption(name = "Rabbit Warning", desc = "Warn when the rabbit that needs to be clicked appears.")
     @ConfigEditorBoolean

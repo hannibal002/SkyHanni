@@ -87,6 +87,7 @@ object ChocolateFactoryDataLoader {
         "rabbit.clickme",
         "§e§lCLICK ME!"
     )
+
     /**
      * REGEX-TEST: §6§lGolden Rabbit §8- §aStampede
      */
