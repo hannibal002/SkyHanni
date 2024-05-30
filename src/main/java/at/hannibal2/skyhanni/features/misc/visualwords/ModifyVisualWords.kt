@@ -29,35 +29,32 @@ object ModifyVisualWords {
             modifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
         }
 
-        val cachedResult = textCache.getOrNull(originalText)
-        if (cachedResult != null) {
-            return cachedResult
-        }
+        return textCache.getOrPut(originalText) {
+            if (originalText.startsWith("§§")) {
+                modifiedText = modifiedText.removePrefix("§§")
+            } else {
+                for (modifiedWord in modifiedWords) {
+                    if (!modifiedWord.enabled) continue
+                    val phrase = modifiedWord.phrase.convertToFormatted()
 
-        if (originalText.startsWith("§§")) {
-            modifiedText = modifiedText.removePrefix("§§")
-        } else {
-            for (modifiedWord in modifiedWords) {
-                if (!modifiedWord.enabled) continue
-                val phrase = modifiedWord.phrase.convertToFormatted()
+                    if (phrase.isEmpty()) continue
 
-                if (phrase.isEmpty()) continue
-
-                modifiedText = modifiedText.replace(
-                    phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive()
-                )
+                    modifiedText = modifiedText.replace(
+                        phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive()
+                    )
+                }
             }
+
+            // Disabled, as it's only a novelty for 30 seconds and will annoy after that everyone.
+            /*
+            if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.02) {
+                modifiedText = modifiedText.replace(reverseRegex) {
+                    it.groupValues[1] + it.groupValues[2].reversed()
+                }
+            }
+            */
+            modifiedText
         }
-
-        // Disabled, as its only a novelty for 30 seconds and will annoy after that everyone.
-
-//         if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.02) {
-//             modifiedText = modifiedText.replace(reverseRegex) {
-//                 it.groupValues[1] + it.groupValues[2].reversed()
-//             }
-//         }
-        textCache.put(originalText, modifiedText)
-        return modifiedText
     }
 
     @SubscribeEvent

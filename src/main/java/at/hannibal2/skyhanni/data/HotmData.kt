@@ -1,20 +1,33 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
+import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,7 +48,7 @@ enum class HotmData(
         { level -> mapOf(HotmReward.MINING_SPEED to level * 20.0) }),
     MINING_FORTUNE("Mining Fortune",
         50,
-        { currentLevel -> (currentLevel + 1.0).pow(3.5) },
+        { currentLevel -> (currentLevel + 2.0).pow(3.05) },
         { level -> mapOf(HotmReward.MINING_FORTUNE to level * 5.0) }),
     QUICK_FORGE("Quick Forge",
         20,
@@ -53,7 +66,7 @@ enum class HotmData(
         45,
         { currentLevel -> (currentLevel + 2.0).pow(3.07) },
         { level -> mapOf(HotmReward.EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES to 5.0 + level) }),
-    CRYSTALLIZED("" + "Crystallized", 30, { currentLevel -> (currentLevel + 2.0).pow(3.4) }, { level ->
+    CRYSTALLIZED("Crystallized", 30, { currentLevel -> (currentLevel + 2.0).pow(3.4) }, { level ->
         mapOf(
             HotmReward.MINING_SPEED to 20.0 + ((level - 1.0) * 6.0),
             HotmReward.MINING_FORTUNE to 20.0 + ((level - 1.0) * 5.0)
@@ -114,10 +127,8 @@ enum class HotmData(
             HotmReward.MINING_SPEED to 50.0, HotmReward.MINING_FORTUNE to 50.0
         )
     }),
-    SKY_MALL("Sky Mall", 1, { null }, { emptyMap() }), PRECISION_MINING("Precision Mining",
-        1,
-        { null },
-        { mapOf(HotmReward.MINING_SPEED_BOOST to 30.0) }),
+    SKY_MALL("Sky Mall", 1, { null }, { emptyMap() }),
+    PRECISION_MINING("Precision Mining", 1, { null }, { mapOf(HotmReward.MINING_SPEED_BOOST to 30.0) }),
     FRONT_LOADED("Front Loaded", 1, { null }, {
         mapOf(
             HotmReward.MINING_SPEED to 100.0,
@@ -126,10 +137,7 @@ enum class HotmData(
             HotmReward.MORE_BASE_GEMSTONE_POWER to 2.0
         )
     }),
-    STAR_POWDER("Star Powder",
-        1,
-        { null },
-        { mapOf(HotmReward.MORE_MITHRIL_POWER to 300.0) }),
+    STAR_POWDER("Star Powder", 1, { null }, { mapOf(HotmReward.MORE_MITHRIL_POWER to 300.0) }),
     GOBLIN_KILLER("Goblin Killer", 1, { null }, { emptyMap() }),
 
     // Abilities
@@ -169,7 +177,7 @@ enum class HotmData(
         "Dust Collector",
         20,
         { currentLevel -> (currentLevel + 1.0).pow(4) },
-        { level -> mapOf(HotmReward.FOSSILE_DUST to 1.0 * level) }),
+        { level -> mapOf(HotmReward.FOSSIL_DUST to 1.0 * level) }),
     WARM_HEARTED("Warm Hearted",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.1)) },
@@ -182,7 +190,7 @@ enum class HotmData(
     NO_STONE_UNTURNED("No Stone Unturned",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.05)) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.5 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) }),
 
     SUB_ZERO_MINING("SubZero Mining",
         100,
@@ -191,7 +199,7 @@ enum class HotmData(
     SURVEYOR("Surveyor",
         20,
         { currentLevel -> (currentLevel + 1.0).pow(4) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.75 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.75 * level) }),
     EAGER_ADVENTURER("Eager Adventurer",
         100,
         { currentLevel -> floor((currentLevel + 1.0).pow(2.3)) },
@@ -200,46 +208,45 @@ enum class HotmData(
     DEAD_MANS_CHEST("Dead Man's Chest",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.2)) },
-        { level -> mapOf(HotmReward.UNKOWN to 1.0 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 1.0 * level) }),
 
     GIFTS_FROM_THE_DEPARTED("Gifts from the Departed",
         100,
         { currentLevel -> floor((currentLevel + 1.0).pow(2.45)) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.2 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.2 * level) }),
 
     EXCAVATOR(
         "Excavator",
         50,
         { currentLevel -> (currentLevel + 1.0).pow(3) },
-        { level -> mapOf(HotmReward.UNKOWN to 0.5 * level) }),
+        { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) }),
     RAGS_TO_RICHES("Rags to Riches",
         50,
         { currentLevel -> floor((currentLevel + 1.0).pow(3.05)) },
         { level -> mapOf(HotmReward.MINING_FORTUNE to 2.0 * level) }),
 
-    KEEN_EYE("Keen Eye", 1, { null }, { emptyMap() }), MINESHAFT_MAYHEM(
-        "Mineshaft Mayhem",
-        1,
-        { null },
-        { emptyMap() }),
-    FROZEN_SOLID(
-        "Frozen Solid",
-        1,
-        { null },
-        { emptyMap() }),
-    GEMSTONE_INFUSION("Gemstone Infusion", 1, { null }, { emptyMap() }), HAZARDOUS_MINER(
-        "Hazardous Miner",
-        1,
-        { null },
-        { emptyMap() }), ;
+    KEEN_EYE("Keen Eye", 1, { null }, { emptyMap() }),
+    MINESHAFT_MAYHEM("Mineshaft Mayhem", 1, { null }, { emptyMap() }),
+    FROZEN_SOLID("Frozen Solid", 1, { null }, { emptyMap() }),
+    GEMSTONE_INFUSION("Gemstone Infusion", 1, { null }, { emptyMap() }),
+    HAZARDOUS_MINER("Hazardous Miner", 1, { null }, { emptyMap() }),
 
-    private val guiNamePattern by repoGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+    ;
+
+    private val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+
+    val printName = name.allLettersFirstUppercase()
+
+    val rawLevel: Int
+        get() = storage?.perks?.get(this.name)?.level ?: 0
 
     var activeLevel: Int
-        get() = storage?.perks?.get(this.name)?.level ?: 0
+        get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
         private set(value) {
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
         }
+
+    private fun blueEgg() = if (this != PEAK_OF_THE_MOUNTAIN && maxLevel != 1 && HotmAPI.isBlueEggActive) 1 else 0
 
     var enabled: Boolean
         get() = storage?.perks?.get(this.name)?.enabled ?: false
@@ -256,7 +263,7 @@ enum class HotmData(
     var slot: Slot? = null
         private set
 
-    fun getLevelUpCost() = costFun(activeLevel)
+    fun getLevelUpCost() = costFun(rawLevel)
 
     fun getReward() = rewardFun(activeLevel)
 
@@ -267,42 +274,50 @@ enum class HotmData(
         val abilities =
             listOf(PICKOBULUS, MINING_SPEED_BOOST, VEIN_SEEKER, MANIAC_MINER, HAZARDOUS_MINER, GEMSTONE_INFUSION)
 
-        private val inventoryPattern by repoGroup.pattern(
+        private val inventoryPattern by patternGroup.pattern(
             "inventory", "Heart of the Mountain"
         )
 
-        private val levelPattern by repoGroup.pattern(
-            "perk.level", "§7Level (?<level>\\d+).*"
+        private val levelPattern by patternGroup.pattern(
+            "perk.level", "§(?<color>.)Level (?<level>\\d+).*"
         )
 
-        private val notUnlockedPattern by repoGroup.pattern(
+        private val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked", "(§.)*Requires.*|.*Mountain!|(§.)*Click to unlock!|"
         )
 
-        private val enabledPattern by repoGroup.pattern(
+        private val enabledPattern by patternGroup.pattern(
             "perk.enable", "§a§lENABLED|(§.)*SELECTED"
         )
-        private val disabledPattern by repoGroup.pattern(
+        private val disabledPattern by patternGroup.pattern(
             "perk.disabled", "§c§lDISABLED|§7§eClick to select!"
         ) // unused for now since the assumption is when enabled isn't found it is disabled, but the value might be useful in the future or for debugging
 
-        private val resetChatPattern by repoGroup.pattern(
+        private val resetChatPattern by patternGroup.pattern(
             "reset.chat", "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset."
         )
 
-        private val heartItemPattern by repoGroup.pattern(
-            "invetory.heart", "§5Heart of the Mountain"
+        private val heartItemPattern by patternGroup.pattern(
+            "inventory.heart", "§5Heart of the Mountain"
         )
-        private val resetItemPattern by repoGroup.pattern(
-            "invetory.reset", "§cReset Heart of the Mountain"
-        )
-
-        private val heartTokensPattern by repoGroup.pattern(
-            "invetory.heart.token", "§7Token of the Mountain: §5(?<token>\\d+)"
+        private val resetItemPattern by patternGroup.pattern(
+            "inventory.reset", "§cReset Heart of the Mountain"
         )
 
-        private val resetTokensPattern by repoGroup.pattern(
-            "invetory.reset.token", "\\s+§8- §5(?<token>\\d+) Token of the Mountain"
+        private val heartTokensPattern by patternGroup.pattern(
+            "inventory.heart.token", "§7Token of the Mountain: §5(?<token>\\d+)"
+        )
+
+        private val resetTokensPattern by patternGroup.pattern(
+            "inventory.reset.token", "\\s+§8- §5(?<token>\\d+) Token of the Mountain"
+        )
+
+        private val skymallPattern by patternGroup.pattern(
+            "skymall", "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?<perk>.*)"
+        )
+
+        private val mayhemChatPattern by patternGroup.pattern(
+            "mayhem", "§b§lMAYHEM! §r§7(?<perk>.*)"
         )
 
         var inInventory = false
@@ -326,6 +341,13 @@ enum class HotmData(
             HotmAPI.Powder.entries.forEach {
                 it.heartPattern
                 it.resetPattern
+            }
+            HotmAPI.SkymallPerk.entries.forEach {
+                it.chatPattern
+                it.itemPattern
+            }
+            HotmAPI.MayhemPerk.entries.forEach {
+                it.chatPattern
             }
         }
 
@@ -357,8 +379,8 @@ enum class HotmData(
             entry.isUnlocked = true
 
             entry.activeLevel = levelPattern.matchMatcher(lore.first()) {
-                group("level").toInt()
-            } ?: 0
+                group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
+            } ?: entry.maxLevel
 
             if (entry.activeLevel > entry.maxLevel) {
                 throw IllegalStateException("Hotm Perk '${entry.name}' over max level")
@@ -369,6 +391,8 @@ enum class HotmData(
                 return
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
+
+            if (entry == SKY_MALL) handelSkyMall(lore)
         }
 
         private fun Slot.handlePowder(): Boolean {
@@ -416,6 +440,52 @@ enum class HotmData(
             return true
         }
 
+        private val skyMallCurrentEffect by patternGroup.pattern(
+            "skymall.current", "§aYour Current Effect"
+        )
+
+        private fun handelSkyMall(lore: List<String>) {
+            if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
+            else {
+                val index = (lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from the hotm tree",
+                        "skyMallCurrentEffect didn't match",
+                        "lore" to lore
+                    )
+                    return
+                }) + 1
+                skymallPattern.matchMatcher(lore[index]) {
+                    val perk = group("perk")
+                    HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read the skymall effect from the hotm tree",
+                            "no itemPattern matched",
+                            "lore" to lore,
+                            "perk" to perk
+                        )
+                        null
+                    }
+                }
+            }
+        }
+
+        @SubscribeEvent
+        fun onScoreboardUpdate(event: ScoreboardChangeEvent) {
+            if (!LorenzUtils.inSkyBlock) return
+
+            event.newList.matchFirst(ScoreboardPattern.powderPattern) {
+                val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
+                val amount = group("amount").formatLong()
+                val difference = amount - type.getCurrent()
+
+                if (difference > 0) {
+                    type.gain(difference)
+                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.lowName} Powder")
+                }
+            }
+        }
+
         @SubscribeEvent
         fun onInventoryClose(event: InventoryCloseEvent) {
             if (!inInventory) return
@@ -430,15 +500,55 @@ enum class HotmData(
             inInventory = inventoryPattern.matches(event.inventoryName)
             DelayedRun.runNextTick {
                 InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
+                abilities.filter { it.isUnlocked }.forEach {
+                    it.activeLevel = if (PEAK_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
+                }
             }
-            inventoryPattern.matcher(event.inventoryName)
         }
 
         @SubscribeEvent
         fun onChat(event: LorenzChatEvent) {
             if (!LorenzUtils.inSkyBlock) return
-            if (!resetChatPattern.matches(event.message)) return
-            resetTree()
+            if (resetChatPattern.matches(event.message)) {
+                resetTree()
+                return
+            }
+            skymallPattern.matchMatcher(event.message) {
+                val perk = group("perk")
+                HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.chatPattern.matches(perk) } ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from chat",
+                        "no chatPattern matched",
+                        "chat" to event.message,
+                        "perk" to perk
+                    )
+                    null
+                }
+                ChatUtils.debug("setting skymall to ${HotmAPI.skymall}")
+                return
+            }
+            DelayedRun.runNextTick {
+                mayhemChatPattern.matchMatcher(event.message) {
+                    val perk = group("perk")
+                    HotmAPI.mineshaftMayhem = MayhemPerk.entries.firstOrNull { it.chatPattern.matches(perk) } ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not read the mayhem effect from chat",
+                            "no chatPattern matched",
+                            "chat" to event.message,
+                            "perk" to perk
+                        )
+                        null
+                    }
+                    ChatUtils.debug("setting mineshaftMayhem to ${HotmAPI.mineshaftMayhem}")
+                }
+            }
+        }
+
+        @SubscribeEvent
+        fun onWorldSwitch(event: IslandChangeEvent) {
+            if (HotmAPI.mineshaftMayhem == null) return
+            HotmAPI.mineshaftMayhem = null
+            ChatUtils.debug("resetting mineshaftMayhem")
         }
 
         @SubscribeEvent
@@ -446,8 +556,7 @@ enum class HotmData(
             HotmAPI.Powder.entries.forEach {
                 if (it.getStorage() == null) {
                     ProfileStorageData.profileSpecific?.mining?.powder?.put(
-                        it,
-                        ProfileSpecificStorage.MiningConfig.PowderStorage()
+                        it, ProfileSpecificStorage.MiningConfig.PowderStorage()
                     )
                 }
             }
@@ -455,20 +564,49 @@ enum class HotmData(
 
         @SubscribeEvent
         fun onDebug(event: DebugDataCollectEvent) {
-            event.title("Hotm")
+            event.title("HotM")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 HotmAPI.Powder.entries.forEach {
                     add("${it.lowName} Powder: ${it.getCurrent()}/${it.getTotal()}")
                 }
-                add("Ability: ${HotmAPI.activeMiningAbility}")
+                add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
+                add("Blue Egg: ${HotmAPI.isBlueEggActive}")
+                add("SkyMall: ${HotmAPI.skymall}")
+                add("Mineshaft Mayhem: ${HotmAPI.mineshaftMayhem}")
             }
+            event.title("HotM - Tree")
+            event.addIrrelevant(entries.filter { it.isUnlocked }.map {
+                "${if (it.enabled) "✔" else "✖"} ${it.printName}: ${it.activeLevel}"
+            })
         }
     }
 }
 
-private val repoGroup = RepoPattern.group("mining.hotm")
+private val patternGroup = RepoPattern.group("mining.hotm")
 
 enum class HotmReward {
-    MINING_SPEED, MINING_FORTUNE, MINING_WISDOM, FORGE_TIME_DECREASE, TITANIUM_CHANCE, DAILY_POWDER, MORE_BASE_MITHRIL_POWER, MORE_BASE_GEMSTONE_POWER, MORE_MITHRIL_POWER, MORE_GEMSTONE_POWER, COMBAT_STAT_BOOST, CHANCE_OF_TREASURE_CHEST, LOCKS_OF_TREASURE_CHEST, EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES, AVERAGE_BLOCK_BREAKS, CHANCE_EXTRA_XP_ORBS, MINING_SPEED_BOOST, ABILITY_DURATION, ABILITY_RADIUS, ABILITY_COOLDOWN, FOSSILE_DUST, UNKOWN, COLD_RESISTANCE
+    MINING_SPEED,
+    MINING_FORTUNE,
+    MINING_WISDOM,
+    FORGE_TIME_DECREASE,
+    TITANIUM_CHANCE,
+    DAILY_POWDER,
+    MORE_BASE_MITHRIL_POWER,
+    MORE_BASE_GEMSTONE_POWER,
+    MORE_MITHRIL_POWER,
+    MORE_GEMSTONE_POWER,
+    COMBAT_STAT_BOOST,
+    CHANCE_OF_TREASURE_CHEST,
+    LOCKS_OF_TREASURE_CHEST,
+    EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES,
+    AVERAGE_BLOCK_BREAKS,
+    CHANCE_EXTRA_XP_ORBS,
+    MINING_SPEED_BOOST,
+    ABILITY_DURATION,
+    ABILITY_RADIUS,
+    ABILITY_COOLDOWN,
+    FOSSIL_DUST,
+    UNKNOWN,
+    COLD_RESISTANCE
 }

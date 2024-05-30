@@ -18,7 +18,8 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -26,6 +27,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 object PowderTracker {
 
@@ -53,7 +55,7 @@ object PowderTracker {
         "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r"
     )
 
-    private var lastChestPicked = 0L
+    private var lastChestPicked = SimpleTimeMark.farPast()
     private var isGrinding = false
     private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val mithrilInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
@@ -122,7 +124,7 @@ object PowderTracker {
                     it.totalChestPicked += 1
                 }
                 isGrinding = true
-                lastChestPicked = System.currentTimeMillis()
+                lastChestPicked = SimpleTimeMark.now()
             }
         }
 
@@ -131,7 +133,7 @@ object PowderTracker {
                 it.totalChestPicked += 1
             }
             isGrinding = true
-            lastChestPicked = System.currentTimeMillis()
+            lastChestPicked = SimpleTimeMark.now()
         }
 
         powderStartedPattern.matchMatcher(msg) { doublePowder = true }
@@ -163,7 +165,7 @@ object PowderTracker {
                 tracker.update()
             }
         }
-        if (System.currentTimeMillis() - lastChestPicked > 60_000) {
+        if (lastChestPicked.passedSince() > 1.minutes) {
             isGrinding = false
         }
     }
