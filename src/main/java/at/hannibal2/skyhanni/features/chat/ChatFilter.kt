@@ -430,7 +430,6 @@ class ChatFilter {
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
         "sacrifice" to sacrificePatterns,
-        "rare_drops" to rareDropsMessages,
         "solo_class" to soloClassPatterns,
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,

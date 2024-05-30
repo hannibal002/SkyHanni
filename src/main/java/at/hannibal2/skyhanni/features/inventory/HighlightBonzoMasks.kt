@@ -11,10 +11,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -43,16 +41,6 @@ object HighlightBonzoMasks {
 
     private val greenHue = Color.RGBtoHSB(0, 255, 0, null)[0].toDouble()
     private val redHue = Color.RGBtoHSB(255, 0, 0, null)[0].toDouble()
-
-    private val patternGroup = RepoPattern.group("highlightbonzomask")
-    private val spiritMaskMessagePattern by patternGroup.pattern(
-        "spiritmask",
-        "^Second Wind Activated! Your Spirit Mask saved your life!$"
-    )
-    private val bonzoMaskMessagePattern by patternGroup.pattern(
-        "bonzomask",
-        "^Your (.*Bonzo's Mask) saved your life!$"
-    )
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {

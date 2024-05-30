@@ -94,6 +94,7 @@ import at.hannibal2.skyhanni.features.combat.FerocityDisplay
 import at.hannibal2.skyhanni.features.combat.FlareDisplay
 import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.features.combat.damageindicator.MobFinder
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
 import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
@@ -579,6 +580,7 @@ class SkyHanniMod {
         loadModule(TabComplete)
         loadModule(HypixelBazaarFetcher)
         loadModule(EventCounter)
+        loadModule(MobFinder)
 
         // APIs
         loadModule(BazaarApi())

@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;

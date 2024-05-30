@@ -2,12 +2,10 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.TabListLineRenderEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,7 +28,7 @@ class DungeonRankTabListColor {
     fun onTabListText(event: TabListLineRenderEvent) {
         if (!isEnabled()) return
 
-        matchPattern.matchMatcher(event.text.stripHypixelMessage()) {
+        pattern.matchMatcher(event.text.stripHypixelMessage()) {
             val sbLevel = group("sbLevel")
             val rank = groupOrNull("rank") ?: ""
             val playerName = group("playerName")

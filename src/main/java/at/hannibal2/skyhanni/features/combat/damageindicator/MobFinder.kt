@@ -45,82 +45,85 @@ import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
 
 class MobFinder {
-    private val patternGroup = RepoPattern.group("mobfinder")
 
-    private val f1Message1Pattern by patternGroup.pattern(
-        "f1message1",
-        "§c\\[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable."
-    )
-    private val f1Message2Pattern by patternGroup.pattern(
-        "f1message2",
-        "§c\\[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!"
-    )
-    private val f1Message3Pattern by patternGroup.pattern(
-        "f1message3",
-        "§c\\[BOSS] Bonzo§r§f: Oh I'm dead!"
-    )
-    private val f1Message4Pattern by patternGroup.pattern(
-        "f1message4",
-        "§c\\[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.."
-    )
-    private val f2Message1Pattern by patternGroup.pattern(
-        "f2message1",
-        "§c\\[BOSS] Scarf§r§f: ARISE, MY CREATIONS!"
-    )
-    private val f2Message2Pattern by patternGroup.pattern(
-        "f2message2",
-        "§c\\[BOSS] Scarf§r§f: Those toys are not strong enough I see."
-    )
-    private val f2Message3Pattern by patternGroup.pattern(
-        "f2message3",
-        "§c\\[BOSS] Scarf§r§f: Don't get too excited though."
-    )
-    private val f2Message4Pattern by patternGroup.pattern(
-        "f2message4",
-        "§c\\[BOSS] Scarf§r§f: Whatever..."
-    )
-    private val f3Message1Pattern by patternGroup.pattern(
-        "f3message1",
-        "§c\\[BOSS] The Professor§r§f: I was burdened with terrible news recently..."
-    )
-    private val f3Message2Pattern by patternGroup.pattern(
-        "f3message2",
-        "§c\\[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?"
-    )
-    private val f3Message3Pattern by patternGroup.pattern(
-        "f3message3",
-        "§c\\[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique."
-    )
-    private val f3Message4Pattern by patternGroup.pattern(
-        "f3message4",
-        "§c\\[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!"
-    )
-    private val f3Message5Pattern by patternGroup.pattern(
-        "f3message5",
-        "§c\\[BOSS] The Professor§r§f: What?! My Guardian power is unbeatable!"
-    )
-    private val f5Message1Pattern by patternGroup.pattern(
-        "f5message1",
-        "§c\\[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him."
-    )
-    private val f6Message1Pattern by patternGroup.pattern(
-        "f6message1",
-        "§c\\[BOSS] Sadan§r§f: ENOUGH!"
-    )
-    private val f6Message2Pattern by patternGroup.pattern(
-        "f6message2",
-        "§c\\[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect."
-    )
-    private val f6Message3Pattern by patternGroup.pattern(
-        "f6message3",
-        "§c\\[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!"
-    )
+    companion object {
+        private val patternGroup = RepoPattern.group("mobfinder")
 
-    //TODO is the .* between [BOSS] and Livid needed?
-    private val correctLividPattern by patternGroup.pattern(
-        "lividpattern",
-        "§c\\[BOSS].*Livid§r§f: Impossible! How did you figure out which one I was\\?!"
-    )
+        private val f1Message1Pattern by patternGroup.pattern(
+            "f1message1",
+            "§c\\[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable."
+        )
+        private val f1Message2Pattern by patternGroup.pattern(
+            "f1message2",
+            "§c\\[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!"
+        )
+        private val f1Message3Pattern by patternGroup.pattern(
+            "f1message3",
+            "§c\\[BOSS] Bonzo§r§f: Oh I'm dead!"
+        )
+        private val f1Message4Pattern by patternGroup.pattern(
+            "f1message4",
+            "§c\\[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.."
+        )
+        private val f2Message1Pattern by patternGroup.pattern(
+            "f2message1",
+            "§c\\[BOSS] Scarf§r§f: ARISE, MY CREATIONS!"
+        )
+        private val f2Message2Pattern by patternGroup.pattern(
+            "f2message2",
+            "§c\\[BOSS] Scarf§r§f: Those toys are not strong enough I see."
+        )
+        private val f2Message3Pattern by patternGroup.pattern(
+            "f2message3",
+            "§c\\[BOSS] Scarf§r§f: Don't get too excited though."
+        )
+        private val f2Message4Pattern by patternGroup.pattern(
+            "f2message4",
+            "§c\\[BOSS] Scarf§r§f: Whatever..."
+        )
+        private val f3Message1Pattern by patternGroup.pattern(
+            "f3message1",
+            "§c\\[BOSS] The Professor§r§f: I was burdened with terrible news recently..."
+        )
+        private val f3Message2Pattern by patternGroup.pattern(
+            "f3message2",
+            "§c\\[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?"
+        )
+        private val f3Message3Pattern by patternGroup.pattern(
+            "f3message3",
+            "§c\\[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique."
+        )
+        private val f3Message4Pattern by patternGroup.pattern(
+            "f3message4",
+            "§c\\[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!"
+        )
+        private val f3Message5Pattern by patternGroup.pattern(
+            "f3message5",
+            "§c\\[BOSS] The Professor§r§f: What?! My Guardian power is unbeatable!"
+        )
+        private val f5Message1Pattern by patternGroup.pattern(
+            "f5message1",
+            "§c\\[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him."
+        )
+        private val f6Message1Pattern by patternGroup.pattern(
+            "f6message1",
+            "§c\\[BOSS] Sadan§r§f: ENOUGH!"
+        )
+        private val f6Message2Pattern by patternGroup.pattern(
+            "f6message2",
+            "§c\\[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect."
+        )
+        private val f6Message3Pattern by patternGroup.pattern(
+            "f6message3",
+            "§c\\[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!"
+        )
+
+        //TODO is the .* between [BOSS] and Livid needed?
+        private val correctLividPattern by patternGroup.pattern(
+            "lividpattern",
+            "§c\\[BOSS].*Livid§r§f: Impossible! How did you figure out which one I was\\?!"
+        )
+    }
 
     // F1
     private var floor1bonzo1 = false

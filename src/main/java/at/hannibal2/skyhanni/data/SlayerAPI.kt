@@ -15,9 +15,9 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -50,10 +50,6 @@ object SlayerAPI {
         "slayerqueststarted",
         "§r§5§lSLAYER QUEST STARTED!"
     )
-
-    fun getLatestProgressChangeTime() = if (latestSlayerProgress == "§eSlay the boss!") {
-        System.currentTimeMillis()
-    } else latestProgressChangeTime
 
     fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> =
         nameCache.getOrPut(internalName to amount) {

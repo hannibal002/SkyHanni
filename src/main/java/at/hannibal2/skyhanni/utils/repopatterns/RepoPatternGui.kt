@@ -7,7 +7,6 @@ import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.observer.ObservableList
 import io.github.notenoughupdates.moulconfig.xml.Bind
 import io.github.notenoughupdates.moulconfig.xml.XMLUniverse
-import net.minecraft.client.Minecraft
 
 /**
  * Gui for analyzing [RepoPattern]s
