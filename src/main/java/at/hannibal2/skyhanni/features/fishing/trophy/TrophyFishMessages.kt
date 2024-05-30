@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TrophyFishMessages {
+object TrophyFishMessages {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
 
-    private val trophyFishPattern by RepoPattern.pattern(
+    val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish",
         "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\."
     )
@@ -29,16 +29,13 @@ class TrophyFishMessages {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        var displayName = ""
-        var displayRarity = ""
 
-        trophyFishPattern.matchMatcher(event.message) {
-            displayName = group("displayName").replace("§k", "")
-            displayRarity = group("displayRarity")
+        val (displayName, displayRarity) = trophyFishPattern.matchMatcher(event.message) {
+            group("displayName").replace("§k", "") to
+                group("displayRarity")
         } ?: return
 
-        val internalName = displayName.replace("Obfuscated", "Obfuscated Fish")
-            .replace("[- ]".toRegex(), "").lowercase().removeColor()
+        val internalName = getInternalName(displayName)
         val rawRarity = displayRarity.lowercase().removeColor()
         val rarity = TrophyRarity.getByName(rawRarity) ?: return
 
@@ -84,6 +81,11 @@ class TrophyFishMessages {
         if (config.duplicateHider) {
             event.chatLineId = (internalName + rarity).hashCode()
         }
+    }
+
+    fun getInternalName(displayName: String): String {
+        return displayName.replace("Obfuscated", "Obfuscated Fish")
+            .replace("[- ]".toRegex(), "").lowercase().removeColor()
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
