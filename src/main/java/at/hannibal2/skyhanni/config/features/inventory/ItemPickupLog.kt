@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -27,6 +28,12 @@ object ItemPickupLog {
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, UpdatedItem>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, UpdatedItem>()
+
+    private val patternGroup = RepoPattern.group("itempickuplog")
+    private val shopPattern by patternGroup.pattern(
+        "shoppattern",
+        "^(?<itemName>.+?)(?: x\\d+)?\$"
+    )
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -126,19 +133,30 @@ object ItemPickupLog {
     }
 
     private fun ItemStack.hash(): Int {
+        var displayName = this.displayName.removeColor()
+        val matcher = shopPattern.matcher(displayName)
+        if (matcher.matches()) {
+            displayName = matcher.group("itemName")
+        }
         return Objects.hash(
             this.getInternalNameOrNull(),
-            this.displayName.removeColor(),
+            displayName.removeColor(),
             this.getItemRarityOrNull()
         )
     }
 
-    //TODO convert to repo patterns once merged?
+    //TODO convert to repo patterns once that pr is merged
+    private val bannedItems = setOf(
+        "SKYBLOCK_MENU".asInternalName(),
+        "CANCEL_PARKOUR_ITEM".asInternalName(),
+        "CANCEL_RACE_ITEM".asInternalName()
+    )
+
     private fun isBannedItem(item: ItemStack): Boolean {
         if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
             return true
         }
-        if (item.getInternalNameOrNull() == "SKYBLOCK_MENU".asInternalName()) {
+        if (bannedItems.contains(item.getInternalNameOrNull())) {
             return true
         }
         if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
