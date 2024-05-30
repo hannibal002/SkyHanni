@@ -19,8 +19,8 @@ object HeldTimeInLore {
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
-        if (!config.timeHeldInLore) return
         if (!LorenzUtils.inSkyBlock) return
+        if (!config.timeHeldInLore) return
         val stack = event.itemStack
         val internalName = stack.getInternalName()
         val timeHeld = when (internalName) {
