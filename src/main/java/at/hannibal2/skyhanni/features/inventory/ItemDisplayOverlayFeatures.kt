@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -78,6 +79,10 @@ object ItemDisplayOverlayFeatures {
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+    )
+    private val bestiaryStackPattern by patternGroup.pattern(
+        "bestiarystack",
+        "§7Progress to Tier (?<tier>[\\dIVXC]+): §b[\\d.]+%"
     )
 
     @SubscribeEvent
@@ -255,6 +260,17 @@ object ItemDisplayOverlayFeatures {
             lore.matchFirst(bingoGoalRankPattern) {
                 val rank = group("rank").formatLong()
                 if (rank < 10000) return "§6${NumberUtil.format(rank)}"
+            }
+        }
+
+        if (BESTIARY_LEVEL.isSelected() && (chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")) && lore.any { it.contains("Deaths: ") }) {
+            lore.matchFirst(bestiaryStackPattern) {
+                val tier = (group("tier").romanToDecimalIfNecessary() - 1)
+                return tier.toString()
+            } ?: run {
+                var tier = itemName.split(" ")
+
+                return tier.last().romanToDecimalIfNecessary().toString()
             }
         }
 
