@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -9,8 +10,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -18,7 +19,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class LimboPlaytime {
+object LimboPlaytime {
     private lateinit var modifiedList: MutableList<String>
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
@@ -31,10 +32,13 @@ class LimboPlaytime {
         "§5§o§b([\\d.,]+) hours.+\$"
     )
 
+    var tooltipPlaytime = mutableListOf<String>()
+
     private var wholeMinutes = 0
     private var hoursString: String = ""
 
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
+    private val enabled get() = SkyHanniMod.feature.misc.showLimboTimeInPlaytimeDetailed
 
     private val itemID = "ENDER_PEARL".asInternalName()
     private val itemName = "§aLimbo"
@@ -43,6 +47,7 @@ class LimboPlaytime {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
+        if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
         if (event.inventory.name != "Detailed /playtime") return
         if (event.slot != 43) return
@@ -74,6 +79,7 @@ class LimboPlaytime {
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (!enabled) return
         if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
         val playtime = storage?.playtime ?: 0
@@ -161,6 +167,8 @@ class LimboPlaytime {
             toolTip.addAll(modifiedList)
         }
         toolTip.addAll(lastList)
+
+        tooltipPlaytime = toolTip
     }
 
     private fun findFloatDecimalPlace(input: Float): Int {

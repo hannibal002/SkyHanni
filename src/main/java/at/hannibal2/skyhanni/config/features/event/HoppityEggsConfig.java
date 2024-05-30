@@ -39,10 +39,28 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
+    @ConfigOption(name = "Mark Duplicate Locations", desc = "Marks egg location waypoints which you have already found in red.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightDuplicateEggLocations = false;
+
+    @Expose
+    @ConfigOption(name = "Mark Nearby Duplicates", desc = "Always show duplicate egg locations when nearby.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showNearbyDuplicateEggLocations = false;
+
+    @Expose
     @ConfigOption(name = "Show Unclaimed Eggs", desc = "Displays which eggs haven't been found in the last SkyBlock day.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
+
+    @Expose
+    @ConfigOption(name = "Show Collected Locations", desc = "Shows the number of found egg locations on this island. §eThis is not retroactive and may not be fully synced with Hypixel's count.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showCollectedLocationCount = false;
 
     @Expose
     @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
@@ -88,8 +106,20 @@ public class HoppityEggsConfig {
     public boolean highlightHoppityShop = true;
 
     @Expose
+    @ConfigOption(name = "Hoppity Shop Reminder", desc = "Reminds you to open the Hoppity Shop each year.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hoppityShopReminder = true;
+
+    @Expose
     @ConfigOption(name = "Time in Chat", desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeInChat = true;
+
+    @Expose
+    @ConfigOption(name = "Compact Chat", desc = "Compact chat events when finding a Hoppity Egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactChat = false;
 }
