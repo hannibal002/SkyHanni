@@ -36,7 +36,7 @@ import kotlin.math.floor
 import kotlin.math.pow
 
 enum class HotmData(
-    guiName: String,
+    val guiName: String,
     val maxLevel: Int,
     val costFun: ((Int) -> (Double?)),
     val rewardFun: ((Int) -> (Map<HotmReward, Double>)),
@@ -267,6 +267,10 @@ enum class HotmData(
 
     fun getReward() = rewardFun(activeLevel)
 
+    fun calculateTotalCost(desiredLevel: Int) = (1 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
+
+    val totalCostMaxLevel = calculateTotalCost(maxLevel)
+
     companion object {
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
@@ -292,6 +296,10 @@ enum class HotmData(
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled", "§c§lDISABLED|§7§eClick to select!"
         ) // unused for now since the assumption is when enabled isn't found it is disabled, but the value might be useful in the future or for debugging
+
+        val perkCostPattern by patternGroup.pattern(
+            "perk.cost", "(?:§.)*§7Cost"
+        )
 
         private val resetChatPattern by patternGroup.pattern(
             "reset.chat", "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset."
@@ -350,6 +358,8 @@ enum class HotmData(
                 it.chatPattern
             }
         }
+
+        fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
 
         private fun resetTree() = entries.forEach {
             it.activeLevel = 0

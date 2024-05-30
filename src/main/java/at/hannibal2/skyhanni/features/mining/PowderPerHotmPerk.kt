@@ -8,14 +8,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 class PowderPerHotmPerk {
 
-    private val config get() = SkyHanniMod.feature.mining.hotmConfig
+    private val config get() = SkyHanniMod.feature.mining.hotm
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
