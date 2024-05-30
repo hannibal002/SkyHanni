@@ -8,20 +8,20 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class HotbarConfig {
+public class XPBarConfig {
 
     @Expose
-    @ConfigOption(name = "Editable", desc = "Adds the hotbar to the gui editor. Allows for moving and scaling of the hotbar.")
+    @ConfigOption(name = "Editable", desc = "Adds the xp bar to the gui editor. Allows for moving and scaling of the xp bar.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean editable = false;
 
-    @ConfigOption(name = "§cNotice", desc = "This option will be §c§lincompatible §r§7with mods that change the hotbar. Eg: §eApec§7.")
+    @ConfigOption(name = "§cNotice", desc = "This option will be §c§lincompatible §r§7with mods that change the xp bar. Eg: §eApec§7.")
     @ConfigEditorInfoText
     public String notice = "";
 
     @Expose
-    @ConfigLink(owner = HotbarConfig.class, field = "editable")
+    @ConfigLink(owner = XPBarConfig.class, field = "editable")
     public Position hotbar = new Position(20, 20);
 
     @Expose
