@@ -79,7 +79,7 @@ class GuiEditManager {
                 name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
                 position.internalName = name
             }
-            currentPositions.put(name, position)
+            currentPositions[name] = position
             currentBorderSize[posLabel] = Pair(x, y)
         }
 

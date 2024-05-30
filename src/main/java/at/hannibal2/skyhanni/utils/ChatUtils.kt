@@ -67,7 +67,7 @@ object ChatUtils {
      * Why deprecate this? Even if this message is descriptive for the user and the developer,
      * we don't want inconsistencies in errors, and we would need to search
      * for the code line where this error gets printed any way.
-     * so it's better to use the stack trace still.
+     * So it's better to use the stack trace still.
      *
      * @param message The message to be sent
      *

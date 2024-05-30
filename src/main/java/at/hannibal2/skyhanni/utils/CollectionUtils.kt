@@ -158,6 +158,10 @@ object CollectionUtils {
         add(Collections.singletonList(text))
     }
 
+    fun MutableList<List<Renderable>>.addSingleString(text: String) {
+        add(Collections.singletonList(Renderable.string(text)))
+    }
+
     fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {
         return sortedBy { (_, value) -> value }
     }
