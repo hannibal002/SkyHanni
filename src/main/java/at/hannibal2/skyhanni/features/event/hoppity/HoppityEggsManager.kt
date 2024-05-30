@@ -45,6 +45,7 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
+     * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §6Solomon §7(§6§LLEGENDARY§7)!
      */
     val rabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found",
@@ -53,6 +54,7 @@ object HoppityEggsManager {
 
     /**
      * REGEX-TEST: §d§lNEW RABBIT! §6+2 Chocolate §7and §6+0.003x Chocolate §7per second!
+     * REGEX-TEST: §d§lNEW RABBIT! §6+0.02x Chocolate §7per second!
      */
     val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found.new",
@@ -108,6 +110,7 @@ object HoppityEggsManager {
         HoppityEggsCompactChat.handleChat(event)
 
         eggFoundPattern.matchMatcher(event.message) {
+            HoppityUniqueEggLocations.saveNearestEgg()
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
             val note = group("note").removeColor()
@@ -187,10 +190,27 @@ object HoppityEggsManager {
             .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
             .toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
+
+        if (config.showCollectedLocationCount) {
+            val totalEggs = HoppityEggLocator.getCurrentIslandEggLocations()?.size
+            if (totalEggs != null) {
+                val collectedEggs = HoppityUniqueEggLocations.collectedEggsThisIsland()
+                val collectedFormat = formatEggsCollected(collectedEggs)
+                displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
+            }
+        }
         if (displayList.size == 1) return
 
         config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
     }
+
+    private fun formatEggsCollected(collectedEggs: Int): String =
+        when (collectedEggs) {
+            in 0 until 5 -> "§c"
+            in 5 until 10 -> "§6"
+            in 10 until 15 -> "§e"
+            else -> "§a"
+        }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {

@@ -63,7 +63,6 @@ object HoppityCollectionStats {
 
         inInventory = true
         display = buildDisplay(event)
-        checkSpecialRabbits()
     }
 
     @SubscribeEvent
@@ -107,7 +106,7 @@ object HoppityCollectionStats {
     }
 
     private fun getRabbitStats(): MutableList<DisplayTableEntry> {
-        var totalAmountFound = 0
+        var totalUniquesFound = 0
         var totalDuplicates = 0
         var totalChocolatePerSecond = 0
         var totalChocolateMultiplier = 0.0
@@ -121,8 +120,8 @@ object HoppityCollectionStats {
             }
 
             val title = "${rarity.displayName} Rabbits"
-            val amountFound = foundOfRarity.size
-            val duplicates = foundOfRarity.values.sum() - amountFound
+            val uniquesFound = foundOfRarity.size
+            val duplicates = foundOfRarity.values.sum() - uniquesFound
 
             val chocolateBonuses = foundOfRarity.keys.map {
                 HoppityCollectionData.getChocolateBonuses(it)
@@ -131,14 +130,18 @@ object HoppityCollectionStats {
             val chocolatePerSecond = chocolateBonuses.sumOf { it.chocolate }
             val chocolateMultiplier = chocolateBonuses.sumOf { it.multiplier }
 
+            if (hasFoundRabbit("Sigma") && rarity == RabbitCollectionRarity.MYTHIC) {
+                totalChocolatePerSecond += uniquesFound * 5
+            }
+
             if (!isTotal) {
-                totalAmountFound += amountFound
+                totalUniquesFound += uniquesFound
                 totalDuplicates += duplicates
                 totalChocolatePerSecond += chocolatePerSecond
                 totalChocolateMultiplier += chocolateMultiplier
             }
 
-            val displayFound = if (isTotal) totalAmountFound else amountFound
+            val displayFound = if (isTotal) totalUniquesFound else uniquesFound
             val displayTotal = if (isTotal) {
                 HoppityCollectionData.knownRabbitCount
             } else {
@@ -175,7 +178,6 @@ object HoppityCollectionStats {
         val rabbit = name.removeColor()
         if (!HoppityCollectionData.isKnownRabbit(rabbit)) return
         loggedRabbits[rabbit] = (loggedRabbits[rabbit] ?: 0) + 1
-        checkSpecialRabbits()
     }
 
     // Gets the found rabbits according to the Hypixel progress bar
@@ -215,20 +217,7 @@ object HoppityCollectionStats {
         ChatUtils.chat("Cleared saved rabbit data.")
     }
 
-
-    // checks special rabbits whenever loggedRabbits is modified to update misc stored values
-    // TODO: make this better than hard-coded checks
-    private fun checkSpecialRabbits() {
-        if (hasFoundRabbit("Einstein")) {
-            ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
-        }
-
-        if (hasFoundRabbit("Mu")) {
-            ChocolateFactoryAPI.profileStorage?.hasMuRabbit = true
-        }
-    }
-
-    private fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
+    fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 
