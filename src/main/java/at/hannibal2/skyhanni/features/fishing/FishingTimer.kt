@@ -3,11 +3,16 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -18,108 +23,118 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class FishingTimer {
 
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private val barnLocation = LorenzVec(108, 89, -252)
+    private val mobMap = mutableMapOf<Mob, SimpleTimeMark>()
 
     private var rightLocation = false
     private var currentCount = 0
     private var startTime = SimpleTimeMark.farPast()
-    private var inHollows = false
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
-
-        if (event.repeatSeconds(3)) {
-            rightLocation = isRightLocation()
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        updateLocation()
+        if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
+            SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
         }
-
-        if (!rightLocation) return
-
-        if (event.isMod(5)) checkMobs()
-        if (event.isMod(7)) tryPlaySound()
-        if (config.manualResetTimer.isKeyHeld() && Minecraft.getMinecraft().currentScreen == null) {
-            startTime = SimpleTimeMark.now()
+        if (config.fishingCapAlert && currentCount >= config.fishingCapAmount) {
+            SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
         }
     }
 
-    private fun tryPlaySound() {
-        if (currentCount == 0) return
+    @SubscribeEvent
+    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+        if (!isEnabled()) return
+        if (event.mob.name !in SeaCreatureManager.allFishingMobs) return
+        mobMap[event.mob] = SimpleTimeMark.now()
+        updateInfo()
+    }
 
-        val passedSince = startTime.passedSince()
-        val barnTimerAlertTime = (config.alertTime * 1_000).milliseconds
-        if (passedSince in barnTimerAlertTime..(barnTimerAlertTime + 3.seconds)) {
-            SoundUtils.playBeepSound()
+    @SubscribeEvent
+    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        if (!isEnabled()) return
+        mobMap.remove(event.mob)
+        updateInfo()
+    }
+
+    @SubscribeEvent
+    fun onKeyPress(event: LorenzKeyPressEvent) {
+        if (!isEnabled()) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (config.manualResetTimer.isKeyClicked()) {
+            mobMap.replaceAll { _, _ ->
+                SimpleTimeMark.now()
+            }
         }
     }
 
-    private fun checkMobs() {
-        val newCount = countMobs()
-
-        if (currentCount == 0 && newCount > 0) {
-            startTime = SimpleTimeMark.now()
+    private fun updateInfo() {
+        currentCount = mobMap.entries.sumOf {
+            1 + it.key.extraEntities.size
         }
-
-        currentCount = newCount
-        if (newCount == 0) {
-            startTime = SimpleTimeMark.farPast()
-        }
-
-        if (inHollows && newCount >= 60 && config.wormLimitAlert) {
+        startTime = mobMap.maxByOrNull { it.value.passedSince() }?.value ?: SimpleTimeMark.farPast()
+        if (IslandType.CRYSTAL_HOLLOWS.isInIsland() && currentCount >= 60 && config.wormLimitAlert) {
             SoundUtils.playBeepSound()
             LorenzUtils.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
         }
     }
 
-    private fun countMobs() =
-        EntityUtils.getEntities<EntityArmorStand>().map { entity -> FishingAPI.seaCreatureCount(entity) }.sum()
-
-    private fun isRightLocation(): Boolean {
-        inHollows = false
-
-        if (config.forStranded && LorenzUtils.isStrandedProfile) return true
-
-        if (config.crystalHollows && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
-            inHollows = true
-            return true
+    private fun updateLocation() {
+        rightLocation = when (LorenzUtils.skyBlockIsland) {
+            IslandType.CRYSTAL_HOLLOWS -> config.crystalHollows.get()
+            IslandType.CRIMSON_ISLE -> config.crimsonIsle.get()
+            IslandType.WINTER -> config.winterIsland.get()
+            IslandType.HUB -> barnLocation.distanceToPlayer() < 50
+            IslandType.PRIVATE_ISLAND -> config.forStranded.get() && LorenzUtils.isStrandedProfile
+            else -> false
         }
-
-        if (config.crimsonIsle && IslandType.CRIMSON_ISLE.isInIsland()) return true
-
-        if (config.winterIsland && IslandType.WINTER.isInIsland()) return true
-
-        if (!IslandType.THE_FARMING_ISLANDS.isInIsland()) {
-            return LocationUtils.playerLocation().distance(barnLocation) < 50
-        }
-
-        return false
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
         if (!FishingAPI.isFishing()) return
 
-        val passedSince = startTime.passedSince()
-        val barnTimerAlertTime = (config.alertTime * 1_000).milliseconds
-        val color = if (passedSince > barnTimerAlertTime) "§c" else "§e"
-        val timeFormat = passedSince.format(TimeUnit.MINUTE)
-        val name = StringUtils.pluralize(currentCount, "sea creature")
-        val text = "$color$timeFormat §8(§e$currentCount §b$name§8)"
-
+        val text = createDisplay()
         config.pos.renderString(text, posLabel = "BarnTimer")
     }
+
+    private fun createDisplay(): String {
+        val passedSince = startTime.passedSince()
+        val timeColor = if (passedSince > config.alertTime.seconds) "§c" else "§e"
+        val timeFormat = passedSince.format(TimeUnit.MINUTE)
+        val countColor = if (config.fishingCapAlert && currentCount >= config.fishingCapAmount) "§c" else "§e"
+        val name = StringUtils.pluralize(currentCount, "sea creature")
+        return "$timeColor$timeFormat §8($countColor$currentCount §b$name§8)"
+    }
+
+    private fun updateAll() {
+        MobData.skyblockMobs.forEach {
+            if (it.name in SeaCreatureManager.allFishingMobs && !mobMap.contains(it)) {
+                mobMap[it] = SimpleTimeMark.now()
+            }
+        }
+        updateInfo()
+    }
+
+    @SubscribeEvent
+    fun onConfig(event: ConfigLoadEvent) {
+        with(config) {
+            ConditionalUtils.onToggle(enabled, crystalHollows, crimsonIsle, winterIsland, forStranded) {
+                updateAll()
+            }
+        }
+    }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
