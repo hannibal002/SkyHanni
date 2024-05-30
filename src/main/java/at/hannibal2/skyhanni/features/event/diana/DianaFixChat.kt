@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.diana
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -14,6 +15,8 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class DianaFixChat {
+
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private var hasSetParticleQuality = false
     private var hasSetToggleMusic = false
@@ -117,5 +120,5 @@ class DianaFixChat {
         errorCounter = 0
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana()
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsSoopyGuess
 }
