@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -153,7 +154,7 @@ object EstimatedItemValue {
 
         val openInventoryName = InventoryUtils.openInventoryName()
         if (openInventoryName.startsWith("Museum ")) {
-            if (item.getLore().any { armorSetPattern.matches(it) }) {
+            if (item.getLore().any { armorSetPattern.find(it) }) {
                 return
             }
         }

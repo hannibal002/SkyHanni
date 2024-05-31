@@ -45,7 +45,7 @@ class SummoningMobManager {
     )
     private val despawnPattern by patternGroup.pattern(
         "despawn",
-        "§cYou have despawned your (monster|monsters)!|^§c ☠ §r§7You "
+        "^§cYou have despawned your (monster|monsters)!$|^§c ☠ §r§7You "
     )
     private val healthPattern by patternGroup.pattern( //§a§ohannibal2's Tank Zombie§r §a160k§c❤
         "health",

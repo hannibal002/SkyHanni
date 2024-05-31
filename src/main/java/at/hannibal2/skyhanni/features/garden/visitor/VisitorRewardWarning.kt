@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RegexUtils.anyFound
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
@@ -104,7 +104,7 @@ class VisitorRewardWarning {
             }
             return
         }
-        if (isAcceptSlot && clickToGivePattern.anyFound(stack.getLore())) {
+        if (isAcceptSlot && clickToGivePattern.anyMatches(stack.getLore())) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.ACCEPTED, "accepted")
             return
         }

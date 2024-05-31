@@ -92,7 +92,7 @@ class BazaarApi {
     private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
-        if (buyPattern.matches(buyInstantly.displayName)) return null
+        if (!buyPattern.matches(buyInstantly.displayName)) return null
         val bazaarItem = inventoryItems[13] ?: return null
 
         return NEUInternalName.fromItemName(bazaarItem.displayName)

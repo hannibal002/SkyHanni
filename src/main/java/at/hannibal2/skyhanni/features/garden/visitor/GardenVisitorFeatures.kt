@@ -49,7 +49,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.anyFound
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -94,7 +94,7 @@ object GardenVisitorFeatures {
     )
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r"
+        "^§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r"
     )
     private val partialAcceptedPattern by patternGroup.pattern(
         "partialaccepted",
@@ -159,7 +159,7 @@ object GardenVisitorFeatures {
         visitor.blockedLore = listOf()
         visitor.blockReason = visitor.blockReason()
 
-        if (clickGivePattern.anyFound(offerItem.getLore())) {
+        if (clickGivePattern.anyMatches(offerItem.getLore())) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.READY, "tooltipClickToGive")
         } else {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.WAITING, "tooltipMissingItems")

@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -145,7 +146,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             update()
         }
 
-        if (trophyFishPattern.matches(message)) {
+        if (trophyFishPattern.find(message)) {
             val fishQuest = getQuest<TrophyFishQuest>() ?: return
             if (fishQuest.state != QuestState.ACCEPTED && fishQuest.state != QuestState.READY_TO_COLLECT) return
             val fishName = fishQuest.fishName

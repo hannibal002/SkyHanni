@@ -42,7 +42,7 @@ class GardenInventoryTooltipOverflow {
         if (inventoryName != "Crop Milestones") return
 
         val stack = event.itemStack
-        if (maxTierPattern.anyFound(stack.getLore())) return
+        if (!maxTierPattern.anyFound(stack.getLore())) return
 
         val split = stack.cleanName().split(" ")
         val crop = getCrop(split)

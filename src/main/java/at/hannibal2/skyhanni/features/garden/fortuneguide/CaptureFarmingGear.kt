@@ -69,7 +69,7 @@ object CaptureFarmingGear {
 
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
-        "§7Progress to Tier (?<nextTier>\\w+):"
+        "^§7Progress to Tier (?<nextTier>\\w+):"
     )
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",

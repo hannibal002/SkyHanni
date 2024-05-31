@@ -257,9 +257,7 @@ class NonGodPotEffectDisplay {
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
-                    if (containsRemainingPattern.find(line) &&
-                        noRemainingPattern.find(line)
-                    ) {
+                    if (containsRemainingPattern.find(line) && !noRemainingPattern.find(line)) {
                         val duration = try {
                             TimeUtils.getDuration(line.split("§f")[1])
                         } catch (e: IndexOutOfBoundsException) {

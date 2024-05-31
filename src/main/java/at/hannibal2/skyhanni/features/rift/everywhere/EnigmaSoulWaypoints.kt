@@ -42,7 +42,7 @@ object EnigmaSoulWaypoints {
     private val patternGroup = RepoPattern.group("enigmasoulwaypoints")
     private val messagePatterns by patternGroup.pattern(
         "message",
-        "^(You have already found that Enigma Soul!|SOUL! You unlocked an Enigma Soul!)$",
+        "You have already found that Enigma Soul!|SOUL! You unlocked an Enigma Soul!",
     )
     private val lorePatterns by patternGroup.pattern(
         "lore",

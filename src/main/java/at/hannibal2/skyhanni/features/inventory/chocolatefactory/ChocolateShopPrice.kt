@@ -76,7 +76,7 @@ object ChocolateShopPrice {
         val isInShopOptions = UtilsPatterns.shopOptionsPattern.matches(event.inventoryName)
 
         if (!isInShop && !isInShopOptions) return
-        if (lorePattern.matches(event.inventoryItems[48]?.getLore()?.first()) && isInShopOptions) return
+        if (!lorePattern.matches(event.inventoryItems[48]?.getLore()?.first()) && isInShopOptions) return
 
         inInventory = true
         callUpdate = isInShop

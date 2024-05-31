@@ -72,7 +72,7 @@ class HighlightPlaceableNpcs {
 
     private fun isPlaceableNpc(lore: List<String>): Boolean {
         // Checking if NPC & placeable
-        if (lorePattern.matches(lore.last())) {
+        if (lore.isEmpty() || !lorePattern.matches(lore.last())) {
             return false
         }
 

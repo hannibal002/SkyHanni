@@ -105,13 +105,13 @@ object QuickModMenuSwitch {
 
             return config.javaClass.name
         }
-//         if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
+        if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
             /** TODO support different oneconfig mods:
              * Partly Sane Skies
              * Dankers SkyBlock Mod
              * Dulkir
              */
-//         }
+        }
 
         return openGui
     }
