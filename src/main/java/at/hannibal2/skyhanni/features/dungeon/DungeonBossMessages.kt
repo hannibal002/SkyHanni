@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.find
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -82,7 +82,7 @@ class DungeonBossMessages {
 
         // Matches Regex for Boss Prefix
         bossPattern.matchMatcher(message) {
-            return messageContainsPatterns.any { it.matches(message) } || messageEndsWithPatterns.any { it.find(message) }
+            return messageContainsPatterns.any { it.find(message) } || messageEndsWithPatterns.any { it.find(message) }
         }
         return false
     }

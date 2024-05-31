@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.find
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,12 +32,12 @@ class CompactBingoChat {
         "(^\\s{3}§r§7§8\\+§a.* §c❤ Health\\s*$)",
         "(^ {3}§r§7§bAccess to Community Shop\\s*$)",
         "(^ {3}§r§7§8\\+§aAuto-pickup block and mob drops\\s*$)",
-        "(^ §r§7§6Access to Bazaar\\s*$)",
-        "(^ §r§a§lREWARDS\\s*$)\n"
+        "(^ {3}§r§7§6Access to Bazaar\\s*$)",
+        "(^ {2}§r§a§lREWARDS\\s*$)\n"
     )
     private val skillLevelUpPattern by patternGroup.pattern(
         "skilllevelup",
-        " ^{2}§r§b§lSKILL LEVEL UP"
+        "^ {2}§r§b§lSKILL LEVEL UP"
     )
     private val tradeRecipePattern by patternGroup.pattern(
         "traderecipe",
@@ -49,11 +49,11 @@ class CompactBingoChat {
     )
     private val collectionLevelUpPattern by patternGroup.pattern(
         "collection",
-        " ^{2}§r§6§lCOLLECTION LEVEL UP"
+        "^ {2}§r§6§lCOLLECTION LEVEL UP"
     )
     private val skyblockLevelUpPattern by patternGroup.pattern(
         "enchant",
-        " ^{2}§r§3§lSKYBLOCK LEVEL UP §bLevel"
+        "^ {2}§r§3§lSKYBLOCK LEVEL UP §bLevel"
     )
     private val newAreaDiscoverdPattern by patternGroup.pattern(
         "newareadiscovered",

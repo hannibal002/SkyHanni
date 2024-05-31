@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.find
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -80,8 +80,7 @@ class ChumBucketHider {
         }
 
         // Chum Bucket
-
-        if (config.hideBucket.get() && entity.inventory.any { emptyPattern.matches(it.name) }) {
+        if (config.hideBucket.get() && entity.inventory.any { it != null && emptyPattern.matches(it.name) }) {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {

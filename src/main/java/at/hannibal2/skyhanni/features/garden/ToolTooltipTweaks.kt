@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
-import at.hannibal2.skyhanni.utils.StringUtils.find
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,7 +30,7 @@ class ToolTooltipTweaks {
     private val patternGroup = RepoPattern.group("tooltiptweaks")
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltipfortune",
-        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?\$"
+        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$"
     )
     private val counterStartLinePatterns by patternGroup.list(
         "counterstart",
@@ -168,7 +168,7 @@ class ToolTooltipTweaks {
                 if (blessedPattern.matches(line)) removingReforgeDescription = true
                 if (removingReforgeDescription) {
                     iterator.remove()
-                    removingReforgeDescription = reforgeEndLinePatterns.any { it.find(line) }
+                    removingReforgeDescription = !reforgeEndLinePatterns.any { it.find(line) }
                 }
                 if (bountifulPattern.matches(line)) removingReforgeDescription = true
 

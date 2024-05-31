@@ -47,6 +47,9 @@ object RegexUtils {
 
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
+    fun Pattern.anyFound(list: List<String>?): Boolean = list?.any { this.find(it) } ?: false
+
+    fun Pattern.replace(string: String, replacement: String): String = matcher(string).replaceAll(replacement)
 
     /**
      * Get the group, otherwise, return null

@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.find
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -226,13 +226,13 @@ class ChatFilter {
     // Party
     private val partyMessagesPatterns by patternGroup.list(
         "partymessages",
-        "§9§m-----------------------------------------------------",
+        "§9§m-{53}",
     )
     // MONEY
     // Auction House
     private val auctionHouseMessagesPatterns by patternGroup.list(
         "auctionhousemessages",
-        "§b-----------------------------------------------------", "§eVisit the Auction House to collect your item!",
+        "§b-{53}", "§eVisit the Auction House to collect your item!",
     )
     // Bazaar
     private val bazaarPatterns by patternGroup.list(
@@ -393,9 +393,16 @@ class ChatFilter {
     )
     private val eventMessagePatterns by patternGroup.list(
         "eventmessage",
-        "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+        "▬{64}",
     )
 
+    /**
+     * REGEX-TEST: §6§lRARE REWARD! §r§bLeebys §r§efound a §r§6Recombobulator 3000 §r§ein their Obsidian Chest§r§e!
+     */
+    private val rareDropsMessagesPattern by patternGroup.list(
+        "raredropmessages",
+        "§6§lRARE REWARD! (.*) §r§efound a (.*) §r§ein their (.*) Chest§r§e!"
+    )
     // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
     private val soloClassPatterns by patternGroup.list(
         "soloclass",
@@ -429,6 +436,7 @@ class ChatFilter {
         "fire_sale" to fireSaleMessagesPatterns,
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
+        "rare_drops" to rareDropsMessagesPattern,
         "sacrifice" to sacrificePatterns,
         "solo_class" to soloClassPatterns,
         "solo_stats" to soloStatsPatterns,

@@ -89,11 +89,11 @@ object EnderNodeTracker {
             tracker.modify { storage ->
                 storage.totalNodesMined++
             }
-            amount = group(amount).toIntOrNull() ?: 1
-            item = group(item)
+            amount = group("amount").toIntOrNull() ?: 1
+            item = group("item")
         } ?: endermanPattern.findMatcher(message) {
             amount = 1
-            item = group(item)
+            item = group("item")
         }
 
         when {

@@ -14,9 +14,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.anyFound
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -62,7 +63,7 @@ class GardenComposterInventoryFeatures {
             }
 
             if (next) {
-                if (copperPattern.matches(line)) continue
+                if (copperPattern.find(line)) continue
                 if (line == "") break
                 val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
                     ErrorManager.logErrorStateWithData(
@@ -106,7 +107,7 @@ class GardenComposterInventoryFeatures {
             val chest = guiChest.inventorySlots as ContainerChest
 
             for ((slot, stack) in chest.getUpperItems()) {
-                if (clickUpgradePattern.anyFound(stack.getLore())) {
+                if (clickUpgradePattern.anyMatches(stack.getLore())) {
                     slot highlight LorenzColor.GOLD
                 }
             }

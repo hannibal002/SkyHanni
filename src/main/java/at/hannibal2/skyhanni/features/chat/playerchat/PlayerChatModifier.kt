@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
-import at.hannibal2.skyhanni.utils.StringUtils.replace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent

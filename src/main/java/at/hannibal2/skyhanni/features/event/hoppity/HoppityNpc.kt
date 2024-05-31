@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.anyFound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -86,7 +86,7 @@ object HoppityNpc {
         if (!inShop) return
         slotsToHighlight.clear()
         for ((slot, item) in event.inventoryItems) {
-            if (lorePattern.anyFound(item.getLore())) {
+            if (lorePattern.anyMatches(item.getLore())) {
                 slotsToHighlight.add(slot)
             }
         }

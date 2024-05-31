@@ -1,13 +1,9 @@
 package at.hannibal2.skyhanni.features.combat.ghostcounter
 
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 object GhostData {
-
-    private val patternGroup = RepoPattern.group("ghostdata")
-
     private var session = mutableMapOf(
         Option.KILLS to 0.0,
         Option.SORROWCOUNT to 0.0,

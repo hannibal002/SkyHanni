@@ -69,7 +69,7 @@ object BestiaryData {
     )
     private val lorePattern by patternGroup.pattern(
         "lore",
-        "§7(?:Overall Progress: §b100% §7(§c§lMAX!§7)|Families Completed: §a100%)"
+        "§7(?:Overall Progress: §b100% §7\\(§c§lMAX!§7\\)|Families Completed: §a100%)"
     )
     private val loreProgressHiddenPattern by patternGroup.pattern(
         "loreprogresshidden",
@@ -228,7 +228,7 @@ object BestiaryData {
             var familiesCompleted: Long = 0
             for ((lineIndex, loreLine) in stack.getLore().withIndex()) {
                 val line = loreLine.removeColor()
-                if (!spacePattern.find(loreLine)) continue
+                if (!spacePattern.find(line)) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = line.substring(line.lastIndexOf(' ') + 1)
                 if (familiesFoundContainsPattern.find(previousLine)) {

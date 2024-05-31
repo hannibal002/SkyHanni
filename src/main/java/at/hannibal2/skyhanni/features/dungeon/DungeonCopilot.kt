@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -70,7 +71,7 @@ class DungeonCopilot {
         }
 
 
-        if (waitDungeonStartMessagePattern.matches(message) && message.contains(LorenzUtils.getPlayerName())) {
+        if (waitDungeonStartMessagePattern.find(message) && message.contains(LorenzUtils.getPlayerName())) {
             changeNextStep("Wait for the dungeon to start!")
         }
 

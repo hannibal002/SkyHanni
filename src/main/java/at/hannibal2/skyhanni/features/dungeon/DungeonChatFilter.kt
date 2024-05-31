@@ -21,7 +21,7 @@ class DungeonChatFilter {
         "end",
         "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!",
         " {4}§r§d(.*) Essence §r§8x(.*)",
-        " Experience §r§b(Team Bonus$)",
+        " Experience §r§b\\(Team Bonus\\)$",
     )
     private val abilityPatterns by patternGroup.list(
         "ability",

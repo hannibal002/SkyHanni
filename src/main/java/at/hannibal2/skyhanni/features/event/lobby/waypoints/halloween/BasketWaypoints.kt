@@ -11,9 +11,8 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.StringUtils.find
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -26,7 +25,7 @@ class BasketWaypoints {
     private val patternGroup = RepoPattern.group("basketwaypoints")
     private val messagePattern by patternGroup.pattern(
         "message",
-        "^§a§lYou found a Candy Basket! §r|^§cYou already found this Candy Basket!"
+        "^§a§lYou found a Candy Basket! §r|^§cYou already found this Candy Basket!$"
     )
     private val levelScoreboardPattern by patternGroup.pattern(
         "level",
@@ -48,7 +47,7 @@ class BasketWaypoints {
 
         if (!isEnabled()) return
 
-        if (messagePattern.matches(event.message)) {
+        if (messagePattern.find(event.message)) {
             val basket = Basket.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
             basket.found = true
             if (closest == basket) {

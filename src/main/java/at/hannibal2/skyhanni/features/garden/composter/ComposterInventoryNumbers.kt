@@ -18,7 +18,7 @@ class ComposterInventoryNumbers {
     private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers.new")
     private val valuePattern by patternGroup.pattern(
         "value",
-        "§e(?<having>.*)§6/(?<total>.*)"
+        "§e(?<having>.*)§6/(?<total>.*)$"
     )
     private val amountPattern by patternGroup.pattern(
         "amount",

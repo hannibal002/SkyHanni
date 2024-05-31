@@ -35,7 +35,7 @@ class ArachneChatMessageHider {
     )
     private val messageDownPattern by patternGroup.pattern(
         "messagedown",
-        "\" {30}§r§6§lARACHNE DOWN!\""
+        " {30}§r§6§lARACHNE DOWN!"
     )
 
     @SubscribeEvent

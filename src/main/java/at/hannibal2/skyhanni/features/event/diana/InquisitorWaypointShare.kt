@@ -59,7 +59,7 @@ object InquisitorWaypointShare {
     )
     private val dugPattern by patternGroup.pattern(
         "dug",
-        "§r§eYou dug out "
+        "§r§eYou dug out"
     )
     private val inquisPattern by patternGroup.pattern(
         "inquis",

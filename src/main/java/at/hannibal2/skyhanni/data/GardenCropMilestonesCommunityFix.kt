@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object GardenCropMilestonesCommunityFix {
     private val amountPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount.new",
-        "§e(?<having>.*)§6/§e(?<max>.*)^"
+        "§e(?<having>.*)§6/§e(?<max>.*)$"
     )
 
     private var showWrongData = false

@@ -12,8 +12,9 @@ import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -35,7 +36,7 @@ object GriffinBurrowParticleFinder {
     private val patternGroup = RepoPattern.group("griffenburrowparticlefinder")
     private val startWithPattern by patternGroup.pattern(
         "dug",
-        "^§eYou dug out a Griffin Burrow!|^§eYou finished the Griffin burrow chain! §r§7(4/4)"
+        "^§eYou dug out a Griffin Burrow!|^§eYou finished the Griffin burrow chain! §r§7(4/4)$"
     )
     private val defendersPattern by patternGroup.pattern(
         "defenders",
@@ -147,7 +148,7 @@ object GriffinBurrowParticleFinder {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val message = event.message
-        if (startWithPattern.matches(message)) {
+        if (startWithPattern.find(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
             if (burrow != null) {

@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.anyFound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -194,7 +194,7 @@ object FrozenTreasureTracker {
     private fun onJerryWorkshop() = IslandType.WINTER.isInIsland()
 
     private fun inGlacialCave() =
-        onJerryWorkshop() && cavePattern.anyFound(ScoreboardData.sidebarLinesFormatted)
+        onJerryWorkshop() && cavePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
     fun resetCommand() {
         tracker.resetCommand()
