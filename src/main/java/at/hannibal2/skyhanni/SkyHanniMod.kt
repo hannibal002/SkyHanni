@@ -135,6 +135,7 @@ import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI
 import at.hannibal2.skyhanni.features.event.diana.DianaFixChat
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -348,6 +349,7 @@ import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.HideFarEntities
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
+import at.hannibal2.skyhanni.features.misc.InWaterDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -615,6 +617,7 @@ class SkyHanniMod {
         loadModule(FossilExcavatorAPI)
         loadModule(ChocolateFactoryAPI)
         loadModule(RenderableTooltips)
+        loadModule(DianaAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -660,7 +663,7 @@ class SkyHanniMod {
         loadModule(AshfangHideParticles())
         loadModule(AshfangHideDamageIndicator())
         loadModule(ItemStars())
-        loadModule(MinionFeatures())
+        loadModule(MinionFeatures)
         loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
         loadModule(WikiManager)
@@ -936,6 +939,7 @@ class SkyHanniMod {
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(MiningEventTracker())
+        loadModule(InWaterDisplay)
         loadModule(MiningNotifications)
         loadModule(MineshaftPityDisplay)
         loadModule(JyrreTimer())
