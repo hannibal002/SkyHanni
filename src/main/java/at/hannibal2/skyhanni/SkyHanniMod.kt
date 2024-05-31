@@ -277,6 +277,7 @@ import at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing
 import at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment
 import at.hannibal2.skyhanni.features.inventory.ShiftClickNPCSell
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
+import at.hannibal2.skyhanni.features.inventory.SnakeGame
 import at.hannibal2.skyhanni.features.inventory.StatsTuning
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures
 import at.hannibal2.skyhanni.features.inventory.SuperpairsClicksAlert
@@ -964,6 +965,7 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
+        loadModule(SnakeGame())
         loadModule(AuctionOutbidWarning)
 
         // test stuff
