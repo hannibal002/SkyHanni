@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DARK_CACAO_TRUFFLE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
@@ -48,6 +49,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -240,6 +242,11 @@ object ItemDisplayOverlayFeatures {
 
         if (BOTTLE_OF_JYRRE.isSelected() && internalName == "NEW_BOTTLE_OF_JYRRE".asInternalName()) {
             val seconds = item.getBottleOfJyrreSeconds() ?: 0
+            return "§a${(seconds / 3600)}"
+        }
+
+        if (DARK_CACAO_TRUFFLE.isSelected() && internalName == "DARK_CACAO_TRUFFLE".asInternalName()) {
+            val seconds = item.getSecondsHeld() ?: 0
             return "§a${(seconds / 3600)}"
         }
 

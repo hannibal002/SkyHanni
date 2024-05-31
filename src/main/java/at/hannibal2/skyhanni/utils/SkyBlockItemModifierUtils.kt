@@ -179,6 +179,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
+    fun ItemStack.getSecondsHeld() = getAttributeInt("seconds_held")
+
     fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
@@ -187,10 +189,12 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
 
-    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
-        val enchantments = this.getCompoundTag("enchantments")
-        enchantments.keySet.associateWith { enchantments.getInteger(it) }
-    }
+    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
+        ?.takeIf { it.hasKey("enchantments") }
+        ?.run {
+            val enchantments = this.getCompoundTag("enchantments")
+            enchantments.keySet.associateWith { enchantments.getInteger(it) }
+        }
 
     fun ItemStack.getAppliedPocketSackInASack(): Int? {
         val data = cachedData
