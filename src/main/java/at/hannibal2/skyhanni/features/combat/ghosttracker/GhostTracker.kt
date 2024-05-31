@@ -10,9 +10,8 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -21,8 +20,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -31,20 +30,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GhostTracker {
 
-    val config get() = SkyHanniMod.feature.combat.ghostCounter
+    private val config get() = SkyHanniMod.feature.combat.ghostCounter
 
     val storage = ProfileStorageData.profileSpecific?.ghostStorage
 
-    var currentCombatXp = 0L
-
-    var currentBestiaryKills = 0L
-    var isMaxBestiary = false
+    private var currentBestiaryKills = 0L
+    private var isMaxBestiary = false
 
     private var allowedDrops = listOf<NEUInternalName>()
 
-    private val MAX_BESTIARY_KILLS = getBestiaryKillsUntilLevel(25)
-
-    fun getCurrentCombatXp(): Long? = ProfileStorageData.profileSpecific?.skillData?.get(SkillType.COMBAT)?.totalXp
+    private val MAX_BESTIARY_KILLS by lazy { getBestiaryKillsUntilLevel(25) }
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
@@ -164,25 +159,16 @@ class GhostTracker {
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        currentCombatXp = getCurrentCombatXp() ?: 0L
         currentBestiaryKills = storage?.bestiaryKills ?: 0
         isMaxBestiary = currentBestiaryKills >= MAX_BESTIARY_KILLS
     }
 
-    // TODO: Skill xp gain event
     @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSkillExp(event: SkillExpGainEvent) {
         if (!isEnabled()) return
-        val newXp = getCurrentCombatXp() ?: return
-        if (newXp <= currentCombatXp) return
-
-        val difference = newXp - currentCombatXp
-
-        currentCombatXp = newXp
-        if (difference > 10_000) return // TODO: find better value for max difference it can have
-
+        if (event.gained > 10_000) return
         tracker.modify {
-            it.combatXpGained += difference
+            it.combatXpGained += event.gained.toLong()
         }
     }
 
@@ -288,10 +274,12 @@ class GhostTracker {
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedDrops
 
-    fun getAverageMagicFind(mf: Long, kills: Long) = if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()
+    private fun getAverageMagicFind(mf: Long, kills: Long) =
+        if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()
 
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "The Mist" && config.enabled
+    private fun isEnabled() =
+        IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "The Mist" && config.enabled
 
     enum class GhostTrackerLines(private val display: String) {
         TITLE("§e§lGhost Profit Tracker\""),
