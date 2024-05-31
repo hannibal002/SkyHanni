@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -403,11 +404,6 @@ class ChatFilter {
         "§d[\\w']+ the Fairy§r§f: Have a great life!".toPattern()
     )
 
-    private val gardenPestPattern by RepoPattern.pattern(
-        "chat.garden.pest",
-        "§cThere are not any Pests on your Garden right now! Keep farming!"
-    )
-
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -494,7 +490,7 @@ class ChatFilter {
         dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
-        config.gardenPest && GardenAPI.inGarden() && gardenPestPattern.matches(message) -> "gardenPest"
+        config.gardenNoPest && GardenAPI.inGarden() && PestFinder.noPestsChatPattern.matches(message) -> "gardenPest"
 
         else -> ""
     }

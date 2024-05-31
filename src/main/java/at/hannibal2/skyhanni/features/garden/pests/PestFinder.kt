@@ -26,8 +26,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -38,6 +40,10 @@ object PestFinder {
     private val config get() = PestAPI.config.pestFinder
 
     private var display = emptyList<Renderable>()
+    val noPestsChatPattern by RepoPattern.pattern(
+        "chat.garden.no.pest",
+        "§cThere are not any Pests on your Garden right now! Keep farming!"
+    )
 
     @SubscribeEvent
     fun onPestUpdate(event: PestUpdateEvent) {
@@ -160,7 +166,7 @@ object PestFinder {
     fun onChat(event: LorenzChatEvent) {
         if (!config.noPestTitle) return
 
-        val containsCheck = GardenAPI.inGarden() && event.message == "§cThere are not any Pests on your Garden right now! Keep farming!"
+        val containsCheck = GardenAPI.inGarden() && noPestsChatPattern.matches(event.message)
 
         if (event.blockedReason == "gardenPest" || containsCheck) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
     }
