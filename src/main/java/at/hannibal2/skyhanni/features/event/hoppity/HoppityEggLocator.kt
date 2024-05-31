@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -56,8 +55,6 @@ object HoppityEggLocator {
     var currentEggType: HoppityEggType? = null
     var currentEggNote: String? = null
 
-    var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
-
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         resetData()
@@ -94,7 +91,7 @@ object HoppityEggLocator {
             }
         }
 
-        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = HoppityEggLocations.currentIslandLocations ?: return
 
         if (shouldShowAllEggs()) {
             for (eggLocation in islandEggsLocations) {
@@ -219,7 +216,7 @@ object HoppityEggLocator {
         lastGuessMade = SimpleTimeMark.now()
         possibleEggLocations = emptyList()
 
-        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = HoppityEggLocations.currentIslandLocations ?: return
         val listSize = validParticleLocations.size
 
         if (listSize < 5) return
@@ -264,11 +261,8 @@ object HoppityEggLocator {
         drawLocations = true
     }
 
-    fun getCurrentIslandEggLocations(): List<LorenzVec>? =
-        eggLocations[LorenzUtils.skyBlockIsland]
-
     fun isValidEggLocation(location: LorenzVec): Boolean =
-        getCurrentIslandEggLocations()?.any { it.distance(location) < 5.0 } ?: false
+        HoppityEggLocations.currentIslandLocations?.any { it.distance(location) < 5.0 } ?: false
 
     private fun ReceiveParticleEvent.isVillagerParticle() =
         type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
@@ -281,7 +275,7 @@ object HoppityEggLocator {
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
-    fun hasLocatorInHotbar() = RecalculatingValue(1.seconds) {
+    private fun hasLocatorInHotbar() = RecalculatingValue(1.seconds) {
         LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
     }.getValue()
 

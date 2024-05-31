@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,7 +16,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityEggLocations {
 
-    var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
+    val currentIslandLocations
+        get() = eggLocations[LorenzUtils.skyBlockIsland]
+
+    // TODO: only use apiEggLocations
+    private var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
+    private var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
 
     private var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>>?
         get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations
@@ -21,12 +29,20 @@ object HoppityEggLocations {
             ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value
         }
 
+    private val collectedLocationCount
+        get() = collectedEggLocations?.values?.sumOf { it.size } ?: 0
 
-    private fun getCurrentIslandCollectedEggs(): MutableSet<LorenzVec>? =
-        collectedEggLocations?.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf<LorenzVec>() }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        // TODO: split Chocolate Factory and Hoppity repo data
+        val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
+        apiEggLocations = data.apiEggLocations
+        eggLocations = data.eggLocations
+    }
 
     fun saveNearestEgg() {
-        val location = HoppityEggLocator.getCurrentIslandEggLocations()
+        val location = currentIslandLocations
             ?.minByOrNull { it.distanceSqToPlayer() } ?: return
         if (location.distanceSqToPlayer() > 100) {
             ErrorManager.skyHanniError(
@@ -38,39 +54,55 @@ object HoppityEggLocations {
             )
         }
 
-        getCurrentIslandCollectedEggs()?.add(location)
+        currentIslandCollectedEggs()?.add(location)
+    }
+
+    private fun currentIslandCollectedEggs(): MutableSet<LorenzVec>? =
+        collectedEggLocations?.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf() }
+
+
+
+    private var loadedNeuThisProfile = false
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        loadedNeuThisProfile = false
     }
 
     @SubscribeEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
-        ChatUtils.chat("Loading profile data for Hoppity egg locations.")
+        if (loadedNeuThisProfile || !HoppityEggsManager.config.loadFromNeuPv) return
 
         // optional chaining to hopefully catch any API responses missing data
-        val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations
+        val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return
 
-        if (rawLocations == null) {
-            ChatUtils.chat("No collected egg locations found in API, aborting.")
-            return
-        }
-
-        val collectedLocations = rawLocations.values.flatten()
-        ChatUtils.chat("Found ${collectedLocations.size} collected locations.")
+        val apiCollectedLocations = rawLocations.values.flatten()
 
         val result = mutableMapOf<IslandType, MutableSet<LorenzVec>>()
 
         for ((island, locationNameToCoords) in apiEggLocations) {
-            val coords = collectedLocations.mapNotNull { locationNameToCoords[it] }
+            val coords = apiCollectedLocations.mapNotNull { locationNameToCoords[it] }
             result[island] = coords.toMutableSet()
         }
 
-        collectedEggLocations = result
-        ChatUtils.chat("Saved all egg locations.")
+        // don't load if there's no change
+        if (apiCollectedLocations.size == collectedLocationCount) return
 
+        ChatUtils.clickableChat(
+            message = "Click here to load ${apiCollectedLocations.size} collected egg locations from NEU PV!",
+            onClick = {
+                collectedEggLocations = result
+                ChatUtils.chat("Updated Hoppity egg location data!")
+                      },
+            oneTimeClick = true
+        )
+
+        ChatUtils.chat("Saved all egg locations.")
     }
 
-    fun collectedEggsThisIsland() = getCurrentIslandCollectedEggs()?.size ?: 0
+    fun collectedEggsThisIsland() = currentIslandCollectedEggs()?.size ?: 0
 
     fun hasCollectedEgg(location: LorenzVec) =
-        getCurrentIslandCollectedEggs()?.contains(location) ?: false
+        currentIslandCollectedEggs()?.contains(location) ?: false
 
 }

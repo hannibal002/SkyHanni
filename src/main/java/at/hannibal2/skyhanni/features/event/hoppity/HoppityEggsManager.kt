@@ -193,7 +193,7 @@ object HoppityEggsManager {
         displayList.add(0, "§bUnclaimed Eggs:")
 
         if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
-            val totalEggs = HoppityEggLocator.getCurrentIslandEggLocations()?.size
+            val totalEggs = HoppityEggLocations.currentIslandLocations?.size
             if (totalEggs != null) {
                 val collectedEggs = HoppityEggLocations.collectedEggsThisIsland()
                 val collectedFormat = formatEggsCollected(collectedEggs)
