@@ -19,6 +19,11 @@ public class RareCatchesConfig {
     public boolean alertOtherCatches = false;
 
     @Expose
+    @ConfigOption(name = "Creature Name", desc = "Say what creature was caught in the alert.")
+    @ConfigEditorBoolean
+    public boolean creatureName = true;
+
+    @Expose
     @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare sea creature alerts are displayed.")
     @ConfigEditorBoolean
     public boolean playSound = true;
