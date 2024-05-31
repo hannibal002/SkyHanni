@@ -13,6 +13,8 @@
     + Show mana regeneration buff next to the GUI element.
     + Option to hide flare particles.
 + Added a "Line to Arachne" setting, just like with slayer minibosses. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/1888)
++ Added In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
+    + Useful when using a Prismarine Blade in Stranded Mode.
 
 #### Garden Features
 
@@ -57,6 +59,8 @@
 + Added option to show time held in lore for Jyrre Bottles and Cacao Truffles. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1916)
 + Added Dark Cacao Truffle hours held as stack size. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1916)
 + Added ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
++ Wand of Strength cooldown is now displayed. - saga (https://github.com/hannibal002/SkyHanni/pull/1948)
+    + The cooldown displayed is for the buff, not the item usage.
 
 #### Fishing Features
 
@@ -121,10 +125,15 @@
 #### Inventory Improvements
 
 + Adjusted and added Rabbit Uncle & Dog Keybinds. - raven (https://github.com/hannibal002/SkyHanni/pull/1907)
++ Improved Bazaar re-buy order helper to also search in the Bazaar upon chat message click. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1946)
 
 #### Fishing Improvements
 
 + Added option to show the name of the sea creature in the title notification. - Empa (https://github.com/hannibal002/SkyHanni/pull/1858)
+
+#### Diana Improvements
+
++ Reduced the frequency of Diana sound guess hints while the feature is working correctly. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1954)
 
 #### Misc Improvements
 
@@ -133,6 +142,7 @@
     + Link to the latest GitHub release instead of 2.2.0.
     + Also link to Modrinth.
 + Improved performance with Slayer Items on Ground and Fished Item Names. - Empa (https://github.com/hannibal002/SkyHanni/pull/1875)
++ Updated /shclearminiondata to remove only bugged minions nearby, not all minions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1951)
 
 ### Fixes
 
@@ -142,6 +152,9 @@
 + Fixed Glacite Walkers not being highlighted during commissions. - Luna (https://github.com/hannibal002/SkyHanni/pull/1850)
 + Fixed warping to Base in Glacite Tunnels when pressing the keybind while inside any GUI. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1911)
 + Fixed Custom Scoreboard error in Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1909)
++ Fixed HotM error with Blue Cheese Goblin Omelette. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1953)
++ Fixed mining events not showing up in the Mineshaft. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1952)
++ Fixed Custom Scoreboard error in the mines. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1947)
 
 #### Garden Fixes
 
@@ -181,6 +194,15 @@
 
 + Fixed small memory leaks when staying in one island for extended periods. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1890)
 
+#### Diana Fixes
+
++ Fixed Inquisitor detection for sharing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1949)
++ Fixed Diana errors being shown when the feature is not enabled. - Empa (https://github.com/hannibal002/SkyHanni/pull/1942)
+
+#### Rift Fixes
+
++ Fixed rift slayer warning showing while hitting Oubliette Guard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1950)
+
 #### Misc Fixes
 
 + Fixed LorenzToolTipEvent triggering when not actually hovering over an item. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1920)
@@ -194,6 +216,8 @@
 + Move regex and pattern operations to RegexUtils. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1854)
 + Added Track Particles command. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1787)
 + Fixed stacked mob highlights. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1856)
++ SkillExpGainEvent now uses SkillAPI data. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1788)
++ Added InquisitorFoundEvent event. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1949)
 
 ## Version 0.25
 
