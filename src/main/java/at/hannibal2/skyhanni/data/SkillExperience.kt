@@ -24,6 +24,10 @@ class SkillExperience {
         "inventory",
         " §e(?<number>.*)§6/"
     )
+    private val progressToPattern by patternGroup.pattern(
+        "progressto",
+        "Progress to Level"
+    )
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {

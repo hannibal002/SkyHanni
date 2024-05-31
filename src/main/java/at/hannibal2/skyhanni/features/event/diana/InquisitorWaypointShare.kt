@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -57,16 +56,6 @@ object InquisitorWaypointShare {
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
     )
-    private val dugPattern by patternGroup.pattern(
-        "dug",
-        "§r§eYou dug out"
-    )
-    private val inquisPattern by patternGroup.pattern(
-        "inquis",
-        "Inquis"
-    )
-
-
     /**
      * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
      */
