@@ -13,12 +13,12 @@ import net.minecraft.item.ItemStack
 object ToolTipData {
 
     @JvmStatic
-    fun getTooltip(stack: ItemStack, toolTip: MutableList<String>): List<String> {
-        onHover(stack, toolTip)
-        return onTooltip(toolTip)
+    fun getTooltip(stack: ItemStack, toolTip: MutableList<String>) {
+        onTooltip(toolTip)
     }
 
-    private fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
+    @JvmStatic
+    fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
         ItemHoverEvent(stack, toolTip).postAndCatch()
     }
 
