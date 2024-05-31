@@ -133,7 +133,11 @@ object ChocolateFactoryDataLoader {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(46, "inventory.chocolateFactory.rabbitWarning", "inventory.chocolateFactory.chocolateFactoryRabbitWarningConfig.rabbitWarning")
+        event.move(
+            46,
+            "inventory.chocolateFactory.rabbitWarning",
+            "inventory.chocolateFactory.chocolateFactoryRabbitWarningConfig.rabbitWarning"
+        )
     }
 
     @SubscribeEvent
@@ -330,7 +334,7 @@ object ChocolateFactoryDataLoader {
         slotIndex: Int,
         isMaxed: Boolean,
         upgradeCost: Long?,
-        averageChocolate: Double
+        averageChocolate: Double,
     ) {
         val level = rabbitAmountPattern.matchMatcher(itemName) {
             group("amount").formatInt()
@@ -355,7 +359,7 @@ object ChocolateFactoryDataLoader {
         slotIndex: Int,
         isMaxed: Boolean,
         upgradeCost: Long?,
-        averageChocolate: Double
+        averageChocolate: Double,
     ) {
         val level = upgradeTierPattern.matchMatcher(itemName) {
             group("tier").romanToDecimal()
@@ -393,7 +397,7 @@ object ChocolateFactoryDataLoader {
         upgradeCost: Long?,
         averageChocolate: Double,
         newAverageChocolate: Double,
-        isRabbit: Boolean
+        isRabbit: Boolean,
     ) {
         val extra = (newAverageChocolate - averageChocolate).round(2)
         val effectiveCost = (upgradeCost!! / extra).round(2)

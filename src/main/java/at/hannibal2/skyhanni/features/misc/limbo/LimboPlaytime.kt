@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
@@ -50,7 +50,7 @@ object LimboPlaytime {
         if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
         if (event.inventory.name != "Detailed /playtime") return
-        if (event.slotNumber != 43) return
+        if (event.slot != 43) return
         val playtime = storage?.playtime ?: 0
         if (playtime < 60) return
 
@@ -62,7 +62,7 @@ object LimboPlaytime {
                 *createItemLore()
             )
         }
-        event.replaceWith(limboItem)
+        event.replace(limboItem)
     }
 
     private fun createItemLore(): Array<String> = when {
