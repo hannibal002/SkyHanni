@@ -403,7 +403,8 @@ class ChatFilter {
         "§d[\\w']+ the Fairy§r§f: Have a great life!".toPattern()
     )
 
-    private val gardenPestMessage = listOf(
+    private val gardenPestPattern by RepoPattern.pattern(
+        "chat.garden.pest",
         "§cThere are not any Pests on your Garden right now! Keep farming!"
     )
 
@@ -447,7 +448,6 @@ class ChatFilter {
         "powder_mining" to powderMiningMessages,
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
-        "gardenPest" to gardenPestMessage,
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
@@ -494,7 +494,7 @@ class ChatFilter {
         dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
-        config.gardenPest && GardenAPI.inGarden() && message.isPresent("gardenPest") -> "gardenPest"
+        config.gardenPest && GardenAPI.inGarden() && gardenPestPattern.matches(message) -> "gardenPest"
 
         else -> ""
     }
