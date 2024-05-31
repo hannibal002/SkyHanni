@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.features.mining.MiningEventConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -135,7 +134,7 @@ object MiningEventDisplay {
     }
 
     private fun shouldDisplay() =
-        LorenzUtils.inSkyBlock && config.enabled && !ReminderUtils.isBusy() && !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
+        LorenzUtils.inSkyBlock && config.enabled && !(!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
