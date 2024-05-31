@@ -58,8 +58,9 @@ object FixGhostEntities {
     }
 
     @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!LorenzUtils.inSkyBlock || !config.hideTemporaryArmorstands) return
+        if (event.entity !is EntityArmorStand) return
         with(event.entity) {
             if (ticksExisted < 10 && name == "Armor Stand" && inventory.all { it == null }) event.cancel()
         }
