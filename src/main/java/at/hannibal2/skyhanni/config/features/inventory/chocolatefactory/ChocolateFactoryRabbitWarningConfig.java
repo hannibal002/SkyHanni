@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class ChocolateFactoryRabbitWarningConfig {
 
@@ -26,7 +27,7 @@ public class ChocolateFactoryRabbitWarningConfig {
         "§eThen write skyhanni:yourfilename\n" +
         "§cMust be a .ogg file")
     @ConfigEditorText
-    public String specialRabbitSound = "note.pling";
+    public Property<String> specialRabbitSound = Property.of("note.pling");
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")

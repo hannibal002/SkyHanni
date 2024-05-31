@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -132,6 +134,13 @@ object ChocolateFactoryDataLoader {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(46, "inventory.chocolateFactory.rabbitWarning", "inventory.chocolateFactory.chocolateFactoryRabbitWarningConfig.rabbitWarning")
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.rabbitWarning.specialRabbitSound) {
+            ChocolateFactoryAPI.warningSound = SoundUtils.createSound(config.rabbitWarning.specialRabbitSound.get(), 1f)
+        }
     }
 
     private fun clearData() {
@@ -404,7 +413,7 @@ object ChocolateFactoryDataLoader {
             if (warningConfig.specialRabbitWarning
                 && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
             ) {
-                SoundUtils.repeatSound(100, warningConfig.repeatSound, SoundUtils.createSound(warningConfig.specialRabbitSound, 1f))
+                SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
             }
 
             ChocolateFactoryAPI.clickRabbitSlot = slotIndex
