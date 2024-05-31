@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityUniqueEggLocations
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -94,6 +95,7 @@ object ChocolateFactoryAPI {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
         HoppityEggLocator.eggLocations = data.eggLocations
+        HoppityUniqueEggLocations.apiEggLocations = data.apiEggLocations
 
         rabbitSlots = data.rabbitSlots
         otherUpgradeSlots = data.otherUpgradeSlots
