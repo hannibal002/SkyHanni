@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -285,6 +286,7 @@ class GoldenFishTimer {
         lastChatMessage = SimpleTimeMark.farPast()
         lastGoldenFishTime = SimpleTimeMark.now()
         interactions = 0
+        ChatUtils.debug("Found Golden Fish!")
         confirmedGoldenFishEntity = possibleGoldenFishEntity
         possibleGoldenFishEntity = null
         goldenFishDespawnTimer = SimpleTimeMark.now() + despawnTime
