@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -153,6 +155,15 @@ object PestFinder {
     }
 
     private var lastKeyPress = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!config.noPestTitle) return
+
+        val containsCheck = GardenAPI.inGarden() && event.message == "§cThere are not any Pests on your Garden right now! Keep farming!"
+
+        if (event.blockedReason == "gardenPest" || containsCheck) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
+    }
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {

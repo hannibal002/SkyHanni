@@ -105,6 +105,11 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean sacrifice = false;
 
+    @Expose
+    @ConfigOption(name = "Garden Pest", desc = "Hide the message of no pests on garden.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gardenPest = false;
 
     //TODO remove
     @Expose
