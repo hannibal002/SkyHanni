@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
+import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -327,6 +328,10 @@ object Commands {
             "shtpinfested",
             "Teleports you to the nearest infested plot"
         ) { PestFinder.teleportNearestInfestedPlot() }
+        registerCommand(
+            "shtps",
+            "Informs the TPS"
+        ) { TpsCounter.tpsCommand() }
     }
 
     private fun usersBugFix() {

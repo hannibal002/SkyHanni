@@ -746,7 +746,7 @@ class SkyHanniMod {
         loadModule(BingoCardDisplay())
         loadModule(BingoNextStepHelper())
         loadModule(MinionCraftHelper())
-        loadModule(TpsCounter())
+        loadModule(TpsCounter)
         loadModule(ParticleHider())
         loadModule(MiscFeatures)
         loadModule(ReplaceRomanNumerals())
