@@ -12,10 +12,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -25,6 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.annotations.Expose
 import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
@@ -36,7 +35,7 @@ object MineshaftPityDisplay {
 
     private val profileStorage get() = ProfileStorageData.profileSpecific?.mining?.mineshaft
 
-    private var minedBlocks: List<PityData>
+    private var minedBlocks: MutableList<PityData>
         get() = profileStorage?.blocksBroken ?: mutableListOf()
         set(value) {
             profileStorage?.blocksBroken = value
@@ -45,30 +44,16 @@ object MineshaftPityDisplay {
     private var PityBlock.efficientMiner: Int
         get() = minedBlocks.firstOrNull { it.pityBlock == this }?.efficientMiner ?: 0
         set(value) {
-            minedBlocks.firstOrNull {
-                ChatUtils.chat("is value: ${it.pityBlock} == $this")
-                it.pityBlock == this
-            }?.let {
-                ChatUtils.chat("setting value: ${it.efficientMiner} = $value")
-                it.efficientMiner = value
-            } ?: run {
-                ChatUtils.chat("adding value: $this")
-                minedBlocks = minedBlocks.editCopy { add(PityData(this@efficientMiner, 0, value)) }
+            minedBlocks.firstOrNull { it.pityBlock == this }?.let { it.efficientMiner = value } ?: run {
+                minedBlocks.add(PityData(this, efficientMiner = value))
             }
         }
 
     private var PityBlock.blocksBroken: Int
         get() = minedBlocks.firstOrNull { it.pityBlock == this }?.blocksBroken ?: 0
         set(value) {
-            minedBlocks.firstOrNull {
-                ChatUtils.chat("is value: ${it.pityBlock} == $this")
-                it.pityBlock == this
-            }?.let {
-                ChatUtils.chat("setting value: ${it.efficientMiner} = $value")
-                it.blocksBroken = value
-            } ?: run {
-                ChatUtils.chat("adding value: $this")
-                minedBlocks = minedBlocks.editCopy { add(PityData(this@blocksBroken, value, 0)) }
+            minedBlocks.firstOrNull { it.pityBlock == this }?.let { it.blocksBroken = value } ?: run {
+                minedBlocks.add(PityData(this, blocksBroken = value))
             }
         }
 
@@ -93,17 +78,10 @@ object MineshaftPityDisplay {
     @SubscribeEvent
     fun onOreMined(event: OreMinedEvent) {
         if (!isEnabled()) return
-        ChatUtils.chat("a")
 
-        val oreType = event.originalOre.getOreType()
-        val effMinerBlocks = event.extraBlocks.map { (block, amount) ->
-            block.getOreType() to amount
-        }.removeFirst { it.first == oreType } // extraBlocks also contains the original block mined
-        ChatUtils.chat("b")
-
-        oreType?.addMined(1, false)
-        effMinerBlocks.forEach { (ore, amount) ->
-            ore?.addMined(amount, true)
+        event.originalOre.getOreType()?.getPityBlock()?.let { it.blocksBroken++ }
+        event.extraBlocks.map { (block, amount) ->
+            block.getOreType()?.getPityBlock()?.let { it.efficientMiner += amount }
         }
         update()
     }
@@ -116,7 +94,6 @@ object MineshaftPityDisplay {
             val chance = calculateChance(pityCounter)
             val counterUntilPity = MAX_COUNTER - pityCounter
             val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.efficientMiner }
-            //val totalBlocks = minedBlocks.sumOf { it.efficientMiner + it.blocksBroken }
 
             mineshaftTotalBlocks += totalBlocks
             mineshaftTotalCount++
@@ -250,7 +227,7 @@ object MineshaftPityDisplay {
     }
 
     fun resetCounter() {
-        profileStorage?.blocksBroken = mutableListOf()
+        minedBlocks = mutableListOf()
         update()
     }
 
@@ -276,14 +253,11 @@ object MineshaftPityDisplay {
         }
     }
 
-    private fun OreType.addMined(amount: Int, efficientMiner: Boolean) {
-        val block = PityBlock.getByOreTypeOrNull(this) ?: return
-        ChatUtils.chat("a")
-        if (efficientMiner) block.efficientMiner += amount
-        else block.blocksBroken += amount
-    }
-
-    data class PityData(val pityBlock: PityBlock, var blocksBroken: Int, var efficientMiner: Int)
+    data class PityData(
+        @Expose val pityBlock: PityBlock,
+        @Expose var blocksBroken: Int = 0,
+        @Expose var efficientMiner: Int = 0
+    )
 
     enum class PityBlock(
         val displayName: String,
@@ -338,7 +312,7 @@ object MineshaftPityDisplay {
 
         companion object {
 
-            fun getByOreTypeOrNull(oreType: OreType) = entries.firstOrNull { oreType in it.oreTypes }
+            fun OreType.getPityBlock() = entries.firstOrNull { this in it.oreTypes }
 
             fun PityBlock.getPity() = (blocksBroken + efficientMiner / 2.0) * multiplier
         }

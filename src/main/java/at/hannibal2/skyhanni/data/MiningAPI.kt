@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -52,8 +51,8 @@ object MiningAPI {
     private var waitingForInitBlockPos: LorenzVec? = null
     private var waitingForInitSound = true
 
-    private var waitingForEffMinerSound = true
-    private var waitingForEffMinerBlock = true
+    private var waitingForEffMinerSound = false
+    private var waitingForEffMinerBlock = false
 
     var inGlacite = false
     var inDwarvenMines = false
@@ -132,7 +131,9 @@ object MiningAPI {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (waitingForInitSound) {
-            if (event.soundName in allowedSoundNames) {
+            if (event.soundName in allowedSoundNames && event.pitch == 0.7936508f) {
+                val pos = event.location.roundLocationToBlock()
+                if (recentClickedBlocks.none { it.position == pos }) return
                 waitingForInitSound = false
                 waitingForInitBlock = true
                 waitingForInitBlockPos = event.location.roundLocationToBlock()
@@ -163,7 +164,6 @@ object MiningAPI {
         val ore = OreBlock.getByStateOrNull(event.oldState) ?: return
 
         if (waitingForInitBlock) {
-            if (recentClickedBlocks.none { it.position == event.location }) return
             if (waitingForInitBlockPos != event.location) return
             waitingForInitBlock = false
             surroundingMinedBlocks.add(MinedBlock(ore, event.location, true, SimpleTimeMark.now()))
@@ -195,8 +195,6 @@ object MiningAPI {
         if (surroundingMinedBlocks.isEmpty()) return
         if (lastInitSound.passedSince() < 200.milliseconds) return
 
-        ChatUtils.chat("d")
-
         resetOreEvent()
 
         val originalBlock = surroundingMinedBlocks.firstOrNull { it.confirmed } ?: run {
@@ -206,7 +204,6 @@ object MiningAPI {
         }
 
         val extraBlocks = surroundingMinedBlocks.filter { it.confirmed }.countBy { it.ore }
-        ChatUtils.chat("c")
 
         OreMinedEvent(originalBlock.ore, extraBlocks).postAndCatch()
 
@@ -226,11 +223,11 @@ object MiningAPI {
 
     private fun resetOreEvent() {
         lastInitSound = SimpleTimeMark.farPast()
-        waitingForInitBlock = false
         waitingForInitSound = true
+        waitingForInitBlock = false
         waitingForInitBlockPos = null
         waitingForEffMinerSound = false
-        waitingForEffMinerBlock = true
+        waitingForEffMinerBlock = false
     }
 
     @SubscribeEvent
@@ -243,9 +240,9 @@ object MiningAPI {
 
         event.addData {
             add("lastInitSound: ${lastInitSound.passedSince().format()}")
+            add("waitingForInitSound: $waitingForInitSound")
             add("waitingForInitBlock: $waitingForInitBlock")
             add("waitingForInitBlockPos: $waitingForInitBlockPos")
-            add("waitingForInitSound: $waitingForInitSound")
             add("waitingForEffMinerSound: $waitingForEffMinerSound")
             add("waitingForEffMinerBlock: $waitingForEffMinerBlock")
             add("recentClickedBlocks: ${recentClickedBlocks.joinToString { it.position.toCleanStringWithSeparator() }}")
