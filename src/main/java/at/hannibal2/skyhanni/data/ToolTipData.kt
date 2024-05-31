@@ -14,17 +14,8 @@ object ToolTipData {
 
     @JvmStatic
     fun getTooltip(stack: ItemStack, toolTip: MutableList<String>) {
-        onTooltip(toolTip)
-    }
-
-    @JvmStatic
-    fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
-        ItemHoverEvent(stack, toolTip).postAndCatch()
-    }
-
-    fun onTooltip(toolTip: MutableList<String>): List<String> {
-        val slot = lastSlot ?: return toolTip
-        val itemStack = slot.stack ?: return toolTip
+        val slot = lastSlot ?: return
+        val itemStack = slot.stack ?: return
         try {
             if (LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()) {
                 toolTip.clear()
@@ -42,7 +33,11 @@ object ToolTipData {
                 "lore" to itemStack.getLore(),
             )
         }
-        return toolTip
+    }
+
+    @JvmStatic
+    fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
+        ItemHoverEvent(stack, toolTip).postAndCatch()
     }
 
     var lastSlot: Slot? = null
