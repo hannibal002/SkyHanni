@@ -17,7 +17,7 @@ public class ChocolateFactoryRabbitWarningConfig {
     public boolean rabbitWarning = true;
 
     @Expose
-    @ConfigOption(name = "Special Rabbit Warning", desc = "Warn when a special rabbit that needs to be clicked appears. (Rabbit The Fish and Golden Rabbits")
+    @ConfigOption(name = "Special Rabbit Warning", desc = "Warn when a special rabbit that needs to be clicked appears. (Rabbit The Fish and Golden Rabbits.")
     @ConfigEditorBoolean
     public boolean specialRabbitWarning = true;
 
