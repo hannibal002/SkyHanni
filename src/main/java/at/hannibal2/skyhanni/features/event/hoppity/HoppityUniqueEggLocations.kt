@@ -13,10 +13,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityUniqueEggLocations {
 
-    var apiEggLocations: Map<String, LorenzVec> = mapOf()
+    var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
-    private val collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>>?
+    private var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>>?
         get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations
+        set(value) {
+            ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value
+        }
+
 
     private fun getCurrentIslandCollectedEggs(): MutableSet<LorenzVec>? =
         collectedEggLocations?.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf<LorenzVec>() }
@@ -39,7 +43,7 @@ object HoppityUniqueEggLocations {
 
     @SubscribeEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
-        // optional chaining to catch any potential API responses missing some data, hopefully
+        // optional chaining to hopefully catch any API responses missing data
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations
 
         if (rawLocations == null) {
@@ -47,9 +51,15 @@ object HoppityUniqueEggLocations {
             return
         }
 
-        val collected = rawLocations.values.flatten().mapNotNull { apiEggLocations[it] }
+        val collectedLocations = rawLocations.values.flatten()
+        val result = mutableMapOf<IslandType, MutableSet<LorenzVec>>()
 
-        
+        for ((island, locationNameToCoords) in apiEggLocations) {
+            val coords = collectedLocations.mapNotNull { locationNameToCoords[it] }
+            result[island] = coords.toMutableSet()
+        }
+
+        collectedEggLocations = result
     }
 
     fun collectedEggsThisIsland() = getCurrentIslandCollectedEggs()?.size ?: 0
