@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -53,19 +53,18 @@ class ChocolateFactoryShortcut {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (event.inventory is ContainerLocalMenu && showItem && event.slotNumber == 15) {
-            event.replaceWith(item)
+        if (event.inventory is ContainerLocalMenu && showItem && event.slot == 15) {
+            event.replace(item)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (showItem && event.slotId == 15) {
-            event.cancel()
-            if (lastClick.passedSince() > 2.seconds) {
-                HypixelCommands.chocolateFactory()
-                lastClick = SimpleTimeMark.now()
-            }
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!showItem || event.slotId != 15) return
+        event.cancel()
+        if (lastClick.passedSince() > 2.seconds) {
+            HypixelCommands.chocolateFactory()
+            lastClick = SimpleTimeMark.now()
         }
     }
 }

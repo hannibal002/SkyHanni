@@ -17,12 +17,12 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -32,18 +32,19 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.roundToInt
@@ -112,9 +113,14 @@ class TunnelsMaps {
     private val commissionInvPattern by RepoPattern.pattern(
         "mining.commission.inventory", "Commissions"
     )
+
+    /**
+     * REGEX-TEST: §7- §b277 Glacite Powder
+     * REGEX-TEST: §7- §b1,010 Glacite Powder
+     */
     private val glacitePattern by RepoPattern.pattern(
         "mining.commisson.reward.glacite",
-        "§7- §b\\d+ Glacite Powder"
+        "§7- §b[\\d,]+ Glacite Powder"
     )
     private val collectorCommissionPattern by RepoPattern.pattern(
         "mining.commisson.collector",
@@ -263,7 +269,7 @@ class TunnelsMaps {
     }
 
     private fun generateLocationsDisplay() = buildList {
-        add(Renderable.string("§6Loactions:"))
+        add(Renderable.string("§6Locations:"))
         add(
             Renderable.multiClickAndHover(
                 campfire.name!!, listOf(
@@ -410,6 +416,7 @@ class TunnelsMaps {
     @SubscribeEvent
     fun onKeyPress(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
+        if (Minecraft.getMinecraft().currentScreen != null) return
         campfireKey(event)
         nextSpotKey(event)
     }
@@ -417,7 +424,7 @@ class TunnelsMaps {
     private fun campfireKey(event: LorenzKeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
         if (config.travelScroll) {
-            ChatUtils.sendMessageToServer("/warp basecamp")
+            HypixelCommands.warp("basecamp")
         } else {
             campfireOverride()
         }

@@ -29,12 +29,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object GardenCropMilestoneDisplay {
@@ -47,7 +49,7 @@ object GardenCropMilestoneDisplay {
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
     private val bestCropTime = GardenBestCropTime()
 
-    private var lastPlaySoundTime = 0L
+    private var lastPlaySoundTime = SimpleTimeMark.farPast()
     private var needsInventory = false
 
     private var lastWarnedLevel = -1
@@ -213,8 +215,15 @@ object GardenCropMilestoneDisplay {
                 }
             }
 
-            val format = (farmingFortuneSpeed * 60).addSeparators()
-            lineMap[MilestoneTextEntry.CROPS_PER_MINUTE] = Renderable.string("§7Crops/Minute§8: §e$format")
+            val secondFormat = (farmingFortuneSpeed).addSeparators()
+            lineMap[MilestoneTextEntry.CROPS_PER_SECOND] = Renderable.string("§7Crops/Second§8: §e$secondFormat")
+
+            val minuteFormat = (farmingFortuneSpeed * 60).addSeparators()
+            lineMap[MilestoneTextEntry.CROPS_PER_MINUTE] = Renderable.string("§7Crops/Minute§8: §e$minuteFormat")
+
+            val hourFormat = (farmingFortuneSpeed * 60 * 60).addSeparators()
+            lineMap[MilestoneTextEntry.CROPS_PER_HOUR] = Renderable.string("§7Crops/Hour§8: §e$hourFormat")
+
             val formatBps = speed.round(config.blocksBrokenPrecision).addSeparators()
             lineMap[MilestoneTextEntry.BLOCKS_PER_SECOND] = Renderable.string("§7Blocks/Second§8: §e$formatBps")
         }
@@ -255,11 +264,11 @@ object GardenCropMilestoneDisplay {
 
     private fun tryWarn(millis: Long, title: String) {
         if (!config.warnClose) return
-        if (GardenCropSpeed.lastBrokenTime + 500 <= System.currentTimeMillis()) return
+        if (GardenCropSpeed.lastBrokenTime.passedSince() > 500.milliseconds) return
         if (millis > 5_900) return
 
-        if (System.currentTimeMillis() > lastPlaySoundTime + 1_000) {
-            lastPlaySoundTime = System.currentTimeMillis()
+        if (lastPlaySoundTime.passedSince() > 1.seconds) {
+            lastPlaySoundTime = SimpleTimeMark.now()
             SoundUtils.playBeepSound()
         }
         if (!needsInventory) {

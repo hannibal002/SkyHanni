@@ -14,6 +14,10 @@ public class MiningConfig {
     public MiningEventConfig miningEvent = new MiningEventConfig();
 
     @Expose
+    @Category(name = "HotM", desc = "Settings for Heart of the Mountain")
+    public HotmConfig hotm = new HotmConfig();
+
+    @Expose
     @ConfigOption(name = "Powder Tracker", desc = "")
     @Accordion
     public PowderTrackerConfig powderTracker = new PowderTrackerConfig();
@@ -54,6 +58,11 @@ public class MiningConfig {
     @ConfigOption(name = "Commissions Blocks Color", desc = "")
     @Accordion
     public CommissionsBlocksColorConfig commissionsBlocksColor = new CommissionsBlocksColorConfig();
+
+    @Expose
+    @ConfigOption(name = "Mineshaft", desc = "")
+    @Accordion
+    public MineshaftConfig mineshaft = new MineshaftConfig();
 
     @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")

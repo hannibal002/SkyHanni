@@ -35,6 +35,7 @@ object ChocolateFactoryUpgradeWarning {
         if (!ChocolateFactoryAPI.isEnabled()) return
         if (!config.upgradeWarning) return
         if (ReminderUtils.isBusy()) return
+        if (ChocolateFactoryCustomReminder.isActive()) return
         if (lastUpgradeWarning.passedSince() < config.timeBetweenWarnings.minutes) return
         lastUpgradeWarning = SimpleTimeMark.now()
         if (config.upgradeWarningSound) {
