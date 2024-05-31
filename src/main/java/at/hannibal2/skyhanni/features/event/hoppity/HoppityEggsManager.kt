@@ -110,7 +110,7 @@ object HoppityEggsManager {
         HoppityEggsCompactChat.handleChat(event)
 
         eggFoundPattern.matchMatcher(event.message) {
-            HoppityUniqueEggLocations.saveNearestEgg()
+            HoppityEggLocations.saveNearestEgg()
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
             val note = group("note").removeColor()
@@ -195,7 +195,7 @@ object HoppityEggsManager {
         if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
             val totalEggs = HoppityEggLocator.getCurrentIslandEggLocations()?.size
             if (totalEggs != null) {
-                val collectedEggs = HoppityUniqueEggLocations.collectedEggsThisIsland()
+                val collectedEggs = HoppityEggLocations.collectedEggsThisIsland()
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }

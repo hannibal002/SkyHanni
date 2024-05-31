@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object HoppityUniqueEggLocations {
+object HoppityEggLocations {
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
@@ -43,6 +43,8 @@ object HoppityUniqueEggLocations {
 
     @SubscribeEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
+        ChatUtils.chat("Loading profile data for Hoppity egg locations.")
+
         // optional chaining to hopefully catch any API responses missing data
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations
 
@@ -52,6 +54,8 @@ object HoppityUniqueEggLocations {
         }
 
         val collectedLocations = rawLocations.values.flatten()
+        ChatUtils.chat("Found ${collectedLocations.size} collected locations.")
+
         val result = mutableMapOf<IslandType, MutableSet<LorenzVec>>()
 
         for ((island, locationNameToCoords) in apiEggLocations) {
@@ -60,6 +64,8 @@ object HoppityUniqueEggLocations {
         }
 
         collectedEggLocations = result
+        ChatUtils.chat("Saved all egg locations.")
+
     }
 
     fun collectedEggsThisIsland() = getCurrentIslandCollectedEggs()?.size ?: 0
