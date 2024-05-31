@@ -139,7 +139,7 @@ object MineshaftPityDisplay {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         update()
     }
 
@@ -217,7 +217,7 @@ object MineshaftPityDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         display.ifEmpty { update() }
         if (display.isEmpty()) return
         config.position.renderRenderables(
@@ -238,6 +238,8 @@ object MineshaftPityDisplay {
     }
 
     fun isEnabled() = MiningAPI.inGlacialTunnels() && config.enabled
+
+    private fun isDisplayEnabled() = (MiningAPI.inGlacialTunnels() || MiningAPI.inDwarvenBaseCamp()) && config.enabled
 
     enum class MineshaftPityLines(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         TITLE("§3§lMineshaft Pity Counter"),

@@ -34,6 +34,7 @@ object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Glacite Lake")
+    private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
     private val coldReset by group.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7."
@@ -72,6 +73,9 @@ object MiningAPI {
     var lastColdReset = SimpleTimeMark.farPast()
 
     fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isInIsland()
+
+    fun inDwarvenBaseCamp() =
+        IslandType.DWARVEN_MINES.isInIsland() && dwarvenBaseCampPattern.matches(LorenzUtils.skyBlockArea)
 
     fun inRegularDwarven() = IslandType.DWARVEN_MINES.isInIsland() && !inGlacialTunnels()
 
