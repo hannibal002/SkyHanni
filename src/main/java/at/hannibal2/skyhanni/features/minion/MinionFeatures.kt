@@ -189,7 +189,6 @@ object MinionFeatures {
         val minions = minions ?: return
         val entity = lastClickedEntity ?: return
 
-
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
         if (!minions.contains(entity) && LorenzUtils.skyBlockIsland != IslandType.HUB) {
@@ -212,7 +211,7 @@ object MinionFeatures {
         lastMinionOpened = 0
     }
 
-    private fun removeBuggedMinions() {
+    fun removeBuggedMinions(isCommand: Boolean = false) {
         if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
@@ -226,8 +225,13 @@ object MinionFeatures {
         }
 
         val size = removedEntities.size
-        if (size == 0) return
-        MinionFeatures.minions = minions.editCopy {
+        if (size == 0) {
+            if (isCommand) {
+                ChatUtils.chat("No bugged minions found nearby.")
+            }
+            return
+        }
+        this.minions = minions.editCopy {
             for (removedEntity in removedEntities) {
                 remove(removedEntity)
             }
@@ -408,11 +412,6 @@ object MinionFeatures {
         if (config.hopperProfitDisplay) {
             config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
-    }
-
-    fun clearMinionData() {
-        minions = mutableMapOf()
-        ChatUtils.chat("Manually reset all private island minion location data!")
     }
 
     @SubscribeEvent
