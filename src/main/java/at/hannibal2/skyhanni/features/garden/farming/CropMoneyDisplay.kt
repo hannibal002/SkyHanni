@@ -359,7 +359,7 @@ object CropMoneyDisplay {
                         if (debug) {
                             debugList.addAsSingletonList(" added seedsPerHour: $seedsPerHour")
                         }
-                        val factor = NEUItems.getMultiplier(internalName).second
+                        val factor = NEUItems.getPrimitiveMultiplier(internalName).amount
                         npcPrice += "SEEDS".asInternalName().getNpcPrice() * seedsPerHour / factor
                         sellOffer += it.buyPrice * seedsPerHour
                         instantSell += it.sellPrice * seedsPerHour
@@ -419,7 +419,7 @@ object CropMoneyDisplay {
                 val internalName = rawInternalName.asInternalName()
                 if (!internalName.isBazaarItem()) continue
 
-                val (newId, amount) = NEUItems.getMultiplier(internalName)
+                val (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName)
                 val itemName = newId.itemNameWithoutColor
                 val crop = getByNameOrNull(itemName)
                 crop?.let {

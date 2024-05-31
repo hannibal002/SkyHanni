@@ -120,7 +120,7 @@ class MinionCraftHelper {
                 if (!allIngredients.contains(rawId)) continue
                 if (!isAllowed(allMinions, rawId)) continue
 
-                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
+                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
                 val old = otherItems.getOrDefault(itemId, 0)
                 otherItems[itemId] = old + item.stackSize * multiplier
             }
@@ -131,7 +131,7 @@ class MinionCraftHelper {
     }
 
     private fun isAllowed(allMinions: List<NEUInternalName>, internalName: NEUInternalName): Boolean {
-        val a = NEUItems.getMultiplier(internalName)
+        val primitiveStack = NEUItems.getPrimitiveMultiplier(internalName)
         for (minion in allMinions) {
             val recipes = NEUItems.getRecipes(minion)
 
@@ -140,8 +140,8 @@ class MinionCraftHelper {
                     val ingredientInternalName = ingredient.internalItemId.asInternalName()
                     if (ingredientInternalName == internalName) return true
 
-                    val b = NEUItems.getMultiplier(ingredientInternalName)
-                    if (a.first == b.first && a.second < b.second) return true
+                    val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
+                    if (primitiveStack.internalName == ingredientPrimitive.internalName && primitiveStack.amount < ingredientPrimitive.amount) return true
                 }
             }
         }
@@ -207,7 +207,7 @@ class MinionCraftHelper {
             }
             var allDone = true
             for ((rawId, need) in map) {
-                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
+                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount

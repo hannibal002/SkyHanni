@@ -23,7 +23,7 @@ class MinionCollectLogic {
         val map = mutableMapOf<NEUInternalName, Int>()
         for (stack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = stack.getInternalName()
-            val (newId, amount) = NEUItems.getMultiplier(internalName)
+            val (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName)
             val old = map[newId] ?: 0
             map[newId] = old + amount * stack.stackSize
         }
