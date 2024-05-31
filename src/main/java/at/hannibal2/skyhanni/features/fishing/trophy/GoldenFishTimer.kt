@@ -163,6 +163,13 @@ class GoldenFishTimer {
     }
 
     private fun drawDisplay() = buildList {
+        if (config.showHead) add(
+            Renderable.itemStack(
+                goldenFishSkullItem,
+                2.5,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+            )
+        )
         val text = buildList {
             add("§6§lGolden Fish Timer")
             if (!isGoldenFishActive()) {
@@ -194,13 +201,6 @@ class GoldenFishTimer {
             Renderable.verticalContainer(
                 text.map { Renderable.string(it) },
                 1,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            )
-        )
-        if (config.showHead) add(
-            Renderable.itemStack(
-                goldenFishSkullItem,
-                2.5,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER
             )
         )
