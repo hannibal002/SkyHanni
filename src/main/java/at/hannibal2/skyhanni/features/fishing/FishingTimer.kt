@@ -41,17 +41,19 @@ class FishingTimer {
         if (!isEnabled()) return
         updateLocation()
         if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
-            SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
+            playSound()
         }
         if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             if (currentCount >= 60) {
-                SoundUtils.playBeepSound()
+                playSound()
                 LorenzUtils.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
             }
         } else if (config.fishingCapAlert && currentCount >= config.fishingCapAmount) {
-            SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
+            playSound()
         }
     }
+
+    private fun playSound() = SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -84,10 +86,6 @@ class FishingTimer {
             1 + it.key.extraEntities.size
         }
         startTime = mobMap.maxByOrNull { it.value.passedSince() }?.value ?: SimpleTimeMark.farPast()
-        if (IslandType.CRYSTAL_HOLLOWS.isInIsland() && currentCount >= 60 && config.wormLimitAlert) {
-            SoundUtils.playBeepSound()
-            LorenzUtils.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
-        }
     }
 
     private fun updateLocation() {
