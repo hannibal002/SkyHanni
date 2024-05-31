@@ -357,8 +357,8 @@ object Commands {
         ) { GardenAPI.clearCropSpeed() }
         registerCommand(
             "shclearminiondata",
-            "Reset data about minion profit and the name display on the private island"
-        ) { MinionFeatures.clearMinionData() }
+            "Removed bugged minion locations from your private island"
+        ) { MinionFeatures.removeBuggedMinions(isCommand = true) }
         registerCommand(
             "shwhereami",
             "Print current island in chat"
