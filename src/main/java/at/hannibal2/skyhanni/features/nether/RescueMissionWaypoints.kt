@@ -69,7 +69,7 @@ class RescueMissionWaypoints(private val reputationHelper: CrimsonIsleReputation
                     it,
                     listOf(),
                     platformSize = 1.0,
-                    detectionRange = 1.0,
+                    detectionRange = 3.5,
                     onEndReach = {
                         show = false
                     }
@@ -79,6 +79,8 @@ class RescueMissionWaypoints(private val reputationHelper: CrimsonIsleReputation
                 ParkourHelper(
                     it,
                     listOf(),
+                    platformSize = 1.0,
+                    detectionRange = 3.5,
                     onEndReach = {
                         show = false
                     }
