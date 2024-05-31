@@ -51,7 +51,7 @@ class SummoningMobManager {
     )
     private val seraphRecallPattern by patternGroup.pattern( //§cThe Seraph recalled your 3 summoned allies!
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d) summoned allies!"
+        "§cThe Seraph recalled your (\\d+) summoned allies!"
     )
 
     @SubscribeEvent
