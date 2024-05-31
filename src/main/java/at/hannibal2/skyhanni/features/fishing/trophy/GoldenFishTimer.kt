@@ -41,20 +41,20 @@ class GoldenFishTimer {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.goldenFishTimer
 
-    private val group = RepoPattern.group("fishing.goldenfish")
-    private val spawnPattern by group.pattern(
+    private val patternGroup = RepoPattern.group("fishing.goldenfish")
+    private val spawnPattern by patternGroup.pattern(
         "spawn",
         "§9You spot a §r§6Golden Fish §r§9surface from beneath the lava!"
     )
-    private val interactPattern by group.pattern(
+    private val interactPattern by patternGroup.pattern(
         "interact",
         "§9The §r§6Golden Fish §r§9escapes your hook but looks weakened\\."
     )
-    private val weakPattern by group.pattern(
+    private val weakPattern by patternGroup.pattern(
         "weak",
         "§9The §r§6Golden Fish §r§9is weak!"
     )
-    private val despawnPattern by group.pattern(
+    private val despawnPattern by patternGroup.pattern(
         "despawn",
         "§9The §r§6Golden Fish §r§9swims back beneath the lava\\.\\.\\."
     )
