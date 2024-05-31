@@ -43,7 +43,12 @@ class FishingTimer {
         if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
             SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
         }
-        if (config.fishingCapAlert && currentCount >= config.fishingCapAmount) {
+        if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
+            if (currentCount >= 60) {
+                SoundUtils.playBeepSound()
+                LorenzUtils.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
+            }
+        } else if (config.fishingCapAlert && currentCount >= config.fishingCapAmount) {
             SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
         }
     }
