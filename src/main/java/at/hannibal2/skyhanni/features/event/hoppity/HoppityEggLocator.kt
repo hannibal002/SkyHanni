@@ -113,7 +113,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: List<LorenzVec>, ) {
+    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>, ) {
         if (!config.highlightDuplicateEggLocations || !config.showNearbyDuplicateEggLocations) return
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()

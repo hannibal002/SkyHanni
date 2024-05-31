@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -537,6 +538,10 @@ object Commands {
             "shaddfoundburrowlocationsfromclipboard",
             "Add all ever found burrow locations from clipboard"
         ) { AllBurrowsList.addFromClipboard() }
+        registerCommand(
+            "shtoggleegglocationdebug",
+            "Shows Hoppity egg locations with their internal API names and status."
+        ) { HoppityEggLocations.toggleDebug() }
     }
 
     private fun internalCommands() {
