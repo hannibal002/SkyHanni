@@ -173,9 +173,28 @@ object ScoreboardPattern {
 
     // mining
     private val miningSb = scoreboardGroup.group("mining")
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f: §235,448
+     * REGEX-TEST: §d᠅ §fGemstone§f: §d36,758
+     * REGEX-TEST: §b᠅ §fGlacite§f: §b29,537
+     * REGEX-TEST: §2᠅ §fMithril Powder§f: §235,448
+     * REGEX-TEST: §d᠅ §fGemstone Powder§f: §d36,758
+     * REGEX-TEST: §b᠅ §fGlacite Powder§f: §b29,537
+     */
     val powderPattern by miningSb.pattern(
         "powder",
-        "(§.)*᠅ §.(Gemstone|Mithril|Glacite)( Powder)?(§.)*:?.*$"
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)"
+    )
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f:§695
+     * REGEX-TEST: §d᠅ §fGemstone§f
+     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
+     */
+    val powderGreedyPattern by miningSb.pattern(
+        "powdergreedy",
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$"
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",

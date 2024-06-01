@@ -128,6 +128,7 @@ public class InventoryConfig {
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
+        DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         ;
@@ -223,4 +224,10 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Time Held in Lore", desc = "Shows time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeHeldInLore = false;
 }

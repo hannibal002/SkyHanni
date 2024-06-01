@@ -180,19 +180,19 @@ object HoppityEggsManager {
         }
     }
 
+    // TODO move logic into second passed event and cache
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
         if (!config.showClaimedEggs) return
-        if (isBuzy()) return
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+        if (isBusy()) return
 
         val displayList = HoppityEggType.entries
             .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
             .toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
 
-        if (config.showCollectedLocationCount) {
+        if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
             val totalEggs = HoppityEggLocator.getCurrentIslandEggLocations()?.size
             if (totalEggs != null) {
                 val collectedEggs = HoppityUniqueEggLocations.collectedEggsThisIsland()
@@ -222,11 +222,11 @@ object HoppityEggsManager {
 
     private fun checkWarn() {
         if (!warningActive) {
-            warningActive = HoppityEggType.entries.all { it.isClaimed() }
+            warningActive = !HoppityEggType.allEggsRemaining()
         }
 
         if (warningActive) {
-            if (HoppityEggType.entries.all { !it.isClaimed() }) {
+            if (HoppityEggType.allEggsRemaining()) {
                 warn()
             }
         }
@@ -234,24 +234,32 @@ object HoppityEggsManager {
 
     private fun warn() {
         if (!config.warnUnclaimedEggs) return
-        if (isBuzy()) return
+        if (isBusy()) return
         if (lastWarnTime.passedSince() < 30.seconds) return
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size
         val message = "All $amount Hoppity Eggs are ready to be found!"
         if (config.warpUnclaimedEggs) {
-            ChatUtils.clickableChat(
-                message,
-                onClick = { HypixelCommands.warp(config.warpDestination) },
-                "§eClick to /warp ${config.warpDestination}!"
-            )
+            if (LorenzUtils.inSkyBlock) {
+                ChatUtils.clickableChat(
+                    message,
+                    onClick = { HypixelCommands.warp(config.warpDestination) },
+                    "§eClick to /warp ${config.warpDestination}!"
+                )
+            } else {
+                ChatUtils.clickableChat(
+                    message,
+                    onClick = { HypixelCommands.skyblock() },
+                    "§eClick to join /skyblock!"
+                )
+            }
         } else ChatUtils.chat(message)
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
-    private fun isBuzy() = ReminderUtils.isBusy(config.showDuringContest)
+    private fun isBusy() = ReminderUtils.isBusy(config.showDuringContest)
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -263,5 +271,6 @@ object HoppityEggsManager {
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 
-    fun isActive() = LorenzUtils.inSkyBlock && ChocolateFactoryAPI.isHoppityEvent()
+    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&
+        ChocolateFactoryAPI.isHoppityEvent()
 }

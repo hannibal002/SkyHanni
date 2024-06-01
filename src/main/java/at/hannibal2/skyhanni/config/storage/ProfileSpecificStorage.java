@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.storage;
 
+import at.hannibal2.skyhanni.api.HotmAPI;
 import at.hannibal2.skyhanni.api.SkillAPI;
 import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
@@ -491,6 +493,27 @@ public class ProfileSpecificStorage {
 
         @Expose
         public ExcavatorProfitTracker.Data fossilExcavatorProfitTracker = new ExcavatorProfitTracker.Data();
+
+        @Expose
+        public HotmTree hotmTree = new HotmTree();
+
+        @Expose
+        public Map<HotmAPI.Powder, PowderStorage> powder = new HashMap<>();
+
+        public static class PowderStorage {
+
+            @Expose
+            public Long available;
+
+            @Expose
+            public Long total;
+        }
+
+        @Expose
+        public int tokens;
+
+        @Expose
+        public int availableTokens;
     }
 
     @Expose
