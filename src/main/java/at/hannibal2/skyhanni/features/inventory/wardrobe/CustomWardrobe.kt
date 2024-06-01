@@ -512,8 +512,7 @@ object CustomWardrobe {
         with(config.color) {
             return Color((when {
                 isCurrentSlot() -> equippedColor
-                locked -> lockedEmptyColor
-                isEmpty() -> lockedEmptyColor
+                locked || isEmpty() -> lockedEmptyColor
                 favorite -> favoriteColor
                 else -> null
             }?.toChromaColor()?.let { if (!isInCurrentPage()) it.darker() else it }
