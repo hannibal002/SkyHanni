@@ -538,7 +538,8 @@ object CustomWardrobe {
                 favorite -> favoriteColor
                 else -> null
             }?.toChromaColor()?.let { if (!isInCurrentPage()) it.darker() else it }
-                ?: (if (!isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()).withAlpha(100), true)
+                ?: (if (!isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
+                ).withAlpha(100), true)
         }
     }
 
