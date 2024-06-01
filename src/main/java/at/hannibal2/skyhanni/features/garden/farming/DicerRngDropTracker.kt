@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -9,15 +10,16 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import java.util.regex.Pattern
 
 object DicerRngDropTracker {
@@ -109,6 +111,13 @@ object DicerRngDropTracker {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.compact) {
+            tracker.update()
+        }
+    }
+
     private fun drawDisplay(data: Data) = buildList {
         val cropInHand = cropInHand ?: return@buildList
         val items = data.drops.getOrPut(cropInHand) { mutableMapOf() }
@@ -118,7 +127,7 @@ object DicerRngDropTracker {
         topLine.add(Renderable.itemStack(cropInHand.icon))
         topLine.add(Renderable.string("§7Dicer Tracker:"))
         add(listOf(Renderable.horizontalContainer(topLine)))
-        if (config.compact) {
+        if (config.compact.get()) {
             var first = true
             var compactLine = ""
 

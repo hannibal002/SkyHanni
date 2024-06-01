@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class DicerRngDropTrackerConfig {
     @Expose
@@ -18,7 +19,7 @@ public class DicerRngDropTrackerConfig {
     @ConfigOption(name = "Compact Tracker", desc = "Compact the Dicer RNG drop Tracker Display.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean compact = false;
+    public Property<Boolean> compact = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when dropping a RNG Dicer drop.")
