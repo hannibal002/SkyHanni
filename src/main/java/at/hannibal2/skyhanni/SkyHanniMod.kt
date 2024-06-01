@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
+import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ItemClickData
@@ -134,6 +135,7 @@ import at.hannibal2.skyhanni.features.dungeon.TerracottaPhase
 import at.hannibal2.skyhanni.features.event.UniqueGiftingOpportunitiesFeatures
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI
 import at.hannibal2.skyhanni.features.event.diana.DianaFixChat
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
@@ -261,6 +263,7 @@ import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.features.inventory.DojoRankDisplay
 import at.hannibal2.skyhanni.features.inventory.HarpFeatures
+import at.hannibal2.skyhanni.features.inventory.HeldTimeInLore
 import at.hannibal2.skyhanni.features.inventory.HideNotClickableItems
 import at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures
@@ -308,6 +311,7 @@ import at.hannibal2.skyhanni.features.mining.ColdOverlay
 import at.hannibal2.skyhanni.features.mining.DeepCavernsGuide
 import at.hannibal2.skyhanni.features.mining.GoldenGoblinHighlight
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
+import at.hannibal2.skyhanni.features.mining.HotmFeatures
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
 import at.hannibal2.skyhanni.features.mining.MiningNotifications
@@ -321,6 +325,8 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.GlacitePowderFeatures
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ProfitPerExcavation
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.solver.FossilSolverDisplay
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseLocator
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints
 import at.hannibal2.skyhanni.features.mining.mineshaft.CorpseAPI
 import at.hannibal2.skyhanni.features.mining.mineshaft.MineshaftCorpseProfitPer
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -344,6 +350,7 @@ import at.hannibal2.skyhanni.features.misc.FixNEUHeavyPearls
 import at.hannibal2.skyhanni.features.misc.HideArmor
 import at.hannibal2.skyhanni.features.misc.HideFarEntities
 import at.hannibal2.skyhanni.features.misc.InGameDateDisplay
+import at.hannibal2.skyhanni.features.misc.InWaterDisplay
 import at.hannibal2.skyhanni.features.misc.JoinCrystalHollows
 import at.hannibal2.skyhanni.features.misc.LesserOrbHider
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -495,7 +502,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.3",
+    version = "0.26.Beta.5",
 )
 class SkyHanniMod {
 
@@ -571,6 +578,7 @@ class SkyHanniMod {
         loadModule(ChatUtils)
         loadModule(FixedRateTimerManager())
         loadModule(ChromaManager)
+        loadModule(HotmData)
         loadModule(ContributorManager)
         loadModule(TabComplete)
         loadModule(HypixelBazaarFetcher)
@@ -610,6 +618,7 @@ class SkyHanniMod {
         loadModule(FossilExcavatorAPI)
         loadModule(ChocolateFactoryAPI)
         loadModule(RenderableTooltips)
+        loadModule(DianaAPI)
 
         // features
         loadModule(BazaarOrderHelper())
@@ -655,7 +664,7 @@ class SkyHanniMod {
         loadModule(AshfangHideParticles())
         loadModule(AshfangHideDamageIndicator())
         loadModule(ItemStars())
-        loadModule(MinionFeatures())
+        loadModule(MinionFeatures)
         loadModule(TimeFeatures())
         loadModule(RngMeterInventory())
         loadModule(WikiManager)
@@ -715,6 +724,7 @@ class SkyHanniMod {
         loadModule(StatsTuning())
         loadModule(NonGodPotEffectDisplay())
         loadModule(SoopyGuessBurrow())
+        loadModule(HotmFeatures())
         loadModule(DianaProfitTracker)
         loadModule(DianaFixChat())
         loadModule(MythologicalCreatureTracker)
@@ -770,6 +780,8 @@ class SkyHanniMod {
         loadModule(ProfitPerExcavation())
         loadModule(GlacitePowderFeatures())
         loadModule(MineshaftCorpseProfitPer())
+        loadModule(MineshaftWaypoints)
+        loadModule(CorpseLocator)
         loadModule(CorpseAPI())
         loadModule(GardenOptimalSpeed())
         loadModule(GardenLevelDisplay())
@@ -930,6 +942,7 @@ class SkyHanniMod {
         loadModule(HighlightPlaceableNpcs())
         loadModule(PresentWaypoints())
         loadModule(MiningEventTracker())
+        loadModule(InWaterDisplay)
         loadModule(MiningNotifications)
         loadModule(JyrreTimer())
         loadModule(TotemOfCorruption())
@@ -943,6 +956,7 @@ class SkyHanniMod {
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
         loadModule(SuperCraftFeatures)
+        loadModule(HeldTimeInLore)
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime)
         loadModule(CopyPlaytime)

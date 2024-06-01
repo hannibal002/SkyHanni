@@ -296,9 +296,7 @@ object Commands {
         registerCommand0(
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
-            {
-                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
-            },
+            { FarmingMilestoneCommand.setGoal(it) },
             FarmingMilestoneCommand::onComplete
         )
         registerCommand0(
@@ -345,8 +343,8 @@ object Commands {
         ) { GardenAPI.clearCropSpeed() }
         registerCommand(
             "shclearminiondata",
-            "Reset data about minion profit and the name display on the private island"
-        ) { MinionFeatures.clearMinionData() }
+            "Removed bugged minion locations from your private island"
+        ) { MinionFeatures.removeBuggedMinions(isCommand = true) }
         registerCommand(
             "shwhereami",
             "Print current island in chat"

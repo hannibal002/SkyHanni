@@ -35,8 +35,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
-import java.util.Timer
-import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -297,14 +295,6 @@ object LorenzUtils {
     fun Int.derpy() = if (isDerpy) this / 2 else this
 
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
-
-    fun runDelayed(duration: Duration, runnable: () -> Unit) {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runnable()
-            }
-        }, duration.inWholeMilliseconds)
-    }
 
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
