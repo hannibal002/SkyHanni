@@ -5,8 +5,8 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 object ConditionalUtils {
 
-    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
-        if (condition()) transofmration(this) else this
+    fun <T> T.transformIf(condition: T.() -> Boolean, transformation: T.() -> T) =
+        if (condition()) transformation(this) else this
 
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)

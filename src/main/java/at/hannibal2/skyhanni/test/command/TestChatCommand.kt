@@ -18,10 +18,11 @@ object TestChatCommand {
 
         SkyHanniMod.launchCoroutine {
             val mutArgs = args.toMutableList()
-            val isComplex = mutArgs.remove("-complex")
-            val isClipboard = mutArgs.remove("-clipboard")
-            val isHidden = mutArgs.remove("-s")
             val multiLines = mutArgs.remove("-lines")
+            val isComplex = mutArgs.remove("-complex")
+            // cant use multi lines without clipboard
+            val isClipboard = mutArgs.remove("-clipboard") || multiLines
+            val isHidden = mutArgs.remove("-s")
             val text = if (isClipboard) {
                 OSUtils.readFromClipboard()
                     ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
@@ -47,20 +48,24 @@ object TestChatCommand {
                 }
             else ChatComponentText(text.replace("&", "§"))
         if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
-        test(component)
+        test(component, isHidden)
     }
 
-    private fun test(componentText: IChatComponent) {
+    private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
         val event = LorenzChatEvent(message, componentText)
         event.postAndCatch()
 
         if (event.blockedReason != "") {
-            ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
+            if (!isHidden) {
+                ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
+            }
         } else {
             val finalMessage = event.chatComponent
             if (finalMessage.formattedText.stripHypixelMessage() != message) {
-                ChatUtils.chat("§eChat modified!")
+                if (!isHidden) {
+                    ChatUtils.chat("§eChat modified!")
+                }
             }
             ChatUtils.chat(finalMessage)
         }

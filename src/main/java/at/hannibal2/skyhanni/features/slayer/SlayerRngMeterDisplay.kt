@@ -22,9 +22,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -54,9 +55,16 @@ class SlayerRngMeterDisplay {
         "changeditem",
         "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
     )
+    /**
+     * REGEX-TEST: §aEnchanted Book (§d§lDuplex I§a)
+     */
+    private val bookFormatPattern by patternGroup.pattern(
+        "book.format",
+        "§aEnchanted Book \\((?<name>.*)§a\\)"
+    )
 
     private var display = emptyList<Renderable>()
-    private var lastItemDroppedTime = 0L
+    private var lastItemDroppedTime = SimpleTimeMark.farPast()
 
     var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
 
@@ -64,8 +72,8 @@ class SlayerRngMeterDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        if (lastItemDroppedTime != 0L && System.currentTimeMillis() > lastItemDroppedTime + 4_000) {
-            lastItemDroppedTime = 0L
+        if (!lastItemDroppedTime.isFarPast() && lastItemDroppedTime.passedSince() > 4.seconds) {
+            lastItemDroppedTime = SimpleTimeMark.farPast()
             update()
         }
     }
@@ -114,7 +122,7 @@ class SlayerRngMeterDisplay {
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
                 ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
-                lastItemDroppedTime = System.currentTimeMillis()
+                lastItemDroppedTime = SimpleTimeMark.now()
             }
             if (blockChat) {
                 event.blockedReason = "slayer_rng_meter"
@@ -159,8 +167,11 @@ class SlayerRngMeterDisplay {
 
         if (name != getCurrentSlayer()) return
 
-        val selectedItem = lore.nextAfter("§7Selected Drop") ?: return
-        val internalName = NEUInternalName.fromItemName(selectedItem)
+        val rawName = lore.nextAfter("§7Selected Drop") ?: return
+        val itemName = bookFormatPattern.matchMatcher(rawName) {
+            group("name")
+        } ?: rawName
+        val internalName = NEUInternalName.fromItemName(itemName)
         setNewGoal(internalName)
     }
 
@@ -210,7 +221,7 @@ class SlayerRngMeterDisplay {
         with(storage) {
             if (itemGoal == "?") return "§cOpen RNG Meter Inventory!"
             if (itemGoal == "") {
-                return if (lastItemDroppedTime != 0L) {
+                return if (!lastItemDroppedTime.isFarPast()) {
                     "§a§lRNG Item dropped!"
                 } else {
                     "§eNo RNG Item selected!"

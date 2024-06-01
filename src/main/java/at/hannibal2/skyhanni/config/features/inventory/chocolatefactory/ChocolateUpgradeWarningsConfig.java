@@ -11,7 +11,7 @@ public class ChocolateUpgradeWarningsConfig {
     @ConfigOption(name = "Upgrade Warning", desc = "Chat notification when you have a chocolate factory upgrade available to purchase.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean upgradeWarning = true;
+    public boolean upgradeWarning = false;
 
     @Expose
     @ConfigOption(name = "Upgrade Warning Sound", desc = "Also plays a sound when an upgrade is available. " +

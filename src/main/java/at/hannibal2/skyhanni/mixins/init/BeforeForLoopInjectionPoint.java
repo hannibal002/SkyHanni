@@ -21,7 +21,7 @@ import java.util.Collection;
  * }
  * }
  * </pre>
- * Does not work for more complex instructions which call functions or do other operations inside of the for loop header.
+ * Does not work for more complex instructions which call functions or do other operations inside the for loop header.
  * Does not work for {@link java.util.Iterator iterators}.
  *
  * <p>Set the lvIndex arg to specify which lvIndex to search for when selecting the loop.</p>

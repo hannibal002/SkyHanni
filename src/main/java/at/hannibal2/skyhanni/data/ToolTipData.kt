@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack
 
 // Please use LorenzToolTipEvent over ItemTooltipEvent if no special EventPriority is necessary
 object ToolTipData {
+
+    @JvmStatic
     fun getTooltip(stack: ItemStack, toolTip: MutableList<String>): List<String> {
         onHover(stack, toolTip)
         return onTooltip(toolTip)
