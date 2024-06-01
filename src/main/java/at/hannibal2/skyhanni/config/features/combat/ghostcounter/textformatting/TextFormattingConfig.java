@@ -13,7 +13,7 @@ public class TextFormattingConfig {
     @ConfigOption(name = "§eText Formatting Info", desc = "§e%session% §ris §e§lalways §rreplaced with\n" +
         "§7the count for your current session.\n" +
         "§7Reset when restarting the game.\n" +
-        "§7You can use §e&Z §7color code to use SBA chroma.")
+        "§7You can use §e&Z §7colour code to use SBA chroma.")
     @ConfigEditorInfoText
     public boolean formatInfo = false;
 

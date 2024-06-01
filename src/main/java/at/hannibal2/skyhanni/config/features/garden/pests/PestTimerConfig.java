@@ -21,7 +21,7 @@ public class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Only With Vacuum",
-        desc = "Only show the time while holding a vacuum in the hand."
+        desc = "Only show the time while holding a vacuum."
     )
     @ConfigEditorBoolean
     public boolean onlyWithVacuum = true;

@@ -31,7 +31,7 @@ public class CompactTabListConfig {
     public boolean hideAdverts = false;
 
     @Expose
-    @ConfigOption(name = "Hide Fire Sale Adverts", desc = "Hides fire sales from the tablist")
+    @ConfigOption(name = "Hide Fire Sale Adverts", desc = "Hides fire sales from the tablist.")
     @ConfigEditorBoolean
     public boolean hideFiresales = false;
 

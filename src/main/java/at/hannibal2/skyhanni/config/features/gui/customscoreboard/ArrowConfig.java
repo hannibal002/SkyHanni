@@ -29,7 +29,7 @@ public class ArrowConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Color Arrow Amount", desc = "Color the arrow amount based on the percentage.")
+    @ConfigOption(name = "Colour Arrow Amount", desc = "Colour the arrow amount based on the percentage.")
     @ConfigEditorBoolean
     public boolean colorArrowAmount = false;
 }

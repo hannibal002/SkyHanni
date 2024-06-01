@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class FishingConfig {
 
     @Expose
-    @Category(name = "Trophy Fishing", desc = "Trophy Fishing Settings")
+    @Category(name = "Trophy Fishing", desc = "Trophy Fishing Settings.")
     public TrophyFishingConfig trophyFishing = new TrophyFishingConfig();
 
     @Expose

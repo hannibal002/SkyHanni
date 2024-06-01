@@ -44,7 +44,7 @@ public class CropMilestonesConfig {
     @Expose
     @ConfigOption(
         name = "Warn When Close",
-        desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
+        desc = "Shows a title and sound 5 seconds before the next crop milestone upgrade happens. " +
             "Useful for switching to a different pet for leveling.")
     @ConfigEditorBoolean
     public boolean warnClose = false;
@@ -148,7 +148,7 @@ public class CropMilestonesConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimals displayed in blocks/second.")
+    @ConfigOption(name = "Block Broken Precision", desc = "The amount of decimal places displayed in blocks/second.")
     @ConfigEditorSlider(
         minValue = 0,
         maxValue = 6,
@@ -157,7 +157,7 @@ public class CropMilestonesConfig {
     public int blocksBrokenPrecision = 2;
 
     @Expose
-    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds of not farming until blocks/second resets.")
+    @ConfigOption(name = "Seconds Before Reset", desc = "How many seconds without farming until blocks per second resets.")
     @ConfigEditorSlider(
         minValue = 2,
         maxValue = 60,

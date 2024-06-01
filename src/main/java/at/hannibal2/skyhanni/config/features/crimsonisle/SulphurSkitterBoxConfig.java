@@ -39,7 +39,7 @@ public class SulphurSkitterBoxConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Box Color", desc = "Choose the color of the box.")
+    @ConfigOption(name = "Box Colour", desc = "Choose the colour of the box.")
     @ConfigEditorColour
     public String boxColor = "0:102:255:216:0";
 

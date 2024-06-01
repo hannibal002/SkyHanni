@@ -49,7 +49,7 @@ public class DisplayConfig {
 
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
-        "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
+        "\n§cMods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideVanillaScoreboard = Property.of(true);
@@ -61,7 +61,7 @@ public class DisplayConfig {
     public boolean displayNumbersFirst = false;
 
     @Expose
-    @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
+    @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can be claimed.")
     @ConfigEditorBoolean
     public boolean showUnclaimedBits = false;
 
@@ -71,7 +71,7 @@ public class DisplayConfig {
     public boolean showMaxIslandPlayers = true;
 
     @Expose
-    @ConfigOption(name = "Number Format", desc = "")
+    @ConfigOption(name = "Number Format", desc = "Format numbers in the scoreboard will be displayed as.")
     @ConfigEditorDropdown
     public NumberFormat numberFormat = NumberFormat.LONG;
 

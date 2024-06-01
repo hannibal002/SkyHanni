@@ -10,13 +10,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class LivingMetalSuitProgressConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Display Living Metal Suit progress.")
+    @ConfigOption(name = "Enabled", desc = "Displays Living Metal Suit progress.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Compact", desc = "Show a compacted version of the overlay when the set is maxed.")
+    @ConfigOption(name = "Compact", desc = "Shows a compacted version of the overlay when the set is maxed.")
     @ConfigEditorBoolean
     public boolean compactWhenMaxed = false;
 

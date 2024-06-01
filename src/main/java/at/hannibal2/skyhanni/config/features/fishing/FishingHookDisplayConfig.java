@@ -27,8 +27,8 @@ public class FishingHookDisplayConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hide Armor Stand",
-        desc = "Hide the original armor stand from Hypixel when the SkyHanni display is enabled."
+        name = "Hide Armour Stand",
+        desc = "Hide the original armour stand from Hypixel when the SkyHanni display is enabled."
     )
     @ConfigEditorBoolean
     public boolean hideArmorStand = true;

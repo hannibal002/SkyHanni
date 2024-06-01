@@ -15,7 +15,7 @@ public class ArmorDropTrackerConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armor drop.")
+    @ConfigOption(name = "Hide Chat", desc = "Hide the chat message when receiving a farming armour drop.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideChat = false;

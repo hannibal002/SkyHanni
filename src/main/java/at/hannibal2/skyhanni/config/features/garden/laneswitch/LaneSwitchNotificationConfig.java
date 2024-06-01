@@ -26,7 +26,7 @@ public class LaneSwitchNotificationConfig {
     public int secondsBefore = 5;
 
     @Expose
-    @ConfigOption(name = "Text", desc = "The text with color to be displayed as the notification.")
+    @ConfigOption(name = "Text", desc = "The text to be displayed as the end of lane notification.")
     @ConfigEditorText
     public String text = "&eLane Switch incoming.";
 

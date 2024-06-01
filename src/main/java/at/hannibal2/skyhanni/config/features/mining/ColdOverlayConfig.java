@@ -20,7 +20,7 @@ public class ColdOverlayConfig {
     @Expose
     @ConfigOption(
         name = "Cold Threshold",
-        desc = "The threshold at which the cold overlay will be shown."
+        desc = "Threshold at which the cold overlay will be shown."
     )
     @ConfigEditorSlider(
         minValue = 0,

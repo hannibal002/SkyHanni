@@ -38,7 +38,7 @@ public class SackDisplayConfig {
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
     @Expose
-    @ConfigOption(name = "Alignment", desc = "Channge the alignment for numbers and money.")
+    @ConfigOption(name = "Alignment", desc = "Change the alignment for numbers and money.")
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
 
@@ -115,8 +115,7 @@ public class SackDisplayConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed. (Some sacks have too many items to fit\n" +
-        "in larger GUI scales, like the nether sack.)")
+    @ConfigOption(name = "Item To Show", desc = "Choose how many items are displayed. (Some sacks have too many items to fit in larger GUI scales, like the nether sack.)")
     @ConfigEditorSlider(
         minValue = 0,
         maxValue = 45,

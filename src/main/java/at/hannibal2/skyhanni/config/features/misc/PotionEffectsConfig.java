@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class PotionEffectsConfig {
     @Expose
-    @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
+    @ConfigOption(name = "Non God Pot Effects", desc = "Displays active potion effects that are not part of the God Pot.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean nonGodPotEffectDisplay = false;

@@ -97,7 +97,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Composter Display",
-        desc = "Displays the Composter data from the tab list as GUI element."
+        desc = "Displays the Composter data from the tab list as a GUI element."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -106,7 +106,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Outside Garden",
-        desc = "Show Time till Composter is empty outside Garden"
+        desc = "Show Time till Composter is empty outside Garden."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -115,7 +115,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Composter Warning",
-        desc = "Warn when the Composter gets close to empty, even outside Garden."
+        desc = "Warn when the Composter gets close to empty, even outside the Garden."
     )
     @ConfigEditorBoolean
     public boolean warnAlmostClose = false;
@@ -156,7 +156,7 @@ public class ComposterConfig {
     public boolean inventoryNumbers = true;
 
     @Expose
-    @ConfigOption(name = "Notification When Low Composter", desc = "")
+    @ConfigOption(name = "Notification When Low Composter Resources", desc = "")
     @Accordion
     public NotifyLowConfig notifyLow = new NotifyLowConfig();
 

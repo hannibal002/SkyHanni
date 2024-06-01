@@ -25,12 +25,12 @@ public class SkillProgressBarConfig {
     public Property<Boolean> useTexturedBar = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Chroma", desc = "Use the SBA like chroma effect on the bar.\n§eIf enabled, ignore the Bar Color setting.")
+    @ConfigOption(name = "Chroma", desc = "Use the SBA like chroma effect on the bar.\n§eIf enabled, ignore the Bar Colour setting.")
     @ConfigEditorBoolean
     public Property<Boolean> useChroma = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Bar Color", desc = "Color of the progress bar.\n§eIgnored if Chroma is enabled.")
+    @ConfigOption(name = "Bar Colour", desc = "Colour of the progress bar.\n§eIgnored if Chroma is enabled.")
     @ConfigEditorColour
     public String barStartColor = "0:255:255:0:0";
 
@@ -76,14 +76,14 @@ public class SkillProgressBarConfig {
         @Expose
         @ConfigOption(name = "Width", desc = "Modify the width of the bar.\n" +
             "§eDefault: 182\n" +
-            "§c!!Do not work for now!!")
+            "§c!!Does not work for now!!")
         @ConfigEditorSlider(minStep = 1, minValue = 16, maxValue = 1024)
         public int width = 182;
 
         @Expose
         @ConfigOption(name = "Height", desc = "Modify the height of the bar.\n" +
             "§eDefault: 5\n" +
-            "§c!!Do not work for now!!")
+            "§c!!Does not work for now!!")
         @ConfigEditorSlider(minStep = 1, minValue = 3, maxValue = 16)
         public int height = 5;
     }

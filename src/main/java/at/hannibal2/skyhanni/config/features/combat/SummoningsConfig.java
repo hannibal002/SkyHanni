@@ -11,7 +11,7 @@ public class SummoningsConfig {
 
     @Expose
     @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground. " +
-        "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
+        "§cDoesn't work in Dungeons if Skytils Hide Non-Starred Mobs Nametags feature is enabled!")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean summoningSoulDisplay = false;
@@ -33,7 +33,7 @@ public class SummoningsConfig {
     public boolean summoningMobHideNametag = false;
 
     @Expose
-    @ConfigOption(name = "Summoning Mob Color", desc = "Marks own summons green.")
+    @ConfigOption(name = "Summoning Mob Colour", desc = "Mark your own summons green.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean summoningMobColored = false;

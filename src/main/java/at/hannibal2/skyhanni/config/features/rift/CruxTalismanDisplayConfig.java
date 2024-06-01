@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CruxTalismanDisplayConfig {
     @Expose
-    @ConfigOption(name = "Crux Talisman Display", desc = "Display progress of the Crux Talisman on screen.")
+    @ConfigOption(name = "Crux Talisman Display", desc = "Displays progress of the Crux Talisman on screen.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

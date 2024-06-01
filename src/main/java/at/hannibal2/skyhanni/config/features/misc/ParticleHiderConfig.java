@@ -31,12 +31,6 @@ public class ParticleHiderConfig {
     public boolean hideFireBlockParticles = false;
 
     @Expose
-    @ConfigOption(name = "Smoke Particles", desc = "Hide smoke particles.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hideSmokeParticles = false;
-
-    @Expose
     @ConfigOption(name = "Far Particles", desc = "Hide particles that are more than 40 blocks away.")
     @ConfigEditorBoolean
     @FeatureToggle

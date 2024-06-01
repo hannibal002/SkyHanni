@@ -18,7 +18,7 @@ public class DianaConfig {
     public boolean highlightInquisitors = true;
 
     @Expose
-    @ConfigOption(name = "Inquisitor Highlight", desc = "Color in which Inquisitors will be highlighted.")
+    @ConfigOption(name = "Inquisitor Highlight", desc = "Colour in which Inquisitors will be highlighted.")
     @ConfigEditorColour
     public String color = "0:127:85:255:255";
 
@@ -73,7 +73,7 @@ public class DianaConfig {
     @Expose
     @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
-    // TODO renmae
+    // TODO rename
     public MythologicalMobTrackerConfig mythologicalMobtracker = new MythologicalMobTrackerConfig();
 
     @Expose

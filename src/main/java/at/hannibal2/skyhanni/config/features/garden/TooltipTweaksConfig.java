@@ -21,7 +21,7 @@ public class TooltipTweaksConfig {
 
     @Expose
     @ConfigOption(
-        name = "Breakdown Hotkey",
+        name = "Breakdown keybind",
         desc = "When the keybind is pressed, show a breakdown of all fortune sources on a tool."
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
@@ -68,7 +68,7 @@ public class TooltipTweaksConfig {
     @Expose
     @ConfigOption(
         name = "Total Crop Milestone",
-        desc = "Shows the progress bar till maxed crop milestone in the crop milestone inventory."
+        desc = "Shows the progress bar until maxed crop milestone in the crop milestone inventory."
     )
     @ConfigEditorBoolean
     @FeatureToggle

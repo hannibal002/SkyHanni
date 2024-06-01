@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class PartyFinderConfig {
     @Expose
-    @ConfigOption(name = "Colored Class Level", desc = "Color class levels in Party Finder.")
+    @ConfigOption(name = "Coloured Class Level", desc = "Colour class levels in Party Finder.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean coloredClassLevel = true;

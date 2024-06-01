@@ -36,7 +36,7 @@ public class EnderNodeConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Tracks all of your drops from mining Ender Nodes in the End.\n" +
-            "Also tracks drops from Endermen."
+            "Also tracks drops from Enderman."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -45,7 +45,7 @@ public class EnderNodeConfig {
     @Expose
     @ConfigOption(
         name = "Only While Holding Tool",
-        desc = "Only shows the tracker if holding a pickaxe, drill or gauntlet in hand."
+        desc = "Only shows the tracker if holding a pickaxe, drill or gauntlet."
     )
     @ConfigEditorBoolean
     public boolean onlyPickaxe = false;

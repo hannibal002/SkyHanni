@@ -23,7 +23,7 @@ public class DanceRoomFormattingConfig {
     public String later = "&7Later:";
 
     @Expose
-    @ConfigOption(name = "Color Option", desc = "")
+    @ConfigOption(name = "Colour Option", desc = "")
     @Accordion
     public ColorConfig color = new ColorConfig();
 }

@@ -38,7 +38,7 @@ public class InventoryConfig {
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
-    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
+    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing.")
     public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose
@@ -171,7 +171,7 @@ public class InventoryConfig {
     @ConfigOption(
         name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+            "(e.g. armour, weapons, accessories). Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -107,7 +107,7 @@ public class FrozenTreasureConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Only in Glacial Cave", desc = "Only shows the overlay while in the Glacial Cave.")
+    @ConfigOption(name = "Only in Glacial Cave", desc = "Only show the overlay while in the Glacial Cave.")
     @ConfigEditorBoolean
     public boolean onlyInCave = true;
 

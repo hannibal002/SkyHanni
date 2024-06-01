@@ -27,12 +27,12 @@ public class TubulatorConfig {
     public boolean outline = true;
 
     @Expose
-    @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+    @ConfigOption(name = "Rainbow Colour", desc = "Shows the rainbow colour effect instead of a boring monochrome colour.")
     @ConfigEditorBoolean
     public Property<Boolean> rainbowColor = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the parkour platforms.")
+    @ConfigOption(name = "Monochrome Colour", desc = "Set a boring monochrome colour for the parkour platforms.")
     @ConfigEditorColour
     public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 

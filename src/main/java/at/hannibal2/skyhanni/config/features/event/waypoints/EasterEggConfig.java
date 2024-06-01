@@ -8,13 +8,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class EasterEggConfig {
 
     @Expose
-    @ConfigOption(name = "Egg Waypoints", desc = "Show all Easter Egg waypoints.\nShoutout to §bSorkoPiko §7for the coordinates.\n(AS OF 2024)")
+    @ConfigOption(name = "Egg Waypoints", desc = "Show all Easter Egg waypoints.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean allWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #18, #27, and #30. Coordinates by §bSorkoPiko§7 and §bErymanthus§7.")
+    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #18, #27, and #30.")
     @ConfigEditorBoolean
     public boolean allEntranceWaypoints = false;
 

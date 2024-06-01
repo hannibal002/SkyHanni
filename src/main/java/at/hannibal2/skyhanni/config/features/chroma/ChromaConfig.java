@@ -16,7 +16,7 @@ public class ChromaConfig {
 
     @Expose
     @ConfigOption(name = "Chroma Preview", desc = "§fPlease star the mod on GitHub!")
-    @ConfigEditorInfoText(infoTitle = "Only In SkyBlock")
+    @ConfigEditorInfoText(infoTitle = "§fOnly In SkyBlock")
     public boolean chromaPreview = false;
 
     @Expose
@@ -26,7 +26,7 @@ public class ChromaConfig {
     public Property<Boolean> enabled = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Chroma Size", desc = "Change the size of each color in the chroma.")
+    @ConfigOption(name = "Chroma Size", desc = "Change the size of each colour in the chroma.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 100f, minStep = 1f)
     public float chromaSize = 30f;
 

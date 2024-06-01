@@ -60,7 +60,7 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Only With Vacuum",
-        desc = "Only show the pest display and waypoints while holding a vacuum in the hand."
+        desc = "Only show the pest display and waypoints while holding a vacuum."
     )
     @ConfigEditorBoolean
     public boolean onlyWithVacuum = true;
@@ -79,12 +79,12 @@ public class PestFinderConfig {
     public Position position = new Position(-350, 200, 1.3f);
 
     @Expose
-    @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
+    @ConfigOption(name = "Teleport Keybind", desc = "Press this key to warp to the nearest plot with pests on it.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int teleportHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Always Teleport", desc = "Allow teleporting with the Teleport Hotkey even when you're already in an infested plot.")
+    @ConfigOption(name = "Always Teleport", desc = "Allow teleporting with the Teleport keybind even when you're already in an infested plot.")
     @ConfigEditorBoolean
     public boolean alwaysTp = false;
 

@@ -9,15 +9,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class HighlightPartyMembersConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Marking party members with a bright outline to better find them in the world.")
+    @ConfigOption(name = "Enabled", desc = "Mark party members with a coloured outline.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     @Expose
     @ConfigOption(
-        name = "Outline Color",
-        desc = "The color to outline party members in."
+        name = "Outline Colour",
+        desc = "The colour to outline party members in."
     )
     @ConfigEditorColour
     public String outlineColor = "0:245:85:255:85";

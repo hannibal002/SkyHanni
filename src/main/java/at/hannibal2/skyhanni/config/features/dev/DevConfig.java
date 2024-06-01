@@ -92,11 +92,11 @@ public class DevConfig {
     public boolean fancySbaContributors = false;
 
     @Expose
-    @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
+    @Category(name = "Minecraft Console", desc = "Minecraft Console Settings.")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
     @Expose
-    @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
+    @Category(name = "Debug Mob", desc = "Debug settings related to the Mob System.")
     public DebugMobConfig mobDebug = new DebugMobConfig();
 
 }

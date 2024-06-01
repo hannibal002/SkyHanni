@@ -58,12 +58,12 @@ public class PlayerMessagesConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hide Level Brackets", desc = "Hide the gray brackets in front of and behind the level numbers.")
+    @ConfigOption(name = "Hide Level Brackets", desc = "Hide the grey brackets in front of and behind the level numbers.")
     @ConfigEditorBoolean
     public boolean hideLevelBrackets = false;
 
     @Expose
-    @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
+    @ConfigOption(name = "Level Colour As Name", desc = "Use the colour of the SkyBlock level for the player colour.")
     @ConfigEditorBoolean
     public boolean useLevelColorForName = false;
 
@@ -79,13 +79,13 @@ public class PlayerMessagesConfig {
     public boolean ignoreYouTube = false;
 
     @Expose
-    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and gray out the message if any are found.")
+    @ConfigOption(name = "Chat Filter", desc = "Scan messages sent by players for blacklisted words and grey out the message if any are found.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean chatFilter = false;
 
     @Expose
-    @ConfigOption(name = "Same Chat Color", desc = "All players, also those with ranks, write with the same, white chat color.")
+    @ConfigOption(name = "Same Chat Colour", desc = "All players, also those with ranks, write with the same, white chat colour.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sameChatColor = true;

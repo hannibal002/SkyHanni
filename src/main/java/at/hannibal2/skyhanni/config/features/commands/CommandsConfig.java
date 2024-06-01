@@ -32,7 +32,7 @@ public class CommandsConfig {
     public boolean partyKickReason = true;
 
     @Expose
-    @ConfigOption(name = "Replace Warp Is", desc = "Adds §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
+    @ConfigOption(name = "Add Warp Is", desc = "Adds §e/warp is §7alongside §e/is§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;

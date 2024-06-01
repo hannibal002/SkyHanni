@@ -22,7 +22,7 @@ import java.util.List;
 public class MiscConfig {
 
     @Expose
-    @Category(name = "Pets", desc = "Pets Settings")
+    @Category(name = "Pets", desc = "Pets Settings.")
     public PetConfig pets = new PetConfig();
 
     @Expose
@@ -41,7 +41,7 @@ public class MiscConfig {
     @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
-    @ConfigOption(name = "Hide Armor", desc = "")
+    @ConfigOption(name = "Hide Armour", desc = "")
     @Accordion
     @Expose
     // TODO maybe we can migrate this already
@@ -141,7 +141,7 @@ public class MiscConfig {
     public boolean hidePiggyScoreboard = true;
 
     @Expose
-    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.")
+    @ConfigOption(name = "Colour Month Names", desc = "Colour the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colorMonthNames = false;

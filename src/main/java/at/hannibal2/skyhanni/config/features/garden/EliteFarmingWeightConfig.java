@@ -39,7 +39,7 @@ public class EliteFarmingWeightConfig {
     public boolean showLbChange = false;
 
     @Expose
-    @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA always, even when not farming at the moment.")
+    @ConfigOption(name = "Always ETA", desc = "Show the Overtake ETA, even when not farming at the moment.")
     @ConfigEditorBoolean
     public boolean overtakeETAAlways = true;
 

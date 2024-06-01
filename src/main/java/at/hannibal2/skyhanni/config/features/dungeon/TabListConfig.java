@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class TabListConfig {
 
     @Expose
-    @ConfigOption(name = "Colored Class Level", desc = "Color class levels in tab list. (Also hides rank colors and emblems, because who needs that in Dungeons anyway?)")
+    @ConfigOption(name = "Coloured Class Level", desc = "Colour class levels in tab list. (Also hides rank colours and emblems, because who needs that in Dungeons anyway?)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean coloredClassLevel = true;

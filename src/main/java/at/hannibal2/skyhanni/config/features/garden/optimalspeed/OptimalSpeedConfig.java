@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class OptimalSpeedConfig {
     @Expose
-    @ConfigOption(name = "Show on HUD", desc = "Show the optimal speed for your current tool in the hand.\n" +
+    @ConfigOption(name = "Show on HUD", desc = "Show the optimal speed for your current held tool.\n" +
         "(Thanks MelonKingDE for the default values).")
     @ConfigEditorBoolean
     @FeatureToggle

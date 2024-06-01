@@ -15,7 +15,7 @@ public class ModifyWordsConfig {
     @FeatureToggle
     public boolean enabled = true;
 
-    @ConfigOption(name = "Open Config", desc = "Opens the menu to setup the visual words.\n§eCommand: /shwords")
+    @ConfigOption(name = "Open Config", desc = "Open the menu to setup the visual words.\n§eCommand: /shwords")
     @ConfigEditorButton(buttonText = "Open")
     public Runnable open = Commands::openVisualWords;
 

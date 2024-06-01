@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class StrandedConfig {
     @Expose
-    @ConfigOption(name = "Highlight Placeable NPCs", desc = "Highlight NPCs that can be placed, but aren't, in the NPC menu.")
+    @ConfigOption(name = "Highlight Placeable NPCs", desc = "Highlight NPCs that can be placed, but aren't in the NPC menu.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightPlaceableNpcs = false;

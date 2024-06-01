@@ -12,11 +12,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CombatConfig {
 
     @Expose
-    @Category(name = "Damage Indicator", desc = "Damage Indicator settings")
+    @Category(name = "Damage Indicator", desc = "Damage Indicator settings.")
     public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost counter settings")
+    @Category(name = "Ghost Counter", desc = "Ghost counter settings.")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose

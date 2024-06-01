@@ -12,12 +12,12 @@ public class ETAFormattingConfig {
     public String base = "  &6ETA: &b%value%";
 
     @Expose
-    @ConfigOption(name = "Maxed!", desc = "So you really maxed ghost bestiary ?")
+    @ConfigOption(name = "Maxed!", desc = "So you really maxed ghost bestiary?")
     @ConfigEditorText
     public String maxed = "&c&lMAXED!";
 
     @Expose
-    @ConfigOption(name = "No Data", desc = "Start killing some ghosts !")
+    @ConfigOption(name = "No Data", desc = "Start killing some ghosts!")
     @ConfigEditorText
     public String noData = "&bN/A";
 
@@ -28,7 +28,7 @@ public class ETAFormattingConfig {
 
     @Expose
     @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
-        "when you are doing nothing for a given amount of seconds")
+        "when you are doing nothing for a given amount of seconds.")
     @ConfigEditorText
     public String paused = "&c(PAUSED)";
 

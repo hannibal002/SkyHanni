@@ -31,7 +31,7 @@ public class DropsStatisticsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tallies up statistic about visitors and the rewards you have received from them."
+        desc = "Displays statistics about visitors and the rewards you have received from them."
     )
     @ConfigEditorBoolean
     @FeatureToggle

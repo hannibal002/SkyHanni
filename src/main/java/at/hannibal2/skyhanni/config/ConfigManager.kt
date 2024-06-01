@@ -54,6 +54,7 @@ import kotlin.concurrent.fixedRateTimer
 
 typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
 
+//TODO rename this to be spelt correctly
 private fun GsonBuilder.reigsterIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (LorenzUtils.isBetaVersion()) {
         registerTypeAdapterFactory(create)

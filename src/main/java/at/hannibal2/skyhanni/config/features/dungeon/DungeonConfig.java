@@ -48,7 +48,7 @@ public class DungeonConfig {
     public boolean damageSplashBoss = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight Deathmites in Dungeons in red color.")
+    @ConfigOption(name = "Highlight Deathmites", desc = "Highlight Deathmites in Dungeons in red colour.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightDeathmites = true;

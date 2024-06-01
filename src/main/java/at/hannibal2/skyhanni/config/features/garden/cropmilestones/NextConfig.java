@@ -56,7 +56,7 @@ public class NextConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the top X best crops.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 10,
@@ -73,14 +73,14 @@ public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Always On",
-        desc = "Show the Best Display always while in the garden.")
+        desc = "Always Show the Best Crop Display while in the garden.")
     @ConfigEditorBoolean
     public boolean bestAlwaysOn = false;
 
     @Expose
     @ConfigOption(
         name = "Compact Display",
-        desc = "A more compact best crop time: Removing the crop name and exp, hide the # number and using a more compact time format.")
+        desc = "Compacts the best crop time; removing the crop name and exp, hiding the # number and using a more compact time format.")
     @ConfigEditorBoolean
     public boolean bestCompact = false;
 

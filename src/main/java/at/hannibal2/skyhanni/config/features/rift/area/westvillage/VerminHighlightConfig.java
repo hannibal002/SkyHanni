@@ -16,7 +16,7 @@ public class VerminHighlightConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Change Vermin highlight color.")
+    @ConfigOption(name = "Colour", desc = "Change Vermin highlight colour.")
     @ConfigEditorColour
     public Property<String> color = Property.of("0:60:0:0:255");
 }

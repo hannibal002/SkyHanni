@@ -22,7 +22,7 @@ public class CityProjectConfig {
     public boolean showReady = true;
 
     @Expose
-    @ConfigOption(name = "Daily Reminder", desc = "Remind every 24 hours to participate.")
+    @ConfigOption(name = "Daily Reminder", desc = "Sends a reminder every 24 hours to participate.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean dailyReminder = true;

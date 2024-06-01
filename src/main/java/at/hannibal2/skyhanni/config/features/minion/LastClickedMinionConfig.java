@@ -16,8 +16,8 @@ public class LastClickedMinionConfig {
 
     @Expose
     @ConfigOption(
-        name = "Last Minion Color",
-        desc = "The color in which the last minion should be displayed."
+        name = "Last Minion Colour",
+        desc = "The colour in which the last minion should be displayed."
     )
     @ConfigEditorColour
     public String color = "0:245:85:255:85";

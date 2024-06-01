@@ -7,8 +7,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class BestiaryFormattingConfig {
 
     @Expose
-    @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §7is replaced with\n" +
-        "Your current progress to next level.\n" +
+    @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n§e%value% §7is replaced with " +
+        "your current progress to next level.\n" +
         "§e%currentLevel% &7is replaced with your current bestiary level\n" +
         "§e%nextLevel% §7is replaced with your current bestiary level +1.\n" +
         "§e%value% §7is replaced with one of the text below.")

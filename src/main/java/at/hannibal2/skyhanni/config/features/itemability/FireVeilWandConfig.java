@@ -43,8 +43,8 @@ public class FireVeilWandConfig {
 
     @Expose
     @ConfigOption(
-        name = "Line Color",
-        desc = "Changes the color of the Fire Veil Wand line."
+        name = "Line Colour",
+        desc = "Changes the colour of the Fire Veil Wand line."
     )
     @ConfigEditorColour
     public String displayColor = "0:245:255:85:85";

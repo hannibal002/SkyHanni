@@ -14,7 +14,7 @@ public class ThunderSparkConfig {
     public boolean highlight = false;
 
     @Expose
-    @ConfigOption(name = "Thunder Spark Color", desc = "Color of the Thunder Sparks.")
+    @ConfigOption(name = "Thunder Spark Colour", desc = "Colour of the Thunder Sparks.")
     @ConfigEditorColour
     public String color = "0:255:255:255:255";
 }

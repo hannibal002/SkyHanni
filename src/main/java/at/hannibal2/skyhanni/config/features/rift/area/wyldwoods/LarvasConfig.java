@@ -9,13 +9,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class LarvasConfig {
 
     @Expose
-    @ConfigOption(name = "Highlight", desc = "Highlight §cLarvas on trees §7while holding a §eLarva Hook §7in the hand.")
+    @ConfigOption(name = "Highlight", desc = "Highlight §cLarvas on trees §7while holding a §eLarva Hook§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlight = true;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color of the Larvas.")
+    @ConfigOption(name = "Colour", desc = "Colour of the Larvas.")
     @ConfigEditorColour
     public String highlightColor = "0:120:13:49:255";
 

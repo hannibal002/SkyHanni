@@ -13,17 +13,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class SlayerConfig {
 
     @Expose
-    @Category(name = "Endermen", desc = "Endermen Slayer Feature")
+    @Category(name = "Endermen", desc = "Endermen Slayer Features.")
     @Accordion
     public EndermanConfig endermen = new EndermanConfig();
 
     @Expose
-    @Category(name = "Blaze", desc = "Blaze Slayer Features")
+    @Category(name = "Blaze", desc = "Blaze Slayer Features.")
     // TODO rename to "blaze"
     public BlazeConfig blazes = new BlazeConfig();
 
     @Expose
-    @Category(name = "Vampire", desc = "Vampire Slayer Features")
+    @Category(name = "Vampire", desc = "Vampire Slayer Features.")
     public VampireConfig vampire = new VampireConfig();
 
     @Expose
@@ -47,7 +47,7 @@ public class SlayerConfig {
     public SlayerBossWarningConfig slayerBossWarning = new SlayerBossWarningConfig();
 
     @Expose
-    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss in blue color.")
+    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss blue.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean slayerMinibossHighlight = false;

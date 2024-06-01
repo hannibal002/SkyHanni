@@ -16,7 +16,7 @@ public class RepositoryConfig {
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;
 
-    @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
+    @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version.")
     @ConfigEditorButton(buttonText = "Update")
     public Runnable updateRepo = RepoUtils::updateRepo;
 
@@ -32,17 +32,17 @@ public class RepositoryConfig {
         public Runnable resetRepoLocation = RepoUtils::resetRepoLocation;
 
         @Expose
-        @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: hannibal002")
+        @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: hannibal002.")
         @ConfigEditorText
         public String user = "hannibal002";
 
         @Expose
-        @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: SkyHanni-Repo")
+        @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: SkyHanni-Repo.")
         @ConfigEditorText
         public String name = "SkyHanni-REPO";
 
         @Expose
-        @ConfigOption(name = "Repository Branch", desc = "The Repository Branch, default: main")
+        @ConfigOption(name = "Repository Branch", desc = "The Repository Branch, default: main.")
         @ConfigEditorText
         public String branch = "main";
     }

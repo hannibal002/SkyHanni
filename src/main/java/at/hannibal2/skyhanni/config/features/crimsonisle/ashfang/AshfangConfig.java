@@ -26,13 +26,13 @@ public class AshfangConfig {
     public HideAshfangConfig hide = new HideAshfangConfig();
 
     @Expose
-    @ConfigOption(name = "Highlight Blazes", desc = "Highlight the different blazes in their respective colors.")
+    @ConfigOption(name = "Highlight Blazes", desc = "Highlight the different blazes in their respective colours.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightBlazes = false;
 
     @Expose
-    @ConfigOption(name = "Freeze Cooldown", desc = "Show the cooldown for how long Ashfang blocks your abilities.")
+    @ConfigOption(name = "Freeze Cooldown", desc = "Displays how long Ashfang blocks your abilities for.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean freezeCooldown = false;

@@ -14,7 +14,7 @@ public class ChristmasPresentConfig {
     public boolean allWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to .")
+    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to the entrance of hidden presents.")
     @ConfigEditorBoolean
     public boolean allEntranceWaypoints = false;
 

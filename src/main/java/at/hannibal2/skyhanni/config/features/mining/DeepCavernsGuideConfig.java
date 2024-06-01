@@ -22,17 +22,17 @@ public class DeepCavernsGuideConfig {
     public Property<Integer> lookAhead = Property.of(3);
 
     @Expose
-    @ConfigOption(name = "Rainbow Color", desc = "Show the rainbow color effect instead of a boring monochrome.")
+    @ConfigOption(name = "Rainbow Colour", desc = "Shows the rainbow colour effect instead of a boring monochrome colour.")
     @ConfigEditorBoolean
     public Property<Boolean> rainbowColor = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the guide waypoints.")
+    @ConfigOption(name = "Monochrome Colour", desc = "Set a boring monochrome colour for the guide waypoints.")
     @ConfigEditorColour
     public Property<String> monochromeColor = Property.of("0:60:0:0:255");
 
 //     @Expose
-//     @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
+//     @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in grey. Useful for debugging.")
 //     @ConfigEditorBoolean
 //     public boolean highlightAllLines = false;
 }

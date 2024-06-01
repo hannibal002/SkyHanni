@@ -7,13 +7,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MobsConfig {
     @Expose
-    @ConfigOption(name = "Area Boss Highlighter", desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist, Millenia-Aged Blaze and Soul of the Alpha.")
+    @ConfigOption(name = "Area Boss Highlighter", desc = "Highlight Golden Ghouls, Old Wolfs, Voidling Extremists, Millenia-Aged Blazes and Soul of the Alpha.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean areaBossHighlight = true;
 
     @Expose
-    @ConfigOption(name = "Arachne Keeper", desc = "Highlight the Arachne Keeper in the Spider's Den in purple color.")
+    @ConfigOption(name = "Arachne Keeper", desc = "Highlight the Arachne Keeper in the Spider's Den in purple colour.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean arachneKeeperHighlight = true;
@@ -31,7 +31,7 @@ public class MobsConfig {
     public boolean zealotBruiserHighlighter = false;
 
     @Expose
-    @ConfigOption(name = "Zealot with Chest", desc = "Highlight Zealots holding a Chest in a different color.")
+    @ConfigOption(name = "Zealot with Chest", desc = "Highlight Zealots holding a Chest in a different colour.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean chestZealotHighlighter = false;
@@ -46,7 +46,7 @@ public class MobsConfig {
     public boolean specialZealotHighlighter = true;
 
     @Expose
-    @ConfigOption(name = "Corrupted Mob", desc = "Highlight corrupted mobs in purple color.")
+    @ConfigOption(name = "Corrupted Mob", desc = "Highlight corrupted mobs in purple colour.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean corruptedMobHighlight = false;
@@ -90,7 +90,7 @@ public class MobsConfig {
     public boolean endermanTeleportationHider = true;
 
     @Expose
-    @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametag above Arachne minis.")
+    @ConfigOption(name = "Arachne Minis Hider", desc = "Hides the nametags above Arachne minis.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideNameTagArachneMinis = true;

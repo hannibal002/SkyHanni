@@ -13,7 +13,7 @@ public class PestProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Count all items you pick up when killing pests."
+        desc = "Tracks all items you pick up when killing pests."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -28,7 +28,7 @@ public class PestProfitTrackerConfig {
     public boolean hideChat = true;
 
     @Expose
-    @ConfigOption(name = "Time Displayed", desc = "Time displayed after killing a pest.")
+    @ConfigOption(name = "Time Displayed", desc = "Time the Pest Profit Tracker is displayed after killing a pest.")
     @ConfigEditorSlider(minValue = 5, maxValue = 60, minStep = 1)
     public int timeDisplayed = 30;
 

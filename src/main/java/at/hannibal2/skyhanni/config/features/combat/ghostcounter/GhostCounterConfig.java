@@ -115,7 +115,7 @@ public class GhostCounterConfig {
     public int extraSpace = 1;
 
     @Expose
-    @ConfigOption(name = "Pause Timer", desc = "How many seconds does it wait before pausing.")
+    @ConfigOption(name = "Pause Timer", desc = "How many seconds to wait before pausing.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 20,
@@ -124,7 +124,7 @@ public class GhostCounterConfig {
     public int pauseTimer = 3;
 
     @Expose
-    @ConfigOption(name = "Show only in The Mist", desc = "Show the overlay only when you are in The Mist.")
+    @ConfigOption(name = "Show only in The Mist", desc = "Only show the overlay when in The Mist.")
     @ConfigEditorBoolean
     public boolean onlyOnMist = true;
 

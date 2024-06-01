@@ -14,7 +14,7 @@ public class PetExperienceToolTipConfig {
     public boolean petDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Show Always", desc = "Show this info always, even if not pressing shift key.")
+    @ConfigOption(name = "Show Always", desc = "Always show this information, even if not pressing the shift key.")
     @ConfigEditorBoolean
     public boolean showAlways = false;
 

@@ -19,12 +19,12 @@ public class EstimatedItemValueConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
+    @ConfigOption(name = "Estimated Item Keybind", desc = "Keybind to show the Estimated Item Value.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int hotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Show Always", desc = "Ignore the hotkey and always display the item value.")
+    @ConfigOption(name = "Show Always", desc = "Ignore the keybind and always display the item value.")
     @ConfigEditorBoolean
     public boolean alwaysEnabled = true;
 
@@ -43,7 +43,7 @@ public class EstimatedItemValueConfig {
     public boolean exactPrice = false;
 
     @Expose
-    @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
+    @ConfigOption(name = "Show Armour Value", desc = "Show the value of the full armour set in the Wardrobe inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armor = true;
@@ -54,7 +54,7 @@ public class EstimatedItemValueConfig {
     public boolean ignoreHelmetSkins = false;
 
     @Expose
-    @ConfigOption(name = "Ignore Armor Dyes", desc = "Ignore Armor Dyes from the total value.")
+    @ConfigOption(name = "Ignore Armour Dyes", desc = "Ignore Armour Dyes from the total value.")
     @ConfigEditorBoolean
     public boolean ignoreArmorDyes = false;
 

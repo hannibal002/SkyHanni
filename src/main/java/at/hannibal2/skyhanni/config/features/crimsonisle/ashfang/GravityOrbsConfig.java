@@ -15,7 +15,7 @@ public class GravityOrbsConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color of the Gravity Orbs.")
+    @ConfigOption(name = "Colour", desc = "Colour of the Gravity Orbs.")
     @ConfigEditorColour
     public String color = "0:120:255:85:85";
 }

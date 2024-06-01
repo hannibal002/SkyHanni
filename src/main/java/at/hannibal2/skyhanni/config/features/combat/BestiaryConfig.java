@@ -94,7 +94,7 @@ public class BestiaryConfig {
     public boolean hideMaxed = false;
 
     @Expose
-    @ConfigOption(name = "Replace Romans", desc = "Replace Roman numerals (IX) with regular numbers (9)")
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman numerals (IX) with regular numbers (9)")
     @ConfigEditorBoolean
     public boolean replaceRoman = false;
 

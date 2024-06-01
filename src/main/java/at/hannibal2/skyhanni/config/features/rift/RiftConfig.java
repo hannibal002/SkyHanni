@@ -26,12 +26,12 @@ public class RiftConfig {
     @Expose
     public EnigmaSoulConfig enigmaSoulWaypoints = new EnigmaSoulConfig();
 
-    @Category(name = "Rift Areas", desc = "Rift Area Settings")
+    @Category(name = "Rift Areas", desc = "Rift Area Settings.")
     @Expose
     public RiftAreasConfig area = new RiftAreasConfig();
 
     @Expose
-    @Category(name = "Motes", desc = "Motes Sell Price")
+    @Category(name = "Motes", desc = "Motes Sell Price.")
     public MotesConfig motes = new MotesConfig();
 
     @Expose
@@ -46,7 +46,7 @@ public class RiftConfig {
     public boolean highlightGuide = true;
 
     @Expose
-    @ConfigOption(name = "Horsezooka Hider", desc = "Hide horses while holding the Horsezooka in the hand.")
+    @ConfigOption(name = "Horsezooka Hider", desc = "Hide horses while holding the Horsezooka.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean horsezookaHider = false;

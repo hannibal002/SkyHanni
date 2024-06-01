@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BlazeHellionConfig {
     @Expose
-    @ConfigOption(name = "Colored Mobs", desc = "Color the Blaze Slayer boss and the demons in the right hellion shield color.")
+    @ConfigOption(name = "Coloured Mobs", desc = "Colour the Blaze Slayer boss and the demons in the right hellion shield colour.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean coloredMobs = false;

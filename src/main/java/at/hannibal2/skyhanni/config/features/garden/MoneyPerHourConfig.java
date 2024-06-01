@@ -22,14 +22,14 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(name = "Show Money per Hour",
         desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
-            "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
+            "Supports Bountiful, Mushroom Cow Perk, Armour Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = false;
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Only Show Top", desc = "Only show the best # items.")
+    @ConfigOption(name = "Only Show Top", desc = "Only show the highest money per hour items.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 25,
@@ -137,8 +137,8 @@ public class MoneyPerHourConfig {
 
     @Expose
     @ConfigOption(
-        name = "Include Armor Drops",
-        desc = "Includes the average coins/hr from your armor.")
+        name = "Include Armour Drops",
+        desc = "Includes the average coins/hr from your armour.")
     @ConfigEditorBoolean
     public boolean armor = true;
 

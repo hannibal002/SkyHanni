@@ -10,13 +10,13 @@ public class OdonataConfig {
 
     @Expose
     @ConfigOption(name = "Highlight", desc = "Highlight the small §cOdonatas §7flying around the trees while holding an " +
-        "§eEmpty Odonata Bottle §7in the hand.")
+        "§eEmpty Odonata Bottle§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlight = true;
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color of the Odonatas.")
+    @ConfigOption(name = "Colour", desc = "Colour of the Odonatas.")
     @ConfigEditorColour
     public String highlightColor = "0:120:13:49:255";
 

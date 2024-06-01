@@ -11,7 +11,7 @@ public class MayorConfig {
     public boolean showMayorPerks = true;
 
     @Expose
-    @ConfigOption(name = "Show Time till next mayor", desc = "Show the time till the next mayor is elected.")
+    @ConfigOption(name = "Show Time until next mayor", desc = "Show the time until the next mayor is elected.")
     @ConfigEditorBoolean
     public boolean showTimeTillNextMayor = true;
 }

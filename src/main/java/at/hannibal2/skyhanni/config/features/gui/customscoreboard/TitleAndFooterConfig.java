@@ -17,8 +17,8 @@ public class TitleAndFooterConfig {
 
     @Expose
     @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard." +
-        "\nUse & for colors." +
-        "\nUse \"\\n\" for new line.")
+        "\nUse & for colours." +
+        "\nUse \"\\n\" for new lines.")
     @ConfigEditorText
     public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
 
@@ -30,8 +30,8 @@ public class TitleAndFooterConfig {
 
     @Expose
     @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard." +
-        "\nUse & for colors." +
-        "\nUse \"\\n\" for new line.")
+        "\nUse & for colours." +
+        "\nUse \"\\n\" for new lines.")
     @ConfigEditorText
     public Property<String> customFooter = Property.of("&ewww.hypixel.net");
 }

@@ -23,18 +23,18 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.Social;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation;
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign;
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
-import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
 import java.util.List;
 
 
 public class Features extends Config {
-    public static final ResourceLocation DISCORD = new ResourceLocation("notenoughupdates:social/discord.png");
-    public static final ResourceLocation GITHUB = new ResourceLocation("notenoughupdates:social/github.png");
-    public static final ResourceLocation PATREON = new ResourceLocation("notenoughupdates:social/patreon.png");
+    public static final MyResourceLocation DISCORD = new MyResourceLocation("notenoughupdates", "social/discord.png");
+    public static final MyResourceLocation GITHUB = new MyResourceLocation("notenoughupdates", "social/github.png");
+    public static final MyResourceLocation PATREON = new MyResourceLocation("notenoughupdates", "social/patreon.png");
 
     @Override
     public boolean shouldAutoFocusSearchbar() {
@@ -105,7 +105,7 @@ public class Features extends Config {
     // Skills
 
     @Expose
-    @Category(name = "Fishing", desc = "Fishing stuff.")
+    @Category(name = "Fishing", desc = "Features related to fishing.")
     public FishingConfig fishing = new FishingConfig();
 
     @Expose
@@ -123,7 +123,7 @@ public class Features extends Config {
     public SlayerConfig slayer = new SlayerConfig();
 
     @Expose
-    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
+    @Category(name = "Dungeons", desc = "Features that change the Dungeons experience in The Catacombs.")
     public DungeonConfig dungeon = new DungeonConfig();
 
     // Misc
@@ -133,7 +133,7 @@ public class Features extends Config {
     public InventoryConfig inventory = new InventoryConfig();
 
     @Expose
-    @Category(name = "Events", desc = "Stuff that is not always available.")
+    @Category(name = "Events", desc = "Features for limited time events.")
     public EventConfig event = new EventConfig();
 
     @Expose

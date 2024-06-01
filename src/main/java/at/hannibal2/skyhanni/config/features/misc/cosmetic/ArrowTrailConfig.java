@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArrowTrailConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Draw a colored line behind arrows in the air.")
+    @ConfigOption(name = "Enabled", desc = "Draw a coloured line behind arrows in the air.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -20,17 +20,17 @@ public class ArrowTrailConfig {
     public boolean hideOtherArrows = true;
 
     @Expose
-    @ConfigOption(name = "Arrow Color", desc = "Color of the line.")
+    @ConfigOption(name = "Arrow Colour", desc = "Colour of the line.")
     @ConfigEditorColour
     public String arrowColor = "0:200:85:255:85";
 
     @Expose
-    @ConfigOption(name = "Player Arrows", desc = "Different color for the line of arrows that you have shot.")
+    @ConfigOption(name = "Player Arrows", desc = "Different colour for arrows that you have shot.")
     @ConfigEditorBoolean
     public boolean handlePlayerArrowsDifferently = false;
 
     @Expose
-    @ConfigOption(name = "Player Arrow Color", desc = "Color of the line of your own arrows.")
+    @ConfigOption(name = "Player Arrow Colour", desc = "Colour of the line of your own arrows.")
     @ConfigEditorColour
     public String playerArrowColor = "0:200:85:255:255";
 

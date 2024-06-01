@@ -37,7 +37,7 @@ public class ObjectHiderConfig {
     public boolean hideJournalEntry = false;
 
     @Expose
-    @ConfigOption(name = "Hide Skeleton Skull", desc = "Hide Skeleton Skulls laying around in Dungeons.")
+    @ConfigOption(name = "Hide Skeleton Skulls", desc = "Hide Skeleton Skulls laying around in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideSkeletonSkull = true;

@@ -21,12 +21,12 @@ public class VoltCruxConfig {
     public boolean voltRange = true;
 
     @Expose
-    @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the Volt range be highlighted?")
+    @ConfigOption(name = "Volt Range Highlighter Colour", desc = "Which colour the Volt range will be highlighted in.")
     @ConfigEditorColour
     public String voltColour = "0:60:0:0:255";
 
     @Expose
-    @ConfigOption(name = "Volt Mood Color", desc = "Change the color of the Volt enemy depending on their mood.")
+    @ConfigOption(name = "Volt Mood Colour", desc = "Change the colour of the Volt enemy depending on their mood.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean voltMoodMeter = false;

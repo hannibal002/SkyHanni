@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class HideArmorConfig {
 
     @Expose
-    @ConfigOption(name = "Mode", desc = "Hide the armor of players.")
+    @ConfigOption(name = "Mode", desc = "Hide the armour of players.")
     @ConfigEditorDropdown
     public ModeEntry mode = ModeEntry.OFF;
 
