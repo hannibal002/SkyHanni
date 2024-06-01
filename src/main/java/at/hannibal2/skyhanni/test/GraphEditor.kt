@@ -61,6 +61,8 @@ object GraphEditor {
             }
         }
 
+    private var inTutorialMode = false
+
     private val textBox = TextInput()
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
@@ -93,6 +95,7 @@ object GraphEditor {
                     add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
                     add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
                     add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
+                    add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
                     if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
                 }
                 if (!inTextMode && activeNode != null) {
@@ -112,6 +115,12 @@ object GraphEditor {
                 }
             }, posLabel = "Graph Info"
         )
+    }
+
+    private fun feedBackInTutorial(text: String) {
+        if (inTutorialMode) {
+            ChatUtils.sendMessageToServer(text)
+        }
     }
 
     @SubscribeEvent
@@ -152,24 +161,26 @@ object GraphEditor {
     fun commandIn() {
         config.enabled = !config.enabled
         if (config.enabled) {
-            ChatUtils.chat("Graph Editor is now active")
+            ChatUtils.chat("Graph Editor is now active.")
         } else {
             chatAtDisable()
         }
     }
 
     private fun chatAtDisable() =
-        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate", ::commandIn)
+        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.", ::commandIn)
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
         if (config.exitKey.isKeyClicked()) {
             if (inTextMode) {
                 inTextMode = false
+                feedBackInTutorial("Exited Text Mode.")
                 return
             }
             if (inEditMode) {
                 inEditMode = false
+                feedBackInTutorial("Exited Edit Mode.")
                 return
             }
             config.enabled = false
@@ -187,6 +198,7 @@ object GraphEditor {
         }
         if (activeNode != null && config.textKey.isKeyClicked()) {
             inTextMode = true
+            feedBackInTutorial("Entered Text Mode.")
             return
         }
         if (inEditMode) {
@@ -199,11 +211,11 @@ object GraphEditor {
         }
         if (config.saveKey.isKeyClicked()) {
             if (nodes.isEmpty()) {
-                ChatUtils.chat("Copied nothing since the graph is empty")
+                ChatUtils.chat("Copied nothing since the graph is empty.")
                 return
             }
             OSUtils.copyToClipboard(compileGraph().toJson())
-            ChatUtils.chat("Copied Graph to Clipboard")
+            ChatUtils.chat("Copied Graph to Clipboard.")
             return
         }
         if (config.loadKey.isKeyClicked()) {
@@ -214,40 +226,57 @@ object GraphEditor {
                     } catch (e: Exception) {
                         ErrorManager.logErrorWithData(
                             e,
-                            "Import of graph failed",
+                            "Import of graph failed.",
                             "json" to it,
                             ignoreErrorCache = true
                         )
                         null
                     }
-                }?.let { import(it) }
+                }?.let {
+                    import(it)
+                    ChatUtils.chat("Loaded Graph from clip board.")
+                }
             }
             return
         }
         if (config.clearKey.isKeyClicked()) {
             OSUtils.copyToClipboard(compileGraph().toJson())
-            ChatUtils.chat("Copied Graph to Clipboard and cleared the graph")
+            ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
             clear()
         }
         if (config.placeKey.isKeyClicked()) {
             addNode()
         }
         if (config.selectKey.isKeyClicked()) {
-            activeNode = if (activeNode == closedNode) null else closedNode
+            activeNode = if (activeNode == closedNode) {
+                feedBackInTutorial("De selected active node.")
+                null
+            } else {
+                feedBackInTutorial("Selected new active node.")
+                closedNode
+            }
         }
         if (activeNode != closedNode && config.connectKey.isKeyClicked()) {
             val edge = getEdgeIndex(activeNode, closedNode)
             if (edge == null) {
                 addEdge(activeNode, closedNode)
+                feedBackInTutorial("Added new edge.")
             } else {
                 this.edge.removeAt(edge)
+                feedBackInTutorial("Removed edge.")
             }
         }
         if (config.throughBlocksKey.isKeyClicked()) {
             seeThroughBlocks = !seeThroughBlocks
+            feedBackInTutorial(if (seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.")
         }
         if (config.dijkstraKey.isKeyClicked()) {
+            feedBackInTutorial("Calculated shortest route and cleared active node.")
             testDijkstra()
+        }
+        if (config.tutorialKey.isKeyHeld()) {
+            inTutorialMode = !inTutorialMode
+            ChatUtils.chat("Tutorial mode is now ${if (inTutorialMode) "active" else "inactive"}.")
         }
     }
 
@@ -276,6 +305,7 @@ object GraphEditor {
     private fun addNode() {
         val closedNode = closedNode
         if (closedNode != null && closedNode.position.distanceSqToPlayer() < 9.0) {
+            feedBackInTutorial("Removed node, since you where closer than 3 blocks from a node.")
             nodes.remove(closedNode)
             edge.removeIf { it.isInEdge(closedNode) }
             if (closedNode == activeNode) activeNode = null
@@ -285,6 +315,7 @@ object GraphEditor {
         val position = LocationUtils.playerLocation().round(0)
         val node = GraphingNode(id++, position)
         nodes.add(node)
+        feedBackInTutorial("Added graph node.")
         if (activeNode == null) return
         addEdge(activeNode, node)
     }

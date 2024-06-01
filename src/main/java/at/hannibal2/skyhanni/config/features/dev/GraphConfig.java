@@ -16,7 +16,8 @@ public class GraphConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Place Key", desc = "Places a new node at the current position. If a node is active automatically connects.")
+    @ConfigOption(name = "Place Key", desc = "Places a new node at the current position. If a node is active automatically connects." +
+        "Deletes a node if you are only 3 blocks away instead of placing a new one")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_F)
     public int placeKey = Keyboard.KEY_F;
 
@@ -26,7 +27,7 @@ public class GraphConfig {
     public int selectKey = -98;
 
     @Expose
-    @ConfigOption(name = "Connect Key", desc = "Connects the nearest node with the active node. If the nodes are already connected removes them.")
+    @ConfigOption(name = "Connect Key", desc = "Connects the nearest node with the active node. If the nodes are already connected removes the connection.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_C)
     public int connectKey = Keyboard.KEY_C;
 
@@ -36,7 +37,7 @@ public class GraphConfig {
     public int exitKey = Keyboard.KEY_HOME;
 
     @Expose
-    @ConfigOption(name = "Edit Key", desc = "While holding the Key edit the position of the active node.")
+    @ConfigOption(name = "Edit Key", desc = "While holding the Key edit the position of the active node with the minecraft movement controls.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_TAB)
     public int editKey = Keyboard.KEY_TAB;
 
@@ -56,12 +57,12 @@ public class GraphConfig {
     public int saveKey = Keyboard.KEY_O;
 
     @Expose
-    @ConfigOption(name = "Load Key", desc = "Loades a graph from clipboard, if valid.")
+    @ConfigOption(name = "Load Key", desc = "Loads a graph from clipboard, if valid.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_I)
     public int loadKey = Keyboard.KEY_I;
 
     @Expose
-    @ConfigOption(name = "Clear Key", desc = "Clears the graph. Also saves the graph to the clipboard.")
+    @ConfigOption(name = "Clear Key", desc = "Clears the graph. Also saves the graph to the clipboard, just in case you miss clicked.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_P)
     public int clearKey = Keyboard.KEY_P;
 
@@ -69,6 +70,11 @@ public class GraphConfig {
     @ConfigOption(name = "Vision Key", desc = "Toggles if the graph should render trough blocks.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_M)
     public int throughBlocksKey = Keyboard.KEY_M;
+
+    @Expose
+    @ConfigOption(name = "Tutorial Key", desc = "Toggles the tutorial mode. In this mode you will get feedback for everything you do.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_K)
+    public int tutorialKey = Keyboard.KEY_K;
 
     @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
