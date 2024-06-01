@@ -217,6 +217,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Hiding the flame particles when using the Fire Veil Wand ability.
 + Circle around the player when having the Fire Veil Wand ability active.
 + Lesser Orb of Healing Hider. - jani
++ Wand of Strength cooldown is now displayed. - saga (https://github.com/hannibal002/SkyHanni/pull/1948)
+    + The cooldown displayed is for the buff, not the item usage.
 
 </details>
 <details open><summary>
@@ -1207,6 +1209,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Editable Hotbar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1903)
     + Allows for moving and scaling in the SkyHanni GUI editor.
 + ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
++ In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
+    + Useful when using a Prismarine Blade in Stranded Mode.
 
 </details>
 <details open><summary>
