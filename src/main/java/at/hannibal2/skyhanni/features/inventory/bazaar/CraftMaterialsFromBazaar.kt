@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.isBazaarItem
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -108,7 +108,7 @@ class CraftMaterialsFromBazaar {
                 val text = "§8${priceMultiplier.addSeparators()}x " + material.itemName +
                     " §6${NumberUtil.format(material.getPrice() * priceMultiplier)}"
                 add(Renderable.optionalLink(text, onClick = {
-                    BazaarApi.searchForBazaarItem(material.itemNameWithoutColor, priceMultiplier)
+                    BazaarApi.searchForBazaarItem(material, priceMultiplier)
                 }))
             }
             add(
@@ -126,18 +126,24 @@ class CraftMaterialsFromBazaar {
 
     private fun MutableList<Renderable>.addMultipliers() {
         for (m in listOf(1, 5, 16, 32, 64, 512)) {
-            val nameColor = if (m == multiplier) "§amount" else "§e"
-            val priceColor = if (m == multiplier) "§6" else "§7"
+            val isThisMultiply = m == multiplier
+            val nameColor = if (isThisMultiply) "§a" else "§e"
+            val priceColor = if (isThisMultiply) "§6" else "§7"
             val price = priceColor + NumberUtil.format(calculateTotalPrice(neededMaterials, m))
-            add(
-                Renderable.clickAndHover(
-                    "${nameColor}Mulitply x$m $price",
-                    listOf("§eClick here to multiply the items needed times $m!"),
-                    onClick = {
-                        multiplier = m
-                        updateBazaarDisplay()
-                    })
-            )
+            val text = "${nameColor}Mulitply x$m $price"
+            if (!isThisMultiply) {
+                add(
+                    Renderable.clickAndHover(
+                        text,
+                        listOf("§eClick here to multiply the items needed times $m!"),
+                        onClick = {
+                            multiplier = m
+                            updateBazaarDisplay()
+                        })
+                )
+            } else {
+                addString(text)
+            }
         }
     }
 

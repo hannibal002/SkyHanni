@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.awt.Toolkit
@@ -26,19 +26,17 @@ object ClipboardUtils {
         return result
     }
 
-    private suspend fun getClipboard(): Clipboard? {
-        val deferred = CompletableDeferred<Clipboard?>()
-        if (canAccessClipboard()) {
-            deferred.complete(Toolkit.getDefaultToolkit().systemClipboard)
-        } else {
-            LorenzUtils.runDelayed(5.milliseconds) {
-                SkyHanniMod.coroutineScope.launch {
-                    deferred.complete(getClipboard())
-                }
-            }
-        }
-        return deferred.await()
+    private suspend fun getClipboard(retries: Int = 20): Clipboard? = if (canAccessClipboard()) {
+        Toolkit.getDefaultToolkit().systemClipboard
+    } else if (retries > 0) {
+        delay(11)
+        getClipboard(retries - 1)
+    } else {
+        ErrorManager.logErrorStateWithData("can not read clipboard",
+            "clipboard can not be accessed after 20 retries")
+        null
     }
+
 
     fun copyToClipboard(text: String, step: Int = 0) {
         SkyHanniMod.coroutineScope.launch {
