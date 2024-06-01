@@ -956,7 +956,7 @@ class SkyHanniMod {
         loadModule(InfernoMinionFeatures())
         loadModule(LimboPlaytime)
         loadModule(CopyPlaytime)
-        loadModule(RareDropMessages())
+        loadModule(RareDropMessages)
         loadModule(CraftMaterialsFromBazaar())
         loadModule(DungeonShadowAssassinNotification())
         loadModule(PestProfitTracker)

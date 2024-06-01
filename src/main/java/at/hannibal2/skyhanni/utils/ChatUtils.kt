@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ChatManager.modifyChatLine
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.command
@@ -13,6 +17,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.prefix
 import at.hannibal2.skyhanni.utils.chat.Text.url
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
@@ -220,6 +225,29 @@ object ChatUtils {
         chat(Text.join(components).prefix(msgPrefix))
     }
 
+    private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorMixinGuiNewChat
+
+    var chatLines: MutableList<ChatLine>
+        get() = chatGui.chatLines_skyhanni
+        set(value) {
+            chatGui.chatLines_skyhanni = value
+        }
+
+    var drawnChatLines: MutableList<ChatLine>
+        get() = chatGui.drawnChatLines_skyhanni
+        set(value) {
+            chatGui.drawnChatLines_skyhanni = value
+        }
+
+    /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
+    fun editFirstMessage(
+        component: (IChatComponent) -> IChatComponent,
+        predicate: (ChatLine) -> Boolean
+    ) {
+        chatLines.modifyChatLine(component, predicate)
+        drawnChatLines.modifyChatLine(component, predicate)
+    }
+
     private var lastMessageSent = SimpleTimeMark.farPast()
     private val sendQueue: Queue<String> = LinkedList()
     private val messageDelay = 300.milliseconds
@@ -278,4 +306,8 @@ object ChatUtils {
         }
         return this
     }
+
+    val ChatLine.message get() = chatComponent.formattedText.stripHypixelMessage()
+
+    fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
 }

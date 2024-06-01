@@ -32,6 +32,7 @@ object ChatManager {
     private val loggerFiltered = LorenzLogger("chat/blocked")
     private val loggerAllowed = LorenzLogger("chat/allowed")
     private val loggerModified = LorenzLogger("chat/modified")
+    private val loggerEdited = LorenzLogger("chat/edited")
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
     private val messageHistory =
         object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
@@ -50,6 +51,7 @@ object ChatManager {
         BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
         RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
         MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
+        EDITED(EnumChatFormatting.GOLD.toString() + EnumChatFormatting.BOLD),
         ALLOWED(EnumChatFormatting.GREEN),
         OUTGOING(EnumChatFormatting.BLUE),
         OUTGOING_BLOCKED(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.BOLD),
@@ -190,5 +192,30 @@ object ChatManager {
         val history = messageHistory[IdentityCharacteristics(message)] ?: return
         history.actionKind = ActionKind.RETRACTED
         history.actionReason = reason.uppercase()
+    }
+
+
+    fun MutableList<ChatLine>.modifyChatLine(
+        component: (IChatComponent) -> IChatComponent,
+        predicate: (ChatLine) -> Boolean
+    ) {
+        indexOfFirst {
+            predicate(it)
+        }.takeIf { it != -1 }?.let {
+            val chatLine = this[it]
+            val counter = chatLine.updatedCounter
+            val id = chatLine.chatLineID
+            val oldComponent = chatLine.chatComponent
+            val newComponent = component(chatLine.chatComponent)
+
+            val key = IdentityCharacteristics(oldComponent)
+            loggerModified.log(" ")
+            loggerModified.log("[original] " + oldComponent.formattedText)
+            loggerModified.log("[modified] " + newComponent.formattedText)
+            messageHistory[key] =
+                MessageFilteringResult(oldComponent, ChatManager.ActionKind.EDITED, null, newComponent)
+
+            this[it] = ChatLine(counter, newComponent, id)
+        }
     }
 }

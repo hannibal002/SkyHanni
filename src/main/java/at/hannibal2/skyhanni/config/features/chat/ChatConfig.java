@@ -33,6 +33,11 @@ public class ChatConfig {
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
 
     @Expose
+    @ConfigOption(name = "Rare Drop Messages", desc = "")
+    @Accordion
+    public RareDropMessagesConfig rareDropMessages = new RareDropMessagesConfig();
+
+    @Expose
     @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     public List<DungeonMessageTypes> dungeonFilteredMessageTypes = new ArrayList<>();
