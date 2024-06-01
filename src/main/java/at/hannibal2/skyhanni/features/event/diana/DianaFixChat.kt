@@ -28,6 +28,7 @@ class DianaFixChat {
 
     private var lastSpadeUse = SimpleTimeMark.farPast()
     private var lastErrorTime = SimpleTimeMark.farPast()
+    private var lastGuessPoint = SimpleTimeMark.farPast()
     private var foundGuess = false
 
     @SubscribeEvent
@@ -123,7 +124,13 @@ class DianaFixChat {
         hasSetParticleQuality = false
         hasSetToggleMusic = false
         errorCounter = 0
-        successfulCounter++
+
+        // This ensures we only count successes after new spade clicks, not the repeated moved guess locations
+        if (lastGuessPoint != lastSpadeUse) {
+            lastGuessPoint = lastSpadeUse
+            lastGuessPoint = SimpleTimeMark.now()
+            successfulCounter++
+        }
     }
 
     @SubscribeEvent
