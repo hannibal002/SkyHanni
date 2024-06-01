@@ -10,11 +10,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class MiningConfig {
 
     @Expose
-    @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker")
+    @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker.")
     public MiningEventConfig miningEvent = new MiningEventConfig();
 
     @Expose
-    @Category(name = "HotM", desc = "Settings for Heart of the Mountain")
+    @Category(name = "HotM", desc = "Settings for Heart of the Mountain.")
     public HotmConfig hotm = new HotmConfig();
 
     @Expose
@@ -43,11 +43,11 @@ public class MiningConfig {
     public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
 
     @Expose
-    @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features")
+    @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features.")
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
 
     @Expose
-    @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft")
+    @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft.")
     public GlaciteMineshaftConfig glaciteMineshaft = new GlaciteMineshaftConfig();
 
     @Expose
@@ -56,7 +56,7 @@ public class MiningConfig {
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
 
     @Expose
-    @Category(name = "Tunnel Maps", desc = "Settings for the Tunnel Maps")
+    @Category(name = "Tunnel Maps", desc = "Settings for the Tunnel Maps.")
     public TunnelMapsConfig tunnelMaps = new TunnelMapsConfig();
     @Expose
     @ConfigOption(name = "Commissions Blocks Color", desc = "")
