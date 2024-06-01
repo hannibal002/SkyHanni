@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -193,9 +190,9 @@ object HoppityEggsManager {
         displayList.add(0, "§bUnclaimed Eggs:")
 
         if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
-            val totalEggs = HoppityEggLocations.currentIslandLocations?.size
-            if (totalEggs != null) {
-                val collectedEggs = HoppityEggLocations.collectedEggsThisIsland()
+            val totalEggs = HoppityEggLocations.islandLocations.size
+            if (totalEggs > 0) {
+                val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }

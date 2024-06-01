@@ -20,28 +20,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityEggLocations {
 
-    val currentIslandLocations
-        get() = legacyEggLocations[LorenzUtils.skyBlockIsland]
-
-    /**
-     * Editing this set will modify the profile storage. null iff ProfileSpecificStorage is null.
-     */
-    private val currentIslandCollectedLocations
-        get() = collectedEggLocations?.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf() }
-
-    // TODO: only use apiEggLocations
-    private var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
-    private var legacyEggLocations: Map<IslandType, Set<LorenzVec>> = mapOf()
-
-    private var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>>?
-        get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations
+    private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
+        get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf()
         set(value) {
             ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value
         }
 
-    private val collectedLocationCount
-        get() = collectedEggLocations?.values?.sumOf { it.size } ?: 0
+    private var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
+    // to be removed once data in apiEggLocations is confirmed accurate
+    private var legacyEggLocations: Map<IslandType, Set<LorenzVec>> = mapOf()
+
+    val islandLocations
+        get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet() ?: emptySet()
+
+    val islandCollectedLocations
+        get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet() ?: emptySet()
+
+    fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -52,8 +48,7 @@ object HoppityEggLocations {
     }
 
     fun saveNearestEgg() {
-        val location = currentIslandLocations
-            ?.minByOrNull { it.distanceSqToPlayer() } ?: return
+        val location = islandLocations.minByOrNull { it.distanceSqToPlayer() } ?: return
         if (location.distanceSqToPlayer() > 100) {
             ErrorManager.skyHanniError(
                 "Player far from any known egg location!",
@@ -64,10 +59,11 @@ object HoppityEggLocations {
             )
         }
 
-        currentIslandCollectedLocations?.add(location)
+        val collected = collectedEggStorage.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf() }
+        collected += location
     }
 
-
+    /* NEU PV loading logic */
     private var loadedNeuThisProfile = false
 
     @SubscribeEvent
@@ -91,27 +87,22 @@ object HoppityEggLocations {
             result[island] = coords.toMutableSet()
         }
 
+        val storedEggLocationCount = collectedEggStorage.values.sumOf { it.size }
+
         // don't load if the API is unchanged or behind
-        if (apiCollectedLocations.size <= collectedLocationCount) return
+        if (apiCollectedLocations.size <= storedEggLocationCount) return
 
         ChatUtils.clickableChat(
             message = "Click here to load ${apiCollectedLocations.size} collected egg locations from NEU PV!",
             onClick = {
-                collectedEggLocations = result
+                collectedEggStorage = result
                 ChatUtils.chat("Updated Hoppity egg location data!")
-                      },
+            },
             oneTimeClick = true
         )
     }
 
-
-    fun collectedEggsThisIsland() = currentIslandCollectedLocations?.size ?: 0
-
-    fun hasCollectedEgg(location: LorenzVec) =
-        currentIslandCollectedLocations?.contains(location) ?: false
-
-
-    /* Debug logic, for if any API locations are mislabeled or an egg location isn't in the repo */
+    /* Debug logic, enabled using /shtoggleegglocationdebug */
     private var showEggLocationsDebug = false
 
     fun toggleDebug() {
@@ -123,12 +114,12 @@ object HoppityEggLocations {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock || !showEggLocationsDebug) return
-        val locations = currentIslandLocations ?: return
+        val locations = legacyEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val apiLocations = apiEggLocations[LorenzUtils.skyBlockIsland] ?: return
-        val collectedLocations = currentIslandCollectedLocations
+        val collectedLocations = islandCollectedLocations
         for (location in locations) {
             val name = apiLocations.entries.find { it.value == location }?.key
-            val isCollected = collectedLocations?.contains(location) == true
+            val isCollected = collectedLocations.contains(location)
             val color = if (isCollected) LorenzColor.GREEN else LorenzColor.RED
             val nameColorCode = (if (name != null) LorenzColor.GREEN else LorenzColor.RED).getChatColor()
 
@@ -140,7 +131,4 @@ object HoppityEggLocations {
 
         }
     }
-
-
-
 }

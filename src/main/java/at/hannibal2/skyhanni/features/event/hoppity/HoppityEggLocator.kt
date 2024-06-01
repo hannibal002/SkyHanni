@@ -91,7 +91,7 @@ object HoppityEggLocator {
             }
         }
 
-        val islandEggsLocations = HoppityEggLocations.currentIslandLocations ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
 
         if (shouldShowAllEggs()) {
             for (eggLocation in islandEggsLocations) {
@@ -216,7 +216,7 @@ object HoppityEggLocator {
         lastGuessMade = SimpleTimeMark.now()
         possibleEggLocations = emptyList()
 
-        val islandEggsLocations = HoppityEggLocations.currentIslandLocations ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
         val listSize = validParticleLocations.size
 
         if (listSize < 5) return
@@ -262,7 +262,7 @@ object HoppityEggLocator {
     }
 
     fun isValidEggLocation(location: LorenzVec): Boolean =
-        HoppityEggLocations.currentIslandLocations?.any { it.distance(location) < 5.0 } ?: false
+        HoppityEggLocations.islandLocations?.any { it.distance(location) < 5.0 } ?: false
 
     private fun ReceiveParticleEvent.isVillagerParticle() =
         type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
