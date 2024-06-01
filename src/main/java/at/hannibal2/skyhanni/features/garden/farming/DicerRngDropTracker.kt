@@ -114,12 +114,14 @@ object DicerRngDropTracker {
         val items = data.drops.getOrPut(cropInHand) { mutableMapOf() }
         val list = mutableListOf<Renderable>()
         val topLine = mutableListOf<Renderable>()
-        var compactLine = ""
+
         topLine.add(Renderable.itemStack(cropInHand.icon))
         topLine.add(Renderable.string("§7Dicer Tracker:"))
         add(listOf(Renderable.horizontalContainer(topLine)))
         if (config.compact) {
             var first = true
+            var compactLine = ""
+
             items.sortedDesc().entries.forEach { (rarity, amount) ->
                 if (!first) compactLine += "§7/"
                 compactLine += "§${rarity.colorCode}${amount.addSeparators()}"
@@ -127,6 +129,7 @@ object DicerRngDropTracker {
             }
             list.add(Renderable.string(compactLine))
             add(listOf(Renderable.verticalContainer(list)))
+
         } else {
             for ((rarity, amount) in items.sortedDesc()) {
                 val colorCode = rarity.colorCode
