@@ -319,7 +319,6 @@ object ChocolateFactoryDataLoader {
         val itemName = item.name.removeColor()
         val lore = item.getLore()
         val upgradeCost = ChocolateFactoryAPI.getChocolateBuyCost(lore)
-
         val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)
         val isMaxed = upgradeCost == null
 
