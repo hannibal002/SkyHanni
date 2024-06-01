@@ -385,7 +385,6 @@ import at.hannibal2.skyhanni.features.misc.pets.CurrentPetDisplay
 import at.hannibal2.skyhanni.features.misc.pets.PetCandyUsedDisplay
 import at.hannibal2.skyhanni.features.misc.pets.PetExpTooltip
 import at.hannibal2.skyhanni.features.misc.pets.PetItemDisplay
-import at.hannibal2.skyhanni.features.misc.pets.PetNametag
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorFeatures
@@ -970,7 +969,6 @@ class SkyHanniMod {
         loadModule(ColdOverlay())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
-        loadModule(PetNametag())
         loadModule(AuctionOutbidWarning)
 
         // test stuff
