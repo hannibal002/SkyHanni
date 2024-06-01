@@ -218,7 +218,6 @@ object CustomWardrobe {
                             MutableList(4) { index -> if (index == 0) firstSize else remainingSize }
                         }
 
-                        // TODO: Do we even need this?
                         for (k in 0 until height % 4) hoverableSizes[k]++
 
                         for (armorIndex in 0 until 4) {
