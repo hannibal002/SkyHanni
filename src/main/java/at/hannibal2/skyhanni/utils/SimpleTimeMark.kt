@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,6 +29,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isFarPast() = millis == 0L
 
+    fun isFarFuture() = millis == Long.MAX_VALUE
+
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
     override fun toString(): String {
@@ -36,9 +39,15 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     }
 
     fun formattedDate(pattern: String): String {
+        val newPattern = if (SkyHanniMod.feature.gui.timeFormat24h) {
+            pattern.replace("h", "H").replace("a", "")
+        } else {
+            pattern
+        }
+
         val instant = Instant.ofEpochMilli(millis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        val formatter = DateTimeFormatter.ofPattern(pattern)
+        val formatter = DateTimeFormatter.ofPattern(newPattern.trim())
         return localDateTime.format(formatter)
     }
 

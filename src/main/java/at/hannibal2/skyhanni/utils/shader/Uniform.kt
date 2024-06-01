@@ -24,6 +24,7 @@ class Uniform<T>(
             val VEC2: UniformType<FloatArray> = UniformType()
             val VEC3: UniformType<FloatArray> = UniformType()
             val BOOL: UniformType<Boolean> = UniformType()
+            val INT: UniformType<Int> = UniformType()
         }
     }
 
@@ -49,6 +50,7 @@ class Uniform<T>(
                 }
 
                 UniformType.BOOL -> ShaderHelper.glUniform1f(uniformID, if (newUniformValue as Boolean) 1f else 0f)
+                UniformType.INT -> ShaderHelper.glUniform1i(uniformID, (newUniformValue as Int))
             }
             previousUniformValue = newUniformValue
         }

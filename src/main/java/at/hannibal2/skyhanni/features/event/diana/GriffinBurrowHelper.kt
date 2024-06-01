@@ -232,7 +232,7 @@ object GriffinBurrowHelper {
         while (!isValidGround(gY)) {
             gY--
             if (gY < 65) {
-                // no ground detected, find lowest block below air
+                // no ground detected, find the lowest block below air
                 return null
             }
         }
