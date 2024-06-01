@@ -199,12 +199,6 @@ public class MiscConfig {
     public boolean accountUpgradeReminder = true;
 
     @Expose
-    @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairsClicksAlert = false;
-
-    @Expose
     @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -221,6 +215,14 @@ public class MiscConfig {
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "showTimeInLimbo")
     public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
+
+    @Expose
+    @ConfigOption(
+        name = "Limbo Playtime Detailed",
+        desc = "Show your total time in limbo in the detailed /playtime.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLimboTimeInPlaytimeDetailed = true;
 
     @Expose
     @ConfigOption(
