@@ -117,7 +117,6 @@ object CorpseLocator {
             // Return if someone had already sent a location nearby
             if (sharedWaypoints.any { it.distance(location) <= 5 }) return
             sharedWaypoints.add(location)
-            println(sharedWaypoints)
         }
     }
 
