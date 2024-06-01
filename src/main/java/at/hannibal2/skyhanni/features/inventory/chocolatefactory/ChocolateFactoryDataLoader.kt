@@ -136,14 +136,15 @@ object ChocolateFactoryDataLoader {
         event.move(
             46,
             "inventory.chocolateFactory.rabbitWarning",
-            "inventory.chocolateFactory.chocolateFactoryRabbitWarningConfig.rabbitWarning"
+            "inventory.chocolateFactory.rabbitWarning.rabbitWarning"
         )
     }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.rabbitWarning.specialRabbitSound) {
-            ChocolateFactoryAPI.warningSound = SoundUtils.createSound(config.rabbitWarning.specialRabbitSound.get(), 1f)
+        val soundProperty = config.rabbitWarning.specialRabbitSound
+        ConditionalUtils.onToggle(soundProperty) {
+            ChocolateFactoryAPI.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
         }
     }
 
