@@ -303,7 +303,6 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
 import at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer
@@ -970,7 +969,6 @@ class SkyHanniMod {
         loadModule(PestProfitTracker)
         loadModule(NoBitsWarning)
         loadModule(ColdOverlay())
-        loadModule(CustomWardrobe())
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
         loadModule(AuctionOutbidWarning)
