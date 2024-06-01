@@ -118,36 +118,52 @@ class CustomScoreboard {
     }
 
     private fun createLines() = buildList<ScoreboardElementType> {
-        if (LorenzUtils.inSkyBlock) {
-            for (element in config.scoreboardEntries) {
-                val lines = element.getVisiblePair()
-                if (lines.isEmpty()) continue
+        if (!LorenzUtils.inSkyBlock) {
+            addAllNonSkyBlockLines()
+            return@buildList
+        }
 
-                // Hide consecutive empty lines
-                if (
-                    informationFilteringConfig.hideConsecutiveEmptyLines &&
-                    lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
-                ) {
-                    continue
-                }
+        if (!displayConfig.useCustomLines) {
+            addDefaultSkyBlockLines()
+            return@buildList
+        }
 
-                // Adds empty lines
-                if (lines.first().first == "<empty>") {
-                    add("" to HorizontalAlignment.LEFT)
-                    continue
-                }
+        addCustomSkyBlockLines()
+    }
 
-                // Does not display this line
-                if (lines.any { it.first == "<hidden>" }) {
-                    continue
-                }
+    private fun MutableList<ScoreboardElementType>.addAllNonSkyBlockLines() {
+        addAll(ScoreboardElement.TITLE.getVisiblePair())
+        addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
+        addAll(ScoreboardElement.FOOTER.getVisiblePair())
+    }
 
-                addAll(lines)
+    private fun MutableList<ScoreboardElementType>.addDefaultSkyBlockLines() {
+        add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
+    }
+
+    private fun MutableList<ScoreboardElementType>.addCustomSkyBlockLines() {
+        for (element in config.scoreboardEntries) {
+            val lines = element.getVisiblePair()
+            if (lines.isEmpty()) continue
+
+            if (
+                informationFilteringConfig.hideConsecutiveEmptyLines &&
+                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+            ) {
+                continue
             }
-        } else {
-            addAll(ScoreboardElement.TITLE.getVisiblePair())
-            addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
-            addAll(ScoreboardElement.FOOTER.getVisiblePair())
+
+            if (lines.first().first == "<empty>") {
+                add("" to HorizontalAlignment.LEFT)
+                continue
+            }
+
+            if (lines.any { it.first == "<hidden>" }) {
+                continue
+            }
+
+            addAll(lines)
         }
     }
 

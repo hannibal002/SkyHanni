@@ -61,6 +61,11 @@ public class DisplayConfig {
     public boolean displayNumbersFirst = false;
 
     @Expose
+    @ConfigOption(name = "Use Custom Lines", desc = "Use custom lines instead of the default ones.")
+    @ConfigEditorBoolean
+    public boolean useCustomLines = true;
+
+    @Expose
     @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
     @ConfigEditorBoolean
     public boolean showUnclaimedBits = false;
