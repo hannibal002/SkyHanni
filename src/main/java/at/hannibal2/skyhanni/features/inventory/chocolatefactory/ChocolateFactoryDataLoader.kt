@@ -134,7 +134,7 @@ object ChocolateFactoryDataLoader {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
-            46,
+            47,
             "inventory.chocolateFactory.rabbitWarning",
             "inventory.chocolateFactory.rabbitWarning.rabbitWarning"
         )
