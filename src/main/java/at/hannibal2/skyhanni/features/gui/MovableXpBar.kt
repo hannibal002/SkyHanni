@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.transform
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class MovableXpBar {
@@ -15,7 +16,7 @@ class MovableXpBar {
 
     private var post = false
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderXpBar(event: RenderGameOverlayEvent.Pre) {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE || !isEnabled()) return
         post = true
@@ -28,7 +29,7 @@ class MovableXpBar {
         GuiEditManager.add(config.hotbar, "Xp Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderXpBar(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE || !post) return
         GlStateManager.popMatrix()
