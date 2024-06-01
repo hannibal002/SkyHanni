@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.DelayedRun
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
@@ -40,7 +41,9 @@ class GuiContainerHook(guiAny: Any) {
             GuiData.preDrawEventCanceled = true
             ci.cancel()
         } else {
-            GuiData.preDrawEventCanceled = false
+            DelayedRun.runNextTick {
+                GuiData.preDrawEventCanceled = false
+            }
         }
     }
 
