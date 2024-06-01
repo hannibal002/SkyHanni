@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -24,10 +25,10 @@ import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.StringUtils.matchAll
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -379,6 +380,16 @@ object SackAPI {
         fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
 
     fun NEUInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
+
+    fun testSackAPI(args: Array<String>) {
+        if (args.size == 1) {
+            if (sackListInternalNames.contains(args[0].uppercase())) {
+                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].asInternalName())}")
+            } else {
+                ChatUtils.userError("That item isn't a valid sack item.")
+            }
+        } else ChatUtils.userError("/shtestsackapi <internal name>")
+    }
 }
 
 data class SackItem(

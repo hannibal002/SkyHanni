@@ -30,13 +30,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -57,7 +54,8 @@ object VampireSlayerFeatures {
     private val entityList = mutableListOf<EntityLivingBase>()
     private val taggedEntityList = mutableListOf<Int>()
     private var standList = mapOf<EntityArmorStand, EntityOtherPlayerMP>()
-    private val username get() = LorenzUtils.getPlayerName()
+    // Nicked support
+    private val username get() = EntityUtils.getEntities<EntityPlayerSP>().firstOrNull()?.name ?: error("own player is null")
     private val bloodIchorTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
     private val killerSpringTexture =
@@ -130,13 +128,11 @@ object VampireSlayerFeatures {
                     if (shouldSendTitle) {
                         DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
                             if (nextClawSend < System.currentTimeMillis()) {
-                                if (shouldSendTitle) {
-                                    LorenzUtils.sendTitle(
-                                        "§6§lTWINCLAWS",
-                                        (1750 - config.twinclawsDelay).milliseconds,
-                                        2.6
-                                    )
-                                }
+                                LorenzUtils.sendTitle(
+                                    "§6§lTWINCLAWS",
+                                    (1750 - config.twinclawsDelay).milliseconds,
+                                    2.6
+                                )
                                 nextClawSend = System.currentTimeMillis() + 5_000
                             }
                         }
@@ -156,13 +152,7 @@ object VampireSlayerFeatures {
                 }
                 contain
             }
-            val neededHealth = when (baseMaxHealth) {
-                625 -> 125f // t1
-                1100 -> 220f // t2
-                1800 -> 360f // t3
-                2400 -> 480f // t4
-                else -> 600f // t5
-            }
+            val neededHealth = baseMaxHealth * 0.2f
             if (containUser && taggedEntityList.contains(this.entityId)) {
                 taggedEntityList.remove(this.entityId)
             }
@@ -242,7 +232,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun pre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {
@@ -251,7 +241,7 @@ object VampireSlayerFeatures {
     }
 
     @SubscribeEvent
-    fun post(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
         if (entityList.contains(event.entity) && event.entity.canBeSeen()) {

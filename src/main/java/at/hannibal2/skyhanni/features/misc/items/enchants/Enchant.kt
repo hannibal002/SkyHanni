@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import java.util.TreeSet
 
@@ -26,10 +28,17 @@ open class Enchant : Comparable<Enchant> {
     open fun getFormat(level: Int): String {
         val config = SkyHanniMod.feature.inventory.enchantParsing
 
-        if (level >= maxLevel) return config.perfectEnchantColor.get().getChatColor()
-        if (level > goodLevel) return config.greatEnchantColor.get().getChatColor()
-        if (level == goodLevel) return config.goodEnchantColor.get().getChatColor()
-        return config.poorEnchantColor.get().getChatColor()
+        // TODO change color to string (support for bold)
+        val colour = when {
+            level >= maxLevel -> config.perfectEnchantColor
+            level > goodLevel -> config.greatEnchantColor
+            level == goodLevel -> config.goodEnchantColor
+            else -> config.poorEnchantColor
+        }
+
+        // TODO when chroma is disabled maybe use the neu chroma style instead of gold
+        if (colour.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
+        return colour.get().getChatColor()
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"

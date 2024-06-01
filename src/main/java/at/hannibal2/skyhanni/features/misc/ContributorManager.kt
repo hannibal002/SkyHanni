@@ -18,7 +18,8 @@ object ContributorManager {
 
     fun getTabListSuffix(username: String): String? = getContributor(username)?.suffix
 
-    fun canSpin(username: String): Boolean = getContributor(username)?.spinny ?: false
+    fun shouldSpin(username: String): Boolean = getContributor(username)?.spinny ?: false
+    fun shouldBeUpsideDown(username: String): Boolean = getContributor(username)?.upsideDown ?: false
 
     private fun getContributor(username: String) =
         contributors[username.lowercase()]?.let { it.takeIf { it.isAllowed() } }

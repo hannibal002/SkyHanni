@@ -66,6 +66,11 @@ public class DebugConfig {
     public boolean showNpcPrice = false;
 
     @Expose
+    @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
+    @ConfigEditorBoolean
+    public boolean showBZPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     public boolean showItemUuid = false;
@@ -139,4 +144,8 @@ public class DebugConfig {
     // Does not have a config element!
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
+
+    // Also does not have a config element!
+    @Expose
+    public Position trackParticlePosition = new Position(0, 0);
 }

@@ -18,7 +18,7 @@ public class EnchantParsingConfig {
 
     @Expose
     @ConfigOption(name = "Format", desc = "The way the enchants are formatted in the tooltip.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<EnchantFormat> format = Property.of(EnchantFormat.NORMAL);
 
     public enum EnchantFormat {
@@ -39,28 +39,29 @@ public class EnchantParsingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
-    @ConfigEditorDropdown()
+    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level. " +
+        "§eIf SkyHanni chroma is disabled this will default to §6Gold.")
+    @ConfigEditorDropdown
     public Property<LorenzColor> perfectEnchantColor = Property.of(LorenzColor.CHROMA);
 
     @Expose
     @ConfigOption(name = "Great Enchantment Color", desc = "The color an enchantment will be at a great level.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LorenzColor> greatEnchantColor = Property.of(LorenzColor.GOLD);
 
     @Expose
     @ConfigOption(name = "Good Enchantment Color", desc = "The color an enchantment will be at a good level.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LorenzColor> goodEnchantColor = Property.of(LorenzColor.BLUE);
 
     @Expose
     @ConfigOption(name = "Poor Enchantment Color", desc = "The color an enchantment will be at a poor level.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<LorenzColor> poorEnchantColor = Property.of(LorenzColor.GRAY);
 
     @Expose
     @ConfigOption(name = "Comma Format", desc = "Change the format of the comma after each enchant.")
-    @ConfigEditorDropdown()
+    @ConfigEditorDropdown
     public Property<CommaFormat> commaFormat = Property.of(CommaFormat.COPY_ENCHANT);
 
     public enum CommaFormat {
