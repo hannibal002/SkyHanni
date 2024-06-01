@@ -216,7 +216,7 @@ object CustomWardrobe {
                         for (k in 0 until height % 4) hoverableSizes[k]++
 
                         for (armorIndex in 0 until 4) {
-                            val stack = wardrobeSlot.getArmor()[armorIndex]?.copy()
+                            val stack = wardrobeSlot.armor[armorIndex]?.copy()
                             if (stack == null) {
                                 loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
                             } else {
@@ -238,18 +238,18 @@ object CustomWardrobe {
                     val playerBackground = createHoverableRenderable(
                         armorTooltipRenderable.invoke(),
                         topLayerRenderable = addSlotHoverableButtons(wardrobeSlot),
-                        hoveredColor = getWardrobeSlotColor(wardrobeSlot),
+                        hoveredColor = wardrobeSlot.getSlotColor(),
                         borderOutlineThickness = config.spacing.outlineThickness,
                         borderOutlineBlur = config.spacing.outlineBlur,
                         onClick = {
-                            clickWardrobeSlot(wardrobeSlot)
+                            wardrobeSlot.clickSlot()
                         }
                     )
 
                     val fakePlayer = getFakePlayer()
 
                     fakePlayer.inventory.armorInventory =
-                        wardrobeSlot.getArmor().map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+                        wardrobeSlot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
 
                     val playerColor = if (!wardrobeSlot.isInCurrentPage()) {
                         scale *= 0.9
@@ -500,28 +500,27 @@ object CustomWardrobe {
             onHover = { onHover() }
         )
 
-    private fun clickWardrobeSlot(wardrobeSlot: WardrobeAPI.WardrobeSlot) {
+    private fun WardrobeAPI.WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = currentPage ?: return
         val windowId = getWindowId() ?: -1
-        if (wardrobeSlot.isInCurrentPage()) {
-            if (wardrobeSlot.isEmpty() || wardrobeSlot.locked || waitingForInventoryUpdate) return
-            currentWardrobeSlot = if (wardrobeSlot.isCurrentSlot()) null
-            else wardrobeSlot.id
-            clickSlot(wardrobeSlot.inventorySlot, windowId)
+        if (isInCurrentPage()) {
+            if (isEmpty() || locked || waitingForInventoryUpdate) return
+            currentWardrobeSlot = if (isCurrentSlot()) null
+            else id
+            clickSlot(inventorySlot, windowId)
         } else {
-            if (wardrobeSlot.page < wardrobePage) {
+            if (page < wardrobePage) {
                 currentPage = wardrobePage - 1
                 waitingForInventoryUpdate = true
                 clickSlot(previousPageSlot, windowId)
-            } else if (wardrobeSlot.page > wardrobePage) {
+            } else if (page > wardrobePage) {
                 currentPage = wardrobePage + 1
                 waitingForInventoryUpdate = true
                 clickSlot(nextPageSlot, windowId)
             }
         }
-        update()
     }
 
     private fun getFakePlayer(): EntityOtherPlayerMP {
@@ -542,17 +541,17 @@ object CustomWardrobe {
         }
     }
 
-    private fun getWardrobeSlotColor(wardrobeSlot: WardrobeAPI.WardrobeSlot): Color {
-        val color = if (wardrobeSlot.isInCurrentPage()) {
-            if (wardrobeSlot.isCurrentSlot()) config.color.equippedColor.toChromaColor()
-            else if (wardrobeSlot.favorite && !config.onlyFavorites) config.color.favoriteColor.toChromaColor()
-            else config.color.samePageColor.toChromaColor()
-        } else {
-            if (wardrobeSlot.isCurrentSlot()) config.color.equippedColor.toChromaColor().darker()
-            else if (wardrobeSlot.favorite && !config.onlyFavorites) config.color.favoriteColor.toChromaColor().darker()
-            else config.color.otherPageColor.toChromaColor()
+    private fun WardrobeAPI.WardrobeSlot.getSlotColor(): Color {
+        with(config.color) {
+            return when {
+                isCurrentSlot() -> equippedColor
+                locked -> lockedEmptyColor
+                isEmpty() -> lockedEmptyColor
+                favorite -> favoriteColor
+                else -> null
+            }?.toChromaColor()?.let { if (!isInCurrentPage()) it.darker() else it }
+                ?: (if (!isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
         }
-        return Color(color.withAlpha(170), true)
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()
