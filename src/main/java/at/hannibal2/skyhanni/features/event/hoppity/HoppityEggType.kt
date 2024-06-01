@@ -6,14 +6,14 @@ import kotlin.time.Duration
 
 enum class HoppityEggType(
     val mealName: String,
-    val resetsAt: Int,
     private val mealColour: String,
+    val resetsAt: Int,
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
 ) {
-    BREAKFAST("Breakfast", 7, "§6"),
-    LUNCH("Lunch", 14, "§9"),
-    DINNER("Dinner", 21, "§a"),
+    BREAKFAST("Breakfast", "§6", 7),
+    LUNCH("Lunch", "§9", 14),
+    DINNER("Dinner", "§a", 21),
     ;
 
     fun timeUntil(): Duration {
@@ -61,6 +61,10 @@ enum class HoppityEggType(
 
         fun eggsRemaining(): Boolean {
             return entries.any { !it.claimed }
+        }
+
+        fun allEggsRemaining(): Boolean {
+            return entries.all { !it.claimed }
         }
     }
 }

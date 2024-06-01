@@ -19,4 +19,10 @@ public class DungeonChestConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean kismetStackSize = true;
+
+    @Expose
+    @ConfigOption(name = "Croesus Limit Warning", desc = "Gives a warning when you are close to being past Croesus limit.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean croesusLimit = true;
 }
