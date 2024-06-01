@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
-import at.hannibal2.skyhanni.features.commands.TransferCooldown
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
@@ -81,7 +80,6 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -325,22 +323,6 @@ object Commands {
             "shignore",
             "Add/Remove a user from your"
         ) { PartyChatCommands.blacklist(it) }
-        registerCommand("warp", "") { args: Array<String> ->
-            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer { HypixelCommands.warp(args.joinToString(" ")) }
-            else HypixelCommands.warp(args.joinToString(" "))
-        }
-        registerCommand("is", "") {
-            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer(HypixelCommands::island)
-            else HypixelCommands.island()
-        }
-        registerCommand("warpforge", "") {
-            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer { HypixelCommands.warp("forge") }
-            else HypixelCommands.warp("forge")
-        }
-        registerCommand("hub", "") {
-            if (LorenzUtils.inSkyBlock) TransferCooldown.transfer(HypixelCommands::hub)
-            else HypixelCommands.hub()
-        }
         registerCommand(
             "shtpinfested",
             "Teleports you to the nearest infested plot"
