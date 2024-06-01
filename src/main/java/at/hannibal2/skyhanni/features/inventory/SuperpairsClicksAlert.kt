@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -11,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SuperpairsClicksAlert {
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
 
     private var roundsNeeded = -1
     private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")
@@ -55,8 +56,13 @@ class SuperpairsClicksAlert {
                 .any { it.value.stackSize > roundsNeeded })
         ) {
             SoundUtils.playBeepSound()
-            ChatUtils.chat("You have reached the maximum possible clicks!")
+            ChatUtils.chat("You have reached the maximum extra Superpairs clicks from this add-on!")
             roundsNeeded = -1
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(46, "misc.superpairsClicksAlert", "inventory.helper.enchanting.superpairsClicksAlert")
     }
 }
