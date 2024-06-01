@@ -1,23 +1,16 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
 
 public class MineshaftWaypointsConfig {
     @Expose
-    @ConfigOption(name = "Corpse Locator", desc = "")
-    @Accordion
-    public CorpseLocatorConfig corpseLocator = new CorpseLocatorConfig();
-
-    @Expose
-    @ConfigOption(name = "Share Waypoint Location", desc = "Shares the location of the nearest waypoint upon key press.\n" +
-        "§eYou can share the location even if it has already been shared!")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int shareWaypointLocation = Keyboard.KEY_NONE;
+    @ConfigOption(name = "Enabled", desc = "Enable features related to the Glacite Mineshaft.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Entrance Location", desc = "Marks the location of the entrance with a waypoint.")

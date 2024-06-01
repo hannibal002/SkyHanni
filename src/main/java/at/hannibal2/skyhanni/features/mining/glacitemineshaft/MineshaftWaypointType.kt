@@ -1,14 +1,29 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 
-// could merge with CorpseAPI (besides the last 3 types)
-enum class MineshaftWaypointType(val displayText: String, val helmetName: String, val color: LorenzColor) {
-    LAPIS("Lapis Corpse", "Lapis Armor Helmet", LorenzColor.DARK_BLUE),
-    UMBER("Umber Corpse", "Yog Helmet", LorenzColor.GOLD),
-    TUNGSTEN("Tungsten Corpse", "Mineral Helmet", LorenzColor.GRAY),
-    VANGUARD("Vanguard Corpse", "Vanguard Helmet", LorenzColor.BLUE),
-    ENTRANCE("Entrance", "", LorenzColor.YELLOW),
-    LADDER("Ladder", "", LorenzColor.YELLOW),
-    UNKNOWN("Unknown", "", LorenzColor.BLACK)
+enum class MineshaftWaypointType(
+    val displayText: String,
+    val color: LorenzColor,
+    private val itemName: String? = null
+) {
+    LAPIS("Lapis Corpse", LorenzColor.DARK_BLUE, "LAPIS_ARMOR_HELMET"),
+    UMBER("Umber Corpse", LorenzColor.GOLD, "ARMOR_OF_YOG_HELMET"),
+    TUNGSTEN("Tungsten Corpse", LorenzColor.GRAY, "MINERAL_HELMET"),
+    VANGUARD("Vanguard Corpse", LorenzColor.BLUE, "VANGUARD_HELMET"),
+    ENTRANCE("Entrance", LorenzColor.YELLOW),
+    LADDER("Ladder", LorenzColor.YELLOW)
+    ;
+
+    val helmet by lazy {
+        itemName?.asInternalName()
+    }
+
+    companion object {
+        fun getByHelmetOrNull(internalName: NEUInternalName): MineshaftWaypointType? {
+            return entries.firstOrNull { it.helmet == internalName }
+        }
+    }
 }

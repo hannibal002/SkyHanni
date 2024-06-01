@@ -47,8 +47,8 @@ public class MiningConfig {
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
 
     @Expose
-    @Category(name = "Mineshaft Waypoints", desc = "Waypoints options for the Glacite Mineshaft.")
-    public MineshaftWaypointsConfig mineshaftWaypoints = new MineshaftWaypointsConfig();
+    @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft")
+    public GlaciteMineshaftConfig glaciteMineshaft = new GlaciteMineshaftConfig();
 
     @Expose
     @ConfigOption(name = "Notifications", desc = "")
