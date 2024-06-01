@@ -120,13 +120,6 @@ object StringUtils {
         return null
     }
 
-    fun List<String>.indexOfFirstMatch(pattern: Pattern): Int? {
-        for ((index, line) in this.withIndex()) {
-            pattern.matcher(line).let { if (it.matches()) return index }
-        }
-        return null
-    }
-
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchAll(pattern, consumer)"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
