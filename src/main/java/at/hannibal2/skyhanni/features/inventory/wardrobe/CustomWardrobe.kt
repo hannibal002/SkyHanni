@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils.getFakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils.clickSlot
 import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
@@ -29,12 +30,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.entity.player.EnumPlayerModelParts
-import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
@@ -102,7 +99,7 @@ object CustomWardrobe {
             padding = 10
         )
 
-        // change global wardrobe scale if its taller or wider than the screen
+        // Change global wardrobe scale if its taller or wider than the screen
         if (fullRenderable.width > gui.width || fullRenderable.height > gui.height) {
             if (config.spacing.globalScale <= 1) return
             val newScale = (config.spacing.globalScale * (0.9 / max(
@@ -211,8 +208,17 @@ object CustomWardrobe {
                         val loreList = mutableListOf<Renderable>()
                         val height = containerHeight - 3
 
-                        // This is needed to keep the total size of the renderable the same as the others
-                        val hoverableSizes = MutableList(4) { height / 4 }
+                        // Adjust hoverableSizes based on whether the slot is on the current page
+                        val hoverableSizes = if (wardrobeSlot.isInCurrentPage()) {
+                            MutableList(4) { height / 4 }
+                        } else {
+                            val inactiveHeight = (height * 0.9).toInt()
+                            val firstSize = (inactiveHeight * 0.4).toInt()
+                            val remainingSize = (inactiveHeight - firstSize) / 3
+                            MutableList(4) { index -> if (index == 0) firstSize else remainingSize }
+                        }
+
+                        // TODO: Do we even need this?
                         for (k in 0 until height % 4) hoverableSizes[k]++
 
                         for (armorIndex in 0 until 4) {
@@ -524,24 +530,6 @@ object CustomWardrobe {
         update()
     }
 
-    private fun getFakePlayer(): EntityOtherPlayerMP {
-        val mc = Minecraft.getMinecraft()
-        return object : EntityOtherPlayerMP(
-            mc.theWorld,
-            mc.thePlayer.gameProfile
-        ) {
-            override fun getLocationSkin() =
-                mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
-
-            override fun getTeam() = object : ScorePlayerTeam(null, null) {
-                override fun getNameTagVisibility() = EnumVisible.NEVER
-            }
-
-            override fun isWearing(part: EnumPlayerModelParts?) =
-                mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
-        }
-    }
-
     private fun getWardrobeSlotColor(wardrobeSlot: WardrobeAPI.WardrobeSlot): Color {
         val color = if (wardrobeSlot.isInCurrentPage()) {
             if (wardrobeSlot.isCurrentSlot()) config.color.equippedColor.toChromaColor()
@@ -555,5 +543,5 @@ object CustomWardrobe {
         return Color(color.withAlpha(170), true)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && inWardrobe()
+    fun isEnabled() = LorenzUtils.inSkyBlock && inWardrobe() && config.enabled
 }
