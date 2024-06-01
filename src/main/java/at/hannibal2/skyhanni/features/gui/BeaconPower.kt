@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -17,13 +18,15 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BeaconPower {
+@SkyHanniModule
+object BeaconPower {
 
     private val storage get() = ProfileStorageData.profileSpecific?.beaconPower
     private val config get() = SkyHanniMod.feature.gui
 
     private val group = RepoPattern.group("gui.beaconpower")
 
+    // TODO add regex tests
     private val deactivatedPattern by group.pattern(
         "deactivated",
         "§7Beacon Deactivated §8- §cNo Power Remaining"
@@ -105,15 +108,16 @@ class BeaconPower {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): String {
-        var text = "§eBeacon: "
-        if (expiryTime.isInPast()) text += "§cNot active"
-        else {
-            text += "§b${expiryTime.timeUntil().format(maxUnits = 2)}"
-            if (config.beaconPowerStat) text += " §7(" + (stat ?: "§cNo stat") + "§7)"
+    private fun drawDisplay(): String = buildString {
+        append("§eBeacon: ")
+        if (expiryTime.isInPast()) {
+            append("§cNot active")
+        } else {
+            append("§b${expiryTime.timeUntil().format(maxUnits = 2)}")
+            if (config.beaconPowerStat) append(" §7(${stat ?: "§cNo stat"}§7)")
         }
-        return text
     }
+
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.beaconPower
 }
