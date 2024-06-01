@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.isBaz
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -17,8 +16,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -109,7 +108,7 @@ class CraftMaterialsFromBazaar {
                 val text = "§8${priceMultiplier.addSeparators()}x " + material.itemName +
                     " §6${NumberUtil.format(material.getPrice() * priceMultiplier)}"
                 add(Renderable.optionalLink(text, onClick = {
-                    BazaarApi.searchForBazaarItem(material.itemNameWithoutColor, priceMultiplier)
+                    BazaarApi.searchForBazaarItem(material, priceMultiplier)
                 }))
             }
             add(
