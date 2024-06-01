@@ -19,7 +19,7 @@ object TransferCooldown {
 
     @SubscribeEvent
     fun onWorldLoad(event: LorenzWorldChangeEvent) {
-        if (!config.transferCooldown || lastRunCompleted.passedSince().inWholeMilliseconds < 0L) return
+        if (!config.transferCooldown || lastRunCompleted.isInFuture()) return
         lastRunCompleted = DelayedRun.runDelayed(3.seconds) {
             if (config.transferCooldownMessage && LorenzUtils.inSkyBlock) ChatUtils.chat(
                 "§aPlayer Transfer Cooldown has ended."
@@ -31,7 +31,7 @@ object TransferCooldown {
 
     @SubscribeEvent
     fun onCommand(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.transferCooldown || lastRunCompleted.passedSince().inWholeMilliseconds > 0L) return
+        if (!LorenzUtils.inSkyBlock || !config.transferCooldown || lastRunCompleted.isInPast()) return
         when (event.splitMessage[0]) {
             "/is" -> {
                 event.cancel()
