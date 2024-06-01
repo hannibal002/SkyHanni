@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -51,10 +52,18 @@ class ComposterDisplay {
     private val BUCKET by lazy { "BUCKET".asInternalName().getItemStack() }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabWidgetUpdateClear(event: TabWidgetUpdate.Clear) {
         if (!(config.displayEnabled && GardenAPI.inGarden())) return
+        if (!event.isEventFor(TabWidget.COMPOSTER)) return
+        tabListData = emptyMap()
+    }
 
-        readData(event.tabList)
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
+        if (!(config.displayEnabled && GardenAPI.inGarden())) return
+        if (!event.isEventFor(TabWidget.COMPOSTER)) return
+
+        readData(event.lines)
 
         if (tabListData.isNotEmpty()) {
             composterEmptyTime = ComposterAPI.estimateEmptyTimeFromTab()

@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -84,8 +85,9 @@ class GardenCropMilestoneFix {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        event.tabList.matchFirst(tabListPattern) {
+    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
+        if (!event.isEventFor(TabWidget.CROP_MILESTONE)) return
+        event.lines.matchFirst(tabListPattern) {
             val tier = group("tier").toInt()
             val percentage = group("percentage").toDouble()
             val cropName = group("crop")

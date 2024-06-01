@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -8,7 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -22,9 +23,9 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -71,13 +72,14 @@ class VisitorListener {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
         if (!GardenAPI.inGarden()) return
+        if (!event.isEventFor(TabWidget.VISITORS)) return
 
-        val hasVisitorInfo = event.tabList.any { VisitorAPI.visitorCountPattern.matches(it) }
+        val hasVisitorInfo = event.lines.any { VisitorAPI.visitorCountPattern.matches(it) }
         if (!hasVisitorInfo) return
 
-        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.lines)
 
         if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
             VisitorAPI.getVisitors().forEach {

@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -25,9 +26,15 @@ class VolcanoExplosivityDisplay {
     private var display = ""
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabWidgetUpdate) {
         if (!isEnabled()) return
-        event.tabList.matchFirst(statusPattern) {
+        if (!event.isEventFor(TabWidget.VOLCANO)) return
+
+        if (event is TabWidgetUpdate.Clear) {
+            display = ""
+            return
+        }
+        statusPattern.matchMatcher(event.widget.lines.first()) {
             display = "§bVolcano Explosivity§7: ${group("status")}"
         }
     }
