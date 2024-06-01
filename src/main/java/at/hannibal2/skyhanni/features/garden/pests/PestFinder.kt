@@ -164,11 +164,10 @@ object PestFinder {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!GardenAPI.inGarden()) return
         if (!config.noPestTitle) return
 
-        val containsCheck = GardenAPI.inGarden() && noPestsChatPattern.matches(event.message)
-
-        if (event.blockedReason == "gardenPest" || containsCheck) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
+        if (noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
     }
 
     @SubscribeEvent
