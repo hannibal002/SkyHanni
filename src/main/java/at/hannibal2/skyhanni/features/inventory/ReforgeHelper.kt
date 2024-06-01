@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
@@ -332,11 +333,19 @@ class ReforgeHelper {
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.posCurrent.renderStrings(
+        config.posList.renderRenderables(display, posLabel = "Reforge Overlay")
+    }
+
+    @SubscribeEvent
+    fun onGuiContainerForegroundDrawn(event: GuiContainerEvent.AfterDraw) {
+        if (!isEnabled()) return
+        GlStateManager.translate(0f, 0f, 10f)
+        val position = if (isInHexReforgeMenu) config.posCurrentHex else config.posCurrent
+        position.renderStrings(
             listOf(formattedReforgeToSearch, formattedCurrentReforge),
             posLabel = "Reforge Notify"
         )
-        config.posList.renderRenderables(display, posLabel = "Reforge Overlay")
+        GlStateManager.translate(0f, 0f, -10f)
     }
 
     @SubscribeEvent

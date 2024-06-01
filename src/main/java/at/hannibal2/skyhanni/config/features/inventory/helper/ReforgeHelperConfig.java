@@ -11,10 +11,13 @@ public class ReforgeHelperConfig {
 
     @Expose
     @ConfigLink(owner = ReforgeHelperConfig.class, field = "enable")
-    public Position posList = new Position(-200, 85, true, true);
+    public Position posList = new Position(80, 85, true, true);
     @Expose
     @ConfigLink(owner = ReforgeHelperConfig.class, field = "enable")
-    public Position posCurrent = new Position(280, 45, true, true);
+    public Position posCurrent = new Position(293, 88, true, true);
+    @Expose
+    @ConfigLink(owner = ReforgeHelperConfig.class, field = "enable")
+    public Position posCurrentHex = new Position(293, 81, true, true);
 
     @Expose
     @ConfigOption(name = "Enable", desc = "Enables the reforge helper.")

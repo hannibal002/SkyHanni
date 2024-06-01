@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 import net.minecraft.item.Item
 
 data class NeuReforgeJson(
-    @Expose @SerializedName("internalName") val internalName: NEUInternalName?,
+    @Expose val internalName: NEUInternalName?,
     @Expose val reforgeName: String,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
