@@ -57,6 +57,7 @@ public class HelperConfig {
     @Accordion
     public ReforgeHelperConfig reforge = new ReforgeHelperConfig();
 
+    @Expose
     @ConfigOption(name = "Enchanting", desc = "")
     @Accordion
     public EnchantingConfig enchanting = new EnchantingConfig();
