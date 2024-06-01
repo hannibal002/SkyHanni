@@ -62,9 +62,7 @@ object MineshaftWaypoints {
         if (timeLastShared.passedSince() < 500.milliseconds) return
 
         val closestWaypoint = waypoints.filter { it.location.distanceToPlayer() <= 5 }
-            .minByOrNull { it.location.distanceToPlayer() }
-
-        closestWaypoint ?: return
+            .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         timeLastShared = SimpleTimeMark.now()
         val location = closestWaypoint.location

@@ -66,13 +66,10 @@ object CorpseLocator {
     private fun shareCorpse() {
         val closestCorpse = MineshaftWaypoints.waypoints.filter { it.isCorpse && !it.shared }
             .filterNot { corpse ->
-                // Don't share if a shared waypoint is near that corpse thus reducing spam
                 sharedWaypoints.any { corpse.location.distance(it) <= 5 }
             }
             .filter { it.location.distanceToPlayer() <= 5}
-            .minByOrNull { it.location.distanceToPlayer() }
-
-        closestCorpse ?: return
+            .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         val (x, y, z) = closestCorpse.location.toDoubleArray().map { it.toInt() }
         val type = closestCorpse.waypointType.displayText
