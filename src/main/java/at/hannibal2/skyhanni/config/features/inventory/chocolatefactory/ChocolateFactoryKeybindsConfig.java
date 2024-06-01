@@ -38,4 +38,14 @@ public class ChocolateFactoryKeybindsConfig {
     @ConfigOption(name = "Key 5", desc = "Key for Rabbit Granny.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_5)
     public int key5 = Keyboard.KEY_5;
+
+    @Expose
+    @ConfigOption(name = "Key 6", desc = "Key for Rabbit Uncle.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_6)
+    public int key6 = Keyboard.KEY_6;
+
+    @Expose
+    @ConfigOption(name = "Key 7", desc = "Key for Rabbit Dog.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_7)
+    public int key7 = Keyboard.KEY_7;
 }
