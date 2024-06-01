@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 object HypixelCommands {
+    fun skyblock() {
+        send("skyblock")
+    }
 
     fun bazaar(searchTerm: String) {
         send("bz $searchTerm")
