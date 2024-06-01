@@ -43,8 +43,8 @@ public class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Text Key", desc = "Starts text mode, which allows editing a name of a node.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_T)
-    public int textKey = Keyboard.KEY_T;
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Y)
+    public int textKey = Keyboard.KEY_Y;
 
     @Expose
     @ConfigOption(name = "Test Dijkstra", desc = "On Keypress shows the shortest path between the nearest node and the active node.")
