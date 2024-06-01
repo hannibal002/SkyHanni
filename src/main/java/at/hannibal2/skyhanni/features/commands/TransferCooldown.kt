@@ -7,33 +7,31 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 object TransferCooldown {
 
     private val config get() = SkyHanniMod.feature.misc.commands
-    var isActive: Boolean = false
+    var lastRunCompleted: SimpleTimeMark = SimpleTimeMark.farPast()
     private var action: (() -> Unit)? = null
 
     @SubscribeEvent
     fun onWorldLoad(event: LorenzWorldChangeEvent) {
-        if (!config.transferCooldown || isActive) return
-        isActive = true
-        DelayedRun.runDelayed(3.seconds) {
+        if (!config.transferCooldown || lastRunCompleted.passedSince().inWholeMilliseconds < 0L) return
+        lastRunCompleted = DelayedRun.runDelayed(3.seconds) {
             if (config.transferCooldownMessage && LorenzUtils.inSkyBlock) ChatUtils.chat(
                 "§aPlayer Transfer Cooldown has ended."
             )
-
             action?.invoke()
             action = null
-            isActive = false
         }
     }
 
     @SubscribeEvent
     fun onCommand(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.transferCooldown || !isActive) return
+        if (!LorenzUtils.inSkyBlock || !config.transferCooldown || lastRunCompleted.passedSince().inWholeMilliseconds > 0L) return
         when (event.splitMessage[0]) {
             "/is" -> {
                 event.cancel()
