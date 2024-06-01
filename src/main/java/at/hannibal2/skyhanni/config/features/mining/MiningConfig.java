@@ -47,6 +47,10 @@ public class MiningConfig {
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
 
     @Expose
+    @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft")
+    public GlaciteMineshaftConfig glaciteMineshaft = new GlaciteMineshaftConfig();
+
+    @Expose
     @ConfigOption(name = "Notifications", desc = "")
     @Accordion
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
