@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -54,6 +55,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     var greatSpook = false
+
+    /**
+     * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
+     * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
+     * REGEX-TEST: §7miniboss §a1 §7time!
+     */
+    val minibossAmountPattern by RepoPattern.pattern(
+        "crimson.reputationhelper.quest.minibossamount",
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+    )
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 

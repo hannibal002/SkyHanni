@@ -119,6 +119,12 @@ public class MiscConfig {
     public boolean hideExpBottles = false;
 
     @Expose
+    @ConfigOption(name = "Armorstands", desc = "Hides Armorstands that are sometimes visible for a fraction of a second.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideTemporaryArmorstands = true;
+
+    @Expose
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
@@ -199,12 +205,6 @@ public class MiscConfig {
     public boolean accountUpgradeReminder = true;
 
     @Expose
-    @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairsClicksAlert = false;
-
-    @Expose
     @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -224,6 +224,14 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Limbo Playtime Detailed",
+        desc = "Show your total time in limbo in the detailed /playtime.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLimboTimeInPlaytimeDetailed = true;
+
+    @Expose
+    @ConfigOption(
         name = "Lesser Orb of Healing Hider",
         desc = "Hides the Lesser Orb of Healing.")
     @ConfigEditorBoolean
@@ -233,7 +241,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Lock Mouse Message",
-        desc = "Show a message in chat when toggling the /shmouselock.")
+        desc = "Show a message in chat when toggling §e/shmouselock§7.")
     @ConfigEditorBoolean
     public boolean lockMouseLookChatMessage = true;
 
@@ -251,6 +259,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
+
+    @Expose
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean replaceRomanNumerals = false;
 
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion

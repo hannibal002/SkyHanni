@@ -7,17 +7,15 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-/** This group / prefix is not allowed to be used anywhere else (tab.widget is allowed as prefix) */
-private val repoGroup = RepoPattern.group("tab.widget.enum")
+private val repoGroup by RepoPattern.exclusiveGroup("tab.widget.enum")
 
 /**
  * This class defines various widgets within the tab list, specifically focusing on the reading of the values.
@@ -26,7 +24,7 @@ private val repoGroup = RepoPattern.group("tab.widget.enum")
  * The class facilitates access to the lines associated with each widget and triggers events when a widget undergoes changes or becomes invisible.
  */
 enum class TabWidget(
-    pattern0: String
+    pattern0: String,
 ) {
     PLAYER_LIST(
         // language=RegExp
@@ -299,7 +297,11 @@ enum class TabWidget(
     DUNGEON_STATS_LINE(
         // language=RegExp
         "(?:§.)*Dungeon Stats"
-    )
+    ),
+    FROZEN_CORPSES(
+        // language=RegExp
+        "§b§lFrozen Corpses:"
+    ),
 
     ;
 
@@ -399,7 +401,7 @@ enum class TabWidget(
 
         @SubscribeEvent(priority = EventPriority.LOW)
         fun onRepoReload(event: RepositoryReloadEvent) {
-            extraPatterns = RepoPatternManager.getUnusedPatterns(repoGroup.prefix)
+            extraPatterns = repoGroup.getUnusedPatterns()
         }
 
         private fun filterTabList(tabList: List<String>): List<String> {

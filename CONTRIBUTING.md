@@ -59,6 +59,9 @@ format like "- #821" to illustrate the dependency.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+- Avoid using deprecated functions.
+    - These functions are marked for removal in future versions.
+    - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
 - Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
     - Config files should still be made in Java.
 - Please use the existing event system, or expand on it. Do not use Forge events.
@@ -148,10 +151,7 @@ folder for how to properly do this. You also may have to disable repo auto updat
 ### Discord IPC
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
-Specifically, we use [NetheriteMiner's Fork](https://github.com/NetheriteMiner/DiscordIPC) of a fork of a fork of a fork of
-the [original](https://github.com/jagrosh/DiscordIPC).
-For info on usage, look
-at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
 ### Auto Updater
 

@@ -11,16 +11,16 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabWidgetUpdate
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -64,6 +64,13 @@ class HypixelData {
         private val playerAmountGuestingPattern by patternGroup.pattern(
             "playeramount.guesting",
             "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        )
+        /**
+         * REGEX-TEST:           §r§b§lParty §r§f(4)
+         */
+        private val dungeonPartyAmountPattern by patternGroup.pattern(
+            "playeramount.dungeonparty",
+            "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
         )
         private val soloProfileAmountPattern by patternGroup.pattern(
             "solo.profile.amount",
@@ -157,11 +164,14 @@ class HypixelData {
 
         fun getPlayersOnCurrentServer(): Int {
             var amount = 0
-            val playerPatternList = listOf(
+            val playerPatternList = mutableListOf(
                 playerAmountPattern,
                 playerAmountCoopPattern,
-                playerAmountGuestingPattern
+                playerAmountGuestingPattern,
             )
+            if (DungeonAPI.inDungeon()) {
+                playerPatternList.add(dungeonPartyAmountPattern)
+            }
 
             out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
@@ -180,8 +190,14 @@ class HypixelData {
             ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
                 return group("maxamount").toInt()
             }
-            if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) return 24
-            return if (serverId?.startsWith("mega") == true) 80 else 26
+
+            return when (skyBlockIsland) {
+                IslandType.MINESHAFT -> 4
+                IslandType.CATACOMBS -> 5
+                IslandType.CRYSTAL_HOLLOWS -> 24
+                IslandType.CRIMSON_ISLE -> 24
+                else -> if (serverId?.startsWith("mega") == true) 80 else 26
+            }
         }
 
         // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
@@ -276,6 +292,7 @@ class HypixelData {
     }
 
     @SubscribeEvent
+    // TODO rewrite everything in here
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             // Modified from NEU.
@@ -295,20 +312,20 @@ class HypixelData {
             }
         }
 
-        if (LorenzUtils.inSkyBlock) {
-            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                skyblockAreaPattern.matchMatcher(line) {
-                    val originalLocation = group("area")
-                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
-                    skyBlockAreaWithSymbol = line.trim()
-                    break@loop
+        if (LorenzUtils.onHypixel) {
+            if (LorenzUtils.inSkyBlock) {
+                loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                    skyblockAreaPattern.matchMatcher(line) {
+                        val originalLocation = group("area")
+                        skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                        skyBlockAreaWithSymbol = line.trim()
+                        break@loop
+                    }
                 }
+
+                checkProfileName()
             }
-
-            checkProfileName()
         }
-
-        if (!event.isMod(5)) return
 
         if (!LorenzUtils.onHypixel) {
             checkHypixel()
@@ -318,6 +335,8 @@ class HypixelData {
             }
         }
         if (!LorenzUtils.onHypixel) return
+
+        if (!event.isMod(5)) return
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {

@@ -33,12 +33,13 @@ class GardenBestCropTime {
         }
 
         fun updateTimeTillNextCrop() {
+            val useOverflow = config.overflow.bestCropTime
             for (crop in CropType.entries) {
                 val speed = crop.getSpeed() ?: continue
-                if (crop.isMaxed()) continue
+                if (crop.isMaxed(useOverflow)) continue
 
                 val counter = crop.getCounter()
-                val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
+                val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow = true)
 
                 val cropsForCurrentTier = GardenCropMilestones.getCropsForTier(currentTier, crop)
                 val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
@@ -62,11 +63,13 @@ class GardenBestCropTime {
         }
 
         val gardenExp = config.next.bestType == NextConfig.BestTypeEntry.GARDEN_EXP
+        val useOverflow = config.overflow.bestCropTime
         val sorted = if (gardenExp) {
             val helpMap = mutableMapOf<CropType, Long>()
             for ((crop, time) in timeTillNextCrop) {
-                if (crop.isMaxed()) continue
-                val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
+                if (crop.isMaxed(useOverflow)) continue
+                val currentTier =
+                    GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
                 val gardenExpForTier = getGardenExpForTier(currentTier + 1)
                 val fakeTime = time / gardenExpForTier
                 helpMap[crop] = fakeTime
@@ -98,7 +101,7 @@ class GardenBestCropTime {
 
         var number = 0
         for (crop in sorted.keys) {
-            if (crop.isMaxed()) continue
+            if (crop.isMaxed(useOverflow)) continue
             val millis = timeTillNextCrop[crop]!!
             // TODO, change functionality to use enum rather than ordinals
             val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
@@ -115,7 +118,7 @@ class GardenBestCropTime {
 
             val color = if (isCurrent) "§e" else "§7"
             val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop)
+            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
             val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
 
             val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""

@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -144,9 +144,10 @@ object RiftBloodEffigies {
                     continue
                 }
 
-                if (config.respawningSoon && duration.passedSince() < config.respwningSoonTime.minutes) {
+                val timeUntil = duration.timeUntil()
+                if (config.respawningSoon && timeUntil <= config.respwningSoonTime.minutes) {
                     event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
-                    val time = duration.timeUntil()
+                    val time = timeUntil.format()
                     event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
                     continue
                 }
