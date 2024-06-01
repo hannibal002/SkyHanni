@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
+import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -80,7 +81,7 @@ object MineshaftPityDisplay {
         if (!isEnabled()) return
 
         event.originalOre.getOreType()?.getPityBlock()?.let { it.blocksBroken++ }
-        event.extraBlocks.map { (block, amount) ->
+        event.extraBlocks.removeFirst { it.key == event.originalOre }.map { (block, amount) ->
             block.getOreType()?.getPityBlock()?.let { it.efficientMiner += amount }
         }
         update()
@@ -270,7 +271,7 @@ object MineshaftPityDisplay {
         MITHRIL(
             "Mithril",
             listOf(OreType.MITHRIL),
-            1,
+            2,
             ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata)
         ),
 
