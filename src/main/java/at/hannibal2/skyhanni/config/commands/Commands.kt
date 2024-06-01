@@ -297,9 +297,7 @@ object Commands {
         registerCommand0(
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
-            {
-                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
-            },
+            { FarmingMilestoneCommand.setGoal(it) },
             FarmingMilestoneCommand::onComplete
         )
         registerCommand0(
