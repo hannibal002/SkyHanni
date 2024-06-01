@@ -79,7 +79,7 @@ class SuperpairsClicksAlert {
                 .any { it.value.stackSize > roundsNeeded })
         ) {
             SoundUtils.playBeepSound()
-            ChatUtils.chat("You have reached the maximum possible clicks!")
+            ChatUtils.chat("You have reached the maximum extra Superpairs clicks from this add-on!")
             roundsNeeded = -1
         }
     }
