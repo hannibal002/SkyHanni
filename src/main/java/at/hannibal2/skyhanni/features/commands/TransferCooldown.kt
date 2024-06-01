@@ -36,22 +36,22 @@ object TransferCooldown {
         if (!LorenzUtils.inSkyBlock || !config.transferCooldown || !isActive) return
         when (event.splitMessage[0]) {
             "/is" -> {
-                event.isCanceled = true
+                event.cancel()
                 action = { HypixelCommands.island() }
             }
 
             "/warp" -> {
-                event.isCanceled = true
+                event.cancel()
                 action = { HypixelCommands.warp(event.splitMessage.subList(1, event.splitMessage.size).joinToString(" ")) }
             }
 
             "/warpforge" -> {
-                event.isCanceled = true
+                event.cancel()
                 action = { HypixelCommands.warp("forge") }
             }
 
             "/hub" -> {
-                event.isCanceled = true
+                event.cancel()
                 action = { HypixelCommands.warp("hub") }
             }
         }
