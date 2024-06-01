@@ -32,7 +32,9 @@ public class BazaarConfig {
     public Position bestSellMethodPos = new Position(394, 142, false, true);
 
     @Expose
-    @ConfigOption(name = "Cancelled Buy Order Clipboard", desc = "Saves missing items from cancelled buy orders to clipboard for faster re-entry.")
+    @ConfigOption(name = "Cancelled Buy Order Clipboard",
+        desc = "Sends missing items from cancelled buy orders in chat. " +
+        "Click on the message to quickly order the same item and amount again.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean cancelledBuyOrderClipboard = false;

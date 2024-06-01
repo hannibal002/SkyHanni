@@ -235,7 +235,7 @@ object CopyNearbyEntitiesCommand {
         add("Name: ${mob.name}")
         add("Type: ${mob.mobType}")
         add("Base Entity: ${mob.baseEntity.asString()}")
-        add("Armorstand: ${mob.armorStand?.asString()}")
+        add("ArmorStand: ${mob.armorStand?.asString()}")
         if (mob.extraEntities.isNotEmpty()) {
             add("Extra Entities")
             addAll(mob.extraEntities.map { "  " + it.asString() })
