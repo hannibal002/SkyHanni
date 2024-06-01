@@ -108,15 +108,16 @@ object BeaconPower {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): String {
-        var text = "§eBeacon: "
-        if (expiryTime.isInPast()) text += "§cNot active"
-        else {
-            text += "§b${expiryTime.timeUntil().format(maxUnits = 2)}"
-            if (config.beaconPowerStat) text += " §7(" + (stat ?: "§cNo stat") + "§7)"
+    private fun drawDisplay(): String = buildString {
+        append("§eBeacon: ")
+        if (expiryTime.isInPast()) {
+            append("§cNot active")
+        } else {
+            append("§b${expiryTime.timeUntil().format(maxUnits = 2)}")
+            if (config.beaconPowerStat) append(" §7(${stat ?: "§cNo stat"}§7)")
         }
-        return text
     }
+
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.beaconPower
 }
