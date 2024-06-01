@@ -18,7 +18,7 @@ public class LavaReplacementConfig {
     @Expose
     @ConfigOption(name = "Only In Crimson Isle", desc = "Enable the water texture only in Crimson Isle.")
     @ConfigEditorBoolean
-    public boolean onlyInCrimsonIsle = false;
+    public boolean onlyInCrimsonIsle = true;
 
     @ConfigOption(name = "Reload", desc = "Reload renderers.\n§eUse if the lava still appear when the feature is enabled.\n§cMay freeze your game for a few seconds!")
     @ConfigEditorButton(buttonText = "RELOAD")
