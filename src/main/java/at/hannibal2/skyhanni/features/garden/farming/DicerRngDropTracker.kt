@@ -128,14 +128,10 @@ object DicerRngDropTracker {
         topLine.add(Renderable.string("§7Dicer Tracker:"))
         add(listOf(Renderable.horizontalContainer(topLine)))
         if (config.compact.get()) {
-            var first = true
-            var compactLine = ""
 
-            items.sortedDesc().entries.forEach { (rarity, amount) ->
-                if (!first) compactLine += "§7/"
-                compactLine += "§${rarity.colorCode}${amount.addSeparators()}"
-                first = false
-            }
+            val compactLine = items.sortedDesc().map { (rarity, amount) ->
+                "§${rarity.colorCode}${amount.addSeparators()}"
+            }.joinToString("§7/")
             list.add(Renderable.string(compactLine))
             add(listOf(Renderable.verticalContainer(list)))
 
