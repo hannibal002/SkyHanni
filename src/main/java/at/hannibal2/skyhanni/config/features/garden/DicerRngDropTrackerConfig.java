@@ -16,7 +16,7 @@ public class DicerRngDropTrackerConfig {
     public boolean display = true;
 
     @Expose
-    @ConfigOption(name = "Compact Tracker", desc = "Compact the Dicer RNG drop Tracker Display.")
+    @ConfigOption(name = "Compact Format", desc = "Compact the Dicer RNG Drop Tracker Display.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> compact = Property.of(false);
