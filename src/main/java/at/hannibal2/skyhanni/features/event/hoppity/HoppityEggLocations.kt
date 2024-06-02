@@ -81,6 +81,7 @@ object HoppityEggLocations {
 
         // optional chaining to hopefully catch any API responses missing data
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return
+        loadedNeuThisProfile = true
 
         val apiCollectedLocations = rawLocations.values.flatten()
 
