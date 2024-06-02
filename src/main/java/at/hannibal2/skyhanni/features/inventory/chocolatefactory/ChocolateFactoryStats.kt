@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -56,7 +57,7 @@ object ChocolateFactoryStats {
             "§6${ChocolateFactoryTimeTowerManager.timeTowerCharges()}"
         }
 
-        val timeTowerFull = ChocolateFactoryTimeTowerManager.timeTowerFullTimemark()
+        val timeTowerFull = ChocolateFactoryTimeTowerManager.timeTowerFullTimeMark()
 
         val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
         val chocolateUntilPrestigeCalculation =
@@ -71,7 +72,7 @@ object ChocolateFactoryStats {
         val upgradeAvailableAt = ChocolateAmount.CURRENT.formattedTimeUntilGoal(profileStorage.bestUpgradeCost)
 
         val map = buildMap {
-            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory Stats")
+            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
 
             put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
             put(ChocolateFactoryStat.THIS_PRESTIGE, "§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
@@ -95,8 +96,14 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
             put(
                 ChocolateFactoryStat.TIME_TOWER_FULL,
-                "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
-                    "§bHappens at: ${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
+                    "§eFull Tower Charges: §a§lNow\n" +
+                        "§eHappens at: §a§lNow"
+                } else {
+                    "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
+                        "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                }
+
             )
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
@@ -116,12 +123,8 @@ object ChocolateFactoryStats {
             tips = listOf("§bCopy to Clipboard!"),
             onClick = {
                 val list = text.toMutableList()
-                val titleHeader = list.indexOf("§6§lChocolate Factory Stats")
-                if (titleHeader != -1) {
-                    list[titleHeader] = "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats"
-                } else {
-                    list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
-                }
+                list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
+
                 ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
             }
         ))
@@ -163,9 +166,9 @@ object ChocolateFactoryStats {
         TIME_TOWER_FULL(
             "§eTime Tower Full Charges: §b5h 13m 59s\n§bHappens at: Monday, May 13 5:32 AM",
             { ChocolateFactoryTimeTowerManager.currentCharges() != -1 || ChocolateFactoryTimeTowerManager.timeTowerFull() }),
-        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { !ChocolateFactoryAPI.isMaxPrestige() }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
-        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { ChocolateFactoryAPI.currentPrestige != 5 }),
+        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { !ChocolateFactoryAPI.isMaxPrestige() }),
         TIME_TO_BEST_UPGRADE(
             "§eBest Upgrade: §b 59m 4s",
             { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L }),

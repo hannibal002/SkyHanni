@@ -195,8 +195,8 @@ object RenderUtils {
 
     fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
 
-    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(n))
-    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector.multiply(-n))
+    fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
+    fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
 
     /**
      * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
@@ -446,7 +446,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Float): Double {
+    fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
@@ -1036,10 +1036,11 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
-        return exactLocation(player).add(add)
+        return exactLocation(player) + add
     }
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
+        if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
         val y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
         val z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
@@ -1374,7 +1375,7 @@ object RenderUtils {
             worldRenderer.pos(sidePoint1).endVertex()
             worldRenderer.pos(middlePoint).endVertex()
             worldRenderer.pos(sidePoint2).endVertex()
-            worldRenderer.pos(sidePoint1.add(sidePoint2).subtract(middlePoint)).endVertex()
+            worldRenderer.pos(sidePoint1 + sidePoint2 - middlePoint).endVertex()
             tessellator.draw()
         }
 

@@ -26,6 +26,6 @@ public class MixinItemStack implements ItemStackCachedData {
     @Inject(method = "getTooltip", at = @At("RETURN"))
     public void getTooltip(EntityPlayer playerIn, boolean advanced, CallbackInfoReturnable<List<String>> ci) {
         ItemStack stack = (ItemStack) (Object) this;
-        ToolTipData.INSTANCE.getTooltip(stack, ci.getReturnValue());
+        ToolTipData.onHover(stack, ci.getReturnValue());
     }
 }

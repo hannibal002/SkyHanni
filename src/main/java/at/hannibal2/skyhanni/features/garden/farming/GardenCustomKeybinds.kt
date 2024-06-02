@@ -14,6 +14,7 @@ import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.IdentityHashMap
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 object GardenCustomKeybinds {
@@ -22,7 +23,7 @@ object GardenCustomKeybinds {
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()
-    private var lastWindowOpenTime = 0L
+    private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
 
     init {
@@ -44,13 +45,13 @@ object GardenCustomKeybinds {
 
         if (Minecraft.getMinecraft().currentScreen != null) {
             if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                lastWindowOpenTime = System.currentTimeMillis()
+                lastWindowOpenTime = SimpleTimeMark.now()
             }
             return false
         }
 
         // TODO remove workaround
-        if (System.currentTimeMillis() < lastWindowOpenTime + 300) return false
+        if (lastWindowOpenTime.passedSince() < 300.milliseconds) return false
 
         val areDuplicates = map.values
             .map { it() }
