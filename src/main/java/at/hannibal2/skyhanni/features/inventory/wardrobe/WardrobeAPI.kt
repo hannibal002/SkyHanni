@@ -179,14 +179,14 @@ object WardrobeAPI {
         val itemsList = event.inventoryItems
 
         val allGrayDye = wardrobeSlots.all {
-            itemsList[it.inventorySlot]?.itemDamage == EnumDyeColor.GRAY.dyeDamage || it.isInCurrentPage()
+            itemsList[it.inventorySlot]?.itemDamage == EnumDyeColor.GRAY.dyeDamage || !it.isInCurrentPage()
         }
 
         if (allGrayDye) {
             val allSlotsEmpty = wardrobeSlots.all {
                 (getWardrobeItem(itemsList[it.helmetSlot]) == null && getWardrobeItem(itemsList[it.chestplateSlot]) == null &&
                     getWardrobeItem(itemsList[it.leggingsSlot]) == null && getWardrobeItem(itemsList[it.bootsSlot]) == null) ||
-                    it.isInCurrentPage()
+                    !it.isInCurrentPage()
             }
             if (allSlotsEmpty) {
                 wardrobeSlots.filter { it.isInCurrentPage() }.forEach {
