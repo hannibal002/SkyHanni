@@ -54,7 +54,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Powder Mining messages hider
 - Winter gift messages hider
 - Many other messages (Not separated into own categories yet)
-+ Added new chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
++ More chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 
 </details>
@@ -217,6 +217,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Hiding the flame particles when using the Fire Veil Wand ability.
 + Circle around the player when having the Fire Veil Wand ability active.
 + Lesser Orb of Healing Hider. - jani
++ Wand of Strength cooldown is now displayed. - saga (https://github.com/hannibal002/SkyHanni/pull/1948)
+    + The cooldown displayed is for the buff, not the item usage.
 
 </details>
 <details open><summary>
@@ -841,6 +843,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Profit Per Corpse. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1734)
     + Displays profit/loss in chat after looting a corpse in the Mineshaft.
     + Includes a breakdown of information on hover.
++ HOTM perks level and Enable Display. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1059)
 
 </details>
 <details open><summary>
@@ -871,6 +874,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Jyrre Timer for Bottle of Jyrre. - walker
     + A timer showing the remaining duration of your intelligence boost.
     + Option to show the timer when inactive rather than removing it.
++ Option to show time held in lore for Jyrre Bottles and Cacao Truffles. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1916)
 + New Year Cake Reminder. - hannibal2
 + Easter Egg Hunt 2024 waypoints. - Erymanthus + walker (https://github.com/hannibal002/SkyHanni/pull/1193)
 
@@ -906,6 +910,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Time until the next Hoppity event in chat message for egg locator. - seraid (https://github.com/hannibal002/SkyHanni/pull/1625)
 + Warning before the Time Tower in the Chocolate Factory ends. - seraid (https://github.com/hannibal002/SkyHanni/pull/1816)
 + Chat reminder to check Hoppity Shop each year. - appable (https://github.com/hannibal002/SkyHanni/pull/1843)
++ Highlight rabbits that have requirements in the Hoppity's Collection menu. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1874)
+    + Green: Requirement met.
+    + Red: Requirement not met.
++ Mark duplicate egg locations in red for unlocking some of the new rabbits. - appable (https://github.com/hannibal002/SkyHanni/pull/1929)
+    + Option to always mark nearby duplicate egg locations.
++ Mark duplicate egg locations in red for unlocking some of the new rabbits. - appable (https://github.com/hannibal002/SkyHanni/pull/1929)
+    + Option to always mark nearby duplicate egg locations.
++ Show total amount of chocolate spent in the Chocolate Shop. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/1921)
 
 </details>
 <details open><summary>
@@ -1053,6 +1065,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **/sendcoords** - dragon99z
     + Sending, detecting and rendering.
 + Dungeon Potion level as item stack size - HiZe
++ Dark Cacao Truffle hours held as stack size. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1916)
 + **Ender Node Tracker** - pretz
     + Tracks items and profit obtained from collecting ender nodes and killing normal endermen.
 + **Harp Keybinds** - NetheriteMiner
@@ -1193,6 +1206,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Simple Ferocity Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1765)
     + Shows the Ferocity stat as a single GUI element.
     + Requires the Tab List widget to be enabled and Ferocity to be selected to work.
++ Editable Hotbar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1903)
+    + Allows for moving and scaling in the SkyHanni GUI editor.
++ ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
++ In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
+    + Useful when using a Prismarine Blade in Stranded Mode.
 
 </details>
 <details open><summary>
