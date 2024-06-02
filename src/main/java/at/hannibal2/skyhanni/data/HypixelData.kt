@@ -405,24 +405,21 @@ class HypixelData {
     private fun checkIsland(event: WidgetUpdateEvent) {
         val islandType: IslandType
         val foundIsland: String
-        when (event) {
-            is WidgetUpdateEvent.Clear -> {
-                TabListData.fullyLoaded = false
-                islandType = IslandType.NONE
-                foundIsland = ""
-            }
+        if (event.isClear()) {
 
-            is WidgetUpdateEvent.NewValues -> {
-                TabListData.fullyLoaded = true
-                // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
-                val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-                foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
-                islandType = getIslandType(foundIsland, guesting)
-                TabWidget.reSendEvents()
-            }
+            TabListData.fullyLoaded = false
+            islandType = IslandType.NONE
+            foundIsland = ""
 
-            else -> ErrorManager.skyHanniError("Unmanaged Event for Island check")
+        } else {
+            TabListData.fullyLoaded = true
+            // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+            val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
+            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
+            islandType = getIslandType(foundIsland, guesting)
+            TabWidget.reSendEvents()
         }
+        
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {

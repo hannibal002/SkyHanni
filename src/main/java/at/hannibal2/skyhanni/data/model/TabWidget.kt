@@ -336,12 +336,12 @@ enum class TabWidget(
         if (lines == this.lines) return
         this.lines = lines
         isActive = true
-        WidgetUpdateEvent.NewValues(this, lines).postAndCatch()
+        WidgetUpdateEvent(this, lines).postAndCatch()
     }
 
     private fun postClearEvent() {
         lines = emptyList()
-        WidgetUpdateEvent.Clear(this).postAndCatch()
+        WidgetUpdateEvent(this, lines).postAndCatch()
     }
 
     /** Update the state of the widget, posts the clear if [isActive] == true && [gotChecked] == false */

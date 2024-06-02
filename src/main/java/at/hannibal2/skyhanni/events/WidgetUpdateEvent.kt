@@ -7,14 +7,8 @@ open class WidgetUpdateEvent(
     val widget: TabWidget,
     val lines: List<String>,
 ) : LorenzEvent() {
-    class NewValues(
-        widget: TabWidget,
-        lines: List<String>,
-    ) : WidgetUpdateEvent(widget, lines)
-
-    class Clear(
-        widget: TabWidget,
-    ) : WidgetUpdateEvent(widget, emptyList())
 
     fun isWidget(widgetType: TabWidget) = widget == widgetType
+
+    fun isClear() = lines.isEmpty()
 }
