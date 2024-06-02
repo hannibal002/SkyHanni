@@ -74,12 +74,31 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         questLoader.checkInventory(event)
     }
 
+    // TODO use WidgetUpdateEvent once its merged
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
         questLoader.loadFromTabList()
     }
+
+//     @SubscribeEvent
+//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.NewValues) {
+//         if (!isEnabled()) return
+//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
+//             println("WidgetUpdateEvent.NewValues")
+//             questLoader.loadFromTabList(event.lines)
+//         }
+//     }
+//
+//     @SubscribeEvent
+//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.Clear) {
+//         if (!isEnabled()) return
+//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
+//             println("WidgetUpdateEvent.Clear")
+//             questLoader.loadFromTabList(emptyList())
+//         }
+//     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
