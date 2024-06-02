@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -31,6 +32,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object MineshaftPityDisplay {
     private val config get() = SkyHanniMod.feature.mining.mineshaftPityDisplay
 
@@ -72,7 +74,7 @@ object MineshaftPityDisplay {
 
     var lastMineshaftSpawn = SimpleTimeMark.farPast()
 
-    var display = listOf<Renderable>()
+    private var display = listOf<Renderable>()
 
     private const val MAX_COUNTER = 2000
 
@@ -112,8 +114,8 @@ object MineshaftPityDisplay {
             minedBlocks.forEach {
                 hover.add(
                     "    §7${it.pityBlock.displayName} mined: " +
-                        "§e${it.blocksBroken.addSeparators()} §6[${it.efficientMiner.addSeparators()}] " +
-                        "§e(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})"
+                        "§e${it.blocksBroken.addSeparators()} [+${it.efficientMiner.addSeparators()} efficient miner] " +
+                        "§6(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})"
                 )
             }
             hover.add("")
@@ -144,15 +146,15 @@ object MineshaftPityDisplay {
         update()
     }
 
-    private fun calculateCounter(): Double {
-        val counter = MAX_COUNTER.toDouble()
+    private fun calculateCounter(): Int {
+        val counter = MAX_COUNTER
         if (minedBlocks.isEmpty()) return counter
         val difference = minedBlocks.sumOf { it.pityBlock.getPity() }
-        return counter - difference
+        return (counter - difference).toInt().coerceAtLeast(0)
     }
 
     // if the chance is 1/1500, it will return 1500
-    private fun calculateChance(counter: Double): Double {
+    private fun calculateChance(counter: Int): Double {
         val surveyorPercent = HotmData.SURVEYOR.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
         val peakMountainPercent = HotmData.PEAK_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
         val chance = counter / (1 + surveyorPercent / 100 + peakMountainPercent / 100)
@@ -223,12 +225,19 @@ object MineshaftPityDisplay {
         if (display.isEmpty()) return
         config.position.renderRenderables(
             listOf(Renderable.verticalContainer(display, 2)),
-            posLabel = "Mineshaft Pity Counter"
+            posLabel = "Mineshaft Pity Display"
         )
     }
 
-    fun resetCounter() {
+    private fun resetCounter() {
         minedBlocks = mutableListOf()
+        update()
+    }
+
+    fun fullResetCounter() {
+        resetCounter()
+        mineshaftTotalBlocks = 0
+        mineshaftTotalCount = 0
         update()
     }
 
@@ -251,9 +260,7 @@ object MineshaftPityDisplay {
         AVERAGE_BLOCKS_MINESHAFT("§3Average Blocks/Mineshaft: §e361.5", { mineshaftTotalCount != 0 })
         ;
 
-        override fun toString(): String {
-            return display
-        }
+        override fun toString() = display
     }
 
     data class PityData(

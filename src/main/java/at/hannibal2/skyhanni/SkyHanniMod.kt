@@ -313,7 +313,6 @@ import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.HotmFeatures
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
-import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.MiningNotifications
 import at.hannibal2.skyhanni.features.mining.TunnelsMaps
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
@@ -946,7 +945,6 @@ class SkyHanniMod {
         loadModule(MiningEventTracker())
         loadModule(InWaterDisplay)
         loadModule(MiningNotifications)
-        loadModule(MineshaftPityDisplay)
         loadModule(JyrreTimer())
         loadModule(TotemOfCorruption())
         loadModule(NewYearCakeReminder())

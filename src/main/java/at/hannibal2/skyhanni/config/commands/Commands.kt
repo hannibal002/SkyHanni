@@ -537,9 +537,9 @@ object Commands {
             "Add all ever found burrow locations from clipboard"
         ) { AllBurrowsList.addFromClipboard() }
         registerCommand(
-            "shresetmineshaftcounter",
-            "Resets the mineshaft pity counter"
-        ) { MineshaftPityDisplay.resetCounter() }
+            "shresetmineshaftpitystats",
+            "Resets the mineshaft pity display stats"
+        ) { MineshaftPityDisplay.fullResetCounter() }
     }
 
     private fun internalCommands() {
