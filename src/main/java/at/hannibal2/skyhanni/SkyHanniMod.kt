@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BlockData
-import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.FixedRateTimerManager
 import at.hannibal2.skyhanni.data.GardenComposterUpgradesData
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -317,7 +316,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.5",
+    version = "0.26.Beta.6",
 )
 class SkyHanniMod {
 
@@ -337,7 +336,6 @@ class SkyHanniMod {
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
-        loadModule(EntityData())
         loadModule(MobData())
         loadModule(MobDetection())
         loadModule(ItemClickData())

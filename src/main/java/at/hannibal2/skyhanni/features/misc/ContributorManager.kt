@@ -3,7 +3,11 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.ChatComponentText
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -18,7 +22,17 @@ object ContributorManager {
         contributors = event.getConstant<ContributorsJson>("Contributors").contributors.mapKeys { it.key.lowercase() }
     }
 
-    fun getTabListSuffix(username: String): String? = getContributor(username)?.suffix
+    @SubscribeEvent
+    fun onRenderNametag(event: EntityDisplayNameEvent) {
+        if (!config.contributorNametags) return
+        (event.entity as? EntityPlayer)?.let { player ->
+            if (player.isRealPlayer()) getSuffix(event.entity.name)?.let {
+                event.chatComponent.appendSibling(ChatComponentText(" $it"))
+            }
+        }
+    }
+
+    fun getSuffix(username: String): String? = getContributor(username)?.suffix
 
     fun shouldSpin(username: String): Boolean = getContributor(username)?.spinny ?: false
     fun shouldBeUpsideDown(username: String): Boolean = getContributor(username)?.upsideDown ?: false

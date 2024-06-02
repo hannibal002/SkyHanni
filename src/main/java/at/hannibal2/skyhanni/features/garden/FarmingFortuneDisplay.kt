@@ -220,8 +220,8 @@ object FarmingFortuneDisplay {
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
             if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
-                "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
-                    "and showing the Farming Fortune stat.",
+                "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
+                    "show the Farming Fortune stat, also give the widget enough priority.",
                 onClick = {
                     HypixelCommands.widget()
                 }
@@ -231,8 +231,8 @@ object FarmingFortuneDisplay {
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
             if (lastCropFortuneMissingError.passedSince() < 1.minutes || !GardenAPI.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
-                "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
-                    "and showing latest Crop Fortune.",
+                "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
+                    "show latest Crop Fortune, also give the widget enough priority.",
                 onClick = {
                     HypixelCommands.widget()
                 }

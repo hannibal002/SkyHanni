@@ -33,8 +33,10 @@ object HoppityCollectionData {
             ?: ChocolateBonuses(0, 0.0)
     }
 
-    private fun String.toApiName(): String =
-        lowercase().replace("[- ]".toRegex(), "_")
+    private fun String.toApiName(): String = when (this) {
+        "Fish the Rabbit" -> "fish"
+        else -> lowercase().replace("[- ]".toRegex(), "_")
+    }
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
