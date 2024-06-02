@@ -67,7 +67,6 @@ object HoppityEggLocations {
         locations += location
     }
 
-    /* NEU PV loading logic */
     private var loadedNeuThisProfile = false
 
     @SubscribeEvent
@@ -79,13 +78,11 @@ object HoppityEggLocations {
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (loadedNeuThisProfile || !HoppityEggsManager.config.loadFromNeuPv) return
 
-        // optional chaining to hopefully catch any API responses missing data
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return
         loadedNeuThisProfile = true
 
         val apiCollectedLocations = rawLocations.values.flatten()
 
-        // transform API data into the same format as collectedEggStorage
         val collectedEggsApiData = mutableMapOf<IslandType, MutableSet<LorenzVec>>()
 
         for ((island, locationNameToCoords) in apiEggLocations) {
@@ -94,10 +91,7 @@ object HoppityEggLocations {
         }
 
         val storedEggLocationCount = collectedEggStorage.values.sumOf { it.size }
-
         val diff = apiCollectedLocations.size - storedEggLocationCount
-
-        // don't load if the API is unchanged or behind
         if (diff <= 0) return
 
         val locationStr = StringUtils.pluralize(diff, "location", "locations")
@@ -141,12 +135,12 @@ object HoppityEggLocations {
             val isCollected = collectedLocations.contains(location)
             val color = if (isCollected) LorenzColor.GREEN else LorenzColor.RED
             val nameColorCode = (if (name != null) LorenzColor.GREEN else LorenzColor.RED).getChatColor()
+
             event.drawColor(location, color, false, 0.5f)
             event.drawDynamicText(location.add(y = 0.5), "$nameColorCode$name", 1.2)
             if (location.distanceSqToPlayer() < 100) {
                 event.drawDynamicText(location.add(y = 0.5), location.toCleanString(), 1.0, yOff = 12f)
             }
-
         }
     }
 }
