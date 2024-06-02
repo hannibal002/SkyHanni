@@ -65,6 +65,7 @@ class HypixelData {
             "playeramount.guesting",
             "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
         )
+
         /**
          * REGEX-TEST:           §r§b§lParty §r§f(4)
          */
@@ -397,26 +398,24 @@ class HypixelData {
         noTrade = ironman || stranded || bingo
     }
 
-    private fun checkIsland(event: TabWidgetUpdate) {
+    private fun checkIsland(event: WidgetUpdateEvent) {
         val islandType: IslandType
         val foundIsland: String
-        when (event) {
-            is TabWidgetUpdate.Clear -> {
-                TabListData.fullyLoaded = false
-                islandType = IslandType.NONE
-                foundIsland = ""
-            }
+        if (event.isClear()) {
 
-            is TabWidgetUpdate.NewValues -> {
-                TabListData.fullyLoaded = true
-                // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
-                val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-                foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
-                islandType = getIslandType(foundIsland, guesting)
-            }
+            TabListData.fullyLoaded = false
+            islandType = IslandType.NONE
+            foundIsland = ""
 
-            else -> ErrorManager.skyHanniError("Unmanaged Event for Island check")
+        } else {
+            TabListData.fullyLoaded = true
+            // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+            val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
+            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
+            islandType = getIslandType(foundIsland, guesting)
+            TabWidget.reSendEvents()
         }
+
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
