@@ -92,6 +92,21 @@ public class GUIConfig {
     public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
+    @ConfigOption(name = "Beacon Power", desc = "Displays the current beacon power duration and what stat is boosted.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean beaconPower = false;
+
+    @Expose
+    @ConfigOption(name = "Show Beacon Stat", desc = "Show what stat is being boosted by your beacon.")
+    @ConfigEditorBoolean
+    public boolean beaconPowerStat = true;
+
+    @Expose
+    @ConfigLink(owner = GUIConfig.class, field = "beaconPower")
+    public Position beaconPowerPosition = new Position(10, 10);
+
+    @Expose
     @ConfigOption(name = "Real Time", desc = "Display the current computer time, a handy feature when playing in full-screen mode.")
     @ConfigEditorBoolean
     @FeatureToggle
