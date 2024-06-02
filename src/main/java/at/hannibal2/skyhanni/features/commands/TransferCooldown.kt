@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -11,10 +12,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object TransferCooldown {
 
     private val config get() = SkyHanniMod.feature.misc.commands
-    var lastRunCompleted: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastRunCompleted: SimpleTimeMark = SimpleTimeMark.farPast()
     private var action: (() -> Unit)? = null
 
     @SubscribeEvent
