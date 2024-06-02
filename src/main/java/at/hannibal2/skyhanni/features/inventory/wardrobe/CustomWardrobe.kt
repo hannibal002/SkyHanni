@@ -194,17 +194,10 @@ object CustomWardrobe {
                     val loreList = mutableListOf<Renderable>()
                     val height = containerHeight - 3
 
-                    // Adjust hoverableSizes based on whether the slot is on the current page
-                    val hoverableSizes = if (slot.isInCurrentPage()) {
-                        MutableList(4) { height / 4 }
-                    } else {
-                        val inactiveHeight = (height * 0.9).toInt()
-                        val firstSize = (inactiveHeight * 0.4).toInt()
-                        val remainingSize = (inactiveHeight - firstSize) / 3
-                        MutableList(4) { index -> if (index == 0) firstSize else remainingSize }
+                    // This is needed to keep the background size the same as the player renderable size
+                    val hoverableSizes = MutableList(4) { height / 4 }.apply {
+                        for (k in 0 until height % 4) this[k]++
                     }
-
-                    for (k in 0 until height % 4) hoverableSizes[k]++
 
                     for (armorIndex in 0 until 4) {
                         val stack = slot.armor[armorIndex]?.copy()
