@@ -34,8 +34,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
-import java.util.Timer
-import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -309,14 +307,6 @@ object LorenzUtils {
 
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 
-    fun runDelayed(duration: Duration, runnable: () -> Unit) {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runnable()
-            }
-        }, duration.inWholeMilliseconds)
-    }
-
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
@@ -352,8 +342,10 @@ object LorenzUtils {
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
      */
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
     fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun inAdvancedMiningIsland() =

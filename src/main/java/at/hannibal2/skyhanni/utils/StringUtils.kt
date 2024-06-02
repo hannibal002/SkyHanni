@@ -14,6 +14,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.NavigableMap
 import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
@@ -42,6 +43,7 @@ object StringUtils {
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
+    private val colorChars = "abcdefABCDEF0123456789".toSet()
 
     /**
      * Removes color and optionally formatting codes from the given string, leaving plain text.
@@ -54,6 +56,9 @@ object StringUtils {
         // Formatting indicator: The '§' character indicating the beginning of a formatting sequence
         // Formatting code: The character following a formatting indicator which specifies what color or text style this sequence corresponds to
         // Formatting sequence: The combination of a formatting indicator and code that changes the color or format of a string
+
+        // Flag for whether there is a text style (non-color and non-reset formatting code) currently being applied
+        var isFormatted = false
 
         // Find the first formatting indicator
         var nextFormattingSequence = indexOf('§')
@@ -74,14 +79,27 @@ object StringUtils {
             // Write everything from the read index up to the next formatting indicator into our clean string
             cleanedString.append(this, readIndex, nextFormattingSequence)
 
+            // Get the formatting code (note: this may not be a valid formatting code)
+            val formattingCode = this.getOrNull(nextFormattingSequence + 1)
+
             // If the next formatting sequence's code indicates a non-color format and we should keep those
-            if (keepFormatting && nextFormattingSequence + 1 < length && this[nextFormattingSequence + 1] in formattingChars) {
+            if (keepFormatting && formattingCode in formattingChars) {
+                // Update formatted flag based on whether this is a reset or a style format code
+                isFormatted = formattingCode?.lowercaseChar() != 'r'
+
                 // Set the readIndex to the formatting indicator, so that the next loop will start writing from that paragraph symbol
                 readIndex = nextFormattingSequence
                 // Find the next § symbol after the formatting sequence
                 nextFormattingSequence = indexOf('§', startIndex = readIndex + 1)
             } else {
                 // If this formatting sequence should be skipped (either a color code, or !keepFormatting or an incomplete formatting sequence without a code)
+
+                // If being formatted and color code encountered, reset the current formatting code
+                if (isFormatted && formattingCode in colorChars) {
+                    cleanedString.append("§r")
+                    isFormatted = false
+                }
+
                 // Set the readIndex to after this formatting sequence, so that the next loop will skip over it before writing the string
                 readIndex = nextFormattingSequence + 2
                 // Find the next § symbol after the formatting sequence
@@ -98,17 +116,38 @@ object StringUtils {
         return cleanedString.toString()
     }
 
+    /**
+     * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
+     */
+    fun <T> subMapOfStringsStartingWith(prefix: String, map: NavigableMap<String, T>): NavigableMap<String, T> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subMap(prefix, true, lastKey, false)
+    }
+
+    fun nextLexicographicallyStringWithSameLength(input: String): String {
+        val lastCharPosition = input.length - 1
+        val inputWithoutLastChar = input.substring(0, lastCharPosition)
+        val lastChar = input[lastCharPosition]
+        val incrementedLastChar = (lastChar.code + 1).toChar()
+        return inputWithoutLastChar + incrementedLastChar
+    }
+
     fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text, consumer)"))
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text, consumer)"))
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
     inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
         toList().matchFirst(pattern, consumer)
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.matches()) return consumer(it) }
@@ -116,6 +155,7 @@ object StringUtils {
         return null
     }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchAll(pattern, consumer)"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.find()) consumer(it) }
@@ -143,6 +183,7 @@ object StringUtils {
         }
     }
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatchers(text, consumer)"))
     inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
         for (pattern in iterator()) {
             pattern.matchMatcher<T>(text) {
@@ -163,6 +204,12 @@ object StringUtils {
             }
         }
         return default
+    }
+
+    fun String.substringBeforeLastOrNull(needle: String): String? {
+        val index = this.lastIndexOf(needle)
+        if (index < 0) return null
+        return this.substring(0, index)
     }
 
     fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
@@ -312,10 +359,16 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matches(string)"))
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
+
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.anyMatches(list)"))
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
+
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.anyMatches(list)"))
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.find(string)"))
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
@@ -464,7 +517,7 @@ object StringUtils {
     }
 
     /**
-     * Removes starting and ending reset formattings that dont sever a benefit at all.
+     * Removes starting and ending reset formattings that don't sever a benefit at all.
      */
     fun String.stripHypixelMessage(): String {
         var message = this

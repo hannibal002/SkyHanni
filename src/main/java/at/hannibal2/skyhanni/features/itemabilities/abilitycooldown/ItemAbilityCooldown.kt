@@ -24,11 +24,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -173,12 +173,16 @@ class ItemAbilityCooldown {
             event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.ROYAL_PIGEON.sound()
             }
+
+            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+                ItemAbility.WAND_OF_STRENGTH.sound()
+            }
         }
     }
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
+        if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 
