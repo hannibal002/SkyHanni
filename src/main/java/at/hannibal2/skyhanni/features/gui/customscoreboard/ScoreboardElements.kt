@@ -48,7 +48,7 @@ import kotlin.time.Duration.Companion.seconds
 
 internal var confirmedUnknownLines = mutableListOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
+internal var unknownLinesSet = TimeLimitedSet<String>(2.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
     if (!unconfirmedUnknownLines.contains(line)) return
