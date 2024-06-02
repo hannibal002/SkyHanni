@@ -75,7 +75,7 @@ public class DevConfig {
         desc = "Makes SkyHanni contributors' nametags fancy too. "
     )
     @ConfigEditorBoolean
-    public boolean contributorNametags = false;
+    public boolean contributorNametags = true;
 
     @Expose
     @ConfigOption(
