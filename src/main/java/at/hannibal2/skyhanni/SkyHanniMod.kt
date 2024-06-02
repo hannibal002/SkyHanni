@@ -177,7 +177,7 @@ import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.features.fishing.TotemOfCorruption
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
-import at.hannibal2.skyhanni.features.fishing.trophy.GoldenFishTimer
+import at.hannibal2.skyhanni.features.fishing.trophy.GeyserFishing
 import at.hannibal2.skyhanni.features.fishing.trophy.OdgerWaypoint
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishDisplay
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet
@@ -645,7 +645,7 @@ class SkyHanniMod {
         loadModule(UniqueGiftCounter)
         loadModule(TrophyFishManager)
         loadModule(TrophyFishFillet())
-        loadModule(GoldenFishTimer())
+        loadModule(GeyserFishing())
         loadModule(BazaarBestSellMethod())
         loadModule(ShiftClickBrewing())
         loadModule(BazaarOpenPriceWebsite())

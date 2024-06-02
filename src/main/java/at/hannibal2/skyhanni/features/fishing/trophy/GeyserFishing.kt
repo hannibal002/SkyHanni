@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,8 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-@SkyHanniModule
-object GeyserFishing {
+class GeyserFishing {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
 
     private val geyserOffset = LorenzVec(0.1f, 0.6f, 0.1f)
