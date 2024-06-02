@@ -13,7 +13,7 @@ public abstract class MixinEntity {
 
     @Inject(method = "getDisplayName", at = @At("RETURN"), cancellable = true)
     public void getDisplayName(CallbackInfoReturnable<IChatComponent> ci) {
-        ci.setReturnValue(EntityData.INSTANCE.postRenderNametag((Entity) (Object) this, ci.getReturnValue()));
+        ci.setReturnValue(EntityData.postRenderNametag((Entity) (Object) this, ci.getReturnValue()));
     }
 
 }

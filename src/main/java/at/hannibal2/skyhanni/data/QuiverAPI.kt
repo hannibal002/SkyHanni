@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -90,7 +90,7 @@ object QuiverAPI {
         "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!"
     )
 
-    // Bows that don't use the players arrows, checked using the SkyBlock Id
+    // Bows that don't use the players arrows, checked using the SkyBlock ID
     private val fakeBowsPattern by group.pattern("fakebows", "^(BOSS_SPIRIT_BOW|CRYPT_BOW)$")
     private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
     private val quiverInventoryPattern by group.pattern(

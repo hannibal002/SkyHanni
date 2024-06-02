@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
@@ -25,6 +26,7 @@ import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
+@SkyHanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
@@ -90,6 +92,7 @@ object EntityData {
         }
     }
 
+    @JvmStatic
     fun postRenderNametag(entity: Entity, chatComponent: IChatComponent): IChatComponent {
         return nametagCache.getOrPut(entity) {
             val event = EntityDisplayNameEvent(entity, chatComponent)
