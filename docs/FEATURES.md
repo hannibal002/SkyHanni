@@ -844,6 +844,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays profit/loss in chat after looting a corpse in the Mineshaft.
     + Includes a breakdown of information on hover.
 + HOTM perks level and Enable Display. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1059)
++ Mineshaft Corpse and Entrance/Ladder Locators. - nobaboy (https://github.com/hannibal002/SkyHanni/pull/1500)
+    + Includes keybind functionality for both.
 
 </details>
 <details open><summary>
@@ -1211,6 +1213,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
 + In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
++ Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)
++ Added Hide Useless Armor Stands. - Empa (https://github.com/hannibal002/SkyHanni/pull/1962)
+    + Hides armor stands that briefly appear on Hypixel.
 
 </details>
 <details open><summary>
