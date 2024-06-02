@@ -2,17 +2,19 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.data.model.TabWidget
 
+/** The events get send on change of the widget and on island switch */
 open class WidgetUpdateEvent(
-    private val widget: TabWidget,
+    val widget: TabWidget,
+    val lines: List<String>,
 ) : LorenzEvent() {
     class NewValues(
         widget: TabWidget,
-        val lines: List<String>
-    ) : WidgetUpdateEvent(widget)
+        lines: List<String>,
+    ) : WidgetUpdateEvent(widget, lines)
 
     class Clear(
         widget: TabWidget,
-    ) : WidgetUpdateEvent(widget)
+    ) : WidgetUpdateEvent(widget, emptyList())
 
     fun isWidget(widgetType: TabWidget) = widget == widgetType
 }
