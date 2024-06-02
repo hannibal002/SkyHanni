@@ -833,7 +833,7 @@ interface Renderable {
         }
 
         fun fakePlayer(
-            entity: EntityPlayer,
+            player: EntityPlayer,
             followMouse: Boolean = false,
             eyesX: Float = 0f,
             eyesY: Float = 0f,
@@ -856,7 +856,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
 
                 GlStateManager.color(1f, 1f, 1f, 1f)
-                if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, colorCondition)
+                if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
                 val mouse = currentRenderPassMousePosition
                 val mouseXRelativeToPlayer =
                     if (followMouse) (posX + playerX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
@@ -870,7 +870,7 @@ interface Renderable {
                     entityScale,
                     mouseXRelativeToPlayer,
                     mouseYRelativeToPlayer,
-                    entity
+                    player
                 )
                 GlStateManager.translate(0f, 0f, -500f)
             }
