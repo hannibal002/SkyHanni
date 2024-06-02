@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object HoppityEggLocations {
@@ -27,9 +28,6 @@ object HoppityEggLocations {
         }
 
     private var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
-
-    // to be removed once data in apiEggLocations is confirmed accurate
-    private var legacyEggLocations: Map<IslandType, Set<LorenzVec>> = mapOf()
 
     val islandLocations
         get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet() ?: emptySet()
@@ -59,8 +57,12 @@ object HoppityEggLocations {
             )
         }
 
-        val collected = collectedEggStorage.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf() }
-        collected += location
+        saveEggLocation(LorenzUtils.skyBlockIsland, location)
+    }
+
+    private fun saveEggLocation(island: IslandType, location: LorenzVec) {
+        val locations = collectedEggStorage.getOrPut(island) { mutableSetOf() }
+        locations += location
     }
 
     /* NEU PV loading logic */
@@ -80,30 +82,44 @@ object HoppityEggLocations {
 
         val apiCollectedLocations = rawLocations.values.flatten()
 
-        val result = mutableMapOf<IslandType, MutableSet<LorenzVec>>()
+        // transform API data into the same format as collectedEggStorage
+        val collectedEggsApiData = mutableMapOf<IslandType, MutableSet<LorenzVec>>()
 
         for ((island, locationNameToCoords) in apiEggLocations) {
             val coords = apiCollectedLocations.mapNotNull { locationNameToCoords[it] }
-            result[island] = coords.toMutableSet()
+            collectedEggsApiData[island] = coords.toMutableSet()
         }
 
         val storedEggLocationCount = collectedEggStorage.values.sumOf { it.size }
 
+        val diff = apiCollectedLocations.size - storedEggLocationCount
+
         // don't load if the API is unchanged or behind
-        if (apiCollectedLocations.size <= storedEggLocationCount) return
+        if (diff <= 0) return
+
+        val locationStr = StringUtils.pluralize(diff, "location", "locations")
 
         ChatUtils.clickableChat(
-            message = "Click here to load ${apiCollectedLocations.size} collected egg locations from NEU PV!",
+            message = "Click here to load $diff more collected egg $locationStr from NEU PV!",
             onClick = {
-                collectedEggStorage = result
+                loadApiCollectedEggs(collectedEggsApiData)
                 ChatUtils.chat("Updated Hoppity egg location data!")
             },
             oneTimeClick = true
         )
     }
 
+    private fun loadApiCollectedEggs(locations: Map<IslandType, Set<LorenzVec>>) {
+        for ((island, coordinates) in locations.entries) {
+            coordinates.forEach { saveEggLocation(island, it) }
+        }
+    }
+
     /* Debug logic, enabled using /shtoggleegglocationdebug */
     private var showEggLocationsDebug = false
+
+    // to be removed - in case there are any issues with missing locations
+    private var legacyEggLocations: Map<IslandType, Set<LorenzVec>> = mapOf()
 
     fun toggleDebug() {
         showEggLocationsDebug = !showEggLocationsDebug
@@ -114,15 +130,14 @@ object HoppityEggLocations {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock || !showEggLocationsDebug) return
-        val locations = legacyEggLocations[LorenzUtils.skyBlockIsland] ?: return
+        val legacyLocations = legacyEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val apiLocations = apiEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val collectedLocations = islandCollectedLocations
-        for (location in locations) {
+        for (location in legacyLocations) {
             val name = apiLocations.entries.find { it.value == location }?.key
             val isCollected = collectedLocations.contains(location)
             val color = if (isCollected) LorenzColor.GREEN else LorenzColor.RED
             val nameColorCode = (if (name != null) LorenzColor.GREEN else LorenzColor.RED).getChatColor()
-
             event.drawColor(location, color, false, 0.5f)
             event.drawDynamicText(location.add(y = 0.5), "$nameColorCode$name", 1.2)
             if (location.distanceSqToPlayer() < 100) {
