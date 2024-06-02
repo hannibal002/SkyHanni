@@ -230,7 +230,7 @@ object FarmingFortuneDisplay {
             if (lastCropFortuneMissingError.passedSince() < 1.minutes || !GardenAPI.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
                 "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
-                    "showing latest Crop Fortune, and give the widget enough priority.",
+                    "show latest Crop Fortune, also give the widget enough priority.",
                 onClick = {
                     HypixelCommands.widget()
                 }
