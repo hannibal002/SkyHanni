@@ -11,11 +11,12 @@ plugins {
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
     `maven-publish`
+    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
     id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.26.Beta.2"
+version = "0.26.Beta.5"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -90,6 +91,8 @@ dependencies {
 
     headlessLwjgl(libs.headlessLwjgl)
 
+    compileOnly(ksp(project(":annotation-processors"))!!)
+
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
@@ -129,6 +132,11 @@ dependencies {
 
     implementation("net.hypixel:mod-api:0.3.1")
 }
+
+ksp {
+    arg("symbolProcessor", "at.hannibal2.skyhanni.loadmodule.LoadModuleProvider")
+}
+
 configurations.getByName("minecraftNamed").dependencies.forEach {
     shot.applyTo(it as HasConfigurableAttributes<*>)
 }
@@ -146,6 +154,12 @@ kotlin {
             languageVersion = "2.0"
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
+    }
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
     }
 }
 
