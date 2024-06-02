@@ -24,6 +24,7 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -93,11 +94,13 @@ object EntityData {
     }
 
     @JvmStatic
-    fun postRenderNametag(entity: Entity, chatComponent: IChatComponent): IChatComponent {
-        return nametagCache.getOrPut(entity) {
-            val event = EntityDisplayNameEvent(entity, chatComponent)
-            event.postAndCatch()
-            event.chatComponent
-        }
+    fun getDisplayName(entity: Entity, ci: CallbackInfoReturnable<IChatComponent>) {
+        ci.returnValue = postRenderNametag(entity, ci.returnValue)
+    }
+
+    private fun postRenderNametag(entity: Entity, chatComponent: IChatComponent) = nametagCache.getOrPut(entity) {
+        val event = EntityDisplayNameEvent(entity, chatComponent)
+        event.postAndCatch()
+        event.chatComponent
     }
 }
