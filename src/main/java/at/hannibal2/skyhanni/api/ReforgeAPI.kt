@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -20,6 +21,7 @@ import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object ReforgeAPI {
     var reforgeList: List<Reforge> = emptyList()
         private set(value) {
@@ -180,5 +182,4 @@ object ReforgeAPI {
             costs = it.reforgeCosts
         )
     }
-
 }
