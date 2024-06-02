@@ -87,6 +87,7 @@ import at.hannibal2.skyhanni.features.chat.WatchdogHider
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatModifier
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
+import at.hannibal2.skyhanni.features.combat.ArmorStackDisplay
 import at.hannibal2.skyhanni.features.combat.BestiaryData
 import at.hannibal2.skyhanni.features.combat.FerocityDisplay
 import at.hannibal2.skyhanni.features.combat.FlareDisplay
@@ -968,6 +969,7 @@ class SkyHanniMod {
         loadModule(QuiverDisplay())
         loadModule(QuiverWarning())
         loadModule(AuctionOutbidWarning)
+        loadModule(ArmorStackDisplay())
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())

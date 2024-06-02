@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class StackDisplayConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Show the number of stacks you have.")
+    @ConfigOption(name = "Enable", desc = "Displays the number of stacks on armor pieces like Crimson, Terror etc.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

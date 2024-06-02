@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,13 +19,13 @@ class ArmorStackDisplay {
      */
     private val armorStackPattern by RepoPattern.pattern(
         "combat.armorstack.actionbar",
-        ".* (§6|§6§l)(?<stack>\\d+.).*"
+        " (§6|§6§l)(?<stack>\\d+.)"
     )
 
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
-        val stacks = armorStackPattern.matchMatcher(event.actionBar) {
+        val stacks = armorStackPattern.findMatcher(event.actionBar) {
             "§6§l" + group("stack")
         } ?: ""
         display = stacks
@@ -33,7 +33,7 @@ class ArmorStackDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || display.isEmpty()) return
         config.stackDisplayPos.renderString(display, posLabel = "Stack Display")
     }
 
