@@ -219,7 +219,7 @@ object FarmingFortuneDisplay {
             if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
                 "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
-                    "showing the Farming Fortune stat, and give the widget enough priority.",
+                    "show the Farming Fortune stat, also give the widget enough priority.",
                 onClick = {
                     HypixelCommands.widget()
                 }
