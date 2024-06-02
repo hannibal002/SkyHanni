@@ -151,7 +151,6 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsShared
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityNpc
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.event.jerry.HighlightJerries
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas.PresentWaypoints
@@ -693,7 +692,6 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryCustomReminder)
         loadModule(HoppityNpc)
         loadModule(HoppityEggsManager)
-        loadModule(HoppityEggLocations)
         loadModule(HoppityEggLocator)
         loadModule(HoppityEggsShared)
         loadModule(HoppityEggDisplayManager)
