@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
@@ -66,9 +65,7 @@ object RenderBackground {
         with(alignmentConfig) {
             if (horizontalAlignment == RenderUtils.HorizontalAlignment.DONT_ALIGN &&
                 verticalAlignment == RenderUtils.VerticalAlignment.DONT_ALIGN
-            ) {
-                return
-            }
+            ) return
         }
 
         val position = CustomScoreboard.config.position
@@ -93,7 +90,7 @@ object RenderBackground {
                 RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - margin
                 else -> 0
             }
-            CustomScoreboard.config.position = Position(x, y, position.getScale(), position.isCenter)
+            CustomScoreboard.config.position.moveTo(x, y)
         }
     }
 }
