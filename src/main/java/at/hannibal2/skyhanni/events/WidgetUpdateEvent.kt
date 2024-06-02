@@ -2,17 +2,17 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.data.model.TabWidget
 
-open class TabWidgetUpdate(
-    val widget: TabWidget,
+open class WidgetUpdateEvent(
+    private val widget: TabWidget,
 ) : LorenzEvent() {
     class NewValues(
         widget: TabWidget,
         val lines: List<String>
-    ) : TabWidgetUpdate(widget)
+    ) : WidgetUpdateEvent(widget)
 
     class Clear(
         widget: TabWidget,
-    ) : TabWidgetUpdate(widget)
+    ) : WidgetUpdateEvent(widget)
 
-    fun isEventFor(widgetType: TabWidget) = widget == widgetType
+    fun isWidget(widgetType: TabWidget) = widget == widgetType
 }
