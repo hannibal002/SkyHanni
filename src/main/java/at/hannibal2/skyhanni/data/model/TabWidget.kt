@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.TabWidgetUpdate
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -114,7 +114,7 @@ enum class TabWidget(
     ),
     MINION(
         // language=RegExp
-        "(?:§.)*Minions; (?:§.)*(?<used>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)"
+        "(?:§.)*Minions: (?:§.)*(?<used>\\d+)(?:§.)*/(?:§.)*(?<max>\\d+)"
     ),
     JERRY_ISLAND_CLOSING(
         // language=RegExp
@@ -336,12 +336,12 @@ enum class TabWidget(
         if (lines == this.lines) return
         this.lines = lines
         isActive = true
-        TabWidgetUpdate.NewValues(this, lines).postAndCatch()
+        WidgetUpdateEvent(this, lines).postAndCatch()
     }
 
     private fun postClearEvent() {
         lines = emptyList()
-        TabWidgetUpdate.Clear(this).postAndCatch()
+        WidgetUpdateEvent(this, lines).postAndCatch()
     }
 
     /** Update the state of the widget, posts the clear if [isActive] == true && [gotChecked] == false */
@@ -424,6 +424,14 @@ enum class TabWidget(
                 removeIndexes.forEach {
                     removeAt(it)
                 }
+            }
+        }
+
+        fun reSendEvents() = entries.forEach {
+            if (it.isActive) {
+                it.postNewEvent(it.lines)
+            } else {
+                it.postClearEvent()
             }
         }
     }

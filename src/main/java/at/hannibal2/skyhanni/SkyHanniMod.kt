@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.BossbarData
-import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.CropAccessoryData
 import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
@@ -63,10 +62,10 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobDebug
 import at.hannibal2.skyhanni.data.mob.MobDetection
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
@@ -455,6 +454,7 @@ import at.hannibal2.skyhanni.features.stranded.HighlightPlaceableNpcs
 import at.hannibal2.skyhanni.features.summonings.SummoningMobManager
 import at.hannibal2.skyhanni.features.summonings.SummoningSoulsName
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.HighlightMissingRepoItems
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.ParkourWaypointSaver
@@ -504,7 +504,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.5",
+    version = "0.26.Beta.6",
 )
 class SkyHanniMod {
 
@@ -514,9 +514,10 @@ class SkyHanniMod {
 
         HotswapSupport.load()
 
-        // data
         loadModule(this)
-        loadModule(ChatManager)
+        LoadedModules.modules.forEach { loadModule(it) }
+
+        // data
         loadModule(PlayerChatManager())
         loadModule(PlayerNameFormatter())
         loadModule(HypixelData())
@@ -1011,9 +1012,13 @@ class SkyHanniMod {
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
+        loadedClasses.clear()
     }
 
+    private val loadedClasses = mutableSetOf<Any>()
+
     fun loadModule(obj: Any) {
+        if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
         modules.add(obj)
         MinecraftForge.EVENT_BUS.register(obj)
     }
