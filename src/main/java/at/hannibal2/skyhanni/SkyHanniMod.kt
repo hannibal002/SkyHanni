@@ -298,6 +298,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTooltip
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTooltipCompact
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTooltipStray
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUpgradeWarning
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
 import at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper
@@ -682,6 +683,7 @@ class SkyHanniMod {
         loadModule(ChocolateFactoryInventory)
         loadModule(ChocolateFactoryStats)
         loadModule(ChocolateFactoryTooltipCompact)
+        loadModule(ChocolateFactoryTooltipStray)
         loadModule(ChocolateFactoryTimeTowerManager)
         loadModule(ChocolateFactoryTooltip)
         loadModule(ChocolateFactoryKeybinds)
