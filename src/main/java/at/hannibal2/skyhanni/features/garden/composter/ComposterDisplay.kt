@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabWidgetUpdate
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -52,16 +52,14 @@ class ComposterDisplay {
     private val BUCKET by lazy { "BUCKET".asInternalName().getItemStack() }
 
     @SubscribeEvent
-    fun onTabWidgetUpdateClear(event: TabWidgetUpdate.Clear) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!(config.displayEnabled && GardenAPI.inGarden())) return
-        if (!event.isEventFor(TabWidget.COMPOSTER)) return
-        tabListData = emptyMap()
-    }
+        if (!event.isWidget(TabWidget.COMPOSTER)) return
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
-        if (!(config.displayEnabled && GardenAPI.inGarden())) return
-        if (!event.isEventFor(TabWidget.COMPOSTER)) return
+        if (event.isClear()) {
+            tabListData = emptyMap()
+            return
+        }
 
         readData(event.lines)
 

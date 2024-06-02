@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabWidgetUpdate
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -76,8 +76,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
-        if (!event.isEventFor(TabWidget.FACTION_QUESTS)) return
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
         questLoader.loadFromTabList()

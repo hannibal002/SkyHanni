@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabWidgetUpdate
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -278,10 +278,7 @@ class HypixelData {
         }
     }
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
-        if (!event.isEventFor(TabWidget.PROFILE)) return
-
+    private fun checkProfile() {
         TabWidget.PROFILE.matchMatcherFirstLine() {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
@@ -350,9 +347,10 @@ class HypixelData {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
+            TabWidget.PROFILE -> checkProfile()
             else -> Unit
         }
     }

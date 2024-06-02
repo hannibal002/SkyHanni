@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabWidgetUpdate
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -24,11 +24,11 @@ class FerocityDisplay {
     private var display = ""
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
-        if (event.isEventFor(TabWidget.STATS) || event.isEventFor(TabWidget.DUNGEON_SKILLS_AND_STATS))
+        if (event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS))
             display = ""
-        if (event !is TabWidgetUpdate.NewValues) return
+        if (event.isClear()) return
         val stat = event.lines.matchFirst(ferocityPattern) {
             group("stat")
         } ?: return

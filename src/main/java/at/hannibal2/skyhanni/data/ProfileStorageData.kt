@@ -9,13 +9,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabWidgetUpdate
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -77,15 +76,9 @@ object ProfileStorageData {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate.Clear) {
-        if (!event.isEventFor(TabWidget.PROFILE)) return
-        noTabListTime = SimpleTimeMark.now()
-    }
-
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
-        if (!event.isEventFor(TabWidget.PROFILE)) return
-        noTabListTime = SimpleTimeMark.farPast()
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PROFILE)) return
+        noTabListTime = if (event.isClear()) SimpleTimeMark.now() else SimpleTimeMark.farPast()
     }
 
     @SubscribeEvent

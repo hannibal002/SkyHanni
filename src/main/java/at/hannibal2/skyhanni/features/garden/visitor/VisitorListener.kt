@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabWidgetUpdate
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -72,9 +72,9 @@ class VisitorListener {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabWidgetUpdate.NewValues) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        if (!event.isEventFor(TabWidget.VISITORS)) return
+        if (!event.isWidget(TabWidget.VISITORS) && !event.isClear()) return
 
         val hasVisitorInfo = event.lines.any { VisitorAPI.visitorCountPattern.matches(it) }
         if (!hasVisitorInfo) return
