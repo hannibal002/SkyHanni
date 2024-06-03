@@ -24,4 +24,5 @@ data class HoppityEggLocationsJson(
     @Expose val upgradeCostsPerLevel: Map<Int, List<Int>>,
     @Expose val maxUpgradeLevelPerPrestige: Map<Int, List<Int>>,
     @Expose val maxPrestige: Int
+    @Expose val specialRabbits: List<String>,
 )

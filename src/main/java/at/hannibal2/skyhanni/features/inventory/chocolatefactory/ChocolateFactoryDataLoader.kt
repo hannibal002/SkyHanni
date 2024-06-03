@@ -1,11 +1,16 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -77,6 +82,14 @@ object ChocolateFactoryDataLoader {
     private val clickMeRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.clickme", "§e§lCLICK ME!"
     )
+
+    /**
+     * REGEX-TEST: §6§lGolden Rabbit §8- §aStampede
+     */
+    private val clickMeGoldenRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.clickme.golden",
+        "§6§lGolden Rabbit §8- §a(?<name>.*)"
+    )
     private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.amount", "Rabbit \\S+ - \\[(?<amount>\\d+)].*"
     )
@@ -105,6 +118,23 @@ object ChocolateFactoryDataLoader {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            47,
+            "inventory.chocolateFactory.rabbitWarning",
+            "inventory.chocolateFactory.rabbitWarning.rabbitWarning"
+        )
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        val soundProperty = config.rabbitWarning.specialRabbitSound
+        ConditionalUtils.onToggle(soundProperty) {
+            ChocolateFactoryAPI.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
+        }
     }
 
     private fun clearData() {
@@ -312,80 +342,97 @@ object ChocolateFactoryDataLoader {
 
     private fun processItem(list: MutableList<ChocolateFactoryUpgrade>, item: ItemStack, slotIndex: Int) {
         if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
-        if (config.rabbitWarning && clickMeRabbitPattern.matches(item.name)) {
-            SoundUtils.playBeepSound()
-            ChocolateFactoryAPI.clickRabbitSlot = slotIndex
-        }
+
+        handleRabbitWarnings(item, slotIndex)
 
         if (slotIndex !in ChocolateFactoryAPI.otherUpgradeSlots && slotIndex !in ChocolateFactoryAPI.rabbitSlots) return
 
         val itemName = item.name.removeColor()
         val lore = item.getLore()
         val upgradeCost = ChocolateFactoryAPI.getChocolateBuyCost(lore)
-
         val averageChocolate = ChocolateAmount.averageChocPerSecond().round(2)
         val isMaxed = upgradeCost == null
 
-        var isRabbit = false
-        var level: Int? = null
-        var newAverageChocolate: Double? = null
+        if (slotIndex in ChocolateFactoryAPI.rabbitSlots) {
+            handleRabbitSlot(list, itemName, slotIndex, isMaxed, upgradeCost, averageChocolate)
+        } else if (slotIndex in ChocolateFactoryAPI.otherUpgradeSlots) {
+            handleOtherUpgradeSlot(list, itemName, slotIndex, isMaxed, upgradeCost, averageChocolate)
+        }
+    }
 
-        when (slotIndex) {
-            in ChocolateFactoryAPI.rabbitSlots -> {
-                level = rabbitAmountPattern.matchMatcher(itemName) {
-                    group("amount").formatInt()
-                } ?: run {
-                    if (unemployedRabbitPattern.matches(itemName)) 0 else null
-                } ?: return
-                isRabbit = true
+    private fun handleRabbitSlot(
+        list: MutableList<ChocolateFactoryUpgrade>,
+        itemName: String,
+        slotIndex: Int,
+        isMaxed: Boolean,
+        upgradeCost: Long?,
+        averageChocolate: Double,
+    ) {
+        val level = rabbitAmountPattern.matchMatcher(itemName) {
+            group("amount").formatInt()
+        } ?: run {
+            if (unemployedRabbitPattern.matches(itemName)) 0 else null
+        } ?: return
 
-                if (isMaxed) {
-                    val rabbitUpgradeItem = ChocolateFactoryUpgrade(slotIndex, level, null, isRabbit = true)
-                    list.add(rabbitUpgradeItem)
-                    return
-                }
+        if (isMaxed) {
+            val rabbitUpgradeItem = ChocolateFactoryUpgrade(slotIndex, level, null, isRabbit = true)
+            list.add(rabbitUpgradeItem)
+            return
+        }
 
-                val chocolateIncrease = ChocolateFactoryAPI.rabbitSlots[slotIndex] ?: 0
-                newAverageChocolate = ChocolateAmount.averageChocPerSecond(rawPerSecondIncrease = chocolateIncrease)
-            }
+        val chocolateIncrease = ChocolateFactoryAPI.rabbitSlots[slotIndex] ?: 0
+        val newAverageChocolate = ChocolateAmount.averageChocPerSecond(rawPerSecondIncrease = chocolateIncrease)
+        addUpgradeToList(list, slotIndex, level, upgradeCost, averageChocolate, newAverageChocolate, isRabbit = true)
+    }
 
-            in ChocolateFactoryAPI.otherUpgradeSlots -> {
-                level = upgradeTierPattern.matchMatcher(itemName) {
-                    group("tier").romanToDecimal()
-                } ?: run {
-                    if (otherUpgradePattern.matches(itemName)) 0 else null
-                } ?: return
+    private fun handleOtherUpgradeSlot(
+        list: MutableList<ChocolateFactoryUpgrade>,
+        itemName: String,
+        slotIndex: Int,
+        isMaxed: Boolean,
+        upgradeCost: Long?,
+        averageChocolate: Double,
+    ) {
+        val level = upgradeTierPattern.matchMatcher(itemName) {
+            group("tier").romanToDecimal()
+        } ?: run {
+            if (otherUpgradePattern.matches(itemName)) 0 else null
+        } ?: return
 
-                if (slotIndex == ChocolateFactoryAPI.timeTowerIndex) this.profileStorage?.timeTowerLevel = level
+        if (slotIndex == ChocolateFactoryAPI.timeTowerIndex) {
+            this.profileStorage?.timeTowerLevel = level
+        }
 
-                if (isMaxed) {
-                    val otherUpgrade = ChocolateFactoryUpgrade(slotIndex, level, null)
-                    list.add(otherUpgrade)
-                    return
-                }
+        if (isMaxed) {
+            val otherUpgrade = ChocolateFactoryUpgrade(slotIndex, level, null)
+            list.add(otherUpgrade)
+            return
+        }
 
-                newAverageChocolate = when (slotIndex) {
-                    ChocolateFactoryAPI.timeTowerIndex -> ChocolateAmount.averageChocPerSecond(
-                        includeTower = true
-                    )
-
-                    ChocolateFactoryAPI.coachRabbitIndex -> ChocolateAmount.averageChocPerSecond(
-                        baseMultiplierIncrease = 0.01
-                    )
-
-                    else -> {
-                        val otherUpgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost)
-                        list.add(otherUpgrade)
-                        return
-                    }
-                }
+        val newAverageChocolate = when (slotIndex) {
+            ChocolateFactoryAPI.timeTowerIndex -> ChocolateAmount.averageChocPerSecond(includeTower = true)
+            ChocolateFactoryAPI.coachRabbitIndex -> ChocolateAmount.averageChocPerSecond(baseMultiplierIncrease = 0.01)
+            else -> {
+                val otherUpgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost)
+                list.add(otherUpgrade)
+                return
             }
         }
-        if (level == null || newAverageChocolate == null || upgradeCost == null) return
 
+        addUpgradeToList(list, slotIndex, level, upgradeCost, averageChocolate, newAverageChocolate, isRabbit = false)
+    }
+
+    private fun addUpgradeToList(
+        list: MutableList<ChocolateFactoryUpgrade>,
+        slotIndex: Int,
+        level: Int,
+        upgradeCost: Long?,
+        averageChocolate: Double,
+        newAverageChocolate: Double,
+        isRabbit: Boolean,
+    ) {
         val extra = (newAverageChocolate - averageChocolate).round(2)
-        val effectiveCost = (upgradeCost / extra).round(2)
-
+        val effectiveCost = (upgradeCost!! / extra).round(2)
         val upgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)
     }
@@ -600,6 +647,25 @@ object ChocolateFactoryDataLoader {
     private fun calculateTotalUpgradeCost(upgrades: Map<Int, List<ChocolateFactoryUpgrade>>) =
         upgrades.values.sumOf { inner -> inner.sumOf { it.price ?: 0 } }
 
+
+    private fun handleRabbitWarnings(item: ItemStack, slotIndex: Int) {
+        val isGoldenRabbit = clickMeGoldenRabbitPattern.matches(item.name)
+        val warningConfig = config.rabbitWarning
+
+        if (clickMeRabbitPattern.matches(item.name) || isGoldenRabbit) {
+            if (config.rabbitWarning.rabbitWarning) {
+                SoundUtils.playBeepSound()
+            }
+
+            if (warningConfig.specialRabbitWarning
+                && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
+            ) {
+                SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
+            }
+
+            ChocolateFactoryAPI.clickRabbitSlot = slotIndex
+        }
+    }
 
     private fun findBestUpgrades(list: MutableList<ChocolateFactoryUpgrade>) {
         val profileStorage = profileStorage ?: return

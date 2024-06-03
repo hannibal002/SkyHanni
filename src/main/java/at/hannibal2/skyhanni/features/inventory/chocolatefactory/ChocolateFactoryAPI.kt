@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -77,10 +78,15 @@ object ChocolateFactoryAPI {
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
+
     var allBestPossibleUpgrades: Map<Int, MutableList<ChocolateFactoryUpgrade>> = mapOf()
     var lastUpgradesWhenChecking: Map<Int,ChocolateFactoryUpgrade> = mapOf()
     var lastBestNotAffordableUpgrade: ChocolateFactoryUpgrade? = null
     var totalUpgradeCost = 0L
+
+    var specialRabbitTextures = listOf<String>()
+    var warningSound = SoundUtils.createSound("note.pling", 1f)
+
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -121,6 +127,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        specialRabbitTextures = data.specialRabbits
 
         upgradeCostFormulaConstants = data.upgradeCostFormulaConstants
         upgradeCostPerLevel = data.upgradeCostsPerLevel
