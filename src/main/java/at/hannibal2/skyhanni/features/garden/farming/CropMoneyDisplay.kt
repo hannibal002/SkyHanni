@@ -158,7 +158,7 @@ object CropMoneyDisplay {
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
-                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160 else (bazaarData.sellPrice + bazaarData.buyPrice) / 320
+                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160 else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
                 extraDicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
@@ -341,8 +341,8 @@ object CropMoneyDisplay {
             val bazaarData = internalName.getBazaarData() ?: continue
 
             var npcPrice = internalName.getNpcPrice() * cropsPerHour
-            var sellOffer = bazaarData.buyPrice * cropsPerHour
-            var instantSell = bazaarData.sellPrice * cropsPerHour
+            var sellOffer = bazaarData.sellOfferPrice * cropsPerHour
+            var instantSell = bazaarData.instantBuyPrice * cropsPerHour
             if (debug) {
                 debugList.addAsSingletonList(" npcPrice: ${npcPrice.addSeparators()}")
                 debugList.addAsSingletonList(" sellOffer: ${sellOffer.addSeparators()}")
@@ -361,8 +361,8 @@ object CropMoneyDisplay {
                         }
                         val factor = NEUItems.getMultiplier(internalName).second
                         npcPrice += "SEEDS".asInternalName().getNpcPrice() * seedsPerHour / factor
-                        sellOffer += it.buyPrice * seedsPerHour
-                        instantSell += it.sellPrice * seedsPerHour
+                        sellOffer += it.sellOfferPrice * seedsPerHour
+                        instantSell += it.instantBuyPrice * seedsPerHour
                     }
                 }
             }
