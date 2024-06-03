@@ -101,7 +101,7 @@ object GuiContainerMixin {
         shift = TargetShift.BEFORE,
         ordinal = 1
     )
-    fun drawScreenPost(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo, @KShadow theSlot: Slot) {
+    fun drawScreenPost(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo, @KShadow theSlot: Slot?) {
         if (DrawScreenAfterEvent(mouseX, mouseY, ci).postAndCatch()) ci.cancel()
         ToolTipData.lastSlot = theSlot
     }
