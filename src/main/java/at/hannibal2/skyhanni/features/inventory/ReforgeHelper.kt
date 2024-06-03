@@ -242,7 +242,7 @@ object ReforgeHelper {
     }
 
     private fun getReforgeView(itemRarity: LorenzRarity): (ReforgeAPI.Reforge) -> Renderable = { reforge ->
-        val text = (if (reforge.isReforgeStone) "§9" else "§7") + reforge.name
+        val text = (if (currentReforge == reforge) "§6" else if (reforge.isReforgeStone) "§9" else "§7") + reforge.name
         val tips = run {
             val pre: List<Renderable>
             val stats: List<Renderable>
