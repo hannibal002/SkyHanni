@@ -3,13 +3,15 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ArmorStackDisplay {
+@SkyHanniModule
+object ArmorStackDisplay {
     private val config get() = SkyHanniMod.feature.combat.stackDisplayConfig
     private var display = ""
 
