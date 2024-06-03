@@ -98,7 +98,7 @@ object EntityData {
         ci.returnValue = postRenderNametag(entity, ci.returnValue)
     }
 
-    private fun postRenderNametag(entity: Entity, chatComponent: IChatComponent) = nametagCache.getOrPut(entity) {
+    fun postRenderNametag(entity: Entity, chatComponent: IChatComponent) = nametagCache.getOrPut(entity) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
         event.postAndCatch()
         event.chatComponent
