@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMi
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -76,12 +78,40 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.enabled) {
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
+                questLoader.loadFromTabList()
+            }
+        }
+    }
+
+    // TODO use WidgetUpdateEvent once its merged
+    @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
         questLoader.loadFromTabList()
     }
+
+//     @SubscribeEvent
+//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.NewValues) {
+//         if (!isEnabled()) return
+//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
+//             println("WidgetUpdateEvent.NewValues")
+//             questLoader.loadFromTabList(event.lines)
+//         }
+//     }
+//
+//     @SubscribeEvent
+//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.Clear) {
+//         if (!isEnabled()) return
+//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
+//             println("WidgetUpdateEvent.Clear")
+//             questLoader.loadFromTabList(emptyList())
+//         }
+//     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -319,5 +349,5 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

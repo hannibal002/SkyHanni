@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
@@ -36,10 +35,33 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
+    // TODO use WidgetUpdateEvent once its merged
+    //     fun loadFromTabList(lines: List<String>) {
     fun loadFromTabList() {
-        TabWidget.FACTION_QUESTS.lines.drop(1).forEach {
-            readQuest(it)
+        var i = -1
+        dailyQuestHelper.greatSpook = false
+        var found = 0
+
+
+        for (line in TabListData.getTabList()) {
+//         for (line in lines) {
+            if (line == "§5§lFaction Quests:") {
+                i = 0
+                continue
+            }
+            if (i == -1) continue
+
+            i++
+            readQuest(line)
+            found++
+            if (dailyQuestHelper.greatSpook) return
+            if (i == 5) {
+                break
+            }
         }
+
+        dailyQuestHelper.reputationHelper.tabListQuestsMissing = found == 0
+        dailyQuestHelper.update()
     }
 
     private fun readQuest(line: String) {
