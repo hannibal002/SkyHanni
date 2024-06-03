@@ -1,0 +1,79 @@
+package at.hannibal2.skyhanni.features.combat.mobs
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+
+class ArachneKillTimer {
+
+    private val config get() = SkyHanniMod.feature.combat.mobs
+
+    private val patternGroup = RepoPattern.group("chat.arachne")
+    private val arachneCallingSpawnedPattern by patternGroup.pattern(
+        "calling.spawned",
+        "§c\\[BOSS] Arachne§r§f: A befitting welcome!"
+    )
+    private val arachneCrystalSpawnedPattern by patternGroup.pattern(
+        "crystal.spawned",
+        "§c\\[BOSS] Arachne§r§f: With your sacrifice."
+    )
+    private val arachneDeathPattern by patternGroup.pattern(
+        "dead",
+        "§f.*§r§6§lARACHNE DOWN!"
+    )
+
+    private val arachneDamagePattern by patternGroup.pattern(
+        "damage",
+        "§f +§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)"
+    )
+
+    private var arachneSpawnedTime = SimpleTimeMark.farPast()
+    private var arachneKillTime = Duration.ZERO
+    private var arachneCallingPattern = ArachneChatMessageHider().arachneCallingPattern
+    private var arachneCrystalPattern = ArachneChatMessageHider().arachneCrystalPattern
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+
+        if (arachneCallingSpawnedPattern.matches(event.message) || arachneCrystalSpawnedPattern.matches(event.message)) {
+            arachneSpawnedTime = SimpleTimeMark.now()
+        }
+
+        if (arachneDeathPattern.matches(event.message) && arachneSpawnedTime != SimpleTimeMark.farPast()) {
+            val time = SimpleTimeMark.now()
+            arachneKillTime = time - arachneSpawnedTime
+        }
+
+        if (arachneCallingPattern.matches(event.message) || arachneCrystalPattern.matches(event.message)) {
+            arachneSpawnedTime = SimpleTimeMark.farPast()
+        }
+
+        if (arachneKillTime.isPositive() && arachneDamagePattern.matches(event.message)) {
+            val format = arachneKillTime.format(showMilliSeconds = true)
+            ChatUtils.chat("                   §eArachne took §7$format§e seconds to kill.", prefix = false)
+            arachneKillTime = Duration.ZERO
+            arachneSpawnedTime = SimpleTimeMark.farPast()
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        if (!IslandType.SPIDER_DEN.isInIsland()) {
+            arachneSpawnedTime = SimpleTimeMark.farPast()
+        }
+    }
+
+    fun isEnabled() =
+        IslandType.SPIDER_DEN.isInIsland() && config.showArachneKillTimer
+}
