@@ -88,7 +88,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!dirty && display.isEmpty()) {
             dirty = true
         }
@@ -141,7 +141,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
         if (config.useHotkey && !config.hotkey.isKeyHeld()) {
