@@ -162,14 +162,14 @@ class ConfigManager {
             try {
                 val inputStreamReader = InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8)
                 val bufferedReader = BufferedReader(inputStreamReader)
-                val safeGson = BaseGsonBuilder.lenientGson().create()
+                val lenientGson = BaseGsonBuilder.lenientGson().create()
 
                 logger.log("load-$fileName-now")
 
                 output = if (fileType == ConfigFileType.FEATURES) {
-                    val jsonObject = safeGson.fromJson(bufferedReader.readText(), JsonObject::class.java)
+                    val jsonObject = lenientGson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
-                    val run = { safeGson.fromJson(newJsonObject, defaultValue.javaClass) }
+                    val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }
                     if (LorenzUtils.isInDevEnvironment()) {
                         try {
                             run()
@@ -181,7 +181,7 @@ class ConfigManager {
                         run()
                     }
                 } else {
-                    safeGson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
+                    lenientGson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
                 }
 
                 logger.log("Loaded $fileName from file")
