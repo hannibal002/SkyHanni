@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object HoppityEggLocations {
 
+    // TODO add gui/command to show total data/missing islands
     private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
         get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf()
         set(value) {
