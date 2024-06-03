@@ -81,10 +81,18 @@ object GuiContainerMixin {
         target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;",
         cancellable = true
     )
-    fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo, @KSelf gui: GuiContainer) {
+    fun onMouseClick(
+        slot: Slot?,
+        slotId: Int,
+        clickedButton: Int,
+        clickType: Int,
+        ci: CallbackInfo,
+        @KSelf gui: GuiContainer
+    ) {
         val item = gui.inventorySlots?.inventory?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
-        if (SlotClickEvent(gui, gui.inventorySlots, item, slot, slotId, clickedButton, clickType).postAndCatch()
-        ) ci.cancel()
+        if (SlotClickEvent(gui, gui.inventorySlots, item, slot, slotId, clickedButton, clickType).postAndCatch()) {
+            ci.cancel()
+        }
     }
 
     @KInjectAt(
