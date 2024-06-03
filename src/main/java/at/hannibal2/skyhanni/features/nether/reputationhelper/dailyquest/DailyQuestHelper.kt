@@ -81,18 +81,17 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
-                questLoader.loadFromTabList()
+                questLoader.loadFromTabList(TabWidget.FACTION_QUESTS.lines)
             }
         }
     }
 
-    // TODO use WidgetUpdateEvent once its merged
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
-        questLoader.loadFromTabList()
+        questLoader.loadFromTabList(event.lines)
     }
 
 //     @SubscribeEvent
