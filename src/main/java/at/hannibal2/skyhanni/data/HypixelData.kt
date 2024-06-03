@@ -110,14 +110,9 @@ class HypixelData {
 
         // Data from locraw
         var locrawData: JsonObject? = null
-        private var locraw: MutableMap<String, String> = mutableMapOf(
-            "server" to "",
-            "gametype" to "",
-            "lobbyname" to "",
-            "lobbytype" to "",
-            "mode" to "",
-            "map" to ""
-        )
+        private var locraw: MutableMap<String, String> = listOf(
+            "server", "gametype", "lobbyname", "lobbytype", "mode", "map"
+        ).associate { it to "" }.toMutableMap()
 
         val server get() = locraw["server"] ?: ""
         val gameType get() = locraw["gametype"] ?: ""
