@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
@@ -20,13 +21,15 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightMiningCommissionMobs {
+@SkyHanniModule
+object HighlightMiningCommissionMobs {
 
     private val config get() = SkyHanniMod.feature.mining
-    // TODO Commissin API
+
+    // TODO Commission API
     private var active = listOf<MobType>()
 
-    // TODO Commissin API
+    // TODO Commission API
     enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
 
         // Dwarven Mines

@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HideFarEntities {
+@SkyHanniModule
+object HideFarEntities {
     private val config get() = SkyHanniMod.feature.misc.hideFarEntities
 
     private var ignored = emptySet<Int>()

@@ -5,7 +5,6 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElementVisitor
 import liveplugin.registerInspection
-import liveplugin.show
 import org.jetbrains.kotlin.idea.base.utils.fqname.fqName
 import org.jetbrains.kotlin.idea.codeinsight.api.classic.inspections.AbstractKotlinInspection
 import org.jetbrains.kotlin.idea.util.AnnotationModificationHelper
@@ -92,7 +91,6 @@ class ModuleQuickFix : LocalQuickFix {
             " ",
             null
         )
-        show("Annotation applied, make sure SkyHanniMod isn't still loading this module")
     }
 
     override fun getName() = "Annotate with @SkyHanniModule"

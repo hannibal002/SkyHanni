@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -21,7 +22,8 @@ import kotlin.math.sin
 /**
  * Taken and ported from Soopyboo32's javascript module SoopyV2
  */
-class SoopyGuessBurrow {
+@SkyHanniModule
+object SoopyGuessBurrow {
 
     private var dingIndex = 0
     private var hasDinged = false
