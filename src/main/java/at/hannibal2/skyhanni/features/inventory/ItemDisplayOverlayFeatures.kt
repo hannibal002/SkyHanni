@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.ENCHANTING_EXP
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
@@ -80,6 +81,10 @@ object ItemDisplayOverlayFeatures {
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+    )
+    private val enchantingExpPattern by patternGroup.pattern(
+        "enchantingexp",
+        "(?<exp>[0-9]+)k Enchanting Exp"
     )
 
     @SubscribeEvent
@@ -262,6 +267,13 @@ object ItemDisplayOverlayFeatures {
             lore.matchFirst(bingoGoalRankPattern) {
                 val rank = group("rank").formatLong()
                 if (rank < 10000) return "§6${NumberUtil.format(rank)}"
+            }
+        }
+
+        if (ENCHANTING_EXP.isSelected() && chestName.startsWith("Superpairs")) {
+            enchantingExpPattern.matchMatcher(item.cleanName()) {
+                val exp = group("exp").formatLong()
+                return "§b${NumberUtil.format(exp)}"
             }
         }
 

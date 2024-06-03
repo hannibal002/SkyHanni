@@ -129,6 +129,7 @@ public class InventoryConfig {
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
         DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
+        ENCHANTING_EXP("§bEnchanting EXP"),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         ;
 
