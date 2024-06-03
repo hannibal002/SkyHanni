@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -52,7 +54,7 @@ object NEUItems {
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
 
     private val hypixelApiGson by lazy {
-        ConfigManager.createBaseGsonBuilder()
+        BaseGsonBuilder.gson()
             .registerTypeAdapter(HypixelApiTrophyFish::class.java, object : TypeAdapter<HypixelApiTrophyFish>() {
                 override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
