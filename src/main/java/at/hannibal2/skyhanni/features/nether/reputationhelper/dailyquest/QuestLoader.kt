@@ -35,11 +35,17 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
+    // TODO use WidgetUpdateEvent once its merged
+    //     fun loadFromTabList(lines: List<String>) {
     fun loadFromTabList() {
         var i = -1
         dailyQuestHelper.greatSpook = false
+        var found = 0
+
+
         for (line in TabListData.getTabList()) {
-            if (line.contains("Faction Quests:")) {
+//         for (line in lines) {
+            if (line == "§5§lFaction Quests:") {
                 i = 0
                 continue
             }
@@ -47,11 +53,15 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
             i++
             readQuest(line)
+            found++
             if (dailyQuestHelper.greatSpook) return
             if (i == 5) {
                 break
             }
         }
+
+        dailyQuestHelper.reputationHelper.tabListQuestsMissing = found == 0
+        dailyQuestHelper.update()
     }
 
     private fun readQuest(line: String) {
