@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
@@ -23,8 +24,10 @@ import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
+@SkyHanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
@@ -90,11 +93,14 @@ object EntityData {
         }
     }
 
-    fun postRenderNametag(entity: Entity, chatComponent: IChatComponent): IChatComponent {
-        return nametagCache.getOrPut(entity) {
-            val event = EntityDisplayNameEvent(entity, chatComponent)
-            event.postAndCatch()
-            event.chatComponent
-        }
+    @JvmStatic
+    fun getDisplayName(entity: Entity, ci: CallbackInfoReturnable<IChatComponent>) {
+        ci.returnValue = postRenderNametag(entity, ci.returnValue)
+    }
+
+    private fun postRenderNametag(entity: Entity, chatComponent: IChatComponent) = nametagCache.getOrPut(entity) {
+        val event = EntityDisplayNameEvent(entity, chatComponent)
+        event.postAndCatch()
+        event.chatComponent
     }
 }

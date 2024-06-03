@@ -15,5 +15,4 @@ public class MixinEntityPlayer {
     public void getDisplayName(CallbackInfoReturnable<IChatComponent> ci) {
         ci.setReturnValue(EntityData.INSTANCE.postRenderNametag((EntityPlayer) (Object) this, ci.getReturnValue()));
     }
-
 }

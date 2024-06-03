@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.other
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import javax.annotation.Nullable
 
 data class HypixelPlayerApiJson(
     @Expose val profiles: List<HypixelApiProfile>
@@ -13,7 +14,21 @@ data class HypixelApiProfile(
 )
 
 data class HypixelApiPlayer(
-    @Expose @SerializedName("trophy_fish") val trophyFish: HypixelApiTrophyFish
+    @Expose @SerializedName("trophy_fish") val trophyFish: HypixelApiTrophyFish,
+    @Expose val events: HypixelApiEvents
+)
+
+data class HypixelApiEvents(
+    @Expose val easter: HypixelApiEasterEvent
+)
+
+data class HypixelApiEasterEvent(
+    @Expose val rabbits: HypixelApiRabbits
+)
+
+data class HypixelApiRabbits(
+    @Expose @SerializedName("collected_locations")
+    val collectedLocations: Map<String, List<String>>
 )
 
 data class HypixelApiTrophyFish(
