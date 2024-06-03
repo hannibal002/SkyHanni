@@ -19,7 +19,7 @@ class ArmorStackDisplay {
      */
     private val armorStackPattern by RepoPattern.pattern(
         "combat.armorstack.actionbar",
-        " (§6|§6§l)(?<stack>\\d+.)"
+        " (§6|§6§l)(?<stack>\\d+[ᝐ⁑|҉Ѫ⚶])"
     )
 
     @SubscribeEvent
