@@ -4,17 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.EntityLiving
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HellionShieldHelper {
+@SkyHanniModule
+object HellionShieldHelper {
 
-    companion object {
-
-        val hellionShieldMobs = mutableMapOf<EntityLiving, HellionShield>()
-    }
+    val hellionShieldMobs = mutableMapOf<EntityLiving, HellionShield>()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

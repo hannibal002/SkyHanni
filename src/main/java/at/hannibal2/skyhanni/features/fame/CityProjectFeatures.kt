@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -40,7 +41,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class CityProjectFeatures {
+@SkyHanniModule
+object CityProjectFeatures {
 
     private var display = emptyList<List<Any>>()
     private var inInventory = false
@@ -56,13 +58,11 @@ class CityProjectFeatures {
         "§aProject is (?:being built|released)!"
     )
 
-    companion object {
 
-        private val config get() = SkyHanniMod.feature.event.cityProject
-        fun disable() {
-            config.dailyReminder = false
-            ChatUtils.chat("Disabled city project reminder messages!")
-        }
+    private val config get() = SkyHanniMod.feature.event.cityProject
+    private fun disable() {
+        config.dailyReminder = false
+        ChatUtils.chat("Disabled city project reminder messages!")
     }
 
     @SubscribeEvent
