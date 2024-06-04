@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -14,7 +15,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 
-class ArachneKillTimer {
+@SkyHanniModule
+object ArachneKillTimer {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
 
@@ -39,8 +41,8 @@ class ArachneKillTimer {
 
     private var arachneSpawnedTime = SimpleTimeMark.farPast()
     private var arachneKillTime = Duration.ZERO
-    private var arachneCallingPattern = ArachneChatMessageHider().arachneCallingPattern
-    private var arachneCrystalPattern = ArachneChatMessageHider().arachneCrystalPattern
+    private var arachneCallingPattern = ArachneChatMessageHider.arachneCallingPattern
+    private var arachneCrystalPattern = ArachneChatMessageHider.arachneCrystalPattern
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -69,11 +71,8 @@ class ArachneKillTimer {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (!IslandType.SPIDER_DEN.isInIsland()) {
-            arachneSpawnedTime = SimpleTimeMark.farPast()
-        }
+        arachneSpawnedTime = SimpleTimeMark.farPast()
     }
 
-    fun isEnabled() =
-        IslandType.SPIDER_DEN.isInIsland() && config.showArachneKillTimer
+    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.showArachneKillTimer
 }

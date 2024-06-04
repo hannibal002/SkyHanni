@@ -95,7 +95,6 @@ import at.hannibal2.skyhanni.features.combat.HideDamageSplash
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
-import at.hannibal2.skyhanni.features.combat.mobs.ArachneKillTimer
 import at.hannibal2.skyhanni.features.combat.mobs.AreaMiniBossFeatures
 import at.hannibal2.skyhanni.features.combat.mobs.AshfangMinisNametagHider
 import at.hannibal2.skyhanni.features.combat.mobs.MobHighlight
@@ -677,7 +676,6 @@ class SkyHanniMod {
         loadModule(PartyChatCommands)
         loadModule(SummoningMobManager())
         loadModule(SkyblockXPInChat())
-        loadModule(ArachneKillTimer())
         loadModule(AreaMiniBossFeatures())
         loadModule(MobHighlight())
         loadModule(ChocolateFactoryDataLoader)
@@ -857,7 +855,7 @@ class SkyHanniMod {
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
         loadModule(QuickModMenuSwitch)
-        loadModule(ArachneChatMessageHider())
+        loadModule(ArachneChatMessageHider)
         loadModule(ShowItemUuid())
         loadModule(FrozenTreasureTracker)
         loadModule(MiningEventDisplay)
