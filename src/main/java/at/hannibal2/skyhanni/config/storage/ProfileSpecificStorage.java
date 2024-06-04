@@ -130,10 +130,13 @@ public class ProfileSpecificStorage {
         public String targetName = null;
 
         @Expose
-        public Map<String, Integer> rabbitCounts = new HashMap();
+        public Map<String, Integer> rabbitCounts = new HashMap<>();
 
         @Expose
-        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap();
+        public Map<String, HoppityCollectionStats.LocationRabbit> locationRabbitRequirements = new HashMap<>();
+
+        @Expose
+        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap<>();
 
         @Expose
         public Integer hoppityShopYearOpened = null;
