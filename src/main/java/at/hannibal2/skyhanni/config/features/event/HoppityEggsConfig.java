@@ -39,6 +39,13 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
+    @ConfigOption(name = "Hide Duplicate Waypoints", desc = "Hides egg waypoints you have found. §e" +
+        "Only works when you don't have an Egglocator in your inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideDuplicateWaypoints = false;
+
+    @Expose
     @ConfigOption(name = "Mark Duplicate Locations", desc = "Marks egg location waypoints which you have already found in red.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -49,12 +56,6 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showNearbyDuplicateEggLocations = false;
-
-    @Expose
-    @ConfigOption(name = "Hide Duplicate Locations", desc = "Hides egg location waypoints which you have already found.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hideDuplicateEggLocations = false;
 
     @Expose
     @ConfigOption(name = "Load from NEU PV", desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer.")
