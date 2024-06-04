@@ -31,6 +31,7 @@ object SeaCreatureFeatures {
     private var lastRareCatch = SimpleTimeMark.farPast()
     private var armorStandIds = TimeLimitedSet<Int>(6.minutes)
 
+    // TODO remove spawn event, check per tick if can see, cache if already warned about
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return

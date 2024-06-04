@@ -109,9 +109,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // May 4, 2024, 4:05 PM GMT+2
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.2.2
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.2.2:all") {
+    // June 3, 2024, 9:30 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -131,10 +131,6 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     implementation("net.hypixel:mod-api:0.3.1")
-}
-
-ksp {
-    arg("symbolProcessor", "at.hannibal2.skyhanni.loadmodule.LoadModuleProvider")
 }
 
 configurations.getByName("minecraftNamed").dependencies.forEach {
