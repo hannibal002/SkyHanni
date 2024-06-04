@@ -30,14 +30,6 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
             GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
     }
 
-    data class AfterDraw(
-        override val gui: GuiContainer,
-        override val container: Container,
-        val mouseX: Int,
-        val mouseY: Int,
-        val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container)
-
     @Cancelable
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
         GuiContainerEvent(gui, container)

@@ -44,11 +44,6 @@ class GuiContainerHook(guiAny: Any) {
         }
     }
 
-    fun postDraw(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        if (!SkyHanniDebugsAndTests.globalRender) return
-        GuiContainerEvent.AfterDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
-    }
-
     fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
         GuiContainerEvent.ForegroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
