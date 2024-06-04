@@ -74,11 +74,11 @@ object MiningEventDisplay {
                             listOf(
                                 when (islandType) {
                                     IslandType.DWARVEN_MINES -> Renderable.itemStack(
-                                        "PERFECT_RUBY_GEM".asInternalName().getItemStack()
+                                        "MITHRIL_ORE".asInternalName().getItemStack()
                                     )
 
                                     IslandType.CRYSTAL_HOLLOWS -> Renderable.itemStack(
-                                        "MITHRIL_ORE".asInternalName().getItemStack()
+                                        "PERFECT_RUBY_GEM".asInternalName().getItemStack()
                                     )
 
                                     IslandType.MINESHAFT -> Renderable.itemStack(ItemStack(Blocks.packed_ice))
