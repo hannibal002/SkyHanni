@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -176,11 +177,22 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
         if (!ProfileStorageData.loaded) return
 
-        update()
+        if (config.nonGodPotEffectDisplay) update()
+
+        val effectWarning = config.nonGodPotEffectWarning
+        val effectSound = config.nonGodPotEffectSound
+
+        if (!effectWarning && !effectSound) return
+
+        effectDuration.sorted().forEach { (effect, time) ->
+            if (time.remaining.inWholeSeconds.toInt() != 60) return
+
+            if (effectWarning) LorenzUtils.sendTitle(effect.tabListName, 3.seconds)
+            if (effectSound) repeat(5) { playPlingSound() }
+        }
     }
 
     @SubscribeEvent
@@ -256,7 +268,7 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || !config.nonGodPotEffectDisplay) return
         if (RiftAPI.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
@@ -274,5 +286,5 @@ class NonGodPotEffectDisplay {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+        LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 }

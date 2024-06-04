@@ -21,6 +21,18 @@ public class PotionEffectsConfig {
     public boolean nonGodPotEffectShowMixins = false;
 
     @Expose
+    @ConfigOption(name = "Ending Warning", desc = "Sends a title when one of the Non God Pot Effects is ending.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean nonGodPotEffectWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Ending Sound", desc = "Makes a ")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean nonGodPotEffectSound = false;
+
+    @Expose
     @ConfigLink(owner = PotionEffectsConfig.class, field = "nonGodPotEffectDisplay")
     public Position nonGodPotEffectPos = new Position(10, 10, false, true);
 }
