@@ -88,6 +88,12 @@ object HoppityCollectionStats {
         "§c✖ §7Requirement §e(?<acquired>[\\d,]+)§7/§a(?<required>[\\d,]+)",
     )
 
+    /**
+     * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
+     */
+    private val locationRequirementDescription by patternGroup.pattern("rabbit.requirement.location",
+                                                                       "Find 15 unique egg locations in (the )?(?<location>.*)\\..*")
+
     private var display = emptyList<Renderable>()
     private val loggedRabbits
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
@@ -173,7 +179,7 @@ object HoppityCollectionStats {
                 Renderable.wrappedString(
                     "§cMissing Locations§7:§c "
                         + missingLocationRabbits.joinToString("§7, §c") {
-                        it.locationName.substringBefore(' ')
+                        it.locationName
                     }, width = 200),
             tips
         ))
@@ -289,27 +295,6 @@ object HoppityCollectionStats {
             }
         }
     }
-    /*
-    * {
-    id: "minecraft:dye",
-    Count: 1b,
-    tag: {
-        display: {
-            Lore: ["§7Grants §6+1 Chocolate §7and §60.002x", "§6Chocolate §7per second to your",
-            * "§7§6Chocolate Factory§7.",
-            * "", "§c✖ §7Requirement §e11§7/§a15", "§7Find §a15 §7unique egg locations in the", "§7§bDeep Caverns§7.",
-            * "", "§7§8You cannot find this rabbit until you", "§8meet the requirement!", "", "§F§LCOMMON RABBIT"],
-            Name: "§fCave"
-        }
-    },
-    Damage: 8s
-}*/
-
-    /**
-     * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
-     */
-    private val locationRequirementDescription by patternGroup.pattern("rabbit.requirement.location",
-                                                                       "Find 15 unique egg locations in (the )?(?<location>.*)\\..*")
 
     private fun saveLocationRabbit(rabbitName: String, lore: List<String>) {
         val iterator = lore.iterator()
