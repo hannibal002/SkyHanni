@@ -514,6 +514,7 @@ class SkyHanniMod {
         HotswapSupport.load()
 
         loadModule(this)
+        loadModule(TabWidgetDisplay)
         LoadedModules.modules.forEach { loadModule(it) }
 
         // data
@@ -883,7 +884,6 @@ class SkyHanniMod {
         loadModule(ShowMotesNpcSellPrice())
         loadModule(LivingMetalSuitProgress())
         loadModule(VampireSlayerFeatures)
-        loadModule(TabWidgetDisplay)
         loadModule(BlobbercystsHighlight())
         loadModule(LivingCaveDefenseBlocks())
         loadModule(LivingCaveLivingMetalHelper())

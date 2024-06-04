@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-enum class TabWidgetDisplay(val configName: String?, vararg val widgets: TabWidget) {
+enum class TabWidgetDisplay(private val configName: String?, vararg val widgets: TabWidget) {
     SOULFLOW(null, TabWidget.SOULFLOW),
     COINS("Bank and Interest", TabWidget.BANK, TabWidget.INTEREST),
     SB_LEVEL("Skyblock Level", TabWidget.SB_LEVEL),
@@ -30,7 +30,8 @@ enum class TabWidgetDisplay(val configName: String?, vararg val widgets: TabWidg
     MINION("Minion Info", TabWidget.MINION),
     COLLECTION(null, TabWidget.COLLECTION),
     TIMERS(null, TabWidget.TIMERS),
-    FIRE_SALE(null, TabWidget.FIRE_SALE)
+    FIRE_SALE(null, TabWidget.FIRE_SALE),
+    RAIN("Park Rain", TabWidget.RAIN),
     ;
 
     val position get() = config.displayPositions[ordinal]
@@ -51,7 +52,7 @@ enum class TabWidgetDisplay(val configName: String?, vararg val widgets: TabWidg
             if (config?.displayPositions == null) return
             config.display.forEach { widget ->
                 widget.position.renderStrings(
-                    widget.widgets.flatMap { it.lines }, posLabel = "Diplay Widget: ${widget.name}"
+                    widget.widgets.flatMap { it.lines }, posLabel = "Display Widget: ${widget.name}"
                 )
             }
         }
@@ -65,7 +66,7 @@ enum class TabWidgetDisplay(val configName: String?, vararg val widgets: TabWidg
                 ErrorManager.skyHanniError(
                     "Invalid State of config.displayPositions",
                     "Display" to TabWidgetDisplay.entries,
-                    "Posions" to config.displayPositions
+                    "Positions" to config.displayPositions
                 )
             } else {
                 config.displayPositions.addAll(generateSequence { Position() }.take(sizeDiff))
