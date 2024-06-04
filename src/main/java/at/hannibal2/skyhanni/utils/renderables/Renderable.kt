@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -296,10 +295,8 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = emptyList(),
             onHover: () -> Unit = {},
         ) = object : Renderable {
-            override val width: Int
-                get() = max(hovered.width, unhovered.width)
-            override val height: Int
-                get() = max(hovered.height, unhovered.height)
+            override val width = max(hovered.width, unhovered.width)
+            override val height = max(hovered.height, unhovered.height)
             override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
             override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
 
@@ -562,14 +559,14 @@ interface Renderable {
         }
 
         // TODO use this to render current boosted crop in next jacob contest crops
-        fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor()) = object : Renderable {
+        fun Renderable.renderBounds(color: Int = LorenzColor.GREEN.toColor().withAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
             override val horizontalAlign = this@renderBounds.horizontalAlign
             override val verticalAlign = this@renderBounds.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, color.withAlpha(100))
+                Gui.drawRect(0, 0, width, height, color)
                 this@renderBounds.render(posX, posY)
             }
 
@@ -854,16 +851,14 @@ interface Renderable {
             val playerY = height / 2 + playerHeight / 2 + padding
 
             override fun render(posX: Int, posY: Int) {
-
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
-                val mouse = currentRenderPassMousePosition
+                val mouse = currentRenderPassMousePosition ?: return
                 val mouseXRelativeToPlayer =
-                    if (followMouse) (posX + playerX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
+                    if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
                 val mouseYRelativeToPlayer =
-                    if (followMouse) (posY + playerY - (mouse?.second
-                        ?: Utils.getMouseY()) - 1.62 * entityScale).toFloat() else eyesY
-                GlStateManager.translate(0f, 0f, 500f)
+                    if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
+                GlStateManager.translate(0f, 0f, 100f)
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -872,7 +867,7 @@ interface Renderable {
                     mouseYRelativeToPlayer,
                     player
                 )
-                GlStateManager.translate(0f, 0f, -500f)
+                GlStateManager.translate(0f, 0f, -100f)
             }
         }
     }

@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -43,67 +44,26 @@ object CustomWardrobe {
     private val config get() = SkyHanniMod.feature.inventory.customWardrobe
 
     private var displayRenderable: Renderable? = null
-    private var buttonsRenderable: Renderable? = null
     private var inventoryButton: Renderable? = null
     private var editMode = false
     private var waitingForInventoryUpdate = false
+    private var lastEditClick = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
         if (!isEnabled() || editMode) return
-        event.cancel()
-    }
-
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
-        if (editMode) { // Inventory Button for re-enabling the Custom Wardrobe
-            val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
-            val accessorGui = gui as AccessorGuiContainer
-            val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
-            val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
-            Position(posX, posY).renderRenderable(renderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
-            return
-        }
+        val gui = event.gui
         val renderable = displayRenderable ?: run {
             update()
             displayRenderable ?: return
         }
-        val button = buttonsRenderable ?: return
-
-        val fullRenderable = Renderable.drawInsideRoundedRect(
-            Renderable.doubleLayered(
-                Renderable.verticalContainer(
-                    listOf(renderable, button),
-                    config.spacing.buttonSlotsVerticalSpacing,
-                    horizontalAlign = HorizontalAlignment.CENTER
-                ),
-                Renderable.clickable(
-                    Renderable.string(
-                        "§7SkyHanni",
-                        horizontalAlign = HorizontalAlignment.RIGHT,
-                        verticalAlign = VerticalAlignment.BOTTOM,
-                        scale = 1.0 * (config.spacing.globalScale / 100.0)
-                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
-                    onClick = {
-                        config::enabled.jumpToEditor()
-                        reset()
-                        currentPage = null
-                    }
-                ),
-                blockBottomHover = false
-            ),
-            config.color.backgroundColor.toChromaColor(),
-            padding = 10
-        )
 
         // Change global wardrobe scale if its taller or wider than the screen
-        if (fullRenderable.width > gui.width || fullRenderable.height > gui.height) {
+        if (renderable.width > gui.width || renderable.height > gui.height) {
             if (config.spacing.globalScale <= 1) return
             val newScale = (config.spacing.globalScale * (0.9 / max(
-                fullRenderable.width.toDouble() / gui.width,
-                fullRenderable.height.toDouble() / gui.height
+                renderable.width.toDouble() / gui.width,
+                renderable.height.toDouble() / gui.height
             ))).toInt()
             config.spacing.globalScale = newScale
             ChatUtils.clickableChat(
@@ -111,10 +71,9 @@ object CustomWardrobe {
                 onClick = { config::spacing.jumpToEditor() }
             )
             update()
-            return
         }
 
-        val (width, height) = fullRenderable.width to fullRenderable.height
+        val (width, height) = renderable.width to renderable.height
         val pos = Position((gui.width - width) / 2, (gui.height - height) / 2)
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.string("§cLoading...")
@@ -124,8 +83,21 @@ object CustomWardrobe {
         }
 
         GlStateManager.translate(0f, 0f, 100f)
-        pos.renderRenderable(fullRenderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
+        pos.renderRenderable(renderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
         GlStateManager.translate(0f, 0f, -100f)
+        event.cancel()
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!isEnabled()) return
+        if (!editMode) return
+        val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
+        val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
+        val accessorGui = gui as AccessorGuiContainer
+        val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
+        val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
+        Position(posX, posY).renderRenderable(renderable, posLabel = "Custom Wardrobe", addToGuiManager = false)
     }
 
     @SubscribeEvent
@@ -144,9 +116,13 @@ object CustomWardrobe {
         update()
     }
 
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (lastEditClick.passedSince() < 50.milliseconds) event.cancel()
+    }
+
     private fun update() {
         displayRenderable = createRenderables()
-        buttonsRenderable = addButtons()
     }
 
     private fun createRenderables(): Renderable {
@@ -259,14 +235,40 @@ object CustomWardrobe {
             horizontalAlign = HorizontalAlignment.CENTER
         )
 
-        return allSlotsRenderable
+        val button = addButtons()
+
+        val fullRenderable = Renderable.drawInsideRoundedRect(
+            Renderable.doubleLayered(
+                Renderable.verticalContainer(
+                    listOf(allSlotsRenderable, button),
+                    config.spacing.buttonSlotsVerticalSpacing,
+                    horizontalAlign = HorizontalAlignment.CENTER
+                ),
+                Renderable.clickable(
+                    Renderable.string(
+                        "§7SkyHanni",
+                        horizontalAlign = HorizontalAlignment.RIGHT,
+                        verticalAlign = VerticalAlignment.BOTTOM,
+                        scale = 1.0 * (config.spacing.globalScale / 100.0)
+                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
+                    onClick = {
+                        config::enabled.jumpToEditor()
+                        reset()
+                        currentPage = null
+                    }
+                ),
+                blockBottomHover = false
+            ),
+            config.color.backgroundColor.toChromaColor(),
+            padding = 10
+        )
+        return fullRenderable
     }
 
     private fun reset() {
         inCustomWardrobe = false
         editMode = false
         displayRenderable = null
-        buttonsRenderable = null
         inventoryButton = null
     }
 
@@ -308,6 +310,7 @@ object CustomWardrobe {
             "§bEdit",
             onClick = {
                 reset()
+                lastEditClick = SimpleTimeMark.now()
                 editMode = true
             }
         )
@@ -337,6 +340,7 @@ object CustomWardrobe {
             onClick = {
                 inCustomWardrobe = false
                 editMode = false
+                lastEditClick = SimpleTimeMark.now()
                 update()
             }
         )
