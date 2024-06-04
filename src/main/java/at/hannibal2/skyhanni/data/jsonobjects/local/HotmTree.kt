@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.local;
 
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 
