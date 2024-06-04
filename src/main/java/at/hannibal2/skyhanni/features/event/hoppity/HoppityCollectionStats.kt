@@ -309,7 +309,7 @@ object HoppityCollectionStats {
      * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
      */
     private val locationRequirementDescription by patternGroup.pattern("rabbit.requirement.location",
-                                                                       "Find 15 unique egg locations in the (?<location>.*)\\..*")
+                                                                       "Find 15 unique egg locations in (the )?(?<location>.*)\\..*")
 
     private fun saveLocationRabbit(rabbitName: String, lore: List<String>) {
         val iterator = lore.iterator()
