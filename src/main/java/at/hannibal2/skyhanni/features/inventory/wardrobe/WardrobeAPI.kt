@@ -137,8 +137,7 @@ object WardrobeAPI {
                 val chestplateSlot = FIRST_CHESTPLATE_SLOT + slot
                 val leggingsSlot = FIRST_LEGGINGS_SLOT + slot
                 val bootsSlot = FIRST_BOOTS_SLOT + slot
-                list.add(WardrobeSlot(id, page, inventorySlot, helmetSlot, chestplateSlot, leggingsSlot, bootsSlot))
-                id++
+                list.add(WardrobeSlot(++id, page, inventorySlot, helmetSlot, chestplateSlot, leggingsSlot, bootsSlot))
             }
         }
         wardrobeSlots = list
@@ -169,11 +168,9 @@ object WardrobeAPI {
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        val inWardrobe = inventoryPattern.matchMatcher(event.inventoryName) {
+        inventoryPattern.matchMatcher(event.inventoryName) {
             currentPage = group("currentPage").formatInt()
-            true
-        } ?: false
-        if (!inWardrobe) return
+        } ?: return
         if (currentPage == null) return
 
         val itemsList = event.inventoryItems

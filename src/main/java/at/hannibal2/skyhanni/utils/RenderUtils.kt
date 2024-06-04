@@ -587,7 +587,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
-            renderable.renderXAligned(0, 0, renderable.width)
+            renderable.render(0, 0)
         }
         GlStateManager.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, 0)
