@@ -33,7 +33,6 @@ object ArachneKillTimer {
         "dead",
         "§f.*§r§6§lARACHNE DOWN!"
     )
-
     private val arachneDamagePattern by patternGroup.pattern(
         "damage",
         "§f +§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)"
@@ -41,29 +40,27 @@ object ArachneKillTimer {
 
     private var arachneSpawnedTime = SimpleTimeMark.farPast()
     private var arachneKillTime = Duration.ZERO
-    private var arachneCallingPattern = ArachneChatMessageHider.arachneCallingPattern
-    private var arachneCrystalPattern = ArachneChatMessageHider.arachneCrystalPattern
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-
         if (arachneCallingSpawnedPattern.matches(event.message) || arachneCrystalSpawnedPattern.matches(event.message)) {
             arachneSpawnedTime = SimpleTimeMark.now()
         }
 
         if (arachneDeathPattern.matches(event.message) && arachneSpawnedTime != SimpleTimeMark.farPast()) {
-            val time = SimpleTimeMark.now()
-            arachneKillTime = time - arachneSpawnedTime
+            arachneKillTime = arachneSpawnedTime.passedSince()
         }
 
-        if (arachneCallingPattern.matches(event.message) || arachneCrystalPattern.matches(event.message)) {
+        if (ArachneChatMessageHider.arachneCallingPattern.matches(event.message) ||
+            ArachneChatMessageHider.arachneCrystalPattern.matches(event.message)
+        ) {
             arachneSpawnedTime = SimpleTimeMark.farPast()
         }
 
         if (arachneKillTime.isPositive() && arachneDamagePattern.matches(event.message)) {
             val format = arachneKillTime.format(showMilliSeconds = true)
-            ChatUtils.chat("                   §eArachne took §7$format§e seconds to kill.", prefix = false)
+            ChatUtils.chat("                   §eArachne took §b$format§e seconds to kill.", prefix = false)
             arachneKillTime = Duration.ZERO
             arachneSpawnedTime = SimpleTimeMark.farPast()
         }
