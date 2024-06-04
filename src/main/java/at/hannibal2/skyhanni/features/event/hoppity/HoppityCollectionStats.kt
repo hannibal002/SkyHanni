@@ -107,7 +107,7 @@ object HoppityCollectionStats {
         val foundCount get() = maxOf(getSkyhanniFoundCount(), loreFoundCount)
 
         fun hasMetRequirements(): Boolean {
-            return foundCount == requiredCount
+            return foundCount >= requiredCount
         }
     }
 
