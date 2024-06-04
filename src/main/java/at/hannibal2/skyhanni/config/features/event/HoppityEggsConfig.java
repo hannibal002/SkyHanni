@@ -51,6 +51,12 @@ public class HoppityEggsConfig {
     public boolean showNearbyDuplicateEggLocations = false;
 
     @Expose
+    @ConfigOption(name = "Hide Duplicate Locations", desc = "Hides egg location waypoints which you have already found.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideDuplicateEggLocations = false;
+
+    @Expose
     @ConfigOption(name = "Load from NEU PV", desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer.")
     @ConfigEditorBoolean
     @FeatureToggle

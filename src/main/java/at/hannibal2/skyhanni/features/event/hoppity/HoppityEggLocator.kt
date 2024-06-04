@@ -99,8 +99,9 @@ object HoppityEggLocator {
             }
             return
         }
-
-        event.drawDuplicateEggs(islandEggsLocations)
+        if (!config.hideDuplicateEggLocations) {
+            event.drawDuplicateEggs(islandEggsLocations)
+        }
     }
 
     private fun LorenzRenderWorldEvent.drawGuessLocations() {
