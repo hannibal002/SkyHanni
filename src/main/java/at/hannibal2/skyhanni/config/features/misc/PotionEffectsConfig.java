@@ -27,7 +27,7 @@ public class PotionEffectsConfig {
     public boolean nonGodPotEffectWarning = false;
 
     @Expose
-    @ConfigOption(name = "Ending Sound", desc = "Makes a ")
+    @ConfigOption(name = "Ending Sound", desc = "Makes a sound when one of the Non God Pot Effects is ending.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean nonGodPotEffectSound = false;
