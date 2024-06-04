@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.inventory.attribute
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object AttributeAPI {
 
     enum class GodRollType {

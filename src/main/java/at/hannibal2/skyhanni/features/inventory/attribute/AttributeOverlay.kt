@@ -4,13 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.getAttributesWithLevels
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.getGodRollType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.StringUtils.width
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AttributeOverlay {
+@SkyHanniModule
+object AttributeOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.attributeOverlay
 
