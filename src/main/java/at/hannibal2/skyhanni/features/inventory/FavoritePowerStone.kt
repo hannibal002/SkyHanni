@@ -6,8 +6,7 @@ import at.hannibal2.skyhanni.data.MaxwellAPI.favoritePowers
 import at.hannibal2.skyhanni.data.MaxwellAPI.isThaumaturgyInventory
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -23,6 +22,7 @@ object FavoritePowerStone {
 
     private val config get() = SkyHanniMod.feature.inventory
     private val storage get() = ProfileStorageData.profileSpecific
+
     private var highlightedSlots = mutableSetOf<Int>()
 
     @SubscribeEvent
@@ -53,18 +53,13 @@ object FavoritePowerStone {
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         if (!isThaumaturgyInventory(event.inventoryName)) return
 
         event.inventoryItems.forEach { (slot, item) ->
             if (item.displayName in favoritePowers) highlightedSlots += slot
         }
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        highlightedSlots = mutableSetOf()
     }
 
     private fun isEnabled() =
