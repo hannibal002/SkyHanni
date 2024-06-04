@@ -140,7 +140,7 @@ object MayorAPI {
 
             val expireTime = (1..21).map { lastMayorTimestamp + (6.hours * it) }.first { it.isInFuture() }
 
-            ChatUtils.chat("Jerry Mayor found: ${jerryMayor.name} expiring at: ${expireTime.timeUntil()}")
+            ChatUtils.debug("Jerry Mayor found: ${jerryMayor.name} expiring at: ${expireTime.timeUntil()}")
 
             jerryExtraMayor = jerryMayor to expireTime
         }
