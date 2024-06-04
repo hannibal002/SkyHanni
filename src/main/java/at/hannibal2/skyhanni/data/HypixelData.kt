@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -38,8 +40,7 @@ object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
     private val islandNamePattern by patternGroup.pattern(
-        "islandname",
-        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+        "islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
     )
     private val serverIdScoreboardPattern by patternGroup.pattern(
         "serverid.scoreboard",
@@ -122,16 +123,11 @@ object HypixelData {
     var skyBlockArea: String? = null
     var skyBlockAreaWithSymbol: String? = null
 
-    // Data from locraw
-    var locrawData: JsonObject? = null
-    private var locraw: MutableMap<String, String> = mutableMapOf(
-        "server" to "",
-        "gametype" to "",
-        "lobbyname" to "",
-        "lobbytype" to "",
-        "mode" to "",
-        "map" to ""
-    )
+        // Data from locraw
+        var locrawData: JsonObject? = null
+    private var locraw: MutableMap<String, String> = listOf(
+        "server", "gametype", "lobbyname", "lobbytype", "mode", "map"
+    ).associateWith { "" }.toMutableMap()
 
     val server get() = locraw["server"] ?: ""
     val gameType get() = locraw["gametype"] ?: ""
@@ -157,13 +153,14 @@ object HypixelData {
             return
         }
 
-        ErrorManager.logErrorWithData(
-            Exception("NoServerId"), "Could not find server id",
-            "islandType" to LorenzUtils.skyBlockIsland,
-            "tablist" to TabListData.getTabList(),
-            "scoreboard" to ScoreboardData.sidebarLinesFormatted
-        )
-    }
+            ErrorManager.logErrorWithData(
+                Exception("NoServerId"),
+                "Could not find server id",
+                "islandType" to LorenzUtils.skyBlockIsland,
+                "tablist" to TabListData.getTabList(),
+                "scoreboard" to ScoreboardData.sidebarLinesFormatted
+            )
+        }
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
@@ -301,10 +298,7 @@ object HypixelData {
             // So, as requested by Hannibal, use locraw from
             // NEU and have NEU send it.
             // Remove this when NEU dependency is removed
-            if (LorenzUtils.onHypixel &&
-                locrawData == null &&
-                lastLocRaw.passedSince() > 15.seconds
-            ) {
+            if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
                 lastLocRaw = SimpleTimeMark.now()
                 thread(start = true) {
                     Thread.sleep(1000)
@@ -341,13 +335,20 @@ object HypixelData {
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
-            checkIsland()
             checkSidebar()
             checkCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        when (event.widget) {
+            TabWidget.AREA -> checkIsland(event)
+            else -> Unit
+        }
     }
 
     private fun checkProfileName() {
@@ -391,18 +392,23 @@ object HypixelData {
         noTrade = ironman || stranded || bingo
     }
 
-    private fun checkIsland() {
-        var foundIsland = ""
-        TabListData.fullyLoaded = false
+    private fun checkIsland(event: WidgetUpdateEvent) {
+        val islandType: IslandType
+        val foundIsland: String
+        if (event.isClear()) {
 
-        TabListData.getTabList().matchFirst(islandNamePattern) {
-            foundIsland = group("island").removeColor()
+            TabListData.fullyLoaded = false
+            islandType = IslandType.NONE
+            foundIsland = ""
+
+        } else {
             TabListData.fullyLoaded = true
+            // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+            val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
+            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
+            islandType = getIslandType(foundIsland, guesting)
         }
 
-        // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
-        val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-        val islandType = getIslandType(foundIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
@@ -412,6 +418,9 @@ object HypixelData {
                 loggerIslandChange.log(islandType.name)
             }
             skyBlockIsland = islandType
+            if (TabListData.fullyLoaded) {
+                TabWidget.reSendEvents()
+            }
         }
     }
 
