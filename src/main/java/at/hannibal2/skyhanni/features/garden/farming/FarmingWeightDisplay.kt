@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
@@ -30,12 +29,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -132,21 +130,9 @@ class FarmingWeightDisplay {
         }
 
         private val eliteWeightApiGson by lazy {
-            ConfigManager.createBaseGsonBuilder()
-                .registerTypeAdapter(CropType::class.java, object : TypeAdapter<CropType>() {
-                    override fun write(out: JsonWriter, value: CropType) {}
-
-                    override fun read(reader: JsonReader): CropType {
-                        return CropType.getByName(reader.nextString())
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(PestType::class.java, object : TypeAdapter<PestType>() {
-                    override fun write(out: JsonWriter, value: PestType) {}
-
-                    override fun read(reader: JsonReader): PestType {
-                        return PestType.getByName(reader.nextString())
-                    }
-                }.nullSafe())
+            BaseGsonBuilder.gson()
+                .registerTypeAdapter(CropType::class.java, SkyHanniTypeAdapters.CROP_TYPE.nullSafe())
+                .registerTypeAdapter(PestType::class.java, SkyHanniTypeAdapters.PEST_TYPE.nullSafe())
                 .create()
         }
 
