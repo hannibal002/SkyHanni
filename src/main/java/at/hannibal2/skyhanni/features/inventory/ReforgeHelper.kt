@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -20,17 +21,18 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
@@ -77,26 +79,21 @@ object ReforgeHelper {
     private var currentReforge: ReforgeAPI.Reforge? = null
         set(value) {
             field = value
-            formattedCurrentReforge = if (value == null) "" else "§7Now:  §3${value.name}"
         }
     private var reforgeToSearch: ReforgeAPI.Reforge? = null
         set(value) {
             field = value
-            formattedReforgeToSearch = if (value == null) "" else "§7Goal: §9${value.name}"
         }
 
-    private var hoverdReforge: ReforgeAPI.Reforge? = null
-
-    private var formattedCurrentReforge = ""
-    private var formattedReforgeToSearch = ""
+    private var hoveredReforge: ReforgeAPI.Reforge? = null
 
     private val reforgeItem get() = if (isInHexReforgeMenu) 19 else 13
     private val reforgeButton get() = if (isInHexReforgeMenu) 48 else 22
 
-    private val hexReforgeNextDownButton = 35
-    private val hexReforgeNextUpButton = 17
+    private const val HEX_REFORGE_NEXT_DOWN_BUTTON = 35
+    private const val HEX_REFORGE_NEXT_UP_BUTTON = 17
 
-    private val exitButton = 40
+    private const val EXIT_BUTTON = 40
 
     private var waitForChat = AtomicBoolean(false)
 
@@ -129,11 +126,12 @@ object ReforgeHelper {
         if (event.slot?.slotNumber == reforgeButton) {
             if (event.slot.stack?.name == "§eReforge Item" || event.slot.stack?.name == "§cError!") return
             if (currentReforge == reforgeToSearch) {
-                event.isCanceled = true
+                event.cancel()
                 waitForChat.set(false)
+                SoundUtils.createSound("random.orb", 0.1f).playSound()
             } else if (waitForChat.get()) {
                 waitDelay = true
-                event.isCanceled = true
+                event.cancel()
             } else {
                 if (event.clickedButton == 2) return
                 if (waitDelay) {
@@ -206,7 +204,7 @@ object ReforgeHelper {
         isInHexReforgeMenu = false
         reforgeToSearch = null
         currentReforge = null
-        hoverdReforge = null
+        hoveredReforge = null
         sortAfter = null
         itemToReforge = null
         updateDisplay()
@@ -241,8 +239,15 @@ object ReforgeHelper {
         this.addAll(list)
     }
 
+    private fun getReforgeColour(reforge: ReforgeAPI.Reforge) = when {
+        currentReforge == reforge -> "§6"
+        reforgeToSearch == reforge -> "§3"
+        reforge.isReforgeStone -> "§9"
+        else -> "§7"
+    }
+
     private fun getReforgeView(itemRarity: LorenzRarity): (ReforgeAPI.Reforge) -> Renderable = { reforge ->
-        val text = (if (currentReforge == reforge) "§6" else if (reforge.isReforgeStone) "§9" else "§7") + reforge.name
+        val text = getReforgeColour(reforge) + reforge.name
         val tips = run {
             val pre: List<Renderable>
             val stats: List<Renderable>
@@ -273,11 +278,15 @@ object ReforgeHelper {
         val onHover = if (!isInHexReforgeMenu) {
             {}
         } else {
-            { hoverdReforge = reforge }
+            { hoveredReforge = reforge }
         }
 
         Renderable.clickAndHover(
-            text, tips, onClick = { reforgeToSearch = reforge }, onHover = onHover
+            text, tips,
+            onClick = {
+                reforgeToSearch = reforge
+                updateDisplay()
+            }, onHover = onHover
         )
     }
 
@@ -290,6 +299,7 @@ object ReforgeHelper {
             )
         }
 
+    @Suppress("UNCHECKED_CAST")
     private fun getSortSelector(
         itemRarity: LorenzRarity,
         sorting: SkyblockStat?,
@@ -339,28 +349,28 @@ object ReforgeHelper {
     }
 
     @SubscribeEvent
-    fun onGuiContainerForegroundDrawn(event: GuiContainerEvent.AfterDraw) {
+    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
-        GlStateManager.translate(0f, 0f, 10f)
-        val position = if (isInHexReforgeMenu) config.posCurrentHex else config.posCurrent
-        position.renderStrings(
-            listOf(formattedReforgeToSearch, formattedCurrentReforge),
-            posLabel = "Reforge Notify"
-        )
-        GlStateManager.translate(0f, 0f, -10f)
+        if (currentReforge == null) return
+
+        InventoryUtils.getItemsInOpenChest().forEach {
+            if (it.slotNumber == reforgeItem) {
+                event.drawSlotText(it.xDisplayPosition - 5, it.yDisplayPosition + 10, "§e${currentReforge?.name}", 1f)
+            }
+        }
     }
 
     @SubscribeEvent
     fun onGuiContainerBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (hoverdReforge != null && isInHexReforgeMenu) {
-            if (hoverdReforge != currentReforge) {
-                colorReforgeStone(hoverColor, hoverdReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
+        if (hoveredReforge != null && isInHexReforgeMenu) {
+            if (hoveredReforge != currentReforge) {
+                colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
                 inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
 
                 //?.get(reforgeItem)?. = hoverColor
             }
-            hoverdReforge = null
+            hoveredReforge = null
         }
 
         if (reforgeToSearch == null) return
@@ -375,7 +385,7 @@ object ReforgeHelper {
         if (isInHexReforgeMenu) {
             colorReforgeStone(selectedColor, reforgeToSearch?.rawReforgeStoneName)
         } else {
-            inventoryContainer?.getSlot(exitButton)?.highlight(selectedColor)
+            inventoryContainer?.getSlot(EXIT_BUTTON)?.highlight(selectedColor)
         }
     } else {
         inventoryContainer?.getSlot(reforgeButton)?.highlight(selectedColor)
@@ -387,8 +397,8 @@ object ReforgeHelper {
         if (slot != null) {
             slot highlight color
         } else {
-            inventory[hexReforgeNextDownButton]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
-            inventory[hexReforgeNextUpButton]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
         }
     }
 

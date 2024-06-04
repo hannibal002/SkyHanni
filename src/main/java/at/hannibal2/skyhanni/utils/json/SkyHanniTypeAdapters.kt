@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -60,6 +61,11 @@ object SkyHanniTypeAdapters {
     val PEST_TYPE: TypeAdapter<PestType> = SimpleStringTypeAdapter(
         { name },
         { PestType.getByName(this) }
+    )
+
+    val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
+        { name.lowercase() },
+        { SkyblockStat.valueOf(this.uppercase()) }
     )
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
