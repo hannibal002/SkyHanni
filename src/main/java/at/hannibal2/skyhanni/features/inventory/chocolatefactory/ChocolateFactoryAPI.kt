@@ -99,8 +99,6 @@ object ChocolateFactoryAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
-        HoppityEggLocator.eggLocations = data.eggLocations
-
         rabbitSlots = data.rabbitSlots
         otherUpgradeSlots = data.otherUpgradeSlots
         noPickblockSlots = data.noPickblockSlots

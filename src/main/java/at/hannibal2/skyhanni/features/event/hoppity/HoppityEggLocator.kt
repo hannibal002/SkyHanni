@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -58,8 +57,6 @@ object HoppityEggLocator {
     var currentEggType: HoppityEggType? = null
     var currentEggNote: String? = null
 
-    var eggLocations: Map<IslandType, List<LorenzVec>> = mapOf()
-
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         resetData()
@@ -96,7 +93,7 @@ object HoppityEggLocator {
             }
         }
 
-        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
 
         if (shouldShowAllEggs()) {
             for (eggLocation in islandEggsLocations) {
@@ -118,11 +115,11 @@ object HoppityEggLocator {
         }
     }
 
-    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: List<LorenzVec>, ) {
+    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>, ) {
         if (!config.highlightDuplicateEggLocations || !config.showNearbyDuplicateEggLocations) return
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
-            if (dist < 10 && HoppityUniqueEggLocations.hasCollectedEgg(eggLocation)) {
+            if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
                 val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
                 drawColor(eggLocation, LorenzColor.RED, false, alpha)
                 drawDynamicText(eggLocation.add(y = 1), "§cDuplicate Location!", 1.5)
@@ -155,7 +152,7 @@ object HoppityEggLocator {
 
     private fun LorenzRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
         val shouldMarkDuplicate = config.highlightDuplicateEggLocations
-            && HoppityUniqueEggLocations.hasCollectedEgg(location)
+            && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
             drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks = true)
@@ -221,7 +218,7 @@ object HoppityEggLocator {
         lastGuessMade = SimpleTimeMark.now()
         possibleEggLocations = emptyList()
 
-        val islandEggsLocations = getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
         val listSize = validParticleLocations.size
 
         if (listSize < 5) return
@@ -266,11 +263,8 @@ object HoppityEggLocator {
         drawLocations = true
     }
 
-    fun getCurrentIslandEggLocations(): List<LorenzVec>? =
-        eggLocations[LorenzUtils.skyBlockIsland]
-
     fun isValidEggLocation(location: LorenzVec): Boolean =
-        getCurrentIslandEggLocations()?.any { it.distance(location) < 5.0 } ?: false
+        HoppityEggLocations.islandLocations?.any { it.distance(location) < 5.0 } ?: false
 
     private fun ReceiveParticleEvent.isVillagerParticle() =
         type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
@@ -283,7 +277,7 @@ object HoppityEggLocator {
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
-    fun hasLocatorInHotbar() = RecalculatingValue(1.seconds) {
+    private fun hasLocatorInHotbar() = RecalculatingValue(1.seconds) {
         LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
     }.getValue()
 
