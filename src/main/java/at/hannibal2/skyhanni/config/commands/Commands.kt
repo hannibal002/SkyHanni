@@ -28,6 +28,8 @@ import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -295,9 +297,7 @@ object Commands {
         registerCommand0(
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
-            {
-                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
-            },
+            { FarmingMilestoneCommand.setGoal(it) },
             FarmingMilestoneCommand::onComplete
         )
         registerCommand0(
@@ -344,8 +344,8 @@ object Commands {
         ) { GardenAPI.clearCropSpeed() }
         registerCommand(
             "shclearminiondata",
-            "Reset data about minion profit and the name display on the private island"
-        ) { MinionFeatures.clearMinionData() }
+            "Removed bugged minion locations from your private island"
+        ) { MinionFeatures.removeBuggedMinions(isCommand = true) }
         registerCommand(
             "shwhereami",
             "Print current island in chat"
@@ -387,7 +387,7 @@ object Commands {
             "Shows the status of all the mods constants"
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
-            "shclearksimet",
+            "shclearkismet",
             "Cleares the saved values of the applied kismet feathers in Croesus"
         ) { CroesusChestTracker.resetChest() }
         registerCommand(
@@ -402,6 +402,10 @@ object Commands {
             "shUpdateBazaarPrices",
             "Forcefully updating the bazaar prices right now."
         ) { HypixelBazaarFetcher.fetchNow() }
+        registerCommand(
+            "shclearsavedrabbits",
+            "Clears the saved rabbits on this profile."
+        ) { HoppityCollectionStats.clearSavedRabbits() }
     }
 
     private fun developersDebugFeatures() {
@@ -532,6 +536,10 @@ object Commands {
             "shaddfoundburrowlocationsfromclipboard",
             "Add all ever found burrow locations from clipboard"
         ) { AllBurrowsList.addFromClipboard() }
+        registerCommand(
+            "shtoggleegglocationdebug",
+            "Shows Hoppity egg locations with their internal API names and status."
+        ) { HoppityEggLocations.toggleDebug() }
     }
 
     private fun internalCommands() {
