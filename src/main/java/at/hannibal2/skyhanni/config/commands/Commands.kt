@@ -541,6 +541,7 @@ object Commands {
             "shgraph",
             "Enables the graph editor"
         ) { GraphEditor.commandIn() }
+        registerCommand(
             "shtoggleegglocationdebug",
             "Shows Hoppity egg locations with their internal API names and status."
         ) { HoppityEggLocations.toggleDebug() }
