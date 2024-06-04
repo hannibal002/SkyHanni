@@ -177,6 +177,7 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
         if (!event.repeatSeconds(1)) return
         if (!ProfileStorageData.loaded) return
 
