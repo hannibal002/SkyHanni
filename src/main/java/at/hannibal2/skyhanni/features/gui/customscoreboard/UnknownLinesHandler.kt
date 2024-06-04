@@ -121,6 +121,14 @@ object UnknownLinesHandler {
             SbPattern.riftHayEatenPattern,
             SbPattern.fossilDustPattern,
             SbPattern.cluesPattern,
+            SbPattern.carnivalPattern,
+            SbPattern.carnivalTasksPattern,
+            SbPattern.carnivalTokensPattern,
+            SbPattern.carnivalFruitsPattern,
+            SbPattern.carnivalScorePattern,
+            SbPattern.carnivalCatchStreakPattern,
+            SbPattern.carnivalAccuracyPattern,
+            SbPattern.carnivalKillsPattern,
         )
 
         unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { line ->

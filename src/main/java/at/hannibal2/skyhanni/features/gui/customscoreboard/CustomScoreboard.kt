@@ -281,5 +281,10 @@ class CustomScoreboard {
                 }
             )
         }
+        event.transform(48, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.CARNIVAL.name))
+            array
+        }
     }
 }
