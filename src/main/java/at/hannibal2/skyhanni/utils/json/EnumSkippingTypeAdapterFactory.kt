@@ -30,13 +30,10 @@ object ListEnumSkippingTypeAdapterFactory : TypeAdapterFactory {
  */
 class ListEnumSkippingTypeAdapter<T : Enum<T>>(private val enumClass: Class<T>) : TypeAdapter<List<T>>() {
     override fun write(out: JsonWriter, value: List<T>?) {
-        if (value == null) {
-            out.nullValue()
-        } else {
-            out.beginArray()
-            value.forEach { out.value(it.name) }
-            out.endArray()
-        }
+        value ?: return
+        out.beginArray()
+        value.forEach { out.value(it.name) }
+        out.endArray()
     }
 
     override fun read(reader: JsonReader): List<T> {
@@ -44,7 +41,7 @@ class ListEnumSkippingTypeAdapter<T : Enum<T>>(private val enumClass: Class<T>) 
         reader.beginArray()
         while (reader.hasNext()) {
             if (reader.peek() == JsonToken.NULL) {
-                reader.nextNull()
+                reader.skipValue()
                 continue
             }
             val name = reader.nextString()
