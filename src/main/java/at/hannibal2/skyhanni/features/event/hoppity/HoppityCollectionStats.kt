@@ -168,13 +168,13 @@ object HoppityCollectionStats {
 
         newList.add(Renderable.hoverTips(
             if (missingLocationRabbits.isEmpty())
-                Renderable.string("§aFound enough eggs in all locations")
+                Renderable.wrappedString("§aFound enough eggs in all locations", width = 200)
             else
-                Renderable.string(
+                Renderable.wrappedString(
                     "§cMissing Locations§7:§c "
                         + missingLocationRabbits.joinToString("§7, §c") {
                         it.locationName.substringBefore(' ')
-                    }),
+                    }, width = 200),
             tips
         ))
 
