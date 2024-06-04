@@ -37,25 +37,27 @@ class SeaCreatureFeatures {
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
-        val creature = SeaCreatureManager.allFishingMobs[event.mob.name] ?: return
+        val mob = event.mob
+        val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
         if (!creature.rare) return
 
-        val shouldNotify = event.mob.baseEntity.entityId !in entityIds
-        entityIds.addIfAbsent(event.mob.baseEntity.entityId)
-        rareSeaCreatures.add(event.mob)
+        val entity = mob.baseEntity
+        val shouldNotify = entity.entityId !in entityIds
+        entityIds.addIfAbsent(entity.entityId)
+        rareSeaCreatures.add(mob)
 
         var shouldHighlight = config.highlight
         if (damageIndicatorConfig.enabled && DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
             val seaCreaturesBosses =
                 BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
-            if (seaCreaturesBosses.any { it.fullName.removeColor() == event.mob.name }) {
+            if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
                 shouldHighlight = false
             }
         }
-        if (shouldHighlight) event.mob.highlight(LorenzColor.GREEN.toColor())
+        if (shouldHighlight) mob.highlight(LorenzColor.GREEN.toColor())
 
         if (lastRareCatch.passedSince() < 1.seconds) return
-        if (event.mob.name == "Water Hydra" && event.mob.baseEntity.health == (event.mob.baseEntity.baseMaxHealth.toFloat() / 2)) return
+        if (mob.name == "Water Hydra" && entity.health == (entity.baseMaxHealth.toFloat() / 2)) return
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
