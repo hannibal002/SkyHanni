@@ -49,6 +49,12 @@ object MaxwellAPI {
             storage?.maxwell?.tunings = value ?: return
         }
 
+    var favoritePowers: List<String>
+        get() = storage?.maxwell?.favoritePowers ?: listOf()
+        set(value) {
+            storage?.maxwell?.favoritePowers = value
+        }
+
     private var powers = mutableListOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
@@ -282,7 +288,7 @@ object MaxwellAPI {
         if (!foundMagicalPower) magicalPower = 0
     }
 
-    private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
+    fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
