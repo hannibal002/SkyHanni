@@ -70,6 +70,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.anvil.AnvilCombineHelper
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BoopParty
 import at.hannibal2.skyhanni.features.bingo.CompactBingoChat
 import at.hannibal2.skyhanni.features.bingo.MinionCraftHelper
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
@@ -956,6 +957,7 @@ class SkyHanniMod {
         loadModule(GardenInventoryTooltipOverflow())
         loadModule(SkillTooltip())
         loadModule(MaxPurseItems())
+        loadModule(BoopParty())
         loadModule(SuperCraftFeatures)
         loadModule(HeldTimeInLore)
         loadModule(InfernoMinionFeatures())
