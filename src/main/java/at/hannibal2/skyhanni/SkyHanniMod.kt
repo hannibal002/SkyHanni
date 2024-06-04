@@ -160,7 +160,6 @@ import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook
 import at.hannibal2.skyhanni.features.event.winter.JyrreTimer
 import at.hannibal2.skyhanni.features.event.winter.NewYearCakeReminder
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
-import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.ChumBucketHider
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
@@ -899,7 +898,6 @@ class SkyHanniMod {
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
         loadModule(AuctionHousePriceComparison())
-        loadModule(AccountUpgradeReminder())
         loadModule(PetExpTooltip())
         loadModule(Translator())
         loadModule(CosmeticFollowingLine())
