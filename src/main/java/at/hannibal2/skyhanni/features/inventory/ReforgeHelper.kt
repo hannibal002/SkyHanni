@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -28,7 +27,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -122,7 +120,7 @@ object ReforgeHelper {
             if (currentReforge == reforgeToSearch) {
                 event.cancel()
                 waitForChat.set(false)
-                SoundUtils.createSound("random.orb", 0.1f).playSound()
+                SoundUtils.playBeepSound()
             } else if (waitForChat.get()) {
                 waitDelay = true
                 event.cancel()
@@ -278,6 +276,7 @@ object ReforgeHelper {
         Renderable.clickAndHover(
             text, tips,
             onClick = {
+                SoundUtils.playClickSound()
                 reforgeToSearch = reforge
                 updateDisplay()
             }, onHover = onHover
@@ -347,10 +346,8 @@ object ReforgeHelper {
         if (!isEnabled()) return
         if (currentReforge == null) return
 
-        InventoryUtils.getItemsInOpenChest().forEach {
-            if (it.slotNumber == reforgeItem) {
-                event.drawSlotText(it.xDisplayPosition - 5, it.yDisplayPosition + 10, "§e${currentReforge?.name}", 1f)
-            }
+        inventoryContainer?.getSlot(reforgeItem)?.let {
+            event.drawSlotText(it.xDisplayPosition - 5, it.yDisplayPosition, "§e${currentReforge?.name}", 1f)
         }
     }
 
