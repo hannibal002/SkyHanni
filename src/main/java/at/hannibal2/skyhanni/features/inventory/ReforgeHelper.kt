@@ -77,13 +77,7 @@ object ReforgeHelper {
     private var inventoryContainer: Container? = null
 
     private var currentReforge: ReforgeAPI.Reforge? = null
-        set(value) {
-            field = value
-        }
     private var reforgeToSearch: ReforgeAPI.Reforge? = null
-        set(value) {
-            field = value
-        }
 
     private var hoveredReforge: ReforgeAPI.Reforge? = null
 
