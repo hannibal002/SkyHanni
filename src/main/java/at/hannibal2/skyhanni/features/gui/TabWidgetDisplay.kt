@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -40,6 +41,7 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
         return configName ?: name.lowercase().allLettersFirstUppercase()
     }
 
+    @SkyHanniModule
     companion object {
 
         private val config get() = SkyHanniMod.feature.gui.tabWidget

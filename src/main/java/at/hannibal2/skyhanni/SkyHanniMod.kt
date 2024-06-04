@@ -253,7 +253,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorRewardWarning
 import at.hannibal2.skyhanni.features.gui.MovableHotBar
-import at.hannibal2.skyhanni.features.gui.TabWidgetDisplay
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
@@ -514,7 +513,6 @@ class SkyHanniMod {
         HotswapSupport.load()
 
         loadModule(this)
-        loadModule(TabWidgetDisplay)
         LoadedModules.modules.forEach { loadModule(it) }
 
         // data
