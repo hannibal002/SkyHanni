@@ -84,7 +84,7 @@ object HoppityCollectionStats {
      * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
      */
     private val requirementAmountNotMet by patternGroup.pattern(
-        "rabbit.requirement.notmet",
+        "rabbit.requirement.notmet.amount",
         "§c✖ §7Requirement §e(?<acquired>[\\d,]+)§7/§a(?<required>[\\d,]+)",
     )
 
