@@ -50,7 +50,20 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        send("gfs $itemName $amount")
+        val realItemName = when (itemName) {
+            // These two are a workaround for a bug with NEU's item lookup.
+            // (The incorrect items cannot go in sacks anyway.)
+            "BUILDER_BROWN_MUSHROOM" -> "BROWN_MUSHROOM"
+            "HAY_BALE" -> "HAY_BLOCK"
+
+            // This one is a workaround for Hypixel's /gfs behavior of taking
+            // both item names and internal IDs causing a collision.
+            // (Actual sulphur will get mapped to SULPHUR_ORE.)
+            "SULPHUR" -> "GUNPOWDER"
+
+            else -> itemName
+        }
+        send("gfs $realItemName $amount")
     }
 
     fun widget() {
