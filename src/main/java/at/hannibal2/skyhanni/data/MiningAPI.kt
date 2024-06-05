@@ -68,7 +68,9 @@ object MiningAPI {
     private var surroundingMinedBlocks = mutableListOf<MinedBlock>()
     private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth")
 
-    private var cold = 0
+    var cold: Int = 0
+        private set
+
     var lastColdUpdate = SimpleTimeMark.farPast()
     var lastColdReset = SimpleTimeMark.farPast()
 
@@ -92,8 +94,6 @@ object MiningAPI {
     )
 
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
-
-    fun getCold() = cold
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardChangeEvent) {
