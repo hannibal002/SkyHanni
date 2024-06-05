@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
@@ -56,7 +56,7 @@ object ChocolateShopPrice {
     var inventoryItems = emptyMap<Int, ItemStack>()
 
     private const val MILESTONE_INDEX = 50
-    private var chocolateSpent = 0
+    private var chocolateSpent = 0L
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -91,7 +91,7 @@ object ChocolateShopPrice {
 
             if (slot == MILESTONE_INDEX) {
                 lore.matchFirst(chocolateSpentPattern) {
-                    chocolateSpent = group("amount").formatInt()
+                    chocolateSpent = group("amount").formatLong()
                 }
             }
 
