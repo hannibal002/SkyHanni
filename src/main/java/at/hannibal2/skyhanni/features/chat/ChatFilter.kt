@@ -5,9 +5,13 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -406,6 +410,23 @@ class ChatFilter {
         "§d[\\w']+ the Fairy§r§f: Have a great life!".toPattern()
     )
 
+    private val stashPatternGroup = RepoPattern.group("chat.stashfilter")
+
+    private val stashTypePattern by stashPatternGroup.pattern(
+        "type",
+        "\\(This totals [0-9]+ type of material stashed!\\)"
+    )
+
+    private val stashClickPattern by stashPatternGroup.pattern(
+        "click",
+        ">>> CLICK HERE to pick (it|them) up! <<<"
+    )
+
+    private val stashItemPattern by stashPatternGroup.pattern(
+        "item",
+        "You have (?<item>[0-9,]+) (?<type>item|items|material|materials) stashed away!"
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -470,31 +491,49 @@ class ChatFilter {
      * @param message The message to check
      * @return The reason why the message was blocked, empty if not blocked
      */
-    private fun block(message: String): String = when {
-        config.hypixelHub && message.isPresent("lobby") -> "lobby"
-        config.empty && StringUtils.isEmpty(message) -> "empty"
-        config.warping && message.isPresent("warping") -> "warping"
-        config.welcome && message.isPresent("welcome") -> "welcome"
-        config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
-        config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
-        config.profileJoin && message.isPresent("profile_join") -> "profile_join"
+    private fun block(message: String): String {
+        val stashMessage = message.removeColor().trim()
 
-        config.others && isOthers(message) -> othersMsg
+        return when {
+            config.hypixelHub && message.isPresent("lobby") -> "lobby"
 
-        config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
-        config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
-        config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
-        config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
-        config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
-        generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
-        generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
-        dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
-        dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
-        dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
-        dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
+            config.empty && StringUtils.isEmpty(message) -> "empty"
+            config.warping && message.isPresent("warping") -> "warping"
+            config.welcome && message.isPresent("welcome") -> "welcome"
+            config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
+            config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
+            config.profileJoin && message.isPresent("profile_join") -> "profile_join"
 
-        else -> ""
+            config.others && isOthers(message) -> othersMsg
+
+            config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
+            config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
+            config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
+            config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+            config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
+            config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
+            generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
+            generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
+            dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
+            dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
+            dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
+            dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
+
+            config.stash && (stashClickPattern.matches(stashMessage) || stashTypePattern.matches(stashMessage)) -> "stash_filter"
+            config.stash && stashItemPattern.matches(stashMessage) -> {
+                stashItemPattern.matchMatcher(stashMessage) {
+                    val stashSize = group("item")
+                    val stashType = group("type")
+
+                    ChatUtils.clickableChat(
+                        "You have §3$stashSize §e$stashType in Stash! Click here to pick up!",
+                        onClick = { HypixelCommands.pickStash() }
+                    )
+                }
+                "stash_filter"
+            }
+            else -> ""
+        }
     }
 
     private var othersMsg = ""

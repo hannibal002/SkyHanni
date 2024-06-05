@@ -134,6 +134,10 @@ object HypixelCommands {
         send("chatprompt $prompt")
     }
 
+    fun pickStash() {
+        send("pickupstash")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function

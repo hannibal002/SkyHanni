@@ -105,6 +105,12 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean sacrifice = false;
 
+    @Expose
+    @ConfigOption(name = "Stash", desc = "Shortens the materials stashed message.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean stash = false;
+
 
     //TODO remove
     @Expose
