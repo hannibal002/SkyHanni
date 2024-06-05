@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -85,6 +84,18 @@ object PowderTracker {
         calculateResourceHour(diamondEssenceInfo)
         calculateResourceHour(goldEssenceInfo)
         calculateResourceHour(chestInfo)
+
+        doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
+        powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
+            powderTimer = group("time")
+            doublePowder = powderTimer != "00:00"
+
+            tracker.update()
+        }
+
+        if (lastChestPicked.passedSince() > 1.minutes) {
+            isGrinding = false
+        }
     }
 
     private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker })
@@ -151,23 +162,6 @@ object PowderTracker {
             }
         }
         tracker.update()
-    }
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-        if (event.repeatSeconds(1)) {
-            doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
-            powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
-                powderTimer = group("time")
-                doublePowder = powderTimer != "00:00"
-
-                tracker.update()
-            }
-        }
-        if (lastChestPicked.passedSince() > 1.minutes) {
-            isGrinding = false
-        }
     }
 
     @SubscribeEvent
