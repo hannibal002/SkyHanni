@@ -30,7 +30,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 

@@ -382,8 +382,14 @@ enum class HotmData(
                 group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
             } ?: entry.maxLevel
 
-            if (entry.activeLevel > entry.maxLevel) {
-                throw IllegalStateException("Hotm Perk '${entry.name}' over max level")
+            // max level + 1 because Blue Cheese Goblin Omelette adds +1 to each level
+            if (entry.activeLevel > entry.maxLevel + 1) {
+                ErrorManager.skyHanniError(
+                    "Hotm Perk '${entry.name}' over max level",
+                    "name" to entry.name,
+                    "activeLevel" to entry.activeLevel,
+                    "maxLevel" to entry.maxLevel,
+                )
             }
 
             if (entry == PEAK_OF_THE_MOUNTAIN) {
