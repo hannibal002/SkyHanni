@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
