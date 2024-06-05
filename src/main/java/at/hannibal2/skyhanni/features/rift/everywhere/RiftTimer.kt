@@ -4,10 +4,13 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -17,13 +20,23 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class RiftTimer {
+@SkyHanniModule
+object RiftTimer {
 
     private val config get() = RiftAPI.config.timer
 
-    private val timePattern by RepoPattern.pattern(
-        "rift.everywhere.timer",
+    private val repoGroup = RepoPattern.group("rift.everywhere")
+    private val timePattern by repoGroup.pattern(
+        "timer",
         "§(?<color>[a7])(?<time>.*)ф Left.*"
+    )
+
+    /**
+     * REGEX-TEST: 3150 §aф
+     */
+    private val nametagPattern by repoGroup.pattern(
+        "nametag.timer",
+        "(?<time>\\d+) §aф"
     )
 
     private var display = emptyList<String>()
@@ -113,6 +126,15 @@ class RiftTimer {
         if (LorenzUtils.skyBlockArea == "Mirrorverse") return
 
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
+    }
+
+    @SubscribeEvent
+    fun onEntityHealthDIsplay(event: EntityHealthDisplayEvent) {
+        if (!RiftAPI.inRift() || !config.nametag) return
+        val time = nametagPattern.matchMatcher(event.text) {
+            group("time")?.toIntOrNull()
+        } ?: return
+        event.text = "${time.seconds.format()} §aф"
     }
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled

@@ -428,7 +428,6 @@ import at.hannibal2.skyhanni.features.rift.everywhere.CruxTalismanDisplay
 import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints
 import at.hannibal2.skyhanni.features.rift.everywhere.HighlightRiftGuide
 import at.hannibal2.skyhanni.features.rift.everywhere.RiftHorsezookaHider
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.RiftMotesOrb
 import at.hannibal2.skyhanni.features.rift.everywhere.motes.ShowMotesNpcSellPrice
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
@@ -862,7 +861,6 @@ class SkyHanniMod {
         loadModule(MiningCommissionsBlocksColor)
         loadModule(SlayerRngMeterDisplay())
         loadModule(GhostCounter)
-        loadModule(RiftTimer())
         loadModule(HighlightRiftGuide())
         loadModule(ShyCruxWarnings())
         loadModule(RiftLarva())

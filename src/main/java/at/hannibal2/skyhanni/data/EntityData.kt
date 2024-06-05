@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -32,6 +33,7 @@ object EntityData {
 
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
     private val nametagCache = TimeLimitedCache<Entity, IChatComponent>(50.milliseconds)
+    private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -103,4 +105,12 @@ object EntityData {
         event.postAndCatch()
         event.chatComponent
     }
+
+    @JvmStatic
+    fun getHealthDisplay(text: String) = healthDisplayCache.getOrPut(text) {
+        val event = EntityHealthDisplayEvent(text)
+        event.postAndCatch()
+        event.text
+    }
+
 }
