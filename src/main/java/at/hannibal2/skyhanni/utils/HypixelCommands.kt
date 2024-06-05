@@ -129,7 +129,7 @@ object HypixelCommands {
         major == null || minor == null -> send("rng")
         else -> send("rng $major $minor")
     }
-    
+
     fun chatPrompt(prompt: String) {
         send("chatprompt $prompt")
     }
