@@ -51,7 +51,7 @@ class ShowFishingItemName {
                 text += name
             }
 
-            itemsOnGround.put(entityItem, text)
+            itemsOnGround[entityItem] = text
         }
     }
 

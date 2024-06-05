@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -27,6 +29,7 @@ import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object DungeonLividFinder {
 
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
@@ -50,13 +53,30 @@ object DungeonLividFinder {
         if (!config.enabled) return
 
         val dyeColor = blockLocation.getBlockStateAt().getValue(BlockStainedGlass.COLOR)
-        color = dyeColor.toLorenzColor() ?: error("No color found for dye color `$dyeColor`")
+        color = dyeColor.toLorenzColor()
 
         val color = color ?: return
         val chatColor = color.getChatColor()
 
         lividArmorStand = EntityUtils.getEntities<EntityArmorStand>()
             .firstOrNull { it.name.startsWith("${chatColor}﴾ ${chatColor}§lLivid") }
+
+        if (event.isMod(20)) {
+            if (lividArmorStand == null) {
+            val amountArmorStands = EntityUtils.getEntities<EntityArmorStand>().filter { it.name.contains("Livid") }.count()
+                if (amountArmorStands >= 8) {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not find livid",
+                        "could not find lividArmorStand",
+                        "dyeColor" to dyeColor,
+                        "color" to color,
+                        "chatColor" to chatColor,
+                        "amountArmorStands" to amountArmorStands,
+                    )
+                }
+            }
+        }
+
         val lividArmorStand = lividArmorStand ?: return
 
         val aabb = with(lividArmorStand) {

@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import com.google.gson.GsonBuilder
@@ -98,12 +98,12 @@ object ItemUtils {
 
     fun ItemStack.getInternalNameOrNull(): NEUInternalName? {
         val data = cachedData
-        if (data.lastInternalNameFetchTime.asTimeMark().passedSince() < 1.seconds) {
+        if (data.lastInternalNameFetchTime.passedSince() < 1.seconds) {
             return data.lastInternalName
         }
         val internalName = grabInternalNameOrNull()
         data.lastInternalName = internalName
-        data.lastInternalNameFetchTime = SimpleTimeMark.now().toMillis()
+        data.lastInternalNameFetchTime = SimpleTimeMark.now()
         return internalName
     }
 
@@ -238,7 +238,7 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
-        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+        data.itemRarityLastCheck = SimpleTimeMark.now()
         val internalName = getInternalName()
         if (internalName == NEUInternalName.NONE) {
             data.itemRarity = null
@@ -267,7 +267,7 @@ object ItemUtils {
     }
 
     private fun itemRarityLastCheck(data: CachedItemData) =
-        data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
+        data.itemRarityLastCheck.passedSince() > 10.seconds
 
     /**
      * Use when comparing the name (e.g. regex), not for showing to the user
