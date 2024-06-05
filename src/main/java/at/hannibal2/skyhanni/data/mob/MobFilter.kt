@@ -73,20 +73,46 @@ object MobFilter {
         "filter.dungeon",
         "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$"
     )
-    val summonFilter by repoGroup.pattern("filter.summon", "^(?<owner>\\w+)'s (?<name>.*) \\d+.*")
-    val dojoFilter by repoGroup.pattern("filter.dojo", "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$")
+    val summonFilter by repoGroup.pattern(
+        "filter.summon",
+        "^(?<owner>\\w+)'s (?<name>.*) \\d+.*"
+    )
+    val dojoFilter by repoGroup.pattern(
+        "filter.dojo",
+        "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$"
+    )
     val jerryPattern by repoGroup.pattern(
         "jerry",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits"
     )
-
-    val petCareNamePattern by repoGroup.pattern("pattern.petcare", "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)")
-    val wokeSleepingGolemPattern by repoGroup.pattern("pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r")
+    val petCareNamePattern by repoGroup.pattern(
+        "pattern.petcare",
+        "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)"
+    )
+    val wokeSleepingGolemPattern by repoGroup.pattern(
+        "pattern.dungeon.woke.golem",
+        "(?:§c§lWoke|§5§lSleeping) Golem§r"
+    )
     val jerryMagmaCubePattern by repoGroup.pattern(
         "pattern.jerry.magma.cube",
         "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤"
     )
-    val summonOwnerPattern by repoGroup.pattern("pattern.summon.owner", ".*Spawned by: (?<name>.*).*")
+    val summonOwnerPattern by repoGroup.pattern(
+        "pattern.summon.owner",
+        ".*Spawned by: (?<name>.*).*"
+    )
+
+    /**
+     * REGEX-TEST: §8[§7Lv1§8] §5Horse
+     * REGEX-TEST: §8[§7Lv52§8] §eArmadillo
+     * REGEX-TEST: §8[§7Lv12§8] §eSkeleton Horse
+     * REGEX-TEST: §8[§7Lv49§8] §ePig
+     * REGEX-TEST: §8[§7Lv64§8] §eRat
+     */
+    val illegalEntitiesPattern by repoGroup.pattern(
+        "pattern.illegal.entities",
+        "^§8\\[§7Lv\\d+§8] §.(Horse|Armadillo|Skeleton Horse|Pig|Rat)$"
+    )
 
     internal const val RAT_SKULL =
         "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
@@ -281,11 +307,7 @@ object MobFilter {
             )
         }
         return when {
-            baseEntity is EntityPig && armorStand.name.endsWith("'s Pig") -> MobResult.illegal // Pig Pet
-
-            baseEntity is EntityHorse && armorStand.name.endsWith("'s Skeleton Horse") -> MobResult.illegal// Skeleton Horse Pet
-
-            baseEntity is EntityHorse && armorStand.name.endsWith("'s Horse") -> MobResult.illegal // Horse Pet
+            (baseEntity is EntityPig || baseEntity is EntityHorse) && illegalEntitiesPattern.matches(armorStand.name) -> MobResult.illegal
 
             baseEntity is EntityGuardian && armorStand.cleanName()
                 .matches("^\\d+".toRegex()) -> MobResult.illegal // Wierd Sea Guardian Ability
@@ -314,8 +336,7 @@ object MobFilter {
     private fun armorStandOnlyMobs(baseEntity: EntityLivingBase, armorStand: EntityArmorStand): MobResult? {
         if (baseEntity !is EntityZombie) return null
         when {
-            armorStand.name.endsWith("'s Armadillo") -> return MobResult.illegal // Armadillo Pet
-            armorStand.name.endsWith("'s Rat") -> return MobResult.illegal // Rat Pet
+            illegalEntitiesPattern.matches(armorStand.name) -> return MobResult.illegal
             baseEntity.riddenByEntity is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)?.inventory?.get(4)
                 ?.getSkullTexture() == RAT_SKULL -> return MobResult.illegal // Rat Morph
         }
