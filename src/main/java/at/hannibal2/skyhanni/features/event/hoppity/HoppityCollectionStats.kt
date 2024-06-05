@@ -91,8 +91,10 @@ object HoppityCollectionStats {
     /**
      * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
      */
-    private val locationRequirementDescription by patternGroup.pattern("rabbit.requirement.location",
-                                                                       "Find 15 unique egg locations in (the )?(?<location>.*)\\..*")
+    private val locationRequirementDescription by patternGroup.pattern(
+        "rabbit.requirement.location",
+        "Find 15 unique egg locations in (the )?(?<location>.*)\\..*"
+    )
 
     private var display = emptyList<Renderable>()
     private val loggedRabbits
@@ -177,13 +179,12 @@ object HoppityCollectionStats {
                 Renderable.wrappedString("§aFound enough eggs in all locations", width = 200)
             else
                 Renderable.wrappedString(
-                    "§cMissing Locations§7:§c "
-                        + missingLocationRabbits.joinToString("§7, §c") {
+                    "§cMissing Locations§7:§c " +
+                        missingLocationRabbits.joinToString("§7, §c") {
                         it.locationName
                     }, width = 200),
             tips
         ))
-
     }
 
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
@@ -301,7 +302,7 @@ object HoppityCollectionStats {
 
         val requirement = iterator.consumeWhile { line ->
             val requirementMet = requirementMet.matches(line)
-            if (requirementMet) Pair(15, 15)// This is kind of hardcoded?
+            if (requirementMet) Pair(15, 15) // This is kind of hardcoded?
             else requirementAmountNotMet.findMatcher(line) {
                 group("acquired").formatInt() to group("required").formatInt()
             }
