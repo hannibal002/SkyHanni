@@ -111,6 +111,7 @@ object ConfigUpdaterMigrator {
         val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lastVersion > CONFIG_VERSION) {
             logger.log("Attempted to downgrade config version")
+            config.add("lastVersion", JsonPrimitive(CONFIG_VERSION))
             return config
         }
         if (lastVersion == CONFIG_VERSION) return config
