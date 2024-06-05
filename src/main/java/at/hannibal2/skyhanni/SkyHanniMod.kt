@@ -637,7 +637,7 @@ class SkyHanniMod {
         loadedClasses.clear()
     }
 
-    private val loadedClasses = mutableSetOf<Any>()
+    private val loadedClasses = mutableSetOf<String>()
 
     fun loadModule(obj: Any) {
         if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
