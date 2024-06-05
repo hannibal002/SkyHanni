@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.model
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -353,6 +354,7 @@ enum class TabWidget(
         }
     }
 
+    @SkyHanniModule
     companion object {
 
         /** The index for the start of each Widget (inclusive) */
