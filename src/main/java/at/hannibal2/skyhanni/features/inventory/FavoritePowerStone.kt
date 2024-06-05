@@ -39,7 +39,7 @@ object FavoritePowerStone {
         val displayName = event.item?.name?.removeColor()?.trim() ?: return
         val power = MaxwellAPI.getPowerByNameOrNull(displayName) ?: return
 
-        if (power in favoritePowers) {
+        if (power in MaxwellAPI.favoritePowers) {
             MaxwellAPI.favoritePowers -= power
             highlightedSlots -= event.slotId
         } else {
