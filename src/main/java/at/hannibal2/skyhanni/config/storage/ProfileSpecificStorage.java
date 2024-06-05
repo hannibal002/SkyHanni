@@ -151,6 +151,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
+
+        @Expose
+        public List<String> favoritePowers = new ArrayList<>();
     }
 
     @Expose
@@ -373,13 +376,7 @@ public class ProfileSpecificStorage {
             public long cakeExpiring = -1L;
 
             @Expose
-            public boolean carrotFortune = false;
-
-            @Expose
-            public boolean pumpkinFortune = false;
-
-            @Expose
-            public boolean cocoaBeansFortune = false;
+            public Map<CropType, Boolean> carrolyn = new HashMap<>();
 
             @Expose
             public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
