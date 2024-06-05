@@ -21,9 +21,9 @@ object PetNametag {
      * REGEX-TEST: §8[§7Lv99§8] Ammonite
      * REGEX-TEST: §8[§7Lv100§8] Endermite§5 ✦
      */
-    private val pattern by RepoPattern.pattern(
-        "feature.pet.nametag",
-        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8\\]) (?<rarity>§.)(?<pet>[\\w\\s]+)(?<skin>§. ✦)?"
+    private val petNametagPattern by RepoPattern.pattern(
+        "pet.nametag",
+        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<pet>[\\w\\s]+)(?<skin>§. ✦)?"
     )
 
     @SubscribeEvent
@@ -31,7 +31,7 @@ object PetNametag {
         if (!isEnabled()) return
         if (event.entity !is EntityArmorStand) return
 
-        pattern.matchMatcher(event.chatComponent.unformattedText) {
+        petNametagPattern.matchMatcher(event.chatComponent.unformattedText) {
             val start = group("start")
             val lvl = group("lvl").formatInt()
             val rarity = group("rarity")
@@ -46,7 +46,5 @@ object PetNametag {
         }
     }
 
-    private fun isEnabled() = with(config) {
-        (hidePetLevel || hideMaxPetLevel) && LorenzUtils.inSkyBlock
-    }
+    private fun isEnabled() = LorenzUtils.inSkyBlock && (config.hidePetLevel || config.hideMaxPetLevel)
 }
