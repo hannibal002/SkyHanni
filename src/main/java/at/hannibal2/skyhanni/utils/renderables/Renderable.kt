@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -230,18 +231,20 @@ interface Renderable {
         }
 
         private fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val isGuiScreen = Minecraft.getMinecraft().currentScreen != null
+            val guiScreen = Minecraft.getMinecraft().currentScreen
+
+            val isGuiScreen = guiScreen != null
             if (bypassChecks) {
                 return isGuiScreen
             }
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
-            val isGuiPositionEditor = Minecraft.getMinecraft().currentScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (Minecraft.getMinecraft().currentScreen !is GuiEditSign) {
+            val isGuiPositionEditor = guiScreen !is GuiPositionEditor
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
                 ToolTipData.lastSlot == null || GuiData.preDrawEventCanceled
             } else true
-            val isConfigScreen = Minecraft.getMinecraft().currentScreen !is GuiScreenElementWrapper
+            val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
-            val openGui = Minecraft.getMinecraft().currentScreen?.javaClass?.name ?: "none"
+            val openGui = guiScreen?.javaClass?.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NEUItems.neuHasFocus()
             val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
@@ -313,11 +316,35 @@ interface Renderable {
             }
         }
 
+        fun itemStackWithTip(
+            item: ItemStack,
+            scale: Double = NEUItems.itemFontSize,
+            xSpacing: Int = 2,
+            ySpacing: Int = 0,
+            rescaleSkulls: Boolean = true,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) =
+            hoverTips(
+                itemStack(
+                    item,
+                    scale,
+                    xSpacing,
+                    ySpacing,
+                    rescaleSkulls,
+                    horizontalAlign = horizontalAlign,
+                    verticalAlign = verticalAlign
+                ),
+                item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                stack = item
+            )
+
         fun itemStack(
             item: ItemStack,
             scale: Double = NEUItems.itemFontSize,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
+            rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
         ) = object : Renderable {
@@ -327,7 +354,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale)
+                item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
 
@@ -380,7 +407,7 @@ interface Renderable {
             scale: Double = 1.0,
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
         ) = object : Renderable {
 
             val list by lazy {
@@ -391,9 +418,9 @@ interface Renderable {
 
             override val width by lazy {
                 if (list.size == 1) {
-                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / scale).toInt() + 1
+                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1
                 } else {
-                    (width / scale).toInt() + 1
+                    width
                 }
             }
 
@@ -432,6 +459,7 @@ interface Renderable {
             content: List<List<Renderable?>>,
             xPadding: Int = 1,
             yPadding: Int = 0,
+            useEmptySpace: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -443,6 +471,9 @@ interface Renderable {
             override val width = xOffsets.last() - xPadding
             override val height = yOffsets.last() - yPadding
 
+            val emptySpaceX = if (useEmptySpace) 0 else xPadding
+            val emptySpaceY = if (useEmptySpace) 0 else yPadding
+
             override fun render(posX: Int, posY: Int) {
                 content.forEachIndexed { rowIndex, row ->
                     row.forEachIndexed { index, renderable ->
@@ -451,8 +482,8 @@ interface Renderable {
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
-                            xOffsets[index + 1] - xOffsets[index],
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY
                         )
                         GlStateManager.popMatrix()
                     }
@@ -558,7 +589,52 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
             override fun render(posX: Int, posY: Int) {
-                render.renderXAligned(0, 0, width)
+                render.renderXAligned(posX, posY, width)
+            }
+        }
+
+        fun fixedSizeLine(
+            content: List<Renderable>,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = width
+            override val height = render.maxOfOrNull { it.height } ?: 0
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val emptySpace = width - render.sumOf { it.width }
+            val spacing = emptySpace / render.size
+
+            override fun render(posX: Int, posY: Int) {
+                var xOffset = posX
+                render.forEach {
+                    val x = it.width + spacing
+                    it.renderXYAligned(xOffset, posY, x, height)
+                    xOffset += x
+                    GlStateManager.translate(x.toFloat(), 0f, 0f)
+                }
+                GlStateManager.translate(-(xOffset - posX).toFloat(), 0f, 0f)
+            }
+        }
+
+        fun fixedSizeCollum(
+            content: Renderable,
+            height: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = render.width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+            override fun render(posX: Int, posY: Int) {
+                render.renderYAligned(posX, posY, height)
             }
         }
 
@@ -602,7 +678,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 var yOffset = posY
                 renderables.forEach {
-                    it.renderXAligned(yOffset, posX, width)
+                    it.renderXAligned(posX, yOffset, width)
                     yOffset += it.height + spacing
                     GlStateManager.translate(0f, (it.height + spacing).toFloat(), 0f)
                 }
@@ -723,7 +799,15 @@ interface Renderable {
                     yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }
                         .takeIf { it > 0 }
                         ?: yOffsets.size) - 1
-                for (rowIndex in range) {
+
+                val range2 =
+                    if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
+                        range.first..range.last() + 1
+                    } else {
+                        range
+                    }
+
+                for (rowIndex in range2) {
                     content[rowIndex].forEachIndexed { index, renderable ->
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(

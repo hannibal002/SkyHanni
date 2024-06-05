@@ -372,17 +372,11 @@ object Commands {
             "Disables/enables the rendering of all skyhanni guis."
         ) { SkyHanniDebugsAndTests.toggleRender() }
         registerCommand(
-            "shcarrot",
-            "Toggles receiving the 12 fortune from carrots"
-        ) { CaptureFarmingGear.reverseCarrotFortune() }
-        registerCommand(
-            "shpumpkin",
-            "Toggles receiving the 12 fortune from pumpkins"
-        ) { CaptureFarmingGear.reversePumpkinFortune() }
-        registerCommand(
-            "shcocoabeans",
-            "Toggles receiving the 12 fortune from cocoa beans"
-        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
+            "shcarrolyn",
+            "Toggels if the specified crops effect is active from carrolyn"
+        ) {
+            CaptureFarmingGear.handelCarrolyn(it)
+        }
         registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
