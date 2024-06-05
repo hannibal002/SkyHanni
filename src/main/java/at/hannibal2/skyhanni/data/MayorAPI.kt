@@ -128,7 +128,7 @@ object MayorAPI {
                 onClick = { HypixelCommands.calendar() }
             )
         }
-        if (Mayor.JERRY.isActive() && jerryExtraMayor.first == null) {
+        if (Mayor.JERRY.isActive() && jerryExtraMayor.first == null && SkyHanniMod.feature.misc.unknownPerkpocalypseMayorWarning) {
             if (lastJerryExtraMayorReminder.passedSince() < 5.minutes) return
 
             lastJerryExtraMayorReminder = SimpleTimeMark.now()
