@@ -39,7 +39,11 @@ object PetNametag {
             val skin = groupOrNull("skin") ?: ""
 
             var text = ""
-            if (!config.hidePetLevel && (!config.hideMaxPetLevel || lvl == 100 || lvl == 200)) text += "$start "
+
+            if (!(config.hidePetLevel || (config.hideMaxPetLevel && (lvl == 100 || lvl == 200)))) {
+                text += start
+            }
+
             text += rarity + pet + skin
 
             event.chatComponent = text.asComponent()
