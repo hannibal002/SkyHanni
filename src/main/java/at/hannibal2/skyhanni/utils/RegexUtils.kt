@@ -36,22 +36,33 @@ object RegexUtils {
         return null
     }
 
+    fun List<Pattern>.allMatches(list: List<String>): List<String> = list.filter { line -> any { it.matches(line) } }
+    fun List<Pattern>.anyMatches(list: List<String>?): Boolean = list?.any { line -> any { it.matches(line) } } ?: false
+
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
 
-    fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
+    fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { matches(it) } ?: false
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
+
+    fun Pattern.matchGroup(text: String, groupName: String): String? = matchMatcher(text) { groupOrNull(groupName) }
+
+    fun Pattern.matchGroups(text: String, vararg groups: String): List<String?>? =
+        matchMatcher(text) { groups.toList().map { groupOrNull(it) } }
+
+    fun Pattern.firstMatches(list: List<String>): String? = list.firstOrNull { matches(it) }
+    fun Pattern.allMatches(list: List<String>): List<String> = list.filter { matches(it) }
 
     /**
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
      */
-    fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
+    fun Matcher.groupOrNull(groupName: String): String? = runCatching { group(groupName) }.getOrNull()
 
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun List<String>.indexOfFirstMatch(pattern: Pattern): Int? {
-        for ((index, line) in this.withIndex()) {
+        for ((index, line) in withIndex()) {
             pattern.matcher(line).let { if (it.matches()) return index }
         }
         return null

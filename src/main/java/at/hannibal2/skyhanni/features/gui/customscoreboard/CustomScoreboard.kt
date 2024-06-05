@@ -6,6 +6,8 @@
 //  - improve hide coin difference to also work with bits, motes, etc
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
+//  - Change ScoreboardElementType to be able to be set with only a single string and have it
+//    by default be HorizontalAlignment.LEFT unless specified? not sure if possible
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
@@ -35,7 +37,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
+internal typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
 class CustomScoreboard {
 
@@ -134,7 +136,7 @@ class CustomScoreboard {
             }
 
             // Does not display this line
-            if (lines.any { it.first == "<hidden>" }) {
+            if (lines.any { it.first == HIDDEN }) {
                 continue
             }
 
