@@ -122,9 +122,9 @@ class CrystalHollowsWalls {
     }
 
     private fun drawNucleus(event: LorenzRenderWorldEvent) {
-        val (southEastCorner, southWestCorner, northEastCorner, northWestCorner) = nucleusBBInflate
+        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) = nucleusBBInflate
             .getCorners(nucleusBBInflate.minY)
-        val (southWestTopCorner, southEastTopCorner, northEastTopCorner, northWestTopCorner) = nucleusBBInflate
+        val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) = nucleusBBInflate
             .getCorners(nucleusBBInflate.maxY)
 
         RenderUtils.QuadDrawer.draw3D(event.partialTicks) {

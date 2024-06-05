@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -30,7 +31,6 @@ import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
@@ -116,7 +116,7 @@ class HypixelData {
         var locrawData: JsonObject? = null
         private var locraw: MutableMap<String, String> = listOf(
             "server", "gametype", "lobbyname", "lobbytype", "mode", "map"
-        ).associate { it to "" }.toMutableMap()
+        ).associateWith { "" }.toMutableMap()
 
         val server get() = locraw["server"] ?: ""
         val gameType get() = locraw["gametype"] ?: ""
@@ -236,7 +236,7 @@ class HypixelData {
     }
 
     @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    fun onDisconnect(event: ClientDisconnectEvent) {
         hypixelLive = false
         hypixelAlpha = false
         skyBlock = false
