@@ -615,5 +615,5 @@ public class ProfileSpecificStorage {
     public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
 
     @Expose
-    public UpgradeReminder.CommunityShopUpgrade communityShopUpgrade = null;
+    public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 }

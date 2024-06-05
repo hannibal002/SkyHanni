@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -17,12 +18,16 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonElement
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,7 +44,7 @@ object UpgradeReminder {
     )
     private val upgradeDurationPattern by patternGroup.pattern(
         "duration",
-        "§8Duration: (?<duration>\\d{1,3})d"
+        "§8Duration: (?<duration>.+)"
     )
     private val upgradeStartedPattern by patternGroup.pattern(
         "started",
@@ -55,15 +60,15 @@ object UpgradeReminder {
     )
 
     private var currentProfileUpgrade: CommunityShopUpgrade?
-        get() = ProfileStorageData.profileSpecific?.communityShopUpgrade
+        get() = ProfileStorageData.profileSpecific?.communityShopProfileUpgrade
         set(value) {
-            ProfileStorageData.profileSpecific?.communityShopUpgrade = value
+            ProfileStorageData.profileSpecific?.communityShopProfileUpgrade = value
         }
 
     private var currentAccountUpgrade: CommunityShopUpgrade?
-        get() = ProfileStorageData.playerSpecific?.communityShopUpgrade
+        get() = ProfileStorageData.playerSpecific?.communityShopAccountUpgrade
         set(value) {
-            ProfileStorageData.playerSpecific?.communityShopUpgrade = value
+            ProfileStorageData.playerSpecific?.communityShopAccountUpgrade = value
         }
 
     private var inInventory = false
@@ -102,7 +107,7 @@ object UpgradeReminder {
         if (!inInventory) return
         val item = event.item ?: return
         clickedUpgradeType = UpgradeType.fromItem(item) ?: return
-        clickedUpgrade = CommunityShopUpgrade.fromItem(item)
+        clickedUpgrade = CommunityShopUpgrade.fromItem(item) ?: return
     }
 
     @SubscribeEvent
@@ -134,16 +139,20 @@ object UpgradeReminder {
     }
 
     @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        val playerStorage = ProfileStorageData.playerSpecific ?: return
-        val name = playerStorage.currentAccountUpgrade ?: return
-        val completionTime = SimpleTimeMark(playerStorage.nextAccountUpgradeCompletionTime)
-        playerStorage.communityShopUpgrade = CommunityShopUpgrade(name, completionTime)
-        playerStorage.currentAccountUpgrade = null
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(48,
+            "#player.currentAccountUpgrade",
+            "#player.communityShopAccountUpgrade.name"
+        )
+
+        event.move(48,
+            "#player.nextAccountUpgradeCompletionTime",
+            "#player.communityShopAccountUpgrade.completionTime"
+        )
     }
 
     class CommunityShopUpgrade(
-        @Expose val name: String,
+        @Expose val name: String?,
         @Expose var completionTime: SimpleTimeMark = SimpleTimeMark.farFuture()
     ) {
         private var duration: Duration = Duration.ZERO
@@ -153,7 +162,7 @@ object UpgradeReminder {
         }
 
         fun sendReminderIfClaimable() {
-            if (this.completionTime.isInFuture()) return
+            if (this.name == null || this.completionTime.isInFuture()) return
             ChatUtils.clickableChat(
                 "The §a$name §eupgrade has completed! §c(Click to disable these reminders)", onClick = {
                     disable()
@@ -162,12 +171,14 @@ object UpgradeReminder {
         }
 
         companion object {
-            fun fromItem(item: ItemStack): CommunityShopUpgrade {
+            fun fromItem(item: ItemStack): CommunityShopUpgrade? {
                 val name = item.displayName
                 val lore = item.getLore()
                 val upgrade = CommunityShopUpgrade(name)
                 upgrade.duration = lore.matchFirst(upgradeDurationPattern) {
-                    group("duration").toInt().days
+                    val durationStr = group("duration")
+                    if (durationStr == "Instant!") return null
+                    TimeUtils.getDuration(durationStr)
                 } ?: Duration.ZERO
                 return upgrade
             }
@@ -185,7 +196,7 @@ object UpgradeReminder {
                 return when {
                     accountUpgradePattern.anyMatches(lore) -> ACCOUNT
                     profileUpgradePattern.anyMatches(lore) -> PROFILE
-                    else -> return null
+                    else -> null
                 }
             }
         }

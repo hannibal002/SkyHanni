@@ -33,7 +33,7 @@ public class PlayerSpecificStorage {
     public long nextAccountUpgradeCompletionTime = -1L;
 
     @Expose
-    public UpgradeReminder.CommunityShopUpgrade communityShopUpgrade = null;
+    public UpgradeReminder.CommunityShopUpgrade communityShopAccountUpgrade = null;
 
     @Expose
     public List<String> guildMembers = new ArrayList<>();
