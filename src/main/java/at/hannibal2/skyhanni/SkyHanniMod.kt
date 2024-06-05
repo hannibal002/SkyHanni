@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.api.DataWatcherAPI
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -613,6 +614,8 @@ class SkyHanniMod {
         loadModule(ParkourWaypointSaver())
         loadModule(TestShowSlotNumber())
         loadModule(MobDebug())
+
+        SkyHanniEvents.init(modules)
 
         Commands.init()
 
