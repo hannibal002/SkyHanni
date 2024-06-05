@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardReader
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardTips
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
-import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.features.chat.ChatFilter
 import at.hannibal2.skyhanni.features.chat.CompactBestiaryChatMessage
 import at.hannibal2.skyhanni.features.chat.CompactSplashPotionMessage
@@ -526,7 +525,6 @@ class SkyHanniMod {
         loadModule(ShowFishingItemName())
         loadModule(SlayerItemsOnGround())
         loadModule(RestorePieceOfWizardPortalLore())
-        loadModule(ArachneChatMessageHider())
         loadModule(ShowItemUuid())
         loadModule(SlayerRngMeterDisplay())
         loadModule(RiftTimer())
