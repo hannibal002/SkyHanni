@@ -99,7 +99,7 @@ class ParkourHelper(
                     val from = locations[shortCut.from].offsetCenter()
                     val to = locations[shortCut.to].offsetCenter()
                     event.draw3DLine_nea(from, to, Color.RED, 3, false)
-                    val textLocation = from.add(to.subtract(from).normalize())
+                    val textLocation = from + (to - from).normalize()
                     event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
 
                     val aabb = axisAlignedBB(locations[shortCut.to])
@@ -141,10 +141,10 @@ class ParkourHelper(
         if (LocationUtils.playerLocation().distance(nextPosition) > currentPosition.distance(nextPosition)) return null
 
         val factor = LocationUtils.playerLocation().distance(currentPosition) / currentPosition.distance(nextPosition)
-        val solpeLocation = lookAheadStart.slope(lookAheadEnd, factor)
+        val slopeLocation = lookAheadStart.slope(lookAheadEnd, factor)
         return Pair(
             IndexedValue(current + lookAhead - 1, lookAheadStart),
-            IndexedValue(current + lookAhead, solpeLocation)
+            IndexedValue(current + lookAhead, slopeLocation)
         )
     }
 

@@ -17,7 +17,7 @@ import java.util.List;
 public class MixinItemStack implements ItemStackCachedData {
 
     @Unique
-    public CachedItemData skyhanni_cachedData = new CachedItemData();
+    public CachedItemData skyhanni_cachedData = new CachedItemData((Void) null);
 
     public CachedItemData getSkyhanni_cachedData() {
         return skyhanni_cachedData;
@@ -25,6 +25,7 @@ public class MixinItemStack implements ItemStackCachedData {
 
     @Inject(method = "getTooltip", at = @At("RETURN"))
     public void getTooltip(EntityPlayer playerIn, boolean advanced, CallbackInfoReturnable<List<String>> ci) {
-        ToolTipData.INSTANCE.onTooltip(ci.getReturnValue());
+        ItemStack stack = (ItemStack) (Object) this;
+        ToolTipData.onHover(stack, ci.getReturnValue());
     }
 }

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -197,12 +197,12 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
-        ContributorManager.getTabListSuffix(data.name)?.let {
+        ContributorManager.getSuffix(data.name)?.let {
             suffix += " $it"
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
-            suffix += data.faction.icon
+            suffix += data.faction.icon ?: ""
         }
 
         return "$level $playerName ${suffix.trim()}"
@@ -210,14 +210,8 @@ object AdvancedPlayerList {
 
     private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
-    private fun getRandomOrder(name: String): Int {
-        val saved = randomOrderCache.getOrNull(name)
-        if (saved != null) {
-            return saved
-        }
-        val r = (Random.nextDouble() * 500).toInt()
-        randomOrderCache.put(name, r)
-        return r
+    private fun getRandomOrder(name: String) = randomOrderCache.getOrPut(name) {
+        (Random.nextDouble() * 500).toInt()
     }
 
     private fun getSocialIcon(name: String) = when {
@@ -240,10 +234,10 @@ object AdvancedPlayerList {
         var faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE
     }
 
-    enum class CrimsonIsleFaction(val icon: String) {
+    enum class CrimsonIsleFaction(val icon: String?) {
         BARBARIAN(" §c⚒"),
         MAGE(" §5ቾ"),
-        NONE("")
+        NONE(null)
     }
 
     enum class SocialIcon(val icon: () -> String, val score: Int) {

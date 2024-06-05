@@ -2,16 +2,40 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import java.util.Collections
+import java.util.Queue
 import java.util.WeakHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.math.ceil
 
 object CollectionUtils {
 
-    fun <E> ConcurrentLinkedQueue<E>.drainTo(list: MutableCollection<E>) {
+    inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
+        while (true)
+            action(this.poll() ?: break)
+        return this
+    }
+
+    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
+        for (i in 1..amount)
+            this.poll() ?: break
+        return this
+    }
+
+    inline fun <reified E, reified K, reified L : MutableCollection<K>>
+        Queue<E>.drainTo(list: L, action: (E) -> K): L {
+        while (true)
+            list.add(action(this.poll() ?: break))
+        return list
+    }
+
+    inline fun <reified E, reified L : MutableCollection<E>>
+        Queue<E>.drainTo(list: L): L {
         while (true)
             list.add(this.poll() ?: break)
+        return list
     }
 
     // Let garbage collector handle the removal of entries in this list
@@ -27,7 +51,7 @@ object CollectionUtils {
 
     // Taken and modified from Skytils
     @JvmStatic
-    fun <T> T.equalsOneOf(vararg other: T): Boolean {
+    fun <T> T?.equalsOneOf(vararg other: T): Boolean {
         for (obj in other) {
             if (this == obj) return true
         }
@@ -127,8 +151,15 @@ object CollectionUtils {
         return this
     }
 
+    operator fun IntRange.contains(range: IntRange): Boolean =
+        range.first in this && range.last in this
+
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
+    }
+
+    fun MutableList<List<Renderable>>.addSingleString(text: String) {
+        add(Collections.singletonList(Renderable.string(text)))
     }
 
     fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {
@@ -141,13 +172,6 @@ object CollectionUtils {
 
     fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
         return toList().sorted().reversed().toMap()
-    }
-
-    inline fun <reified T> ConcurrentLinkedQueue<T>.drainForEach(action: (T) -> Unit) {
-        while (true) {
-            val value = this.poll() ?: break
-            action(value)
-        }
     }
 
     fun <T> Sequence<T>.takeWhileInclusive(predicate: (T) -> Boolean) = sequence {
@@ -185,8 +209,16 @@ object CollectionUtils {
     }
 
     // TODO add internal name support, and caching
-    fun MutableList<Renderable>.addItemStack(itemStack: ItemStack) {
-        add(Renderable.itemStack(itemStack))
+    fun MutableList<Renderable>.addItemStack(
+        itemStack: ItemStack,
+        highlight: Boolean = false,
+        scale: Double = NEUItems.itemFontSize,
+    ) {
+        if (highlight) {
+            // Hack to add enchant glint, like Hypixel does it
+            itemStack.addEnchantment(Enchantment.protection, 0)
+        }
+        add(Renderable.itemStack(itemStack, scale = scale))
     }
 
     fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
@@ -247,5 +279,81 @@ object CollectionUtils {
             }
             addString("§a]")
         }))
+    }
+
+    fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
+        if (this.isEmpty()) return xSpace
+        val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
+        val xLength = off.size - 1
+        val emptySpace = xSpace - off.last()
+        if (emptySpace < 0) {
+            //    throw IllegalArgumentException("Not enough space for content")
+        }
+        return emptySpace / (xLength - 1)
+    }
+
+    fun Collection<Collection<Renderable>>.tableStretchYPadding(ySpace: Int): Int {
+        if (this.isEmpty()) return ySpace
+        val off = RenderableUtils.calculateTableYOffsets(this as List<List<Renderable?>>, 0)
+        val yLength = off.size - 1
+        val emptySpace = ySpace - off.last()
+        if (emptySpace < 0) {
+            //    throw IllegalArgumentException("Not enough space for content")
+        }
+        return emptySpace / (yLength - 1)
+    }
+
+    /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
+    fun <T> Collection<T>.split(subs: Int = 2): List<List<T>> {
+        if (this.isEmpty()) return listOf(emptyList())
+        val list = this.chunked(ceil(this.size.toDouble() / subs.toDouble()).toInt()).toMutableList()
+        while (list.size < subs) {
+            list.add(emptyList())
+        }
+        return list
+    }
+
+    inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
+        val destination = LinkedHashMap<R, V>()
+        for (element in this) {
+            val newKey = transform(element)
+            if (newKey != null) {
+                destination[newKey] = element.value
+            }
+        }
+        return destination
+    }
+
+    inline fun <T, C : Number, D : Number> Iterable<T>.sumOfPair(selector: (T) -> Pair<C, D>): Pair<Double, Double> {
+        var sum = Pair(0.0, 0.0)
+        for (element in this) {
+            val add = selector(element)
+            sum = sum.first + add.first.toDouble() to sum.second + add.second.toDouble()
+        }
+        return sum
+    }
+
+    inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {
+        val iterator = iterator()
+        if (!iterator.hasNext()) return emptyList()
+        var one = iterator.next()
+        if (!iterator.hasNext()) return emptyList()
+        var two = iterator.next()
+        val result = mutableListOf<R>()
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            result.add(transform(one, two, next))
+            one = two
+            two = next
+        }
+        return result
+    }
+
+    fun <T> Iterable<T>.zipWithNext3(): List<Triple<T, T, T>> {
+        return zipWithNext3 { a, b, c -> Triple(a, b, c) }
+    }
+
+    fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
+        return filterKeys { it != null } as Map<K, V>
     }
 }

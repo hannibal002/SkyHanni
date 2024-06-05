@@ -40,10 +40,10 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -517,11 +517,12 @@ object ComposterOverlay {
         }
 
         HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
-        if (itemsNeeded > havingInInventory - havingInSacks) {
+        val havingInTotal = havingInInventory + havingInSacks
+        if (itemsNeeded >= havingInTotal) {
             if (LorenzUtils.noTradeMode) {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
-                ChatUtils.clickableChat(
+                ChatUtils.clickableChat( // TODO Add this as a separate feature, and then don't send any msg if the feature is disabled
                     "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     onClick = {
                         HypixelCommands.bazaar(itemName.removeColor())

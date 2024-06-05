@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -25,6 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
 
+@SkyHanniModule
 object ChatManager {
 
     private val loggerAll = LorenzLogger("chat/all")
@@ -152,9 +155,7 @@ object ChatManager {
         // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
         if (chatEvent.chatLineId != 0) {
             event.isCanceled = true
-            Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(
-                event.message, chatEvent.chatLineId
-            )
+            event.message.send(chatEvent.chatLineId)
         }
     }
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -121,15 +122,10 @@ class CrystalHollowsWalls {
     }
 
     private fun drawNucleus(event: LorenzRenderWorldEvent) {
-        val southEastCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.minZ)
-        val southWestCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, nucleusBBInflate.maxZ)
-        val northEastCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.minZ)
-        val northWestCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, nucleusBBInflate.maxZ)
-
-        val southWestTopCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ)
-        val southEastTopCorner = LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.maxY, nucleusBBInflate.minZ)
-        val northEastTopCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.minZ)
-        val northWestTopCorner = LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.maxY, nucleusBBInflate.maxZ)
+        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) = nucleusBBInflate
+            .getCorners(nucleusBBInflate.minY)
+        val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) = nucleusBBInflate
+            .getCorners(nucleusBBInflate.maxY)
 
         RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
             draw(
@@ -193,7 +189,7 @@ class CrystalHollowsWalls {
         isMinXEsleMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color1: Color,
-        color2: Color
+        color2: Color,
     ) {
         val nucleusX = if (isMinXEsleMaxX) nucleusBBExpand.minX else nucleusBBExpand.maxX
         val middleX = if (isMinXEsleMaxX) middleX.shiftNX() else middleX.shiftPX()

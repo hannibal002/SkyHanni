@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -53,8 +53,8 @@ object EnigmaSoulWaypoints {
         if (!isEnabled()) return
 
         if (inventoryUnfound.isEmpty()) return
-        if (event.inventory is ContainerLocalMenu && inInventory && event.slotNumber == 31) {
-            event.replaceWith(item)
+        if (event.inventory is ContainerLocalMenu && inInventory && event.slot == 31) {
+            event.replace(item)
         }
     }
 
@@ -98,13 +98,14 @@ object EnigmaSoulWaypoints {
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
             event.makePickblock()
-            if (soulLocations.contains(split.last())) {
-                if (!trackedSouls.contains(split.last())) {
-                    ChatUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
-                    trackedSouls.add(split.last())
+            val name = split.last()
+            if (soulLocations.contains(name)) {
+                if (!trackedSouls.contains(name)) {
+                    ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
+                    trackedSouls.add(name)
                 } else {
-                    trackedSouls.remove(split.last())
-                    ChatUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
+                    trackedSouls.remove(name)
+                    ChatUtils.chat("§5No longer tracking the $name Enigma Soul!", prefixColor = "§5")
                 }
             }
         }
@@ -136,7 +137,7 @@ object EnigmaSoulWaypoints {
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(y = 1), "§5$soul Soul", 1.5)
+                event.drawDynamicText(it.add(y = 1), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
             }
         }
     }

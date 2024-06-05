@@ -27,7 +27,7 @@ object ErrorManager {
 
     private val replace = mapOf(
         "at.hannibal2.skyhanni" to "SH",
-        "io.mouberry,notenoughupdates" to "NEU",
+        "io.moulberry.notenoughupdates" to "NEU",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
     )
@@ -58,7 +58,9 @@ object ErrorManager {
 
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message)
-        logErrorWithData(exception, message, extraData = extraData)
+        println("silent SkyHanni error:")
+        println("message: '$message'")
+        println("extraData: \n${buildExtraDataString(extraData)}")
         throw exception
     }
 
@@ -118,7 +120,7 @@ object ErrorManager {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
                 throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
             } else message to 0
-            if (cache.contains(pair)) return
+            if (pair in cache) return
             cache.add(pair)
         }
 

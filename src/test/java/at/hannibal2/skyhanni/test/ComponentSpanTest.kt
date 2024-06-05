@@ -29,6 +29,19 @@ class ComponentSpanTest {
     }
 
     @Test
+    fun testRemovePrefix() {
+        val component = text("12345") {
+            appendSibling(text("12345"))
+            appendSibling(text("12345§r"))
+        }.intoSpan()
+        val prefixRemoved = component.removePrefix("123")
+        require(prefixRemoved.getText() == "451234512345§r")
+        require(component.stripHypixelMessage().getText() == "123451234512345")
+        require(component.stripHypixelMessage().slice().getText() == "123451234512345")
+        require(component.slice(0, 0).slice(0, 0).getText() == "")
+    }
+
+    @Test
     fun testRegex() {
         val component = text("12345") {
             appendSibling(text("abcdef") {
@@ -37,16 +50,18 @@ class ComponentSpanTest {
             appendSibling(text("12345"))
         }
         Pattern.compile("[0-9]*(?<middle>[a-z]+)[0-9]*").matchStyledMatcher(component) {
-            require(group("middle")?.sampleStyleAtStart()?.color == EnumChatFormatting.RED)
+            require(groupOrThrow("middle")?.sampleStyleAtStart()?.color == EnumChatFormatting.RED)
         }
         val middlePartExtracted =
             Pattern.compile("[0-9]*(?<middle>[0-9][a-z]+[0-9])[0-9]*").matchStyledMatcher(component) {
-                require(group("middle")?.sampleComponents()?.size == 3)
-                require(group("middle")?.sampleStyles()?.find { it.color != null }?.color == EnumChatFormatting.RED)
-                group("middle")
+                require(groupOrThrow("middle")?.sampleComponents()?.size == 3)
+                require(
+                    groupOrThrow("middle")?.sampleStyles()?.find { it.color != null }?.color == EnumChatFormatting.RED
+                )
+                groupOrThrow("middle")
             }!!
         Pattern.compile("(?<whole>c)").findStyledMatcher(middlePartExtracted) {
-            require(group("whole")?.sampleStyleAtStart()?.color == EnumChatFormatting.RED)
+            require(groupOrThrow("whole")?.sampleStyleAtStart()?.color == EnumChatFormatting.RED)
         }
     }
 

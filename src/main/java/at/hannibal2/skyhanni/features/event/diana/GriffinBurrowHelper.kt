@@ -14,10 +14,11 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -35,6 +36,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -45,11 +47,26 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
+    private val allowedBlocksAboveGround =
+        listOf(
+            Blocks.air,
+            Blocks.leaves,
+            Blocks.leaves2,
+            Blocks.tallgrass,
+            Blocks.double_plant,
+            Blocks.red_flower,
+            Blocks.yellow_flower,
+            Blocks.spruce_fence
+        )
+
     var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
     var lastTitleSentTime = SimpleTimeMark.farPast()
     private var shouldFocusOnInquis = false
+
+    private var testList = listOf<LorenzVec>()
+    private var testGriffinSpots = false
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
@@ -71,11 +88,28 @@ object GriffinBurrowHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
-
         update()
+        loadTestGriffinSpots()
+    }
+
+    fun testGriffinSpots() {
+        testGriffinSpots = !testGriffinSpots
+        val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
+        ChatUtils.chat("Test Griffin Spots $state§e.")
+    }
+
+    private fun loadTestGriffinSpots() {
+        if (!testGriffinSpots) return
+        val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
+        val list = mutableListOf<LorenzVec>()
+        for (x in -5 until 5) {
+            for (z in -5 until 5) {
+                list.add(findBlock(center.add(x, 0, z)))
+            }
+        }
+        testList = list
     }
 
     fun update() {
@@ -166,7 +200,9 @@ object GriffinBurrowHelper {
         GriffinBurrowParticleFinder.reset()
 
         BurrowWarpHelper.currentWarp = null
-        update()
+        if (isEnabled()) {
+            update()
+        }
     }
 
     @SubscribeEvent
@@ -175,31 +211,57 @@ object GriffinBurrowHelper {
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
-        var gY = 131.0
+        if (!point.isInLoadedChunk()) {
+            return point.copy(y = LocationUtils.playerLocation().y)
+        }
+        findGround(point)?.let {
+            return it
+        }
 
-        var searchGrass = true
-        while ((if (searchGrass) LorenzVec(point.x, gY, point.z).getBlockAt() != Blocks.grass else LorenzVec(
-                point.x,
-                gY,
-                point.z
-            ).getBlockAt() == Blocks.air)
-        ) {
+        return findBlockBelowAir(point)
+    }
+
+    private fun findGround(point: LorenzVec): LorenzVec? {
+        fun isValidGround(y: Double): Boolean {
+            val isGround = point.copy(y = y).getBlockAt() == Blocks.grass
+            val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
+            return isGround && isValidBlockAbove
+        }
+
+        var gY = 140.0
+        while (!isValidGround(gY)) {
             gY--
-            if (gY < 70) {
-                if (!searchGrass) {
-                    break
-                } else {
-                    searchGrass = false
-                    gY = 131.0
-                }
+            if (gY < 65) {
+                // no ground detected, find the lowest block below air
+                return null
             }
         }
-        return LorenzVec(point.x, gY, point.z)
+        return point.copy(y = gY)
+    }
+
+    private fun findBlockBelowAir(point: LorenzVec): LorenzVec {
+        val start = 65.0
+        var gY = start
+        while (point.copy(y = gY).getBlockAt() != Blocks.air) {
+            gY++
+            if (gY > 140) {
+                // no blocks at this spot, assuming outside of island
+                return point.copy(y = LocationUtils.playerLocation().y)
+            }
+        }
+
+        if (gY == start) {
+            return point.copy(y = LocationUtils.playerLocation().y)
+        }
+        return point.copy(y = gY - 1)
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
+
+        showTestLocations(event)
+
         showWarpSuggestions()
 
         val playerLocation = LocationUtils.playerLocation()
@@ -276,6 +338,13 @@ object GriffinBurrowHelper {
                     event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
+        }
+    }
+
+    private fun showTestLocations(event: LorenzRenderWorldEvent) {
+        if (!testGriffinSpots) return
+        for (location in testList) {
+            event.drawColor(location, LorenzColor.WHITE)
         }
     }
 

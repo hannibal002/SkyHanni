@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -16,18 +17,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object AllBurrowsList {
     private var list = listOf<LorenzVec>()
     private val config get() = SkyHanniMod.feature.event.diana.allBurrowsList
-    private val burrowLocations get() = SkyHanniMod.feature.storage?.foundDianaBurrowLocations
+    private var burrowLocations
+        get() = SkyHanniMod.feature.storage?.foundDianaBurrowLocations
+        set(value) {
+            SkyHanniMod.feature.storage?.foundDianaBurrowLocations = value
+        }
 
     @SubscribeEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         if (!isEnabled()) return
-        burrowLocations?.add(event.burrowLocation)
+        burrowLocations = burrowLocations?.editCopy {
+            add(event.burrowLocation)
+        }
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!event.repeatSeconds(1)) return
         val burrowLocations = burrowLocations ?: return
 
         val range = 5..70
@@ -52,15 +58,20 @@ object AllBurrowsList {
 
             var new = 0
             var duplicate = 0
+            val newEntries = mutableListOf<LorenzVec>()
             for (raw in text.split(";")) {
                 val location = LorenzVec.decodeFromString(raw)
                 if (location !in burrowLocations) {
-                    burrowLocations.add(location)
+                    newEntries.add(location)
                     new++
                 } else {
                     duplicate++
                 }
             }
+            AllBurrowsList.burrowLocations = burrowLocations.editCopy {
+                addAll(newEntries)
+            }
+
             ChatUtils.chat("Added $new new burrow locations, $duplicate are duplicate.")
         }
     }

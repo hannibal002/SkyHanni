@@ -37,9 +37,13 @@ object InventoryUtils {
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getItemsInOwnInventory() =
-        Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.filterNotNull() ?: emptyList()
+        getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
 
-    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
+
+    // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
+    fun getItemsInHotbar() =
+        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
 
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
@@ -75,7 +79,8 @@ object InventoryUtils {
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
         val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
-        return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
+        val slotUnderMouse = screen.slotUnderMouse ?: return false
+        return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
     }
 
     fun isItemInInventory(name: NEUInternalName) = name.getAmountInInventory() > 0

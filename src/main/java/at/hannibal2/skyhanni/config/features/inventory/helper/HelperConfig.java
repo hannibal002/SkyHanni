@@ -36,6 +36,12 @@ public class HelperConfig {
         public boolean showNumbers = false;
 
         @Expose
+        @ConfigOption(name = "Hide Tooltip", desc = "Hides the item tooltips inside the Harp.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean hideMelodyTooltip = false;
+
+        @Expose
         @ConfigOption(name = "Keybinds", desc = "")
         @Accordion
         public HarpConfigKeyBinds harpKeybinds = new HarpConfigKeyBinds();
@@ -45,4 +51,24 @@ public class HelperConfig {
     @ConfigOption(name = "Tia Relay Abiphone Network Maintenance", desc = "")
     @Accordion
     public TiaRelayConfig tiaRelay = new TiaRelayConfig();
+
+    @Expose
+    @ConfigOption(name = "Enchanting", desc = "")
+    @Accordion
+    public EnchantingConfig enchanting = new EnchantingConfig();
+
+    public static class EnchantingConfig {
+        @Expose
+        @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean superpairsClicksAlert = false;
+
+        @Expose
+        @ConfigOption(name = "ULTRA-RARE Book Alert", desc = "Sends a chat message, title and sound when you find an ULTRA-RARE book.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean ultraRareBookAlert = false;
+    }
+
 }
