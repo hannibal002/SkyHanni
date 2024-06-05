@@ -60,6 +60,5 @@ object FavoritePowerStone {
         }
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && storage != null && config.favoritePowerStone
+    private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null && config.favoritePowerStone
 }
