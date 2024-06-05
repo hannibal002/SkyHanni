@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -296,9 +297,7 @@ object Commands {
         registerCommand0(
             "shcropgoal",
             "Define a custom milestone goal for a crop.",
-            {
-                FarmingMilestoneCommand.setGoal(it.getOrNull(0), it.getOrNull(1))
-            },
+            { FarmingMilestoneCommand.setGoal(it) },
             FarmingMilestoneCommand::onComplete
         )
         registerCommand0(
@@ -372,17 +371,11 @@ object Commands {
             "Disables/enables the rendering of all skyhanni guis."
         ) { SkyHanniDebugsAndTests.toggleRender() }
         registerCommand(
-            "shcarrot",
-            "Toggles receiving the 12 fortune from carrots"
-        ) { CaptureFarmingGear.reverseCarrotFortune() }
-        registerCommand(
-            "shpumpkin",
-            "Toggles receiving the 12 fortune from pumpkins"
-        ) { CaptureFarmingGear.reversePumpkinFortune() }
-        registerCommand(
-            "shcocoabeans",
-            "Toggles receiving the 12 fortune from cocoa beans"
-        ) { CaptureFarmingGear.reverseCocoaBeansFortune() }
+            "shcarrolyn",
+            "Toggels if the specified crops effect is active from carrolyn"
+        ) {
+            CaptureFarmingGear.handelCarrolyn(it)
+        }
         registerCommand(
             "shrepostatus",
             "Shows the status of all the mods constants"
@@ -537,6 +530,10 @@ object Commands {
             "shaddfoundburrowlocationsfromclipboard",
             "Add all ever found burrow locations from clipboard"
         ) { AllBurrowsList.addFromClipboard() }
+        registerCommand(
+            "shtoggleegglocationdebug",
+            "Shows Hoppity egg locations with their internal API names and status."
+        ) { HoppityEggLocations.toggleDebug() }
     }
 
     private fun internalCommands() {

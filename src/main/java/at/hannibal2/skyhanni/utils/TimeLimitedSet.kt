@@ -13,6 +13,12 @@ class TimeLimitedSet<T : Any>(
         cache[element] = Unit
     }
 
+    fun addIfAbsent(element: T) {
+        if (!contains(element)) add(element)
+    }
+
+    fun remove(element: T) = cache.remove(element)
+
     operator fun contains(element: T): Boolean = cache.containsKey(element)
 
     fun clear() = cache.clear()

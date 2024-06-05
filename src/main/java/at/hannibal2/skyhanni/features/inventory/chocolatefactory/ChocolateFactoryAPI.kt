@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -71,6 +71,9 @@ object ChocolateFactoryAPI {
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
+    var specialRabbitTextures = listOf<String>()
+    var warningSound = SoundUtils.createSound("note.pling", 1f)
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
@@ -93,8 +96,6 @@ object ChocolateFactoryAPI {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
-        HoppityEggLocator.eggLocations = data.eggLocations
-
         rabbitSlots = data.rabbitSlots
         otherUpgradeSlots = data.otherUpgradeSlots
         noPickblockSlots = data.noPickblockSlots
@@ -110,6 +111,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        specialRabbitTextures = data.specialRabbits
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
