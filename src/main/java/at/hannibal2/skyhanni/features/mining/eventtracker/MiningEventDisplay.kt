@@ -27,7 +27,6 @@ object MiningEventDisplay {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(1)) return
         updateDisplay()
     }
 
