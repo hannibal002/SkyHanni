@@ -186,7 +186,6 @@ import at.hannibal2.skyhanni.features.mining.DeepCavernsGuide
 import at.hannibal2.skyhanni.features.mining.GoldenGoblinHighlight
 import at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs
 import at.hannibal2.skyhanni.features.mining.HotmFeatures
-import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.TunnelsMaps
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsNamesInCore
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalHollowsWalls
@@ -553,7 +552,6 @@ class SkyHanniMod {
         loadModule(RiftWiltedBerberisHelper())
         loadModule(RiftHorsezookaHider())
         loadModule(GriffinPetWarning())
-        loadModule(KingTalismanHelper())
         loadModule(CompactBestiaryChatMessage())
         loadModule(WatchdogHider())
         loadModule(AuctionHousePriceComparison())
