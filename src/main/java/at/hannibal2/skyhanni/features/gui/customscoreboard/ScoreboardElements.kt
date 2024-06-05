@@ -761,12 +761,12 @@ private fun getMayorDisplayPair() = buildList {
     }
 
     if (!mayorConfig.showExtraMayor) return@buildList
-    if (MayorAPI.jerryExtraMayor.first == null) return@buildList
+    val jerryExtraMayor = MayorAPI.jerryExtraMayor
+    val extraMayor = jerryExtraMayor.first ?: return@buildList
 
-    val extraMayorName =
-        MayorAPI.jerryExtraMayor.first?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: "<hidden>"
+    val extraMayorName = extraMayor.mayorName.let { MayorAPI.mayorNameWithColorCode(it) }
     val extraTimeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
-        "§7 (§6${MayorAPI.jerryExtraMayor.second.timeUntil().format(maxUnits = 2)}§7)"
+        "§7 (§6${jerryExtraMayor.second.timeUntil().format(maxUnits = 2)}§7)"
     } else {
         ""
     }

@@ -46,7 +46,7 @@ object MayorAPI {
         "foxy.extraevent",
         "Schedules an extra §.(?<event>.*) §.event during the year\\."
     )
-    private val electionOver by group.pattern(
+    private val electionOverPattern by group.pattern(
         "election.over",
         "§eThe election room is now closed\\. Clerk Seraphine is doing a final count of the votes\\.\\.\\."
     )
@@ -58,6 +58,7 @@ object MayorAPI {
         "jerry.head",
         "§dMayor Jerry"
     )
+    // TODO add regex tests
     private val perkpocalypsePerksPattern by group.pattern(
         "perkpocalypse",
         "§9Perkpocalypse Perks:"
@@ -115,7 +116,7 @@ object MayorAPI {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        if (electionOver.matches(event.message)) {
+        if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
             currentMayor = Mayor.UNKNOWN
         }
