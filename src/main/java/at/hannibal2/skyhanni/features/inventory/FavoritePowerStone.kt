@@ -61,10 +61,9 @@ object FavoritePowerStone {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled() || !inInventory) return
 
-        highlightedSlots = setOf()
-        event.inventoryItems.forEach { (slot, item) ->
-            if (item.displayName in MaxwellAPI.favoritePowers) highlightedSlots += slot
-        }
+        highlightedSlots = event.inventoryItems
+            .filter { (_, item) -> item.displayName.removeColor() in MaxwellAPI.favoritePowers }
+            .keys
     }
 
     @SubscribeEvent
