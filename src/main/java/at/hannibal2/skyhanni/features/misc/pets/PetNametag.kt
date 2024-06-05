@@ -38,13 +38,15 @@ object PetNametag {
             val pet = group("pet")
             val skin = groupOrNull("skin") ?: ""
 
-            var text = ""
+            val hideLevel = config.hidePetLevel
+            val hideMaxLevel = config.hideMaxPetLevel && (lvl == 100 || lvl == 200)
 
-            if (!(config.hidePetLevel || (config.hideMaxPetLevel && (lvl == 100 || lvl == 200)))) {
-                text += start
+            val text = buildString {
+                if (!hideLevel && !hideMaxLevel) {
+                    append(start)
+                }
+                append(rarity + pet + skin)
             }
-
-            text += rarity + pet + skin
 
             event.chatComponent = text.asComponent()
         }
