@@ -43,5 +43,5 @@ class CrystalHollowsProfessorRobot {
         GetFromSackAPI.getFromChatMessageSackItems(PrimitiveItemStack(itemName.asInternalName(), 1))
     }
 
-    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && SkyHanniMod.feature.mining.professorRobotHelper;
+    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && SkyHanniMod.feature.mining.professorRobotHelper
 }
