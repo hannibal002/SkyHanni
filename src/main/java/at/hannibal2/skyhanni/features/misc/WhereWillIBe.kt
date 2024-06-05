@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -12,6 +13,7 @@ import java.util.Date
 import kotlin.math.pow
 import kotlin.random.Random
 
+@SkyHanniModule
 object WhereWillIBe {
     private val nonIslands = listOf(
         IslandType.NONE, IslandType.UNKNOWN, IslandType.MINESHAFT
