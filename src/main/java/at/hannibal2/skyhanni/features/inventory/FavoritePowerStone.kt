@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MaxwellAPI
-import at.hannibal2.skyhanni.data.MaxwellAPI.favoritePowers
-import at.hannibal2.skyhanni.data.MaxwellAPI.isThaumaturgyInventory
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -28,7 +26,7 @@ object FavoritePowerStone {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (!isThaumaturgyInventory(InventoryUtils.openInventoryName())) return
+        if (!MaxwellAPI.isThaumaturgyInventory(InventoryUtils.openInventoryName())) return
 
         highlightedSlots.forEach { event.gui.inventorySlots.inventorySlots[it] highlight LorenzColor.AQUA }
     }
@@ -36,16 +34,16 @@ object FavoritePowerStone {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !KeyboardManager.isShiftKeyDown()) return
-        if (!isThaumaturgyInventory(InventoryUtils.openInventoryName())) return
+        if (!MaxwellAPI.isThaumaturgyInventory(InventoryUtils.openInventoryName())) return
 
         val displayName = event.item?.name?.removeColor()?.trim() ?: return
         val power = MaxwellAPI.getPowerByNameOrNull(displayName) ?: return
 
         if (power in favoritePowers) {
-            favoritePowers -= power
+            MaxwellAPI.favoritePowers -= power
             highlightedSlots -= event.slotId
         } else {
-            favoritePowers += power
+            MaxwellAPI.favoritePowers += power
             highlightedSlots += event.slotId
         }
 
@@ -55,10 +53,10 @@ object FavoritePowerStone {
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
-        if (!isThaumaturgyInventory(event.inventoryName)) return
+        if (!MaxwellAPI.isThaumaturgyInventory(event.inventoryName)) return
 
         event.inventoryItems.forEach { (slot, item) ->
-            if (item.displayName in favoritePowers) highlightedSlots += slot
+            if (item.displayName in MaxwellAPI.favoritePowers) highlightedSlots += slot
         }
     }
 
