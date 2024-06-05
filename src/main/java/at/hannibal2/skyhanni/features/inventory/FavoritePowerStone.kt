@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.data.MaxwellAPI.favoritePowers
 import at.hannibal2.skyhanni.data.MaxwellAPI.isThaumaturgyInventory
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -23,20 +23,19 @@ object FavoritePowerStone {
     private val config get() = SkyHanniMod.feature.inventory
     private val storage get() = ProfileStorageData.profileSpecific
 
-    private var highlightedSlots = mutableSetOf<Int>()
+    private var highlightedSlots = setOf<Int>()
+    private var inInventory = false
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
-        if (!isThaumaturgyInventory(InventoryUtils.openInventoryName())) return
+        if (!isEnabled() || !inInventory) return
 
         highlightedSlots.forEach { event.gui.inventorySlots.inventorySlots[it] highlight LorenzColor.AQUA }
     }
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled() || !KeyboardManager.isShiftKeyDown()) return
-        if (!isThaumaturgyInventory(InventoryUtils.openInventoryName())) return
+        if (!isEnabled() || !KeyboardManager.isShiftKeyDown() || !inInventory) return
 
         val displayName = event.item?.name?.removeColor()?.trim() ?: return
         val power = MaxwellAPI.getPowerByNameOrNull(displayName) ?: return
@@ -53,13 +52,20 @@ object FavoritePowerStone {
     }
 
     @SubscribeEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (!isThaumaturgyInventory(event.inventoryName)) return
 
+        inInventory = true
+        highlightedSlots = setOf()
         event.inventoryItems.forEach { (slot, item) ->
             if (item.displayName in favoritePowers) highlightedSlots += slot
         }
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inInventory = false
     }
 
     private fun isEnabled() =
