@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.inventory.tiarelay
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -54,18 +54,16 @@ class TiaRelayHelper {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.soundHelper) return
 
-        if (event.repeatSeconds(1)) {
-            if (InventoryUtils.openInventoryName().contains("Network Relay")) {
-                inInventory = true
-            } else {
-                inInventory = false
-                sounds.clear()
-                resultDisplay.clear()
-            }
+        if (InventoryUtils.openInventoryName().contains("Network Relay")) {
+            inInventory = true
+        } else {
+            inInventory = false
+            sounds.clear()
+            resultDisplay.clear()
         }
     }
 
