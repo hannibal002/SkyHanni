@@ -121,13 +121,12 @@ object RareDropMessages {
             return
         }
         ChatUtils.editFirstMessage(
-            predicate = {
-                it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message)
-            },
-            component = {
-                it.formattedText.replace("Enchanted Book", internalName.itemName).asComponent()
-            }
+            component = { it.formattedText.replace("Enchanted Book", internalName.itemName).asComponent() },
+            "enchanted book",
+            predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) }
         )
+
+        ChatUtils.deleteFirstMessage("stash_filter") { it.message.isBlank() }
     }
 
     @SubscribeEvent

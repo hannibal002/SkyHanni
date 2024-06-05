@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ChatUtils.message
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,27 +23,26 @@ class CompactBestiaryChatMessage {
 
     private val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
 
+    private val BORDER = "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
 
         val titleMessage = "§f                                  §6§lBESTIARY"
-        val border = "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
 
         val message = event.message
 
-        if (message == border) {
-            lastBorder = event.chatComponent
-        }
         if (message == " ") {
             lastEmpty = event.chatComponent
         }
 
         if (message == titleMessage) {
             event.blockedReason = "bestiary"
-            ChatManager.retractMessage(lastBorder, "bestiary")
-            ChatManager.retractMessage(lastEmpty, "bestiary")
+            ChatUtils.deleteMessage("bestiary") {
+                it.message == titleMessage || it.message == BORDER
+            }
 
             lastBorder = null
             lastEmpty = null
@@ -63,7 +62,7 @@ class CompactBestiaryChatMessage {
                 blockedLines = 0
                 inBestiary = false
             }
-            if (message == border) {
+            if (message == BORDER) {
                 inBestiary = false
 
                 val list = bestiaryDescription.map { it.replace("§f", "").trim() }

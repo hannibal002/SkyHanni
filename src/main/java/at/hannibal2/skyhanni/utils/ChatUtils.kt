@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ChatManager.modifyChatLine
+import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
+import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
@@ -242,10 +243,23 @@ object ChatUtils {
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
     fun editFirstMessage(
         component: (IChatComponent) -> IChatComponent,
+        reason: String,
         predicate: (ChatLine) -> Boolean
     ) {
-        chatLines.modifyChatLine(component, predicate)
-        drawnChatLines.modifyChatLine(component, predicate)
+        chatLines.editChatLine(component, predicate, reason)
+        drawnChatLines.editChatLine(component, predicate)
+    }
+
+    /**
+     * Deletes a maximum of [amount] messages in chat that match the given [predicate].
+     */
+    fun deleteMessage(
+        reason: String,
+        amount: Int = 1,
+        predicate: (ChatLine) -> Boolean
+    ) {
+        chatLines.deleteChatLine(amount, reason, predicate)
+        drawnChatLines.deleteChatLine(amount, predicate = predicate)
     }
 
     private var lastMessageSent = SimpleTimeMark.farPast()

@@ -11,20 +11,16 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
-import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.relauncher.ReflectionHelper
-import java.lang.invoke.MethodHandles
 
 object ChatManager {
 
@@ -32,7 +28,6 @@ object ChatManager {
     private val loggerFiltered = LorenzLogger("chat/blocked")
     private val loggerAllowed = LorenzLogger("chat/allowed")
     private val loggerModified = LorenzLogger("chat/modified")
-    private val loggerEdited = LorenzLogger("chat/edited")
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
     private val messageHistory =
         object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
@@ -71,7 +66,7 @@ object ChatManager {
         val message: IChatComponent,
         var actionKind: ActionKind,
         var actionReason: String?,
-        val modified: IChatComponent?,
+        var modified: IChatComponent?,
         val hoverInfo: List<String> = listOf(),
         val hoverExtraInfo: List<String> = listOf(),
     )
@@ -173,31 +168,10 @@ object ChatManager {
         }
     }
 
-    private val chatLinesField by lazy {
-        MethodHandles.publicLookup().unreflectGetter(
-            ReflectionHelper.findField(GuiNewChat::class.java, "chatLines", "field_146252_h", "h")
-                .makeAccessible()
-        )
-    }
-
-    fun retractMessage(message: IChatComponent?, reason: String) {
-        if (message == null) return
-        val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
-
-        @Suppress("UNCHECKED_CAST")
-        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine?>? ?: return
-        if (!chatLines.removeIf { it?.chatComponent === message }) return
-        chatGUI.refreshChat()
-
-        val history = messageHistory[IdentityCharacteristics(message)] ?: return
-        history.actionKind = ActionKind.RETRACTED
-        history.actionReason = reason.uppercase()
-    }
-
-
-    fun MutableList<ChatLine>.modifyChatLine(
+    fun MutableList<ChatLine>.editChatLine(
         component: (IChatComponent) -> IChatComponent,
-        predicate: (ChatLine) -> Boolean
+        predicate: (ChatLine) -> Boolean,
+        reason: String? = null
     ) {
         indexOfFirst {
             predicate(it)
@@ -209,13 +183,39 @@ object ChatManager {
             val newComponent = component(chatLine.chatComponent)
 
             val key = IdentityCharacteristics(oldComponent)
-            loggerModified.log(" ")
-            loggerModified.log("[original] " + oldComponent.formattedText)
-            loggerModified.log("[modified] " + newComponent.formattedText)
-            messageHistory[key] =
-                MessageFilteringResult(oldComponent, ChatManager.ActionKind.EDITED, null, newComponent)
+
+            reason?.let { reason ->
+                messageHistory[key]?.let { history ->
+                    history.modified = newComponent
+                    history.actionKind = ActionKind.EDITED
+                    history.actionReason = reason.uppercase()
+                }
+            }
 
             this[it] = ChatLine(counter, newComponent, id)
+        }
+    }
+
+    fun MutableList<ChatLine>.deleteChatLine(
+        amount: Int,
+        reason: String? = null,
+        predicate: (ChatLine) -> Boolean,
+    ) {
+        val iterator = iterator()
+        var removed = 0
+        while (iterator.hasNext() && removed < amount) {
+            val chatLine = iterator.next()
+            if (predicate(chatLine)) {
+                iterator.remove()
+                removed++
+                val key = IdentityCharacteristics(chatLine.chatComponent)
+                reason?.let {
+                    messageHistory[key]?.let { history ->
+                        history.actionKind = ActionKind.RETRACTED
+                        history.actionReason = it.uppercase()
+                    }
+                }
+            }
         }
     }
 }
