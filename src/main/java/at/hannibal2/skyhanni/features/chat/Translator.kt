@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonArray
 import kotlinx.coroutines.launch
 import net.minecraft.event.ClickEvent
@@ -19,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 
-// TODO split into two classes: TranslatorCommand and GoogleTransaltor. only communicates via getTranslationFromEnglish and getTranslationToEnglish
+// TODO split into two classes: TranslatorCommand and GoogleTranslator. only communicates via getTranslationFromEnglish and getTranslationToEnglish
 class Translator {
 
     private val messageContentRegex = Regex(".*: (.*)")
@@ -31,6 +32,7 @@ class Translator {
         if (!isEnabled()) return
 
         val message = event.message
+        // TODO use PlayerAllChatEvent and other player chat events
         if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
@@ -41,18 +43,9 @@ class Translator {
     }
 
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
-        style.setChatClickEvent(
-            ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/shtranslate ${messageContentRegex.find(message)!!.groupValues[1]}"
-            )
-        )
-        style.setChatHoverEvent(
-            HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                ChatComponentText("§bClick to translate!")
-            )
-        )
+        val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
+        style.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shtranslate $text"))
+        style.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§bClick to translate!")))
         return style
     }
 
@@ -134,7 +127,7 @@ class Translator {
         }
 
         fun toEnglish(args: Array<String>) {
-            val message = args.joinToString(" ")
+            val message = args.joinToString(" ").removeColor()
 
             coroutineScope.launch {
                 val translation = getTranslationToEnglish(message)

@@ -7,7 +7,9 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class CustomScoreboardConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(
@@ -45,7 +47,12 @@ public class CustomScoreboardConfig {
     @Accordion
     public InformationFilteringConfig informationFiltering = new InformationFilteringConfig();
 
+    @Expose
+    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")
+    @ConfigEditorBoolean
+    public boolean unknownLinesWarning = true;
 
     @Expose
+    @ConfigLink(owner = CustomScoreboardConfig.class, field = "enabled")
     public Position position = new Position(10, 80, false, true);
 }

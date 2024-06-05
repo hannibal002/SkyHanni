@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -66,10 +66,10 @@ object VerminTracker {
         var count: MutableMap<VerminType, Int> = mutableMapOf()
     }
 
-    enum class VerminType(val vermin: String, val pattern: Pattern) {
-        SILVERFISH("§aSilverfish", silverfishPattern),
-        SPIDER("§aSpiders", spiderPattern),
-        FLY("§aFlies", flyPattern),
+    enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {
+        FLY(1, "§aFlies", flyPattern),
+        SPIDER(2, "§aSpiders", spiderPattern),
+        SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
     @SubscribeEvent
@@ -152,7 +152,7 @@ object VerminTracker {
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7Vermin Tracker:")
-        data.count.entries.sortedByDescending { it.value }.forEach { (vermin, amount) ->
+        data.count.entries.sortedBy { it.key.order }.forEach { (vermin, amount) ->
             val verminName = vermin.vermin
             addAsSingletonList(" §7- §e${amount.addSeparators()} $verminName")
         }
@@ -176,8 +176,8 @@ object VerminTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetvermintracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = RiftAPI.inRift() && config.enabled

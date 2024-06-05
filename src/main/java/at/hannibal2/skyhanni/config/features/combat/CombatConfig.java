@@ -20,6 +20,11 @@ public class CombatConfig {
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
+    @ConfigOption(name = "Quiver", desc = "")
+    @Accordion
+    public QuiverConfig quiverConfig = new QuiverConfig();
+
+    @Expose
     @ConfigOption(name = "Summonings", desc = "")
     @Accordion
     public SummoningsConfig summonings = new SummoningsConfig();
@@ -38,6 +43,16 @@ public class CombatConfig {
     @ConfigOption(name = "Ender Node Tracker", desc = "")
     @Accordion
     public EnderNodeConfig enderNodeTracker = new EnderNodeConfig();
+
+    @Expose
+    @ConfigOption(name = "Ferocity Display", desc = "")
+    @Accordion
+    public FerocityDisplayConfig ferocityDisplay = new FerocityDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Flare", desc = "")
+    @Accordion
+    public FlareConfig flare = new FlareConfig();
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")

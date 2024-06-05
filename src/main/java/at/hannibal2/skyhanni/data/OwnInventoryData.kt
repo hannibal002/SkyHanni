@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C0EPacketClickWindow
@@ -38,7 +38,7 @@ class OwnInventoryData {
     )
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onItemPickupReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val packet = event.packet
@@ -48,9 +48,10 @@ class OwnInventoryData {
         if (packet is S2FPacketSetSlot) {
             val windowId = packet.func_149175_c()
             if (windowId == 0) {
+                val slot = packet.func_149173_d()
                 val item = packet.func_149174_e() ?: return
                 DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item).postAndCatch()
+                    OwnInventoryItemUpdateEvent(item, slot).postAndCatch()
                 }
             }
         }

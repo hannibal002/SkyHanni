@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -46,7 +46,7 @@ class ShowMotesNpcSellPrice {
         if (inInventory) {
             config.inventoryValue.position.renderStringsAndItems(
                 display,
-                itemScale = 1.3,
+                itemScale = 0.7,
                 posLabel = "Inventory Motes Value"
             )
         }
@@ -146,7 +146,14 @@ class ShowMotesNpcSellPrice {
                     add("")
                     add("§6Total value: §d$price coins")
                 }
-                add(Renderable.hoverTips("§6${stack.displayName}: §b$price", tips, highlightsOnHoverSlots = index, stack = stack))
+                add(
+                    Renderable.hoverTips(
+                        "§6${stack.displayName}: §b$price",
+                        tips,
+                        highlightsOnHoverSlots = index,
+                        stack = stack
+                    )
+                )
             })
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()

@@ -15,26 +15,25 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.launchwrapper.Launch
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
-import java.util.Timer
-import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -51,14 +50,15 @@ object LorenzUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
-    val inDungeons get() = inSkyBlock && DungeonAPI.inDungeon()
+    @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
+    val inDungeons get() = DungeonAPI.inDungeon()
 
     /**
-     * Consider using IslandType.isInIsland() instead
+     * Consider using [IslandType.isInIsland] instead
      */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
-    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
+    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
@@ -85,20 +85,16 @@ object LorenzUtils {
             return result
         }
 
+    val debug: Boolean = onHypixel && SkyHanniMod.feature.dev.debug.enabled
+
     private var previousApril = false
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
+    // TODO move to string utils
+    @Deprecated("outdated", ReplaceWith("originalMessage.stripHypixelMessage()"))
     fun stripVanillaMessage(originalMessage: String): String {
-        var message = originalMessage
-
-        while (message.startsWith("§r")) {
-            message = message.substring(2)
-        }
-        while (message.endsWith("§r")) {
-            message = message.substring(0, message.length - 2)
-        }
-        return message
+        return originalMessage.stripHypixelMessage()
     }
 
     fun Double.round(decimals: Int): Double {
@@ -127,15 +123,11 @@ object LorenzUtils {
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
+    // TODO create extenstion function
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
-
-    @Deprecated("old code", ReplaceWith("d.round(round).addSeparators()"))
-    fun formatDouble(d: Double, round: Int = 1): String {
-        return d.round(round).addSeparators()
-    }
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
@@ -170,7 +162,13 @@ object LorenzUtils {
 
     fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    fun fillTable(data: List<DisplayTableEntry>, padding: Int = 1, itemScale: Double = 1.0): Renderable {
+    fun getPlayer(): EntityPlayerSP? = Minecraft.getMinecraft()?.thePlayer
+
+    fun fillTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NEUItems.itemFontSize,
+    ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 
         val outerList = mutableListOf<List<Renderable>>()
@@ -218,6 +216,7 @@ object LorenzUtils {
         }
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
         getName: (T) -> String,
@@ -227,6 +226,7 @@ object LorenzUtils {
         add(buildSelector<T>(prefix, getName, isCurrent, onChange))
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
@@ -249,6 +249,7 @@ object LorenzUtils {
         }
     }
 
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun MutableList<List<Any>>.addButton(
         prefix: String,
         getName: String,
@@ -306,14 +307,6 @@ object LorenzUtils {
 
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 
-    fun runDelayed(duration: Duration, runnable: () -> Unit) {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runnable()
-            }
-        }, duration.inWholeMilliseconds)
-    }
-
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
@@ -332,6 +325,8 @@ object LorenzUtils {
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
 
+    inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
+
     // TODO move to val by lazy
     fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
 
@@ -347,8 +342,10 @@ object LorenzUtils {
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
      */
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
     fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun inAdvancedMiningIsland() =
@@ -358,4 +355,13 @@ object LorenzUtils {
         || inAdvancedMiningIsland()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+
+    fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
+        val cornerOne = LorenzVec(minX, y, minZ)
+        val cornerTwo = LorenzVec(minX, y, maxZ)
+        val cornerThree = LorenzVec(maxX, y, maxZ)
+        val cornerFour = LorenzVec(maxX, y, minZ)
+
+        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
+    }
 }

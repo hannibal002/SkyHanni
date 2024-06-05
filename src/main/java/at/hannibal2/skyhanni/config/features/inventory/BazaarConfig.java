@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BazaarConfig {
@@ -27,10 +28,13 @@ public class BazaarConfig {
     public boolean bestSellMethod = false;
 
     @Expose
+    @ConfigLink(owner = BazaarConfig.class, field = "bestSellMethod")
     public Position bestSellMethodPos = new Position(394, 142, false, true);
 
     @Expose
-    @ConfigOption(name = "Cancelled Buy Order Clipboard", desc = "Saves missing items from cancelled buy orders to clipboard for faster re-entry.")
+    @ConfigOption(name = "Cancelled Buy Order Clipboard",
+        desc = "Sends missing items from cancelled buy orders in chat. " +
+        "Click on the message to quickly order the same item and amount again.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean cancelledBuyOrderClipboard = false;
@@ -48,6 +52,7 @@ public class BazaarConfig {
     public boolean maxPurseItems = false;
 
     @Expose
+    @ConfigLink(owner = BazaarConfig.class, field = "maxPurseItems")
     public Position maxPurseItemsPosition = new Position(346, 90, true, false);
 
     @Expose
@@ -57,5 +62,6 @@ public class BazaarConfig {
     public boolean craftMaterialsFromBazaar = false;
 
     @Expose
+    @ConfigLink(owner = BazaarConfig.class, field = "craftMaterialsFromBazaar")
     public Position craftMaterialsFromBazaarPosition = new Position(50, 50, true, false);
 }

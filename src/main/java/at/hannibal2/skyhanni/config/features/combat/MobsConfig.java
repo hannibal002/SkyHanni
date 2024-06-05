@@ -31,6 +31,12 @@ public class MobsConfig {
     public boolean zealotBruiserHighlighter = false;
 
     @Expose
+    @ConfigOption(name = "Zealot with Chest", desc = "Highlight Zealots holding a Chest in a different color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean chestZealotHighlighter = false;
+
+    @Expose
     @ConfigOption(
         name = "Special Zealots",
         desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End."
@@ -50,6 +56,12 @@ public class MobsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean arachneBossHighlighter = true;
+
+    @Expose
+    @ConfigOption(name = "Line to Arachne", desc = "Draw a line pointing to where Arachne is currently at.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean lineToArachne = false;
 
     @Expose
     @ConfigOption(

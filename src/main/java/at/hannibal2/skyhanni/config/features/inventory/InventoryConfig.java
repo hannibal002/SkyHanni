@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -25,19 +26,23 @@ import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.It
 public class InventoryConfig {
 
     @Expose
-    @Category(name = "Skyblock Guide", desc = "")
+    @Category(name = "Skyblock Guide", desc = "Helps finding stuff to do in SkyBlock.")
     public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
 
     @Expose
-    @Category(name = "Auction House", desc = "")
+    @Category(name = "Auction House", desc = "Be smart when buying or selling expensive items in the Auctions House.")
     public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
     @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
+    @Category(name = "Bazaar", desc = "Be smart when buying or selling many items in the Bazaar.")
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
-    @Category(name = "Helpers", desc = "Settings for Helpers")
+    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
+    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
+
+    @Expose
+    @Category(name = "Helpers", desc = "Some smaller Helper settings.")
     public HelperConfig helper = new HelperConfig();
 
     @Expose
@@ -45,7 +50,11 @@ public class InventoryConfig {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
-    @ConfigOption(name = "Not Clickable Items", desc = "")
+    @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
+    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
+
+    @Expose
+    @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
@@ -118,6 +127,7 @@ public class InventoryConfig {
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
+        DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         ;
@@ -221,9 +231,8 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Low Quiver Alert", desc = "Notifies you when your Quiver runs out of arrows.")
+    @ConfigOption(name = "Time Held in Lore", desc = "Shows time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean quiverAlert = false;
-
+    public boolean timeHeldInLore = false;
 }

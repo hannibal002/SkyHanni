@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.NumberFormat
 import java.util.TreeMap
 import kotlin.math.pow
@@ -46,7 +46,7 @@ object NumberUtil {
     fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + format(-value, preciseBillions)
 
@@ -170,12 +170,12 @@ object NumberUtil {
         lastDecimal + decimal
     }
 
-    val pattern = "^[0-9]*$".toPattern()
-    val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
+    private val numberPattern = "^[0-9]*$".toPattern()
+    private val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
-    fun String.isInt(): Boolean {
-        return isNotEmpty() && pattern.matcher(this).matches()
-    }
+    fun String.isInt(): Boolean = isNotEmpty() && numberPattern.matcher(this).matches()
+
+    fun String.isDouble(): Boolean = runCatching { toDouble() }.getOrNull() != null
 
     fun String.isFormatNumber(): Boolean {
         return isNotEmpty() && formatPattern.matches(this)
@@ -248,12 +248,11 @@ object NumberUtil {
         }
     }
 
-
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
     private val Int.billion get() = this * 1_000_000_000.0
     val Double.million get() = (this * 1_000_000.0).toLong()
-    
+
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max

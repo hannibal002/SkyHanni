@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -60,7 +61,7 @@ public class BarnTimerConfig {
     public boolean wormLimitAlert = true;
 
     @Expose
-    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manualy")
+    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manually.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int manualResetTimer = Keyboard.KEY_NONE;
 
@@ -74,5 +75,6 @@ public class BarnTimerConfig {
     public int alertTime = 330;
 
     @Expose
+    @ConfigLink(owner = BarnTimerConfig.class, field = "enabled")
     public Position pos = new Position(10, 10, false, true);
 }

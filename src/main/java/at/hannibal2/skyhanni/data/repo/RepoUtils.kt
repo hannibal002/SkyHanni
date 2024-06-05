@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.repo
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
@@ -102,5 +103,15 @@ object RepoUtils {
                 return gson.fromJson(reader, type)
             }
         }
+    }
+
+    @JvmStatic
+    fun updateRepo() {
+        SkyHanniMod.repo.updateRepo()
+    }
+
+    @JvmStatic
+    fun resetRepoLocation() {
+        SkyHanniMod.repo.resetRepositoryLocation(manual = true)
     }
 }

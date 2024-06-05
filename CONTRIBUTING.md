@@ -59,6 +59,12 @@ format like "- #821" to illustrate the dependency.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+- New features should be made in Kotlin objects unless there is a specific reason for it not to.
+    - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
+    - This will automatically register it to the forge event bus and load the repo patterns
+- Avoid using deprecated functions.
+    - These functions are marked for removal in future versions.
+    - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
 - Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
     - Config files should still be made in Java.
 - Please use the existing event system, or expand on it. Do not use Forge events.
@@ -148,10 +154,7 @@ folder for how to properly do this. You also may have to disable repo auto updat
 ### Discord IPC
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
-Specifically, we use [NetheriteMiner's Fork](https://github.com/NetheriteMiner/DiscordIPC) of a fork of a fork of a fork of
-the [original](https://github.com/jagrosh/DiscordIPC).
-For info on usage, look
-at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
 ### Auto Updater
 
@@ -162,28 +165,12 @@ We use the [auto update library](https://github.com/nea89o/libautoupdate) from n
 ### DevAuth
 
 [DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
-debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar, put it into the
-`mods` folder, and start the Minecraft launcher manually.
+debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
 
 - The library is already downloaded by Gradle.
-- Create the config folder (Windows only). For other OSes, use the guide from DJtheRedstoner.
-    - Navigate to `C:\Users\<your username>`
-    - Create a new folder `.devauth`
-    - Navigate to `C:\Users\<your username>\.devauth`
-    - Create a new file `config.toml`
-    - Paste this text into the file: (Don't change anything.)
-
-```
-defaultEnabled = true
-
-defaultAccount = "main"
-
-[accounts.main]
-type = "microsoft"
-```
-
+- SkyHanni will automatically set up DevAuth.
 - Start Minecraft inside IntelliJ normally.
-    - Click on the link in the console and verify with a Mojang account.
+    - Click on the link in the console and verify with a Microsoft account.
     - The verification process will reappear every few days (after the session token expires).
 
 ### Hot Swap

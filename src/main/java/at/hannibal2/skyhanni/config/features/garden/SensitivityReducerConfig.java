@@ -6,6 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
@@ -66,5 +67,6 @@ public class SensitivityReducerConfig {
     public Property<Boolean> onlyPlot = Property.of(true);
 
     @Expose
+    @ConfigLink(owner = SensitivityReducerConfig.class, field = "showGUI")
     public Position position = new Position(400, 400, 0.8f);
 }

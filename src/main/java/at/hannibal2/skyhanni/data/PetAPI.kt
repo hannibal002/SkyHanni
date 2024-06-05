@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object PetAPI {
@@ -32,7 +32,7 @@ object PetAPI {
 
     // Contains color code + name and for older SkyHanni users maybe also the pet level
     var currentPet: String?
-        get() = ProfileStorageData.profileSpecific?.currentPet
+        get() = ProfileStorageData.profileSpecific?.currentPet?.takeIf { it.isNotEmpty() }
         set(value) {
             ProfileStorageData.profileSpecific?.currentPet = value
         }

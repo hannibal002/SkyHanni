@@ -35,4 +35,9 @@ public class PestsConfig {
     @ConfigOption(name = "Spray", desc = "")
     @Accordion
     public SprayConfig spray = new SprayConfig();
+
+    @ConfigOption(name = "Stereo Harmony", desc = "")
+    @Accordion
+    @Expose
+    public StereoHarmonyConfig stereoHarmony = new StereoHarmonyConfig();
 }

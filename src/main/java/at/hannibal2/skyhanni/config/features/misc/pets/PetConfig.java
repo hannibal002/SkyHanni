@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class PetConfig {
     public boolean display = false;
 
     @Expose
+    @ConfigLink(owner = PetConfig.class, field = "display")
     public Position displayPos = new Position(-330, -15, false, true);
 
     @Expose
