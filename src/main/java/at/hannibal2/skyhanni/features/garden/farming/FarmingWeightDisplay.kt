@@ -192,8 +192,9 @@ class FarmingWeightDisplay {
             list.add(
                 Renderable.clickAndHover(
                     "§6Farming Weight§7: $weight$leaderboard",
-                    listOf("§eClick to open your Farming Profile."),
-                    onClick = { openWebsite(LorenzUtils.getPlayerName()) }
+                    listOf("§eClick to open your Farming Profile."), onClick = {
+                        openWebsite(LorenzUtils.getPlayerName())
+                    }
                 )
             )
 

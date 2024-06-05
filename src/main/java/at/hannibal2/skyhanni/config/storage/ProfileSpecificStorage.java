@@ -373,13 +373,7 @@ public class ProfileSpecificStorage {
             public long cakeExpiring = 0;
 
             @Expose
-            public boolean carrotFortune = false;
-
-            @Expose
-            public boolean pumpkinFortune = false;
-
-            @Expose
-            public boolean cocoaBeansFortune = false;
+            public Map<CropType, Boolean> carrolyn = new HashMap<>();
 
             @Expose
             public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
