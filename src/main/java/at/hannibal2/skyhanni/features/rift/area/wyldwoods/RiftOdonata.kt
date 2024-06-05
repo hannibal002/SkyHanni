@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -22,13 +22,15 @@ class RiftOdonata {
     private val emptyBottle by lazy { "EMPTY_ODONATA_BOTTLE".asInternalName() }
 
     @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
         checkHand()
         if (!hasBottleInHand) return
 
-        findOdonatas()
+        if (event.repeatSeconds(1)) {
+            findOdonatas()
+        }
     }
 
     private fun checkHand() {
