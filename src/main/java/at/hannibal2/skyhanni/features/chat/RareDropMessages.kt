@@ -107,6 +107,7 @@ object RareDropMessages {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enchantedBook) return
         val internalName = event.internalName
+        if (event.amount != 1) return
         val isEnchantedBook = internalName.getItemStack().getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         if (!isEnchantedBook) return
 
@@ -115,9 +116,10 @@ object RareDropMessages {
             userLuck?.takeIf { it != 0f }?.let { luck ->
                 var luckString = luck.round(2).toString()
                 if (luck > 0) luckString = "+$luckString"
-                message += " §a($luckString ✴ SkyHanni User Luck)"
+                message += " §a($luckString ✴ SkyHanni User Luck"
             }
             ChatUtils.chat(message, prefix = false)
+            println(message)
             return
         }
         ChatUtils.editFirstMessage(
@@ -126,11 +128,10 @@ object RareDropMessages {
             predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) }
         )
 
-        ChatUtils.deleteFirstMessage("stash_filter") { it.message.isBlank() }
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(47, "config.chat.petRarityDropMessage", "config.chat.rareDropMessages.petRarity")
+        event.move(47, "chat.petRarityDropMessage", "chat.rareDropMessages.petRarity")
     }
 }

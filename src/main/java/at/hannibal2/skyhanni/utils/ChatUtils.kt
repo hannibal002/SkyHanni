@@ -226,18 +226,18 @@ object ChatUtils {
         chat(Text.join(components).prefix(msgPrefix))
     }
 
-    private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI as AccessorMixinGuiNewChat
+    private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
 
     var chatLines: MutableList<ChatLine>
-        get() = chatGui.chatLines_skyhanni
+        get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
         set(value) {
-            chatGui.chatLines_skyhanni = value
+            (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
         }
 
     var drawnChatLines: MutableList<ChatLine>
-        get() = chatGui.drawnChatLines_skyhanni
+        get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
         set(value) {
-            chatGui.drawnChatLines_skyhanni = value
+            (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
         }
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
@@ -247,7 +247,7 @@ object ChatUtils {
         predicate: (ChatLine) -> Boolean
     ) {
         chatLines.editChatLine(component, predicate, reason)
-        drawnChatLines.editChatLine(component, predicate)
+        chatGui.refreshChat()
     }
 
     /**
@@ -259,7 +259,7 @@ object ChatUtils {
         predicate: (ChatLine) -> Boolean
     ) {
         chatLines.deleteChatLine(amount, reason, predicate)
-        drawnChatLines.deleteChatLine(amount, predicate = predicate)
+        chatGui.refreshChat()
     }
 
     private var lastMessageSent = SimpleTimeMark.farPast()
