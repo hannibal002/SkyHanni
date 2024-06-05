@@ -197,7 +197,7 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
-        ContributorManager.getTabListSuffix(data.name)?.let {
+        ContributorManager.getSuffix(data.name)?.let {
             suffix += " $it"
         }
 

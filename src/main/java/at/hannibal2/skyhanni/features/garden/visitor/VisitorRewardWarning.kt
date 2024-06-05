@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.REFUSE_SLOT
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.inventory.Slot
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
@@ -85,7 +85,7 @@ class VisitorRewardWarning {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return

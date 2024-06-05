@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.CropAccessoryData
-import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.EventCounter
 import at.hannibal2.skyhanni.data.FameRanks
@@ -65,6 +64,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobDebug
 import at.hannibal2.skyhanni.data.mob.MobDetection
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
@@ -501,7 +501,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.5",
+    version = "0.26.Beta.6",
 )
 class SkyHanniMod {
 
@@ -523,7 +523,6 @@ class SkyHanniMod {
         loadModule(ScoreboardData())
         loadModule(SeaCreatureFeatures())
         loadModule(SeaCreatureManager())
-        loadModule(EntityData())
         loadModule(MobData())
         loadModule(MobDetection())
         loadModule(EntityMovementData)
@@ -578,6 +577,7 @@ class SkyHanniMod {
         loadModule(ChatUtils)
         loadModule(FixedRateTimerManager())
         loadModule(ChromaManager)
+        loadModule(TabWidget)
         loadModule(HotmData)
         loadModule(ContributorManager)
         loadModule(TabComplete)
@@ -696,7 +696,7 @@ class SkyHanniMod {
         loadModule(HoppityCollectionData)
         loadModule(HoppityCollectionStats)
         loadModule(SpawnTimers())
-        loadModule(MarkedPlayerManager())
+        loadModule(MarkedPlayerManager)
         loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
         loadModule(HighlightDungeonDeathmite())

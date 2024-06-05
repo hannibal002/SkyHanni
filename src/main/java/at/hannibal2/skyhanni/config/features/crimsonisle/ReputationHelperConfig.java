@@ -18,7 +18,7 @@ public class ReputationHelperConfig {
     @ConfigOption(name = "Enabled", desc = "Enable features around Reputation features in the Crimson Isle.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Hide Completed", desc = "Hides tasks after they've been completed.")
