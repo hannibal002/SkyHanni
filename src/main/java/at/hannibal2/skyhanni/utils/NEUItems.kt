@@ -228,9 +228,14 @@ object NEUItems {
 
     const val itemFontSize = 2.0 / 3.0
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = itemFontSize) {
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        scaleMultiplier: Double = itemFontSize,
+        rescaleSkulls: Boolean = true
+    ) {
         val item = checkBlinkItem()
-        val isSkull = item.item === Items.skull
+        val isSkull = rescaleSkulls && item.item === Items.skull
 
         val baseScale = (if (isSkull) 4f / 3f else 1f)
         val finalScale = baseScale * scaleMultiplier
