@@ -27,12 +27,6 @@ public class PlayerSpecificStorage {
     public long nextCityProjectParticipationTime = 0L;
 
     @Expose
-    public String currentAccountUpgrade = null;
-
-    @Expose
-    public long nextAccountUpgradeCompletionTime = -1L;
-
-    @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopAccountUpgrade = null;
 
     @Expose
