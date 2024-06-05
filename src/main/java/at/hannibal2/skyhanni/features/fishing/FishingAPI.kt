@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
@@ -53,17 +54,15 @@ object FishingAPI {
 
     var wearingTrophyArmor = false
 
-    @SubscribeEvent
-    fun onJoinWorld(event: EntityEnterWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !holdingRod) return
-        val entity = event.entity ?: return
-        if (entity !is EntityFishHook) return
-        if (entity.angler != Minecraft.getMinecraft().thePlayer) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
+        if (!holdingRod) return
+        if (event.entity.angler != Minecraft.getMinecraft().thePlayer) return
 
         lastCastTime = SimpleTimeMark.now()
-        bobber = entity
+        bobber = event.entity
         bobberHasTouchedWater = false
-        FishingBobberCastEvent(entity).postAndCatch()
+        FishingBobberCastEvent(event.entity).postAndCatch()
     }
 
     private fun resetBobber() {

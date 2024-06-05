@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -46,13 +47,10 @@ class FishingHookDisplay {
         armorStand = null
     }
 
-    @SubscribeEvent
-    fun onJoinWorld(event: EntityEnterWorldEvent) {
+    @HandleEvent
+    fun onJoinWorld(event: EntityEnterWorldEvent<EntityArmorStand>) {
         if (!isEnabled()) return
-        val entity = event.entity
-        if (entity !is EntityArmorStand) return
-
-        potentionArmorStands.add(entity)
+        potentionArmorStands.add(event.entity)
     }
 
     @SubscribeEvent
