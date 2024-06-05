@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -15,13 +19,16 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object HoppityCollectionStats {
 
     private val config get() = ChocolateFactoryAPI.config
@@ -48,6 +55,22 @@ object HoppityCollectionStats {
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
+    )
+    /**
+     * REGEX-TEST: §a✔ §7Requirement
+     */
+    private val requirementMet by patternGroup.pattern(
+        "rabbit.requirement.met",
+        "§a✔ §7Requirement"
+    )
+    /**
+     * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
+     * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
+     * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
+     */
+    private val requirementNotMet by patternGroup.pattern(
+        "rabbit.requirement.notmet",
+        "§c✖ §7Requirement.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -80,6 +103,21 @@ object HoppityCollectionStats {
             extraSpace = 5,
             posLabel = "Hoppity's Collection Stats"
         )
+    }
+
+    // TODO cache with inventory update event
+    @SubscribeEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!config.highlightRabbitsWithRequirement) return
+        if (!inInventory) return
+
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val lore = slot.stack.getLore()
+            if (lore.any { requirementMet.find(it) } && !config.onlyHighlightRequirementNotMet)
+                slot highlight LorenzColor.GREEN
+            if (lore.any { requirementNotMet.find(it) })
+                slot highlight LorenzColor.RED
+        }
     }
 
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {

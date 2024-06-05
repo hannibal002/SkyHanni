@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.storage;
 
+import at.hannibal2.skyhanni.api.HotmAPI;
 import at.hannibal2.skyhanni.api.SkillAPI;
+import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
@@ -41,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ProfileSpecificStorage {
 
@@ -129,6 +133,9 @@ public class ProfileSpecificStorage {
         public Map<String, Integer> rabbitCounts = new HashMap();
 
         @Expose
+        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap();
+
+        @Expose
         public Integer hoppityShopYearOpened = null;
     }
 
@@ -144,6 +151,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
+
+        @Expose
+        public List<String> favoritePowers = new ArrayList<>();
     }
 
     @Expose
@@ -189,6 +199,18 @@ public class ProfileSpecificStorage {
                 ", lastClicked=" + lastClicked +
                 '}';
         }
+    }
+
+    @Expose
+    public BeaconPowerStorage beaconPower = new BeaconPowerStorage();
+
+    public static class BeaconPowerStorage {
+
+        @Expose
+        public Long beaconPowerExpiryTime = null;
+
+        @Expose
+        public String boostedStat = null;
     }
 
     @Expose
@@ -354,13 +376,7 @@ public class ProfileSpecificStorage {
             public long cakeExpiring = -1L;
 
             @Expose
-            public boolean carrotFortune = false;
-
-            @Expose
-            public boolean pumpkinFortune = false;
-
-            @Expose
-            public boolean cocoaBeansFortune = false;
+            public Map<CropType, Boolean> carrolyn = new HashMap<>();
 
             @Expose
             public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
@@ -485,6 +501,27 @@ public class ProfileSpecificStorage {
 
         @Expose
         public ExcavatorProfitTracker.Data fossilExcavatorProfitTracker = new ExcavatorProfitTracker.Data();
+
+        @Expose
+        public HotmTree hotmTree = new HotmTree();
+
+        @Expose
+        public Map<HotmAPI.Powder, PowderStorage> powder = new HashMap<>();
+
+        public static class PowderStorage {
+
+            @Expose
+            public Long available;
+
+            @Expose
+            public Long total;
+        }
+
+        @Expose
+        public int tokens;
+
+        @Expose
+        public int availableTokens;
     }
 
     @Expose
