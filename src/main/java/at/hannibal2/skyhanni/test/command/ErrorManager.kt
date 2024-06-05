@@ -27,7 +27,7 @@ object ErrorManager {
 
     private val replace = mapOf(
         "at.hannibal2.skyhanni" to "SH",
-        "io.mouberry,notenoughupdates" to "NEU",
+        "io.moulberry.notenoughupdates" to "NEU",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
     )
