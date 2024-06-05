@@ -416,7 +416,7 @@ class SkyHanniMod {
         loadModule(MobHighlight())
         loadModule(ChocolateFactoryShortcut())
         loadModule(SpawnTimers())
-        loadModule(MarkedPlayerManager())
+        loadModule(MarkedPlayerManager)
         loadModule(SlayerMiniBossFeatures())
         loadModule(PlayerDeathMessages())
         loadModule(HighlightDungeonDeathmite())
