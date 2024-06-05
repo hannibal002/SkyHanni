@@ -125,7 +125,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonHideItems
 import at.hannibal2.skyhanni.features.dungeon.DungeonHighlightClickedBlocks
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
 import at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay
-import at.hannibal2.skyhanni.features.dungeon.DungeonMobManager
 import at.hannibal2.skyhanni.features.dungeon.DungeonRankTabListColor
 import at.hannibal2.skyhanni.features.dungeon.DungeonShadowAssassinNotification
 import at.hannibal2.skyhanni.features.dungeon.DungeonTeammateOutlines
@@ -638,7 +637,6 @@ class SkyHanniMod {
         loadModule(ItemAbilityCooldown())
         loadModule(DungeonHighlightClickedBlocks())
         loadModule(DungeonMilestonesDisplay)
-        loadModule(DungeonMobManager())
         loadModule(DungeonDeathCounter())
         loadModule(DungeonCleanEnd())
         loadModule(TunnelsMaps())

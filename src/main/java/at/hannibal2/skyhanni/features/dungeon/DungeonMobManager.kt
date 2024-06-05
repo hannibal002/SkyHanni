@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -18,7 +19,8 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class DungeonMobManager {
+@SkyHanniModule
+object DungeonMobManager {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHighlighter
     private val starred get() = config.starred
@@ -29,7 +31,7 @@ class DungeonMobManager {
         onToggle(
             starred.highlight,
             starred.colour,
-            //stared.showOutline
+//             starred.showOutline
         ) {
             val color = if (starred.highlight.get()) null else starred.colour.get().toChromaColor()
             MobData.skyblockMobs.filter { it.hasStar }.forEach {
@@ -113,7 +115,7 @@ class DungeonMobManager {
     }
 
     @SubscribeEvent
-    fun onLorenzRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!fel.highlight.get()) return
         if (fel.line) {
             felOnTheGround.filter { it.canBeSeen() }.forEach {
