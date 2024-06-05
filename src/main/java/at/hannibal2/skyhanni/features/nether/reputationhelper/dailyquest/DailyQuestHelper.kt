@@ -94,24 +94,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         questLoader.loadFromTabList(event.lines)
     }
 
-//     @SubscribeEvent
-//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.NewValues) {
-//         if (!isEnabled()) return
-//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
-//             println("WidgetUpdateEvent.NewValues")
-//             questLoader.loadFromTabList(event.lines)
-//         }
-//     }
-//
-//     @SubscribeEvent
-//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.Clear) {
-//         if (!isEnabled()) return
-//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
-//             println("WidgetUpdateEvent.Clear")
-//             questLoader.loadFromTabList(emptyList())
-//         }
-//     }
-
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return

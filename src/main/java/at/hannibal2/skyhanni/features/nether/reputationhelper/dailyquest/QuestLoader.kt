@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
@@ -42,20 +43,9 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
 
         for (line in lines) {
-//         for (line in lines) {
-            if (line == "§5§lFaction Quests:") {
-                i = 0
-                continue
-            }
-            if (i == -1) continue
-
-            i++
             readQuest(line)
             found++
             if (dailyQuestHelper.greatSpook) return
-            if (i == 5) {
-                break
-            }
         }
 
         dailyQuestHelper.reputationHelper.tabListQuestsMissing = found == 0
