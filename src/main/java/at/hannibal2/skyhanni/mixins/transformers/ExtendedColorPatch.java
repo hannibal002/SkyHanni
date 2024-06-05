@@ -110,11 +110,11 @@ public abstract class ExtendedColorPatch {
                 throw new IllegalStateException("Encountered §/ without encountering enough pushes: " + skyhanni$colorState);
             }
             textColor = skyhanni$colorSR;
-            int shadowDivsior = shadow ? 4 : 1;
+            int shadowDivisor = shadow ? 4 : 1;
             setColor(
-                (skyhanni$colorSR >> 16 & 0xFF) / 255.0f / shadowDivsior,
-                (skyhanni$colorSR >> 8 & 0xFF) / 255.0f / shadowDivsior,
-                (skyhanni$colorSR & 0xFF) / 255.0f / shadowDivsior,
+                (skyhanni$colorSR >> 16 & 0xFF) / 255.0f / shadowDivisor,
+                (skyhanni$colorSR >> 8 & 0xFF) / 255.0f / shadowDivisor,
+                (skyhanni$colorSR & 0xFF) / 255.0f / shadowDivisor,
                 (skyhanni$colorState == 8 ? (skyhanni$colorSR >> 24 & 0xFF) / 255.0f : this.alpha)
             );
             skyhanni$colorState = -1;

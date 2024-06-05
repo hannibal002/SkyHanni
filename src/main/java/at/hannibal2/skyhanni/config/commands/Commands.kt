@@ -90,7 +90,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.ClientCommandHandler
-import java.awt.Color
 
 object Commands {
 
@@ -509,15 +508,7 @@ object Commands {
         registerCommand(
             "shtestrainbow",
             "Sends a rainbow in chat"
-        ) {
-            val string = StringBuilder()
-            for (i in (0 until 100)) {
-                val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
-                val extendedChatColor = ExtendedChatColor(color, false)
-                string.append("${extendedChatColor}§m ")
-            }
-            ChatUtils.chat(string.toString())
-        }
+        ) { ExtendedChatColor.testCommand() }
         registerCommand(
             "shcopyinternalname",
             "Copies the internal name of the item in hand to the clipboard."

@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import java.awt.Color
+
 class ExtendedChatColor(
     val rgb: Int,
     val hasAlpha: Boolean,
@@ -17,4 +19,16 @@ class ExtendedChatColor(
         return stringBuilder.toString()
     }
 
+    companion object {
+
+        fun testCommand() {
+            val string = StringBuilder()
+            for (i in (0 until 100)) {
+                val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
+                val extendedChatColor = ExtendedChatColor(color, false)
+                string.append("$extendedChatColor§m ")
+            }
+            ChatUtils.chat(string.toString())
+        }
+    }
 }
