@@ -42,23 +42,40 @@ import kotlin.time.Duration.Companion.minutes
 object MayorAPI {
 
     private val group = RepoPattern.group("mayorapi")
+
+    // TODO: Add Regex-test
     val foxyExtraEventPattern by group.pattern(
         "foxy.extraevent",
         "Schedules an extra §.(?<event>.*) §.event during the year\\."
     )
+
+    /**
+     * REGEX-TEST: The election room is now closed. Clerk Seraphine is doing a final count of the votes...
+     */
     private val electionOverPattern by group.pattern(
         "election.over",
         "§eThe election room is now closed\\. Clerk Seraphine is doing a final count of the votes\\.\\.\\."
     )
+
+    /**
+     * REGEX-TEST: Calendar and Events
+     */
     private val calendarGuiPattern by group.pattern(
         "calendar.gui",
         "Calendar and Events"
     )
+
+    /**
+     * REGEX-TEST: §dMayor Jerry
+     */
     private val jerryHeadPattern by group.pattern(
         "jerry.head",
         "§dMayor Jerry"
     )
-    // TODO add regex tests
+
+    /**
+     * REGEX-TEST: §9Perkpocalypse Perks:
+     */
     private val perkpocalypsePerksPattern by group.pattern(
         "perkpocalypse",
         "§9Perkpocalypse Perks:"
@@ -66,9 +83,10 @@ object MayorAPI {
 
     var currentMayor: Mayor? = null
         private set
+    private var lastMayor: Mayor? = null
     var jerryExtraMayor: Pair<Mayor?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
         private set
-    private var lastMayor: Mayor? = null
+    var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
     private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
@@ -106,7 +124,16 @@ object MayorAPI {
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast() && Mayor.JERRY.isActive()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
             ChatUtils.clickableChat(
-                "The Perkpocalypse Mayor has expired! Click here to update to the new temporary Mayor.",
+                "The Perkpocalypse Mayor has expired! Click here to update the new temporary Mayor.",
+                onClick = { HypixelCommands.calendar() }
+            )
+        }
+        if (Mayor.JERRY.isActive() && jerryExtraMayor.first == null) {
+            if (lastJerryExtraMayorReminder.passedSince() < 5.minutes) return
+
+            lastJerryExtraMayorReminder = SimpleTimeMark.now()
+            ChatUtils.clickableChat(
+                "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
                 onClick = { HypixelCommands.calendar() }
             )
         }
