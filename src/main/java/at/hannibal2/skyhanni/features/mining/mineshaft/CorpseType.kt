@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining.mineshaft
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 
-enum class CorpeType(val displayName: String, private val keyName: String? = null) {
+enum class CorpseType(val displayName: String, private val keyName: String? = null) {
     LAPIS("§9Lapis"),
     TUNGSTEN("§7Tungsten", "TUNGSTEN_KEY"),
     UMBER("§6Umber", "UMBER_KEY"),

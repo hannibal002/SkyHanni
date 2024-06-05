@@ -98,12 +98,12 @@ object ItemUtils {
 
     fun ItemStack.getInternalNameOrNull(): NEUInternalName? {
         val data = cachedData
-        if (data.lastInternalNameFetchTime.asTimeMark().passedSince() < 1.seconds) {
+        if (data.lastInternalNameFetchTime.passedSince() < 1.seconds) {
             return data.lastInternalName
         }
         val internalName = grabInternalNameOrNull()
         data.lastInternalName = internalName
-        data.lastInternalNameFetchTime = SimpleTimeMark.now().toMillis()
+        data.lastInternalNameFetchTime = SimpleTimeMark.now()
         return internalName
     }
 
@@ -238,7 +238,7 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
-        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+        data.itemRarityLastCheck = SimpleTimeMark.now()
         val internalName = getInternalName()
         if (internalName == NEUInternalName.NONE) {
             data.itemRarity = null
@@ -267,7 +267,7 @@ object ItemUtils {
     }
 
     private fun itemRarityLastCheck(data: CachedItemData) =
-        data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
+        data.itemRarityLastCheck.passedSince() > 10.seconds
 
     /**
      * Use when comparing the name (e.g. regex), not for showing to the user

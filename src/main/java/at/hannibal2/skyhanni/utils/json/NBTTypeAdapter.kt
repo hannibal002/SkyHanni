@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils.json
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
