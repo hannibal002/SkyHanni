@@ -249,7 +249,7 @@ object MiningAPI {
             add("waitingForInitBlockPos: $waitingForInitBlockPos")
             add("waitingForEffMinerSound: $waitingForEffMinerSound")
             add("waitingForEffMinerBlock: $waitingForEffMinerBlock")
-            add("recentClickedBlocks: ${recentClickedBlocks.joinToString { it.position.toCleanStringWithSeparator() }}")
+            add("recentClickedBlocks: ${recentClickedBlocks.joinToString { it.position.toCleanString() }}")
         }
     }
 
