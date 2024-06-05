@@ -199,6 +199,18 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
+    public BeaconPowerStorage beaconPower = new BeaconPowerStorage();
+
+    public static class BeaconPowerStorage {
+
+        @Expose
+        public Long beaconPowerExpiryTime = null;
+
+        @Expose
+        public String boostedStat = null;
+    }
+
+    @Expose
     public CrimsonIsleStorage crimsonIsle = new CrimsonIsleStorage();
 
     public static class CrimsonIsleStorage {
