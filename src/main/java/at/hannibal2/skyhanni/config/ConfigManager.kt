@@ -2,42 +2,28 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.events.LorenzEvent
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
-import com.google.gson.TypeAdapter
 import com.google.gson.TypeAdapterFactory
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
-import net.minecraft.item.ItemStack
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -49,12 +35,9 @@ import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.UUID
 import kotlin.concurrent.fixedRateTimer
 
-typealias TrackerDisplayMode = SkyHanniTracker.DefaultDisplayMode
-
-private fun GsonBuilder.reigsterIfBeta(create: TypeAdapterFactory): GsonBuilder {
+private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (LorenzUtils.isBetaVersion()) {
         registerTypeAdapterFactory(create)
     } else this
@@ -62,114 +45,12 @@ private fun GsonBuilder.reigsterIfBeta(create: TypeAdapterFactory): GsonBuilder 
 
 class ConfigManager {
     companion object {
-        fun createBaseGsonBuilder(): GsonBuilder {
-            return GsonBuilder().setPrettyPrinting()
-                .excludeFieldsWithoutExposeAnnotation()
-                .serializeSpecialFloatingPointValues()
-                .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
-                .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
-                .registerTypeAdapter(UUID::class.java, object : TypeAdapter<UUID>() {
-                    override fun write(out: JsonWriter, value: UUID) {
-                        out.value(value.toString())
-                    }
 
-                    override fun read(reader: JsonReader): UUID {
-                        return UUID.fromString(reader.nextString())
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(LorenzVec::class.java, object : TypeAdapter<LorenzVec>() {
-                    override fun write(out: JsonWriter, value: LorenzVec) {
-                        value.run { out.value("$x:$y:$z") }
-                    }
-
-                    override fun read(reader: JsonReader): LorenzVec {
-                        return LorenzVec.decodeFromString(reader.nextString())
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(TrophyRarity::class.java, object : TypeAdapter<TrophyRarity>() {
-                    override fun write(out: JsonWriter, value: TrophyRarity) {
-                        value.run { out.value(value.name) }
-                    }
-
-                    override fun read(reader: JsonReader): TrophyRarity {
-                        val text = reader.nextString()
-                        return TrophyRarity.getByName(text) ?: error("Could not parse TrophyRarity from '$text'")
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(ItemStack::class.java, object : TypeAdapter<ItemStack>() {
-                    override fun write(out: JsonWriter, value: ItemStack) {
-                        out.value(NEUItems.saveNBTData(value))
-                    }
-
-                    override fun read(reader: JsonReader): ItemStack {
-                        return NEUItems.loadNBTData(reader.nextString())
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(NEUInternalName::class.java, object : TypeAdapter<NEUInternalName>() {
-                    override fun write(out: JsonWriter, value: NEUInternalName) {
-                        out.value(value.asString())
-                    }
-
-                    override fun read(reader: JsonReader): NEUInternalName {
-                        return reader.nextString().asInternalName()
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(LorenzRarity::class.java, object : TypeAdapter<LorenzRarity>() {
-                    override fun write(out: JsonWriter, value: LorenzRarity) {
-                        out.value(value.name)
-                    }
-
-                    override fun read(reader: JsonReader): LorenzRarity {
-                        return LorenzRarity.valueOf(reader.nextString().uppercase().replace(" ", "_"))
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(IslandType::class.java, object : TypeAdapter<IslandType>() {
-                    override fun write(out: JsonWriter, value: IslandType) {
-                        out.value(value.name)
-                    }
-
-                    override fun read(reader: JsonReader): IslandType {
-                        return IslandType.valueOf(reader.nextString().uppercase())
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(TrackerDisplayMode::class.java, object : TypeAdapter<TrackerDisplayMode>() {
-                    override fun write(out: JsonWriter, value: TrackerDisplayMode) {
-                        out.value(value.name)
-                    }
-
-                    override fun read(reader: JsonReader): TrackerDisplayMode {
-                        return TrackerDisplayMode.valueOf(reader.nextString())
-                    }
-                }.nullSafe())
-                .registerTypeAdapter(SimpleTimeMark::class.java, object : TypeAdapter<SimpleTimeMark>() {
-                    override fun write(out: JsonWriter, value: SimpleTimeMark) {
-                        out.value(value.toMillis())
-                    }
-
-                    override fun read(reader: JsonReader): SimpleTimeMark {
-                        return reader.nextString().toLong().asTimeMark()
-                    }
-                }.nullSafe())
-                .enableComplexMapKeySerialization()
-        }
-
-        val gson: Gson = createBaseGsonBuilder()
-            // TODO reenable with toggle that is default disabled
-//             .reigsterIfBeta(FeatureTogglesByDefaultAdapter)
+        val gson: Gson = BaseGsonBuilder.gson()
+//             .registerIfBeta(FeatureTogglesByDefaultAdapter)
             .create()
 
         var configDirectory = File("config/skyhanni")
-
-        inline fun <reified T> GsonBuilder.registerTypeAdapter(
-            crossinline write: (JsonWriter, T) -> Unit,
-            crossinline read: (JsonReader) -> T,
-        ): GsonBuilder {
-            this.registerTypeAdapter(T::class.java, object : TypeAdapter<T>() {
-                override fun write(out: JsonWriter, value: T) = write(out, value)
-                override fun read(reader: JsonReader) = read(reader)
-            }.nullSafe())
-            return this
-        }
     }
 
     val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
@@ -281,13 +162,14 @@ class ConfigManager {
             try {
                 val inputStreamReader = InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8)
                 val bufferedReader = BufferedReader(inputStreamReader)
+                val lenientGson = BaseGsonBuilder.lenientGson().create()
 
                 logger.log("load-$fileName-now")
 
                 output = if (fileType == ConfigFileType.FEATURES) {
-                    val jsonObject = gson.fromJson(bufferedReader.readText(), JsonObject::class.java)
+                    val jsonObject = lenientGson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
-                    val run = { gson.fromJson(newJsonObject, defaultValue.javaClass) }
+                    val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }
                     if (LorenzUtils.isInDevEnvironment()) {
                         try {
                             run()
@@ -299,7 +181,7 @@ class ConfigManager {
                         run()
                     }
                 } else {
-                    gson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
+                    lenientGson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
                 }
 
                 logger.log("Loaded $fileName from file")

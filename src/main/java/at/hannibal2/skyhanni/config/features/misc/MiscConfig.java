@@ -119,6 +119,12 @@ public class MiscConfig {
     public boolean hideExpBottles = false;
 
     @Expose
+    @ConfigOption(name = "Armorstands", desc = "Hides Armorstands that are sometimes visible for a fraction of a second.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideTemporaryArmorstands = true;
+
+    @Expose
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
