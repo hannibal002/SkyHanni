@@ -49,5 +49,4 @@ object PetNametag {
     private fun isEnabled() = with(config) {
         (hidePetLevel || hideMaxPetLevel) && LorenzUtils.inSkyBlock
     }
-
 }

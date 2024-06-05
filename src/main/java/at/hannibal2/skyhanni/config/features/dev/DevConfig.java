@@ -63,7 +63,7 @@ public class DevConfig {
     @Expose
     @ConfigOption(
         name = "Fancy Contributors",
-        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list and nametags. " +
+        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
             "§eThose are the folks that coded the mod for you for free :)"
     )
     @ConfigEditorBoolean
