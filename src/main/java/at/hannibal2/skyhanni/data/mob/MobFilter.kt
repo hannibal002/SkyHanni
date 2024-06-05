@@ -308,10 +308,8 @@ object MobFilter {
         }
         return when {
             (baseEntity is EntityPig || baseEntity is EntityHorse) && illegalEntitiesPattern.matches(armorStand.name) -> MobResult.illegal
-
             baseEntity is EntityGuardian && armorStand.cleanName()
                 .matches("^\\d+".toRegex()) -> MobResult.illegal // Wierd Sea Guardian Ability
-
             else -> null
         }
     }
