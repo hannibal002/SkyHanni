@@ -239,7 +239,7 @@ object EnchantParser {
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
                 val enchant = this.enchants.getFromLore(matcher.group("enchant"))
-                val level = try{
+                val level = try {
                     // If one enchant is not a roman numeral we assume all are not roman numerals (idk a situation where this wouldn't be the case)
                     matcher.group("levelNumeral").toInt().also { isRoman = false }
                 } catch (e: NumberFormatException) {
