@@ -115,5 +115,5 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
     }
 
     private fun getByDisplayName(name: String) = miniBosses.firstOrNull { it.displayName == name }
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

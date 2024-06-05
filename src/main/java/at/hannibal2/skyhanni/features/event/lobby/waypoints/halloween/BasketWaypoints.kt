@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -38,13 +38,11 @@ class BasketWaypoints {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            isHalloween = checkScoreboardHalloweenSpecific()
-        }
+        isHalloween = checkScoreboardHalloweenSpecific()
 
         if (isHalloween) {
             if (config.onlyClosest) {
