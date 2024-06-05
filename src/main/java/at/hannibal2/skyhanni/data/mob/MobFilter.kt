@@ -110,7 +110,7 @@ object MobFilter {
      * REGEX-TEST: §8[§7Lv64§8] §eRat
      */
     val illegalEntitiesPattern by repoGroup.pattern(
-        "pattern.illegal.entities",
+        "pattern.pet.entities",
         "^§8\\[§7Lv\\d+§8] §.(Horse|Armadillo|Skeleton Horse|Pig|Rat)$"
     )
 
