@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ActionBarStatsData
-import at.hannibal2.skyhanni.data.FlightDurationAPI
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.BlockData
 import at.hannibal2.skyhanni.data.BossbarData
@@ -616,7 +615,6 @@ class SkyHanniMod {
         loadModule(LorenzUtils)
         loadModule(NEUItems)
         loadModule(PestAPI)
-        loadModule(FlightDurationAPI)
         loadModule(MiningAPI)
         loadModule(FossilExcavatorAPI)
         loadModule(ChocolateFactoryAPI)
