@@ -337,7 +337,7 @@ enum class ScoreboardElement(
 private fun getTitleDisplayPair(): List<ScoreboardElementType> {
     val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
 
-    if (displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock && !LorenzUtils.inSkyBlock) {
+    if (!LorenzUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {
         return listOf(ScoreboardData.objectiveTitle to alignment)
     }
 
