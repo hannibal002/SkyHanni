@@ -17,7 +17,7 @@ public class ChatConfig {
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
-    public int peekChat = Keyboard.KEY_Z;
+    public int peekChat = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")

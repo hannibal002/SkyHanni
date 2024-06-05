@@ -21,7 +21,16 @@ class RemoveColorTest {
 
     @Test
     fun testKeepNonColor() {
-        Assertions.assertEquals("§k§l§m§n§o§r", "§k§l§m§f§n§o§r".removeColor(true))
+        Assertions.assertEquals("§k§l§m", "§f§k§l§m".removeColor(true))
+    }
+
+    @Test
+    fun testColorToResetIfFormatted() {
+        // Replace color code with §r if a formatting style is being applied
+        Assertions.assertEquals("§k§l§m§r§o", "§k§l§m§f§o".removeColor(true))
+
+        // Remove the color code otherwise
+        Assertions.assertEquals("§m§r§l", "§m§r§f§l".removeColor(true))
     }
 
     @Test
@@ -40,6 +49,13 @@ class RemoveColorTest {
             "Ancient Necron's Chestplate ✪✪✪✪",
             "§dAncient Necron's Chestplate §6✪§6✪§6✪§6✪".removeColor()
         )
+        Assertions.assertEquals(
+            "PROMOTE ➜ [158] Manager",
+            "§5§o§a§lPROMOTE §8➜ §7[158§7] §5Manager".removeColor()
+        )
+        Assertions.assertEquals(
+            "§o§r§lPROMOTE §r➜ [158] Manager",
+            "§5§o§a§lPROMOTE §8➜ §7[158§7] §5Manager".removeColor(true)
+        )
     }
-
 }
