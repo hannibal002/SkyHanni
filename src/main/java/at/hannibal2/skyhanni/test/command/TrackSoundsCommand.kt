@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -20,6 +21,7 @@ import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object TrackSoundsCommand {
 
     private var cutOffTime = SimpleTimeMark.farPast()

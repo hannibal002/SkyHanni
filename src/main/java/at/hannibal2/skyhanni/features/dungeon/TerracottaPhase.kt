@@ -5,11 +5,13 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TerracottaPhase {
+@SkyHanniModule
+object TerracottaPhase {
 
     private val config get() = SkyHanniMod.feature.dungeon.terracottaPhase
 

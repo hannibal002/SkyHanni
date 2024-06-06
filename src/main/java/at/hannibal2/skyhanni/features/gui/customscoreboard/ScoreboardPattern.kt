@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+@SkyHanniModule
 object ScoreboardPattern {
     val group = RepoPattern.group("features.gui.customscoreboard")
 
@@ -185,6 +187,16 @@ object ScoreboardPattern {
     val powderPattern by miningSb.pattern(
         "powder",
         "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)"
+    )
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f:§695
+     * REGEX-TEST: §d᠅ §fGemstone§f
+     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
+     */
+    val powderGreedyPattern by miningSb.pattern(
+        "powdergreedy",
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$"
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",

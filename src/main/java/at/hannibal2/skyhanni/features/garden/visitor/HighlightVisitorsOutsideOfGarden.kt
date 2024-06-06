@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -25,7 +26,8 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightVisitorsOutsideOfGarden {
+@SkyHanniModule
+object HighlightVisitorsOutsideOfGarden {
 
     private var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
 
