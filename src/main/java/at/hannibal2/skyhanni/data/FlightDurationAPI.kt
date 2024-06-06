@@ -16,7 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FlightDurationAPI {
 
-    private val group = RepoPattern.group("data.activeeffects")
+    private val group = RepoPattern.group("data.effects")
     private val flightGroup = group.group("flight")
     private val durationPattern by flightGroup.pattern(
         "duration",
