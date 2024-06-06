@@ -1,39 +1,47 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.ProfileApiDataLoadedEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.features.bazaar.BazaarApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CollectionAPI {
-    private val counterPattern = "(?:.*) §e(?<amount>.*)§6\\/(?:.*)".toPattern()
-    private val singleCounterPattern = "§7Total Collected: §e(?<amount>.*)".toPattern()
+@SkyHanniModule
+object CollectionAPI {
+    private val patternGroup = RepoPattern.group("data.collection.api")
+    private val counterPattern by patternGroup.pattern(
+        "counter",
+        ".* §e(?<amount>.*)§6/.*"
+    )
+    private val singleCounterPattern by patternGroup.pattern(
+        "singlecounter",
+        "§7Total Collected: §e(?<amount>.*)"
+    )
+    private val collectionTier0Pattern by patternGroup.pattern(
+        "tierzero",
+        "§7Progress to .* I: .*"
+    )
 
-    @SubscribeEvent
-    fun onProfileDataLoad(event: ProfileApiDataLoadedEvent) {
-        val profileData = event.profileData
-        val jsonElement = profileData["collection"] ?: return
-        val asJsonObject = jsonElement.asJsonObject ?: return
-        for ((hypixelId, rawCounter) in asJsonObject.entrySet()) {
-            val counter = rawCounter.asLong
-            val neuItemId = NEUItems.transHypixelNameToInternalName(hypixelId)
+    val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
-            // MUSHROOM_COLLECTION, GEMSTONE_COLLECTION
-             BazaarApi.getBazaarDataByInternalName(neuItemId)?.displayName ?: continue
-
-            collectionValue[neuItemId] = counter
-        }
-
-        CollectionUpdateEvent().postAndCatch()
-    }
+    // TODO repo
+    private val incorrectCollectionNames = mapOf(
+        "Mushroom" to "RED_MUSHROOM".asInternalName()
+    )
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -41,16 +49,15 @@ class CollectionAPI {
     }
 
     @SubscribeEvent
-    fun onTick(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
             val stack = event.inventoryItems[4] ?: return
-            for (line in stack.getLore()) {
-                singleCounterPattern.matchMatcher(line) {
-                    val counter = group("amount").replace(",", "").toLong()
-                    val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                    collectionValue[name] = counter
-                }
+            stack.getLore().matchFirst(singleCounterPattern) {
+                val counter = group("amount").formatLong()
+                val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
+                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
+                collectionValue[internalName] = counter
             }
             CollectionUpdateEvent().postAndCatch()
         }
@@ -59,7 +66,7 @@ class CollectionAPI {
             if (inventoryName == "Boss Collections") return
 
             for ((_, stack) in event.inventoryItems) {
-                var name = stack.name?.removeColor() ?: continue
+                var name = stack.name.removeColor()
                 if (name.contains("Collections")) continue
 
                 val lore = stack.getLore()
@@ -69,45 +76,30 @@ class CollectionAPI {
                     name = name.split(" ").dropLast(1).joinToString(" ")
                 }
 
-                for (line in lore) {
-                    counterPattern.matchMatcher(line) {
-                        val counter = group("amount").replace(",", "").toLong()
-                        collectionValue[name] = counter
-                    }
+                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
+                lore.matchFirst(counterPattern) {
+                    val counter = group("amount").formatLong()
+                    collectionValue[internalName] = counter
                 }
             }
             CollectionUpdateEvent().postAndCatch()
         }
     }
 
-    companion object {
-        private val collectionValue = mutableMapOf<String, Long>()
-        private val collectionTier0Pattern = "§7Progress to .* I: .*".toPattern()
-
-        fun isCollectionTier0(lore: List<String>) = lore.map { collectionTier0Pattern.matcher(it) }.any { it.matches() }
-
-        fun getCollectionCounter(searchName: String): Long? {
-            for ((collectionName, counter) in collectionValue) {
-                if (collectionName.equals(searchName, true)) {
-                    return counter
-                }
-            }
-            return null
-        }
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        val internalName = event.internalName
+        val (_, amount) = NEUItems.getMultiplier(internalName)
+        if (amount > 1) return
 
         // TODO add support for replenish (higher collection than actual items in inv)
-        fun addFromInventory(internalName: String, amount: Int) {
-            val stack = NEUItems.getItemStackOrNull(internalName)
-            if (stack == null) {
-                LorenzUtils.debug("CollectionAPI.addFromInventory: internalName is null for '$internalName'")
-                return
-            }
-
-            val name = stack.name!!.removeColor()
-            val oldValue = collectionValue[name] ?: return
-
-            val newValue = oldValue + amount
-            collectionValue[name] = newValue
+        if (internalName.getItemStackOrNull() == null) {
+            ChatUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
+            return
         }
+        collectionValue.addOrPut(internalName, event.amount.toLong())
     }
+
+    fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
+    fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
 }

@@ -1,77 +1,167 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Mayor
+import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.EntityMoveEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GriffinBurrowHelper {
-    private val config get() = SkyHanniMod.feature.diana
 
+    private val config get() = SkyHanniMod.feature.event.diana
+
+    private val allowedBlocksAboveGround =
+        listOf(
+            Blocks.air,
+            Blocks.leaves,
+            Blocks.leaves2,
+            Blocks.tallgrass,
+            Blocks.double_plant,
+            Blocks.red_flower,
+            Blocks.yellow_flower,
+            Blocks.spruce_fence
+        )
+
+    var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
-    private var targetLocation: LorenzVec? = null
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
-    var animationLocation: LorenzVec? = null
-    private var lastDug: LorenzVec? = null
-    private var teleportedLocation: LorenzVec? = null
-    private var lastGuessTime = 0L
-    private var lastAnimationTime = 0L
+    var lastTitleSentTime = SimpleTimeMark.farPast()
+    private var shouldFocusOnInquis = false
+
+    private var testList = listOf<LorenzVec>()
+    private var testGriffinSpots = false
 
     @SubscribeEvent
-    fun onSoopyGuessBurrow(event: SoopyGuessBurrowEvent) {
-        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
-        if (System.currentTimeMillis() > lastGuessTime + 1_000) {
-            animationLocation = LocationUtils.playerLocation().add(-0.5, -1.0, -0.5)
-        }
-        lastGuessTime = System.currentTimeMillis()
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Griffin Burrow Helper")
 
-        guessLocation = event.guessLocation
-        setTargetLocation(event.guessLocation)
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+
+        event.addData {
+            add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
+            add("guessLocation: ${guessLocation?.printWithAccuracy(1)}")
+            add("particleBurrows: ${particleBurrows.size}")
+            for ((location, type) in particleBurrows) {
+                add(location.printWithAccuracy(1) + " " + type)
+            }
+        }
     }
 
-    fun setTargetLocation(location: LorenzVec) {
-        targetLocation = location
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        update()
+        loadTestGriffinSpots()
+    }
+
+    fun testGriffinSpots() {
+        testGriffinSpots = !testGriffinSpots
+        val state = if (testGriffinSpots) "§aenabled" else "§cdisabled"
+        ChatUtils.chat("Test Griffin Spots $state§e.")
+    }
+
+    private fun loadTestGriffinSpots() {
+        if (!testGriffinSpots) return
+        val center = LocationUtils.playerLocation().toBlockPos().toLorenzVec()
+        val list = mutableListOf<LorenzVec>()
+        for (x in -5 until 5) {
+            for (z in -5 until 5) {
+                list.add(findBlock(center.add(x, 0, z)))
+            }
+        }
+        testList = list
+    }
+
+    fun update() {
+        if (config.burrowsNearbyDetection) {
+            checkRemoveGuess()
+        }
+
+        val locations = mutableListOf<LorenzVec>()
+
+        if (config.inquisitorSharing.enabled) {
+            for (waypoint in InquisitorWaypointShare.waypoints) {
+                locations.add(waypoint.value.location)
+            }
+        }
+        shouldFocusOnInquis = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
+        if (!shouldFocusOnInquis) {
+            locations.addAll(particleBurrows.keys.toMutableList())
+            guessLocation?.let {
+                locations.add(findBlock(it))
+            }
+            locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
+        }
+        targetLocation = locations.minByOrNull { it.distanceToPlayer() }
 
         if (config.burrowNearestWarp) {
-            BurrowWarpHelper.shouldUseWarps(location)
+            targetLocation?.let {
+                BurrowWarpHelper.shouldUseWarps(it)
+            }
         }
-        if (config.burrowsNearbyDetection) {
-            checkRemoveGuess(false)
-        }
+    }
+
+    @SubscribeEvent
+    fun onBurrowGuess(event: BurrowGuessEvent) {
+        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+
+        guessLocation = event.guessLocation
+        update()
     }
 
     @SubscribeEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
-
-        if (config.burrowsNearbyDetection) {
-            checkRemoveGuess(true)
-        }
+        update()
     }
 
-    private fun checkRemoveGuess(animation: Boolean) {
+    private fun checkRemoveGuess() {
         guessLocation?.let { guessRaw ->
             val guess = findBlock(guessRaw)
             if (particleBurrows.any { guess.distance(it.key) < 40 }) {
-                if (animation) {
-                    animationLocation = guess
-                }
                 guessLocation = null
             }
         }
@@ -81,84 +171,151 @@ object GriffinBurrowHelper {
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         particleBurrows = particleBurrows.editCopy { remove(location) }
-        if (particleBurrows.isNotEmpty()) {
-            animationLocation = location
-        }
-        lastDug = location
+        update()
     }
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
-        if (event.distance > 10) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                teleportedLocation = event.newLocation
-            }
+        if (!isEnabled()) return
+        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+            update()
         }
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
         }
+
+        // talking to Diana NPC
+        if (event.message == "§6Poof! §r§eYou have cleared your griffin burrows!") {
+            resetAllData()
+        }
+    }
+
+    private fun resetAllData() {
+        guessLocation = null
+        targetLocation = null
+        particleBurrows = emptyMap()
+        GriffinBurrowParticleFinder.reset()
+
+        BurrowWarpHelper.currentWarp = null
+        if (isEnabled()) {
+            update()
+        }
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        guessLocation = null
-        targetLocation = null
-        animationLocation = null
-        lastDug = null
-        particleBurrows = particleBurrows.editCopy { clear() }
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        resetAllData()
     }
 
     private fun findBlock(point: LorenzVec): LorenzVec {
-        var gY = 131.0
+        if (!point.isInLoadedChunk()) {
+            return point.copy(y = LocationUtils.playerLocation().y)
+        }
+        findGround(point)?.let {
+            return it
+        }
 
-        var searchGrass = true
-        while ((if (searchGrass) LorenzVec(point.x, gY, point.z).getBlockAt() != Blocks.grass else LorenzVec(
-                point.x,
-                gY,
-                point.z
-            ).getBlockAt() == Blocks.air)
-        ) {
+        return findBlockBelowAir(point)
+    }
+
+    private fun findGround(point: LorenzVec): LorenzVec? {
+        fun isValidGround(y: Double): Boolean {
+            val isGround = point.copy(y = y).getBlockAt() == Blocks.grass
+            val isValidBlockAbove = point.copy(y = y + 1).getBlockAt() in allowedBlocksAboveGround
+            return isGround && isValidBlockAbove
+        }
+
+        var gY = 140.0
+        while (!isValidGround(gY)) {
             gY--
-            if (gY < 70) {
-                if (!searchGrass) {
-                    break
-                } else {
-                    searchGrass = false
-                    gY = 131.0
-                }
+            if (gY < 65) {
+                // no ground detected, find the lowest block below air
+                return null
             }
         }
-        return LorenzVec(point.x, gY, point.z)
+        return point.copy(y = gY)
+    }
+
+    private fun findBlockBelowAir(point: LorenzVec): LorenzVec {
+        val start = 65.0
+        var gY = start
+        while (point.copy(y = gY).getBlockAt() != Blocks.air) {
+            gY++
+            if (gY > 140) {
+                // no blocks at this spot, assuming outside of island
+                return point.copy(y = LocationUtils.playerLocation().y)
+            }
+        }
+
+        if (gY == start) {
+            return point.copy(y = LocationUtils.playerLocation().y)
+        }
+        return point.copy(y = gY - 1)
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
-        sendTip(event)
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
+
+        showTestLocations(event)
+
+        showWarpSuggestions()
 
         val playerLocation = LocationUtils.playerLocation()
-        for ((playerName, location) in InquisitorWaypointShare.waypoints) {
-            event.drawColor(location, LorenzColor.LIGHT_PURPLE)
-            val distance = location.distance(playerLocation)
-            if (distance > 10) {
-                val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
-                event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor §e${formattedDistance}m", 1.7)
-            } else {
-                event.drawDynamicText(location.add(0, 1, 0), "§d§lInquisitor", 1.7)
+        if (config.inquisitorSharing.enabled) {
+            for (inquis in InquisitorWaypointShare.waypoints.values) {
+                val location = inquis.location
+                event.drawColor(location, LorenzColor.LIGHT_PURPLE)
+                val distance = location.distance(playerLocation)
+                if (distance > 10) {
+                    // TODO use round(1)
+                    val formattedDistance = distance.toInt().addSeparators()
+                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+                } else {
+                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
+                }
+                if (distance < 5) {
+                    InquisitorWaypointShare.maybeRemove(inquis)
+                }
+                event.drawDynamicText(location.add(y = 1), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
+
+                if (config.inquisitorSharing.showDespawnTime) {
+                    val spawnTime = inquis.spawnTime
+                    val format = (75.seconds - spawnTime.passedSince()).format()
+                    event.drawDynamicText(location.add(y = 1), "§eDespawns in §b$format", 1.6, yOff = 18f)
+                }
             }
-            if (distance < 5) {
-                InquisitorWaypointShare.maybeRemove(playerName)
-            }
-            event.drawDynamicText(location.add(0, 1, 0), "§eFrom §b$playerName", 1.6, yOff = 9f)
         }
 
-        if (InquisitorWaypointShare.waypoints.isNotEmpty()) {
-            if (SkyHanniMod.feature.diana.inquisitorSharing.focusInquisitor) {
-                return
+        val currentWarp = BurrowWarpHelper.currentWarp
+        if (config.lineToNext) {
+            val player = event.exactPlayerEyeLocation()
+
+            var color: LorenzColor?
+            val renderLocation = if (currentWarp != null) {
+                color = LorenzColor.AQUA
+                currentWarp.location
+            } else {
+                color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE else LorenzColor.WHITE
+                targetLocation?.add(0.5, 0.5, 0.5) ?: return
             }
+
+            val lineWidth = if (targetLocation in particleBurrows) {
+                color = particleBurrows[targetLocation]!!.color
+                3
+            } else 2
+            if (currentWarp == null) {
+                event.draw3DLine(player, renderLocation, color.toColor(), lineWidth, false)
+            }
+        }
+
+        if (InquisitorWaypointShare.waypoints.isNotEmpty() && config.inquisitorSharing.focusInquisitor) {
+            return
         }
 
         if (config.burrowsNearbyDetection) {
@@ -167,7 +324,7 @@ object GriffinBurrowHelper {
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
                 event.drawColor(location, burrowType.color, distance > 10)
-                event.drawDynamicText(location.add(0, 1, 0), burrowType.text, 1.5)
+                event.drawDynamicText(location.add(y = 1), burrowType.text, 1.5)
             }
         }
 
@@ -176,75 +333,107 @@ object GriffinBurrowHelper {
                 val guessLocation = findBlock(it)
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
-                event.drawDynamicText(guessLocation.add(0, 1, 0), "Guess", 1.5)
+                val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
+                event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
                 if (distance > 5) {
-                    val formattedDistance = LorenzUtils.formatInteger(distance.toInt())
-                    event.drawDynamicText(guessLocation.add(0, 1, 0), "§e${formattedDistance}m", 1.7, yOff = 10f)
+                    val formattedDistance = distance.toInt().addSeparators()
+                    event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
         }
     }
 
-    private fun sendTip(event: RenderWorldLastEvent) {
-        teleportedLocation?.let {
-            teleportedLocation = null
-
-            if (BurrowWarpHelper.currentWarp != null) {
-                BurrowWarpHelper.currentWarp = null
-                if (config.burrowNearestWarp) {
-                    animationLocation = it
-                    return
-                }
-            }
+    private fun showTestLocations(event: LorenzRenderWorldEvent) {
+        if (!testGriffinSpots) return
+        for (location in testList) {
+            event.drawColor(location, LorenzColor.WHITE)
         }
+    }
 
-        if (config.burrowNearestWarp) {
-            BurrowWarpHelper.currentWarp?.let { warp ->
-                animationLocation?.let {
-                    event.drawColor(it.add(0.0, 1.0, 0.0), LorenzColor.AQUA)
-                    if (it.distanceToPlayer() < 10) {
-                        event.drawString(it.add(0.5, 1.5, 0.5), "§bWarp to " + warp.displayName, true)
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "diana", "event.diana")
+    }
+
+    @SubscribeEvent
+    fun onBlockClick(event: BlockClickEvent) {
+        if (!isEnabled()) return
+
+        val location = event.position
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+
+        if (particleBurrows.containsKey(location)) {
+            DelayedRun.runDelayed(1.seconds) {
+                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                    if (particleBurrows.containsKey(location)) {
+                        // workaround
+                        particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                     }
-                    return
                 }
-            }
-        }
-        if (config.burrowSmoothTransition) {
-            animationLocation?.let {
-                event.drawColor(it, LorenzColor.WHITE)
-                animationLocation = moveAnimation(it, event)
             }
         }
     }
 
-    private fun moveAnimation(animation: LorenzVec, event: RenderWorldLastEvent): LorenzVec? {
-        val list = mutableListOf<LorenzVec>()
-        if (config.burrowsNearbyDetection) {
-            list.addAll(particleBurrows.keys)
+    private fun showWarpSuggestions() {
+        if (!config.burrowNearestWarp) return
+        val warp = BurrowWarpHelper.currentWarp ?: return
+
+        val text = "§bWarp to " + warp.displayName
+        val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
+            val keyname = KeyboardManager.getKeyName(config.keyBindWarp)
+            " §7(§ePress $keyname§7)"
+        } else ""
+        if (lastTitleSentTime.passedSince() > 2.seconds) {
+            lastTitleSentTime = SimpleTimeMark.now()
+            LorenzUtils.sendTitle(text + keybindSuffix, 2.seconds, fontSize = 3f)
         }
-        targetLocation?.let {
-            val loc = findBlock(it)
-            if (loc.y > 200) {
-                list.add(LorenzVec(loc.x, LocationUtils.playerLocation().y, loc.z))
+    }
+
+    private fun isEnabled() = DianaAPI.isDoingDiana()
+
+    fun setTestBurrow(strings: Array<String>) {
+        if (!IslandType.HUB.isInIsland()) {
+            ChatUtils.userError("You can only create test burrows on the hub island!")
+            return
+        }
+
+        if (!isEnabled()) {
+            if (currentMayor != Mayor.DIANA) {
+                ChatUtils.chatAndOpenConfig(
+                    "§cSelect Diana as mayor overwrite!",
+                    SkyHanniMod.feature.dev.debug::assumeMayor
+                )
+
             } else {
-                list.add(loc)
+                ChatUtils.userError("Have an Ancestral Spade in the inventory!")
+            }
+            return
+        }
+
+        if (strings.size != 1) {
+            ChatUtils.userError("/shtestburrow <type>")
+            return
+        }
+
+        val type: BurrowType = when (strings[0].lowercase()) {
+            "reset" -> {
+                resetAllData()
+                ChatUtils.chat("Manually reset all burrow data.")
+                return
+            }
+
+            "1", "start" -> BurrowType.START
+            "2", "mob" -> BurrowType.MOB
+            "3", "treasure" -> BurrowType.TREASURE
+            else -> {
+                ChatUtils.userError("Unknown burrow type! Try 1-3 instead.")
+                return
             }
         }
-        val target = list.minByOrNull { it.distance(animation) } ?: return null
-        val distance = target.distance(animation)
-        if (distance < 0.20) return null
 
-        var vector = target.subtract(animation)
-
-        event.draw3DLine(animation.add(0.5, 0.5, 0.5), target.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 2, true)
-
-        return if (System.currentTimeMillis() > lastAnimationTime + 25) {
-            lastAnimationTime = System.currentTimeMillis()
-            vector = vector.multiply(1 / vector.length())
-            vector = vector.multiply(0.18)
-            animation.add(vector)
-        } else {
-            animation
-        }
+        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        val location = LocationUtils.playerLocation().roundLocation()
+        particleBurrows = particleBurrows.editCopy { this[location] = type }
+        update()
     }
 }

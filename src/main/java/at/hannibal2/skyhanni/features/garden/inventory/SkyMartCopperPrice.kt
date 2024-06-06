@@ -1,62 +1,96 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SkyMartCopperPrice {
-    private val pattern = "§c(?<amount>.*) Copper".toPattern()
-    private var display = emptyList<List<Any>>()
-    private val config get() = SkyHanniMod.feature.garden
+
+    private val copperPattern by RepoPattern.pattern(
+        "garden.inventory.skymart.copper",
+        "§c(?<amount>.*) Copper"
+    )
+
+    private var display = emptyList<Renderable>()
+    private val config get() = GardenAPI.config.skyMart
 
     companion object {
+
         var inInventory = false
     }
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (event.inventoryName != "SkyMart") return
+        if (!event.inventoryName.startsWith("SkyMart ")) return
 
         inInventory = true
-        val table = mutableMapOf<Pair<String, String>, Pair<Double, String>>()
-        for (stack in event.inventoryItems.values) {
-            for (line in stack.getLore()) {
-                val internalName = stack.getInternalName()
-                val lowestBin = NEUItems.getPrice(internalName)
-                if (lowestBin == -1.0) continue
-                pattern.matchMatcher(line) {
-                    val amount = group("amount").replace(",", "").toInt()
-                    val factor = lowestBin / amount
-                    val perFormat = NumberUtil.format(factor)
-                    val priceFormat = NumberUtil.format(lowestBin)
-                    val amountFormat = NumberUtil.format(amount)
+        val table = mutableListOf<DisplayTableEntry>()
+        for ((slot, item) in event.inventoryItems) {
+            val lore = item.getLore()
+            val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
 
-                    val name = stack.nameWithEnchantment!!
-                    val advancedStats = if (config.skyMartCopperPriceAdvancedStats) {
-                        " §7(§6$priceFormat §7/ §c$amountFormat Copper§7)"
-                    } else ""
-                    val pair = Pair("$name§f:", "§6§l$perFormat$advancedStats")
-                    table[pair] = Pair(factor, internalName)
+            for (line in lore) {
+                val copper = copperPattern.matchMatcher(line) {
+                    group("amount").formatInt()
+                } ?: continue
+
+                val internalName = item.getInternalName()
+                val itemPrice = internalName.getPriceOrNull() ?: continue
+                val profit = itemPrice - (otherItemsPrice ?: 0.0)
+
+                val factor = profit / copper
+                val perFormat = NumberUtil.format(factor)
+
+                val itemName = item.itemName
+                val hover = buildList {
+                    add(itemName)
+                    add("")
+                    add("§7Item price: §6${NumberUtil.format(itemPrice)} ")
+                    otherItemsPrice?.let {
+                        add("§7Additional cost: §6${NumberUtil.format(it)} ")
+                    }
+                    add("§7Profit per purchase: §6${NumberUtil.format(profit)} ")
+                    add("")
+                    add("§7Copper amount: §c${copper.addSeparators()} ")
+                    add("§7Profit per copper: §6${perFormat} ")
                 }
+                table.add(
+                    DisplayTableEntry(
+                        "$itemName§f:",
+                        "§6§l$perFormat",
+                        factor,
+                        internalName,
+                        hover,
+                        highlightsOnHoverSlots = listOf(slot)
+                    )
+                )
             }
         }
 
-        val newList = mutableListOf<List<Any>>()
-        newList.addAsSingletonList("§eCoins per Copper§f:")
-        LorenzUtils.fillTable(newList, table)
+        val newList = mutableListOf<Renderable>()
+        newList.add(Renderable.string("§eCoins per Copper§f:"))
+        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         display = newList
     }
 
@@ -66,16 +100,25 @@ class SkyMartCopperPrice {
     }
 
     @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
-            config.skyMartCopperPricePos.renderStringsAndItems(
+            config.copperPricePos.renderRenderables(
                 display,
                 extraSpace = 5,
-                itemScale = 1.7,
                 posLabel = "SkyMart Copper Price"
             )
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.skyMartCopperPrice
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
+        event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
+        event.move(3, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")
+        event.transform(32, "garden.skyMart.itemScale") {
+            JsonPrimitive((it.asDouble / 1.851).round(1))
+        }
+    }
+
+    private fun isEnabled() = GardenAPI.inGarden() && config.copperPrice
 }

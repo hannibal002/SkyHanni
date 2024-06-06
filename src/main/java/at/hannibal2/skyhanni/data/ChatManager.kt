@@ -1,37 +1,115 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.LorenzActionBarEvent
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
+import at.hannibal2.skyhanni.features.chat.ChatFilterGui
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.event.HoverEvent
-import net.minecraft.network.play.server.S02PacketChat
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.Text.send
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ChatLine
+import net.minecraft.client.gui.GuiNewChat
+import net.minecraft.network.play.client.C01PacketChatMessage
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher.ReflectionHelper
+import java.lang.invoke.MethodHandles
 
-class ChatManager {
+@SkyHanniModule
+object ChatManager {
 
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
     private val loggerAllowed = LorenzLogger("chat/allowed")
     private val loggerModified = LorenzLogger("chat/modified")
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
+    private val messageHistory =
+        object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?): Boolean {
+                return size > 100
+            }
+        }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onActionBarPacket(event: PacketEvent.ReceiveEvent) {
-        val packet = event.packet
-        if (packet !is S02PacketChat) return
-        val messageComponent = packet.chatComponent
+    private fun getRecentMessageHistory(): List<MessageFilteringResult> = messageHistory.toList().map { it.second }
 
-        val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
-        if (packet.type.toInt() == 2) {
-            val actionBarEvent = LorenzActionBarEvent(message)
-            actionBarEvent.postAndCatch()
+    private fun getRecentMessageHistoryWithSearch(searchTerm: String): List<MessageFilteringResult> =
+        messageHistory.toList().map { it.second }
+            .filter { it.message.formattedText.removeColor().contains(searchTerm, ignoreCase = true) }
+
+    enum class ActionKind(format: Any) {
+        BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
+        RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
+        MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
+        ALLOWED(EnumChatFormatting.GREEN),
+        OUTGOING(EnumChatFormatting.BLUE),
+        OUTGOING_BLOCKED(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.BOLD),
+        ;
+
+        val renderedString = "$format$name"
+
+        companion object {
+
+            val maxLength by lazy {
+                entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.renderedString) }
+            }
+        }
+    }
+
+    data class MessageFilteringResult(
+        val message: IChatComponent,
+        var actionKind: ActionKind,
+        var actionReason: String?,
+        val modified: IChatComponent?,
+        val hoverInfo: List<String> = listOf(),
+        val hoverExtraInfo: List<String> = listOf(),
+    )
+
+    @SubscribeEvent
+    fun onSendMessageToServerPacket(event: PacketEvent.SendEvent) {
+        val packet = event.packet as? C01PacketChatMessage ?: return
+
+        val message = packet.message
+        val component = ChatComponentText(message)
+        val originatingModCall = event.findOriginatingModCall()
+        val originatingModContainer = originatingModCall?.getClassInstance()?.getModContainer()
+        val hoverInfo = listOf(
+            "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
+            "§7Mod id: §a${originatingModContainer?.modId}",
+            "§7Mod name: §a${originatingModContainer?.name}"
+        )
+        val stackTrace =
+            Thread.currentThread().stackTrace.map {
+                "§7  §2${it.className}§7.§a${it.methodName}§7" +
+                    if (it.fileName == null) "" else "(§b${it.fileName}§7:§3${it.lineNumber}§7)"
+            }
+        val result = MessageFilteringResult(
+            component, ActionKind.OUTGOING, null, null,
+            hoverInfo = hoverInfo,
+            hoverExtraInfo = hoverInfo + listOf("") + stackTrace
+        )
+
+        messageHistory[IdentityCharacteristics(component)] = result
+        val trimmedMessage = message.trimEnd()
+        if (MessageSendToServerEvent(
+                trimmedMessage,
+                trimmedMessage.split(" "),
+                originatingModContainer
+            ).postAndCatch()
+        ) {
+            event.isCanceled = true
+            messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
         }
     }
 
@@ -42,12 +120,13 @@ class ChatManager {
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
-        if (message.startsWith("§f{\"server\":\"")) return
-
-        val chatEvent = LorenzChatEvent(message, original)
-        if (!isSoopyMessage(event.message)) {
-            chatEvent.postAndCatch()
+        if (message.startsWith("§f{\"server\":\"")) {
+            HypixelData.checkForLocraw(message)
+            return
         }
+        val key = IdentityCharacteristics(original)
+        val chatEvent = LorenzChatEvent(message, original)
+        chatEvent.postAndCatch()
 
         val blockReason = chatEvent.blockedReason.uppercase()
         if (blockReason != "") {
@@ -56,6 +135,7 @@ class ChatManager {
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null)
             return
         }
 
@@ -67,41 +147,50 @@ class ChatManager {
             loggerModified.log(" ")
             loggerModified.log("[original] " + original.formattedText)
             loggerModified.log("[modified] " + modified.formattedText)
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified)
+        } else {
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null)
+        }
+
+        // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
+        if (chatEvent.chatLineId != 0) {
+            event.isCanceled = true
+            event.message.send(chatEvent.chatLineId)
         }
     }
 
-    private fun isSoopyMessage(message: IChatComponent): Boolean {
-        for (sibling in message.siblings) {
-            if (isSoopyMessage(sibling)) return true
+    fun openChatFilterGUI(args: Array<String>) {
+        SkyHanniMod.screenToOpen = if (args.isEmpty()) {
+            ChatFilterGui(getRecentMessageHistory())
+        } else {
+            val searchTerm = args.joinToString(" ")
+            val history = getRecentMessageHistoryWithSearch(searchTerm)
+            if (history.isEmpty()) {
+                ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
+                return
+            }
+            ChatFilterGui(history)
         }
-
-        val style = message.chatStyle ?: return false
-        val hoverEvent = style.chatHoverEvent ?: return false
-        if (hoverEvent.action != HoverEvent.Action.SHOW_TEXT) return false
-        val text = hoverEvent.value?.formattedText ?: return false
-
-        val lines = text.split("\n")
-        if (lines.isEmpty()) return false
-
-        val last = lines.last()
-        if (last.startsWith("§f§lCOMMON")) return true
-        if (last.startsWith("§a§lUNCOMMON")) return true
-        if (last.startsWith("§9§lRARE")) return true
-        if (last.startsWith("§5§lEPIC")) return true
-        if (last.startsWith("§6§lLEGENDARY")) return true
-        if (last.startsWith("§d§lMYTHIC")) return true
-        if (last.startsWith("§c§lSPECIAL")) return true
-
-        // TODO confirm this format is correct
-        if (last.startsWith("§c§lVERY SPECIAL")) return true
-        return false
     }
 
-    @SubscribeEvent
-    fun onChatMessage(chatEvent: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    private val chatLinesField by lazy {
+        MethodHandles.publicLookup().unreflectGetter(
+            ReflectionHelper.findField(GuiNewChat::class.java, "chatLines", "field_146252_h", "h")
+                .makeAccessible()
+        )
+    }
 
-        val seaCreature = SeaCreatureManager.getSeaCreature(chatEvent.message) ?: return
-        SeaCreatureFishEvent(seaCreature, chatEvent).postAndCatch()
+    fun retractMessage(message: IChatComponent?, reason: String) {
+        if (message == null) return
+        val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
+
+        @Suppress("UNCHECKED_CAST")
+        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine?>? ?: return
+        if (!chatLines.removeIf { it?.chatComponent === message }) return
+        chatGUI.refreshChat()
+
+        val history = messageHistory[IdentityCharacteristics(message)] ?: return
+        history.actionKind = ActionKind.RETRACTED
+        history.actionReason = reason.uppercase()
     }
 }

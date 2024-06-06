@@ -1,10 +1,15 @@
 package at.hannibal2.skyhanni.config.features;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.*;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class About {
 
@@ -16,6 +21,12 @@ public class About {
     @Expose
     @ConfigEditorBoolean
     public boolean autoUpdates = true;
+
+    @ConfigOption(name = "Full Auto Updates", desc = "Automatically downloads new version on each startup.")
+    @Expose
+    @FeatureToggle
+    @ConfigEditorBoolean
+    public boolean fullAutoUpdates = false;
 
     @ConfigOption(name = "Update Stream", desc = "How frequently do you want updates for SkyHanni")
     @Expose

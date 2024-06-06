@@ -4,50 +4,81 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0APacketAnimation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import org.lwjgl.input.Mouse
 
-class ItemClickData {
+@SkyHanniModule
+object ItemClickData {
 
     @SubscribeEvent
     fun onItemClickSend(event: PacketEvent.SendEvent) {
         val packet = event.packet
-        if (packet is C08PacketPlayerBlockPlacement) {
-            val position = packet.position.toLorenzVec()
-            BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
-        }
-        if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
-            val position = packet.position.toLorenzVec()
-            BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
-        }
-        if (packet is C0APacketAnimation) {
-            ItemClickEvent(InventoryUtils.getItemInHand()).postAndCatch()
+        event.isCanceled = when {
+            packet is C08PacketPlayerBlockPlacement -> {
+                if (packet.placedBlockDirection != 255) {
+                    val position = packet.position.toLorenzVec()
+                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
+                } else {
+                    ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+                }
+            }
+
+            packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
+                val position = packet.position.toLorenzVec()
+                val blockClickCancelled =
+                    BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also {
+                    it.isCanceled = blockClickCancelled
+                }.postAndCatch()
+            }
+
+            packet is C0APacketAnimation -> {
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
+            }
+
+            packet is C02PacketUseEntity -> {
+                val clickType = when (packet.action) {
+                    C02PacketUseEntity.Action.INTERACT -> ClickType.RIGHT_CLICK
+                    C02PacketUseEntity.Action.ATTACK -> ClickType.LEFT_CLICK
+                    C02PacketUseEntity.Action.INTERACT_AT -> ClickType.RIGHT_CLICK
+                    else -> return
+                }
+                val clickedEntity = packet.getEntityFromWorld(Minecraft.getMinecraft().theWorld) ?: return
+                EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
+            }
+
+            else -> {
+                return
+            }
         }
     }
 
-    @SubscribeEvent
-    fun onEntityClick(event: InputEvent.MouseInputEvent) {
+    /* @SubscribeEvent
+    fun onEntityClick(event: InputEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         val minecraft = Minecraft.getMinecraft()
+
+        val attackKey = minecraft.gameSettings.keyBindAttack
+        val useKey = minecraft.gameSettings.keyBindUseItem
+
+        val clickType = when {
+            attackKey.isKeyDown -> ClickType.LEFT_CLICK
+            useKey.isKeyDown -> ClickType.RIGHT_CLICK
+            else -> return
+        }
+
         val clickedEntity = minecraft.pointedEntity
         if (minecraft.thePlayer == null) return
         if (clickedEntity == null) return
 
-        val clickType = when (Mouse.getEventButton()) {
-            0 -> ClickType.LEFT_CLICK
-            1 -> ClickType.RIGHT_CLICK
-            else -> return
-        }
-
-        EntityClickEvent(clickType, clickedEntity).postAndCatch()
-    }
+        EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
+    } */
 }

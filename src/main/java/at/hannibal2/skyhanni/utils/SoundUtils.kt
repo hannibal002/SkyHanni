@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
 import net.minecraft.client.audio.PositionedSound
@@ -7,8 +11,12 @@ import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
 
 object SoundUtils {
+
     private val beepSound by lazy { createSound("random.orb", 1f) }
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
+    private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
+    val plingSound by lazy { createSound("note.pling", 1f) }
+    val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
         Minecraft.getMinecraft().addScheduledTask {
@@ -26,17 +34,20 @@ object SoundUtils {
                         }
                     }
                 }
-                e.printStackTrace()
+                ErrorManager.logErrorWithData(
+                    e, "Failed to play a sound",
+                    "soundLocation" to this.soundLocation
+                )
             } finally {
                 gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
             }
         }
     }
 
-    fun createSound(name: String, pitch: Float): ISound {
+    fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
         val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
             init {
-                volume = 50f
+                this.volume = volume
                 repeat = false
                 repeatDelay = 0
                 attenuationType = ISound.AttenuationType.NONE
@@ -51,6 +62,36 @@ object SoundUtils {
     }
 
     fun playClickSound() {
-       clickSound.playSound()
+        clickSound.playSound()
+    }
+
+    fun playPlingSound() {
+        plingSound.playSound()
+    }
+
+    fun command(args: Array<String>) {
+        if (args.isEmpty()) {
+            ChatUtils.userError("Specify a sound effect to test")
+            return
+        }
+
+        val soundName = args[0]
+        val pitch = args.getOrNull(1)?.toFloat() ?: 1.0f
+        val volume = args.getOrNull(2)?.toFloat() ?: 50.0f
+
+        createSound(soundName, pitch, volume).playSound()
+    }
+
+    fun playErrorSound() {
+        errorSound.playSound()
+    }
+
+    fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
+        SkyHanniMod.coroutineScope.launch {
+            repeat(repeat) {
+                sound.playSound()
+                delay(delay)
+            }
+        }
     }
 }

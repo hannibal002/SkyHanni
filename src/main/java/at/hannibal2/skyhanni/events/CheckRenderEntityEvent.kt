@@ -10,5 +10,5 @@ data class CheckRenderEntityEvent<T : Entity>(
     val camera: ICamera,
     val camX: Double,
     val camY: Double,
-    val camZ: Double
+    val camZ: Double,
 ) : LorenzEvent()

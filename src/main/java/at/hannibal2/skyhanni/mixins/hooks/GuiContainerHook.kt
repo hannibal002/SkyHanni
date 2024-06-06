@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -20,24 +23,44 @@ class GuiContainerHook(guiAny: Any) {
         if (CloseWindowEvent(gui, gui.inventorySlots).postAndCatch()) ci.cancel()
     }
 
-    fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
+    fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
         GuiContainerEvent.BackgroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
-    fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float, ci: CallbackInfo) {
+    fun preDraw(
+        mouseX: Int,
+        mouseY: Int,
+        partialTicks: Float,
+        ci: CallbackInfo,
+    ) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
+        if (GuiContainerEvent.BeforeDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
+            NEUApi.setInventoryButtonsToDisabled()
+            GuiData.preDrawEventCanceled = true
+            ci.cancel()
+        } else {
+            GuiData.preDrawEventCanceled = false
+        }
+    }
+
+    fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
         GuiContainerEvent.ForegroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
     fun onDrawSlot(slot: Slot, ci: CallbackInfo) {
-        if (GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, gui.inventorySlots, slot).postAndCatch()) ci.cancel()
+        val event = GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, gui.inventorySlots, slot)
+        if (event.postAndCatch()) ci.cancel()
     }
 
-    fun onDrawSlotPost(slot: Slot, ci: CallbackInfo) {
+    fun onDrawSlotPost(slot: Slot) {
         GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPost(gui, gui.inventorySlots, slot).postAndCatch()
     }
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
-        if (SlotClickEvent(gui, gui.inventorySlots, slot, slotId, clickedButton, clickType).postAndCatch()) ci.cancel()
+        val item = gui.inventorySlots?.inventory?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
+        if (SlotClickEvent(gui, gui.inventorySlots, item, slot, slotId, clickedButton, clickType).postAndCatch()
+        ) ci.cancel()
     }
 
     fun onDrawScreenAfter(
@@ -47,4 +70,5 @@ class GuiContainerHook(guiAny: Any) {
     ) {
         if (DrawScreenAfterEvent(mouseX, mouseY, ci).postAndCatch()) ci.cancel()
     }
+
 }

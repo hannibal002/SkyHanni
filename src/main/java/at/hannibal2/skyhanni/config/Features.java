@@ -1,11 +1,30 @@
 package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.features.*;
+import at.hannibal2.skyhanni.config.features.About;
+import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
+import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
+import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig;
+import at.hannibal2.skyhanni.config.features.dev.DevConfig;
+import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig;
+import at.hannibal2.skyhanni.config.features.event.EventConfig;
+import at.hannibal2.skyhanni.config.features.fishing.FishingConfig;
+import at.hannibal2.skyhanni.config.features.garden.GardenConfig;
+import at.hannibal2.skyhanni.config.features.gui.GUIConfig;
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig;
+import at.hannibal2.skyhanni.config.features.mining.MiningConfig;
+import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
+import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
+import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
+import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
+import at.hannibal2.skyhanni.config.storage.Storage;
+import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.Config;
-import io.github.moulberry.moulconfig.Social;
-import io.github.moulberry.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.Config;
+import io.github.notenoughupdates.moulconfig.Social;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign;
+import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
@@ -15,6 +34,7 @@ import java.util.List;
 public class Features extends Config {
     public static final ResourceLocation DISCORD = new ResourceLocation("notenoughupdates:social/discord.png");
     public static final ResourceLocation GITHUB = new ResourceLocation("notenoughupdates:social/github.png");
+    public static final ResourceLocation PATREON = new ResourceLocation("notenoughupdates:social/patreon.png");
 
     @Override
     public boolean shouldAutoFocusSearchbar() {
@@ -22,118 +42,122 @@ public class Features extends Config {
     }
 
     @Override
+    public HorizontalAlign alignCategory(ProcessedCategory category, boolean isSelected) {
+        if (LorenzUtils.INSTANCE.isAprilFoolsDay())
+            return HorizontalAlign.RIGHT;
+        return super.alignCategory(category, isSelected);
+    }
+
+    @Override
     public List<Social> getSocials() {
         return Arrays.asList(
-                Social.forLink("Join our Discord", DISCORD, "https://discord.gg/8DXVN4BJz3"),
-                Social.forLink("Look at the code", GITHUB, "https://github.com/hannibal002/SkyHanni")
+            Social.forLink("Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
+            Social.forLink("GitHub", GITHUB, "https://github.com/hannibal002/SkyHanni"),
+            Social.forLink("Patreon", PATREON, "https://www.patreon.com/hannibal2")
         );
     }
 
     @Override
     public void saveNow() {
-        SkyHanniMod.configManager.saveConfig("close-gui");
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "close-gui");
     }
 
     @Override
     public String getTitle() {
-        return "SkyHanni " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
+        String modName = "SkyHanni";
+        if (LorenzUtils.INSTANCE.isAprilFoolsDay())
+            modName = new StringBuilder().append("اسکای هانی").reverse().toString(); // Minecraft does not render RTL strings very nicely, so we reverse the string here. Not authentic, but close enough.
+
+        return modName + " " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
 
+    /*
+     * If you are adding a new category, please insert it alphabetically
+     * The only exceptions to this are About and GUI, which are pinned to the top
+     * and Misc and Dev, which are to be at the bottom. Thanks!
+     */
+
+
+    // Top
+
     @Expose
-    @Category(name = "About", desc = "Information about SkyHanni and updates")
+    @Category(name = "About", desc = "Information about SkyHanni and updates.")
     public About about = new About();
 
     @Expose
-    @Category(name = "GUI Locations", desc = "Change the locations of GUI elements. (§e/sh gui§7)")
-    public GUI gui = new GUI();
+    @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
+    public GUIConfig gui = new GUIConfig();
+
+    // Islands
 
     @Expose
-    @Category(name = "Chat", desc = "Change how the chat looks.")
-    public Chat chat = new Chat();
+    @Category(name = "Garden", desc = "Features for the Garden island.")
+    public GardenConfig garden = new GardenConfig();
 
     @Expose
-    @Category(name = "Dungeon", desc = "Features that change the dungeon experience in catacombs.")
-    public Dungeon dungeon = new Dungeon();
-
-    @Expose
-    @Category(name = "Inventory", desc = "Changing the behavior around items and the inventory.")
-    public Inventory inventory = new Inventory();
-
-    @Expose
-    @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
-    public ItemAbilities itemAbilities = new ItemAbilities();
-
-    @Expose
-    @Category(name = "Summonings", desc = "Mobs you revive.")
-    public Summonings summonings = new Summonings();
-
-    @Expose
-    @Category(name = "Ashfang", desc = "Ashfang fight in Crimson Isle.")
-    public Ashfang ashfang = new Ashfang();
-
-    @Expose
-    @Category(name = "Minion", desc = "The minions at your private island.")
-    public Minions minions = new Minions();
-
-    @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
-    public Bazaar bazaar = new Bazaar();
-
-    @Expose
-    @Category(name = "Fishing", desc = "Fishing stuff.")
-    public Fishing fishing = new Fishing();
-
-    @Expose
-    @Category(name = "Damage Indicator", desc = "Better damage overview in combat with bosses of all sorts.")
-    public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
-
-    @Expose
-    @Category(name = "Slayer", desc = "Slayer features.")
-    public Slayer slayer = new Slayer();
-
-    @Expose
-    @Category(name = "Diana", desc = "Diana's mythological event.")
-    public Diana diana = new Diana();
-
-    @Expose
-    @Category(name = "Commands", desc = "Enable or disable commands.")
-    public CommandsFeatures commands = new CommandsFeatures();
-
-    @Expose
-    @Category(name = "Marked Players", desc = "Players that got marked with /shmarkplayer.")
-    public MarkedPlayers markedPlayers = new MarkedPlayers();
-
-    @Expose
-    @Category(name = "Bingo", desc = "Features for the Bingo mode.")
-    public Bingo bingo = new Bingo();
-
-    @Expose
-    @Category(name = "Mobs", desc = "Visual help for Mobs")
-    public Mobs mobs = new Mobs();
-
-    @Expose
-    @Category(name = "Garden", desc = "Features on the Garden island.")
-    public Garden garden = new Garden();
+    @Category(name = "Crimson Isle", desc = "Things to do on the Crimson Isle/Nether island.")
+    public CrimsonIsleConfig crimsonIsle = new CrimsonIsleConfig();
 
     @Expose
     @Category(name = "The Rift", desc = "Features for The Rift dimension.")
     public RiftConfig rift = new RiftConfig();
 
+    // Skills
+
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost Counter settings.")
-    public GhostCounter ghostCounter = new GhostCounter();
+    @Category(name = "Fishing", desc = "Fishing stuff.")
+    public FishingConfig fishing = new FishingConfig();
+
+    @Expose
+    @Category(name = "Mining", desc = "Features that help you break blocks.")
+    public MiningConfig mining = new MiningConfig();
+
+    // Combat like
+
+    @Expose
+    @Category(name = "Combat", desc = "Everything combat and PvE related.")
+    public CombatConfig combat = new CombatConfig();
+
+    @Expose
+    @Category(name = "Slayer", desc = "Slayer features.")
+    public SlayerConfig slayer = new SlayerConfig();
+
+    @Expose
+    @Category(name = "Dungeon", desc = "Features that change the Dungeons experience in The Catacombs.")
+    public DungeonConfig dungeon = new DungeonConfig();
+
+    // Misc
+
+    @Expose
+    @Category(name = "Inventory", desc = "Change the behavior of items and the inventory.")
+    public InventoryConfig inventory = new InventoryConfig();
+
+    @Expose
+    @Category(name = "Events", desc = "Stuff that is not always available.")
+    public EventConfig event = new EventConfig();
+
+    @Expose
+    @Category(name = "Skill Progress", desc = "Skill Progress related config options.")
+    public SkillProgressConfig skillProgress = new SkillProgressConfig();
+
+    @Expose
+    @Category(name = "Chat", desc = "Change how the chat looks.")
+    public ChatConfig chat = new ChatConfig();
 
     @Expose
     @Category(name = "Misc", desc = "Settings without a category.")
     public MiscConfig misc = new MiscConfig();
+
+    // Bottom
 
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     public DevConfig dev = new DevConfig();
 
     @Expose
-    public OldHidden hidden = new OldHidden();
+    public Storage storage = new Storage();
 
     @Expose
-    public Storage storage = new Storage();
+    public int lastVersion = ConfigUpdaterMigrator.CONFIG_VERSION;
+
 }

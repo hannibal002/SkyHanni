@@ -1,82 +1,99 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
-import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.world.WorldEvent
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import kotlin.time.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
  * @author Linnea Gräf
  */
-@OptIn(ExperimentalTime::class)
-class HighlightBonzoMasks {
+@SkyHanniModule
+object HighlightBonzoMasks {
 
-    val maskTimers = mutableMapOf<String, CooldownTimer>()
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities
 
-    // Technically this timer is overestimating since the cooldown is affected by mage level, however I do not care.
-    val bonzoMaskCooldown = 360.seconds
-    val bonzoMaskMessage = "^Your (.*Bonzo's Mask) saved your life!$".toRegex()
+    private val maskTimers = mutableMapOf<MaskType, SimpleTimeMark>()
 
-    val spiritMaskCooldown = 30.seconds
-    val spiritMaskMessage = "^Second Wind Activated! Your Spirit Mask saved your life!$".toRegex()
+    private val patternGroup = RepoPattern.group("inventory.masks.timers")
+    private val bonzoMaskPattern by patternGroup.pattern(
+        "bonzo",
+        "Your .*Bonzo's Mask saved your life!"
+    )
+    private val spiritMaskPattern by patternGroup.pattern(
+        "spirit",
+        "Second Wind Activated! Your Spirit Mask saved your life!"
+    )
 
-    val greenHue = Color.RGBtoHSB(0, 255, 0, null)[0].toDouble()
-    val redHue = Color.RGBtoHSB(255, 0, 0, null)[0].toDouble()
+    private val greenHue = Color.RGBtoHSB(0, 255, 0, null)[0].toDouble()
+    private val redHue = Color.RGBtoHSB(255, 0, 0, null)[0].toDouble()
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!SkyHanniMod.feature.inventory.highlightDepletedBonzosMasks) return
+        if (!config.depletedBonzosMasks) return
         for (slot in event.gui.inventorySlots.inventorySlots) {
-            val item = slot.stack ?: continue
-            val maskType = maskType(item) ?: continue
-            val timer = maskTimers[maskType] ?: continue
-            if (timer.isActive) {
-                val hue = interpolate(greenHue, redHue, timer.percentComplete.toFloat())
+            val internalName = slot.stack?.getInternalName() ?: continue
+            val maskType = MaskType.getByInternalName(internalName) ?: continue
+            val readyAt = maskTimers[maskType] ?: continue
+
+            if (readyAt.isInFuture()) {
+                val hue = interpolate(redHue, greenHue, maskType.percentageComplete(readyAt.timeUntil()))
                 slot.highlight(Color(Color.HSBtoRGB(hue.toFloat(), 1F, 1F)))
             }
         }
     }
 
-    private fun maskType(item: ItemStack): String? {
-        return when (item.getInternalName()) {
-            "STARRED_BONZO_MASK" -> "BONZO_MASK"
-            "BONZO_MASK" -> "BONZO_MASK"
-            "SPIRIT_MASK" -> "SPIRIT_MASK"
-            else -> null
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        val message = event.message.removeColor()
+        // TODO move pattern into enum
+        if (bonzoMaskPattern.matches(message)) {
+            maskTimers[MaskType.BONZO_MASK] = SimpleTimeMark.now() + MaskType.BONZO_MASK.cooldown
+        } else if (spiritMaskPattern.matches(message)) {
+            maskTimers[MaskType.SPIRIT_MASK] = SimpleTimeMark.now() + MaskType.SPIRIT_MASK.cooldown
         }
     }
 
     @SubscribeEvent
-    fun onChatReceived(event: ClientChatReceivedEvent) {
-        val message = event.message.unformattedText
-        if (bonzoMaskMessage.matches(message)) {
-            maskTimers["BONZO_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), bonzoMaskCooldown)
-        } else if (spiritMaskMessage.matches(message)) {
-            maskTimers["SPIRIT_MASK"] = CooldownTimer(TimeSource.Monotonic.markNow(), spiritMaskCooldown)
-        }
-    }
-
-    @SubscribeEvent
-    fun onJoinWorld(ignored: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         maskTimers.clear()
     }
 
-    companion object {
-        data class CooldownTimer(val timeMark: TimeMark, val duration: Duration) {
-            val percentComplete: Double get() =
-                timeMark.elapsedNow().toDouble(DurationUnit.SECONDS) / duration.toDouble(DurationUnit.SECONDS)
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(2, "inventory.highlightDepletedBonzosMasks", "itemAbilities.depletedBonzosMasks")
+    }
 
-            val isActive: Boolean get() = timeMark.elapsedNow() < duration
+    // This timer is overestimating since mage level affects the cooldown
+    private enum class MaskType(val internalNames: List<NEUInternalName>, val cooldown: Duration) {
+        BONZO_MASK(listOf("BONZO_MASK".asInternalName(), "STARRED_BONZO_MASK".asInternalName()), 6.minutes),
+        SPIRIT_MASK(listOf("SPIRIT_MASK".asInternalName(), "STARRED_SPIRIT_MASK".asInternalName()), 30.seconds),
+        ;
 
+        fun percentageComplete(timeUntil: Duration): Double {
+            return timeUntil.inWholeMilliseconds / cooldown.inWholeMilliseconds.toDouble()
+        }
+
+        companion object {
+            fun getByInternalName(internalName: NEUInternalName): MaskType? {
+                return entries.firstOrNull { internalName in it.internalNames }
+            }
         }
     }
 }
-

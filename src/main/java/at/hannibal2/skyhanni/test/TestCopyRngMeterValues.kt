@@ -2,37 +2,55 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object TestCopyRngMeterValues {
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!SkyHanniMod.feature.dev.copyRngMeter) return
+    private val patternGroup = RepoPattern.group("test.dev.copyrng")
+    private val slayerPattern by patternGroup.pattern(
+        "slayer",
+        "§7Slayer XP: §d.*§5/§d(?<xp>.*)"
+    )
+    private val dungeonPattern by patternGroup.pattern(
+        "dungeon",
+        "§7Dungeon Score: §d.*§5/§d(?<xp>.*)"
+    )
 
-        val map = mutableMapOf<String, Long>()
-        val slayerPattern = "§7Slayer XP: §d.*§5/§d(?<xp>.*)".toPattern()
-        val dungeonPattern = "§7Dungeon Score: §d.*§5/§d(?<xp>.*)".toPattern()
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!SkyHanniMod.feature.dev.debug.copyRngMeter) return
+
+        val map = mutableMapOf<NEUInternalName, Long>()
         for (item in event.inventoryItems.values) {
             for (line in item.getLore()) {
                 slayerPattern.matchMatcher(line) {
-                    map[item.getInternalName()] = group("xp").formatNumber()
+                    map[item.getInternalName()] = group("xp").formatLong()
                 }
                 dungeonPattern.matchMatcher(line) {
-                    map[item.getInternalName()] = group("xp").formatNumber()
+                    map[item.getInternalName()] = group("xp").formatLong()
                 }
             }
         }
         if (map.isEmpty()) return
 
         OSUtils.copyToClipboard(ConfigManager.gson.toJson(map))
-        LorenzUtils.debug("${map.size} items saved to clipboard.")
+        ChatUtils.debug("${map.size} items saved to clipboard.")
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "dev.copyRngMeter", "dev.debug.copyRngMeter")
     }
 }

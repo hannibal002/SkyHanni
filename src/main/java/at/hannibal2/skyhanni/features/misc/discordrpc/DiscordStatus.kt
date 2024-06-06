@@ -1,102 +1,117 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
-// SkyblockAddons code, adapted for SkyHanni
+// SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.*
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getCounter
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.getTierForCrops
-import at.hannibal2.skyhanni.data.GardenCropMilestones.Companion.progressToNextLevel
+import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
+import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
+import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData.Companion.getTabList
+import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import java.util.function.Supplier
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
 
 var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
     mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
 
 val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
+val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
-val stackingEnchants = mapOf(
-    "compact" to mapOf(
-        "levels" to listOf(0, 100, 500, 1500, 5000, 15000, 50000, 150000, 500000, 1000000),
-        "nbtNum" to "compact_blocks"
-    ),
-    "cultivating" to mapOf(
-        "levels" to listOf(
-            0,
-            1000,
-            5000,
-            25000,
-            100000,
-            300000,
-            1500000,
-            5000000,
-            20000000,
-            100000000
-        ), "nbtNum" to "farmed_cultivating"
-    ),
-    "expertise" to mapOf(
-        "levels" to listOf(0, 50, 100, 250, 500, 1000, 2500, 5500, 10000, 15000),
-        "nbtNum" to "expertise_kills"
-    ),
-    "hecatomb" to mapOf(
-        "levels" to listOf(0, 2, 5, 10, 20, 30, 40, 60, 80, 100),
-        "nbtNum" to "hecatomb_s_runs"
-    ),
-    "champion" to mapOf(
-        "levels" to listOf(
-            0,
-            50000,
-            100000,
-            250000,
-            500000,
-            1000000,
-            1500000,
-            2000000,
-            2500000,
-            3000000
-        ), "nbtNum" to "champion_combat_xp"
-    )
-) // nbtNum is the id of the enchantment in the nbt data
-
 private fun getVisitingName(): String {
-    val tabData = getTabList()
-    val ownerRegex = Pattern.compile(".*Owner: (?<username>\\w+).*")
+    val tabData = TabListData.getTabList()
+    val ownerRegex = Regex(".*Owner: (\\w+).*")
     for (line in tabData) {
         val colorlessLine = line.removeColor()
-        val ownerMatcher = ownerRegex.matcher(colorlessLine)
-        if (ownerMatcher.matches()) {
-            return ownerMatcher.group("username")
+        if (ownerRegex.matches(colorlessLine)) {
+            return ownerRegex.find(colorlessLine)!!.groupValues[1]
         }
     }
     return "Someone"
 }
 
-enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) {
+var beenAfkFor = SimpleTimeMark.now()
 
-    NONE(null),
+fun getPetDisplay(): String = PetAPI.currentPet?.let {
+    val colorCode = it.substring(1..2).first()
+    val petName = it.substring(2)
+    val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
+
+    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+} ?: "No pet equipped"
+
+private fun getCropMilestoneDisplay(): String {
+    val crop = InventoryUtils.getItemInHand()?.getCropType()
+    val cropCounter = crop?.getCounter()
+    val allowOverflow = GardenAPI.config.cropMilestones.overflow.discordRPC
+    val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
+    val progress = tier?.let {
+        LorenzUtils.formatPercentage(crop.progressToNextLevel(allowOverflow))
+    } ?: 100 // percentage to next milestone
+
+    if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
+
+    val text = if (crop.isMaxed(allowOverflow)) {
+        "MAXED (${cropCounter.addSeparators()} crops)"
+    } else {
+        "Milestone $tier ($progress)"
+    }
+    return "${crop.cropName}: $text"
+}
+
+enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
+
+    NONE({ null }),
 
     LOCATION({
-        var location = LorenzUtils.skyBlockArea
+        var location = LorenzUtils.skyBlockArea?.removeColor() ?: "invalid"
         val island = LorenzUtils.skyBlockIsland
+
         if (location == "Your Island") location = "Private Island"
-        if (island == IslandType.PRIVATE_ISLAND_GUEST) lastKnownDisplayStrings[LOCATION] =
-            "${getVisitingName()}'s Island"
-        else if (location != "None" && location != "invalid") {
-            lastKnownDisplayStrings[LOCATION] = location
+        when {
+            island == IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
+                "${getVisitingName()}'s Island"
+
+            island == IslandType.GARDEN -> {
+                if (location.startsWith("Plot: ")) {
+                    lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
+                } else {
+                    lastKnownDisplayStrings[LOCATION] = "Personal Garden"
+                }
+            }
+
+            island == IslandType.GARDEN_GUEST -> {
+                lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
+                if (location.startsWith("Plot: ")) {
+                    lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
+                } // "MelonKingDe's Garden (Plot: 8)"
+            }
+
+            location != "None" && location != "invalid" -> {
+                lastKnownDisplayStrings[LOCATION] = location
+            }
         }
         lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
     }),
@@ -107,10 +122,16 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
             purseRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
-        if (coins == "1") {
-            lastKnownDisplayStrings[PURSE] = "1 Coin"
-        } else if (coins != "" && coins != null) {
-            lastKnownDisplayStrings[PURSE] = "$coins Coins"
+        val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
+            motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+        }
+        lastKnownDisplayStrings[PURSE] = when {
+            coins == "1" -> "1 Coin"
+            coins != "" && coins != null -> "$coins Coins"
+            motes == "1" -> "1 Mote"
+            motes != "" && motes != null -> "$motes Motes"
+
+            else -> lastKnownDisplayStrings[PURSE] ?: ""
         }
         lastKnownDisplayStrings[PURSE] ?: ""
     }),
@@ -129,13 +150,12 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     STATS({
-        val groups = ActionBarStatsData.groups
         val statString = if (!RiftAPI.inRift()) {
-            "❤${groups["health"]} ❈${groups["defense"]} ✎${groups["mana"]}"
+            "❤${ActionBarStatsData.HEALTH.value} ❈${ActionBarStatsData.DEFENSE.value} ✎${ActionBarStatsData.MANA.value}"
         } else {
-            "${groups["riftTime"]}ф ✎${groups["mana"]}"
+            "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
         }
-        if (groups["mana"] != "") {
+        if (ActionBarStatsData.MANA.value != "") {
             lastKnownDisplayStrings[STATS] = statString
         }
         lastKnownDisplayStrings[STATS] ?: ""
@@ -148,52 +168,24 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
     }),
 
     TIME({
-        fun formatNum(num: Int): Int {
-            val rem = num % 10
-            var returnNum = num - rem // floor()
-            if (returnNum == 0) {
-                returnNum = "0$num".toInt()
-                /**
-                 * and this is so that if the minute value is ever
-                 * a single digit (0 after being floored), it displays as 00 because 12:0pm just looks bad
-                 */
-            }
-            return returnNum
-        }
-
-        val date: SkyBlockTime = SkyBlockTime.now()
-        val hour = if (date.hour > 12) date.hour - 12 else date.hour
-        val timeOfDay = if (date.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        "${SkyBlockTime.monthName(date.month)} ${date.day}${SkyBlockTime.daySuffix(date.day)}, $hour:${formatNum(date.minute)}$timeOfDay" // Early Winter 1st, 12:00pm
+        SkyBlockTime.now().formatted()
     }),
 
     PROFILE({
-        val player = LorenzUtils.getPlayerName()
-
-        val tabData = getTabList()
-        val levelRegex = Regex("""\[(\d{1,3})] $player""")
-        var sbLevel = ""
-// SkyBlock Level: [999] on Lemon
-        for (line in tabData) {
-            if (line.contains(player)) {
-                val colorlessLine = line.removeColor()
-                sbLevel = levelRegex.find(colorlessLine)!!.groupValues[1]
-                break
-            }
-        }
-
+        val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
         var profile = "SkyBlock Level: [$sbLevel] on "
 
-        profile += (
-                if (HypixelData.ironman) "♲"
-                else if (HypixelData.bingo) "Ⓑ"
-                else if (HypixelData.stranded) "☀"
-                else ""
-                )
+        profile += when {
+
+            LorenzUtils.isIronmanProfile -> "♲"
+            LorenzUtils.isBingoProfile -> "Ⓑ"
+            LorenzUtils.isStrandedProfile -> "☀"
+            else -> ""
+        }
 
         val fruit = HypixelData.profileName.firstLetterUppercase()
         if (fruit == "") profile =
-            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit has not loaded in yet
+            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit hasn't loaded in yet
         else profile += fruit
 
         lastKnownDisplayStrings[PROFILE] = profile
@@ -210,63 +202,53 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             val noColorLine = line.removeColor()
             val match = slayerRegex.matcher(noColorLine)
-            if (match.matches()) {
-                slayerName = match.group("name")
-                slayerLevel = match.group("level")
-            } else if (noColorLine == "Slay the boss!") bossAlive = "slaying"
-            else if (noColorLine == "Boss slain!") bossAlive = "slain"
+            when {
+                match.matches() -> {
+                    slayerName = match.group("name")
+                    slayerLevel = match.group("level")
+                }
+
+                noColorLine == "Slay the boss!" -> bossAlive = "slaying"
+                noColorLine == "Boss slain!" -> bossAlive = "slain"
+            }
         }
 
-        if (slayerLevel == "") "Planning to do a slayer quest"// selected slayer in rpc but hasn't started a quest
-        else if (bossAlive == "spawning") "Spawning a $slayerName $slayerLevel boss."
-        else if (bossAlive == "slaying") "Slaying a $slayerName $slayerLevel boss."
-        else if (bossAlive == "slain") "Finished slaying a $slayerName $slayerLevel boss."
-        else "Something went wrong with slayer detection!"
+        when {
+            slayerLevel == "" -> AutoStatus.SLAYER.placeholderText // selected slayer in rpc but hasn't started a quest
+            bossAlive == "spawning" -> "Spawning a $slayerName $slayerLevel boss."
+            bossAlive == "slaying" -> "Slaying a $slayerName $slayerLevel boss."
+            bossAlive == "slain" -> "Finished slaying a $slayerName $slayerLevel boss."
+            else -> "Something went wrong with slayer detection!"
+        }
     }),
 
     CUSTOM({
-        SkyHanniMod.feature.misc.discordRPC.customText.get() // custom field in the config
+        DiscordRPCManager.config.customText.get() // custom field in the config
     }),
 
     AUTO({
-        val slayerResult = SLAYER.displayMessageSupplier!!.get()
-        val stackingResult = STACKING.displayMessageSupplier!!.get()
-        val milestoneResult = CROP_MILESTONES.displayMessageSupplier!!.get()
-        if (slayerResult != "Planning to do a slayer quest") slayerResult
-        else if (milestoneResult != "Not farming!") milestoneResult
-        else if (stackingResult != "") stackingResult
-        else {
-            val statusNoAuto = DiscordStatus.values().toMutableList()
+        var autoReturn = ""
+        for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
+            // TODO, change functionality to use enum rather than ordinals
+            val autoStatus = AutoStatus.entries[statusID.ordinal]
+            val result =
+                autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
+            if (result != autoStatus.placeholderText) { // if that value is useful, display it
+                autoReturn = result
+                break
+            }
+        }
+        if (autoReturn == "") { // if we didn't find any useful information, display the fallback
+            val statusNoAuto = DiscordStatus.entries.toMutableList()
             statusNoAuto.remove(AUTO)
-            statusNoAuto[SkyHanniMod.feature.misc.discordRPC.auto.get()].getDisplayString()
+            autoReturn = statusNoAuto[DiscordRPCManager.config.auto.get().ordinal].getDisplayString()
         }
+        autoReturn
     }),
 
-    CROP_MILESTONES({
-        val crop = InventoryUtils.getItemInHand()?.getCropType()
-        val cropCounter = crop?.getCounter()
-        val tier = cropCounter?.let { getTierForCrops(it) }
+    CROP_MILESTONES({ getCropMilestoneDisplay() }),
 
-        val progress = tier?.let {
-            LorenzUtils.formatPercentage(crop.progressToNextLevel())
-        } ?: 100 // percentage to next milestone
-
-        if (tier != null) {
-            "${crop.cropName}: Milestone $tier ($progress)"
-        } else {
-            "Not farming!"
-        }
-    }),
-
-    PETS({
-        ProfileStorageData.profileSpecific?.currentPet?.let {
-            val colorCode = it.substring(1..2).first()
-            val petName = it.substring(2)
-            val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
-
-            "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
-        } ?: "No pet equipped"
-    }),
+    PETS({ getPetDisplay() }),
 
     // Dynamic-only
     STACKING({
@@ -278,17 +260,15 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             } else item.getSubCompound("ExtraAttributes", false)
         }
 
-        val itemInHand = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()
+        val itemInHand = InventoryUtils.getItemInHand()
         val itemName = itemInHand?.displayName?.removeColor() ?: ""
 
         val extraAttributes = getExtraAttributes(itemInHand)
 
         fun getProgressPercent(amount: Int, levels: List<Int>): String {
-            var currentLevel = 0
             var percent = "MAXED"
             for (level in levels.indices) {
                 if (amount > levels[level]) {
-                    currentLevel++
                     continue
                 }
                 percent = if (amount.toDouble() == 0.0) {
@@ -301,34 +281,61 @@ enum class DiscordStatus(private val displayMessageSupplier: Supplier<String>?) 
             return percent
         }
 
-        var stackingReturn = ""
+        var stackingReturn = AutoStatus.STACKING.placeholderText
         if (extraAttributes != null) {
             val enchantments = extraAttributes.getCompoundTag("enchantments")
             var stackingEnchant = ""
-            for (enchant in stackingEnchants.keys) {
-                if (extraAttributes.hasKey(stackingEnchants[enchant]?.get("nbtNum").toString())) {
-                    stackingEnchant = enchant
+            for (enchant in DiscordRPCManager.stackingEnchants) {
+                if (extraAttributes.hasKey(enchant.value.statName)) {
+                    stackingEnchant = enchant.key
                     break
                 }
             }
-            val levels = stackingEnchants[stackingEnchant]?.get("levels") as? List<Int> ?: listOf(0)
+            val levels = DiscordRPCManager.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
             val level = enchantments.getInteger(stackingEnchant)
-            val amount = extraAttributes.getInteger(stackingEnchants[stackingEnchant]?.get("nbtNum").toString())
+            val amount = extraAttributes.getInteger(DiscordRPCManager.stackingEnchants[stackingEnchant]?.statName)
             val stackingPercent = getProgressPercent(amount, levels)
 
             stackingReturn =
-                if (stackingPercent == "" || amount == 0) "" // outdated info is useless for AUTO; empty strings are manually ignored
+                if (stackingPercent == "" || amount == 0) AutoStatus.STACKING.placeholderText // outdated info is useless for AUTO
                 else "$itemName: ${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
         }
         stackingReturn
 
+    }),
+
+    DUNGEONS({
+        if (!DungeonAPI.inDungeon()) {
+            AutoStatus.DUNGEONS.placeholderText
+        } else {
+            val boss = DungeonAPI.getCurrentBoss()
+            if (boss == null) {
+                "Unknown dungeon boss"
+            } else {
+                val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
+                val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
+                val time = DungeonAPI.getTime()
+                "$floor Kills: $amountKills ($time)"
+            }
+        }
+    }),
+
+    AFK({
+        if (beenAfkFor.passedSince() > 5.minutes) {
+            val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+            "AFK for $format"
+        } else AutoStatus.AFK.placeholderText
     })
     ;
 
-    fun getDisplayString(): String {
-        if (displayMessageSupplier != null) {
-            return displayMessageSupplier.get()
-        }
-        return ""
-    }
+    fun getDisplayString(): String = displayMessageSupplier() ?: ""
+}
+
+enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {
+    CROP_MILESTONES("Not farming!", DiscordStatus.CROP_MILESTONES),
+    SLAYER("Planning to do a slayer quest", DiscordStatus.SLAYER),
+    STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
+    DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
+    AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
+    ;
 }

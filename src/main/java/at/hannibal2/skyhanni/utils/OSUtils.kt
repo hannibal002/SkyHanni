@@ -1,12 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.client.settings.KeyBinding
-import org.lwjgl.input.Keyboard
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import java.awt.Desktop
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.StringSelection
-import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
 import java.net.URI
 
@@ -14,43 +9,31 @@ object OSUtils {
 
     @JvmStatic
     fun openBrowser(url: String) {
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        val desktopSupported = Desktop.isDesktopSupported()
+        val supportedActionBrowse = Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
+        if (desktopSupported && supportedActionBrowse) {
             try {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: IOException) {
-                e.printStackTrace()
-                LorenzUtils.error("[SkyHanni] Error opening website: $url!")
+                ErrorManager.logErrorWithData(
+                    e, "Error while opening website.",
+                    "url" to url
+                )
             }
         } else {
             copyToClipboard(url)
-            LorenzUtils.warning("[SkyHanni] Web browser is not supported! Copied url to clipboard.")
+            ErrorManager.logErrorStateWithData(
+                "Cannot open website! Copied url to clipboard instead", "Web browser is not supported",
+                "url" to url,
+                "desktopSupported" to desktopSupported,
+                "supportedActionBrowse" to supportedActionBrowse,
+            )
         }
     }
 
     fun copyToClipboard(text: String) {
-        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
+        ClipboardUtils.copyToClipboard(text)
     }
 
-    fun readFromClipboard(): String? {
-        val systemClipboard = Toolkit.getDefaultToolkit().systemClipboard ?: return null
-        try {
-            val data = systemClipboard.getData(DataFlavor.stringFlavor) ?: return null
-            return data.toString()
-        } catch (e: UnsupportedFlavorException) {
-            return null
-        }
-    }
-
-    fun KeyBinding.isActive() : Boolean {
-        if (!Keyboard.isCreated()) return false
-        try {
-            if (Keyboard.isKeyDown(this.keyCode)) return true
-        } catch (e: IndexOutOfBoundsException) {
-            println("KeyBinding isActive caused an IndexOutOfBoundsException with keyCode: $keyCode")
-            e.printStackTrace()
-            return false
-        }
-        if (this.isKeyDown || this.isPressed) return true
-        return false
-    }
+    suspend fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 }

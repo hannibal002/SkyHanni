@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.client.gui.FontRenderer
-
-private val piggyPattern = "Piggy: (?<coins>.*)".toPattern()
 
 fun drawString(
     instance: FontRenderer,
@@ -12,18 +12,60 @@ fun drawString(
     x: Int,
     y: Int,
     color: Int,
-): Int {
-    if (SkyHanniMod.feature.misc.hideScoreboardNumbers) {
-        if (text.startsWith("§c") && text.length <= 4) {
-            return 0
-        }
+) = tryToReplaceScoreboardLine(text)?.let {
+    instance.drawString(it, x, y, color)
+} ?: 0
+
+/**
+ * Tries to replace a scoreboard line with a modified one
+ * @param text The line to check and possibly replace
+ * @return The replaced line, or null if it should be hidden
+ */
+fun tryToReplaceScoreboardLine(text: String): String? {
+    try {
+        return tryToReplaceScoreboardLineHarder(text)
+    } catch (t: Throwable) {
+        ErrorManager.logErrorWithData(
+            t, "Error while changing the scoreboard text.",
+            "text" to text
+        )
+        return text
+    }
+}
+
+private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+    if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
+        return null
     }
     if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-        piggyPattern.matchMatcher(text) {
+        PurseAPI.piggyPattern.matchMatcher(text) {
             val coins = group("coins")
-            return instance.drawString("Purse: $coins", x, y, color)
+            return "Purse: $coins"
         }
     }
 
-    return instance.drawString(text, x, y, color)
+    if (SkyHanniMod.feature.misc.colorMonthNames) {
+        for (season in Season.entries) {
+            if (text.trim().startsWith(season.prefix)) {
+                return season.colorCode + text
+            }
+        }
+    }
+
+    return text
+}
+
+enum class Season(val prefix: String, val colorCode: String) {
+    EARLY_SPRING("Early Spring", "§d"),
+    SPRING("Spring", "§d"),
+    LATE_SPRING("Late Spring", "§d"),
+    EARLY_SUMMER("Early Summer", "§6"),
+    SUMMER("Summer", "§6"),
+    LATE_SUMMER("Late Summer", "§6"),
+    EARLY_AUTUMN("Early Autumn", "§e"),
+    AUTUMN("Autumn", "§e"),
+    LATE_AUTUMN("Late Autumn", "§e"),
+    EARLY_WINTER("Early Winter", "§9"),
+    WINTER("Winter", "§9"),
+    LATE_WINTER("Late Winter", "§9")
 }

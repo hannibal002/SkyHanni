@@ -1,46 +1,78 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SeaCreatureJson
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class SeaCreatureManager {
 
+    private var doubleHook = false
+
     @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        seaCreatureMap.clear()
-        var counter = 0
-
-        try {
-            val data = event.getConstant("SeaCreatures")!!
-
-            for (variant in data.entrySet().map { it.value.asJsonObject }) {
-                val chatColor = variant["chat_color"].asString
-                for ((displayName, value) in variant["sea_creatures"].asJsonObject.entrySet()) {
-                    val seaCreature = value.asJsonObject
-                    val chatMessage = seaCreature["chat_message"].asString
-                    val fishingExperience = seaCreature["fishing_experience"].asInt
-
-                    val rare = if (seaCreature.has("rare")) {
-                         seaCreature["rare"].asBoolean
-                    } else false
-
-                    seaCreatureMap[chatMessage] = SeaCreature(displayName, fishingExperience, chatColor, rare)
-                    counter++
-                }
+    fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (doubleHookMessages.contains(event.message)) {
+            if (SkyHanniMod.feature.fishing.compactDoubleHook) {
+                event.blockedReason = "double_hook"
             }
-            LorenzUtils.debug("Loaded $counter sea creatures from repo")
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
+            doubleHook = true
+        } else {
+            val seaCreature = getSeaCreatureFromMessage(event.message)
+            if (seaCreature != null) {
+                SeaCreatureFishEvent(seaCreature, event, doubleHook).postAndCatch()
+            }
+            doubleHook = false
         }
     }
 
-    companion object {
-        private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        seaCreatureMap.clear()
+        allFishingMobs = emptyMap()
+        var counter = 0
 
-        fun getSeaCreature(message: String): SeaCreature? {
+        val data = event.getConstant<Map<String, SeaCreatureJson.Variant>>("SeaCreatures", SeaCreatureJson.TYPE)
+        val allFishingMobs = mutableMapOf<String, SeaCreature>()
+
+        val variants = mutableMapOf<String, List<String>>()
+
+        for ((variantName, variant) in data) {
+            val chatColor = variant.chat_color
+            val variantFishes = mutableListOf<String>()
+            variants[variantName] = variantFishes
+            for ((name, seaCreature) in variant.sea_creatures) {
+                val chatMessage = seaCreature.chat_message
+                val fishingExperience = seaCreature.fishing_experience
+                val rarity = seaCreature.rarity
+                val rare = seaCreature.rare ?: false
+
+                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity)
+                seaCreatureMap[chatMessage] = creature
+                allFishingMobs[name] = creature
+                variantFishes.add(name)
+                counter++
+            }
+        }
+        SeaCreatureManager.allFishingMobs = allFishingMobs
+        allVariants = variants
+    }
+
+    companion object {
+
+        private val seaCreatureMap = mutableMapOf<String, SeaCreature>()
+        var allFishingMobs = mapOf<String, SeaCreature>()
+        var allVariants = mapOf<String, List<String>>()
+
+        private val doubleHookMessages = setOf(
+            "§eIt's a §r§aDouble Hook§r§e! Woot woot!",
+            "§eIt's a §r§aDouble Hook§r§e!"
+        )
+
+        fun getSeaCreatureFromMessage(message: String): SeaCreature? {
             return seaCreatureMap.getOrDefault(message, null)
         }
     }

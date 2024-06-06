@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -10,12 +12,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightRiftGuide {
+@SkyHanniModule
+object HighlightRiftGuide {
+
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
 
     @SubscribeEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inInventory = false
 
         if (!isEnabled()) return
@@ -30,10 +34,8 @@ class HighlightRiftGuide {
         val highlightedItems = mutableListOf<Int>()
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
-            if (lore.isNotEmpty()) {
-                if (lore.last() == "§8✖ Not completed yet!") {
-                    highlightedItems.add(slot)
-                }
+            if (lore.isNotEmpty() && lore.last() == "§8✖ Not completed yet!") {
+                highlightedItems.add(slot)
             }
         }
         inInventory = true

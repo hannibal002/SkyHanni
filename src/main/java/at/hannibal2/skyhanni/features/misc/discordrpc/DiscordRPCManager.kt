@@ -2,198 +2,241 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // This entire file was taken from SkyblockAddons code, ported to SkyHanni
 
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.consoleLog
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
+import at.hannibal2.skyhanni.SkyHanniMod.Companion.logger
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
+import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onToggle
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
 import com.jagrosh.discordipc.entities.RichPresence
+import com.jagrosh.discordipc.entities.RichPresenceButton
+import com.jagrosh.discordipc.entities.pipe.PipeStatus
 import kotlinx.coroutines.launch
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object DiscordRPCManager : IPCListener {
-    private const val applicationID = 1093298182735282176L
-    private const val updatePeriod = 4200L
 
-    private val config get() = feature.misc.discordRPC
+    private const val APPLICATION_ID = 1093298182735282176L
+
+    val config get() = feature.gui.discordRPC
 
     private var client: IPCClient? = null
-    private lateinit var secondLine: DiscordStatus
-    private lateinit var firstLine: DiscordStatus
-    private var startTimestamp: Long? = null
-    private var startOnce = false
+    private var startTimestamp: Long = 0
+    private var started = false
+    private var nextUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    private var updateTimer: Timer? = null
-    private var connected = false
-
-    private val DiscordLocationKey = DiscordLocationKey()
+    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
 
     fun start(fromCommand: Boolean = false) {
         coroutineScope.launch {
             try {
-                if (isActive()) {
-                    return@launch
-                }
-                consoleLog("Starting Discord RPC...")
+                if (isConnected()) return@launch
 
-                firstLine = getStatusByConfigId(config.firstLine.get())
-                secondLine = getStatusByConfigId(config.secondLine.get())
+                logger.info("Starting Discord RPC...")
                 startTimestamp = System.currentTimeMillis()
-                client = IPCClient(applicationID)
-                client?.setListener(this@DiscordRPCManager)
-
-                try {
-                    client?.connect()
-                    if (fromCommand) LorenzUtils.chat("§a[SkyHanni] Successfully started Rich Presence!") // confirm that /shrpcstart worked
-                } catch (ex: Exception) {
-                    consoleLog("Warn: Failed to connect to RPC!")
-                    consoleLog(ex.toString())
-                    LorenzUtils.clickableChat("§e[SkyHanni] Discord Rich Presence was unable to start! " +
-                            "This usually happens when you join SkyBlock when Discord is not started. " +
-                            "Please run /shrpcstart to retry once you have launched Discord.", "shrpcstart")
-                }
+                client = IPCClient(APPLICATION_ID)
+                client?.setup(fromCommand)
             } catch (ex: Throwable) {
-                consoleLog("Warn: Discord RPC has thrown an unexpected error while trying to start...")
-                consoleLog(ex.toString())
+                logger.warn("Discord RPC has thrown an unexpected error while trying to start...", ex)
             }
         }
     }
 
     private fun stop() {
         coroutineScope.launch {
-            if (isActive()) {
-                connected = false
+            if (isConnected()) {
                 client?.close()
-                startOnce = false
+                started = false
             }
         }
     }
 
-    private fun isActive() = client != null && connected
+    private fun IPCClient.setup(fromCommand: Boolean) {
+        setListener(DiscordRPCManager)
+
+        try {
+            connect()
+            if (!fromCommand) return
+
+            // confirm that /shrpcstart worked
+            ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
+        } catch (ex: Exception) {
+            logger.warn("Failed to connect to RPC!", ex)
+            ChatUtils.clickableChat(
+                "Discord Rich Presence was unable to start! " +
+                    "This usually happens when you join SkyBlock when Discord is not started. " +
+                    "Please run /shrpcstart to retry once you have launched Discord.",
+                onClick = {
+                    startCommand()
+                }
+            )
+        }
+    }
+
+    private fun isConnected() = client?.status == PipeStatus.CONNECTED
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.firstLine,
-            config.secondLine,
-            config.customText) {
-            if (isActive()) {
+        ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
+            if (isConnected()) {
                 updatePresence()
             }
         }
         config.enabled.whenChanged { _, new ->
-            if (new) {
-//                start()
-            } else {
+            if (!new) {
                 stop()
             }
         }
     }
-    fun updatePresence() {
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
+    }
+
+    private fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
+        client?.sendRichPresence(RichPresence.Builder().apply {
+            setDetails(getStatusByConfigId(config.firstLine.get()).getDisplayString())
+            setState(getStatusByConfigId(config.secondLine.get()).getDisplayString())
+            setStartTimestamp(startTimestamp)
+            setLargeImage(discordIconKey, location)
 
-        secondLine = getStatusByConfigId(config.secondLine.get())
-        firstLine = getStatusByConfigId(config.firstLine.get())
-        val presence: RichPresence = RichPresence.Builder()
-            .setDetails(firstLine.getDisplayString())
-            .setState(secondLine.getDisplayString())
-            .setStartTimestamp(startTimestamp!!)
-            .setLargeImage(discordIconKey, location)
-            .build()
-        client?.sendRichPresence(presence)
+            if (config.showSkyCryptButton.get()) {
+                addButton(
+                    RichPresenceButton(
+                        "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
+                        "Open SkyCrypt"
+                    )
+                )
+            }
+        }.build())
     }
 
     override fun onReady(client: IPCClient) {
-        consoleLog("Discord RPC Started.")
-        connected = true
-        updateTimer = Timer()
-        updateTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                updatePresence()
-            }
-        }, 0, updatePeriod)
+        logger.info("Discord RPC Ready.")
     }
 
-    override fun onClose(client: IPCClient, json: JsonObject?) {
-        consoleLog("Discord RPC closed.")
-        this.client = null
-        connected = false
-        cancelTimer()
-    }
-
-    override fun onDisconnect(client: IPCClient?, t: Throwable?) {
-        consoleLog("Discord RPC disconnected.")
-        this.client = null
-        connected = false
-        cancelTimer()
-    }
-
-    private fun cancelTimer() {
-        updateTimer?.let {
-            it.cancel()
-            updateTimer = null
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isConnected()) return
+        if (event.repeatSeconds(5)) {
+            updatePresence()
         }
     }
 
-    private fun getStatusByConfigId(id: Int) = DiscordStatus.values().getOrElse(id) { DiscordStatus.NONE }
+    override fun onClose(client: IPCClient, json: JsonObject?) {
+        logger.info("Discord RPC closed.")
+        this.client = null
+    }
+
+    override fun onDisconnect(client: IPCClient?, t: Throwable?) {
+        logger.info("Discord RPC disconnected.")
+        this.client = null
+    }
+
+    private fun getStatusByConfigId(entry: LineEntry) =
+        DiscordStatus.entries.getOrElse(entry.ordinal) { DiscordStatus.NONE }
 
     private fun isEnabled() = config.enabled.get()
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (startOnce || !isEnabled()) return // the mod has already started the connection process. this variable is my way of running a function when the player joins skyblock but only running it again once they join and leave.
+    fun onTick(event: LorenzTickEvent) {
+        // The mod has already started the connection process. This variable is my way of running a function when
+        // the player joins SkyBlock but only running it again once they join and leave.
+        if (started || !isEnabled()) return
         if (LorenzUtils.inSkyBlock) {
             start()
-            startOnce = true
+            started = true
         }
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        val executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
-        executor.schedule(
-            {
-                if (!LorenzUtils.inSkyBlock) {
-                    stop()
-                }
-            },
-            5,
-            TimeUnit.SECONDS
-        ) // wait 5 seconds to check if the new world is skyblock or not before stopping the function
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        if (nextUpdate.isInFuture()) return
+        // wait 5 seconds to check if the new world is skyblock or not before stopping the function
+        nextUpdate = DelayedRun.runDelayed(5.seconds) {
+            if (!LorenzUtils.inSkyBlock) {
+                stop()
+            }
+        }
     }
 
     @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    fun onDisconnect(event: ClientDisconnectEvent) {
         stop()
     }
 
     fun startCommand() {
-        if (!config.enabled.get()) {
-            LorenzUtils.chat("§c[SkyHanni] Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
+        if (!isEnabled()) {
+            ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
             return
         }
 
-        if (isActive()) {
-            LorenzUtils.chat("§e[SkyHanni] Discord Rich Presence is already active!")
+        if (isConnected()) {
+            ChatUtils.userError("Discord Rich Presence is already active!")
             return
         }
 
-        LorenzUtils.chat("§e[SkyHanni] Attempting to start Discord Rich Presence...")
+        ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             start(true)
         } catch (e: Exception) {
-            LorenzUtils.chat("§c[SkyHanni] Unable to start Discord Rich Presence! Please report this on Discord and ping NetheriteMiner#6267.")
+            ErrorManager.logErrorWithData(
+                e,
+                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer."
+            )
         }
     }
+
+    // Events that change things in DiscordStatus
+    @SubscribeEvent
+    fun onKeyClick(event: LorenzKeyPressEvent) {
+        if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
+        beenAfkFor = SimpleTimeMark.now()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(11, "misc.discordRPC.firstLine") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.transform(11, "misc.discordRPC.secondLine") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.transform(11, "misc.discordRPC.auto") { element ->
+            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
+        }
+        event.transform(11, "misc.discordRPC.autoPriority") { element ->
+            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
+        }
+
+        event.move(31, "misc.discordRPC", "gui.discordRPC")
+    }
+
+    private fun PriorityEntry.isSelected() = config.autoPriority.contains(this)
 }

@@ -2,46 +2,91 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.CropClickEvent
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MinecraftDispatcher
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenAPI {
+
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
-    var mushroomCowPet = false
+    val mushroomCowPet
+        get() = PetAPI.isCurrentPet("Mooshroom Cow") &&
+            storage?.fortune?.farmingItems?.get(FarmingItems.MOOSHROOM_COW)
+                ?.let { it.getItemRarityOrNull()?.isAtLeast(LorenzRarity.RARE) } ?: false
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
-    val config get() = ProfileStorageData.profileSpecific?.garden
+    val storage get() = ProfileStorageData.profileSpecific?.garden
+    val config get() = SkyHanniMod.feature.garden
+    var totalAmountVisitorsExisting = 0
+    var gardenExp: Long?
+        get() = storage?.experience
+        set(value) {
+            value?.let {
+                storage?.experience = it
+            }
+        }
 
-    var tick = 0
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
+
+    // TODO USE SH-REPO
+    private val otherToolsList = listOf(
+        "DAEDALUS_AXE",
+        "BASIC_GARDENING_HOE",
+        "ADVANCED_GARDENING_AXE",
+        "BASIC_GARDENING_AXE",
+        "ADVANCED_GARDENING_HOE",
+        "ROOKIE_HOE",
+        "BINGHOE"
+    )
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
@@ -51,17 +96,20 @@ object GardenAPI {
     }
 
     @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
+        DelayedRun.runDelayed(500.milliseconds) {
+            if (inGarden()) {
+                checkItemInHand()
+            }
+        }
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!inGarden()) return
-        tick++
-        if (tick % 10 == 0) {
+        if (event.isMod(10, 1)) {
             inBarn = barnArea.isPlayerInside()
 
             // We ignore random hypixel moments
@@ -70,21 +118,12 @@ object GardenAPI {
         }
     }
 
+    // TODO use IslandChangeEvent
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (inGarden()) {
-            mushroomCowPet = event.tabList.any { it.startsWith(" Strength: §r§c❁") }
-        }
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        SkyHanniMod.coroutineScope.launch {
-            delay(2.seconds)
-            withContext(MinecraftDispatcher) {
-                if (inGarden()) {
-                    checkItemInHand()
-                }
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        DelayedRun.runDelayed(2.seconds) {
+            if (inGarden()) {
+                checkItemInHand()
             }
         }
     }
@@ -109,48 +148,56 @@ object GardenAPI {
         if (crop != null) return crop.cropName
 
         val internalName = toolItem?.getInternalName() ?: return null
-        return if (isOtherTool(internalName)) internalName else null
+        return if (isOtherTool(internalName)) internalName.asString() else null
     }
 
-    private fun isOtherTool(internalName: String): Boolean {
-        if (internalName.startsWith("DAEDALUS_AXE")) return true
-
-        if (internalName.startsWith("BASIC_GARDENING_HOE")) return true
-        if (internalName.startsWith("ADVANCED_GARDENING_AXE")) return true
-
-        if (internalName.startsWith("BASIC_GARDENING_AXE")) return true
-        if (internalName.startsWith("ADVANCED_GARDENING_HOE")) return true
-
-        if (internalName.startsWith("ROOKIE_HOE")) return true
-
-        return false
+    private fun isOtherTool(internalName: NEUInternalName): Boolean {
+        return internalName.asString() in otherToolsList
     }
 
-    fun inGarden() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.GARDEN
+    fun inGarden() = IslandType.GARDEN.isInIsland()
+
+    fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && hasFarmingToolInHand()
+
+    fun hasFarmingToolInHand() = InventoryUtils.getItemInHand()?.let {
+        val crop = it.getCropType()
+        getToolInHand(it, crop) != null
+    } ?: false
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
-        return CropType.values().firstOrNull { internalName.startsWith(it.toolName) }
+        return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    fun MutableList<Any>.addCropIcon(crop: CropType) {
-        try {
-            add(crop.icon)
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-        }
+    @Deprecated("use renderable list instead", ReplaceWith(""))
+    fun MutableList<Any>.addCropIcon(
+        crop: CropType,
+        scale: Double = NEUItems.itemFontSize,
+        highlight: Boolean = false,
+    ) =
+        addItemIcon(crop.icon.copy(), highlight, scale = scale)
+
+    // TODO rename to addCropIcon
+    fun MutableList<Renderable>.addCropIconRenderable(
+        crop: CropType,
+        scale: Double = NEUItems.itemFontSize,
+        highlight: Boolean = false,
+    ) {
+        addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-            SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory
+        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory ||
+        FFGuideGUI.isInGui() || ChocolateShopPrice.inInventory || ChocolateFactoryAPI.inChocolateFactory ||
+        ChocolateFactoryAPI.chocolateFactoryPaused || HoppityCollectionStats.inInventory
 
     fun clearCropSpeed() {
-        config?.cropsPerSecond?.clear()
+        storage?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
-        LorenzUtils.chat("§e[SkyHanni] Manually reset all crop speed data!")
+        ChatUtils.chat("Manually reset all crop speed data!")
     }
 
     @SubscribeEvent
@@ -166,14 +213,12 @@ object GardenAPI {
     private var lastLocation: LorenzVec? = null
 
     @SubscribeEvent
-    fun onBlockBreak(event: BlockClickEvent) {
+    fun onBlockClick(event: BlockClickEvent) {
         if (!inGarden()) return
 
         val blockState = event.getBlockState
         val cropBroken = blockState.getCropType() ?: return
-        if (cropBroken.multiplier == 1) {
-            if (blockState.isBabyCrop()) return
-        }
+        if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position
         if (lastLocation == position) {
@@ -181,7 +226,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {
@@ -194,10 +239,19 @@ object GardenAPI {
                 return totalExp
             }
         }
+
+        while (tier < requestedLevel) {
+            totalExp += gardenOverflowExp
+            tier++
+            if (tier == requestedLevel) {
+                return totalExp
+            }
+        }
         return 0
     }
 
-    fun getLevelForExp(gardenExp: Long): Int {
+    fun getGardenLevel(overflow: Boolean = true): Int {
+        val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
         for (tierExp in gardenExperience) {
@@ -207,51 +261,24 @@ object GardenAPI {
             }
             tier++
         }
+        if (overflow) {
+            totalExp += gardenOverflowExp
+
+            while (totalExp < gardenExp) {
+                tier++
+                totalExp += gardenOverflowExp
+            }
+        }
         return tier
     }
 
-    private val gardenExperience = listOf(
-        0,
-        70,
-        100,
-        140,
-        240,
-        600,
-        1500,
-        2000,
-        2500,
-        3000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000, // level 15
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden")
+        gardenExperience = data.garden_exp
+        totalAmountVisitorsExisting = data.visitors.size
+    }
 
-        // overflow levels till 40 for now, in 10k steps
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-        10_000,
-    )
+    private var gardenExperience = listOf<Int>()
+    private const val gardenOverflowExp = 10000
 }

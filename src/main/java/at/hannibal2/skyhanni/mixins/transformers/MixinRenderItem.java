@@ -14,18 +14,11 @@ public abstract class MixinRenderItem {
 
     @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
     private void renderItemOverlayPost(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
-        RenderItemHookKt.renderItemOverlayPost(fr, stack, xPosition, yPosition, text, ci);
-    }
-
-    @Inject(method = "renderEffect", at = @At("HEAD"), cancellable = true)
-    public void onRenderEffect(CallbackInfo ci) {
-        if (RenderItemHookKt.getSkipGlint()) {
-            ci.cancel();
-        }
+        RenderItemHookKt.renderItemOverlayPost(fr, stack, xPosition, yPosition, text);
     }
 
     @Inject(method = "renderItemIntoGUI", at = @At("RETURN"))
     public void renderItemReturn(ItemStack stack, int x, int y, CallbackInfo ci) {
-        RenderItemHookKt.renderItemReturn(stack, x, y, ci);
+        RenderItemHookKt.renderItemReturn(stack, x, y);
     }
 }

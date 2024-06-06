@@ -1,141 +1,164 @@
 package at.hannibal2.skyhanni.features.event.diana
 
-
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleUtils
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
-import at.hannibal2.skyhanni.utils.*
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import io.github.moulberry.moulconfig.internal.KeybindHelper
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import org.lwjgl.input.Keyboard
+import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object InquisitorWaypointShare {
-    private val config get() = SkyHanniMod.feature.diana.inquisitorSharing
-    private val partyPattern =
-        "§9Party §8> (?<playerName>.*)§f: §rx: (?<x>-?[0-9]{1,4}), y: (?<y>-?[0-9]{1,4}), z: (?<z>-?[0-9]{1,4})\\b".toPattern()
-    private val diedPattern = "§9Party §8> (?<playerName>.*)§f: §rInquisitor dead!".toPattern()
 
-    private var time = 0L
-    private var testTime = 0L
-    private var lastInquisitorMessage = ""
+    private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
+
+    private val patternGroup = RepoPattern.group("diana.waypoints")
+
+    /**
+     * REGEX-TEST: §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: 6.7
+     */
+    private val partyOnlyCoordsPattern by patternGroup.pattern(
+        "party.onlycoords",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
+    )
+
+    //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
+    /**
+     * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
+     */
+    private val partyInquisitorCheckerPattern by patternGroup.pattern(
+        "party.inquisitorchecker",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
+    )
+    private val diedPattern by patternGroup.pattern(
+        "died",
+        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
+    )
+
+    /**
+     * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
+     */
+    private val inquisitorFoundChatPattern by patternGroup.pattern(
+        "inquisitor.dug",
+        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
+    )
+
     private var inquisitor = -1
     private var lastInquisitor = -1
-    private var lastShareTime = 0L
+    private var lastShareTime = SimpleTimeMark.farPast()
     private var inquisitorsNearby = emptyList<EntityOtherPlayerMP>()
-    private var tick = 0
 
-    private val logger = LorenzLogger("diana/waypoints")
+    var waypoints = mapOf<String, SharedInquisitor>()
 
-    var waypoints = mapOf<String, LorenzVec>()
+    class SharedInquisitor(
+        val fromPlayer: String,
+        val displayName: String,
+        val location: LorenzVec,
+        val spawnTime: SimpleTimeMark,
+    )
 
     private var test = false
 
     fun test() {
         test = !test
-        LorenzUtils.chat("§e[SkyHanni] Inquisitor Test " + if (test) "Enabled" else "Disabled")
+        ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        if (tick++ % 60 == 0) {
+        if (event.repeatSeconds(3)) {
             inquisitorsNearby = inquisitorsNearby.editCopy { removeIf { it.isDead } }
         }
+
+        waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
         waypoints = emptyMap()
         inquisitorsNearby = emptyList()
     }
 
+    val inquisitorTime = mutableListOf<SimpleTimeMark>()
+
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-        val message = event.message
-        if (message.contains("§eYou dug out")) {
-            testTime = System.currentTimeMillis()
-            lastInquisitorMessage = message
+    fun onInquisitorFound(event: InquisitorFoundEvent) {
+        val inquisitor = event.inquisitorEntity
+        inquisitorsNearby = inquisitorsNearby.editCopy { add(inquisitor) }
+        GriffinBurrowHelper.update()
 
-            val diff = System.currentTimeMillis() - time
+        lastInquisitor = inquisitor.entityId
+        checkInquisFound()
+    }
 
-            if (diff < 10_000) {
-                logger.log(" ")
-                logger.log("reverse!")
-                logger.log("diff: $diff")
-            }
-            if (diff > 1500 || diff < -500) {
-                return
-            }
+    // We do not know if the chat message or the entity spawn happens first.
+    // We only want to run foundInquisitor when both happens in under 1.5 seconds
+    private fun checkInquisFound() {
+        inquisitorTime.add(SimpleTimeMark.now())
+
+        val lastTwo = inquisitorTime.takeLast(2)
+        if (lastTwo.size != 2) return
+
+        if (lastTwo.all { it.passedSince() < 1.5.seconds }) {
+            inquisitorTime.clear()
             foundInquisitor(lastInquisitor)
-        }
-
-        if (message.endsWith("§r§eYou dug out §r§2a Minos Champion§r§e!")) {
-            time = System.currentTimeMillis()
-            logger.log("found Champion/Inquisitor")
         }
     }
 
-
     @SubscribeEvent
-    fun onJoinWorld(event: EntityJoinWorldEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        val entity = event.entity
-        if (entity !is EntityOtherPlayerMP) return
-        val name = entity.name
-        if (test) {
-            if (name != "Minos Inquisitor" && name != "Minotaur " && name != "Minos Champion") return
-        } else {
-            if (name != "Minos Inquisitor") return
+        val message = event.message
+
+        if (inquisitorFoundChatPattern.matches(message)) {
+            checkInquisFound()
         }
-        logger.log("FOUND: $name")
-
-        inquisitorsNearby = inquisitorsNearby.editCopy { add(entity) }
-
-        val diff = System.currentTimeMillis() - time
-        time = System.currentTimeMillis()
-        lastInquisitor = entity.entityId
-
-        logger.log("diff: $diff")
-        if (diff > 1500 || diff < -500) {
-            val testDiff = System.currentTimeMillis() - testTime
-            if (testDiff > 1500 || testDiff < -500) {
-                logger.log("testDiff: $diff")
-                return
-            } else {
-                logger.log("wrong Inquisitor message!")
-            }
-        }
-        foundInquisitor(entity.entityId)
     }
 
     private fun foundInquisitor(inquisId: Int) {
-        logger.log("lastInquisitorMessage: '$lastInquisitorMessage'")
+        lastShareTime = SimpleTimeMark.farPast()
         inquisitor = inquisId
 
         if (config.instantShare) {
+            // add repo kill switch
             sendInquisitor()
         } else {
-            val keyName = KeybindHelper.getKeyName(config.keyBindShare)
-            val message =
-                "§e[SkyHanni] §l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
-            LorenzUtils.clickableChat(message, "shshareinquis")
+            val keyName = KeyboardManager.getKeyName(config.keyBindShare)
+            val message = "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+            ChatUtils.clickableChat(
+                message, onClick = {
+                    sendInquisitor()
+                },
+                oneTimeClick = true
+            )
         }
     }
 
@@ -154,53 +177,47 @@ object InquisitorWaypointShare {
     }
 
     @SubscribeEvent
-    fun onKeyBindPressed(event: InputEvent.KeyInputEvent) {
+    fun onKeyClick(event: LorenzKeyPressEvent) {
         if (!isEnabled()) return
-        if (!Keyboard.getEventKeyState()) return
-        val key = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
-        if (config.keyBindShare == key) {
-            sendInquisitor()
-        }
+        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (event.keyCode == config.keyBindShare) sendInquisitor()
     }
 
     private fun sendDeath() {
         if (!isEnabled()) return
-        if (lastShareTime + 5000 > System.currentTimeMillis()) return
-        lastShareTime = System.currentTimeMillis()
+        if (lastShareTime.passedSince() < 5.seconds) return
 
-        if (inquisitor == -1) {
-            logger.log("Inquisitor is already null!")
-            return
-        }
+        // already dead
+        if (inquisitor == -1) return
         inquisitor = -1
-        LorenzUtils.sendCommandToServer("pc Inquisitor dead!")
+        HypixelCommands.partyChat("Inquisitor dead!")
     }
 
     fun sendInquisitor() {
         if (!isEnabled()) return
-        if (lastShareTime + 5000 > System.currentTimeMillis()) return
-        lastShareTime = System.currentTimeMillis()
+        if (lastShareTime.passedSince() < 5.seconds) return
+        lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
-            LorenzUtils.chat("§c[SkyHanni] No Inquisitor Found!")
+            ChatUtils.error("No Inquisitor Found!")
             return
         }
 
-        val inquisitor = Minecraft.getMinecraft().theWorld.getEntityByID(inquisitor)
+        val inquisitor = EntityUtils.getEntityByID(inquisitor)
         if (inquisitor == null) {
-            LorenzUtils.chat("§cInquisitor out of range!")
+            ChatUtils.chat("§cInquisitor out of range!")
             return
         }
 
         if (inquisitor.isDead) {
-            LorenzUtils.chat("§cInquisitor is ded")
+            ChatUtils.chat("§cInquisitor is dead")
             return
         }
         val location = inquisitor.getLorenzVec()
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        LorenzUtils.sendCommandToServer("pc x: $x, y: $y, z: $z ")
+        HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -210,45 +227,61 @@ object InquisitorWaypointShare {
         if (packet !is S02PacketChat) return
         val messageComponent = packet.chatComponent
 
-        val message = LorenzUtils.stripVanillaMessage(messageComponent.formattedText)
+        val message = messageComponent.formattedText.stripHypixelMessage()
         if (packet.type.toInt() != 0) return
 
-        partyPattern.matchMatcher(message) {
-            val playerName = group("playerName")
-            val x = group("x").trim().toInt()
-            val y = group("y").trim().toInt()
-            val z = group("z").trim().toInt()
-            val location = LorenzVec(x, y, z)
-
-            val cleanName = playerName.cleanPlayerName()
-            if (!waypoints.containsKey(cleanName)) {
-                LorenzUtils.chat("§e[SkyHanni] $playerName §l§efound an inquisitor at §l§c$x $y $z!")
-                if (cleanName != LorenzUtils.getPlayerName()) {
-                    TitleUtils.sendTitle("§dINQUISITOR §efrom §b$cleanName", 5_000)
-                    SoundUtils.playBeepSound()
-                }
+        partyInquisitorCheckerPattern.matchMatcher(message) {
+            if (detectFromChat()) {
+                event.isCanceled = true
             }
-            waypoints = waypoints.editCopy { this[cleanName] = location }
-            if (config.focusInquisitor) {
-                GriffinBurrowHelper.setTargetLocation(location.add(0, 1, 0))
-                GriffinBurrowHelper.animationLocation = LocationUtils.playerLocation()
-            }
+        }
 
-            event.isCanceled = true
+        partyOnlyCoordsPattern.matchMatcher(message) {
+            if (detectFromChat()) {
+                event.isCanceled = true
+            }
         }
         diedPattern.matchMatcher(message) {
-            val playerName = group("playerName").cleanPlayerName()
-            waypoints = waypoints.editCopy { remove(playerName) }
-            logger.log("Inquisitor died from '$playerName'")
+            if (block()) return
+            val rawName = group("playerName")
+            val name = rawName.cleanPlayerName()
+            waypoints = waypoints.editCopy { remove(name) }
+            GriffinBurrowHelper.update()
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland == IslandType.HUB && config.enabled
+    private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
 
-    fun maybeRemove(playerName: String) {
+    private fun Matcher.detectFromChat(): Boolean {
+        if (block()) return false
+        val rawName = group("playerName")
+        val x = group("x").trim().toDoubleOrNull() ?: return false
+        val y = group("y").trim().toDoubleOrNull() ?: return false
+        val z = group("z").trim().toDoubleOrNull() ?: return false
+        val location = LorenzVec(x, y, z)
+
+        val name = rawName.cleanPlayerName()
+        val displayName = rawName.cleanPlayerName(displayName = true)
+        if (!waypoints.containsKey(name)) {
+            ChatUtils.chat("$displayName §l§efound an inquisitor at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+            if (name != LorenzUtils.getPlayerName()) {
+                LorenzUtils.sendTitle("§dINQUISITOR §efrom §b$displayName", 5.seconds)
+                SoundUtils.playBeepSound()
+            }
+        }
+        val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
+        waypoints = waypoints.editCopy { this[name] = inquis }
+        GriffinBurrowHelper.update()
+        return true
+    }
+
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
+
+    fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
-            waypoints = waypoints.editCopy { remove(playerName) }
-            LorenzUtils.chat("§e[SkyHanni] Inquisitor from $playerName not found, deleting.")
+            waypoints = waypoints.editCopy { remove(inquis.fromPlayer) }
+            GriffinBurrowHelper.update()
+            ChatUtils.chat("Inquisitor from ${inquis.displayName} §enot found, deleting.")
         }
     }
 }

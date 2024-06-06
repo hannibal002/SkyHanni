@@ -14,10 +14,10 @@ object BlockUtils {
         getBlockStateAt().block
 
     fun LorenzVec.getBlockStateAt(): IBlockState =
-        Minecraft.getMinecraft().theWorld.getBlockState(toBlocPos())
+        Minecraft.getMinecraft().theWorld.getBlockState(toBlockPos())
 
     fun LorenzVec.isInLoadedChunk(): Boolean =
-        Minecraft.getMinecraft().theWorld.chunkProvider.provideChunk(toBlocPos()).isLoaded
+        Minecraft.getMinecraft().theWorld.chunkProvider.provideChunk(toBlockPos()).isLoaded
 
     fun getTextureFromSkull(position: BlockPos?): String? {
         val entity = Minecraft.getMinecraft().theWorld.getTileEntity(position) as TileEntitySkull
@@ -26,7 +26,7 @@ object BlockUtils {
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
     }
 
-    fun IBlockState.isBabyCrop(): Boolean  {
+    fun IBlockState.isBabyCrop(): Boolean {
         for (property in block.blockState.properties) {
             val name = property.name
             if (name != "age") continue
@@ -41,16 +41,16 @@ object BlockUtils {
     }
 
     fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
-        val help = direction.normalize().multiply(distance)
-        val target = start.add(help)
+        val help = direction.normalize() * distance
+        val target = start + help
         val result = Minecraft.getMinecraft().theWorld.rayTraceBlocks(start.toVec3(), target.toVec3())
 
         return result?.blockPos?.toLorenzVec()
     }
 
-    fun getBlockLookingAt(duration: Double = 10.0) = rayTrace(
+    fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
         LocationUtils.playerEyeLocation(),
         Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec(),
-        duration
+        distance
     )
 }

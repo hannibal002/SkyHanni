@@ -1,33 +1,37 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
+@SkyHanniModule
 object OtherInventoryData {
+
     private var currentInventory: Inventory? = null
     private var acceptItems = false
-    private var lateEvent: LateInventoryOpenEvent? = null
+    private var lateEvent: InventoryUpdatedEvent? = null
 
     @SubscribeEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close()
     }
 
-    fun close() {
-        currentInventory?.let {
-            InventoryCloseEvent(it).postAndCatch()
-            currentInventory = null
-        }
+    fun close(reopenSameName: Boolean = false) {
+        InventoryCloseEvent(reopenSameName).postAndCatch()
+        currentInventory = null
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         lateEvent?.let {
             it.postAndCatch()
             lateEvent = null
@@ -35,7 +39,7 @@ object OtherInventoryData {
     }
 
     @SubscribeEvent
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onInventoryDataReceiveEvent(event: PacketEvent.ReceiveEvent) {
         val packet = event.packet
 
         if (packet is S2EPacketCloseWindow) {
@@ -46,7 +50,7 @@ object OtherInventoryData {
             val windowId = packet.windowId
             val title = packet.windowTitle.unformattedText
             val slotCount = packet.slotCount
-            close()
+            close(reopenSameName = title == currentInventory?.title)
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true
@@ -62,7 +66,7 @@ object OtherInventoryData {
                         val itemStack = packet.func_149174_e()
                         if (itemStack != null) {
                             it.items[slot] = itemStack
-                            lateEvent = LateInventoryOpenEvent(it)
+                            lateEvent = InventoryUpdatedEvent(it)
                         }
                     }
                 }
@@ -90,7 +94,9 @@ object OtherInventoryData {
     }
 
     private fun done(inventory: Inventory) {
-        InventoryOpenEvent(inventory).postAndCatch()
+        InventoryFullyOpenedEvent(inventory).postAndCatch()
+        inventory.fullyOpenedOnce = true
+        InventoryUpdatedEvent(inventory).postAndCatch()
         acceptItems = false
     }
 
@@ -99,5 +105,6 @@ object OtherInventoryData {
         val title: String,
         val slotCount: Int,
         val items: MutableMap<Int, ItemStack> = mutableMapOf(),
+        var fullyOpenedOnce: Boolean = false,
     )
 }

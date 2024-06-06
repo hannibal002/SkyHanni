@@ -3,140 +3,131 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonData
+import at.hannibal2.skyhanni.data.Perk
+import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.TestBingo
+import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.moulconfig.observer.Observer
-import io.github.moulberry.moulconfig.observer.Property
-import io.github.moulberry.notenoughupdates.mixins.AccessorGuiEditSign
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
+import net.minecraft.launchwrapper.Launch
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
-import org.lwjgl.input.Keyboard
-import java.awt.Color
+import net.minecraftforge.fml.common.FMLCommonHandler
 import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty0
+import java.time.LocalDate
+import java.time.Month
+import java.util.regex.Matcher
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
-    val onHypixel get() = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) && Minecraft.getMinecraft().thePlayer != null
+    val connectedToHypixel get() = HypixelData.hypixelLive || HypixelData.hypixelAlpha
+
+    val onHypixel get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
-    val inDungeons get() = inSkyBlock && DungeonData.inDungeon()
+    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
+    @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
+    val inDungeons get() = DungeonAPI.inDungeon()
+
+    /**
+     * Consider using [IslandType.isInIsland] instead
+     */
     val skyBlockIsland get() = HypixelData.skyBlockIsland
 
-    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else "?"
+    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
-    val inKuudraFight get() = skyBlockIsland == IslandType.KUUDRA_ARENA
+    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 
+    val isStrandedProfile get() = inSkyBlock && HypixelData.stranded
+
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
+
+    val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
-    const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
-    private val log = LorenzLogger("chat/mod_sent")
-
-    fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debugEnabled) {
-            if (internalChat(DEBUG_PREFIX + message)) {
-                consoleLog("[Debug] $message")
+    val isAprilFoolsDay: Boolean
+        get() {
+            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
+            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+            val result = (!never && (always || itsTime))
+            if (previousApril != result) {
+                ModifyVisualWords.textCache.clear()
             }
-        }
-    }
-
-    // TODO remove ig?
-    fun warning(message: String) {
-        internalChat("§cWarning! $message")
-    }
-
-    fun error(message: String) {
-        println("error: '$message'")
-        internalChat("§c$message")
-    }
-
-    fun chat(message: String) {
-        internalChat(message)
-    }
-
-    private fun internalChat(message: String): Boolean {
-        log.log(message)
-        val minecraft = Minecraft.getMinecraft()
-        if (minecraft == null) {
-            consoleLog(message.removeColor())
-            return false
+            previousApril = result
+            return result
         }
 
-        val thePlayer = minecraft.thePlayer
-        if (thePlayer == null) {
-            consoleLog(message.removeColor())
-            return false
-        }
+    val debug: Boolean = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
-        thePlayer.addChatMessage(ChatComponentText(message))
-        return true
-    }
+    private var previousApril = false
 
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
+    // TODO move to string utils
+    @Deprecated("outdated", ReplaceWith("originalMessage.stripHypixelMessage()"))
     fun stripVanillaMessage(originalMessage: String): String {
-        var message = originalMessage
-
-        while (message.startsWith("§r")) {
-            message = message.substring(2)
-        }
-        while (message.endsWith("§r")) {
-            message = message.substring(0, message.length - 2)
-        }
-        return message
+        return originalMessage.stripHypixelMessage()
     }
 
     fun Double.round(decimals: Int): Double {
         var multiplier = 1.0
         repeat(decimals) { multiplier *= 10 }
-        return kotlin.math.round(this * multiplier) / multiplier
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString()
+        val b = toString()
+        return if (a.length > b.length) this else result
+    }
+
+    fun Float.round(decimals: Int): Float {
+        var multiplier = 1.0
+        repeat(decimals) { multiplier *= 10 }
+        val result = kotlin.math.round(this * multiplier) / multiplier
+        val a = result.toString().length
+        val b = toString().length
+        return if (a > b) this else result.toFloat()
     }
 
     // TODO replace all calls with regex
+    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
-    //TODO change to Int
+    // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
+    // TODO create extenstion function
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
-//        NumberFormat.getPercentInstance().format(percentage)
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
-
-    fun formatInteger(i: Int): String = formatInteger(i.toLong())
-
-    fun formatInteger(l: Long): String = NumberFormat.getIntegerInstance().format(l)
-
-    fun formatDouble(d: Double, round: Int = 1): String {
-        val numberInstance = NumberFormat.getNumberInstance()
-        numberInstance.maximumFractionDigits = round
-        return numberInstance.format(d.round(round))
-    }
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
@@ -154,18 +145,6 @@ object LorenzUtils {
         }
     }
 
-    fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {
-        return sortedBy { (_, value) -> value }
-    }
-
-    fun <K, V : Comparable<V>> Map<K, V>.sorted(): Map<K, V> {
-        return toList().sorted().toMap()
-    }
-
-    fun <K, V : Comparable<V>> Map<K, V>.sortedDesc(): Map<K, V> {
-        return toList().sorted().reversed().toMap()
-    }
-
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
         for (i in 1..12) {
@@ -181,98 +160,47 @@ object LorenzUtils {
 
     fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
 
-    fun getPlayerName() = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
 
-    fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
-        add(Collections.singletonList(text))
-    }
+    fun getPlayer(): EntityPlayerSP? = Minecraft.getMinecraft()?.thePlayer
 
-    // (key -> value) -> (sorting value -> key item icon)
-    fun fillTable(list: MutableList<List<Any>>, data: MutableMap<Pair<String, String>, Pair<Double, String>>) {
-        val keys = data.mapValues { (_, v) -> v.first }.sortedDesc().keys
-        val renderer = Minecraft.getMinecraft().fontRendererObj
-        val longest = keys.map { it.first }.maxOfOrNull { renderer.getStringWidth(it.removeColor()) } ?: 0
+    fun fillTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NEUItems.itemFontSize,
+    ): Renderable {
+        val sorted = data.sortedByDescending { it.sort }
 
-        for (pair in keys) {
-            val (name, second) = pair
-            var displayName = name
-            while (renderer.getStringWidth(displayName.removeColor()) < longest) {
-                displayName += " "
-            }
-
-            NEUItems.getItemStackOrNull(data[pair]!!.second)?.let {
-                list.add(listOf(it, "$displayName   $second"))
-            }
+        val outerList = mutableListOf<List<Renderable>>()
+        for (entry in sorted) {
+            val item = entry.item.getItemStackOrNull()?.let {
+                Renderable.itemStack(it, scale = itemScale)
+            } ?: continue
+            val left = Renderable.hoverTips(
+                entry.left,
+                tips = entry.hover,
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+            )
+            val right = Renderable.string(entry.right)
+            outerList.add(listOf(item, left, right))
         }
+        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
     }
 
-    fun setTextIntoSign(text: String) {
+    fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiEditSign) return
-        gui as AccessorGuiEditSign
-        gui.tileSign.signText[0] = ChatComponentText(text)
+        if (gui !is AccessorGuiEditSign) return
+        gui.tileSign.signText[line] = ChatComponentText(text)
     }
 
-    fun clickableChat(message: String, command: String) {
-        val text = ChatComponentText(message)
-        text.chatStyle.chatClickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/$command")
-        text.chatStyle.chatHoverEvent =
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§eExecute /$command"))
-        Minecraft.getMinecraft().thePlayer.addChatMessage(text)
+    fun addTextIntoSign(addedText: String) {
+        val gui = Minecraft.getMinecraft().currentScreen
+        if (gui !is AccessorGuiEditSign) return
+        val lines = gui.tileSign.signText
+        val index = gui.editLine
+        val text = lines[index].unformattedText + addedText
+        lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
     }
-
-    fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
-        val entry = entries.find(matcher)
-        if (entry != null) {
-            val newMap = linkedMapOf(entry.key to entry.value)
-            newMap.putAll(this)
-            return newMap
-        }
-        return this
-    }
-
-    private var lastMessageSent = 0L
-
-    fun sendCommandToServer(command: String) {
-        sendMessageToServer("/$command")
-    }
-
-    fun sendMessageToServer(message: String) {
-        if (System.currentTimeMillis() > lastMessageSent + 2_000) {
-            lastMessageSent = System.currentTimeMillis()
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            thePlayer.sendChatMessage(message)
-        }
-    }
-
-    fun isShiftKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)
-
-    fun isControlKeyDown() = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)
-
-    // MoulConfig is in Java, I don't want to downgrade this logic
-    fun <T> onChange(vararg properties: Property<out T>, observer: Observer<T>) {
-        for (property in properties) {
-            property.whenChanged { a, b -> observer.observeChange(a, b) }
-        }
-    }
-
-    fun <T> onToggle(vararg properties: Property<out T>, observer: Runnable) {
-        onChange(*properties) { _, _ -> observer.run() }
-    }
-
-    fun <T> Property<out T>.onToggle(observer: Runnable) {
-        whenChanged { _, _ -> observer.run() }
-    }
-
-    fun <T> Property<out T>.afterChange(observer: T.() -> Unit) {
-        whenChanged { _, new -> observer(new) }
-    }
-
-    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
-        toMutableMap().also { function(it) }.toMap()
-
-    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
-        toMutableList().also { function(it) }.toList()
 
     fun colorCodeToRarity(colorCode: Char): String {
         return when (colorCode) {
@@ -288,74 +216,63 @@ object LorenzUtils {
         }
     }
 
-    fun <T> MutableList<List<Any>>.addSelector(
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
+    inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
-        values: Array<T>,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
-        onChange: (T) -> Unit,
+        crossinline onChange: (T) -> Unit,
     ) {
-        val newList = mutableListOf<Any>()
-        newList.add(prefix)
-        for (entry in values) {
-            val display = getName(entry)
-            if (isCurrent(entry)) {
-                newList.add("§a[$display]")
-            } else {
-                newList.add("§e[")
-                newList.add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
-                newList.add("§e]")
-            }
-            newList.add(" ")
-        }
-        add(newList)
+        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
     }
 
-    // TODO nea?
-//    fun <T> dynamic(block: () -> KMutableProperty0<T>?): ReadWriteProperty<Any?, T?> {
-//        return object : ReadWriteProperty<Any?, T?> {
-//            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-//                return block()?.get()
-//            }
-//
-//            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
-//                if (value != null)
-//                    block()?.set(value)
-//            }
-//        }
-//    }
-
-    fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) =
-        object : ReadWriteProperty<Any?, T?> {
-            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
-                val rootObj = root.get() ?: return null
-                return child.get(rootObj)
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
+    inline fun <reified T : Enum<T>> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) = buildList {
+        add(prefix)
+        for (entry in enumValues<T>()) {
+            val display = getName(entry)
+            if (isCurrent(entry)) {
+                add("§a[$display]")
+            } else {
+                add("§e[")
+                add(Renderable.link("§e$display") {
+                    onChange(entry)
+                })
+                add("§e]")
             }
+            add(" ")
+        }
+    }
 
-            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
-                if (value == null) return
-                val rootObj = root.get() ?: return
-                child.set(rootObj, value)
+    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
+    inline fun MutableList<List<Any>>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                lastButtonClicked = System.currentTimeMillis()
             }
         }
-
-    fun List<String>.nextAfter(after: String, skip: Int = 1): String? {
-        var missing = -1
-        for (line in this) {
-            if (line == after) {
-                missing = skip - 1
-                continue
+        add(buildList {
+            add(prefix)
+            add("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
             }
-            if (missing == 0) {
-                return line
-            }
-            if (missing != -1) {
-                missing--
-            }
-        }
-        return null
+            add("§a]")
+        })
     }
 
     fun GuiEditSign.isRancherSign(): Boolean {
@@ -363,32 +280,88 @@ object LorenzUtils {
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
         return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-                && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-                && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
+            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
     }
 
-    fun inIsland(island: IslandType) = inSkyBlock && skyBlockIsland == island
+    fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
-    fun IslandType.isInIsland() = inIsland(this)
+    fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && islandTypes.any { it.isInIsland() }
 
-    fun <K, N : Number> MutableMap<K, N>.addOrPut(item: K, amount: N) {
-        val old = this[item] ?: 0
-        val d = old.toDouble() + amount.toDouble()
-        @Suppress("UNCHECKED_CAST")
-        this[item] = d as N
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
+        slot?.slotNumber?.let { slotNumber ->
+            Minecraft.getMinecraft().playerController.windowClick(
+                container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
+            )
+            isCanceled = true
+        }
     }
 
-    /** transfer string colors from the config to java.awt.Color */
-    fun String.toChromaColor() = Color(SpecialColour.specialToChromaRGB(this), true)
+    private val recalculateDerpy =
+        RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
-    fun <E> List<E>.getOrNull(index: Int): E? {
-        return if (index in indices) {
-            get(index)
-        } else null
+    val isDerpy get() = recalculateDerpy.getValue()
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
+
+    val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
+
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
+        TitleManager.sendTitle(text, duration, height, fontSize)
     }
 
-    fun <T : Any> T?.toSingletonListOrEmpty(): List<T> {
-        if (this == null) return emptyList()
-        return listOf(this)
+    inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
+        val enums = enumValues<T>()
+        return enums.firstOrNull { it.name == name }
+    }
+
+    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
+        enumValueOfOrNull<T>(name)
+            ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+
+    inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
+        enumValues<T>().joinToString("|", transform = transform)
+
+    inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
+
+    // TODO move to val by lazy
+    fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
+
+    fun shutdownMinecraft(reason: String? = null) {
+        System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
+        reason?.let {
+            System.err.println("Reason: $it")
+        }
+        FMLCommonHandler.instance().handleExit(-1)
+    }
+
+    /**
+     * Get the group, otherwise, return null
+     * @param groupName The group name in the pattern
+     */
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
+    fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
+
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
+    fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
+
+    fun inAdvancedMiningIsland() =
+        IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
+
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
+        || inAdvancedMiningIsland()
+
+    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+
+    fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
+        val cornerOne = LorenzVec(minX, y, minZ)
+        val cornerTwo = LorenzVec(minX, y, maxZ)
+        val cornerThree = LorenzVec(maxX, y, maxZ)
+        val cornerFour = LorenzVec(maxX, y, minZ)
+
+        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
     }
 }

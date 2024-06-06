@@ -1,0 +1,23 @@
+name: Check banned imports
+on:
+  - pull_request
+  - push
+  - workflow_dispatch
+permissions: {}
+jobs:
+  check-imports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout code
+      - name: Check imports
+        run: |
+          while IFS=' ' read search banned; do
+            echo Banning $banned from $search
+            grep -nrE -- "import $banned" src/main/java/"$search"|sed -E 's/^(.*):([0-9]+):(.*)/::error file=\1,line=\2::Illegal \3/g'|tee -a temp
+          done<<<$(cat .github/workflows/illegal-imports.txt|sed -E 's/#.*//;/^$/d')
+          found=$(wc -l temp|cut -d ' ' -f 1)
+          echo Found "$found" invalid imports. Check the files tab for more information.
+          if [[ "$found" -ne 0 ]]; then
+            exit 1
+          fi

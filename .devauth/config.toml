@@ -1,0 +1,6 @@
+defaultEnabled = true
+defaultAccount = "main"
+
+[accounts.main]
+type = "microsoft"
+

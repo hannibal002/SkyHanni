@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.misc.GhostCounter
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostCounter
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData
+import at.hannibal2.skyhanni.mixins.transformers.MixinXPInformation
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 
@@ -12,7 +14,7 @@ object CombatUtils {
     var lastUpdate: Long = -1
     private var skillInfo: XPInformation.SkillInfo? = null
     private var skillInfoLast: XPInformation.SkillInfo? = null
-    private const val skillType = "Combat"
+    private const val SKILL_TYPE = "Combat"
     var xpGainHourLast = -1f
     var xpGainHour = -1f
     var isKilling = false
@@ -24,6 +26,15 @@ object CombatUtils {
     private var gainTimer = 0
     var _isKilling = false
 
+    private fun getSkillInfo(xpInformation: XPInformation.SkillInfo?): Float {
+        return try {
+            val a = xpInformation as? MixinXPInformation
+            a!!.getTotalXp().toFloat()
+        } catch (e: Error) {
+            val xpInfo = xpInformation ?: return -1f
+            xpInfo.totalXp
+        }
+    }
 
     /**
      * Taken from NotEnoughUpdates
@@ -32,77 +43,73 @@ object CombatUtils {
         lastUpdate = System.currentTimeMillis()
         xpGainHourLast = xpGainHour
         skillInfoLast = skillInfo
-        skillInfo = XPInformation.getInstance().getSkillInfo(skillType) ?: return
-        val totalXp: Float = skillInfo!!.totalXp
+        skillInfo = XPInformation.getInstance().getSkillInfo(SKILL_TYPE) ?: return
+        val totalXp = getSkillInfo(skillInfo)
         if (lastTotalXp > 0) {
             val delta: Float = totalXp - lastTotalXp
 
-            if (delta > 0 && delta < 1000) {
-                xpGainTimer = GhostCounter.config.pauseTimer
-                xpGainQueue.add(0, delta)
-                while (xpGainQueue.size > 30) {
-                    xpGainQueue.removeLast()
+            when {
+                delta > 0 && delta < 1000 -> {
+                    xpGainTimer = GhostCounter.config.pauseTimer
+                    xpGainQueue.add(0, delta)
+                    calculateXPHour()
                 }
-                var totalGain = 0f
-                for (f in xpGainQueue) totalGain += f
-                xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
-                isKilling = true
-            } else if (xpGainTimer > 0) {
-                xpGainTimer--
-                xpGainQueue.add(0, 0f)
-                while (xpGainQueue.size > 30) {
-                    xpGainQueue.removeLast()
+
+                xpGainTimer > 0 -> {
+                    xpGainTimer--
+                    xpGainQueue.add(0, 0f)
+                    calculateXPHour()
                 }
-                var totalGain = 0f
-                for (f in xpGainQueue) totalGain += f
-                xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
-                isKilling = true
-            } else if (delta <= 0) {
-                isKilling = false
+
+                delta <= 0 -> {
+                    isKilling = false
+                }
             }
         }
         lastTotalXp = totalXp
     }
 
-    /*
-    Must be a better way to do this than repeating the calculateXP function
-     */
-    fun calculateETA(){
+    private fun calculateXPHour() {
+        while (xpGainQueue.size > 30) {
+            xpGainQueue.removeLast()
+        }
+        var totalGain = 0f
+        for (f in xpGainQueue) totalGain += f
+        xpGainHour = totalGain * (60 * 60) / xpGainQueue.size
+        isKilling = true
+    }
+
+    fun calculateETA() {
         lastKillUpdate = System.currentTimeMillis()
         killGainHourLast = killGainHour
-        val nextLevel = GhostCounter.hidden?.bestiaryNextLevel?.toInt() ?: return
-        val kill = GhostCounter.hidden?.bestiaryCurrentKill?.toInt() ?: return
-        val sum = GhostCounter.bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
-        val cKill = sum + kill
-        val totalKill = if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill else cKill
-        if (lastTotalKill > 0){
-            val delta: Int = totalKill - lastTotalKill
-            if (delta in 1..19){
-                gainTimer = GhostCounter.config.pauseTimer
-                killGainQueue.add(0, delta)
-                while (killGainQueue.size > 30){
-                    killGainQueue.removeLast()
+
+        GhostCounter.storage?.bestiaryNextLevel?.toInt()?.let { nextLevel ->
+            GhostCounter.storage?.bestiaryCurrentKill?.toInt()?.let { kill ->
+                val sum = GhostData.bestiaryData.filterKeys { it <= nextLevel - 1 }.values.sum()
+                val cKill = sum + kill
+                val totalKill = if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill else cKill
+
+                if (lastTotalKill > 0) {
+                    val delta: Int = totalKill - lastTotalKill
+                    if (delta in 1..10 || gainTimer > 0) {
+                        gainTimer = maxOf(gainTimer - 1, 0)
+                        killGainQueue.add(0, delta)
+                        while (killGainQueue.size > 30) {
+                            killGainQueue.removeLast()
+                        }
+
+                        val totalGain = killGainQueue.sum()
+                        killGainHour = totalGain * 3600 / killGainQueue.size
+                        _isKilling = true
+                    } else if (delta <= 0) {
+                        _isKilling = false
+                    }
                 }
-                var totalGain = 0
-                for (f in killGainQueue) totalGain += f
-                killGainHour = totalGain * (60 * 60) / killGainQueue.size
-                _isKilling = true
-            }else if(gainTimer > 0){
-                gainTimer--
-                killGainQueue.add(0, 0)
-                while (killGainQueue.size > 30){
-                    killGainQueue.removeLast()
-                }
-                var totalGain = 0
-                for (f in killGainQueue) totalGain += f
-                killGainHour = totalGain * (60 * 60) / killGainQueue.size
-                _isKilling = true
-            }else if (delta <= 0){
-                _isKilling = false
+                lastTotalKill = totalKill
             }
         }
-        lastTotalKill = totalKill
     }
+
     /**
      * Taken from NotEnoughUpdates
      */
@@ -115,5 +122,4 @@ object CombatUtils {
         }
         return interp
     }
-
 }

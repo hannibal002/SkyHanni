@@ -1,7 +1,15 @@
 package at.hannibal2.skyhanni.data.repo
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream
@@ -25,7 +33,7 @@ object RepoUtils {
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs()
         val fis: FileInputStream
-        //buffer for read and write data to file
+        // buffer for read and write data to file
         val buffer = ByteArray(1024)
         try {
             fis = FileInputStream(zipFilePath)
@@ -36,7 +44,7 @@ object RepoUtils {
                     var fileName = ze.name
                     fileName = fileName.substring(fileName.split("/").toTypedArray()[0].length + 1)
                     val newFile = File(destDir + File.separator + fileName)
-                    //create directories for sub directories in zip
+                    // create directories for sub directories in zip
                     File(newFile.parent).mkdirs()
                     if (!isInTree(dir, newFile)) {
                         throw RuntimeException(
@@ -50,19 +58,25 @@ object RepoUtils {
                     }
                     fos.close()
                 }
-                //close this ZipEntry
+                // close this ZipEntry
                 zis.closeEntry()
                 ze = zis.nextEntry
             }
-            //close last ZipEntry
+            // close last ZipEntry
             zis.closeEntry()
             zis.close()
             fis.close()
         } catch (e: IOException) {
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(
+                e,
+                "unzipIgnoreFirstFolder failed",
+                "zipFilePath" to zipFilePath,
+                "destDir" to destDir,
+            )
         }
     }
 
+    @Suppress("NAME_SHADOWING")
     @Throws(IOException::class)
     private fun isInTree(rootDirectory: File, file: File): Boolean {
         var rootDirectory = rootDirectory
@@ -76,18 +90,28 @@ object RepoUtils {
         return false
     }
 
-    fun <T> getConstant(repo: File, constant: String, gson: Gson, clazz: Class<T>?): T? {
-        if (repo.exists()) {
-            val jsonFile = File(repo, "constants/$constant.json")
-            BufferedReader(
-                InputStreamReader(
-                    FileInputStream(jsonFile),
-                    StandardCharsets.UTF_8
-                )
-            ).use { reader ->
+    fun <T> getConstant(repoLocation: File, constant: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T {
+        val name = "constants/$constant.json"
+        val jsonFile = File(repoLocation, name)
+        if (!jsonFile.isFile) {
+            throw RepoError("Repo file '$name' not found.")
+        }
+        BufferedReader(InputStreamReader(FileInputStream(jsonFile), StandardCharsets.UTF_8)).use { reader ->
+            if (type == null) {
                 return gson.fromJson(reader, clazz)
+            } else {
+                return gson.fromJson(reader, type)
             }
         }
-        return null
+    }
+
+    @JvmStatic
+    fun updateRepo() {
+        SkyHanniMod.repo.updateRepo()
+    }
+
+    @JvmStatic
+    fun resetRepoLocation() {
+        SkyHanniMod.repo.resetRepositoryLocation(manual = true)
     }
 }

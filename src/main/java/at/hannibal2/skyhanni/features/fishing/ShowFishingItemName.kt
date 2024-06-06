@@ -1,29 +1,28 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.common.cache.CacheBuilder
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
-class ShowFishingItemName {
+@SkyHanniModule
+object ShowFishingItemName {
+
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
-    private var tick = 0
-    private var hasRodInHand = false
-    private var cache =
-        CacheBuilder.newBuilder().expireAfterWrite(750, TimeUnit.MILLISECONDS)
-            .build<EntityItem, Pair<LorenzVec, String>>()
+    private var itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
 
     // Taken from Skytils
     private val cheapCoins = setOf(
@@ -32,59 +31,41 @@ class ShowFishingItemName {
     )
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
+            val itemStack = entityItem.entityItem
+            // Hypixel sometimes replaces the bait item midair with a stone
+            if (itemStack.name.removeColor() == "Stone") continue
+            var text = ""
 
-        tick++
-        if (tick % 10 == 0) {
-            hasRodInHand = isFishingRod()
+            val isBait = itemStack.isBait()
+            if (isBait && !config.showBaits) continue
+
+            if (itemStack.getSkullTexture() in cheapCoins) {
+                text = "§6Coins"
+            } else {
+                val name = itemStack.name.transformIf({ isBait }) { "§7" + this.removeColor() }
+                text += if (isBait) "§c§l- §r" else "§a§l+ §r"
+
+                val size = itemStack.stackSize
+                if (size != 1) text += "§7x$size §r"
+                text += name
+            }
+
+            itemsOnGround[entityItem] = text
         }
     }
 
-    private fun isFishingRod() = InventoryUtils.getItemInHand()?.name?.contains("Rod") ?: false
-
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        if (hasRodInHand) {
-            for (entityItem in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityItem>()) {
-                val location = event.exactLocation(entityItem).add(0.0, 0.8, 0.0)
-                if (location.distance(LocationUtils.playerLocation()) > 15) continue
-                val itemStack = entityItem.entityItem
-                var name = itemStack.name ?: continue
 
-                // Hypixel sometimes replaces the bait item mid air with a stone
-                if (name.removeColor() == "Stone") continue
-
-                val size = itemStack.stackSize
-                val isBait = name.endsWith(" Bait") && size == 1
-                val prefix = if (!isBait) {
-                    "§a§l+"
-                } else {
-                    if (!config.showBaits) continue
-                    name = "§7" + name.removeColor()
-                    "§c§l-"
-                }
-
-                itemStack?.tagCompound?.getTag("SkullOwner")?.toString()?.let {
-                    for (coin in cheapCoins) {
-                        if (it.contains(coin)) {
-                            name = "§6Coins"
-                        }
-                    }
-                }
-
-                val sizeText = if (size != 1) "§7x$size §r" else ""
-                cache.put(entityItem, location to "$prefix §r$sizeText$name")
-            }
-        }
-
-        for ((location, text) in cache.asMap().values) {
+        for ((item, text) in itemsOnGround) {
+            val location = event.exactLocation(item).add(y = 0.8)
             event.drawString(location, text)
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.holdingRod
 }

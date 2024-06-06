@@ -1,86 +1,66 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-class GriffinBurrowParticleFinder {
+@SkyHanniModule
+object GriffinBurrowParticleFinder {
 
-    private val recentlyDugParticleBurrows = mutableListOf<LorenzVec>()
+    private val config get() = SkyHanniMod.feature.event.diana
+
+    private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
-    var lastDugParticleBurrow: LorenzVec? = null
+    private var lastDugParticleBurrow: LorenzVec? = null
 
-    //    private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
-//        EMPTY({
-//            type == net.minecraft.util.EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset.x == 0.5 && offset.y == 0.1 && offset.z == 0.5
-//        }),
-//        MOB({
-//            type == net.minecraft.util.EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.x == 0.5 && offset.y == 0.1 && offset.z == 0.5
-//
-//        }),
-//        TREASURE({
-//            type == net.minecraft.util.EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.x == 0.35 && offset.y == 0.1 && offset.z == 0.35
-//        }),
-//        FOOTSTEP({
-//            type == net.minecraft.util.EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && offset.x == 0.05 && offset.y == 0.0 && offset.z == 0.05
-//        }),
-//        ENCHANT({
-//            type == net.minecraft.util.EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.x == 0.5 && offset.y == 0.4 && offset.z == 0.5
-//        });
-//
-//        companion object {
-//            fun getParticleType(packet: ReceiveParticleEvent): ParticleType? {
-//                if (!packet.longDistance) return null
-//                for (type in values()) {
-//                    if (type.check(packet)) {
-//                        return type
-//                    }
-//                }
-//                return null
-//            }
-//        }
-//    }
-//
-//    @SubscribeEvent
-//    fun onChatPacket(event: ReceiveParticleEvent) {
-//        if (!LorenzUtils.inSkyblock) return
-//        if (!SkyHanniMod.feature.dev.debugEnabled) return
-//
-//            val particleType = getParticleType(event)
-//            if (particleType != null) {
-//
-//                val location = event.location.toBlocPos().down().toLorenzVec()
-//                if (recentlyDugParticleBurrows.contains(location)) return
-//                val burrow = particleBurrows.getOrPut(location) { ParticleBurrow(location) }
-//
-//                when (particleType) {
-//                    ParticleType.FOOTSTEP -> burrow.hasFootstep = true
-//                    ParticleType.ENCHANT -> burrow.hasEnchant = true
-//                    ParticleType.EMPTY -> burrow.type = 0
-//                    ParticleType.MOB -> burrow.type = 1
-//                    ParticleType.TREASURE -> burrow.type = 2
-//                }
-//
-//        }
-//
-//    }
+    // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
+    private var fakeBurrow: LorenzVec? = null
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Griffin Burrow Particle Finder")
+
+        if (!DianaAPI.isDoingDiana()) {
+            event.addIrrelevant("not doing diana")
+            return
+        }
+
+        event.addData {
+            add("burrows: ${burrows.size}")
+            for (burrow in burrows.values) {
+                val location = burrow.location
+                val found = burrow.found
+                add(location.printWithAccuracy(1))
+                add(" type: " + burrow.getType())
+                add(" found: $found")
+                add(" ")
+            }
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+        if (!isEnabled()) return
+        if (!config.burrowsSoopyGuess) return
         val packet = event.packet
 
         if (packet is S2APacketParticles) {
@@ -88,8 +68,8 @@ class GriffinBurrowParticleFinder {
             val particleType = ParticleType.getParticleType(packet)
             if (particleType != null) {
 
-                val location = packet.toLorenzVec().toBlocPos().down().toLorenzVec()
-                if (recentlyDugParticleBurrows.contains(location)) return
+                val location = packet.toLorenzVec().toBlockPos().down().toLorenzVec()
+                if (location in recentlyDugParticleBurrows) return
                 val burrow = burrows.getOrPut(location) { Burrow(location) }
 
                 when (particleType) {
@@ -103,8 +83,8 @@ class GriffinBurrowParticleFinder {
                 if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
                     if (!burrow.found) {
                         BurrowDetectEvent(burrow.location, burrow.getType()).postAndCatch()
+                        burrow.found = true
                     }
-                    burrow.found = true
                 }
             }
         }
@@ -132,7 +112,7 @@ class GriffinBurrowParticleFinder {
 
             fun getParticleType(packet: S2APacketParticles): ParticleType? {
                 if (!packet.isLongDistance) return null
-                for (type in values()) {
+                for (type in entries) {
                     if (type.check(packet)) {
                         return type
                     }
@@ -143,48 +123,72 @@ class GriffinBurrowParticleFinder {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        reset()
+    }
+
+    fun reset() {
         burrows.clear()
         recentlyDugParticleBurrows.clear()
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+        if (!config.burrowsSoopyGuess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
         ) {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
             if (burrow != null) {
-                recentlyDugParticleBurrows.add(burrow)
-                lastDugParticleBurrow = null
-                burrows.remove(burrow)?.let {
-                    if (it.found) {
-                        BurrowDugEvent(it.location).postAndCatch()
-                    }
+                if (!tryDig(burrow)) {
+                    fakeBurrow = burrow
                 }
             }
         }
+        if (message == "§cDefeat all the burrow defenders in order to dig it!") {
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+        }
+    }
+
+    private fun tryDig(location: LorenzVec, ignoreFound: Boolean = false): Boolean {
+        val burrow = burrows[location] ?: return false
+        if (!burrow.found && !ignoreFound) return false
+        burrows.remove(location)
+        recentlyDugParticleBurrows.add(location)
+        lastDugParticleBurrow = null
+
+        BurrowDugEvent(burrow.location).postAndCatch()
+        return true
     }
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!SkyHanniMod.feature.diana.burrowsSoopyGuess) return
-        if (LorenzUtils.skyBlockIsland != IslandType.HUB) return
+        if (!isEnabled()) return
+        if (!config.burrowsSoopyGuess) return
 
-        val pos = event.position
-        if (event.itemInHand?.isSpade != true || pos.getBlockAt() !== Blocks.grass) return
+        val location = event.position
+        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
 
-        if (burrows.containsKey(pos)) {
-            lastDugParticleBurrow = pos
+        if (location == fakeBurrow) {
+            fakeBurrow = null
+            // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
+            tryDig(location, ignoreFound = true)
+            return
+        }
+
+        if (burrows.containsKey(location)) {
+            lastDugParticleBurrow = location
+
+            DelayedRun.runDelayed(1.seconds) {
+                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                    burrows.remove(location)
+                }
+            }
         }
     }
-
-    private val ItemStack.isSpade
-        get() = this.getInternalName() == "ANCESTRAL_SPADE"
 
     class Burrow(
         var location: LorenzVec,
@@ -202,15 +206,7 @@ class GriffinBurrowParticleFinder {
                 else -> BurrowType.UNKNOWN
             }
         }
-
-//        private fun getWaypointText(): String {
-//            var type = "Burrow"
-//            when (this.type) {
-//                0 -> type = "§aStart"
-//                1 -> type = "§cMob"
-//                2 -> type = "§6Treasure"
-//            }
-//            return "$type §a(Particle)"
-//        }
     }
+
+    private fun isEnabled() = DianaAPI.isDoingDiana()
 }

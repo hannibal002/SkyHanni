@@ -1,35 +1,46 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ItemStars {
+@SkyHanniModule
+object ItemStars {
+
+    private val config get() = SkyHanniMod.feature.inventory
+
+    private val starPattern by RepoPattern.pattern(
+        "inventory.itemstars.stars",
+        "(.*)§.✪(.*)"
+    )
 
     private val armorNames = mutableListOf<String>()
     private val tiers = mutableMapOf<String, Int>()
-    private val STAR_FIND_PATCHER = "(.*)§.✪(.*)".toPattern()
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onTooltip(event: ItemTooltipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!isEnabled()) return
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
-        if (!SkyHanniMod.feature.inventory.itemStars) return
 
-        val itemName = stack.name ?: return
+        val itemName = stack.name
         val stars = getStars(itemName)
 
         if (stars > 0) {
             var name = itemName
-            while (STAR_FIND_PATCHER.matcher(name).matches()) {
+            while (starPattern.matches(name)) {
                 name = name.replaceFirst("§.✪".toRegex(), "")
             }
             name = name.trim()
@@ -39,31 +50,20 @@ class ItemStars {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        try {
-            val items = event.getConstant("Items")!!
-            if (items.has("crimson_armors")) {
-                armorNames.clear()
-                armorNames.addAll(items.getAsJsonArray("crimson_armors").map { it.asString })
-            }
-
-            tiers.clear()
-            if (items.has("crimson_tiers")) {
-                items.getAsJsonObject("crimson_tiers").entrySet().forEach {
-                    tiers[it.key] = it.value.asInt
-                }
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            LorenzUtils.error("error in RepositoryReloadEvent")
+        val data = event.getConstant<ItemsJson>("Items")
+        armorNames.clear()
+        tiers.clear()
+        armorNames.addAll(data.crimson_armors)
+        for (tier in data.crimson_tiers) {
+            tiers[tier.key] = tier.value
         }
     }
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!SkyHanniMod.feature.inventory.itemNumberAsStackSize.contains(6)) return
+        if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
-        val number = getCrimsonStars(stack.name ?: return)
+        val number = getCrimsonStars(stack.name)
         if (number != -1) {
             event.stackTip = number.toString()
         }
@@ -130,4 +130,6 @@ class ItemStars {
 
         return -1
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.itemStars
 }

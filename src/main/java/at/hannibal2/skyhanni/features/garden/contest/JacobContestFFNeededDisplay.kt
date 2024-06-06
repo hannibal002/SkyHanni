@@ -1,31 +1,36 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.Companion.getLatestTrueFarmingFortune
+import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrueFarmingFortune
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.milliseconds
 
-class JacobContestFFNeededDisplay {
-    private val config get() = SkyHanniMod.feature.garden
+@SkyHanniModule
+object JacobContestFFNeededDisplay {
+
+    private val config get() = GardenAPI.config
     private var display = emptyList<List<Any>>()
-    private var lastToolTipTime = 0L
+    private var lastToolTipTime = SimpleTimeMark.farPast()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
 
     @SubscribeEvent
-    fun onTooltip(event: RenderItemTooltipEvent) {
+    fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!isEnabled()) return
 
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
@@ -34,18 +39,17 @@ class JacobContestFFNeededDisplay {
         val oldData = cache[stack]
         if (oldData != null) {
             display = oldData
-            lastToolTipTime = System.currentTimeMillis()
+            lastToolTipTime = SimpleTimeMark.now()
             return
         }
 
-        val name = stack.name ?: return
-        val time = FarmingContestAPI.getSbTimeFor(name) ?: return
+        val time = FarmingContestAPI.getSbTimeFor(stack.name) ?: return
         val contest = FarmingContestAPI.getContestAtTime(time) ?: return
 
         val newDisplay = drawDisplay(contest)
         display = newDisplay
         cache[stack] = newDisplay
-        lastToolTipTime = System.currentTimeMillis()
+        lastToolTipTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -59,27 +63,27 @@ class JacobContestFFNeededDisplay {
 
         val crop = contest.crop
         add(listOf("§7For this ", crop.icon, "§7${crop.cropName} contest:"))
-        for (bracket in ContestBracket.values()) {
+        for (bracket in ContestBracket.entries) {
             addAsSingletonList(getLine(bracket, contest.brackets, crop))
         }
         addAsSingletonList("")
 
         val (size, averages) = FarmingContestAPI.calculateAverages(crop)
         add(listOf("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:"))
-        for (bracket in ContestBracket.values()) {
+        for (bracket in ContestBracket.entries) {
             addAsSingletonList(getLine(bracket, averages, crop))
         }
         addAsSingletonList("")
 
-        val blocksPerSecond = crop.getLatestBlocksPerSecond()
+        var blocksPerSecond = crop.getLatestBlocksPerSecond()
         if (blocksPerSecond == null) {
             add(listOf("§cNo ", crop.icon, "§cblocks/second data,"))
-            addAsSingletonList("§cassuming 20.")
+            addAsSingletonList("§cassuming 19.9 instead.")
         } else {
-            add(listOf("§7Using latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.round(2)}"))
-            if (blocksPerSecond < 1) {
-                addAsSingletonList("§cLow blocks per second!")
-                addAsSingletonList("§cFarm this crop for couple more seconds!")
+            if (blocksPerSecond < 15.0) {
+                add(listOf("§7Your latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.round(2)}"))
+                add(listOf("§cThis is too low, showing 19.9 Blocks/second instead!"))
+                blocksPerSecond = 19.9
             }
         }
         addAsSingletonList("")
@@ -92,40 +96,40 @@ class JacobContestFFNeededDisplay {
             add(listOf("§6Your ", crop.icon, "§6FF: $farmingFortune"))
         }
         addAsSingletonList("")
-       if (blocksPerSecond == null || trueFF == null) {
-           add(listOf("§cMissing data from above!"))
-       } else {
-           val predictedScore = (trueFF * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
-           add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
-       }
+        if (blocksPerSecond == null || trueFF == null) {
+            add(listOf("§cMissing data from above!"))
+        } else {
+            val predictedScore =
+                ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            add(listOf("§6Predicted ", crop.icon, "§6crops: $predictedScore"))
+        }
     }
 
-    private fun formatFarmingFortune(farmingFortune: Double): String {
-        var ff = farmingFortune
-        if (!config.farmingFortuneDropMultiplier) {
-            ff -= 100
-            if (ff < 100) {
-                ff = 0.0
-            }
-        }
-        return ceil(ff).addSeparators()
-    }
+    private fun formatFarmingFortune(farmingFortune: Double) = ceil(farmingFortune).addSeparators()
 
     private fun getLine(bracket: ContestBracket, map: Map<ContestBracket, Int>, crop: CropType): String {
-        val counter = map[bracket]!!
-        val blocksPerSecond = crop.getLatestBlocksPerSecond() ?: 20.0
+        val counter = map[bracket] ?: return " ${bracket.displayName}§f: §8Not found!"
+        val blocksPerSecond = crop.getRealBlocksPerSecond()
         val cropsPerSecond = counter.toDouble() / blocksPerSecond / 60
-        val farmingFortune = formatFarmingFortune(cropsPerSecond * 100 / 20 / crop.baseDrops)
-        return " ${bracket.displayName}§f: §6$farmingFortune FF §7(${counter.addSeparators()} crops)"
+        val farmingFortune = (cropsPerSecond * 100 / 20 / crop.baseDrops) - 100
+        val format = formatFarmingFortune(farmingFortune.coerceAtLeast(0.0))
+        return " ${bracket.displayName}§f: §6$format FF §7(${counter.addSeparators()} crops)"
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestBackgroundRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
-        if (System.currentTimeMillis() > lastToolTipTime + 200) return
+        if (lastToolTipTime.passedSince() < 200.milliseconds) return
         config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Jacob Contest Crop Data")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest
+}
+
+private fun CropType.getRealBlocksPerSecond(): Double {
+    val bps = getLatestBlocksPerSecond() ?: 20.0
+    return if (bps < 15.0) {
+        return 19.9
+    } else bps
 }

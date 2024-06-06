@@ -1,4 +1,6 @@
+import org.apache.commons.lang3.SystemUtils
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.ByteArrayOutputStream
 
 plugins {
     idea
@@ -6,11 +8,25 @@ plugins {
     id("gg.essential.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.8.20-RC"
+    kotlin("jvm") version "1.9.0"
+    id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
+    `maven-publish`
+    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
+    id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.19.Beta.10"
+version = "0.26.Beta.7"
+
+val gitHash by lazy {
+    val baos = ByteArrayOutputStream()
+    exec {
+        standardOutput = baos
+        commandLine("git", "rev-parse", "--short", "HEAD")
+        isIgnoreExitValue = true
+    }
+    baos.toByteArray().decodeToString().trim()
+}
 
 // Toolchains:
 java {
@@ -18,35 +34,46 @@ java {
 }
 
 sourceSets.main {
-    output.setResourcesDir(file("$buildDir/classes/java/main"))
+    output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
+    java.srcDir(layout.projectDirectory.dir("src/main/kotlin"))
+    kotlin.destinationDirectory.set(java.destinationDirectory)
 }
 
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://repo.spongepowered.org/maven/")
-    // If you don't want to log in with your real minecraft account, remove this line
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-    maven("https://jitpack.io") {
+    maven("https://repo.spongepowered.org/maven/") // mixin
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
         content {
             includeGroupByRegex("com\\.github\\..*")
         }
     }
-    maven("https://repo.nea.moe/releases")
+    maven("https://repo.nea.moe/releases") // libautoupdate
+    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
+    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
+    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
 }
 
-val shadowImpl by configurations.creating {
+val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
-val shadowModImpl by configurations.creating {
+val shadowModImpl: Configuration by configurations.creating {
     configurations.modImplementation.get().extendsFrom(this)
 }
 
-val devenvMod by configurations.creating {
+val devenvMod: Configuration by configurations.creating {
     isTransitive = false
     isVisible = false
 }
+
+val headlessLwjgl by configurations.creating {
+    isTransitive = false
+    isVisible = false
+}
+
+val shot = shots.shot("minecraft", project.file("shots.txt"))
 
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
@@ -54,13 +81,17 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.ILikePlayingGames:DiscordIPC:f91ed4b") {
+    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
         because("Different version conflicts with Minecraft's Log4j")
     }
+    compileOnly(libs.jbAnnotations)
 
+    headlessLwjgl(libs.headlessLwjgl)
+
+    compileOnly(ksp(project(":annotation-processors"))!!)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -68,21 +99,51 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.4-SNAPSHOT")
 
     implementation(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") {
+    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    // If you don't want to log in with your real minecraft account, remove this line
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
 
-    implementation("com.github.hannibal002:notenoughupdates:4957f0b:all")
-    devenvMod("com.github.hannibal002:notenoughupdates:4957f0b:all")
+    modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
+    // June 3, 2024, 9:30 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
 
-    shadowModImpl("com.github.NotEnoughUpdates:MoulConfig:1.1.4")
-    devenvMod("com.github.NotEnoughUpdates:MoulConfig:1.1.4:test")
+    shadowModImpl(libs.moulconfig)
+    shadowImpl(libs.libautoupdate) {
+        exclude(module = "gson")
+    }
+    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    implementation(libs.hotswapagentforge)
 
-    shadowImpl("moe.nea:libautoupdate:1.0.3")
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
+        exclude(module = "unspecified")
+        isTransitive = false
+    }
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("io.mockk:mockk:1.12.5")
+
+    implementation("net.hypixel:mod-api:0.3.1")
 }
+
+configurations.getByName("minecraftNamed").dependencies.forEach {
+    shot.applyTo(it as HasConfigurableAttributes<*>)
+}
+
+tasks.withType(Test::class) {
+    useJUnitPlatform()
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    workingDir(file("run"))
+    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+}
+
 kotlin {
     sourceSets.all {
         languageSettings {
@@ -90,32 +151,42 @@ kotlin {
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
     }
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
+    }
 }
 
 // Minecraft configuration:
 loom {
     launchConfigs {
         "client" {
-            // If you don't want mixins, remove these lines
             property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
+            if (System.getenv("repo_action") != "true") {
+                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+            }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--mixin", "mixins.skyhanni.json")
-            val modFiles = devenvMod
-                .incoming.artifacts.resolvedArtifacts.get()
-            arg("--mods", modFiles.joinToString(",") { it.file.relativeTo(file("run")).path })
+            arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
+            arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
     }
     forge {
         pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
         mixinConfig("mixins.skyhanni.json")
     }
-    // If you don't want mixins, remove these lines
+    @Suppress("UnstableApiUsage")
     mixin {
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
     runConfigs {
+        "client" {
+            if (SystemUtils.IS_OS_MAC_OSX) {
+                vmArgs.remove("-XstartOnFirstThread")
+            }
+            vmArgs.add("-Xmx4G")
+        }
         "server" {
             isIdeConfigGenerated = false
         }
@@ -130,6 +201,28 @@ tasks.processResources {
     }
 }
 
+val generateRepoPatterns by tasks.creating(JavaExec::class) {
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass.set("net.fabricmc.devlaunchinjector.Main")
+    workingDir(project.file("run"))
+    classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
+    jvmArgs(
+        "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
+        "-Dfabric.dli.env=client",
+        "-Dfabric.dli.main=net.minecraft.launchwrapper.Launch",
+        "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
+        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
+        "-javaagent:${headlessLwjgl.singleFile.absolutePath}"
+    )
+    val outputFile = project.file("build/regexes/constants.json")
+    environment("SKYHANNI_DUMP_REGEXES", "${gitHash}:${outputFile.absolutePath}")
+    environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
+}
+
+tasks.compileJava {
+    dependsOn(tasks.processResources)
+}
+
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
@@ -140,13 +233,12 @@ tasks.withType(Jar::class) {
     manifest.attributes.run {
         this["FMLCorePluginContainsFMLMod"] = "true"
         this["ForceLoadAsMod"] = "true"
+        this["Main-Class"] = "SkyHanniInstallerFrame"
 
-        // If you don't want mixins, remove these lines
         this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
 }
-
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
@@ -163,9 +255,11 @@ tasks.shadowJar {
             println("Config: ${it.files}")
         }
     }
-
-    relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
+    exclude("META-INF/versions/**")
+    mergeServiceFiles()
+    relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
+    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -181,3 +275,31 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
+val sourcesJar by tasks.creating(Jar::class) {
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+    archiveClassifier.set("src")
+    from(sourceSets.main.get().allSource)
+}
+
+publishing.publications {
+    create<MavenPublication>("maven") {
+        artifact(tasks.remapJar)
+        artifact(sourcesJar) { classifier = "sources" }
+        pom {
+            name.set("SkyHanni")
+            licenses {
+                license {
+                    name.set("GNU Lesser General Public License")
+                    url.set("https://github.com/hannibal002/SkyHanni/blob/HEAD/LICENSE")
+                }
+            }
+            developers {
+                developer { name.set("hannibal002") }
+                developer { name.set("The SkyHanni contributors") }
+            }
+        }
+    }
+}
+
+
+

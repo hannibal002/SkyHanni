@@ -1,18 +1,27 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-class MinecraftData {
+@SkyHanniModule
+object MinecraftData {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onSoundPacket(event: PacketEvent.ReceiveEvent) {
@@ -30,6 +39,11 @@ class MinecraftData {
         ) {
             event.isCanceled = true
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        LorenzWorldChangeEvent().postAndCatch()
     }
 
     @SubscribeEvent(receiveCanceled = true)
@@ -53,13 +67,39 @@ class MinecraftData {
         }
     }
 
-    private var tick = 0
+    var totalTicks = 0
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+        if (event.phase == TickEvent.Phase.START) return
         Minecraft.getMinecraft().thePlayer ?: return
-        tick++
-        LorenzTickEvent(tick).postAndCatch()
+
+        DelayedRun.checkRuns()
+        totalTicks++
+        LorenzTickEvent(totalTicks).postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val hand = InventoryUtils.getItemInHand()
+        val newItem = hand?.getInternalName() ?: NEUInternalName.NONE
+        val oldItem = InventoryUtils.itemInHandId
+        if (newItem != oldItem) {
+
+            InventoryUtils.recentItemsInHand.keys.removeIf { it + 30_000 > System.currentTimeMillis() }
+            if (newItem != NEUInternalName.NONE) {
+                InventoryUtils.recentItemsInHand[System.currentTimeMillis()] = newItem
+            }
+            InventoryUtils.itemInHandId = newItem
+            InventoryUtils.latestItemInHand = hand
+            ItemInHandChangeEvent(newItem, oldItem).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        InventoryUtils.itemInHandId = NEUInternalName.NONE
+        InventoryUtils.recentItemsInHand.clear()
     }
 }

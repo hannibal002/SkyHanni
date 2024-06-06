@@ -1,3 +1,3 @@
 package at.hannibal2.skyhanni.events
 
-class TabListUpdateEvent(val tabList: List<String>): LorenzEvent()
+class TabListUpdateEvent(val tabList: List<String>) : LorenzEvent()

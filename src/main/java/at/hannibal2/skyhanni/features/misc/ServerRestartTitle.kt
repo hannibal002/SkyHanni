@@ -2,36 +2,42 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.TitleUtils
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-class ServerRestartTitle {
+@SkyHanniModule
+object ServerRestartTitle {
+
     private val config get() = SkyHanniMod.feature.misc
-    private var tick = 0
-    private val pattern = "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) §8.*".toPattern()
+    private val patternGroup = RepoPattern.group("features.misc.serverrestart")
+    private val restartingPattern by patternGroup.pattern(
+        "time",
+        "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) ?§8.*"
+    )
+    val restartingGreedyPattern by patternGroup.pattern(
+        "greedy",
+        "§cServer closing.*"
+    )
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.serverRestartTitle) return
 
-        if (event.phase != TickEvent.Phase.START) return
-        tick++
-
-        if (tick % 20 != 0) return
-
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            pattern.matchMatcher(line) {
-                val minutes = group("minutes").toInt()
-                val seconds = group("seconds").toInt()
-                val totalSeconds = minutes * 60 + seconds
-                val time = TimeUtils.formatDuration(totalSeconds.toLong() * 1000)
-                TitleUtils.sendTitle("§cServer Restart in §b$time", 2_000)
-            }
+        ScoreboardData.sidebarLinesFormatted.matchFirst(restartingPattern) {
+            val minutes = group("minutes").toInt().minutes
+            val seconds = group("seconds").toInt().seconds
+            val totalTime = minutes + seconds
+            if (totalTime > 2.minutes && totalTime.inWholeSeconds % 30 != 0L) return
+            val time = totalTime.format()
+            LorenzUtils.sendTitle("§cServer Restart in §b$time", 2.seconds)
         }
     }
 }

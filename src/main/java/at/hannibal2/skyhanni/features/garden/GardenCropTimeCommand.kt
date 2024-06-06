@@ -1,35 +1,35 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.sorted
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 
 object GardenCropTimeCommand {
-    private val config get() = SkyHanniMod.feature.garden
+
+    private val config get() = GardenAPI.config.moneyPerHours
 
     fun onCommand(args: Array<String>) {
-        if (!config.moneyPerHourDisplay) {
-            LorenzUtils.chat("§c[SkyHanni] §cshcroptime requires 'Show money per Hour' feature to be enabled to work!")
+        if (!config.display) {
+            ChatUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
         if (args.size < 2) {
-            LorenzUtils.chat("§cUsage: /shcroptime <amount> <item>")
+            ChatUtils.userError("Usage: /shcroptime <amount> <item>")
             return
         }
 
-        val rawAmount = args[0]
-        val amount = try {
-            rawAmount.toInt()
-        } catch (e: NumberFormatException) {
-            LorenzUtils.chat("§cNot a valid number: '$rawAmount'")
+        val amount = args[0].formatLongOrUserError() ?: return
+        val multipliers = CropMoneyDisplay.multipliers
+        if (multipliers.isEmpty()) {
+            ChatUtils.userError("Data not loaded yet. Join the garden and display the money per hour display.")
             return
         }
 
@@ -37,15 +37,15 @@ object GardenCropTimeCommand {
         val searchName = rawSearchName.lowercase()
 
         val map = mutableMapOf<String, Long>()
-        for (entry in CropMoneyDisplay.multipliers) {
+        for (entry in multipliers) {
             val internalName = entry.key
-            val itemName = NEUItems.getItemStack(internalName).name!!
+            val itemName = internalName.itemName
             if (itemName.removeColor().lowercase().contains(searchName)) {
                 val (baseId, baseAmount) = NEUItems.getMultiplier(internalName)
-                val baseName = NEUItems.getItemStack(baseId).name!!
+                val baseName = baseId.itemName
                 val crop = CropType.getByName(baseName.removeColor())
 
-                val fullAmount = baseAmount.toLong() * amount.toLong()
+                val fullAmount = baseAmount.toLong() * amount
                 val text = if (baseAmount == 1) {
                     "§e${amount.addSeparators()}x $itemName"
                 } else {
@@ -64,10 +64,10 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            LorenzUtils.chat("§c[SkyHanni] §cNo crop item found for '$rawSearchName'")
+            ChatUtils.userError("No crop item found for '$rawSearchName'.")
             return
         }
 
-        LorenzUtils.chat("§e[SkyHanni] Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+        ChatUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
     }
 }

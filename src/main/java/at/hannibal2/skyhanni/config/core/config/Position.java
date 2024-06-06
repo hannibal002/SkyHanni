@@ -19,149 +19,217 @@
 
 package at.hannibal2.skyhanni.config.core.config;
 
+import at.hannibal2.skyhanni.SkyHanniMod;
+import at.hannibal2.skyhanni.config.ConfigGuiManager;
+import at.hannibal2.skyhanni.config.Features;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper;
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
 
 public class Position {
-	@Expose
-	private int x;
-	@Expose
-	private int y;
-	@Expose
-	private boolean centerX;
-	@Expose
-	private boolean centerY;
+    @Expose
+    private int x;
+    @Expose
+    private int y;
+    @Expose
+    private float scale = 1F;
+    @Expose
+    private boolean center = false;
 
-	private boolean clicked = false;
-	public String internalName = null;
+    @Expose
+    private boolean centerX;
+    @Expose
+    private boolean centerY;
 
-	public Position(int x, int y) {
-		this(x, y, false, false);
-	}
+    public transient Field linkField;
 
-	public Position(int x, int y, boolean centerX, boolean centerY) {
-		this.x = x;
-		this.y = y;
-		this.centerX = centerX;
-		this.centerY = centerY;
-	}
+    private boolean clicked = false;
+    public String internalName = null;
 
-	public void set(Position other) {
-		this.x = other.x;
-		this.y = other.y;
-		this.centerX = other.centerX;
-		this.centerY = other.centerY;
-	}
+    public Position(int x, int y) {
+        this(x, y, false, false);
+    }
 
-	public int getRawX() {
-		return x;
-	}
+    public Position(int x, int y, float scale) {
+        this.x = x;
+        this.y = y;
+        this.centerX = false;
+        this.centerY = true;
+        this.scale = scale;
+    }
 
-	public int getRawY() {
-		return y;
-	}
+    public Position(int x, int y, float scale, boolean center) {
+        this.x = x;
+        this.y = y;
+        this.centerX = false;
+        this.centerY = true;
+        this.scale = scale;
+        this.center = center;
+    }
 
-	public void setClicked(boolean state) {
-		this.clicked = state;
-	}
-	public boolean getClicked() {
-		return clicked;
-	}
+    public Position(int x, int y, boolean centerX, boolean centerY) {
+        this.x = x;
+        this.y = y;
+        this.centerX = centerX;
+        this.centerY = centerY;
+    }
 
-	public int getAbsX0(int objWidth) {
-		int width = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
+    public void set(Position other) {
+        this.x = other.x;
+        this.y = other.y;
+        this.centerX = other.centerX;
+        this.centerY = other.centerY;
+        this.scale = other.getScale();
+        this.center = other.isCenter();
+    }
 
-		int ret = x;
-		if (x < 0) {
-			ret = width + x - objWidth;
-		}
+    public float getEffectiveScale() {
+        return Math.max(Math.min(getScale() * SkyHanniMod.getFeature().gui.globalScale, 10F), 0.1F);
+    }
 
-		if (ret < 0) ret = 0;
-		if (ret > width - objWidth) ret = width - objWidth;
+    public float getScale() {
+        if (scale == 0) return 1f;
+        return scale;
+    }
 
-		return ret;
-	}
+    public boolean isCenter() {
+        return center;
+    }
 
-	public int getAbsY0(int objHeight) {
-		int height = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
+    public void setScale(float newScale) {
+        scale = Math.max(Math.min(10F, newScale), 0.1f);
+    }
 
-		int ret = y;
-		if (y < 0) {
-			ret = height + y - objHeight;
-		}
+    public int getRawX() {
+        return x;
+    }
 
-		if (ret < 0) ret = 0;
-		if (ret > height - objHeight) ret = height - objHeight;
+    public int getRawY() {
+        return y;
+    }
 
-		return ret;
-	}
+    public void setClicked(boolean state) {
+        this.clicked = state;
+    }
 
-	public int moveX(int deltaX, int objWidth) {
-		int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
-		boolean wasPositiveX = this.x >= 0;
-		this.x += deltaX;
+    public boolean getClicked() {
+        return clicked;
+    }
 
-		if (wasPositiveX) {
-			if (this.x < 0) {
-				deltaX -= this.x;
-				this.x = 0;
-			}
-			if (this.x > screenWidth) {
-				deltaX += screenWidth - this.x;
-				this.x = screenWidth;
-			}
-		} else {
-			if (this.x + 1 > 0) {
-				deltaX += -1 - this.x;
-				this.x = -1;
-			}
-			if (this.x + screenWidth < 0) {
-				deltaX += -screenWidth - this.x;
-				this.x = -screenWidth;
-			}
-		}
+    public int getAbsX0(int objWidth) {
+        int width = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
 
-		if (this.x >= 0 && this.x + objWidth / 2 > screenWidth / 2) {
-			this.x -= screenWidth - objWidth;
-		}
-		if (this.x < 0 && this.x + objWidth / 2 <= -screenWidth / 2) {
-			this.x += screenWidth - objWidth;
-		}
-		return deltaX;
-	}
+        return calcAbs0(x, width, objWidth);
+    }
 
-	public int moveY(int deltaY, int objHeight) {
-		int screenHeight = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
-		boolean wasPositiveY = this.y >= 0;
-		this.y += deltaY;
+    public int getAbsY0(int objHeight) {
+        int height = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
 
-		if (wasPositiveY) {
-			if (this.y < 0) {
-				deltaY -= this.y;
-				this.y = 0;
-			}
-			if (this.y > screenHeight) {
-				deltaY += screenHeight - this.y;
-				this.y = screenHeight;
-			}
-		} else {
-			if (this.y + 1 > -0) {
-				deltaY += -1 - this.y;
-				this.y = -1;
-			}
-			if (this.y + screenHeight < 0) {
-				deltaY += -screenHeight - this.y;
-				this.y = -screenHeight;
-			}
-		}
+        return calcAbs0(y, height, objHeight);
+    }
 
-		if (this.y >= 0 && this.y - objHeight / 2 > screenHeight / 2) {
-			this.y -= screenHeight - objHeight;
-		}
-		if (this.y < 0 && this.y - objHeight / 2 <= -screenHeight / 2) {
-			this.y += screenHeight - objHeight;
-		}
-		return deltaY;
-	}
+    private int calcAbs0(int axis, int length, int objLength) {
+        int ret = axis;
+        if (axis < 0) {
+            ret = length + axis - objLength;
+        }
+
+        if (ret < 0) ret = 0;
+        if (ret > length - objLength) ret = length - objLength;
+
+        return ret;
+    }
+
+    public int moveX(int deltaX, int objWidth) {
+        int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
+        boolean wasPositiveX = this.x >= 0;
+        this.x += deltaX;
+
+        if (wasPositiveX) {
+            if (this.x < 0) {
+                deltaX -= this.x;
+                this.x = 0;
+            }
+            if (this.x > screenWidth) {
+                deltaX += screenWidth - this.x;
+                this.x = screenWidth;
+            }
+        } else {
+            if (this.x + 1 > 0) {
+                deltaX += -1 - this.x;
+                this.x = -1;
+            }
+            if (this.x + screenWidth < 0) {
+                deltaX += -screenWidth - this.x;
+                this.x = -screenWidth;
+            }
+        }
+
+        if (this.x >= 0 && this.x + objWidth / 2 > screenWidth / 2) {
+            this.x -= screenWidth - objWidth;
+        }
+        if (this.x < 0 && this.x + objWidth / 2 <= -screenWidth / 2) {
+            this.x += screenWidth - objWidth;
+        }
+        return deltaX;
+    }
+
+    public int moveY(int deltaY, int objHeight) {
+        int screenHeight = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
+        boolean wasPositiveY = this.y >= 0;
+        this.y += deltaY;
+
+        if (wasPositiveY) {
+            if (this.y < 0) {
+                deltaY -= this.y;
+                this.y = 0;
+            }
+            if (this.y > screenHeight) {
+                deltaY += screenHeight - this.y;
+                this.y = screenHeight;
+            }
+        } else {
+            if (this.y + 1 > -0) {
+                deltaY += -1 - this.y;
+                this.y = -1;
+            }
+            if (this.y + screenHeight < 0) {
+                deltaY += -screenHeight - this.y;
+                this.y = -screenHeight;
+            }
+        }
+
+        if (this.y >= 0 && this.y - objHeight / 2 > screenHeight / 2) {
+            this.y -= screenHeight - objHeight;
+        }
+        if (this.y < 0 && this.y - objHeight / 2 <= -screenHeight / 2) {
+            this.y += screenHeight - objHeight;
+        }
+        return deltaY;
+    }
+
+    public boolean canJumpToConfigOptions() {
+        return linkField != null && ConfigGuiManager.INSTANCE.getEditorInstance().getProcessedConfig().getOptionFromField(linkField) != null;
+    }
+
+    public void jumpToConfigOptions() {
+        MoulConfigEditor<Features> editor = ConfigGuiManager.INSTANCE.getEditorInstance();
+        if (linkField == null) return;
+        ProcessedOption option = editor.getProcessedConfig().getOptionFromField(linkField);
+        if (option == null) return;
+        editor.search("");
+        if (!editor.goToOption(option)) return;
+        SkyHanniMod.Companion.setScreenToOpen(new GuiScreenElementWrapper(editor));
+    }
+
+    public void setLink(@NotNull ConfigLink configLink) throws NoSuchFieldException {
+        linkField = configLink.owner().getField(configLink.field());
+    }
 }

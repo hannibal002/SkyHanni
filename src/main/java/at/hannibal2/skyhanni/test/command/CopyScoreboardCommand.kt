@@ -1,25 +1,29 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 object CopyScoreboardCommand {
+
     fun command(args: Array<String>) {
-        try {
-            val resultList = mutableListOf<String>()
-            val noColor = args.size == 1 && args[0] == "true"
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                val scoreboardLine = if (noColor) line.removeColor() else line
-                resultList.add("'$scoreboardLine'")
-            }
-            val string = resultList.joinToString("\n")
-            OSUtils.copyToClipboard(string)
-            LorenzUtils.chat("§e[SkyHanni] scoreboard copied into the clipboard!")
+        val resultList = mutableListOf<String>()
+        val noColor = args.contains("-nocolor")
+        val raw = args.contains("-raw")
+        resultList.add("Title:")
+        resultList.add(ScoreboardData.objectiveTitle.transformIf({ noColor }) { removeColor() })
+        resultList.add("")
+
+        val lines = if (raw) ScoreboardData.sidebarLinesRaw else ScoreboardData.sidebarLinesFormatted
+        for (line in lines) {
+            val scoreboardLine = line.transformIf({ noColor }) { removeColor() }
+            resultList.add("'$scoreboardLine'")
         }
-        catch (_: Throwable) {
-            LorenzUtils.chat("§c[SkyHanni] Nothing in scoreboard")
-        }
+
+        val string = resultList.joinToString("\n")
+        OSUtils.copyToClipboard(string)
+        ChatUtils.chat("Scoreboard copied into your clipboard!")
     }
 }

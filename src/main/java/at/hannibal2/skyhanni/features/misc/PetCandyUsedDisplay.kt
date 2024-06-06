@@ -1,45 +1,43 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetCandyUsed
-import net.minecraft.client.renderer.GlStateManager
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PetCandyUsedDisplay {
+@SkyHanniModule
+object PetCandyUsedDisplay {
+
+    private val config get() = SkyHanniMod.feature.misc.petCandy
 
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
-        if (!SkyHanniMod.feature.misc.petCandyUsed) return
+        if (!config.showCandy) return
 
+        if (config.hideOnMaxed) {
+            if (stack.getPetLevel() == stack.getMaxPetLevel()) return
+        }
 
         val petCandyUsed = stack.getPetCandyUsed() ?: return
         if (petCandyUsed == 0) return
 
         val stackTip = "§c$petCandyUsed"
-
-        GlStateManager.disableLighting()
-        GlStateManager.disableDepth()
-        GlStateManager.disableBlend()
-
-        val fontRenderer = event.fontRenderer
-        val x = event.x + 13 - fontRenderer.getStringWidth(stackTip)
+        val x = event.x + 13
         val y = event.y + 1
 
-        val scale = 0.9
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x.toFloat(), y.toFloat(), 0f)
-        GlStateManager.scale(scale, scale, scale)
-        fontRenderer.drawStringWithShadow(stackTip, 0f, 0f, 16777215)
-        val reverseScale = 1 / 0.7
-        GlStateManager.scale(reverseScale, reverseScale, reverseScale)
-        GlStateManager.popMatrix()
-
-        GlStateManager.enableLighting()
-        GlStateManager.enableDepth()
+        event.drawSlotText(x, y, stackTip, .9f)
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(22, "misc.petCandyUsed", "misc.petCandy.showCandy")
+    }
 }

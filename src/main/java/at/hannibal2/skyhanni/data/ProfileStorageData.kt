@@ -1,183 +1,137 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import net.minecraftforge.event.world.WorldEvent
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ProfileStorageData {
-    var playerSpecific: Storage.PlayerSpecific? = null
-    var profileSpecific: Storage.ProfileSpecific? = null
+
+    var playerSpecific: PlayerSpecificStorage? = null
+    var profileSpecific: ProfileSpecificStorage? = null
     var loaded = false
-    var noTabListTime = -1L
+    private var noTabListTime = SimpleTimeMark.farPast()
 
-    private var nextProfile: String? = null
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onChat(event: LorenzChatEvent) {
-        "§7Switching to profile (?<name>.*)\\.\\.\\.".toPattern().matchMatcher(event.message) {
-            nextProfile = group("name").lowercase()
-            loaded = false
-            PreProfileSwitchEvent().postAndCatch()
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onWorldChange(event: WorldEvent.Load) {
-        val profileName = nextProfile ?: return
-        nextProfile = null
-
-        val playerSpecific = playerSpecific
-        if (playerSpecific == null) {
-            LorenzUtils.error("profileSpecific after profile swap can not be set: playerSpecific is null!")
-            return
-        }
-        loadProfileSpecific(playerSpecific, profileName, "profile swap (chat message)")
-        ConfigLoadEvent().postAndCatch()
-    }
+    private var sackPlayers: SackData.PlayerSpecific? = null
+    var sackProfiles: SackData.ProfileSpecific? = null
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
+        val profileName = event.name
         if (playerSpecific == null) {
-            LorenzUtils.error("playerSpecific is null in ProfileJoinEvent!")
+            DelayedRun.runDelayed(10.seconds) {
+                workaroundIn10SecondsProfileStorage(profileName)
+            }
             return
         }
-
-        if (profileSpecific == null) {
-            val profileName = event.name
-            loadProfileSpecific(playerSpecific, profileName, "first join (chat message)")
+        if (sackPlayers == null) {
+            ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
+
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        ConfigLoadEvent().postAndCatch()
+    }
+
+    private fun workaroundIn10SecondsProfileStorage(profileName: String) {
+        println("workaroundIn10SecondsProfileStorage")
+        val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
+
+        if (playerSpecific == null) {
+            ErrorManager.skyHanniError(
+                "failed to load your profile data delayed ",
+                "onHypixel" to LorenzUtils.onHypixel,
+                "HypixelData.hypixelLive" to HypixelData.hypixelLive,
+                "HypixelData.hypixelAlpha" to HypixelData.hypixelAlpha,
+                "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
+            )
+        }
+        if (sackPlayers == null) {
+            ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
+        }
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        ConfigLoadEvent().postAndCatch()
+    }
+
+    private fun runWorkaround() {
+
     }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (profileSpecific != null) return
-        val playerSpecific = playerSpecific ?: return
-        for (line in event.tabList) {
-            val pattern = "§e§lProfile: §r§a(?<name>.*)".toPattern()
-            pattern.matchMatcher(line) {
-                val profileName = group("name").lowercase()
-                loadProfileSpecific(playerSpecific, profileName, "tab list")
-                nextProfile = null
-                return
-            }
+        if (!LorenzUtils.inSkyBlock) return
+
+        event.tabList.matchFirst(UtilsPatterns.tabListProfilePattern) {
+            noTabListTime = SimpleTimeMark.farPast()
+            return
         }
 
-        if (LorenzUtils.inSkyBlock) {
-            noTabListTime = System.currentTimeMillis()
-        }
+        noTabListTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (noTabListTime == -1L) return
+        if (noTabListTime == SimpleTimeMark.farPast()) return
 
-        if (System.currentTimeMillis() > noTabListTime + 3_000) {
-            noTabListTime = System.currentTimeMillis()
-            LorenzUtils.chat(
-                "§c[SkyHanni] Extra Information from Tab list not found! " +
+        if (noTabListTime.passedSince() > 3.seconds) {
+            noTabListTime = SimpleTimeMark.now()
+            val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
+            if (foundSkyBlockTabList) {
+                ChatUtils.clickableChat(
+                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
+                        "This is needed for the mod to function! And therefore this warning cannot be disabled",
+                    onClick = {
+                        HypixelCommands.widget()
+                    }
+                )
+            } else {
+                ChatUtils.chat(
+                    "§cExtra Information from Tab list not found! " +
                         "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
-            )
+                )
+            }
         }
     }
 
-    private fun loadProfileSpecific(playerSpecific: Storage.PlayerSpecific, profileName: String, reason: String) {
-        noTabListTime = -1
-        profileSpecific = playerSpecific.profiles.getOrPut(profileName) { Storage.ProfileSpecific() }
-        tryMigrateProfileSpecific()
-        ConfigLoadEvent().postAndCatch()
+    private fun loadProfileSpecific(
+        playerSpecific: PlayerSpecificStorage,
+        sackProfile: SackData.PlayerSpecific,
+        profileName: String,
+    ) {
+        noTabListTime = SimpleTimeMark.farPast()
+        profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
+        sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         loaded = true
+        ConfigLoadEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
-        playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { Storage.PlayerSpecific() }
-        migratePlayerSpecific()
+        playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
+        sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         ConfigLoadEvent().postAndCatch()
-    }
-
-    private fun migratePlayerSpecific() {
-        val oldHidden = SkyHanniMod.feature.hidden
-        if (oldHidden.isMigrated) return
-
-        SkyHanniMod.feature.storage.apiKey = oldHidden.apiKey
-
-        SkyHanniMod.feature.storage?.let {
-            it.gardenJacobFarmingContestTimes = oldHidden.gardenJacobFarmingContestTimes
-        }
-    }
-
-    private fun tryMigrateProfileSpecific() {
-        val oldHidden = SkyHanniMod.feature.hidden
-        if (oldHidden.isMigrated) return
-
-        profileSpecific?.let {
-            it.currentPet = oldHidden.currentPet
-
-            for ((rawLocation, minionName) in oldHidden.minionName) {
-                val lastClick = oldHidden.minionLastClick[rawLocation] ?: -1
-                val location = LorenzVec.decodeFromString(rawLocation)
-                val minionConfig = Storage.ProfileSpecific.MinionConfig()
-                minionConfig.displayName = minionName
-                minionConfig.lastClicked = lastClick
-                it.minions[location] = minionConfig
-            }
-        }
-
-        profileSpecific?.crimsonIsle?.let {
-            it.quests = oldHidden.crimsonIsleQuests
-            it.latestTrophyFishInInventory = oldHidden.crimsonIsleLatestTrophyFishInInventory
-            it.miniBossesDoneToday = oldHidden.crimsonIsleMiniBossesDoneToday
-            it.kuudraTiersDone = oldHidden.crimsonIsleKuudraTiersDone
-        }
-
-        profileSpecific?.garden?.let {
-            it.experience = oldHidden.gardenExp
-            it.cropCounter = oldHidden.gardenCropCounter
-            it.cropUpgrades = oldHidden.gardenCropUpgrades
-
-            for ((crop, speed) in oldHidden.gardenCropsPerSecond) {
-                if (speed != -1) {
-                    it.cropsPerSecond[crop] = speed
-                }
-            }
-
-            it.latestBlocksPerSecond = oldHidden.gardenLatestBlocksPerSecond
-            it.latestTrueFarmingFortune = oldHidden.gardenLatestTrueFarmingFortune
-            it.savedCropAccessory = oldHidden.savedCropAccessory
-            it.dicerRngDrops = oldHidden.gardenDicerRngDrops
-            it.informedAboutLowMatter = oldHidden.informedAboutLowMatter
-            it.informedAboutLowFuel = oldHidden.informedAboutLowFuel
-            it.visitorInterval = oldHidden.visitorInterval
-            it.nextSixthVisitorArrival = oldHidden.nextSixthVisitorArrival
-            it.farmArmorDrops = oldHidden.gardenFarmingArmorDrops
-            it.composterUpgrades = oldHidden.gardenComposterUpgrades
-            it.toolWithBountiful = oldHidden.gardenToolHasBountiful
-            it.composterCurrentOrganicMatterItem = oldHidden.gardenComposterCurrentOrganicMatterItem
-            it.composterCurrentFuelItem = oldHidden.gardenComposterCurrentFuelItem
-        }
-
-        profileSpecific?.garden?.visitorDrops?.let {
-            val old = oldHidden.visitorDrops
-            it.acceptedVisitors = old.acceptedVisitors
-            it.deniedVisitors = old.deniedVisitors
-            it.visitorRarities = old.visitorRarities
-            it.copper = old.copper
-            it.farmingExp = old.farmingExp
-            it.coinsSpent = old.coinsSpent
-            it.rewardsCount = old.rewardsCount
-        }
-
-        oldHidden.isMigrated = true
     }
 }

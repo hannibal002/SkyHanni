@@ -1,37 +1,45 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.Garden
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-import java.util.*
+import java.util.IdentityHashMap
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenCustomKeybinds {
-    private val shConfig: Garden get() = SkyHanniMod.feature.garden
+
+    private val config get() = GardenAPI.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private val map: MutableMap<KeyBinding, () -> Int> = IdentityHashMap()
-    private var lastWindowOpenTime = 0L
+    private var lastWindowOpenTime = SimpleTimeMark.farPast()
+    private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
 
     init {
-        map[mcSettings.keyBindAttack] = { shConfig.keyBindAttack }
-        map[mcSettings.keyBindUseItem] = { shConfig.keyBindUseItem }
-        map[mcSettings.keyBindLeft] = { shConfig.keyBindLeft }
-        map[mcSettings.keyBindRight] = { shConfig.keyBindRight }
-        map[mcSettings.keyBindForward] = { shConfig.keyBindForward }
-        map[mcSettings.keyBindBack] = { shConfig.keyBindBack }
-        map[mcSettings.keyBindJump] = { shConfig.keyBindJump }
-        map[mcSettings.keyBindSneak] = { shConfig.keyBindSneak }
+        map[mcSettings.keyBindAttack] = { config.attack }
+        map[mcSettings.keyBindUseItem] = { config.useItem }
+        map[mcSettings.keyBindLeft] = { config.left }
+        map[mcSettings.keyBindRight] = { config.right }
+        map[mcSettings.keyBindForward] = { config.forward }
+        map[mcSettings.keyBindBack] = { config.back }
+        map[mcSettings.keyBindJump] = { config.jump }
+        map[mcSettings.keyBindSneak] = { config.sneak }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && shConfig.keyBindEnabled
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
     private fun isActive(): Boolean {
         if (!isEnabled()) return false
@@ -39,24 +47,30 @@ object GardenCustomKeybinds {
 
         if (Minecraft.getMinecraft().currentScreen != null) {
             if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                lastWindowOpenTime = System.currentTimeMillis()
+                lastWindowOpenTime = SimpleTimeMark.now()
             }
             return false
         }
 
         // TODO remove workaround
-        if (System.currentTimeMillis() < lastWindowOpenTime + 300) return false
+        if (lastWindowOpenTime.passedSince() < 300.milliseconds) return false
+
+        val areDuplicates = map.values
+            .map { it() }
+            .filter { it != Keyboard.KEY_NONE }
+            .let { values -> values.size != values.toSet().size }
+        if (areDuplicates) {
+            if (lastDuplicateKeybindsWarnTime.passedSince() > 30.seconds) {
+                ChatUtils.chatAndOpenConfig(
+                    "Duplicate Custom Keybinds aren't allowed!",
+                    GardenAPI.config::keyBind
+                )
+                lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
+            }
+            return false
+        }
 
         return true
-    }
-
-    private fun isHeld(keyCode: Int): Boolean {
-        if (keyCode == 0) return false
-        return if (keyCode < 0) {
-            Mouse.isButtonDown(keyCode + 100)
-        } else {
-            Keyboard.isKeyDown(keyCode)
-        }
     }
 
     @JvmStatic
@@ -64,7 +78,7 @@ object GardenCustomKeybinds {
         if (!isActive()) return
         val override = map[keyBinding] ?: return
         val keyCode = override()
-        cir.returnValue = isHeld(keyCode)
+        cir.returnValue = keyCode.isKeyHeld()
     }
 
     @JvmStatic
@@ -75,5 +89,18 @@ object GardenCustomKeybinds {
         ci.cancel()
         keyBinding as AccessorKeyBinding
         keyBinding.pressTime_skyhanni++
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.keyBindEnabled", "garden.keyBind.enabled")
+        event.move(3, "garden.keyBindAttack", "garden.keyBind.attack")
+        event.move(3, "garden.keyBindUseItem", "garden.keyBind.useItem")
+        event.move(3, "garden.keyBindLeft", "garden.keyBind.left")
+        event.move(3, "garden.keyBindRight", "garden.keyBind.right")
+        event.move(3, "garden.keyBindForward", "garden.keyBind.forward")
+        event.move(3, "garden.keyBindBack", "garden.keyBind.back")
+        event.move(3, "garden.keyBindJump", "garden.keyBind.jump")
+        event.move(3, "garden.keyBindSneak", "garden.keyBind.sneak")
     }
 }

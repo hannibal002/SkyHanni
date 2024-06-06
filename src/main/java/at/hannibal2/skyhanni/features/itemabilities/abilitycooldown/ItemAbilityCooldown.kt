@@ -1,8 +1,21 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
+import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -10,133 +23,168 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlin.math.max
 
-class ItemAbilityCooldown {
+@SkyHanniModule
+object ItemAbilityCooldown {
+
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities
+
+    private val patternGroup = RepoPattern.group("item.abilities.cooldown")
+    private val youAlignedOthersPattern by patternGroup.pattern(
+        "alignedother",
+        "§eYou aligned §r§a.* §r§eother player(s)?!"
+    )
+    private val youBuffedYourselfPattern by patternGroup.pattern(
+        "buffedyourself",
+        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+    )
+
     private var lastAbility = ""
-    var tick = 0
-    var items = mapOf<ItemStack, List<ItemText>>()
-    private val youAlignedOthersPattern = "§eYou aligned §r§a.* §r§eother player(s)?!".toPattern()
+    private var items = mapOf<String, List<ItemText>>()
+    private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
+    private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
+    private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
 
     @SubscribeEvent
-    fun onSoundEvent(event: PlaySoundEvent) {
-        if (event.soundName == "mob.zombie.remedy") {
-            if (event.pitch == 0.6984127f && event.volume == 1f) {
+    fun onPlaySound(event: PlaySoundEvent) {
+        when {
+            // Hyperion
+            event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {
                 val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
                 if (abilityScrolls.size != 3) return
 
                 ItemAbility.HYPERION.sound()
             }
-        }
-        if (event.soundName == "mob.enderdragon.growl") {
-            if (event.pitch == 1f && event.volume == 1f) {
+            // Fire Fury Staff
+            event.soundName == "liquid.lavapop" && event.pitch == 1.0f && event.volume == 1f -> {
+                ItemAbility.FIRE_FURY_STAFF.sound()
+            }
+            // Ice Spray Wand
+            event.soundName == "mob.enderdragon.growl" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.ICE_SPRAY_WAND.sound()
             }
-        }
-        if (event.soundName == "mob.endermen.portal") {
-            if (event.pitch == 0.61904764f && event.volume == 1f) {
-                ItemAbility.GYROKINETIC_WAND_LEFT.sound()
+            // Gyrokinetic Wand & Shadow Fury
+            event.soundName == "mob.endermen.portal" -> {
+                // Gryokinetic Wand
+                if (event.pitch == 0.61904764f && event.volume == 1f) {
+                    ItemAbility.GYROKINETIC_WAND_LEFT.sound()
+                }
+                // Shadow Fury
+                if (event.pitch == 1f && event.volume == 1f) {
+                    val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                    if (!internalName.equalsOneOf(
+                            "SHADOW_FURY".asInternalName(),
+                            "STARRED_SHADOW_FURY".asInternalName()
+                        )
+                    ) return
+
+                    ItemAbility.SHADOW_FURY.sound()
+                }
             }
-        }
-        if (event.soundName == "random.anvil_land") {
-            if (event.pitch == 0.4920635f && event.volume == 1f) {
+            // Giant's Sword
+            event.soundName == "random.anvil_land" && event.pitch == 0.4920635f && event.volume == 1f -> {
                 ItemAbility.GIANTS_SWORD.sound()
             }
-        }
-        if (event.soundName == "mob.ghast.affectionate_scream") {
-            if (event.pitch == 0.4920635f && event.volume == 0.15f) {
+            // Atomsplit Katana
+            event.soundName == "mob.ghast.affectionate_scream" && event.pitch == 0.4920635f && event.volume == 0.15f -> {
                 ItemAbility.ATOMSPLIT_KATANA.sound()
             }
-        }
-//        if (event.soundName == "random.click") {
-//            if (event.pitch == 2.0f && event.volume == 0.55f) {
-//                ItemAbility.RAGNAROCK_AXE.sound()
-//            }
-//        }
-        if (event.soundName == "liquid.lavapop") {
-            if (event.pitch == 0.7619048f && event.volume == 0.15f) {
+            // Wand of Atonement
+            event.soundName == "liquid.lavapop" && event.pitch == 0.7619048f && event.volume == 0.15f -> {
                 ItemAbility.WAND_OF_ATONEMENT.sound()
             }
-        }
-        if (event.soundName == "mob.bat.hurt") {
-            if (event.volume == 0.1f) {
+            // Starlight Wand
+            event.soundName == "mob.bat.hurt" && event.volume == 0.1f -> {
                 ItemAbility.STARLIGHT_WAND.sound()
             }
-        }
-        if (event.soundName == "mob.guardian.curse") {
-            if (event.volume == 0.2f) {
+            // Voodoo Doll
+            event.soundName == "mob.guardian.curse" && event.volume == 0.2f -> {
                 ItemAbility.VOODOO_DOLL.sound()
             }
-        }
-        if (event.soundName == "random.successful_hit") {
-            if (event.volume == 1.0f && event.pitch == 0.7936508f) {
+            // Jinxed Voodoo Doll Hit
+            event.soundName == "random.successful_hit" && event.volume == 1.0f && event.pitch == 0.7936508f -> {
                 ItemAbility.VOODOO_DOLL_WILTED.sound()
             }
-        }
-        if (event.soundName == "random.explode") {
-            if (event.pitch == 4.047619f && event.volume == 0.2f) {
+            // Jinxed Voodoo Doll Miss
+            event.soundName == "mob.ghast.scream" && event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7 -> {
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if (VOODOO_DOLL_WILTED in recentItems) {
+                    ItemAbility.VOODOO_DOLL_WILTED.sound()
+                }
+            }
+            // Golem Sword
+            event.soundName == "random.explode" && event.pitch == 4.047619f && event.volume == 0.2f -> {
                 ItemAbility.GOLEM_SWORD.sound()
             }
-        }
-        if (event.soundName == "mob.wolf.howl") {
-            if (event.volume == 0.5f) {
-                ItemAbility.WEIRD_TUBA.sound()
+            // Weird Tuba & Weirder Tuba
+            event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
+                val recentItems = InventoryUtils.recentItemsInHand.values
+                if (WEIRD_TUBA in recentItems) {
+                    ItemAbility.WEIRD_TUBA.sound()
+                }
+                if (WEIRDER_TUBA in recentItems) {
+                    ItemAbility.WEIRDER_TUBA.sound()
+                }
             }
-        }
-        if (event.soundName == "mob.zombie.unfect") {
-            if (event.pitch == 2.0f && event.volume == 0.3f) {
+            // End Stone Sword
+            event.soundName == "mob.zombie.unfect" && event.pitch == 2.0f && event.volume == 0.3f -> {
                 ItemAbility.END_STONE_SWORD.sound()
             }
-        }
-        if (event.soundName == "mob.wolf.panting") {
-            if (event.pitch == 1.3968254f && event.volume == 0.4f) {
+            // Soul Esoward
+            event.soundName == "mob.wolf.panting" && event.pitch == 1.3968254f && event.volume == 0.4f -> {
                 ItemAbility.SOUL_ESOWARD.sound()
             }
-        }
-        if (event.soundName == "mob.zombiepig.zpigangry") {
-            if (event.pitch == 2.0f && event.volume == 0.3f) {
+            // Pigman Sword
+            event.soundName == "mob.zombiepig.zpigangry" && event.pitch == 2.0f && event.volume == 0.3f -> {
                 ItemAbility.PIGMAN_SWORD.sound()
             }
-        }
-        if (event.soundName == "mob.ghast.fireball") {
-            if (event.pitch == 1.0f && event.volume == 0.3f) {
+            // Ember Rod
+            event.soundName == "mob.ghast.fireball" && event.pitch == 1.0f && event.volume == 0.3f -> {
                 ItemAbility.EMBER_ROD.sound()
             }
-        }
-        if (event.soundName == "mob.guardian.elder.idle") {
-            if (event.pitch == 2.0f && event.volume == 0.2f) {
+            // Fire Freeze Staff
+            event.soundName == "mob.guardian.elder.idle" && event.pitch == 2.0f && event.volume == 0.2f -> {
                 ItemAbility.FIRE_FREEZE_STAFF.sound()
             }
-        }
-        if (event.soundName == "random.explode") {
-            if (event.pitch == 0.4920635f && event.volume == 0.5f) {
+            // Staff of the Volcano
+            event.soundName == "random.explode" && event.pitch == 0.4920635f && event.volume == 0.5f -> {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
-        }
-        if (event.soundName == "random.eat") {
-            if (event.pitch == 1.0f && event.volume == 1.0f) {
+            // Staff of the Volcano
+            event.soundName == "random.eat" && event.pitch == 1.0f && event.volume == 1.0f -> {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
-        }
-        if (event.soundName == "random.drink") {
-            if (event.pitch == 1.8888888f && event.volume == 1.0f) {
+            // Holy Ice
+            event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
-        }
-    }
+            // Royal Pigeon
+            event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+                ItemAbility.ROYAL_PIGEON.sound()
+            }
 
-    @SubscribeEvent
-    fun onBlockClickSend(event: BlockClickEvent) {
-        handleItemClick(event.itemInHand)
+            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+                ItemAbility.WAND_OF_STRENGTH.sound()
+            }
+        }
     }
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
+        if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 
@@ -148,46 +196,57 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onActionBar(event: LorenzActionBarEvent) {
+    fun onIslandChange(event: LorenzWorldChangeEvent) {
+        for (ability in ItemAbility.entries) {
+            ability.lastActivation = 0L
+            ability.specialColor = null
+        }
+    }
+
+    @SubscribeEvent
+    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
 
-        val message: String = event.message
+        val message: String = event.actionBar
         handleOldAbilities(message)
 
-        if (message.contains("§lCASTING IN ")) {
-            if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown()) {
-                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
+        when {
+            message.contains("§lCASTING IN ") -> {
+                if (!ItemAbility.RAGNAROCK_AXE.isOnCooldown()) {
+                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.WHITE, 3_000)
+                }
             }
-        } else if (message.contains("§lCASTING")) {
-            if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
-                ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10_000)
+
+            message.contains("§lCASTING") -> {
+                if (ItemAbility.RAGNAROCK_AXE.specialColor != LorenzColor.DARK_PURPLE) {
+                    ItemAbility.RAGNAROCK_AXE.activate(LorenzColor.DARK_PURPLE, 10_000)
+                }
             }
-        } else if (message.contains("§c§lCANCELLED")) {
-            ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
+
+            message.contains("§c§lCANCELLED") -> {
+                ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
+            }
         }
     }
 
     private fun handleOldAbilities(message: String) {
-        if (message.contains(" (§6")) {
-            if (message.contains("§b) ")) {
-                val name: String = message.between(" (§6", "§b) ")
-                if (name == lastAbility) return
-                lastAbility = name
-                for (ability in ItemAbility.values()) {
-                    if (ability.abilityName == name) {
-                        click(ability)
-                        return
-                    }
+        // TODO use regex
+        if (message.contains(" (§6") && message.contains("§b) ")) {
+            val name: String = message.between(" (§6", "§b) ")
+            if (name == lastAbility) return
+            lastAbility = name
+            for (ability in ItemAbility.entries) {
+                if (ability.abilityName == name) {
+                    click(ability)
+                    return
                 }
-                return
             }
+            return
         }
         lastAbility = ""
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.itemAbilities.itemAbilityCooldown
-    }
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.itemAbilityCooldown
 
     private fun click(ability: ItemAbility) {
         if (ability.actionBarDetection) {
@@ -196,32 +255,31 @@ class ItemAbilityCooldown {
     }
 
     @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        tick++
-        if (tick % 2 == 0) {
-            checkHotBar()
-        }
+        checkHotBar(event.isMod(10))
     }
 
-    private fun checkHotBar() {
-        val items = mutableMapOf<ItemStack, MutableList<ItemText>>()
-        for ((stack, _) in ItemUtils.getItemsInInventoryWithSlots(true)) {
-            for (ability in hasAbility(stack)) {
-                items.getOrPut(stack) { mutableListOf() }.add(createItemText(ability))
-            }
+    private fun checkHotBar(recheckInventorySlots: Boolean = false) {
+        if (recheckInventorySlots || abilityItems.isEmpty()) {
+            abilityItems = ItemUtils.getItemsInInventory(true).associateWith { hasAbility(it) }
         }
-        this.items = items
+
+        items = abilityItems.entries.associateByTo(
+            mutableMapOf(),
+            { it.key.getIdentifier() },
+            { kp -> kp.value.map { createItemText(it) } }
+        ).mapKeysNotNull { it.key }
+
     }
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
+        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long =
-                ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color =
-                specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
+            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -229,20 +287,16 @@ class ItemAbilityCooldown {
                 tryHandleNextPhase(ability, specialColor)
                 return createItemText(ability)
             }
-            ItemText(LorenzColor.GREEN, "R", false, ability.alternativePosition)
+            ItemText(LorenzColor.GREEN, readyText, false, ability.alternativePosition)
         }
     }
 
     private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
-        if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT) {
-            if (specialColor == LorenzColor.BLUE) {
-                ability.activate(null, 4_000)
-            }
+        if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT && specialColor == LorenzColor.BLUE) {
+            ability.activate(null, 4_000)
         }
-        if (ability == ItemAbility.RAGNAROCK_AXE) {
-            if (specialColor == LorenzColor.DARK_PURPLE) {
-                ability.activate(null, 7_000)
-            }
+        if (ability == ItemAbility.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
+            ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
         }
     }
 
@@ -253,8 +307,8 @@ class ItemAbilityCooldown {
         val stack = event.stack
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
-        val list = items.filter { it.key == stack }
-            .firstNotNullOfOrNull { it.value } ?: return
+        val uuid = stack.getIdentifier() ?: return
+        val list = items[uuid] ?: return
 
         for (itemText in list) {
             if (guiOpen && !itemText.onCooldown) continue
@@ -265,20 +319,38 @@ class ItemAbilityCooldown {
                 renderObject.offsetY = -10
             }
             event.renderObjects.add(renderObject)
-
-            // fix multiple problems when having multiple abilities
-            if (SkyHanniMod.feature.itemAbilities.itemAbilityCooldownBackground) {
-                var opacity = 130
-                if (color == LorenzColor.GREEN) {
-                    opacity = 80
-                }
-                stack.background = color.addOpacity(opacity).rgb
-            }
         }
     }
 
     @SubscribeEvent
-    fun onChatMessage(event: LorenzChatEvent) {
+    fun onRenderItem(event: RenderGuiItemOverlayEvent) {
+        if (!isEnabled()) return
+        if (!config.itemAbilityCooldownBackground) return
+
+        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        val stack = event.stack
+
+        val uuid = stack?.getIdentifier() ?: return
+        val list = items[uuid] ?: return
+
+        for (itemText in list) {
+            if (guiOpen && !itemText.onCooldown) continue
+            val color = itemText.color
+
+            // fix multiple problems when having multiple abilities
+            var opacity = 130
+            if (color == LorenzColor.GREEN) {
+                opacity = 80
+                if (!config.itemAbilityShowWhenReady) return
+            }
+            event highlight color.addOpacity(opacity)
+        }
+    }
+
+    private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -303,6 +375,14 @@ class ItemAbilityCooldown {
         if (message == "§cRagnarock was cancelled due to being hit!") {
             ItemAbility.RAGNAROCK_AXE.activate(null, 17_000)
         }
+        youBuffedYourselfPattern.matchMatcher(message) {
+            ItemAbility.SWORD_OF_BAD_HEALTH.activate()
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(31, "itemAbilities", "inventory.itemAbilities")
     }
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
@@ -310,7 +390,7 @@ class ItemAbilityCooldown {
         val internalName = stack.getInternalName()
 
         val list = mutableListOf<ItemAbility>()
-        for (ability in ItemAbility.values()) {
+        for (ability in ItemAbility.entries) {
             if (ability.newVariant) {
                 if (ability.internalNames.contains(internalName)) {
                     list.add(ability)

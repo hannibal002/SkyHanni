@@ -1,27 +1,30 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.test.command.CopyErrorCommand
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson.ShortCut
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
-import at.hannibal2.skyhanni.utils.jsonobjects.ParkourJson
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
     val locations: List<LorenzVec>,
-    private val shortCuts: List<ParkourJson.ShortCut>,
+    private val shortCuts: List<ShortCut>,
     val platformSize: Double = 1.0,
-    val detectionRange: Double = 1.0
+    val detectionRange: Double = 1.0,
+    val depth: Boolean = true,
+    val onEndReach: () -> Unit = {},
 ) {
+
     private var current = -1
     private var visible = false
 
@@ -38,9 +41,9 @@ class ParkourHelper(
         visible = false
     }
 
-    fun render(event: RenderWorldLastEvent) {
+    fun render(event: LorenzRenderWorldEvent) {
         if (locations.isEmpty()) {
-            CopyErrorCommand.logError(
+            ErrorManager.logErrorWithData(
                 IllegalArgumentException("locations is empty"),
                 "Trying to render an empty parkour"
             )
@@ -53,10 +56,10 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        if (location.offsetCenter().distanceToPlayer() < detectionRange) {
-                            if (Minecraft.getMinecraft().thePlayer.onGround) {
-                                current = index
-                            }
+                        val onGround = Minecraft.getMinecraft().thePlayer.onGround
+                        val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
+                        if (closeEnough && onGround) {
+                            current = index
                         }
                     }
                 }
@@ -64,10 +67,8 @@ class ParkourHelper(
                 val distanceToPlayer = locations.first().offsetCenter().distanceToPlayer()
                 if (distanceToPlayer < detectionRange) {
                     visible = true
-                } else if (distanceToPlayer > 15) {
-                    if (current < 1) {
-                        visible = false
-                    }
+                } else if (distanceToPlayer > 15 && current < 1) {
+                    visible = false
                 }
 
                 if (!visible) return
@@ -79,15 +80,17 @@ class ParkourHelper(
             }
 
             val inProgressVec = getInProgressPair().toSingletonListOrEmpty()
+            if (locations.size == current + 1) {
+                onEndReach()
+            }
             for ((prev, next) in locations.asSequence().withIndex().zipWithNext().drop(current)
                 .take(lookAhead - 1) + inProgressVec) {
-                event.draw3DLine(
+                event.draw3DLine_nea(
                     prev.value.offsetCenter(),
                     next.value.offsetCenter(),
                     colorForIndex(prev.index),
                     5,
-                    false,
-                    colorForIndex(next.index)
+                    false
                 )
             }
             val nextShortcuts = current until current + lookAhead
@@ -95,15 +98,14 @@ class ParkourHelper(
                 if (shortCut.from in nextShortcuts && shortCut.to in locations.indices) {
                     val from = locations[shortCut.from].offsetCenter()
                     val to = locations[shortCut.to].offsetCenter()
-                    event.draw3DLine(from, to, Color.RED, 3, false)
-                    val textLocation = from.add(to.subtract(from).normalize())
+                    event.draw3DLine_nea(from, to, Color.RED, 3, false)
+                    val textLocation = from + (to - from).normalize()
                     event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
 
                     val aabb = axisAlignedBB(locations[shortCut.to])
-                    event.drawFilledBoundingBox(aabb, Color.RED, 1f)
-                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
+                    event.drawFilledBoundingBox_nea(aabb, Color.RED, 1f)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
                 }
-
             }
 
             for ((index, location) in locations.asSequence().withIndex().drop(current)
@@ -112,20 +114,18 @@ class ParkourHelper(
                 if (isMovingPlatform && showEverything) continue
                 if (isMovingPlatform) {
                     val aabb = axisAlignedBB(location).expandBlock()
-                    event.drawFilledBoundingBox(aabb, colorForIndex(index), .6f)
+                    event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), .6f)
                 } else {
-                  val aabb = axisAlignedBB(location)
-                    event.drawFilledBoundingBox(aabb, colorForIndex(index), 1f)
-                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, true)
+                    val aabb = axisAlignedBB(location)
+                    event.drawFilledBoundingBox_nea(aabb, colorForIndex(index), 1f)
+                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
                 }
-                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber) {
-                    if (!isMovingPlatform) {
-                        event.drawString(location.offsetCenter().add(0, 1, 0), "§a§l$index", seeThroughBlocks = true)
-                    }
+                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
+                    event.drawString(location.offsetCenter().add(y = 1), "§a§l$index", seeThroughBlocks = true)
                 }
             }
         } catch (e: Throwable) {
-            CopyErrorCommand.logError(e, "Error while rendering a parkour")
+            ErrorManager.logErrorWithData(e, "Error while rendering a parkour")
         }
     }
 
@@ -141,10 +141,10 @@ class ParkourHelper(
         if (LocationUtils.playerLocation().distance(nextPosition) > currentPosition.distance(nextPosition)) return null
 
         val factor = LocationUtils.playerLocation().distance(currentPosition) / currentPosition.distance(nextPosition)
-        val solpeLocation = lookAheadStart.slope(lookAheadEnd, factor)
+        val slopeLocation = lookAheadStart.slope(lookAheadEnd, factor)
         return Pair(
             IndexedValue(current + lookAhead - 1, lookAheadStart),
-            IndexedValue(current + lookAhead, solpeLocation)
+            IndexedValue(current + lookAhead, slopeLocation)
         )
     }
 
