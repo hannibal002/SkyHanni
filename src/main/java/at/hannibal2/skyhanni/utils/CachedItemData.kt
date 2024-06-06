@@ -16,8 +16,7 @@ data class CachedItemData(
     // null = not loaded
     var riftExportable: Boolean? = null,
 
-    // null = not loaded
-    var itemRarityLastCheck: Long = 0L, // Can't use SimpleTimeMark here
+    var itemRarityLastCheck: SimpleTimeMark = SimpleTimeMark.farPast(),
 
     // null = not loaded
     var itemRarity: LorenzRarity? = null,
@@ -26,5 +25,12 @@ data class CachedItemData(
 
     var lastInternalName: NEUInternalName? = null,
 
-    var lastInternalNameFetchTime: Long = 0L, // Still can't use SimpleTimeMark here
-)
+    var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+) {
+    /**
+     * Delegate constructor to avoid calling a function with default arguments from java.
+     * We can't call the generated no args constructors (or rather we cannot generate that constructor), because inline
+     * classes are not part of the java-kotlin ABI that is super well supported (especially with default arguments).
+     */
+    constructor(void: Void?) : this()
+}

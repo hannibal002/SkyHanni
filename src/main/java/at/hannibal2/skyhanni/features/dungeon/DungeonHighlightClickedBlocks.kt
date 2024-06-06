@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -14,7 +15,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonHighlightClickedBlocks {
+@SkyHanniModule
+object DungeonHighlightClickedBlocks {
 
     private val blocks = mutableListOf<ClickedBlock>()
     private var colorIndex = 0

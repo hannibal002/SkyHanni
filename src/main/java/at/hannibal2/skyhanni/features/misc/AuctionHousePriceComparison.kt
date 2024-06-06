@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -19,7 +20,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class AuctionHousePriceComparison {
+@SkyHanniModule
+object AuctionHousePriceComparison {
 
     private val config get() = SkyHanniMod.feature.inventory.auctions.auctionsPriceComparison
 

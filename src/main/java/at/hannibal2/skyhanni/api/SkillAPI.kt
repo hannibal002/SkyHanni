@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevel
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevelExact
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -39,6 +40,7 @@ import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object SkillAPI {
     private val patternGroup = RepoPattern.group("api.skilldisplay")
     private val skillPercentPattern by patternGroup.pattern(

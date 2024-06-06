@@ -17,7 +17,7 @@ import java.util.List;
 public class MixinItemStack implements ItemStackCachedData {
 
     @Unique
-    public CachedItemData skyhanni_cachedData = new CachedItemData();
+    public CachedItemData skyhanni_cachedData = new CachedItemData((Void) null);
 
     public CachedItemData getSkyhanni_cachedData() {
         return skyhanni_cachedData;

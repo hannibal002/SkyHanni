@@ -51,6 +51,12 @@ public class HoppityEggsConfig {
     public boolean showNearbyDuplicateEggLocations = false;
 
     @Expose
+    @ConfigOption(name = "Load from NEU PV", desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean loadFromNeuPv = true;
+
+    @Expose
     @ConfigOption(name = "Show Unclaimed Eggs", desc = "Displays which eggs haven't been found in the last SkyBlock day.")
     @ConfigEditorBoolean
     @FeatureToggle
