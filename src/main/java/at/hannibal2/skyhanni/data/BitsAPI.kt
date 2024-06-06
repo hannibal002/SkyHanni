@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
+@SkyHanniModule
 object BitsAPI {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
     private val playerStorage get() = SkyHanniMod.feature.storage

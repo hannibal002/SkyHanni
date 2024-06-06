@@ -60,7 +60,7 @@ object UnknownLinesHandler {
             SbPattern.mobLocationPattern,
             SbPattern.jacobsContestPattern,
             SbPattern.plotPattern,
-            SbPattern.powderPattern,
+            SbPattern.powderGreedyPattern,
             SbPattern.windCompassPattern,
             SbPattern.windCompassArrowPattern,
             SbPattern.miningEventPattern,
