@@ -37,7 +37,7 @@ object FFStats {
     var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
-        cakeExpireTime = SimpleTimeMark(GardenAPI.storage?.fortune?.cakeExpiring ?: 0)
+        cakeExpireTime = SimpleTimeMark(GardenAPI.storage?.fortune?.cakeExpiring ?: -1L)
 
         FarmingItems.resetFFData()
 
