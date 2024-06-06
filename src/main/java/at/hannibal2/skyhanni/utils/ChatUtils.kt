@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text
@@ -23,6 +24,7 @@ import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
+@SkyHanniModule
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
@@ -67,7 +69,7 @@ object ChatUtils {
      * Why deprecate this? Even if this message is descriptive for the user and the developer,
      * we don't want inconsistencies in errors, and we would need to search
      * for the code line where this error gets printed any way.
-     * so it's better to use the stack trace still.
+     * So it's better to use the stack trace still.
      *
      * @param message The message to be sent
      *
@@ -126,6 +128,7 @@ object ChatUtils {
      * Sends a message to the user that they can click and run an action
      * @param message The message to be sent
      * @param onClick The runnable to be executed when the message is clicked
+     * @param hover The string to be shown when the message is hovered
      * @param expireAt When the click action should expire, default never
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
@@ -135,6 +138,7 @@ object ChatUtils {
     fun clickableChat(
         message: String,
         onClick: () -> Any,
+        hover: String = "§eClick here!",
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
         prefixColor: String = "§e",
@@ -143,7 +147,7 @@ object ChatUtils {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(Text.text(msgPrefix + message) {
             this.onClick(expireAt, oneTimeClick, onClick)
-            this.hover = "§eClick here!".asComponent()
+            this.hover = hover.asComponent()
         })
     }
 

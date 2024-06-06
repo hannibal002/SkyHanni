@@ -83,7 +83,7 @@ enum class PestType(
         SprayType.TASTY_CHEESE,
         VinylType.RODENT_REVOLUTION,
         "PEST_RAT_MONSTER".asInternalName(),
-        CropType.COCOA_BEANS,
+        CropType.PUMPKIN,
     ),
     SLUG(
         "Slug",

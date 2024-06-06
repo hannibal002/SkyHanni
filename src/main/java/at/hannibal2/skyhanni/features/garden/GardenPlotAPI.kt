@@ -5,15 +5,16 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
@@ -23,6 +24,7 @@ import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object GardenPlotAPI {
 
     private val patternGroup = RepoPattern.group("garden.plot")
@@ -332,7 +334,7 @@ object GardenPlotAPI {
             for (j in 0..plotSize step plotSize) {
                 val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
                 val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
-                tryDraw3DLine(start, end, cornerColor, 2, true)
+                tryDraw3DLine(start, end, cornerColor, 3, true)
             }
         }
 
@@ -341,9 +343,9 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
             val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
             // Front lines
-            tryDraw3DLine(start, end, lineColor, 1, true)
+            tryDraw3DLine(start, end, lineColor, 2, true)
             // Back lines
-            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 2, true)
         }
 
         // Render vertical on Z-Axis
@@ -351,9 +353,9 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
             val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
             // Left lines
-            tryDraw3DLine(start, end, lineColor, 1, true)
+            tryDraw3DLine(start, end, lineColor, 2, true)
             // Right lines
-            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 2, true)
         }
 
         // Render horizontal
@@ -367,7 +369,7 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
             val isRedLine = y == buildLimit
             val color = if (isRedLine) Color.red else lineColor
-            val depth = if (isRedLine) 2 else 1
+            val depth = if (isRedLine) 3 else 2
             // (minX, minZ) -> (minX, minZ + 96)
             tryDraw3DLine(start, start.add(z = plotSize), color, depth, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
