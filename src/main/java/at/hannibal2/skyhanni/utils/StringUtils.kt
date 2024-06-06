@@ -135,19 +135,19 @@ object StringUtils {
 
     fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text, consumer)"))
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text) { consumer() }"))
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text, consumer)"))
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text) { consumer() }"))
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern) { consumer() }"))
     inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
         toList().matchFirst(pattern, consumer)
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern) { consumer() }"))
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.matches()) return consumer(it) }
@@ -155,7 +155,7 @@ object StringUtils {
         return null
     }
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchAll(pattern, consumer)"))
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchAll(pattern) { consumer() }"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
         for (line in this) {
             pattern.matcher(line).let { if (it.find()) consumer(it) }
@@ -183,7 +183,7 @@ object StringUtils {
         }
     }
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatchers(text, consumer)"))
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatchers(text) { consumer() }"))
     inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
         for (pattern in iterator()) {
             pattern.matchMatcher<T>(text) {

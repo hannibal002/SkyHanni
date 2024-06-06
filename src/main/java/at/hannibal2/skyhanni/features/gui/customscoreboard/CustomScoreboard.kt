@@ -41,7 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 internal typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
 @SkyHanniModule
-class CustomScoreboard {
+object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
@@ -105,19 +105,17 @@ class CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    companion object {
-        internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-        internal val displayConfig get() = config.display
-        internal val alignmentConfig get() = displayConfig.alignment
-        internal val arrowConfig get() = displayConfig.arrow
-        internal val chunkedConfig get() = displayConfig.chunkedStats
-        internal val eventsConfig get() = displayConfig.events
-        internal val mayorConfig get() = displayConfig.mayor
-        internal val partyConfig get() = displayConfig.party
-        internal val maxwellConfig get() = displayConfig.maxwell
-        internal val informationFilteringConfig get() = config.informationFiltering
-        internal val backgroundConfig get() = config.background
-    }
+    internal val config get() = SkyHanniMod.feature.gui.customScoreboard
+    internal val displayConfig get() = config.display
+    internal val alignmentConfig get() = displayConfig.alignment
+    internal val arrowConfig get() = displayConfig.arrow
+    internal val chunkedConfig get() = displayConfig.chunkedStats
+    internal val eventsConfig get() = displayConfig.events
+    internal val mayorConfig get() = displayConfig.mayor
+    internal val partyConfig get() = displayConfig.party
+    internal val maxwellConfig get() = displayConfig.maxwell
+    internal val informationFilteringConfig get() = config.informationFiltering
+    internal val backgroundConfig get() = config.background
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
