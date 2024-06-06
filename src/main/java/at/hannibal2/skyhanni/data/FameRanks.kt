@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FameRankJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object FameRanks {
     var fameRanks = emptyMap<String, FameRank>()
         private set
