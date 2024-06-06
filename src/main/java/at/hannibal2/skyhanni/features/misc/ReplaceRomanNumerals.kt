@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -17,7 +18,8 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ReplaceRomanNumerals {
+@SkyHanniModule
+object ReplaceRomanNumerals {
     // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
     private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
 
