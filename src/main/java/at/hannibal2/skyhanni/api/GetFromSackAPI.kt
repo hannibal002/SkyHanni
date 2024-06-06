@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
@@ -31,6 +32,7 @@ import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GetFromSackAPI {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 

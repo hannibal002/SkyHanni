@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -70,10 +71,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
-private val config get() = VisitorAPI.config
 
+@SkyHanniModule
 object GardenVisitorFeatures {
 
+    private val config get() = VisitorAPI.config
     private var display = emptyList<List<Any>>()
 
     private val patternGroup = RepoPattern.group("garden.visitor")
