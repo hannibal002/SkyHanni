@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.Queue
 import java.util.WeakHashMap
+import kotlin.math.ceil
 
 object CollectionUtils {
 
@@ -300,6 +302,38 @@ object CollectionUtils {
         }))
     }
 
+    fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
+        if (this.isEmpty()) return xSpace
+        val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
+        val xLength = off.size - 1
+        val emptySpace = xSpace - off.last()
+        if (emptySpace < 0) {
+            //    throw IllegalArgumentException("Not enough space for content")
+        }
+        return emptySpace / (xLength - 1)
+    }
+
+    fun Collection<Collection<Renderable>>.tableStretchYPadding(ySpace: Int): Int {
+        if (this.isEmpty()) return ySpace
+        val off = RenderableUtils.calculateTableYOffsets(this as List<List<Renderable?>>, 0)
+        val yLength = off.size - 1
+        val emptySpace = ySpace - off.last()
+        if (emptySpace < 0) {
+            //    throw IllegalArgumentException("Not enough space for content")
+        }
+        return emptySpace / (yLength - 1)
+    }
+
+    /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
+    fun <T> Collection<T>.split(subs: Int = 2): List<List<T>> {
+        if (this.isEmpty()) return listOf(emptyList())
+        val list = this.chunked(ceil(this.size.toDouble() / subs.toDouble()).toInt()).toMutableList()
+        while (list.size < subs) {
+            list.add(emptyList())
+        }
+        return list
+    }
+
     inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
         val destination = LinkedHashMap<R, V>()
         for (element in this) {
@@ -309,6 +343,15 @@ object CollectionUtils {
             }
         }
         return destination
+    }
+
+    inline fun <T, C : Number, D : Number> Iterable<T>.sumOfPair(selector: (T) -> Pair<C, D>): Pair<Double, Double> {
+        var sum = Pair(0.0, 0.0)
+        for (element in this) {
+            val add = selector(element)
+            sum = sum.first + add.first.toDouble() to sum.second + add.second.toDouble()
+        }
+        return sum
     }
 
     inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
 import at.hannibal2.skyhanni.data.MayorAPI.foxyExtraEventPattern
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -39,9 +40,19 @@ enum class Mayor(
 
     override fun toString() = mayorName
 
+    fun addAllPerks(): Mayor {
+        activePerks.addAll(perks)
+        perks.forEach { it.isActive = true }
+        return this
+    }
+
+    fun isActive() = this == currentMayor
+
     companion object {
 
         fun getMayorFromName(name: String): Mayor? = entries.firstOrNull { it.mayorName == name }
+
+        fun getMayorFromPerk(perk: Perk): Mayor? = entries.firstOrNull { it.perks.contains(perk) }
 
         fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): Mayor? {
             val mayor = getMayorFromName(name)
@@ -146,4 +157,8 @@ enum class Perk(val perkName: String) {
     ;
 
     var isActive = false
+
+    companion object {
+        fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
+    }
 }
