@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -37,6 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PestAPI {
 
     val config get() = GardenAPI.config.pests

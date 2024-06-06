@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -36,6 +37,7 @@ import kotlin.math.log10
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object FarmingFortuneDisplay {
     private val config get() = GardenAPI.config.farmingFortunes
 

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -35,6 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias CategoryName = String
 
+@SkyHanniModule
 object FishingProfitTracker {
 
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
