@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -12,7 +13,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ComposterInventoryNumbers {
+@SkyHanniModule
+object ComposterInventoryNumbers {
 
     private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers")
     private val valuePattern by patternGroup.pattern(
