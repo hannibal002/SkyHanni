@@ -39,9 +39,10 @@ object CustomScoreboardUtils {
 
     internal fun String.formatNum() = formatDouble().formatNum()
 
-    internal fun getMotes() = ScoreboardPattern.motesPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "motes")
+    internal fun getMotes() =
+        ScoreboardPattern.motesPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "motes") ?: "0"
 
-    internal fun getBank() = ScoreboardPattern.bankPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "bank")
+    internal fun getBank() = ScoreboardPattern.bankPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "bank") ?: "0"
 
     internal fun getBits() = BitsAPI.bits.coerceAtLeast(0).formatNum()
 
@@ -54,15 +55,15 @@ object CustomScoreboardUtils {
     }
 
     internal fun getCopper() =
-        ScoreboardPattern.copperPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "copper")
+        ScoreboardPattern.copperPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "copper") ?: "0"
 
-    internal fun getGems() = ScoreboardPattern.gemsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "gems")
+    internal fun getGems() = ScoreboardPattern.gemsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "gems") ?: "0"
 
     internal fun getHeat() =
         ScoreboardPattern.heatPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "heat")
 
     internal fun getNorthStars() =
-        ScoreboardPattern.northstarsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "northStars")
+        ScoreboardPattern.northstarsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "northStars") ?: "0"
 
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
