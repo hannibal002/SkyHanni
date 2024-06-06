@@ -18,10 +18,18 @@ object FlightDurationAPI {
 
     private val group = RepoPattern.group("data.effects")
     private val flightGroup = group.group("flight")
+
+    /**
+     * REGEX-TEST: §aYou can now fly for §r§c200§r§a minutes.
+     */
     private val durationPattern by flightGroup.pattern(
         "duration",
         "§aYou can now fly for §r§c(?<time>[\\d,.]+)§r§a minutes."
     )
+
+    /**
+     * REGEX-TEST: §aYour flight has been extended for §r§c2§r§a extra minutes.
+     */
     private val durationExtendedPattern by flightGroup.pattern(
         "duration.extended",
         "§aYour flight has been extended for §r§c(?<time>[\\d,.]+)§r§a extra minutes."
