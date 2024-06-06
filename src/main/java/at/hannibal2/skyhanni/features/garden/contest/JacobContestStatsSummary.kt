@@ -26,7 +26,7 @@ import kotlin.time.DurationUnit
 @SkyHanniModule
 object JacobContestStatsSummary {
 
-    private val config get() = GardenAPI.config
+    private val config get() = GardenAPI.config.jacobContestStats
     private var blocksBroken = 0
     private var startTimeIrl = SimpleTimeMark.farPast()
     private var startTimeRelative: Long? = null
