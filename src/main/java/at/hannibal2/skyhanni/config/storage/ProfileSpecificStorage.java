@@ -189,7 +189,7 @@ public class ProfileSpecificStorage {
         public String displayName = "";
 
         @Expose
-        public long lastClicked = 0;
+        public long lastClicked = -1;
 
         @Override
         public String toString() {
