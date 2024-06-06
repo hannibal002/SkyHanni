@@ -358,7 +358,7 @@ private fun getWinterLines() = buildList {
         SbPattern.winterMagmaLeftPattern,
         SbPattern.winterTotalDmgPattern,
         SbPattern.winterCubeDmgPattern
-    ).allMatches(getSbLines()).filter { it.endsWith("Soon!") })
+    ).allMatches(getSbLines()).filter { !it.endsWith("Soon!") })
 }
 
 private fun getWinterShowWhen(): Boolean = // is empty on top already
