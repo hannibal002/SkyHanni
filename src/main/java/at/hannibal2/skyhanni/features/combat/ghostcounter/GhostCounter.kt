@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGho
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -63,6 +64,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
+@SkyHanniModule
 object GhostCounter {
 
     val config get() = SkyHanniMod.feature.combat.ghostCounter
