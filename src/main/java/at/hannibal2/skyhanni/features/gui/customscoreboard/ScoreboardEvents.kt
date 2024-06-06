@@ -346,7 +346,7 @@ private fun getGardenPastingLines(): List<String> =
 private fun getGardenPastingShowWhen(): Boolean = SbPattern.pastingPattern.anyMatches(getSbLines())
 
 private fun getFlightDurationLines(): List<String> =
-    listOf("Flight Duration: ${FlightDurationAPI.flightDuration.format(maxUnits = 2)}")
+    listOf("Flight Duration: §a${FlightDurationAPI.flightDuration.format(maxUnits = 2)}")
 
 private fun getFlightDurationShowWhen(): Boolean = FlightDurationAPI.isFlyingActive()
 
