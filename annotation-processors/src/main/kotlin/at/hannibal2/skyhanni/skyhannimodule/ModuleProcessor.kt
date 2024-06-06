@@ -47,7 +47,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
     //TODO remove when KMixins added as it contains KSP annotation helpers.
     private fun isDevAnnotation(klass: KSClassDeclaration): Boolean {
         val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
-        return annotation.arguments.find { it.name?.asString() == "inDevelopment" }?.value as? Boolean ?: false
+        return annotation.arguments.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
     }
 
     private fun generateFile(symbols: List<KSClassDeclaration>) {

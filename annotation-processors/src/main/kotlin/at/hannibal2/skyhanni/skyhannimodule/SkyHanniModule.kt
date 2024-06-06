@@ -6,5 +6,5 @@ annotation class SkyHanniModule(
     /**
      * If the module will only be loaded in a development environment.
      */
-    val inDevelopment: Boolean = false,
+    val devOnly: Boolean = false,
 )
