@@ -3,23 +3,28 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SoulboundItemIcon {
-    val config get() = SkyHanniMod.feature.inventory.soulbound
-    val coopSoulboundPattern by RepoPattern.pattern(
+@SkyHanniModule
+object SoulboundItemIcon {
+
+    private val config get() = SkyHanniMod.feature.inventory.soulbound
+
+    private val coopSoulboundPattern by RepoPattern.pattern(
         "inventory.coopsoulbound",
         "§8§l* §8Co-op Soulbound §8§l*"
     )
-    val soulboundPattern by RepoPattern.pattern(
+    private val soulboundPattern by RepoPattern.pattern(
         "inventory.soulbound",
         "§8§l* §8Soulbound §8§l*"
     )
+
     @SubscribeEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!LorenzUtils.inSkyBlock) return
