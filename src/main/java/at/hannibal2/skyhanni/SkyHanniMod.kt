@@ -41,7 +41,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
-import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
@@ -124,7 +123,6 @@ class SkyHanniMod {
         loadModule(CropSpeedMeter())
         loadModule(MovementSpeedDisplay())
         loadModule(CityProjectFeatures())
-        loadModule(KingTalismanHelper())
         loadModule(WatchdogHider())
         loadModule(AccountUpgradeReminder())
         loadModule(Translator())
