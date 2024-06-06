@@ -25,6 +25,8 @@ class TimeLimitedCache<K: Any, V: Any>(
 
     fun clear() = cache.invalidateAll()
 
+    fun remove(key: K) = cache.invalidate(key)
+
     fun entries(): Set<Map.Entry<K, V>> = cache.asMap().entries
 
     fun values(): Collection<V> = cache.asMap().values
