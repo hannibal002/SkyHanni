@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.data.FlightDurationAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import java.util.function.Supplier
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
@@ -344,9 +346,9 @@ private fun getGardenPastingLines(): List<String> =
 private fun getGardenPastingShowWhen(): Boolean = SbPattern.pastingPattern.anyMatches(getSbLines())
 
 private fun getFlightDurationLines(): List<String> =
-    listOf(getSbLines().first { SbPattern.flightDurationPattern.matches(it) }.trim())
+    listOf("Flight Duration: ${FlightDurationAPI.flightDuration.format(maxUnits = 2)}")
 
-private fun getFlightDurationShowWhen(): Boolean = SbPattern.flightDurationPattern.anyMatches(getSbLines())
+private fun getFlightDurationShowWhen(): Boolean = FlightDurationAPI.isFlyingActive()
 
 private fun getWinterLines() = buildList {
     getSbLines().firstOrNull { SbPattern.winterEventStartPattern.matches(it) }?.let { add(it) }

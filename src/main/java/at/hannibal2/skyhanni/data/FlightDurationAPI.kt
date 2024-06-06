@@ -4,13 +4,12 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -27,13 +26,21 @@ object FlightDurationAPI {
         "duration.extended",
         "§aYour flight has been extended for §r§c(?<time>[\\d,.]+)§r§a extra minutes."
     )
+    private val expiresInPattern by flightGroup.pattern(
+        "expires.duration",
+        "§cMushroom Soup Flight expires in §r§e(?<time>\\d+)s§r§c."
+    )
+    private val expiredPattern by flightGroup.pattern(
+        "expired",
+        "§cMushroom Soup Flight has expired!"
+    )
 
     private val storage get() = ProfileStorageData.profileSpecific
 
-    private var flightDuration: Duration
-        get() = (storage?.flightDuration ?: 0).milliseconds
-        set(value) {
-            storage?.flightDuration = value.inWholeMilliseconds
+    var flightDuration: Duration
+        get() = (storage?.flightDuration ?: 0).coerceAtLeast(0).seconds
+        private set(value) {
+            storage?.flightDuration = value.inWholeSeconds
         }
 
     private val flightIslands = listOf(
@@ -43,7 +50,7 @@ object FlightDurationAPI {
         IslandType.GARDEN_GUEST
     )
 
-    private var inIsland = false
+    private var inFlyingIsland = false
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -51,28 +58,35 @@ object FlightDurationAPI {
 
         val message = event.message
         durationPattern.matchMatcher(message) {
-            val time = group("time").toLong()
+            val time = group("time").toInt()
             flightDuration = time.minutes
-            ChatUtils.debug("§aFlight duration set to §c${flightDuration}§a minutes.")
+            return
         }
         durationExtendedPattern.matchMatcher(message) {
-            val time = group("time").toLong()
+            val time = group("time").toInt()
             flightDuration += time.minutes
-            ChatUtils.debug("§aFlight duration extended to §c${flightDuration}§a minutes.")
+            return
+        }
+        expiresInPattern.matchMatcher(message) {
+            val time = group("time").toInt()
+            flightDuration = time.seconds
+            return
+        }
+        if (expiredPattern.matches(message)) {
+            flightDuration = 0.seconds
+            return
         }
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (inIsland && flightDuration.isPositive() && !BitsAPI.hasCookieBuff()) {
-            flightDuration -= 1.seconds
-        }
+        if (isFlyingActive()) flightDuration -= 1.seconds
     }
 
     @SubscribeEvent
     fun onIslandSwitch(event: IslandChangeEvent) {
-        inIsland = event.newIsland in flightIslands
+        inFlyingIsland = event.newIsland in flightIslands
     }
 
-
+    fun isFlyingActive() = inFlyingIsland && flightDuration.isPositive() && !BitsAPI.hasCookieBuff()
 }
