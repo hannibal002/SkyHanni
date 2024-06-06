@@ -457,18 +457,6 @@ object ScoreboardPattern {
         "soulflow",
         "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$"
     )
-    val mithrilPowderPattern by tablistGroup.pattern(
-        "mithrilpowder",
-        "^\\s*Mithril(?: Powder)?: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
-    )
-    val gemstonePowderPattern by tablistGroup.pattern(
-        "gemstonepowder",
-        "^\\s*Gemstone(?: Powder)?: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
-    )
-    val glacitePowderPattern by tablistGroup.pattern(
-        "glacitepowder",
-        "^\\s*Glacite(?: Powder)?: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
-    )
     val eventNamePattern by tablistGroup.pattern(
         "event",
         "^\\s*§e§lEvent: §r(?<name>§.*)$"
