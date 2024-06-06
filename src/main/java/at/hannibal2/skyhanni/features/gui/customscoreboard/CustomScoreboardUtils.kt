@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
@@ -40,8 +39,9 @@ object CustomScoreboardUtils {
 
     internal fun String.formatNum() = formatDouble().formatNum()
 
-    internal fun getMotes() = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes")
-    internal fun getBank() = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
+    internal fun getMotes() = ScoreboardPattern.motesPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "motes")
+
+    internal fun getBank() = ScoreboardPattern.bankPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "bank")
 
     internal fun getBits() = BitsAPI.bits.coerceAtLeast(0).formatNum()
 
@@ -54,15 +54,15 @@ object CustomScoreboardUtils {
     }
 
     internal fun getCopper() =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper")
+        ScoreboardPattern.copperPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "copper")
 
-    internal fun getGems() = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
+    internal fun getGems() = ScoreboardPattern.gemsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "gems")
 
     internal fun getHeat() =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.heatPattern, "heat")
+        ScoreboardPattern.heatPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "heat")
 
     internal fun getNorthStars() =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
+        ScoreboardPattern.northstarsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "northStars")
 
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
