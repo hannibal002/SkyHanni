@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -23,7 +23,7 @@ object BoopParty {
     )
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
 
         val msg = event.message.trimWhiteSpaceAndResets()
@@ -35,5 +35,5 @@ object BoopParty {
         }
     }
 
-    fun isEnabled() = config && LorenzUtils.isBingoProfile
+    fun isEnabled() = LorenzUtils.isBingoProfile && config
 }
