@@ -3,13 +3,15 @@ package at.hannibal2.skyhanni.features.minion
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MinionCollectLogic {
+@SkyHanniModule
+object MinionCollectLogic {
 
     private var oldMap = mapOf<NEUInternalName, Int>()
 

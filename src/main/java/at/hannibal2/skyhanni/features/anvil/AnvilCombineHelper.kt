@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.anvil
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -13,7 +14,8 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AnvilCombineHelper {
+@SkyHanniModule
+object AnvilCombineHelper {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
