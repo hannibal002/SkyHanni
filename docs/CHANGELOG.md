@@ -112,6 +112,7 @@
 + Added an option for a compacted Dicer RNG Drop Tracker Display. -
   Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1735)
     + Also shortened the default display.
++ Minor GUI improvements in /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/873)
 
 #### Hoppity Event Improvements
 
@@ -126,6 +127,8 @@
   maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/1926)
 + Adjusted and added Rabbit Uncle & Dog Keybinds. - raven (https://github.com/hannibal002/SkyHanni/pull/1907)
 + Added a distinct sound for the special stray rabbit. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1913)
++ Added collected egg location API import. - appable (https://github.com/hannibal002/SkyHanni/pull/1972)
+    + Open your NEU profile viewer and click the chat message to load data.
 
 #### Mining Improvements
 
@@ -166,6 +169,10 @@
 + Reduced the frequency of Diana sound guess hints while the feature is working correctly. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1954)
 
+#### Crimson Isle
+
++ Crimson Isle Reputation Helper now warns when the Faction Quest Widget is disabled in the tab list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1977)
+
 #### Misc Improvements
 
 + Added a toggle for 24-hour time. - seraid (https://github.com/hannibal002/SkyHanni/pull/1804)
@@ -176,6 +183,8 @@
   Empa (https://github.com/hannibal002/SkyHanni/pull/1875)
 + Updated /shclearminiondata to remove only bugged minions nearby, not all minions. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1951)
++ Added information about the current Perkopocalypse Mayor's perks to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2003)
++ Added support for Fancy Contributors in nametags. - Empa (https://github.com/hannibal002/SkyHanni/pull/1687)
 
 ### Fixes
 
@@ -193,6 +202,7 @@
 + Fixed a typo in Tunnels Maps. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1883)
 + Fixed error with SkyMall with Titanium buff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1967)
 + Fixed swapped mining event display icons. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1958)
++ Fixed Area Walls being broken in Nucleus. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1994)
 
 #### Garden Fixes
 
@@ -201,6 +211,8 @@
   raven (https://github.com/hannibal002/SkyHanni/pull/1849)
 + Fixed /shcropgoal not working with double-name crops (wart, cocoa, cane). -
   L3Cache (https://github.com/hannibal002/SkyHanni/pull/1970)
++ Fixed Garden Visitor Drop Statistics not tracking new data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1976)
+    + This may also fix the display not showing up.
 
 #### Chocolate Factory & Hoppity Hunt Fixes
 
@@ -236,6 +248,7 @@
 + Fixed Thunder and Jawbus not being highlighted by Highlight Rare Sea Creatures. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1858)
 + Fixed Trophy Fish Display not working for stranded players. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1966)
++ Fixed Sea Creature highlight not working when the damage indicator was enabled. - Empa (https://github.com/hannibal002/SkyHanni/pull/1985)
 
 #### Performance Fixes
 
@@ -267,6 +280,11 @@
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1920)
 + Fixed the GUI editor opening unintentionally. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1973)
 + Fixed movable hotbar conflicts with some mods. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1965)
++ Fixed crashes caused by tooltips. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1986)
++ Fixed config reset on encountering unknown enum values in the config. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1990)
++ Config no longer resets when an incorrect value is entered. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1979)
++ Config no longer resets when downgrading versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1979)
++ Fixed accidental hiding of boss bars. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1980)
 
 ### Technical Details
 
@@ -289,6 +307,19 @@
 + Added unit test for repo pattern lists. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1733)
 + Added RepoPattern.exclusiveGroup. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1733)
     + Reserves a key namespace, that is only accessible from this group.
++ Increased usage of seconds passed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1899)
++ Refactored /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/873)
++ Added Perkopocalypse Mayor to MayorAPI. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2003)
++ Created FmlEventApi to hold Forge events before dispatching them as SkyHanniEvents. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1986)
++ Ensured correct config version when downgrading the mod. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1990)
++ Changed CachedItemData to use SimpleTimeMark. - nea (https://github.com/hannibal002/SkyHanni/pull/2006)
+    + This is done via an in-Kotlin delegate constructor, since calling functions with default arguments that have an inline class type from Java is not stable.
++ Added SimpleStringTypeAdapter. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1979)
++ Added SkippingTypeAdapterFactory. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1979)
++ Cleaned up ConfigManager. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1979)
++ Moved json package inside the utils package. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1979)
++ Added Tab Widget abstraction. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1150)
++ Added EntityDisplayNameEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/1687)
 
 ## Version 0.25
 

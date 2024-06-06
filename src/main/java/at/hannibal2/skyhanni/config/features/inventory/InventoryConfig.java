@@ -218,6 +218,12 @@ public class InventoryConfig {
     public boolean powerStoneGuide = true;
 
     @Expose
+    @ConfigOption(name = "Favorite Power Stone", desc = "Shows your favorite power stones. You can add/remove them by shift clicking a Power Stone.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean favoritePowerStone = false;
+
+    @Expose
     @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
