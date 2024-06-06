@@ -50,7 +50,10 @@ class AccountUpgradeReminder {
 
         ChatUtils.clickableChat(
             "The §a$upgrade §eupgrade has completed! §c(Click to disable these reminders)",
-            "shstopaccountupgradereminder"
+            onClick = {
+                disable()
+            },
+            oneTimeClick = true
         )
     }
 
@@ -111,6 +114,7 @@ class AccountUpgradeReminder {
 
         fun disable() {
             SkyHanniMod.feature.misc.accountUpgradeReminder = false
+            ChatUtils.chat("Disabled account upgrade reminder.")
         }
     }
 }

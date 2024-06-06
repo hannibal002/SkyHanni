@@ -1,25 +1,25 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import net.minecraft.inventory.Slot
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.item.ItemStack
 
-// Please use LorenzToolTipEvent over ItemTooltipEvent if no special EventPriority is necessary
-class ToolTipData {
+// Please use LorenzToolTipEvent over ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
+object ToolTipData {
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: ItemTooltipEvent) {
-        val toolTip = event.toolTip ?: return
+    @JvmStatic
+    fun getTooltip(stack: ItemStack, toolTip: MutableList<String>) {
         val slot = lastSlot ?: return
-        val itemStack = event.itemStack ?: return
+        val itemStack = slot.stack ?: return
         try {
-            LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()
+            if (LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()) {
+                toolTip.clear()
+            }
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error in item tool tip parsing or rendering detected",
@@ -35,8 +35,11 @@ class ToolTipData {
         }
     }
 
-    companion object {
-
-        var lastSlot: Slot? = null
+    @JvmStatic
+    fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
+        ItemHoverEvent(stack, toolTip).postAndCatch()
     }
+
+    var lastSlot: Slot? = null
+
 }

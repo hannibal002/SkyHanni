@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -47,7 +47,7 @@ class PatcherSendCoordinates {
             val end = group("z")
             val z = if (end.contains(" ")) {
                 val split = end.split(" ")
-                val extra = split.drop(1).joinToString(" ")
+                val extra = split.drop(1).joinToString(" ").take(50)
                 description += " $extra"
 
                 split.first().toFloat()

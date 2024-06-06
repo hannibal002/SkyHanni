@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
+@SkyHanniModule
 object KeyboardManager {
 
     private var lastClickedMouseButton = -1
@@ -49,9 +51,11 @@ object KeyboardManager {
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
     @SubscribeEvent
-    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        GuiKeyPressEvent(guiScreen).postAndCatch()
+        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+            event.isCanceled = true
+        }
     }
 
     @SubscribeEvent

@@ -27,7 +27,7 @@ object ErrorManager {
 
     private val replace = mapOf(
         "at.hannibal2.skyhanni" to "SH",
-        "io.mouberry,notenoughupdates" to "NEU",
+        "io.moulberry.notenoughupdates" to "NEU",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
     )
@@ -58,22 +58,18 @@ object ErrorManager {
 
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message)
-        logErrorWithData(exception, message, extraData = extraData)
+        println("silent SkyHanni error:")
+        println("message: '$message'")
+        println("extraData: \n${buildExtraDataString(extraData)}")
         throw exception
     }
 
-    fun command(array: Array<String>) {
-        if (array.size != 1) {
-            ChatUtils.userError("Use /shcopyerror <error id>")
-            return
-        }
-
-        val id = array[0]
+    private fun copyError(errorId: String) {
         val fullErrorMessage = KeyboardManager.isModifierKeyDown()
         val errorMessage = if (fullErrorMessage) {
-            fullErrorMessages[id]
+            fullErrorMessages[errorId]
         } else {
-            errorMessages[id]
+            errorMessages[errorId]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
         ChatUtils.chat(errorMessage?.let {
@@ -124,7 +120,7 @@ object ErrorManager {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
                 throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
             } else message to 0
-            if (cache.contains(pair)) return
+            if (pair in cache) return
             cache.add(pair)
         }
 
@@ -152,8 +148,10 @@ object ErrorManager {
 
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
-            "shcopyerror $randomId",
-            false
+            onClick = {
+                copyError(randomId)
+            },
+            prefix = false
         )
     }
 

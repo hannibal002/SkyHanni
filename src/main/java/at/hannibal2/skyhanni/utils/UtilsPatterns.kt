@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+@SkyHanniModule
 object UtilsPatterns {
 
     private val patternGroup = RepoPattern.group("utils")
@@ -28,9 +30,13 @@ object UtilsPatterns {
         ".{2}Abiphone .*"
     )
 
+    /**
+     * REGEX-TEST: §fEnchanted Book
+     * REGEX-TEST: §f§f§fEnchanted Book
+     */
     val enchantedBookPattern by patternGroup.pattern(
         "item.name.enchanted.book",
-        ".{2}?Enchanted Book"
+        "(?:§.)+Enchanted Book"
     )
 
     val baitPattern by patternGroup.pattern(
@@ -57,7 +63,7 @@ object UtilsPatterns {
     )
     val costLinePattern by patternGroup.pattern(
         "item.cost.line",
-        "§7Cost"
+        "(?:§5§o)?§7Cost.*"
     )
 
     val timeAmountPattern by patternGroup.pattern(
@@ -91,5 +97,10 @@ object UtilsPatterns {
     val tabListProfilePattern by patternGroup.pattern(
         "tablist.profile",
         "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*"
+    )
+
+    val shopOptionsPattern by patternGroup.pattern(
+        "inventory.shopoptions",
+        "Shop Trading Options"
     )
 }

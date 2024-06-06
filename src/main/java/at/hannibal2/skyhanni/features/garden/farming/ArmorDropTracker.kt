@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -27,6 +28,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ArmorDropTracker {
 
     private val config get() = GardenAPI.config.farmingArmorDrop
@@ -94,6 +96,7 @@ object ArmorDropTracker {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
         if (!hasArmor) return
+        if (!GardenAPI.hasFarmingToolInHand()) return
 
         tracker.renderDisplay(config.pos)
     }
@@ -165,7 +168,7 @@ object ArmorDropTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetarmordroptracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -31,6 +32,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object EnderNodeTracker {
 
     private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
@@ -257,7 +259,7 @@ object EnderNodeTracker {
         return newList
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetendernodetracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

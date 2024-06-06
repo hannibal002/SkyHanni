@@ -43,7 +43,7 @@ class FireVeilWandParticles {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val internalName = event.itemInHand?.getInternalName()
 
-        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
+        if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
 
         if (internalName == item) {
             lastClick = SimpleTimeMark.now()

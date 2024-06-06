@@ -7,16 +7,17 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object MaxwellAPI {
 
     private val storage get() = ProfileStorageData.profileSpecific
@@ -49,12 +51,22 @@ object MaxwellAPI {
             storage?.maxwell?.tunings = value ?: return
         }
 
+    var favoritePowers: List<String>
+        get() = storage?.maxwell?.favoritePowers ?: listOf()
+        set(value) {
+            storage?.maxwell?.favoritePowers = value
+        }
+
     private var powers = mutableListOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
-    private val chatPowerpattern by patternGroup.pattern(
+    private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
         "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!"
+    )
+    private val chatPowerUnlockedPattern by patternGroup.pattern(
+        "chat.power.unlocked",
+        "§eYour selected power was set to (?:§r)*§a(?<power>.*)(?:§r)*§e!"
     )
     private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
@@ -78,7 +90,7 @@ object MaxwellAPI {
     )
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
-        "§7Total: §6(?<mp>\\d+) Magical Power"
+        "§7Total: §6(?<mp>[\\d.,]+) Magical Power"
     )
     private val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
@@ -120,23 +132,26 @@ object MaxwellAPI {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
-        chatPowerpattern.matchMatcher(message) {
-            val power = group("power")
-            currentPower = getPowerByNameOrNull(power)
-                ?: return ErrorManager.logErrorWithData(
-                    UnknownMaxwellPower("Unknown power: $power"),
-                    "Unknown power: $power",
-                    "power" to power,
-                    "message" to message
-                )
-        }
+        chatPowerPattern.tryReadPower(message)
+        chatPowerUnlockedPattern.tryReadPower(message)
         tuningAutoAssignedPattern.matchMatcher(event.message) {
-            if (tunings?.isNotEmpty() == true) {
-                val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
-                if (tuningsInScoreboard) {
-                    ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
-                }
+            if (tunings.isNullOrEmpty()) return
+            val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
+            if (tuningsInScoreboard) {
+                ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
             }
+        }
+    }
+
+    private fun Pattern.tryReadPower(message: String) {
+        matchMatcher(message) {
+            val power = group("power")
+            currentPower = getPowerByNameOrNull(power) ?: return ErrorManager.logErrorWithData(
+                UnknownMaxwellPower("Unknown power: $power"),
+                "Unknown power: $power",
+                "power" to power,
+                "message" to message
+            )
         }
     }
 
@@ -238,6 +253,7 @@ object MaxwellAPI {
     }
 
     private fun processStack(stack: ItemStack) {
+        var foundMagicalPower = false
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {
                 ChatUtils.chat("Seems like you don't have the Requirement for the Accessory Bag yet, setting power to No Power and magical power to 0.")
@@ -254,7 +270,7 @@ object MaxwellAPI {
 
                 val mp = group("mp")
                 magicalPower = mp.formatInt()
-                return@matchMatcher
+                foundMagicalPower = true
             }
 
             inventoryPowerPattern.matchMatcher(line) {
@@ -267,12 +283,14 @@ object MaxwellAPI {
                         "lore" to stack.getLore(),
                         noStackTrace = true
                     )
-                return@matchMatcher
             }
         }
+
+        // If Magical Power isn't in the lore
+        if (!foundMagicalPower) magicalPower = 0
     }
 
-    private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
+    fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 

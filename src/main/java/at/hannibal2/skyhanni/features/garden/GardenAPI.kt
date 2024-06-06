@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
@@ -23,8 +24,12 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -38,13 +43,16 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenAPI {
 
     var toolInHand: String? = null
@@ -91,6 +99,11 @@ object GardenAPI {
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
+        DelayedRun.runDelayed(500.milliseconds) {
+            if (inGarden()) {
+                checkItemInHand()
+            }
+        }
     }
 
     @SubscribeEvent
@@ -166,8 +179,19 @@ object GardenAPI {
     ) =
         addItemIcon(crop.icon.copy(), highlight, scale = scale)
 
+    // TODO rename to addCropIcon
+    fun MutableList<Renderable>.addCropIconRenderable(
+        crop: CropType,
+        scale: Double = NEUItems.itemFontSize,
+        highlight: Boolean = false,
+    ) {
+        addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
+    }
+
     fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory || FFGuideGUI.isInGui()
+        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory ||
+        FFGuideGUI.isInGui() || ChocolateShopPrice.inInventory || ChocolateFactoryAPI.inChocolateFactory ||
+        ChocolateFactoryAPI.chocolateFactoryPaused || HoppityCollectionStats.inInventory
 
     fun clearCropSpeed() {
         storage?.cropsPerSecond?.clear()
@@ -226,7 +250,7 @@ object GardenAPI {
         return 0
     }
 
-    fun getGardenLevel(): Int {
+    fun getGardenLevel(overflow: Boolean = true): Int {
         val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
@@ -237,11 +261,13 @@ object GardenAPI {
             }
             tier++
         }
-        totalExp += gardenOverflowExp
-
-        while (totalExp < gardenExp) {
-            tier++
+        if (overflow) {
             totalExp += gardenOverflowExp
+
+            while (totalExp < gardenExp) {
+                tier++
+                totalExp += gardenOverflowExp
+            }
         }
         return tier
     }

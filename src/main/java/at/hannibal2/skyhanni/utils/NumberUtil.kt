@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.NumberFormat
 import java.util.TreeMap
 import kotlin.math.pow
@@ -46,7 +46,7 @@ object NumberUtil {
     fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + format(-value, preciseBillions)
 
@@ -173,9 +173,9 @@ object NumberUtil {
     private val numberPattern = "^[0-9]*$".toPattern()
     private val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
-    fun String.isInt(): Boolean {
-        return isNotEmpty() && numberPattern.matcher(this).matches()
-    }
+    fun String.isInt(): Boolean = isNotEmpty() && numberPattern.matcher(this).matches()
+
+    fun String.isDouble(): Boolean = runCatching { toDouble() }.getOrNull() != null
 
     fun String.isFormatNumber(): Boolean {
         return isNotEmpty() && formatPattern.matches(this)

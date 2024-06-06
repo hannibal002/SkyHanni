@@ -8,13 +8,14 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -23,6 +24,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PestProfitTracker {
     val config get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
 
@@ -31,10 +33,11 @@ object PestProfitTracker {
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)"
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)"
     )
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -139,8 +142,8 @@ object PestProfitTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetpestprofittracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled

@@ -11,11 +11,12 @@ plugins {
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
     `maven-publish`
+    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
     id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.11"
+version = "0.26.Beta.7"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -41,16 +42,17 @@ sourceSets.main {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://repo.spongepowered.org/maven/")
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-    maven("https://jitpack.io") {
+    maven("https://repo.spongepowered.org/maven/") // mixin
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
         content {
             includeGroupByRegex("com\\.github\\..*")
         }
     }
-    maven("https://repo.nea.moe/releases")
-    maven("https://maven.notenoughupdates.org/releases")
-    maven("https://repo.hypixel.net/repository/Hypixel/")
+    maven("https://repo.nea.moe/releases") // libautoupdate
+    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
+    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
+    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -79,7 +81,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
+    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
@@ -88,6 +90,8 @@ dependencies {
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)
+
+    compileOnly(ksp(project(":annotation-processors"))!!)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -105,18 +109,21 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
+    // June 3, 2024, 9:30 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
 
     shadowModImpl(libs.moulconfig)
-    shadowImpl(libs.libautoupdate)
+    shadowImpl(libs.libautoupdate) {
+        exclude(module = "gson")
+    }
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(libs.hotswapagentforge)
 
-//    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:6a661042b0:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -125,6 +132,7 @@ dependencies {
 
     implementation("net.hypixel:mod-api:0.3.1")
 }
+
 configurations.getByName("minecraftNamed").dependencies.forEach {
     shot.applyTo(it as HasConfigurableAttributes<*>)
 }
@@ -142,6 +150,12 @@ kotlin {
             languageVersion = "2.0"
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
+    }
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
     }
 }
 
@@ -226,7 +240,6 @@ tasks.withType(Jar::class) {
     }
 }
 
-
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
     from(tasks.shadowJar)
@@ -246,6 +259,7 @@ tasks.shadowJar {
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
+    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
