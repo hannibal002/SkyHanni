@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -590,14 +590,14 @@ interface Renderable {
         }
 
         // TODO use this to render current boosted crop in next jacob contest crops
-        fun Renderable.renderBounds(color: Int = LorenzColor.GREEN.toColor().withAlpha(100)) = object : Renderable {
+        fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
             override val horizontalAlign = this@renderBounds.horizontalAlign
             override val verticalAlign = this@renderBounds.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, color)
+                Gui.drawRect(0, 0, width, height, color.rgb)
                 this@renderBounds.render(posX, posY)
             }
 
