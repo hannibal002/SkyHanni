@@ -89,7 +89,6 @@ object UnknownLinesHandler {
             SbPattern.essencePattern,
             SbPattern.redstonePattern,
             SbPattern.visitingPattern,
-            SbPattern.flightDurationPattern,
             SbPattern.dojoChallengePattern,
             SbPattern.dojoDifficultyPattern,
             SbPattern.dojoPointsPattern,
