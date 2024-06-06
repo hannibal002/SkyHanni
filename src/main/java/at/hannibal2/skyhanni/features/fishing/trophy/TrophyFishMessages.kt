@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesC
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -18,7 +19,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TrophyFishMessages {
+@SkyHanniModule
+object TrophyFishMessages {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
 
     private val trophyFishPattern by RepoPattern.pattern(
