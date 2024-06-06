@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SendCoordinatedCommand {
+@SkyHanniModule
+object SendCoordinatedCommand {
 
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {

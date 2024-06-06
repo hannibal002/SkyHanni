@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -38,7 +39,8 @@ import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class EndermanSlayerFeatures {
+@SkyHanniModule
+object EndermanSlayerFeatures {
 
     private val config get() = SkyHanniMod.feature.slayer.endermen
     private val beaconConfig get() = config.beacon
@@ -47,7 +49,7 @@ class EndermanSlayerFeatures {
     private val nukekubiSkulls = mutableSetOf<EntityArmorStand>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = LorenzLogger("slayer/enderman")
-    private val nukekubiSkulTexture =
+    private const val NUKEKUBI_SKULL_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0="
 
     @SubscribeEvent
@@ -79,7 +81,7 @@ class EndermanSlayerFeatures {
                 }
             }
 
-            if (config.highlightNukekebi && entity.inventory.any { it?.getSkullTexture() == nukekubiSkulTexture } && entity !in nukekubiSkulls) {
+            if (config.highlightNukekebi && entity.inventory.any { it?.getSkullTexture() == NUKEKUBI_SKULL_TEXTURE } && entity !in nukekubiSkulls) {
                 nukekubiSkulls.add(entity)
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
