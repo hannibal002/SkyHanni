@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,7 +23,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class GardenOptimalSpeed {
+@SkyHanniModule
+object GardenOptimalSpeed {
 
     private val config get() = GardenAPI.config.optimalSpeeds
 
@@ -33,7 +35,7 @@ class GardenOptimalSpeed {
 
     /**
      * This speed value represents the walking speed, not the speed stat.
-     * blocks per second = 4.317 * speed / 100
+     * Blocks per second = 4.317 * speed / 100
      *
      * It has an absolute speed cap of 500, and items that normally increase the cap do not apply here:
      * (Black Cat pet, Cactus knife, Racing Helmet or Young Dragon Armor)

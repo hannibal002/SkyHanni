@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBoarderPacket
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.network.play.server.S44PacketWorldBorder
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class DungeonShadowAssassinNotification {
+@SkyHanniModule
+object DungeonShadowAssassinNotification {
     private val config get() = SkyHanniMod.feature.dungeon
 
     @SubscribeEvent

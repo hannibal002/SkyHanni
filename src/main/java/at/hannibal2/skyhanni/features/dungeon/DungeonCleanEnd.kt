@@ -9,8 +9,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -18,7 +19,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityGuardian
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonCleanEnd {
+@SkyHanniModule
+object DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
     private val catacombsPattern by RepoPattern.pattern(

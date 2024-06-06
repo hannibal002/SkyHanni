@@ -9,14 +9,16 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonCopilot {
+@SkyHanniModule
+object DungeonCopilot {
 
     private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
 

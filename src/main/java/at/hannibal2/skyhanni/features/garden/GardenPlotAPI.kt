@@ -5,15 +5,16 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
@@ -23,6 +24,7 @@ import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object GardenPlotAPI {
 
     private val patternGroup = RepoPattern.group("garden.plot")

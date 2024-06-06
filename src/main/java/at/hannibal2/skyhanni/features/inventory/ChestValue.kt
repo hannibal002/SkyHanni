@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -34,7 +35,8 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ChestValue {
+@SkyHanniModule
+object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()

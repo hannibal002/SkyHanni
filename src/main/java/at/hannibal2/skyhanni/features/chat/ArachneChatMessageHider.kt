@@ -3,13 +3,15 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ArachneChatMessageHider {
+@SkyHanniModule
+object ArachneChatMessageHider {
 
     private val config get() = SkyHanniMod.feature.chat
     private var hideArachneDeadMessage = false

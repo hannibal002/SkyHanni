@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -16,8 +17,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLiving
@@ -26,7 +27,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SummoningMobManager {
+@SkyHanniModule
+object SummoningMobManager {
 
     private val config get() = SkyHanniMod.feature.combat.summonings
 
@@ -49,9 +51,14 @@ class SummoningMobManager {
         "health",
         "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤"
     )
-    private val seraphRecallPattern by patternGroup.pattern( //§cThe Seraph recalled your 3 summoned allies!
+
+    /**
+     * REGEX-TEST: §cThe Seraph recalled your 3 summoned allies!
+     * REGEX-TEST: §cThe Seraph recalled your 10 summoned allies!
+     */
+    private val seraphRecallPattern by patternGroup.pattern(
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d) summoned allies!"
+        "§cThe Seraph recalled your (\\d+) summoned allies!"
     )
 
     @SubscribeEvent

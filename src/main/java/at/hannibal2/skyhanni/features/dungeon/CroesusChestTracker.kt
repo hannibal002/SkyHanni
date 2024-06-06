@@ -21,10 +21,10 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -230,6 +230,10 @@ class CroesusChestTracker {
         if ((croesusChests?.size ?: 0) > maxChests) {
             croesusChests?.dropLast(1)
         }
+
+        if (config.croesusLimit && getLastActiveChest() >= 55) {
+            ChatUtils.chat("You are close to the Croesus Limit. Please open your chests!")
+        }
     }
 
     private fun Int.getRun() = getRun0(this)
@@ -268,10 +272,10 @@ class CroesusChestTracker {
             ChatUtils.chat("Kismet State was cleared!")
         }
 
-        fun generateMaxChest() = generateSequence { DungeonRunInfo() }.take(maxChests)
-        fun generateMaxChestAsList() = generateMaxChest().toList()
+        fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(maxChests)
+        fun generateMaxChestAsList(): List<DungeonRunInfo> = generateMaxChest().toList()
 
-        fun getLastActiveChest(includeDungeonKey: Boolean = false) =
+        fun getLastActiveChest(includeDungeonKey: Boolean = false): Int =
             (croesusChests?.indexOfLast {
                 it.floor != null &&
                     (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))

@@ -1,23 +1,26 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SendCoordinatedCommand {
+@SkyHanniModule
+object SendCoordinatedCommand {
 
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         val message = event.message
-        if (message == "/sendcoords") {
+        if (message.startsWith("/sendcoords")) {
             event.isCanceled = true
-            ChatUtils.sendMessageToServer(getCoordinates())
-        } else if (message.startsWith("/sendcoords ")) {
-            event.isCanceled = true
-            val description = message.split(" ").drop(1).joinToString(" ")
-            ChatUtils.sendMessageToServer("${getCoordinates()} $description")
+            val description = message.substringAfter("/sendcoords").trim()
+            sendCoordinates(description)
         }
+    }
+
+    private fun sendCoordinates(description: String) {
+        ChatUtils.sendMessageToServer(getCoordinates() + " $description")
     }
 
     private fun getCoordinates(): String {

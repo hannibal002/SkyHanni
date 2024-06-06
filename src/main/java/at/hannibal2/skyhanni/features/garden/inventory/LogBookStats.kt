@@ -7,18 +7,20 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class LogBookStats {
+@SkyHanniModule
+object LogBookStats {
 
     private val groupPattern = RepoPattern.group("garden.inventory.logbook")
     private val visitedPattern by groupPattern.pattern(

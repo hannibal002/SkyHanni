@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
@@ -29,7 +30,8 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 // TODO delete workaround class PestParticleLine when this class works again
-class PestParticleWaypoint {
+@SkyHanniModule
+object PestParticleWaypoint {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
@@ -177,9 +179,9 @@ class PestParticleWaypoint {
         val list = locations.toList()
         var pos = LorenzVec(0.0, 0.0, 0.0)
         for ((i, particle) in list.withIndex()) {
-            pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))
+            pos += (particle - firstParticle) / (i.toDouble() + 1.0)
         }
-        return firstParticle.add(pos.multiply(120.0 / list.size))
+        return firstParticle + pos * (120.0 / list.size)
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled

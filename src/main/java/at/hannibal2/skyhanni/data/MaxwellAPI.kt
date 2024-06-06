@@ -7,16 +7,17 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object MaxwellAPI {
 
     private val storage get() = ProfileStorageData.profileSpecific
@@ -47,6 +49,12 @@ object MaxwellAPI {
         get() = storage?.maxwell?.tunings
         set(value) {
             storage?.maxwell?.tunings = value ?: return
+        }
+
+    var favoritePowers: List<String>
+        get() = storage?.maxwell?.favoritePowers ?: listOf()
+        set(value) {
+            storage?.maxwell?.favoritePowers = value
         }
 
     private var powers = mutableListOf<String>()
@@ -282,7 +290,7 @@ object MaxwellAPI {
         if (!foundMagicalPower) magicalPower = 0
     }
 
-    private fun getPowerByNameOrNull(name: String) = powers.find { it == name }
+    fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
