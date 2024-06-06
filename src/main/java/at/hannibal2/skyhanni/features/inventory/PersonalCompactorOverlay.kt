@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object PersonalCompactorOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.personalCompactor
@@ -115,7 +117,6 @@ object PersonalCompactorOverlay {
         )
         event.renderObjects.add(renderObject)
     }
-
 
     private fun shouldShow() = when (config.visibilityMode) {
         PersonalCompactorConfig.VisibilityMode.ALWAYS -> true
