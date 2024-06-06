@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
@@ -29,7 +30,8 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-class GardenVisitorTimer {
+@SkyHanniModule
+object GardenVisitorTimer {
 
     private val config get() = GardenAPI.config.visitors.timer
 
@@ -45,6 +47,7 @@ class GardenVisitorTimer {
     private var sixthVisitorReady = false
     private var lastTimerValue = ""
     private var lastTimerUpdate = SimpleTimeMark.farPast()
+    private var lastVisitors: Int = -1
 
     // TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
@@ -55,11 +58,6 @@ class GardenVisitorTimer {
                 GardenAPI.storage?.visitorInterval = it.inWholeMilliseconds
             }
         }
-
-    companion object {
-
-        var lastVisitors: Int = -1
-    }
 
     @SubscribeEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {

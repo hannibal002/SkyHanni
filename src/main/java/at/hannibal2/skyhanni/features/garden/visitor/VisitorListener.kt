@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -37,7 +38,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class VisitorListener {
+@SkyHanniModule
+object VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
         "garden.visitor.offersaccepted",
         "§7Offers Accepted: §a(?<offersAccepted>\\d+)"
@@ -46,12 +48,6 @@ class VisitorListener {
     private val config get() = VisitorAPI.config
 
     private val logger = LorenzLogger("garden/visitors/listener")
-
-    companion object {
-        private val VISITOR_INFO_ITEM_SLOT = 13
-        private val VISITOR_ACCEPT_ITEM_SLOT = 29
-        private val VISITOR_REFUSE_ITEM_SLOT = 33
-    }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {

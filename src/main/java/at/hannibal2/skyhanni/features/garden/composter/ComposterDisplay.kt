@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -24,7 +25,8 @@ import java.util.Collections
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class ComposterDisplay {
+@SkyHanniModule
+object ComposterDisplay {
 
     private val config get() = GardenAPI.config.composters
     private val storage get() = GardenAPI.storage
@@ -48,8 +50,6 @@ class ComposterDisplay {
             return listOf(displayItem, map[this]!!)
         }
     }
-
-    private val BUCKET by lazy { "BUCKET".asInternalName().getItemStack() }
 
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
