@@ -2,14 +2,16 @@ package at.hannibal2.skyhanni.features.event.spook
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TheGreatSpook {
+@SkyHanniModule
+object TheGreatSpook {
 
     // §r§cPrimal Fears§r§7: §r§6§lREADY!!
     private val config get() = SkyHanniMod.feature.event.spook
@@ -19,9 +21,8 @@ class TheGreatSpook {
     private var notificationSeconds = 0
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (isAllDisabled()) return
-        if (!event.repeatSeconds(1)) return
 
         if (isTimerEnabled() || isNotificationEnabled()) displayTimer = checkTabList(" §r§cPrimal Fears§r§7: ")
         if (isFearStatEnabled()) displayFearStat = checkTabList(" §r§5Fear: ")

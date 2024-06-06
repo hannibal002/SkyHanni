@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuHoppityJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.RabbitCollectionRarity
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object HoppityCollectionData {
     private val rabbitRarities = mutableMapOf<String, RabbitCollectionRarity>()
     private val rarityBonuses = mutableMapOf<RabbitCollectionRarity, ChocolateBonuses>()
@@ -31,8 +33,10 @@ object HoppityCollectionData {
             ?: ChocolateBonuses(0, 0.0)
     }
 
-    private fun String.toApiName(): String =
-        lowercase().replace("[- ]".toRegex(), "_")
+    private fun String.toApiName(): String = when (this) {
+        "Fish the Rabbit" -> "fish"
+        else -> lowercase().replace("[- ]".toRegex(), "_")
+    }
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {

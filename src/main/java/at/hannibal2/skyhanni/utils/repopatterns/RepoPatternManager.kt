@@ -7,27 +7,43 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
+import java.util.NavigableMap
+import java.util.TreeMap
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
 /**
  * Manages [RepoPattern]s.
  */
+@SkyHanniModule
 object RepoPatternManager {
 
-    val allPatterns: Collection<RepoPatternImpl> get() = usedKeys.values
+    val allPatterns: Collection<CommonPatternInfo<*, *>> get() = usedKeys.values
 
     /**
      * Remote loading data that will be used to compile regexes from, once such a regex is needed.
      */
     private var regexes: RepoPatternDump? = null
+
+    /**
+     * [regexes] but as a NavigableMap. (Creates the Map at call)
+     */
+    private val remotePattern: NavigableMap<String, String>
+        get() = TreeMap(
+            if (localLoading) mapOf()
+            else regexes?.regexes ?: mapOf()
+        )
 
     /**
      * Map containing the exclusive owner of a regex key
@@ -38,7 +54,7 @@ object RepoPatternManager {
      * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for
      * checking duplicate registrations.
      */
-    private var usedKeys = mutableMapOf<String, RepoPatternImpl>()
+    private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
     private var wasPreinitialized = false
     private val isInDevEnv = try {
@@ -75,15 +91,60 @@ object RepoPatternManager {
      * using that [key] again. Thread safe.
      */
     fun checkExclusivity(owner: RepoPatternKeyOwner, key: String) {
+        val parentKeyHolder = owner.parent
         synchronized(exclusivity) {
-            val previousOwner = exclusivity.get(key)
-            if (previousOwner != owner && previousOwner != null) {
-                if (!config.tolerateDuplicateUsage)
-                    crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
-            } else {
-                exclusivity[key] = owner
+            run {
+                val previousOwner = exclusivity[key]
+                if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
+                    if (!config.tolerateDuplicateUsage)
+                        crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
+                } else {
+                    exclusivity[key] = owner
+                }
+            }
+            run {
+                val transient = owner.copy(shares = true, transient = true)
+                var parent = key
+                var previousParentOwnerMutable: RepoPatternKeyOwner? = null
+                while (previousParentOwnerMutable == null && parent.isNotEmpty()) {
+                    parent = parent.substringBeforeLastOrNull(".") ?: return
+                    previousParentOwnerMutable = exclusivity[parent]
+                    previousParentOwnerMutable ?: run {
+                        exclusivity[parent] = transient
+                    }
+                }
+                val previousParentOwner = previousParentOwnerMutable
+
+                if (previousParentOwner != null && previousParentOwner != parentKeyHolder && !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)) {
+                    if (!config.tolerateDuplicateUsage) crash(
+                        "Non unique access to array regex at \"$parent\"." +
+                            " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +
+                            " tried to use at ${owner.ownerClass} / ${owner.property}" +
+                            if (parentKeyHolder != null) "with parentKeyHolder ${parentKeyHolder.ownerClass} / ${parentKeyHolder.property}"
+                            else ""
+                    )
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Check that the [owner] has exclusive right to the specified namespace and locks out other code parts from ever
+     * using that [key] prefix again without permission of the [owner]. Thread safe.
+     */
+    fun checkNameSpaceExclusivity(owner: RepoPatternKeyOwner, key: String) {
+        synchronized(exclusivity) {
+            val preRegistered = exclusivity[key]
+            if (preRegistered != null) {
+                if (!config.tolerateDuplicateUsage) crash(
+                    "Non unique access to array regex at \"$key\"." +
+                        " First obtained by ${preRegistered.ownerClass} / ${preRegistered.property}," +
+                        " tried to use at ${owner.ownerClass} / ${owner.property}"
+                )
             }
         }
+        checkExclusivity(owner, key)
     }
 
     @SubscribeEvent
@@ -106,26 +167,62 @@ object RepoPatternManager {
      * Reload patterns in [usedKeys] from [regexes] or their fallbacks.
      */
     private fun reloadPatterns() {
-        val remotePatterns =
-            if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf()
-
+        val remotePatterns = remotePattern
         for (it in usedKeys.values) {
-            val remotePattern = remotePatterns[it.key]
-            try {
-                if (remotePattern != null) {
-                    it.compiledPattern = Pattern.compile(remotePattern)
-                    it.wasLoadedRemotely = true
-                    it.wasOverridden = remotePattern != it.defaultPattern
-                    continue
-                }
-            } catch (e: PatternSyntaxException) {
-                SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+            when (it) {
+                is RepoPatternListImpl -> loadArrayPatterns(remotePatterns, it)
+                is RepoPatternImpl -> loadStandalonePattern(remotePatterns, it)
             }
-            it.compiledPattern = Pattern.compile(it.defaultPattern)
-            it.wasLoadedRemotely = false
-            it.wasOverridden = false
         }
+    }
+
+    private fun loadStandalonePattern(remotePatterns: NavigableMap<String, String>, it: RepoPatternImpl) {
+        val remotePattern = remotePatterns[it.key]
+        try {
+            if (remotePattern != null) {
+                it.value = Pattern.compile(remotePattern)
+                it.isLoadedRemotely = true
+                it.wasOverridden = remotePattern != it.defaultPattern
+                return
+            }
+        } catch (e: PatternSyntaxException) {
+            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+        }
+        it.value = Pattern.compile(it.defaultPattern)
+        it.isLoadedRemotely = false
+        it.wasOverridden = false
+    }
+
+    private fun loadArrayPatterns(remotePatterns: NavigableMap<String, String>, arrayPattern: RepoPatternListImpl) {
+        val prefix = arrayPattern.key + "."
+        val remotePatternList = StringUtils.subMapOfStringsStartingWith(prefix, remotePatterns)
+        val patternMap = remotePatternList.mapNotNull {
+            val index = it.key.removePrefix(prefix).toIntOrNull()
+            if (index == null) null
+            else index to it.value
+        }
+
+        fun setDefaultPatterns() {
+            arrayPattern.value = arrayPattern.defaultPattern.map(Pattern::compile)
+            arrayPattern.isLoadedRemotely = false
+            arrayPattern.wasOverridden = false
+        }
+
+        if (patternMap.mapTo(mutableSetOf()) { it.first } != patternMap.indices.toSet()) {
+            SkyHanniMod.logger.error("Incorrect index set for $arrayPattern")
+            setDefaultPatterns()
+        }
+
+        val patternStrings = patternMap.sortedBy { it.first }.map { it.second }
+        try {
+            arrayPattern.value = patternStrings.map(Pattern::compile)
+            arrayPattern.isLoadedRemotely = true
+            arrayPattern.wasOverridden = patternStrings != arrayPattern.defaultPattern
+            return
+        } catch (e: PatternSyntaxException) {
+            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+        }
+        setDefaultPatterns()
     }
 
     val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
@@ -145,7 +242,8 @@ object RepoPatternManager {
             ConfigManager.gson.toJson(
                 RepoPatternDump(
                     sourceLabel,
-                    usedKeys.values.associate { it.key to it.defaultPattern })
+                    usedKeys.values.flatMap { it.dump().toList() }.toMap()
+                )
             )
         file.parentFile.mkdirs()
         file.writeText(data)
@@ -164,15 +262,67 @@ object RepoPatternManager {
         }
     }
 
-    fun of(key: String, fallback: String): RepoPattern {
+    fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {
         verifyKeyShape(key)
         if (wasPreinitialized && !config.tolerateLateRegistration) {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
         }
         if (key in usedKeys) {
-            exclusivity[key] = RepoPatternKeyOwner(null, null)
             usedKeys[key]?.hasObtainedLock = false
         }
-        return RepoPatternImpl(fallback, key).also { usedKeys[key] = it }
+        return RepoPatternImpl(fallback, key, parentKeyHolder).also { usedKeys[key] = it }
     }
+
+    fun ofList(
+        key: String,
+        fallbacks: Array<out String>,
+        parentKeyHolder: RepoPatternKeyOwner? = null,
+    ): RepoPatternList {
+        verifyKeyShape(key)
+        if (wasPreinitialized && !config.tolerateLateRegistration) {
+            crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
+        }
+        if (key in usedKeys) {
+            usedKeys[key]?.hasObtainedLock = false
+        }
+        StringUtils.subMapOfStringsStartingWith(key, usedKeys).forEach {
+            it.value.hasObtainedLock = false
+        }
+        return RepoPatternListImpl(fallbacks.toList(), key, parentKeyHolder).also { usedKeys[key] = it }
+
+    }
+
+    /**
+     * The caller must ensure the exclusivity to the [prefix]!
+     *
+     * @param prefix the prefix to search without the dot at the end (the match includes the .)
+     * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
+     * */
+    internal fun getUnusedPatterns(prefix: String): List<Pattern> {
+        if (config.forceLocal.get()) return emptyList()
+        try {
+            verifyKeyShape(prefix)
+        } catch (e: IllegalArgumentException) {
+            ErrorManager.logErrorWithData(e, "getUnusedPatterns failed do to invalid key shape", "prefix" to prefix)
+            return emptyList()
+        }
+        val prefixWithDot = "$prefix."
+        val patterns = StringUtils.subMapOfStringsStartingWith(prefixWithDot, remotePattern)
+        val holders = StringUtils.subMapOfStringsStartingWith(prefixWithDot, usedKeys)
+
+        val noShareHolder = holders.filter { !it.value.shares }.map { it.key.removePrefix(prefixWithDot) }
+            .groupBy { it.count { it == '.' } }
+
+        return patterns.filter { it.key !in holders.keys }.filter { unused ->
+            val dot = unused.key.count { it == '.' }
+            val possibleConflicts = noShareHolder.filter { it.key < dot }.flatMap { it.value }.toSet()
+            var key: String = unused.key.removePrefix(prefixWithDot)
+            while (key.isNotEmpty()) {
+                if (possibleConflicts.contains(key)) return@filter false
+                key = key.substringBeforeLastOrNull(".") ?: return@filter true
+            }
+            true
+        }.map { it.value.toPattern() }
+    }
+
 }

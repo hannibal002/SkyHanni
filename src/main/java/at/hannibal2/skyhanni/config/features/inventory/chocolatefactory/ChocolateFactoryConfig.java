@@ -71,11 +71,6 @@ public class ChocolateFactoryConfig {
     public boolean useMiddleClick = true;
 
     @Expose
-    @ConfigOption(name = "Rabbit Warning", desc = "Warn when the rabbit that needs to be clicked appears.")
-    @ConfigEditorBoolean
-    public boolean rabbitWarning = true;
-
-    @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
         desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
@@ -184,6 +179,11 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean onlyHighlightRequirementNotMet = true;
+
+    @Expose
+    @ConfigOption(name = "Rabbit Warning", desc = "")
+    @Accordion
+    public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
