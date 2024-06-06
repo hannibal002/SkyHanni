@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -142,14 +142,12 @@ object SkillProgress {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
-        if (event.repeatSeconds(1)) {
-            allDisplay = formatAllDisplay(drawAllDisplay())
-            etaDisplay = drawETADisplay()
-        }
+        allDisplay = formatAllDisplay(drawAllDisplay())
+        etaDisplay = drawETADisplay()
 
         if (event.repeatSeconds(2)) {
             update()
