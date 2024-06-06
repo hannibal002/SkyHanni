@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -76,7 +76,7 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && LorenzUtils.isInDevEnvironment())
+    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.

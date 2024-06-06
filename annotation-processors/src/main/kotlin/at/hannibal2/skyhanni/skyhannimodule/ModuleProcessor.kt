@@ -44,6 +44,12 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         return symbol
     }
 
+    //TODO remove when KMixins added as it contains KSP annotation helpers.
+    private fun isDevAnnotation(klass: KSClassDeclaration): Boolean {
+        val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
+        return annotation.arguments.find { it.name?.asString() == "inDevelopment" }?.value as? Boolean ?: false
+    }
+
     private fun generateFile(symbols: List<KSClassDeclaration>) {
         val dependencies = symbols.mapNotNull { it.containingFile }.toTypedArray()
         val deps = Dependencies(true, *dependencies)
@@ -53,13 +59,18 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         OutputStreamWriter(file).use {
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
             it.write("object LoadedModules {\n")
-            it.write("    val modules: List<Any> = listOf(\n")
+            it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
+            it.write("    val modules: List<Any> = buildList {\n")
 
             symbols.forEach { symbol ->
-                it.write("        ${symbol.qualifiedName!!.asString()},\n")
+                if (isDevAnnotation(symbol)) {
+                    it.write("        if (isDev) add(${symbol.qualifiedName!!.asString()})\n")
+                } else {
+                    it.write("        add(${symbol.qualifiedName!!.asString()})\n")
+                }
             }
 
-            it.write("    )\n")
+            it.write("    }\n")
             it.write("}\n")
         }
 
