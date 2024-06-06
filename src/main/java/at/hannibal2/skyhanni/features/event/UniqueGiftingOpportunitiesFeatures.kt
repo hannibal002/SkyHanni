@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
@@ -23,9 +25,9 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object UniqueGiftingOpportunitiesFeatures {
 
     private val playerList: MutableSet<String>?
@@ -72,13 +74,13 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     @SubscribeEvent
-    fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
+    fun onEntityJoinWorld(event: EntityEnterWorldEvent) {
         playerColor(event)
         val entity = event.entity as? EntityArmorStand ?: return
         analyzeArmorStand(entity)
     }
 
-    private fun playerColor(event: EntityJoinWorldEvent) {
+    private fun playerColor(event: EntityEnterWorldEvent) {
         if (event.entity is EntityOtherPlayerMP) {
             val entity = event.entity as EntityOtherPlayerMP
             if (entity.isNPC() || isIronman(entity) || isBingo(entity)) return
