@@ -10,19 +10,31 @@ object RegexUtils {
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
+    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer(it) }"))
     inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        toList().matchFirst(pattern, consumer)
+        pattern.firstMatcher(this, consumer)
 
-    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
-        for (line in this) {
-            pattern.matcher(line).let { if (it.matches()) return consumer(it) }
+    inline fun <T> Pattern.firstMatcher(sequence: Sequence<String>, consumer: Matcher.() -> T): T? =
+        firstMatcher(sequence.toList(), consumer)
+
+    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer(it) }"))
+    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
+        pattern.firstMatcher(this, consumer)
+
+    inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? {
+        for (line in list) {
+            matcher(line).let { if (it.matches()) return consumer(it) }
         }
         return null
     }
 
-    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
-        for (line in this) {
-            pattern.matcher(line).let { if (it.find()) consumer(it) }
+    @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer(it) }"))
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? =
+        pattern.matchAll(this, consumer)
+
+    inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T): T? {
+        for (line in list) {
+            matcher(line).let { if (it.find()) consumer(it) }
         }
         return null
     }
@@ -61,9 +73,9 @@ object RegexUtils {
 
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
-    fun List<String>.indexOfFirstMatch(pattern: Pattern): Int? {
-        for ((index, line) in withIndex()) {
-            pattern.matcher(line).let { if (it.matches()) return index }
+    fun Pattern.indexOfFirstMatch(list: List<String>): Int? {
+        for ((index, line) in list.withIndex()) {
+            matcher(line).let { if (it.matches()) return index }
         }
         return null
     }
