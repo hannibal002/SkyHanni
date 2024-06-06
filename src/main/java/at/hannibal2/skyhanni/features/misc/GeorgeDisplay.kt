@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -23,10 +25,11 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
-class GeorgeDisplay {
+@SkyHanniModule
+object GeorgeDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.george
-    private val useFandomWiki get() = SkyHanniMod.feature.commands.betterWiki.useFandom
+    private val useFandomWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useFandom
 
     private var isValidChest = false
 
@@ -94,7 +97,7 @@ class GeorgeDisplay {
                         "§eClick to run §a/ahs ] $origPetString §eto find it on the AH.",
                         "§eNotes: Set the rarity filter yourself. §cBooster Cookie required!"
                     ),
-                    onClick = { LorenzUtils.sendCommandToServer("ahs ] $origPetString") }
+                    onClick = { ChatUtils.sendCommandToServer("ahs ] $origPetString") }
                 ))
         } else {
             val typeOfWiki = if (useFandomWiki) "Fandom" else "Official Hypixel"
