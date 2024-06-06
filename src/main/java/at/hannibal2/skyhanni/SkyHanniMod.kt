@@ -44,7 +44,6 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
-import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
@@ -110,7 +109,6 @@ class SkyHanniMod {
         // features
         loadModule(BazaarOrderHelper())
         loadModule(DamageIndicatorManager())
-        loadModule(MarkedPlayerManager())
         loadModule(HellionShieldHelper())
         loadModule(PlayerChatFilter())
         loadModule(BurrowWarpHelper())
@@ -159,7 +157,7 @@ class SkyHanniMod {
         loadedClasses.clear()
     }
 
-    private val loadedClasses = mutableSetOf<Any>()
+    private val loadedClasses = mutableSetOf<String>()
 
     fun loadModule(obj: Any) {
         if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
