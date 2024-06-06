@@ -231,7 +231,6 @@ import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
@@ -503,7 +502,6 @@ class SkyHanniMod {
         loadModule(BetterSignEditing())
         loadModule(PatcherSendCoordinates())
         loadModule(PetItemDisplay())
-        loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
         loadModule(ToolTooltipTweaks())
         loadModule(CropSpeedMeter())
