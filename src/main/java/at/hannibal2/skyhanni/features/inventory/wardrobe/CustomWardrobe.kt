@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -47,7 +46,6 @@ object CustomWardrobe {
     private var inventoryButton: Renderable? = null
     private var editMode = false
     private var waitingForInventoryUpdate = false
-    private var lastEditClick = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
@@ -114,11 +112,6 @@ object CustomWardrobe {
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!isEnabled() || editMode) return
         update()
-    }
-
-    @SubscribeEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (lastEditClick.passedSince() < 50.milliseconds) event.cancel()
     }
 
     private fun update() {
@@ -309,9 +302,10 @@ object CustomWardrobe {
         val editButton = createLabeledButton(
             "§bEdit",
             onClick = {
-                reset()
-                lastEditClick = SimpleTimeMark.now()
-                editMode = true
+                DelayedRun.runNextTick {
+                    reset()
+                    editMode = true
+                }
             }
         )
 
@@ -340,7 +334,6 @@ object CustomWardrobe {
             onClick = {
                 inCustomWardrobe = false
                 editMode = false
-                lastEditClick = SimpleTimeMark.now()
                 update()
             }
         )
