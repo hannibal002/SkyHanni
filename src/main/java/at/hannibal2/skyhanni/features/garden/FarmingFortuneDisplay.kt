@@ -347,7 +347,8 @@ object FarmingFortuneDisplay {
 
         // TODO code cleanup (after ff rework)
 
-        for (line in tool?.getLore()!!) {
+        val lore = tool?.getLore() ?: return
+        for (line in lore) {
             tooltipFortunePattern.matchMatcher(line) {
                 displayedFortune = group("display")?.toDouble() ?: 0.0
                 reforgeFortune = groupOrNull("reforge")?.toDouble() ?: 0.0
