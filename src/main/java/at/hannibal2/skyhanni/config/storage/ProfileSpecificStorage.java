@@ -152,6 +152,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
+
+        @Expose
+        public List<String> favoritePowers = new ArrayList<>();
     }
 
     @Expose
