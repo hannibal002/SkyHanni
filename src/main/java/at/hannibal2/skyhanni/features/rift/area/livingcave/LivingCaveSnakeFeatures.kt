@@ -1,20 +1,22 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.features.rift.everywhere.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.editCopy
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import net.minecraft.client.Minecraft
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class LivingCaveSnakeFeatures {
-    private val config get() = RiftAPI.config.area.livingCaveConfig.livingCaveLivingMetalConfig
+@SkyHanniModule
+object LivingCaveSnakeFeatures {
+    private val config get() = RiftAPI.config.area.livingCave.livingCaveLivingMetalConfig
     private var snakes = emptyList<Snake>()
 
     class Snake(var show: Boolean, var blocks: List<LorenzVec>)
@@ -77,7 +79,7 @@ class LivingCaveSnakeFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
         for (snake in snakes) {
