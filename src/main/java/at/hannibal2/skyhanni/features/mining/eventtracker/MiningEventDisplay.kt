@@ -5,8 +5,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.MiningEventConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -19,6 +20,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object MiningEventDisplay {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
     private var display = listOf<Renderable>()
@@ -26,8 +28,7 @@ object MiningEventDisplay {
     private val islandEventData: MutableMap<IslandType, MiningIslandEventInfo> = mutableMapOf()
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!event.repeatSeconds(1)) return
+    fun onSecondPassed(event: SecondPassedEvent) {
         updateDisplay()
     }
 
