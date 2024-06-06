@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
-import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
 import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
@@ -126,7 +125,6 @@ class SkyHanniMod {
         loadModule(CityProjectFeatures())
         loadModule(KingTalismanHelper())
         loadModule(WatchdogHider())
-        loadModule(AccountUpgradeReminder())
         loadModule(Translator())
         loadModule(CustomScoreboard())
         loadModule(MiningEventTracker())
