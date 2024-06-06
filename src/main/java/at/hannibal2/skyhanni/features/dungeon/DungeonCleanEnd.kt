@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -19,7 +19,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityGuardian
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonCleanEnd {
+@SkyHanniModule
+object DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
     private val catacombsPattern by RepoPattern.pattern(
@@ -33,7 +34,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
 
         val message = event.message
@@ -44,7 +45,7 @@ class DungeonCleanEnd {
     }
 
     private fun shouldBlock(): Boolean {
-        if (!LorenzUtils.inDungeons) return false
+        if (!DungeonAPI.inDungeon()) return false
         if (!config.enabled) return false
 
         if (!bossDone) return false
@@ -61,7 +62,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (bossDone) return
 
         if (lastBossId == -1) {
@@ -71,7 +72,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
         if (bossDone) return
         if (lastBossId == -1) return
@@ -109,7 +110,7 @@ class DungeonCleanEnd {
     }
 
     @SubscribeEvent
-    fun onPlayParticle(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (shouldBlock()) {
             event.isCanceled = true
         }

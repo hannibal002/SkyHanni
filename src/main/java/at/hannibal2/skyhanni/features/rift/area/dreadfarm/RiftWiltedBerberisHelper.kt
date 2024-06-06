@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,25 +16,28 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration.Companion.milliseconds
 
-class RiftWiltedBerberisHelper {
+@SkyHanniModule
+object RiftWiltedBerberisHelper {
 
     private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
     private var list = listOf<WiltedBerberis>()
 
-    class WiltedBerberis(var currentParticles: LorenzVec) {
+    data class WiltedBerberis(var currentParticles: LorenzVec) {
 
         var previous: LorenzVec? = null
         var moving = true
         var y = 0.0
-        var lastTime = System.currentTimeMillis()
+        var lastTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -41,7 +45,7 @@ class RiftWiltedBerberisHelper {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        list = list.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 500 } }
+        list = list.editCopy { removeIf { it.lastTime.passedSince() > 500.milliseconds } }
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
@@ -98,7 +102,7 @@ class RiftWiltedBerberisHelper {
 
             moving = isMoving
             currentParticles = location
-            lastTime = System.currentTimeMillis()
+            lastTime = SimpleTimeMark.now()
         }
     }
 

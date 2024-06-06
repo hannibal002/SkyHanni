@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden.visitor;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class TimerConfig {
     @Expose
@@ -33,5 +34,6 @@ public class TimerConfig {
     public boolean newVisitorPing = false;
 
     @Expose
-    public Position pos = new Position(390, 65, false, true);
+    @ConfigLink(owner = TimerConfig.class, field = "enabled")
+    public Position pos = new Position(-200, 40, false, true);
 }

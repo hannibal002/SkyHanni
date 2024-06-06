@@ -4,43 +4,63 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0APacketAnimation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
 
-class ItemClickData {
+@SkyHanniModule
+object ItemClickData {
 
     @SubscribeEvent
     fun onItemClickSend(event: PacketEvent.SendEvent) {
         val packet = event.packet
-        if (packet is C08PacketPlayerBlockPlacement) {
-            if (packet.placedBlockDirection != 255) {
-                val position = packet.position.toLorenzVec()
-                event.isCanceled = BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
-            } else {
-                event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+        event.isCanceled = when {
+            packet is C08PacketPlayerBlockPlacement -> {
+                if (packet.placedBlockDirection != 255) {
+                    val position = packet.position.toLorenzVec()
+                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
+                } else {
+                    ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+                }
             }
-        }
-        if (packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
-            val position = packet.position.toLorenzVec()
-            val blockClickCancelled =
-                BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
-            event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also {
-                it.isCanceled = blockClickCancelled
-            }.postAndCatch()
-        }
-        if (packet is C0APacketAnimation) {
-            event.isCanceled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
+
+            packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
+                val position = packet.position.toLorenzVec()
+                val blockClickCancelled =
+                    BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also {
+                    it.isCanceled = blockClickCancelled
+                }.postAndCatch()
+            }
+
+            packet is C0APacketAnimation -> {
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
+            }
+
+            packet is C02PacketUseEntity -> {
+                val clickType = when (packet.action) {
+                    C02PacketUseEntity.Action.INTERACT -> ClickType.RIGHT_CLICK
+                    C02PacketUseEntity.Action.ATTACK -> ClickType.LEFT_CLICK
+                    C02PacketUseEntity.Action.INTERACT_AT -> ClickType.RIGHT_CLICK
+                    else -> return
+                }
+                val clickedEntity = packet.getEntityFromWorld(Minecraft.getMinecraft().theWorld) ?: return
+                EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
+            }
+
+            else -> {
+                return
+            }
         }
     }
 
-    @SubscribeEvent
+    /* @SubscribeEvent
     fun onEntityClick(event: InputEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -60,5 +80,5 @@ class ItemClickData {
         if (clickedEntity == null) return
 
         EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
-    }
+    } */
 }

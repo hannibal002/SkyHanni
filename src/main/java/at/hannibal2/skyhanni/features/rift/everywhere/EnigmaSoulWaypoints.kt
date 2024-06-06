@@ -7,19 +7,21 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.events.SlotClickEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -27,6 +29,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object EnigmaSoulWaypoints {
 
     private val config get() = RiftAPI.config.enigmaSoulWaypoints
@@ -37,7 +40,7 @@ object EnigmaSoulWaypoints {
     private var adding = true
 
     private val item by lazy {
-        val neuItem = NEUItems.getItemStack("SKYBLOCK_ENIGMA_SOUL")
+        val neuItem = "SKYBLOCK_ENIGMA_SOUL".asInternalName().getItemStack()
         Utils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
@@ -52,8 +55,8 @@ object EnigmaSoulWaypoints {
         if (!isEnabled()) return
 
         if (inventoryUnfound.isEmpty()) return
-        if (event.inventory is ContainerLocalMenu && inInventory && event.slotNumber == 31) {
-            event.replaceWith(item)
+        if (event.inventory is ContainerLocalMenu && inInventory && event.slot == 31) {
+            event.replace(item)
         }
     }
 
@@ -79,11 +82,11 @@ object EnigmaSoulWaypoints {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory || !isEnabled()) return
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
-            event.usePickblockInstead()
+            event.makePickblock()
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
                 adding = false
@@ -93,17 +96,18 @@ object EnigmaSoulWaypoints {
             }
         }
 
-        if (event.slot.stack == null) return
+        if (event.slot?.stack == null) return
         val split = event.slot.stack.displayName.split("Enigma: ")
         if (split.size == 2) {
-            event.usePickblockInstead()
-            if (soulLocations.contains(split.last())) {
-                if (!trackedSouls.contains(split.last())) {
-                    ChatUtils.chat("§5Tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
-                    trackedSouls.add(split.last())
+            event.makePickblock()
+            val name = split.last()
+            if (soulLocations.contains(name)) {
+                if (!trackedSouls.contains(name)) {
+                    ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
+                    trackedSouls.add(name)
                 } else {
-                    trackedSouls.remove(split.last())
-                    ChatUtils.chat("§5No longer tracking the ${split.last()} Enigma Soul!", prefixColor = "§5")
+                    trackedSouls.remove(name)
+                    ChatUtils.chat("§5No longer tracking the $name Enigma Soul!", prefixColor = "§5")
                 }
             }
         }
@@ -117,10 +121,7 @@ object EnigmaSoulWaypoints {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            val stack = slot.stack ?: continue
-
+        for ((slot, stack) in chest.getAllItems()) {
             for (soul in trackedSouls) {
                 if (stack.displayName.removeColor().contains(soul)) {
                     slot highlight LorenzColor.DARK_PURPLE
@@ -138,7 +139,7 @@ object EnigmaSoulWaypoints {
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, LorenzColor.DARK_PURPLE.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(y = 1), "§5$soul Soul", 1.5)
+                event.drawDynamicText(it.add(y = 1), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
             }
         }
     }

@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
-import io.github.moulberry.moulconfig.observer.Observer
-import io.github.moulberry.moulconfig.observer.Property
+import io.github.notenoughupdates.moulconfig.observer.Observer
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 object ConditionalUtils {
 
-    fun <T> T.transformIf(condition: T.() -> Boolean, transofmration: T.() -> T) =
-        if (condition()) transofmration(this) else this
+    fun <T> T.transformIf(condition: T.() -> Boolean, transformation: T.() -> T) =
+        if (condition()) transformation(this) else this
 
     fun <T> T.conditionalTransform(condition: Boolean, ifTrue: T.() -> Any, ifFalse: T.() -> Any) =
         if (condition) ifTrue(this) else ifFalse(this)

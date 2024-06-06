@@ -1,130 +1,93 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class SlayerQuestWarning {
+@SkyHanniModule
+object SlayerQuestWarning {
 
     private val config get() = SkyHanniMod.feature.slayer
 
-    private val talkToMaddoxPattern by RepoPattern.pattern(
-        "slayer.questwarning.talkto",
-        " {3}§r§5§l» §r§7Talk to Maddox to claim your .+ Slayer XP!"
-    )
+    private var lastWeaponUse = SimpleTimeMark.farPast()
+    private val voidItem = "ASPECT_OF_THE_VOID".asInternalName()
+    private val endItem = "ASPECT_OF_THE_END".asInternalName()
 
-    private var needSlayerQuest = false
-    private var lastWarning = 0L
-    private var currentReason = ""
-    private var dirtySidebar = false
-    private var hasAutoSlayer = false
+    private val outsideRiftData = SlayerData()
+    private val insideRiftData = SlayerData()
 
-    // TODO add check if player has clicked on an item, before mobs around you gets damage
-
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!(LorenzUtils.inSkyBlock)) return
-
-        val message = event.message
-
-        // died
-        if (message == "  §r§c§lSLAYER QUEST FAILED!") {
-            needNewQuest("The old slayer quest has failed!")
-        }
-        if (message == "  §r§5§lSLAYER QUEST STARTED!") {
-            needSlayerQuest = false
-            hasAutoSlayer = true
-            dirtySidebar = true
-        }
-
-        // no auto slayer
-        talkToMaddoxPattern.matchMatcher(message) {
-            needNewQuest("You have no Auto-Slayer active!")
-        }
-        if (message == "  §r§a§lSLAYER QUEST COMPLETE!") {
-            needSlayerQuest = false
-        }
-
-        if (message == "§aYour Slayer Quest has been cancelled!") {
-            needSlayerQuest = false
-        }
-
-        // TODO auto slayer disabled bc of no more money in bank or purse
-    }
-
-    private fun needNewQuest(reason: String) {
-        currentReason = reason
-        needSlayerQuest = true
+    class SlayerData {
+        var currentSlayerState: String? = null
+        var lastSlayerType: SlayerType? = null
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!(LorenzUtils.inSkyBlock)) return
+    fun onScoreboardChange(event: ScoreboardChangeEvent) {
+        val slayerType = event.newList.nextAfter("Slayer Quest")
+        val slayerProgress = event.newList.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+        val new = slayerProgress.removeColor()
+        val slayerData = getSlayerData()
 
-        if (dirtySidebar && event.repeatSeconds(3)) {
-            checkSidebar()
+        if (slayerData.currentSlayerState == new) return
+
+        slayerData.currentSlayerState?.let {
+            change(it, new)
+        }
+        slayerData.currentSlayerState = new
+        slayerType?.let {
+            slayerData.lastSlayerType = SlayerType.getByName(it)
         }
     }
 
-    private fun checkSidebar() {
-        var loaded = false
+    private fun getSlayerData() = if (RiftAPI.inRift()) outsideRiftData else insideRiftData
 
-        var slayerQuest = false
-        var bossSlain = false
-        var slayBoss = false
-        var nextIsType = false
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (nextIsType) {
-                nextIsType = false
-            }
-            if (line == "Slayer Quest") {
-                slayerQuest = true
-                nextIsType = true
-            }
-            if (line == "§aBoss slain!") {
-                bossSlain = true
-            }
-            if (line == "§eSlay the boss!") {
-                slayBoss = true
-            }
-            if (line == "§ewww.hypixel.net" || line == "§ewww.alpha.hypixel.net") {
-                loaded = true
+    private fun change(old: String, new: String) {
+        if (new.contains("Combat")) {
+            if (!old.contains("Combat")) {
+                needSlayerQuest = false
             }
         }
-
-        if (loaded) {
-            dirtySidebar = false
-            if (slayerQuest && !needSlayerQuest) {
-                if (bossSlain) {
-                    if (!hasAutoSlayer) {
-                        needNewQuest("You have no Auto-Slayer active!")
-                        hasAutoSlayer = false
-                    }
-                } else if (slayBoss) {
-                    needNewQuest("You probably switched the server during an active boss and now hypixel doesn't know what to do.")
+        if (new == "no slayer") {
+            if (old == "Slay the boss!") {
+                needNewQuest("The old slayer quest has failed!")
+            }
+        }
+        if (new == "Boss slain!") {
+            DelayedRun.runDelayed(2.seconds) {
+                if (getSlayerData().currentSlayerState == "Boss slain!") {
+                    needNewQuest("You have no Auto-Slayer active!")
                 }
             }
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (!needSlayerQuest) {
-            dirtySidebar = true
-        }
+    private var needSlayerQuest = false
+    private var lastWarning = SimpleTimeMark.farPast()
+    private var currentReason = ""
+
+    private fun needNewQuest(reason: String) {
+        currentReason = reason
+        needSlayerQuest = true
     }
 
     private fun tryWarn() {
@@ -134,9 +97,13 @@ class SlayerQuestWarning {
 
     private fun warn(titleMessage: String, chatMessage: String) {
         if (!config.questWarning) return
-        if (lastWarning + 10_000 > System.currentTimeMillis()) return
+        if (lastWarning.passedSince() < 10.seconds) return
 
-        lastWarning = System.currentTimeMillis()
+        if (DianaAPI.isDoingDiana()) return
+        // prevent warnings when mobs are hit by other players
+        if (lastWeaponUse.passedSince() > 500.milliseconds) return
+      
+        lastWarning = SimpleTimeMark.now()
         ChatUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
@@ -146,7 +113,7 @@ class SlayerQuestWarning {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!(LorenzUtils.inSkyBlock)) return
+        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {
@@ -163,14 +130,32 @@ class SlayerQuestWarning {
             if (slayerType != activeSlayer) {
                 val activeSlayerName = activeSlayer.displayName
                 val slayerName = slayerType.displayName
-                SlayerAPI.latestWrongAreaWarning = System.currentTimeMillis()
+                SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
                     "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
                 )
             }
         }
+        // workaround for rift mob that is unrelated to slayer
+        val isSlayer = slayerType.clazz.isInstance(entity) && entity.name != "Oubliette Guard"
+        return (getSlayerData().lastSlayerType == slayerType) && isSlayer
+    }
 
-        return slayerType.clazz.isInstance(entity)
+    @SubscribeEvent
+    fun onItemClick(event: ItemClickEvent) {
+        val internalName = event.itemInHand?.getInternalNameOrNull()
+
+        if (event.clickType == ClickType.RIGHT_CLICK) {
+            if (internalName == voidItem || internalName == endItem) {
+                // ignore harmless teleportation
+                return
+            }
+            if (internalName == null) {
+                // ignore harmless right click
+                return
+            }
+        }
+        lastWeaponUse = SimpleTimeMark.now()
     }
 }

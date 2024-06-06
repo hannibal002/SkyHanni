@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -22,12 +23,13 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class SulphurSkitterBox {
+@SkyHanniModule
+object SulphurSkitterBox {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
     private var spongeBlocks = listOf<BlockPos>()
     private var closestBlock: BlockPos? = null
-    private val radius = 8
+    private const val RADIUS = 8
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -44,8 +46,8 @@ class SulphurSkitterBox {
                 val loc = it.toLorenzVec()
                 loc.getBlockAt() == Blocks.sponge && loc.distanceToPlayer() <= 15
             }.filter {
-                val pos1 = it.add(-radius, -radius, -radius)
-                val pos2 = it.add(radius, radius, radius)
+                val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
+                val pos2 = it.add(RADIUS, RADIUS, RADIUS)
                 BlockPos.getAllInBox(pos1, pos2).any { pos ->
                     pos.toLorenzVec().getBlockAt() in FishingAPI.lavaBlocks
                 }
@@ -63,8 +65,8 @@ class SulphurSkitterBox {
         if (!isEnabled()) return
         closestBlock?.let {
             if (it.toLorenzVec().distanceToPlayer() >= 50) return
-            val pos1 = it.add(-radius, -radius, -radius)
-            val pos2 = it.add(radius, radius, radius)
+            val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
+            val pos2 = it.add(RADIUS, RADIUS, RADIUS)
             val axis = AxisAlignedBB(pos1, pos2).expandBlock()
 
             drawBox(axis, event.partialTicks)
@@ -99,7 +101,6 @@ class SulphurSkitterBox {
 
     fun isEnabled() =
         IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || FishingAPI.holdingLavaRod)
-
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

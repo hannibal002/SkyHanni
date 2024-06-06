@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -22,20 +23,42 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object BestiaryData {
 
     private val config get() = SkyHanniMod.feature.combat.bestiary
 
     private val patternGroup = RepoPattern.group("combat.bestiary.data")
+
+    /**
+     * REGEX-TEST: §7Progress to Tier 14: §b26%
+     * REGEX-TEST: §7Progress to Tier XV: §b57.1%
+     */
+    private val tierProgressPattern by patternGroup.pattern(
+        "tierprogress",
+        "§7Progress to Tier [\\dIVXC]+: §b[\\d.]+%"
+    )
+
+    /**
+     * REGEX-TEST: §7Overall Progress: §b55.2%
+     * REGEX-TEST: §7Overall Progress: §b100% §7(§c§lMAX!§7)
+     */
+    private val overallProgressPattern by patternGroup.pattern(
+        "overallprogress",
+        "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"
+    )
+
     private val progressPattern by patternGroup.pattern(
         "progress",
         "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)"
@@ -64,13 +87,13 @@ object BestiaryData {
         if (!isEnabled()) return
         if (inInventory) {
             config.position.renderStringsAndItems(
-                display, extraSpace = -1, itemScale = 1.3, posLabel = "Bestiary Data"
+                display, extraSpace = -1, itemScale = 0.7, posLabel = "Bestiary Data"
             )
         }
     }
 
     @SubscribeEvent
-    fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inInventory) {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
@@ -97,7 +120,7 @@ object BestiaryData {
         isCategory = inventoryName == "Bestiary ➜ Fishing" || inventoryName == "Bestiary"
         stackList.putAll(items)
         inInventory = true
-        overallProgressEnabled = items[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } ?: false
+        overallProgressEnabled = isOverallProgressEnabled(items)
         update()
     }
 
@@ -382,6 +405,21 @@ object BestiaryData {
                 })
             }
         }
+    }
+
+    private fun isOverallProgressEnabled(inventoryItems: Map<Int, ItemStack>): Boolean {
+        if (inventoryItems[52]?.item == Items.ender_eye) {
+            return inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } == true
+        }
+
+        indexes.forEach { index ->
+            val item = inventoryItems[index] ?: return true
+            val hasTierProgress = item.getLore().any { tierProgressPattern.matches(it) }
+            val hasOverallProgress = item.getLore().any { overallProgressPattern.matches(it) }
+            if (hasTierProgress && !hasOverallProgress) return false
+        }
+
+        return true
     }
 
     private fun isBestiaryGui(stack: ItemStack?, name: String): Boolean {

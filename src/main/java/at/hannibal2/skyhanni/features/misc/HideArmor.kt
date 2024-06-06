@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
@@ -13,10 +15,10 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HideArmor {
+@SkyHanniModule
+object HideArmor {
 
     private val config get() = SkyHanniMod.feature.misc.hideArmor2
     private var armor = mapOf<Int, ItemStack>()
@@ -38,7 +40,7 @@ class HideArmor {
     }
 
     @SubscribeEvent
-    fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return
@@ -56,7 +58,7 @@ class HideArmor {
     }
 
     @SubscribeEvent
-    fun onRenderLivingPost(event: RenderLivingEvent.Post<EntityLivingBase>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return

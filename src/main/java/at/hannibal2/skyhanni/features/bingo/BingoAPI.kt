@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
-import at.hannibal2.skyhanni.config.Storage.PlayerSpecific.BingoSession
+import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
@@ -8,9 +8,10 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,6 +19,7 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
+@SkyHanniModule
 object BingoAPI {
 
     private var ranks = mapOf<String, Int>()
@@ -52,7 +54,7 @@ object BingoAPI {
                 add("  guide: '${goal.guide}'")
                 add("  done: '${goal.done}'")
                 add("  highlight: '${goal.highlight}'")
-                add("  communtyGoalPercentage: '${goal.communtyGoalPercentage}'")
+                add("  communityGoalPercentage: '${goal.communtyGoalPercentage}'")
                 val hiddenGoalData = goal.hiddenGoalData
                 add("  hiddenGoalData")
                 add("    unknownTip: '${hiddenGoalData.unknownTip}'")
@@ -71,6 +73,8 @@ object BingoAPI {
     }
 
     fun getRankFromScoreboard(text: String) = if (detectionPattern.matches(text)) getRank(text) else null
+
+    fun getIconFromScoreboard(text: String) = getRankFromScoreboard(text)?.let { getIcon(it) }
 
     fun getRank(text: String) = ranks.entries.find { text.contains(it.key) }?.value
 
@@ -104,4 +108,13 @@ object BingoAPI {
 
         else -> "§c"
     } + LorenzUtils.formatPercentage(percentage)
+
+    fun getBingoIcon(rank: Int): String {
+        val rankIcon = getIcon(rank) ?: ""
+        return if (rank != -1) {
+            "$rankIcon $rank"
+        } else {
+            rankIcon
+        }
+    }
 }

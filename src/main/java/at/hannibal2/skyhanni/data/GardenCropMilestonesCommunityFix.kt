@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -17,14 +18,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object GardenCropMilestonesCommunityFix {
     private val amountPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount",
@@ -91,10 +93,7 @@ object GardenCropMilestonesCommunityFix {
 //         debug("crop: $crop")
 //         debug("realTier: $realTier")
 
-        val guessNextMax = GardenCropMilestones.getCropsForTier(
-            realTier + 1,
-            crop
-        ) - GardenCropMilestones.getCropsForTier(realTier, crop)
+        val guessNextMax = GardenCropMilestones.getCropsForTier(realTier + 1, crop) - GardenCropMilestones.getCropsForTier(realTier, crop)
 //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
         val nextMax = amountPattern.matchMatcher(next) {
             group("max").formatLong()
@@ -105,7 +104,7 @@ object GardenCropMilestonesCommunityFix {
             wrongData.add("$crop:$realTier:${nextMax.addSeparators()}")
         }
 
-        val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop)
+        val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop) // no need to overflow here
 //         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
         val totalMax = amountPattern.matchMatcher(total) {
             group("max").formatLong()
@@ -163,13 +162,8 @@ object GardenCropMilestonesCommunityFix {
     }
 
     private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {
-        val guessNextMax = GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(
-            tier,
-            crop
-        )
-        if (guessNextMax.toInt() == amount) {
-            return false
-        }
+        val guessNextMax = GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(tier, crop)
+        if (guessNextMax.toInt() == amount) return false
         GardenCropMilestones.cropMilestoneData = GardenCropMilestones.cropMilestoneData.editCopy {
             fix(crop, this, tier, amount)
         }

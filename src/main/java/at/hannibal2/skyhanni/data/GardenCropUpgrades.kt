@@ -1,52 +1,62 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.CropUpgradeUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenCropUpgrades {
+@SkyHanniModule
+object GardenCropUpgrades {
 
-    // TODO USE SH-REPO
-    private val tierPattern = "§7Current Tier: §[0-9a-e](\\d)§7/§a9".toRegex()
-    private val chatUpgradePattern = " {2}§r§6§lCROP UPGRADE §e§f([\\w ]+)§7 #(\\d)".toRegex()
+    private val patternGroup = RepoPattern.group("garden.cropupgrades")
+    private val tierPattern by patternGroup.pattern(
+        "tier",
+        "§7Current Tier: §.(?<level>\\d)§7/§a9"
+    )
+    private val chatUpgradePattern by patternGroup.pattern(
+        "chatupgrade",
+        "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)"
+    )
+
+    private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropUpgrades
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        chatUpgradePattern.matchEntire(event.message)?.groups?.let { matches ->
-            val crop = getByNameOrNull(matches[1]!!.value) ?: return
-            val level = matches[2]!!.value.toInt()
-            crop.setUpgradeLevel(level)
+        if (!GardenAPI.inGarden()) return
+
+        chatUpgradePattern.matchMatcher(event.message) {
+            val crop = CropType.getByNameOrNull(group("crop"))
+            val level = group("tier").formatInt()
+            crop?.setUpgradeLevel(level)
         }
-        CropUpgradeUpdateEvent().postAndCatch()
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Crop Upgrades") return
-        event.inventoryItems.forEach { (_, item) ->
-            val crop = CropType.getByNameOrNull(item.name.removeColor()) ?: return@forEach
-            val level = item.getLore()
-                .firstNotNullOfOrNull { tierPattern.matchEntire(it)?.groups?.get(1)?.value?.toIntOrNull() } ?: 0
-            crop.setUpgradeLevel(level)
+
+        for (item in event.inventoryItems.values) {
+            val crop = CropType.getByNameOrNull(item.name.removeColor()) ?: continue
+            item.getLore().matchFirst(tierPattern) {
+                val level = group("level").formatInt()
+                crop.setUpgradeLevel(level)
+            }
         }
-        CropUpgradeUpdateEvent().postAndCatch()
     }
 
-    companion object {
+    fun CropType.getUpgradeLevel() = cropUpgrades?.get(this)
 
-        private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropUpgrades
-
-        fun CropType.getUpgradeLevel() = cropUpgrades?.get(this)
-
-        fun CropType.setUpgradeLevel(level: Int) {
-            cropUpgrades?.put(this, level)
-        }
+    private fun CropType.setUpgradeLevel(level: Int) {
+        cropUpgrades?.put(this, level)
     }
 }

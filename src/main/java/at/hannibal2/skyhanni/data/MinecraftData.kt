@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -19,6 +20,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
+@SkyHanniModule
 object MinecraftData {
 
     @SubscribeEvent(receiveCanceled = true)
@@ -69,14 +71,16 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase == TickEvent.Phase.START) return
         Minecraft.getMinecraft().thePlayer ?: return
+
+        DelayedRun.checkRuns()
         totalTicks++
         LorenzTickEvent(totalTicks).postAndCatch()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        DelayedRun.checkRuns()
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
         val newItem = hand?.getInternalName() ?: NEUInternalName.NONE

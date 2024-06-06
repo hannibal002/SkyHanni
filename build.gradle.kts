@@ -10,11 +10,13 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
+    `maven-publish`
+    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
     id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.24.Beta.5"
+version = "0.26.Beta.7"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -40,15 +42,17 @@ sourceSets.main {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven("https://repo.spongepowered.org/maven/")
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-    maven("https://jitpack.io") {
+    maven("https://repo.spongepowered.org/maven/") // mixin
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
+    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
         content {
             includeGroupByRegex("com\\.github\\..*")
         }
     }
-    maven("https://repo.nea.moe/releases")
-    maven("https://maven.notenoughupdates.org/releases")
+    maven("https://repo.nea.moe/releases") // libautoupdate
+    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
+    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
+    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -77,7 +81,7 @@ dependencies {
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
-    shadowImpl("com.github.NetheriteMiner:DiscordIPC:3106be5") {
+    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")
@@ -86,6 +90,8 @@ dependencies {
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)
+
+    compileOnly(ksp(project(":annotation-processors"))!!)
 
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
@@ -103,24 +109,30 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    // June 3, 2024, 9:30 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
 
     shadowModImpl(libs.moulconfig)
-    shadowImpl(libs.libautoupdate)
+    shadowImpl(libs.libautoupdate) {
+        exclude(module = "gson")
+    }
     shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation(libs.hotswapagentforge)
 
-//    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-pre5:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
+
+    implementation("net.hypixel:mod-api:0.3.1")
 }
+
 configurations.getByName("minecraftNamed").dependencies.forEach {
     shot.applyTo(it as HasConfigurableAttributes<*>)
 }
@@ -139,6 +151,12 @@ kotlin {
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
     }
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
+    }
 }
 
 // Minecraft configuration:
@@ -150,7 +168,7 @@ loom {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
             arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-            arg("--tweakClass", "io.github.moulberry.moulconfig.tweaker.DevelopmentResourceTweaker")
+            arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
     }
@@ -222,7 +240,6 @@ tasks.withType(Jar::class) {
     }
 }
 
-
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
     from(tasks.shadowJar)
@@ -240,8 +257,9 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
-    relocate("io.github.moulberry.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
+    relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
+    relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -257,3 +275,31 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
+val sourcesJar by tasks.creating(Jar::class) {
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+    archiveClassifier.set("src")
+    from(sourceSets.main.get().allSource)
+}
+
+publishing.publications {
+    create<MavenPublication>("maven") {
+        artifact(tasks.remapJar)
+        artifact(sourcesJar) { classifier = "sources" }
+        pom {
+            name.set("SkyHanni")
+            licenses {
+                license {
+                    name.set("GNU Lesser General Public License")
+                    url.set("https://github.com/hannibal002/SkyHanni/blob/HEAD/LICENSE")
+                }
+            }
+            developers {
+                developer { name.set("hannibal002") }
+                developer { name.set("The SkyHanni contributors") }
+            }
+        }
+    }
+}
+
+
+

@@ -2,28 +2,29 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
+@SkyHanniModule
 object WikiManager {
     private const val OFFICIAL_URL_PREFIX = "https://wiki.hypixel.net/"
     private const val OFFICIAL_SEARCH_PREFIX = "index.php?search="
     private const val FANDOM_URL_PREFIX = "https://hypixel-skyblock.fandom.com/wiki/"
     private const val FANDOM_SEARCH_PREFIX = "Special:Search?query="
 
-    private val config get() = SkyHanniMod.feature.commands.betterWiki
+    private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -49,7 +50,7 @@ object WikiManager {
         }
         if (message == ("/wikithis")) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                LorenzUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.chat("§cYou must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, config.autoOpenWiki)
@@ -58,11 +59,10 @@ object WikiManager {
     }
 
     @SubscribeEvent
-    fun onKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+    fun onKeybind(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val gui = event.gui as? GuiContainer ?: return
-        if (NEUItems.neuHasFocus()) return // because good heavens if this worked on neuitems...
-        val stack = gui.slotUnderMouse?.stack ?: return
+        if (NEUItems.neuHasFocus()) return
+        val stack = event.guiContainer.slotUnderMouse?.stack ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return
         wikiTheItem(stack, config.menuOpenWiki)
@@ -70,7 +70,7 @@ object WikiManager {
 
     private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useFandom: Boolean = config.useFandom) {
         val itemDisplayName =
-            (item.nameWithEnchantment ?: return).replace("§a✔ ", "").replace("§c✖ ", "")
+            item.itemName.replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 

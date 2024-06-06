@@ -2,13 +2,17 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
+import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
+import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
+import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +26,35 @@ import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.It
 public class InventoryConfig {
 
     @Expose
-    @ConfigOption(name = "Not Clickable Items", desc = "")
+    @Category(name = "Skyblock Guide", desc = "Helps finding stuff to do in SkyBlock.")
+    public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
+
+    @Expose
+    @Category(name = "Auction House", desc = "Be smart when buying or selling expensive items in the Auctions House.")
+    public AuctionHouseConfig auctions = new AuctionHouseConfig();
+
+    @Expose
+    @Category(name = "Bazaar", desc = "Be smart when buying or selling many items in the Bazaar.")
+    public BazaarConfig bazaar = new BazaarConfig();
+
+    @Expose
+    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
+    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
+
+    @Expose
+    @Category(name = "Helpers", desc = "Some smaller Helper settings.")
+    public HelperConfig helper = new HelperConfig();
+
+    @Expose
+    @Category(name = "Item Abilities", desc = "Stuff about item abilities.")
+    public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
+
+    @Expose
+    @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
+    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
+
+    @Expose
+    @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
@@ -41,11 +73,15 @@ public class InventoryConfig {
     @Accordion
     public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
 
-
     @Expose
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
     public SackDisplayConfig sackDisplay = new SackDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
+    @Accordion
+    public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
 
     @Expose
     @ConfigOption(name = "Chest Value", desc = "")
@@ -53,26 +89,14 @@ public class InventoryConfig {
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
 
     @Expose
-    @Category(name = "Skyblock Guide", desc = "")
-    public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
-
-    @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
-    public BazaarConfig bazaar = new BazaarConfig();
-
-    @Expose
-    @Category(name = "Helpers", desc = "Settings for Helpers")
-    public HelperConfig helper = new HelperConfig();
-
-    @Expose
     @ConfigOption(name = "Get From Sack", desc = "")
     @Accordion
     public GetFromSackConfig gfs = new GetFromSackConfig();
 
-    @Expose
-    @ConfigOption(name = "Auctions", desc = "")
+    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
-    public AuctionHouseConfig auctions = new AuctionHouseConfig();
+    @Expose
+    public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
 
     @Expose
     @ConfigOption(
@@ -95,7 +119,6 @@ public class InventoryConfig {
         PET_LEVEL("§bPet Level", 4),
         MINION_TIER("§bMinion Tier", 5),
         CRIMSON_ARMOR("§bCrimson Armor", 6),
-        REMOVED("§7(Removed)", 7),
         KUUDRA_KEY("§bKuudra Key", 8),
         SKILL_LEVEL("§bSkill Level", 9),
         COLLECTION_LEVEL("§bCollection Level", 10),
@@ -104,6 +127,7 @@ public class InventoryConfig {
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
+        DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         ;
@@ -131,6 +155,12 @@ public class InventoryConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Highlight Widgets", desc = "Highlight enabled and disabled widgets in /tab.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightWidgets = true;
 
     @Expose
     @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
@@ -183,6 +213,12 @@ public class InventoryConfig {
     public boolean powerStoneGuide = true;
 
     @Expose
+    @ConfigOption(name = "Favorite Power Stone", desc = "Shows your favorite power stones. You can add/remove them by shift clicking a Power Stone.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean favoritePowerStone = false;
+
+    @Expose
     @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -201,9 +237,8 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Low Quiver Alert", desc = "Notifies you when your Quiver runs out of arrows.")
+    @ConfigOption(name = "Time Held in Lore", desc = "Shows time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean quiverAlert = false;
-
+    public boolean timeHeldInLore = false;
 }

@@ -7,15 +7,18 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CurrentPetDisplay {
+@SkyHanniModule
+object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets
 
@@ -66,11 +69,9 @@ class CurrentPetDisplay {
         if (!PetAPI.isPetMenu(event.inventoryName)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
-        for (line in lore) {
-            inventorySelectedPetPattern.matchMatcher(line) {
-                val newPet = group("pet")
-                PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
-            }
+        lore.matchFirst(inventorySelectedPetPattern) {
+            val newPet = group("pet")
+            PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
         }
     }
 

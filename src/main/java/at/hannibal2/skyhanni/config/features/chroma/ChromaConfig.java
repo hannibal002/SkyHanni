@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.config.features.chroma;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.features.chroma.ChromaManager;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class ChromaConfig {
 
@@ -22,7 +23,7 @@ public class ChromaConfig {
     @ConfigOption(name = "Enabled", desc = "Toggle for SkyHanni's chroma. (Disables Patcher's Optimized Font Renderer while enabled)")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Chroma Size", desc = "Change the size of each color in the chroma.")
@@ -76,7 +77,7 @@ public class ChromaConfig {
 
     @ConfigOption(name = "Reset to Default", desc = "Resets all chroma settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetSettings = this::resetChromaSettings;
+    public Runnable resetSettings = ChromaManager::resetChromaSettings;
 
     @Expose
     @ConfigOption(name = "Everything Chroma", desc = "Renders §4§l§oALL §r§7text in chroma. (Some enchants may appear white with SBA enchant parsing)")
@@ -88,12 +89,4 @@ public class ChromaConfig {
     @ConfigEditorBoolean
     public boolean ignoreChat = false;
 
-    private void resetChromaSettings() {
-        SkyHanniMod.getFeature().chroma.chromaSize = 30f;
-        SkyHanniMod.getFeature().chroma.chromaSpeed = 6f;
-        SkyHanniMod.getFeature().chroma.chromaSaturation = 0.75f;
-        SkyHanniMod.getFeature().chroma.allChroma = false;
-        SkyHanniMod.getFeature().chroma.ignoreChat = false;
-        SkyHanniMod.getFeature().chroma.chromaDirection = Direction.FORWARD_RIGHT;
-    }
 }

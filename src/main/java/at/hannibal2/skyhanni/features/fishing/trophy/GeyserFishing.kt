@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,8 +20,11 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class GeyserFishing {
+@SkyHanniModule
+object GeyserFishing {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
+
+    private val geyserOffset = LorenzVec(0.1f, 0.6f, 0.1f)
 
     private var geyser: LorenzVec? = null
     private var geyserBox: AxisAlignedBB? = null
@@ -28,13 +32,9 @@ class GeyserFishing {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!shouldProcessParticles()) return
-        if (event.type != EnumParticleTypes.CLOUD || event.count != 15 || event.speed != 0.05f || event.offset != LorenzVec(
-                0.1f,
-                0.6f,
-                0.1f
-            )
-        ) return
-
+        with(event) {
+            if (type != EnumParticleTypes.CLOUD || count != 15 || speed != 0.05f || offset != geyserOffset) return
+        }
         geyser = event.location
         val potentialGeyser = geyser ?: return
 
@@ -57,12 +57,12 @@ class GeyserFishing {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!config.drawBox) return
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (config.onlyWithRod && !FishingAPI.holdingLavaRod) return
+        val geyserBox = geyserBox ?: return
         val geyser = geyser ?: return
         if (geyser.distanceToPlayerIgnoreY() > 96) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (config.onlyWithRod && !FishingAPI.holdingLavaRod) return
 
-        val geyserBox = geyserBox ?: return
         val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
         event.drawFilledBoundingBox_nea(geyserBox, color)
     }

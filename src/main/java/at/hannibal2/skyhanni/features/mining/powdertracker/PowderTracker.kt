@@ -9,15 +9,17 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -25,8 +27,9 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.fixedRateTimer
+import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object PowderTracker {
 
     private val config get() = SkyHanniMod.feature.mining.powderTracker
@@ -53,7 +56,7 @@ object PowderTracker {
         "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r"
     )
 
-    private var lastChestPicked = 0L
+    private var lastChestPicked = SimpleTimeMark.farPast()
     private var isGrinding = false
     private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val mithrilInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
@@ -73,14 +76,27 @@ object PowderTracker {
 
     init {
         PowderChestReward.entries.forEach { it.chatPattern }
+    }
 
-        fixedRateTimer(name = "skyhanni-powder-tracker", period = 1000) {
-            if (!isEnabled()) return@fixedRateTimer
-            calculateResourceHour(gemstoneInfo)
-            calculateResourceHour(mithrilInfo)
-            calculateResourceHour(diamondEssenceInfo)
-            calculateResourceHour(goldEssenceInfo)
-            calculateResourceHour(chestInfo)
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        calculateResourceHour(gemstoneInfo)
+        calculateResourceHour(mithrilInfo)
+        calculateResourceHour(diamondEssenceInfo)
+        calculateResourceHour(goldEssenceInfo)
+        calculateResourceHour(chestInfo)
+
+        doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
+        powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
+            powderTimer = group("time")
+            doublePowder = powderTimer != "00:00"
+
+            tracker.update()
+        }
+
+        if (lastChestPicked.passedSince() > 1.minutes) {
+            isGrinding = false
         }
     }
 
@@ -121,7 +137,7 @@ object PowderTracker {
                     it.totalChestPicked += 1
                 }
                 isGrinding = true
-                lastChestPicked = System.currentTimeMillis()
+                lastChestPicked = SimpleTimeMark.now()
             }
         }
 
@@ -130,7 +146,7 @@ object PowderTracker {
                 it.totalChestPicked += 1
             }
             isGrinding = true
-            lastChestPicked = System.currentTimeMillis()
+            lastChestPicked = SimpleTimeMark.now()
         }
 
         powderStartedPattern.matchMatcher(msg) { doublePowder = true }
@@ -140,7 +156,7 @@ object PowderTracker {
             reward.chatPattern.matchMatcher(msg) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
-                    var amount = group("amount").formatNumber()
+                    var amount = group("amount").formatLong()
                     if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder)
                         amount *= 2
                     it.rewards[reward] = count + amount
@@ -148,23 +164,6 @@ object PowderTracker {
             }
         }
         tracker.update()
-    }
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-        if (event.repeatSeconds(1)) {
-            doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
-            powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
-                powderTimer = group("time")
-                doublePowder = powderTimer != "00:00"
-
-                tracker.update()
-            }
-        }
-        if (System.currentTimeMillis() - lastChestPicked > 60_000) {
-            isGrinding = false
-        }
     }
 
     @SubscribeEvent
@@ -370,7 +369,7 @@ object PowderTracker {
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetpowdertracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

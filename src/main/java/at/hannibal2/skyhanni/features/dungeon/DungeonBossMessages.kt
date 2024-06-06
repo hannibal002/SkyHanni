@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonBossMessages {
+@SkyHanniModule
+object DungeonBossMessages {
 
     private val config get() = SkyHanniMod.feature.chat
     private val bossPattern = "§([cd4])\\[BOSS] (.*)".toPattern()
@@ -45,7 +46,7 @@ class DungeonBossMessages {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (!isBoss(event.message)) return
 
         DungeonAPI.handleBossMessage(event.message)

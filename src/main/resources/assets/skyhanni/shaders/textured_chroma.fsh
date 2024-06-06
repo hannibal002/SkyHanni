@@ -2,7 +2,7 @@
 // Modified from SkyblockAddons
 // Credit: https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/resources/assets/skyblockaddons/shaders/program/chroma_screen_textured.fsh
 
-#version 130
+#version 120
 
 uniform float chromaSize;
 uniform float timeOffset;
@@ -11,8 +11,8 @@ uniform bool forwardDirection;
 
 uniform sampler2D outTexture;
 
-in vec2 outTextureCoords;
-in vec4 outColor;
+varying vec2 outTextureCoords;
+varying vec4 outColor;
 
 float rgb2b(vec3 rgb) {
     return max(max(rgb.r, rgb.g), rgb.b);

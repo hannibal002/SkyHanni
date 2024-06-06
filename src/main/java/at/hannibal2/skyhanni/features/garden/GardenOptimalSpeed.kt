@@ -5,17 +5,16 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.moulconfig.observer.Property
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -24,33 +23,42 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class GardenOptimalSpeed {
+@SkyHanniModule
+object GardenOptimalSpeed {
 
     private val config get() = GardenAPI.config.optimalSpeeds
-
-    private val currentSpeedPattern by RepoPattern.pattern(
-        "garden.optimalspeed.currentspeed",
-        " Speed: §r§f✦(?<speed>.*)"
-    )
 
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
     private val sneakingPersistent get() = sneakingTime > 5.seconds
-    private var _currentSpeed = 100
-    private var currentSpeed: Int
-        get() = (_currentSpeed * (if (sneaking) 0.3 else 1.0)).toInt()
-        set(value) {
-            _currentSpeed = value
-        }
+
+    /**
+     * This speed value represents the walking speed, not the speed stat.
+     * Blocks per second = 4.317 * speed / 100
+     *
+     * It has an absolute speed cap of 500, and items that normally increase the cap do not apply here:
+     * (Black Cat pet, Cactus knife, Racing Helmet or Young Dragon Armor)
+     *
+     * If this information ever gets abstracted away and made available outside this class,
+     * and some features need the actual value of the Speed stat instead,
+     * we can always just have two separate variables, like walkSpeed and speedStat.
+     * But since this change is confined to Garden-specific code, it's fine the way it is for now.
+     */
+    private var currentSpeed = 100
+
     private var optimalSpeed = -1
     private var lastWarnTime = 0L
     private var cropInHand: CropType? = null
     private var rancherOverlayList: List<List<Any?>> = emptyList()
+    private var lastToolSwitch = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
+
         if (sneaking) {
+            currentSpeed = (currentSpeed * 0.3).toInt()
             sneakingTime += 50.milliseconds
         } else {
             sneakingTime = 0.seconds
@@ -58,16 +66,11 @@ class GardenOptimalSpeed {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            currentSpeedPattern.matchMatcher(line) {
-                currentSpeed = group("speed").toInt()
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
+        if (!isRancherOverlayEnabled()) return
+        val gui = event.gui
+        if (gui !is GuiEditSign) return
+        if (!gui.isRancherSign()) return
         rancherOverlayList = CropType.entries.map { crop ->
             listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
                 LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")
@@ -89,6 +92,7 @@ class GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
+        lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
         optimalSpeed = cropInHand?.getOptimalSpeed() ?: -1
     }
@@ -134,13 +138,16 @@ class GardenOptimalSpeed {
             text += " (§eCurrent: §f$currentSpeed"
             if (sneaking) text += " §7[Sneaking]"
             text += "§f)"
-
-            if (config.showOnHUD) config.pos.renderString("§c$text", posLabel = "Garden Optimal Speed")
-            if (sneaking && !sneakingPersistent) return
-            warn()
-        } else {
-            if (config.showOnHUD) config.pos.renderString("§a$text", posLabel = "Garden Optimal Speed")
         }
+
+        val recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
+        val recentlyStartedSneaking = sneaking && !sneakingPersistent
+
+        val colorCode =
+            if (recentlySwitchedTool || recentlyStartedSneaking) "7" else if (optimalSpeed != currentSpeed) "c" else "a"
+
+        if (config.showOnHUD) config.pos.renderString("§$colorCode$text", posLabel = "Garden Optimal Speed")
+        if (optimalSpeed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn()
     }
 
     private fun warn() {

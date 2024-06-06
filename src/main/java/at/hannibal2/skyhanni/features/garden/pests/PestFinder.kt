@@ -1,85 +1,46 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPlayerInside
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class PestFinder {
+@SkyHanniModule
+object PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
-    private val patternGroup = RepoPattern.group("garden.pests.finder")
-    private val pestsInScoreboardPattern by patternGroup.pattern(
-        "scoreboard",
-        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)"
-    )
-    private val pestInventoryPattern by patternGroup.pattern(
-        "inventory",
-        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
-    )
-
     private var display = emptyList<Renderable>()
-    private var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onPestSpawn(event: PestSpawnEvent) {
-        if (!isEnabled()) return
-        PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
-        val plot = GardenPlotAPI.getPlotByName(event.plotName)
-        if (plot == null) {
-            ChatUtils.userError("Open Desk to load plot names and pest locations!")
-            return
-        }
-        plot.pests += event.amountPests
-        update()
-    }
-
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
-        if (event.inventoryName != "Configure Plots") return
-
-        for (plot in GardenPlotAPI.plots) {
-            plot.pests = 0
-            val item = event.inventoryItems[plot.inventorySlot] ?: continue
-            for (line in item.getLore()) {
-                pestInventoryPattern.matchMatcher(line) {
-                    plot.pests = group("amount").formatNumber().toInt()
-                }
-            }
-        }
+    fun onPestUpdate(event: PestUpdateEvent) {
         update()
     }
 
@@ -90,23 +51,20 @@ class PestFinder {
     }
 
     private fun drawDisplay() = buildList {
-        val totalAmount = getPlotsWithPests().sumOf { it.pests }
-        if (totalAmount != PestAPI.scoreboardPests) {
-            add(Renderable.string("§cIncorrect pest amount!"))
-            add(Renderable.string("§eOpen Configure Plots Menu!"))
-            return@buildList
-        }
+        add(Renderable.string("§6Total pests: §e${PestAPI.scoreboardPests}§6/§e8"))
 
-        add(Renderable.string("§eTotal pests in garden: §c${totalAmount}§7/§c8"))
-
-        for (plot in getPlotsWithPests()) {
+        for (plot in PestAPI.getInfestedPlots()) {
             val pests = plot.pests
             val plotName = plot.name
-            val pestsName = StringUtils.pluralize(pests, "pest", withNumber = true)
+            val isInaccurate = plot.isPestCountInaccurate
+            val pestsName = StringUtils.pluralize(pests, "pest")
+            val name = "§e" + if (isInaccurate) "1+?" else {
+                pests
+            } + " §c$pestsName §7in §b$plotName"
             val renderable = Renderable.clickAndHover(
-                "§c$pestsName §7in §b$plotName",
+                name,
                 listOf(
-                    "§7Pests Found: §e$pests",
+                    "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
                     "",
                     "§eClick here to warp!"
@@ -117,76 +75,25 @@ class PestFinder {
             )
             add(renderable)
         }
+
+        if (PestAPI.getInfestedPlots().isEmpty() && PestAPI.scoreboardPests != 0) {
+            add(Renderable.string("§e${PestAPI.scoreboardPests} §6Bugged pests!"))
+            add(Renderable.clickAndHover(
+                "§cTry opening your plots menu.",
+                listOf(
+                    "Runs /desk."
+                ),
+                onClick = {
+                    HypixelCommands.gardenDesk()
+                }
+            ))
+        }
     }
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
+        display = listOf()
         update()
-    }
-
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-        if (event.message == "§cThere are no pests in your Garden right now! Keep farming!") {
-            GardenPlotAPI.plots.forEach {
-                it.pests = 0
-            }
-            update()
-        }
-    }
-
-    @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        if (!GardenAPI.inGarden()) return
-
-        var newPests = 0
-        for (line in event.newList) {
-            pestsInScoreboardPattern.matchMatcher(line) {
-                newPests = group("pests").formatNumber().toInt()
-            }
-        }
-
-        if (newPests != PestAPI.scoreboardPests) {
-            removePests(PestAPI.scoreboardPests - newPests)
-            PestAPI.scoreboardPests = newPests
-            update()
-        }
-
-        resetAllPests(newPests)
-    }
-
-    // Auto fixing plots marked as pests when killing all pests without SkyHanni earlier.
-    private fun resetAllPests(newPests: Int) {
-        if (newPests != 0) return
-
-        var fixed = false
-        for (plot in GardenPlotAPI.plots) {
-            if (plot.pests > 0) {
-                fixed = true
-                plot.pests = 0
-            }
-        }
-        if (fixed) {
-            ChatUtils.debug("Auto fixed all plots with pests.")
-        }
-    }
-
-    private fun removePests(removedPests: Int) {
-        if (!isEnabled()) return
-        if (removedPests < 1) return
-        repeat(removedPests) {
-            removeNearestPest()
-        }
-    }
-
-    private fun getNearestInfectedPest() = getPlotsWithPests().minByOrNull { it.middle.distanceSqToPlayer() }
-
-    private fun removeNearestPest() {
-        val plot = getNearestInfectedPest() ?: run {
-            ChatUtils.error("Can not remove nearest pest: No infected plots detected.")
-            return
-        }
-        plot.pests--
     }
 
     @SubscribeEvent
@@ -200,30 +107,51 @@ class PestFinder {
         }
     }
 
-    private fun getPlotsWithPests() = GardenPlotAPI.plots.filter { it.pests > 0 }
-
     // priority to low so that this happens after other renderPlot calls.
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
 
         val playerLocation = event.exactPlayerEyeLocation()
-        for (plot in getPlotsWithPests()) {
+        val visibility = config.visibilityType
+        val showBorder = visibility == VisibilityType.BOTH || visibility == VisibilityType.BORDER
+        val showName = visibility == VisibilityType.BOTH || visibility == VisibilityType.NAME
+        for (plot in PestAPI.getInfestedPlots()) {
             if (plot.isPlayerInside()) {
-                event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                if (showBorder) {
+                    event.renderPlot(plot, LorenzColor.RED.toColor(), LorenzColor.DARK_RED.toColor())
+                }
                 continue
             }
-            event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
-
-            val pestsName = StringUtils.pluralize(plot.pests, "pest", withNumber = true)
-            val plotName = plot.name
-            val middle = plot.middle
-            val location = playerLocation.copy(x = middle.x, z = middle.z)
-            event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-            event.drawDynamicText(location, "§c$pestsName §7in §b$plotName", 1.5)
+            if (showBorder) {
+                event.renderPlot(plot, LorenzColor.GOLD.toColor(), LorenzColor.RED.toColor())
+            }
+            if (showName) {
+                drawName(plot, playerLocation, event)
+            }
         }
+    }
+
+    private fun drawName(
+        plot: GardenPlotAPI.Plot,
+        playerLocation: LorenzVec,
+        event: LorenzRenderWorldEvent,
+    ) {
+        val pests = plot.pests
+        val pestsName = StringUtils.pluralize(pests, "pest")
+        val plotName = plot.name
+        val middle = plot.middle
+        val isInaccurate = plot.isPestCountInaccurate
+        val location = playerLocation.copy(x = middle.x, z = middle.z)
+        event.drawWaypointFilled(location, LorenzColor.RED.toColor())
+        val text = "§e" + (if (isInaccurate) "?" else
+            pests
+            ) + " §c$pestsName §7in §b$plotName"
+        event.drawDynamicText(
+            location, text, 1.5
+        )
     }
 
     private var lastKeyPress = SimpleTimeMark.farPast()
@@ -238,25 +166,28 @@ class PestFinder {
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
-        val plot = getNearestInfectedPest() ?: run {
-            ChatUtils.userError("No infected plots detected to warp to!")
+        teleportNearestInfestedPlot()
+    }
+
+    fun teleportNearestInfestedPlot() {
+        // need to check again for the command
+        if (!GardenAPI.inGarden()) {
+            ChatUtils.userError("This command only works while on the Garden!")
+        }
+
+        val plot = PestAPI.getNearestInfestedPlot() ?: run {
+            if (config.backToGarden) return HypixelCommands.warp("garden")
+
+            ChatUtils.userError("No infested plots detected to warp to!")
             return
         }
 
-        if (plot.isPlayerInside()) {
-            ChatUtils.userError("You stand already on the infected plot!")
+        if (plot.isPlayerInside() && !config.alwaysTp) {
+            ChatUtils.userError("You're already in an infested plot!")
             return
         }
 
         plot.sendTeleportTo()
-    }
-
-    @SubscribeEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (!isEnabled()) return
-        if (!config.showPlotInWorld) return
-        if (event.oldItem !in PestAPI.vacuumVariants) return
-        lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.showPlotInWorld)

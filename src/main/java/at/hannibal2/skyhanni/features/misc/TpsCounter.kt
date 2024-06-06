@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -13,31 +14,30 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
-class TpsCounter {
+@SkyHanniModule
+object TpsCounter {
 
     private val config get() = SkyHanniMod.feature.gui
 
-    companion object {
-
-        private const val minDataAmount = 5
-        private const val waitAfterWorldSwitch = 6
-    }
+    private const val MIN_DATA_AMOUNT = 5
+    private const val WAIT_AFTER_WORLD_SWITCH = 6
 
     private var packetsFromLastSecond = 0
     private var tpsList = mutableListOf<Int>()
-    private var ignoreFirstTicks = waitAfterWorldSwitch
+    private var ignoreFirstTicks = WAIT_AFTER_WORLD_SWITCH
     private var hasPacketReceived = false
 
     private var display = ""
 
     init {
+        // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
             if (!isEnabled()) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
             if (ignoreFirstTicks > 0) {
                 ignoreFirstTicks--
-                val current = ignoreFirstTicks + minDataAmount
+                val current = ignoreFirstTicks + MIN_DATA_AMOUNT
                 display = "§eTPS: §f(${current}s)"
                 packetsFromLastSecond = 0
                 return@fixedRateTimer
@@ -49,8 +49,8 @@ class TpsCounter {
                 tpsList = tpsList.drop(1).toMutableList()
             }
 
-            display = if (tpsList.size < minDataAmount) {
-                val current = minDataAmount - tpsList.size
+            display = if (tpsList.size < MIN_DATA_AMOUNT) {
+                val current = MIN_DATA_AMOUNT - tpsList.size
                 "§eTPS: §f(${current}s)"
             } else {
                 val sum = tpsList.sum().toDouble()
@@ -60,6 +60,7 @@ class TpsCounter {
                 "§eTPS: $color$tps"
             }
         }
+        // TODO use DelayedRun
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
             if (!isEnabled()) return@fixedRateTimer
 
@@ -74,12 +75,12 @@ class TpsCounter {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         tpsList.clear()
         packetsFromLastSecond = 0
-        ignoreFirstTicks = waitAfterWorldSwitch
+        ignoreFirstTicks = WAIT_AFTER_WORLD_SWITCH
         display = ""
     }
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!config.tpsDisplay) return
         hasPacketReceived = true
     }

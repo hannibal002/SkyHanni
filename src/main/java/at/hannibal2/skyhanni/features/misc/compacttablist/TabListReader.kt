@@ -1,38 +1,51 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // heavily inspired by SBA code
+@SkyHanniModule
 object TabListReader {
 
-    private val config get() = SkyHanniMod.feature.misc.compactTabList
+    private val config get() = SkyHanniMod.feature.gui.compactTabList
 
     private val patternGroup = RepoPattern.group("misc.compacttablist")
     val usernamePattern by patternGroup.pattern(
         "username",
         "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
     )
+    /**
+     * REGEX-TEST: §r§r§7You have a §r§cGod Potion §r§7active! §r§d12 Hours§r
+     */
     private val godPotPattern by patternGroup.pattern(
         "effects.godpot",
-        "You have a God Potion active! (?<timer>[\\w ]+)"
+        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r"
     )
+    /**
+     * REGEX-TEST: §r§r§a§lActive Effects§r
+     */
     private val activeEffectPattern by patternGroup.pattern(
         "effects.active",
         "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
+    /**
+     * REGEX-TEST: §r§r§7§r§7You have §r§e1 §r§7active effect. Use "§r§6/effects§r§7" to see it!§r
+     */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count",
-        "You have (?<effectCount>[0-9]+) active effect"
+        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect"
     )
     private val cookiePattern by patternGroup.pattern(
         "cookie",
@@ -46,18 +59,19 @@ object TabListReader {
         "upgrades",
         "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
     )
+    private val winterPowerUpsPattern by patternGroup.pattern(
+        "winterpowerups",
+        "Active Power Ups(?:§.)*(?:\\n(§.)*§7.+)*"
+    )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"
 
     val renderColumns = mutableListOf<RenderColumn>()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    private fun updateTablistData(tablist: List<String>? = null) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!event.isMod(5)) return
-        if (!config.enabled) return
 
-        var tabLines = TabListData.getTabList()
+        var tabLines = tablist ?: TabListData.getTabList()
 
         if (tabLines.size < 80) return
 
@@ -76,6 +90,11 @@ object TabListReader {
         val renderColumn = RenderColumn()
         renderColumns.add(renderColumn)
         combineColumnsToRender(columns, renderColumn)
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        updateTablistData(event.tabList)
     }
 
     private fun parseColumns(original: List<String>): MutableList<TabColumn> {
@@ -99,53 +118,51 @@ object TabListReader {
     }
 
     private fun parseFooterAsColumn(): TabColumn? {
-        val tabList = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
+        var footer = TabListData.getFooter().removeSFormattingCode()
+        if (footer.isEmpty()) return null
 
-        if (tabList.footer_skyhanni == null) {
-            return null
+        footer = godPotPattern.findMatcher(footer) {
+            activeEffectPattern.matcher(footer)
+                .replaceAll("Active Effects:\n§cGod Potion§r: ${group("timer")}")
+        } ?: run {
+            effectCountPattern.findMatcher(footer) {
+                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + group("effectCount"))
+            } ?: activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e0")
         }
 
-        val column = TabColumn("§2§lOther")
-
-        var footer = tabList.footer_skyhanni.formattedText.removeSFormattingCode()
-
-        var matcher = godPotPattern.matcher(tabList.footer_skyhanni.unformattedText)
-        if (matcher.find()) {
-            footer = activeEffectPattern.matcher(footer)
-                .replaceAll("Active Effects:\n§cGod Potion§r: ${matcher.group("timer")}")
-        } else {
-            matcher = effectCountPattern.matcher(tabList.footer_skyhanni.unformattedText)
-            footer = if (matcher.find()) {
-                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + matcher.group("effectCount"))
-            } else {
-                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e0")
+        cookiePattern.findMatcher(footer) {
+            if (group().contains("Not active!")) {
+                footer = this.replaceAll("Cookie Buff \n§r§7Not Active")
             }
         }
 
-        matcher = cookiePattern.matcher(footer)
-        if (matcher.find() && matcher.group().contains("Not active!")) {
-            footer = matcher.replaceAll("Cookie Buff \n§r§7Not Active")
+        dungeonBuffPattern.findMatcher(footer) {
+            if (group().contains("No Buffs active.")) {
+                footer = this.replaceAll("Dungeon Buffs \n§r§7None Found")
+            }
         }
 
-        matcher = dungeonBuffPattern.matcher(footer)
-        if (matcher.find() && matcher.group().contains("No Buffs active.")) {
-            footer = matcher.replaceAll("Dungeon Buffs \n§r§7None Found")
+        winterPowerUpsPattern.findMatcher(footer) {
+            if (group().contains("No Power Ups active.")) {
+                footer = this.replaceAll("Active Power Ups \n§r§7None")
+            }
         }
+
+        val column = TabColumn("§2§lOther")
 
         for (line in footer.split("\n")) {
             if (line.contains(hypixelAdvertisingString)) continue
 
             var newLine = line
-            matcher = upgradesPattern.matcher(newLine.removeResets())
 
-            if (matcher.matches()) {
-                var firstPart = matcher.group("firstPart").trimWhiteSpaceAndResets()
+            upgradesPattern.matchMatcher(newLine.removeResets()) {
+                var firstPart = group("firstPart").trimWhiteSpaceAndResets()
                 if (!firstPart.contains("§l")) {
                     firstPart = " $firstPart"
                 }
                 column.addLine(firstPart)
 
-                newLine = matcher.group("secondPart")
+                newLine = group("secondPart")
             }
 
             newLine = newLine.trimWhiteSpaceAndResets()
@@ -189,62 +206,67 @@ object TabListReader {
         var firstColumnCopy = firstColumn
         var lastTitle: String? = null
 
-        for (column in columns) {
-            for (section in column.sections) {
-                var sectionSize = section.size()
+        for (section in columns.flatMap { it.sections }) {
+            var sectionSize = section.size()
 
-                var needsTitle = false
-                if (lastTitle != section.columnValue.columnTitle) {
-                    needsTitle = true
-                    sectionSize++
+            var needsTitle = false
+            if (lastTitle != section.columnValue.columnTitle) {
+                needsTitle = true
+                sectionSize++
+            }
+
+            var currentCount = firstColumnCopy.size()
+
+            if (sectionSize >= TabListRenderer.MAX_LINES / 2) {
+                if (currentCount >= TabListRenderer.MAX_LINES) {
+                    renderColumns.add(RenderColumn().also { firstColumnCopy = it })
+                    currentCount = 1
+                } else {
+                    if (firstColumnCopy.size() > 0) {
+                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
+                    }
                 }
 
-                var currentCount = firstColumnCopy.size()
+                if (needsTitle) {
+                    lastTitle = section.columnValue.columnTitle
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
+                    currentCount++
+                }
 
-                if (sectionSize >= TabListRenderer.maxLines / 2) {
-                    if (currentCount >= TabListRenderer.maxLines) {
+                for (line in section.lines) {
+                    if (currentCount >= TabListRenderer.MAX_LINES) {
                         renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                         currentCount = 1
-                    } else {
-                        if (firstColumnCopy.size() > 0) {
-                            firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
-                        }
                     }
 
-                    if (needsTitle) {
-                        lastTitle = section.columnValue.columnTitle
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
-                        currentCount++
-                    }
-
-                    for (line in section.lines) {
-                        if (currentCount >= TabListRenderer.maxLines) {
-                            renderColumns.add(RenderColumn().also { firstColumnCopy = it })
-                            currentCount = 1
-                        }
-
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
-                        currentCount++
-                    }
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
+                    currentCount++
+                }
+            } else {
+                if (currentCount + sectionSize > TabListRenderer.MAX_LINES) {
+                    renderColumns.add(RenderColumn().also { firstColumnCopy = it })
                 } else {
-                    if (currentCount + sectionSize > TabListRenderer.maxLines) {
-                        renderColumns.add(RenderColumn().also { firstColumnCopy = it })
-                    } else {
-                        if (firstColumnCopy.size() > 0) {
-                            firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
-                        }
-                    }
-
-                    if (needsTitle) {
-                        lastTitle = section.columnValue.columnTitle
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
-                    }
-
-                    for (line in section.lines) {
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
+                    if (firstColumnCopy.size() > 0) {
+                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
                     }
                 }
+
+                if (needsTitle) {
+                    lastTitle = section.columnValue.columnTitle
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
+                }
+
+                for (line in section.lines) {
+                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
+                }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.enabled) {
+            updateTablistData()
         }
     }
 }

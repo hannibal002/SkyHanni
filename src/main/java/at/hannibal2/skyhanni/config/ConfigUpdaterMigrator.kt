@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.events.LorenzEvent
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
+import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -10,7 +12,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 26
+    const val CONFIG_VERSION = 48
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -81,7 +83,8 @@ object ConfigUpdaterMigrator {
                 return
             }
             movesPerformed++
-            newParentElement.add(np.last(), transform(oldElem))
+            if (np == listOf("#player", "personalBest")) LimboTimeTracker.workaroundMigration(oldElem.asInt)
+            newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))
             logger.log("Moved element from $oldPath to $newPath")
         }
     }
@@ -107,7 +110,9 @@ object ConfigUpdaterMigrator {
     fun fixConfig(config: JsonObject): JsonObject {
         val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lastVersion > CONFIG_VERSION) {
-            error("Cannot downgrade config")
+            logger.log("Attempted to downgrade config version")
+            config.add("lastVersion", JsonPrimitive(CONFIG_VERSION))
+            return config
         }
         if (lastVersion == CONFIG_VERSION) return config
         return (lastVersion until CONFIG_VERSION).fold(config) { accumulator, i ->

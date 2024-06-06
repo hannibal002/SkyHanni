@@ -3,15 +3,18 @@ package at.hannibal2.skyhanni.config.features.misc;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
-import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
-import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
+import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
+import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
+import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,22 @@ public class MiscConfig {
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
     public PetConfig pets = new PetConfig();
+
+    @Expose
+    @Category(name = "Commands", desc = "Enable or disable commands.")
+    public CommandsConfig commands = new CommandsConfig();
+
+    @Expose
+    @Category(name = "Party Commands", desc = "Enable or disable party commands.")
+    public PartyCommandsConfig partyCommands = new PartyCommandsConfig();
+
+    @Expose
+    @Category(name = "Minions", desc = "The minions on your private island.")
+    public MinionsConfig minions = new MinionsConfig();
+
+    @Expose
+    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    public StrandedConfig stranded = new StrandedConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
@@ -38,16 +57,6 @@ public class MiscConfig {
     @Accordion
     public ParticleHiderConfig particleHiders = new ParticleHiderConfig();
 
-    @Expose
-    @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
-    @Accordion
-    public EstimatedItemValueConfig estimatedItemValues = new EstimatedItemValueConfig();
-
-    @ConfigOption(name = "Discord Rich Presence", desc = "")
-    @Accordion
-    @Expose
-    public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
-
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
     @Expose
@@ -58,20 +67,10 @@ public class MiscConfig {
     @Expose
     public TeleportPadConfig teleportPad = new TeleportPadConfig();
 
-    @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
-    @Accordion
-    @Expose
-    public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
-
     @ConfigOption(name = "Quick Mod Menu Switch", desc = "")
     @Accordion
     @Expose
     public QuickModMenuSwitchConfig quickModMenuSwitch = new QuickModMenuSwitchConfig();
-
-    @Expose
-    @Category(name = "Cosmetic", desc = "Cosmetics Settings")
-    public CosmeticConfig cosmetic = new CosmeticConfig();
-
 
     @Expose
     @ConfigOption(name = "Glowing Dropped Items", desc = "")
@@ -82,11 +81,6 @@ public class MiscConfig {
     @ConfigOption(name = "Highlight Party Members", desc = "")
     @Accordion
     public HighlightPartyMembersConfig highlightPartyMembers = new HighlightPartyMembersConfig();
-
-    @Expose
-    @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
-    @Accordion
-    public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
     @Expose
     @ConfigOption(name = "Kick Duration", desc = "")
@@ -104,6 +98,16 @@ public class MiscConfig {
     public PetCandyDisplayConfig petCandy = new PetCandyDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Bits Features", desc = "")
+    @Accordion
+    public BitsConfig bits = new BitsConfig();
+
+    @Expose
+    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
+    @Accordion
+    public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
@@ -113,6 +117,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideExpBottles = false;
+
+    @Expose
+    @ConfigOption(name = "Armorstands", desc = "Hides Armorstands that are sometimes visible for a fraction of a second.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideTemporaryArmorstands = true;
 
     @Expose
     public Position collectionCounterPos = new Position(10, 10, false, true);
@@ -137,7 +147,7 @@ public class MiscConfig {
     public boolean hidePiggyScoreboard = true;
 
     @Expose
-    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.")
+    @ConfigOption(name = "Color Month Names", desc = "Color the month names in the Scoreboard.\nAlso applies to the Custom Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colorMonthNames = false;
@@ -173,13 +183,8 @@ public class MiscConfig {
     public boolean playerMovementSpeed = false;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Pet Candy Used", desc = "Show the number of Pet Candy used on a pet.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean petCandyUsed = true;
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
@@ -194,23 +199,10 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Patcher Coords Waypoint", desc = "Highlight the coordinates sent by Patcher.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean patcherSendCoordWaypoint = false;
-
-
-    @Expose
     @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean accountUpgradeReminder = true;
-
-    @Expose
-    @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairsClicksAlert = false;
 
     @Expose
     @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
@@ -227,6 +219,18 @@ public class MiscConfig {
     public boolean showTimeInLimbo = true;
 
     @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "showTimeInLimbo")
+    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
+
+    @Expose
+    @ConfigOption(
+        name = "Limbo Playtime Detailed",
+        desc = "Show your total time in limbo in the detailed /playtime.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLimboTimeInPlaytimeDetailed = true;
+
+    @Expose
     @ConfigOption(
         name = "Lesser Orb of Healing Hider",
         desc = "Hides the Lesser Orb of Healing.")
@@ -237,21 +241,17 @@ public class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Lock Mouse Message",
-        desc = "Show a message in chat when toggling the /shmouselock.")
+        desc = "Show a message in chat when toggling §e/shmouselock§7.")
     @ConfigEditorBoolean
     public boolean lockMouseLookChatMessage = true;
 
-    @Expose
-    public Position showTimeInLimboPosition = new Position(400, 200, 1.3f);
-
+    // Does not have a config element!
     @Expose
     public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
+    @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
     public Position inventoryLoadPos = new Position(394, 124, false, true);
-
-    @Expose
-    public int limboTimePB = 0;
 
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
@@ -259,4 +259,15 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
+
+    @Expose
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean replaceRomanNumerals = false;
+
+    @ConfigOption(name = "Hide Far Entities", desc = "")
+    @Accordion
+    @Expose
+    public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 }

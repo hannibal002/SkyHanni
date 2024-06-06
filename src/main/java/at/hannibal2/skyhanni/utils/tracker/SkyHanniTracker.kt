@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
@@ -24,13 +24,13 @@ import kotlin.time.Duration.Companion.seconds
 open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
-    private val getStorage: (Storage.ProfileSpecific) -> Data,
+    private val getStorage: (ProfileSpecificStorage) -> Data,
     private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
 
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
-    private val currentSessions = mutableMapOf<Storage.ProfileSpecific, Data>()
+    private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<List<Any>>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var dirty = false
@@ -50,17 +50,13 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun isInventoryOpen() = inventoryOpen
 
-    fun resetCommand(args: Array<String>, command: String) {
-        if (args.size == 1 && args[0].lowercase() == "confirm") {
+    fun resetCommand() = ChatUtils.clickableChat(
+        "Are you sure you want to reset your total $name? Click here to confirm.",
+        onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
-            return
-        }
-
-        ChatUtils.clickableChat(
-            "Are you sure you want to reset your total $name? Click here to confirm.",
-            "$command confirm"
-        )
-    }
+        },
+        oneTimeClick = true
+    )
 
     fun modify(modifyFunction: (Data) -> Unit) {
         getSharedTracker()?.let {
@@ -122,12 +118,12 @@ open class SkyHanniTracker<Data : TrackerData>(
             "§ccurrent session of",
             "§c$name"
         ),
-    ) {
-        if (sessionResetTime.passedSince() > 3.seconds) {
-            reset(DisplayMode.SESSION, "Reset this session of $name!")
-            sessionResetTime = SimpleTimeMark.now()
-        }
-    }
+        onClick = {
+            if (sessionResetTime.passedSince() > 3.seconds) {
+                reset(DisplayMode.SESSION, "Reset this session of $name!")
+                sessionResetTime = SimpleTimeMark.now()
+            }
+        })
 
     private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
         "§7Display Mode: ",
@@ -144,9 +140,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         SharedTracker(it.getTotal(), it.getCurrentSession())
     }
 
-    private fun Storage.ProfileSpecific.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
+    private fun ProfileSpecificStorage.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
 
-    private fun Storage.ProfileSpecific.getTotal(): Data = getStorage(this)
+    private fun ProfileSpecificStorage.getTotal(): Data = getStorage(this)
 
     private fun reset(displayMode: DisplayMode, message: String) {
         getSharedTracker()?.let {

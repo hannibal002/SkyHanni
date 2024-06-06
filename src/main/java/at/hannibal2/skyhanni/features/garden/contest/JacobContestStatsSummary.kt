@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -11,14 +12,15 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class JacobContestStatsSummary {
+@SkyHanniModule
+object JacobContestStatsSummary {
 
     private val config get() = GardenAPI.config
     private var blocksBroken = 0
     private var startTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onBlockClick(event: CropClickEvent) {
+    fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
@@ -28,7 +30,7 @@ class JacobContestStatsSummary {
     }
 
     @SubscribeEvent
-    fun onFarmingContestEvent(event: FarmingContestEvent) {
+    fun onFarmingContest(event: FarmingContestEvent) {
         if (!isEnabled()) return
 
         when (event.phase) {

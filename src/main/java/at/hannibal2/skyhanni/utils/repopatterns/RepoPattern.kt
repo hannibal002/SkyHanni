@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.utils.repopatterns
 import at.hannibal2.skyhanni.SkyHanniMod
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 
 /**
  * RepoPattern is our innovative tool to cope with the fucking game updates Hypixel deems to be important enough to brick
@@ -41,52 +39,56 @@ import kotlin.reflect.KProperty
  * When accessing the metaobject (the RepoPattern instance itself), then you afford yourself less protection at the cost
  * of slightly more options.
  */
-interface RepoPattern : ReadOnlyProperty<Any?, Pattern> {
-
+sealed class RepoPattern : CommonPatternInfo<String, Pattern>() {
     /**
      * Check whether [value] has been loaded remotely or from the fallback value at [defaultPattern]. In case this is
      * accessed off-thread there are no guarantees for the correctness of this value in relation to any specific call
      * to [value].
      */
-    val isLoadedRemotely: Boolean
+    abstract override val isLoadedRemotely: Boolean
 
     /**
      * Check whether [value] was compiled from a value other than the [defaultPattern]. This is `false` even when
      * loading remotely if the remote pattern matches the local one.
      */
-    val wasOverridden: Boolean
+    abstract override val wasOverridden: Boolean
 
     /**
      * The default pattern that is specified at compile time. This local pattern will be a fallback in case there is no
      * remote pattern available or the remote pattern does not compile.
      */
-    val defaultPattern: String
+    abstract override val defaultPattern: String
 
     /**
-     * Key for this pattern. Used as an identifier when loading from the repo. Should be consistent accross versions.
+     * Key for this pattern. Used as an identifier when loading from the repo. Should be consistent across versions.
      */
-    val key: String
+    abstract override val key: String
 
     /**
      * Should not be accessed directly. Instead, use delegation at one code location and share the regex from there.
      * ```kt
-     * val actualValue by pattern
+     * val actualValue: Pattern by pattern
      * ```
      */
-    val value: Pattern
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): Pattern {
-        return value
-    }
+    abstract override val value: Pattern
 
     companion object {
 
         /**
          * Obtain a reference to a [Pattern] backed by either a local regex, or a remote regex.
          * Check the documentation of [RepoPattern] for more information.
+         *
+         * This method supports "Open regex101.com" using [LivePlugin](https://plugins.jetbrains.com/plugin/7282-liveplugin).
+         * To use it, install LivePlugin, enable "Run plugins on IDE start" and "Run project specific plugins".
+         * Now you can use ALT+ENTER while hovering over a [pattern] call using your text cursor to access the "Open in regex101.com" intention.
+         * Add a KDoc comment to the associated variable containing lines starting with `REGEX-TEST: ` to pre-fill examples.
          */
         fun pattern(key: String, @Language("RegExp") fallback: String): RepoPattern {
             return RepoPatternManager.of(key, fallback)
+        }
+
+        fun list(key: String, @Language("RegExp") vararg fallbacks: String): RepoPatternList {
+            return RepoPatternManager.ofList(key, fallbacks)
         }
 
         /**
@@ -94,6 +96,13 @@ interface RepoPattern : ReadOnlyProperty<Any?, Pattern> {
          */
         fun group(prefix: String): RepoPatternGroup {
             return RepoPatternGroup(prefix)
+        }
+
+        /**
+         * Obtains a [RepoPatternExclusiveGroup] which functions like a [RepoPatternGroup] but the key namespace can only be used via this object.
+         */
+        fun exclusiveGroup(prefix: String): RepoPatternExclusiveGroupInfo {
+            return RepoPatternExclusiveGroupInfo(prefix, null)
         }
     }
 }

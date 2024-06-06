@@ -5,15 +5,16 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.withAlpha
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -28,6 +29,7 @@ import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object DungeonLividFinder {
 
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
@@ -41,7 +43,6 @@ object DungeonLividFinder {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inDungeon()) return
-        if (!event.isMod(2)) return
 
         val isCurrentlyBlind = isCurrentlyBlind()
         if (!gotBlinded) {
@@ -52,13 +53,30 @@ object DungeonLividFinder {
         if (!config.enabled) return
 
         val dyeColor = blockLocation.getBlockStateAt().getValue(BlockStainedGlass.COLOR)
-        color = dyeColor.toLorenzColor() ?: error("No color found for dye color `$dyeColor`")
+        color = dyeColor.toLorenzColor()
 
         val color = color ?: return
         val chatColor = color.getChatColor()
 
         lividArmorStand = EntityUtils.getEntities<EntityArmorStand>()
             .firstOrNull { it.name.startsWith("${chatColor}﴾ ${chatColor}§lLivid") }
+
+        if (event.isMod(20)) {
+            if (lividArmorStand == null) {
+            val amountArmorStands = EntityUtils.getEntities<EntityArmorStand>().filter { it.name.contains("Livid") }.count()
+                if (amountArmorStands >= 8) {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not find livid",
+                        "could not find lividArmorStand",
+                        "dyeColor" to dyeColor,
+                        "color" to color,
+                        "chatColor" to chatColor,
+                        "amountArmorStands" to amountArmorStands,
+                    )
+                }
+            }
+        }
+
         val lividArmorStand = lividArmorStand ?: return
 
         val aabb = with(lividArmorStand) {
@@ -77,8 +95,10 @@ object DungeonLividFinder {
         if (!newLivid.name.contains("Livid")) return
 
         lividEntity = newLivid
-        RenderLivingEntityHelper.setEntityColor(newLivid, color.toColor().withAlpha(30)) { shouldHighlight() }
-        RenderLivingEntityHelper.setNoHurtTime(newLivid) { shouldHighlight() }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            newLivid,
+            color.toColor().withAlpha(30)
+        ) { shouldHighlight() }
     }
 
     private fun shouldHighlight() = getLividAlive() != null && config.enabled
@@ -134,7 +154,7 @@ object DungeonLividFinder {
     }
 
     private fun inDungeon(): Boolean {
-        if (!LorenzUtils.inDungeons) return false
+        if (!DungeonAPI.inDungeon()) return false
         if (!DungeonAPI.inBossRoom) return false
         if (!DungeonAPI.isOneOf("F5", "M5")) return false
 

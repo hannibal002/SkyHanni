@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -20,9 +21,10 @@ import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class CosmeticFollowingLine {
+@SkyHanniModule
+object CosmeticFollowingLine {
 
-    private val config get() = SkyHanniMod.feature.misc.cosmetic.followingLine
+    private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
     private var locations = mapOf<LorenzVec, LocationSpot>()
     private var latestLocations = mapOf<LorenzVec, LocationSpot>()
@@ -130,5 +132,6 @@ class CosmeticFollowingLine {
         event.move(9, "misc.cosmeticConfig", "misc.cosmetic")
         event.move(9, "misc.cosmeticConfig.followingLineConfig", "misc.cosmetic.followingLine")
         event.move(9, "misc.cosmeticConfig.arrowTrailConfig", "misc.cosmetic.arrowTrail")
+        event.move(31, "misc.cosmetic", "gui.cosmetic")
     }
 }

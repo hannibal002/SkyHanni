@@ -11,11 +11,11 @@ enum class TabStringType {
     companion object {
 
         fun fromLine(line: String): TabStringType {
-            val strippedLine: String = line.removeColor()
-            if (strippedLine.startsWith(" ")) {
+            val unformattedLine: String = line.removeColor()
+            if (unformattedLine.startsWith(" ")) {
                 return TEXT
             }
-            return if (TabListReader.usernamePattern.matcher(strippedLine).find()) {
+            return if (TabListReader.usernamePattern.matcher(unformattedLine).find()) {
                 PLAYER
             } else {
                 SUB_TITLE

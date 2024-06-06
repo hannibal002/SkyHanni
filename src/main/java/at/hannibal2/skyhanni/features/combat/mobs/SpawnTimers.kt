@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -20,9 +21,11 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class SpawnTimers {
+@SkyHanniModule
+object SpawnTimers {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
 
@@ -40,13 +43,13 @@ class SpawnTimers {
     private var arachneSpawnTime = SimpleTimeMark.farPast()
     private var saveNextTickParticles = false
     private var particleCounter = 0
-    private var tickTime: Long = 0
-    private var searchTime: Long = 0
+    private var lastTickTime = SimpleTimeMark.farPast()
+    private var searchTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        searchTime = 0
-        tickTime = 0
+        searchTime = SimpleTimeMark.farPast()
+        lastTickTime = SimpleTimeMark.farPast()
         particleCounter = 0
         saveNextTickParticles = false
         arachneSpawnTime = SimpleTimeMark.farPast()
@@ -63,29 +66,29 @@ class SpawnTimers {
     }
 
     @SubscribeEvent
-    fun onChatReceived(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message.removeColor().lowercase()
 
         if (arachneFragmentPattern.matches(message) || arachneCrystalPattern.matches(message)) {
             if (arachneCrystalPattern.matches(message)) {
                 saveNextTickParticles = true
-                searchTime = System.currentTimeMillis()
+                searchTime = SimpleTimeMark.now()
                 particleCounter = 0
-                tickTime = 0L
+                lastTickTime = SimpleTimeMark.farPast()
             } else arachneSpawnTime = SimpleTimeMark.now() + 19.seconds
         }
     }
 
     // All this to detect "quickspawn" vs regular arachne spawn
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
         if (!saveNextTickParticles) return
-        if (System.currentTimeMillis() <= searchTime + 3000) return
+        if (searchTime.passedSince() < 3.seconds) return
 
-        if (particleCounter == 0 && tickTime == 0L) tickTime = System.currentTimeMillis()
+        if (particleCounter == 0 && lastTickTime.isFarPast()) lastTickTime = SimpleTimeMark.now()
 
-        if (System.currentTimeMillis() > tickTime + 60) {
+        if (lastTickTime.passedSince() > 60.milliseconds) {
             arachneSpawnTime = if (particleCounter <= 20) {
                 SimpleTimeMark.now() + 21.seconds
             } else {

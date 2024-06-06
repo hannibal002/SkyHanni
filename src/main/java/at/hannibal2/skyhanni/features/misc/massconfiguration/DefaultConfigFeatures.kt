@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.misc.massconfiguration
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import io.github.moulberry.moulconfig.processor.ConfigProcessorDriver
+import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object DefaultConfigFeatures {
 
     private var didNotifyOnce = false
@@ -28,7 +30,7 @@ object DefaultConfigFeatures {
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val updated = SkyHanniMod.version !in knownToggles
         val processor = FeatureToggleProcessor()
-        ConfigProcessorDriver.processConfig(SkyHanniMod.feature.javaClass, SkyHanniMod.feature, processor)
+        ConfigProcessorDriver(processor).processConfig(SkyHanniMod.feature)
         knownToggles[SkyHanniMod.version] = processor.allOptions.map { it.path }
         SkyHanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
         if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
@@ -36,7 +38,9 @@ object DefaultConfigFeatures {
             ChatUtils.clickableChat(
                 "Looks like this is the first time you are using SkyHanni. " +
                     "Click here to configure default options, or run /shdefaultoptions.",
-                "shdefaultoptions"
+                onClick = {
+                    onCommand("null", "null")
+                }
             )
         } else if (updated) {
             val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
@@ -44,14 +48,16 @@ object DefaultConfigFeatures {
             ChatUtils.clickableChat(
                 "Looks like you updated SkyHanni. " +
                     "Click here to configure the newly introduced options, or run $command.",
-                command
+                onClick = {
+                    onCommand(lastVersion, SkyHanniMod.version)
+                }
             )
         }
     }
 
     fun onCommand(old: String, new: String) {
         val processor = FeatureToggleProcessor()
-        ConfigProcessorDriver.processConfig(SkyHanniMod.feature.javaClass, SkyHanniMod.feature, processor)
+        ConfigProcessorDriver(processor).processConfig(SkyHanniMod.feature)
         var optionList = processor.orderedOptions
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val togglesInNewVersion = knownToggles[new]
