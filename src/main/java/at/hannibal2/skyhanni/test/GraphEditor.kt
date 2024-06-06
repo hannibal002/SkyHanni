@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.model.toJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,6 +31,7 @@ import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
+@SkyHanniModule
 object GraphEditor {
 
     private val config get() = SkyHanniMod.feature.dev.devTool.graph

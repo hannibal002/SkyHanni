@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentPage
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.currentWardrobeSlot
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inCustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -39,7 +40,8 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
-class CustomWardrobe {
+@SkyHanniModule
+object CustomWardrobe {
 
     private val config get() = SkyHanniMod.feature.inventory.customWardrobe
 

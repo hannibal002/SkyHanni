@@ -151,6 +151,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.HighlightVisitorsOutsideOfG
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorRewardWarning
 import at.hannibal2.skyhanni.features.gui.MovableHotBar
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLinesGui
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning
@@ -231,7 +232,6 @@ import at.hannibal2.skyhanni.features.misc.SkyBlockKickDuration
 import at.hannibal2.skyhanni.features.misc.TabWidgetSettings
 import at.hannibal2.skyhanni.features.misc.TimeFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.items.EstimatedWardrobePrice
 import at.hannibal2.skyhanni.features.misc.items.GlowingDroppedItems
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadCompactName
 import at.hannibal2.skyhanni.features.misc.teleportpad.TeleportPadInventoryNumber
@@ -503,7 +503,6 @@ class SkyHanniMod {
         loadModule(BetterSignEditing())
         loadModule(PatcherSendCoordinates())
         loadModule(PetItemDisplay())
-        loadModule(EstimatedWardrobePrice())
         loadModule(ComposterInventoryNumbers())
         loadModule(ToolTooltipTweaks())
         loadModule(CropSpeedMeter())
@@ -569,6 +568,7 @@ class SkyHanniMod {
         loadModule(VolcanoExplosivityDisplay())
         loadModule(FixNEUHeavyPearls())
         loadModule(QuickCraftFeatures())
+        loadModule(CustomLinesGui())
         loadModule(SkyBlockKickDuration())
         loadModule(PartyMemberOutlines())
         loadModule(ArrowTrail())

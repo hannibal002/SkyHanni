@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
