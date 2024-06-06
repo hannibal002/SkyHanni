@@ -13,12 +13,15 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
+@SkyHanniModule
 object GardenCropSpeed {
 
     private val config get() = GardenAPI.config
@@ -26,7 +29,7 @@ object GardenCropSpeed {
     private val latestBlocksPerSecond: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestBlocksPerSecond
 
     var lastBrokenCrop: CropType? = null
-    var lastBrokenTime = 0L
+    var lastBrokenTime = SimpleTimeMark.now()
 
     var averageBlocksPerSecond = 0.0
 
@@ -76,7 +79,7 @@ object GardenCropSpeed {
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         lastBrokenCrop = event.crop
-        lastBrokenTime = System.currentTimeMillis()
+        lastBrokenTime = SimpleTimeMark.now()
         blocksBroken++
     }
 
@@ -174,11 +177,7 @@ object GardenCropSpeed {
         secondsStopped = 0
     }
 
-    fun finneganPerkActive(): Boolean {
-        val forcefullyEnabledAlwaysFinnegan = config.forcefullyEnabledAlwaysFinnegan
-        val perkActive = Perk.FARMING_SIMULATOR.isActive
-        return forcefullyEnabledAlwaysFinnegan || perkActive
-    }
+    fun finneganPerkActive() = Perk.FARMING_SIMULATOR.isActive
 
     fun isEnabled() = GardenAPI.inGarden()
 

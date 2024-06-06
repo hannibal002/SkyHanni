@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -45,11 +44,6 @@ class PowerStoneGuideFeatures {
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
-        inInventory = false
-    }
-
-    @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
@@ -65,7 +59,7 @@ class PowerStoneGuideFeatures {
         if (!inInventory) return
         val internalName = missing[event.slotId] ?: return
 
-        BazaarApi.searchForBazaarItem(internalName.itemName, 9)
+        BazaarApi.searchForBazaarItem(internalName, 9)
     }
 
     @SubscribeEvent

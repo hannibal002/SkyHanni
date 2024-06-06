@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -31,7 +30,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         if (event.message == "§cYou hear the sound of something opening...") {
             event.blockedReason = "dungeon_highlight_clicked_block"
@@ -41,7 +40,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.inBossRoom) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
@@ -76,7 +75,7 @@ class DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         blocks.removeAll { System.currentTimeMillis() > it.time + 3000 }
         blocks.forEach {

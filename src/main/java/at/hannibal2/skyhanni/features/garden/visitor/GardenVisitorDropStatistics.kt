@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -20,13 +21,16 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenVisitorDropStatistics {
 
     private val config get() = GardenAPI.config.visitors.dropsStatistics
@@ -37,7 +41,7 @@ object GardenVisitorDropStatistics {
     private var totalVisitors = 0
     var coinsSpent = 0L
 
-    var lastAccept = 0L
+    var lastAccept = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
     private val acceptPattern by patternGroup.pattern(
@@ -101,39 +105,39 @@ object GardenVisitorDropStatistics {
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
-        if (lastAccept - System.currentTimeMillis() > 0 || lastAccept - System.currentTimeMillis() <= -1000) return
+        if (lastAccept.passedSince() > 1.seconds) return
 
         val message = event.message.removeColor().trim()
         val storage = GardenAPI.storage?.visitorDrops ?: return
 
         copperPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.copper += amount
             saveAndUpdate()
         }
         farmingExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber()
+            val amount = group("amount").formatInt()
             storage.farmingExp += amount
             saveAndUpdate()
         }
         gardenExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
             storage.gardenExp += amount
             saveAndUpdate()
         }
         bitsPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.bits += amount
             saveAndUpdate()
         }
         mithrilPowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.mithrilPowder += amount
             saveAndUpdate()
         }
         gemstonePowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.gemstonePowder += amount
             saveAndUpdate()
         }
@@ -307,5 +311,9 @@ object GardenVisitorDropStatistics {
 }
 
 enum class VisitorRarity {
-    UNCOMMON, RARE, LEGENDARY, MYTHIC, SPECIAL,
+    UNCOMMON,
+    RARE,
+    LEGENDARY,
+    MYTHIC,
+    SPECIAL,
 }

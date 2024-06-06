@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+@SkyHanniModule
 object ScoreboardPattern {
     val group = RepoPattern.group("features.gui.customscoreboard")
 
@@ -38,9 +40,13 @@ object ScoreboardPattern {
         "date",
         "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?.*"
     )
+    /*
+      * REGEX-TEST:  §78:50am
+      * REGEX-TEST:  §75:50am §b☽
+    */
     val timePattern by mainSb.pattern(
         "time",
-        "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm) (?<symbol>(§b☽|§e☀|§.⚡|§.☔)).*$"
+        "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm)\\s*(?<symbol>(§b☽|§e☀|§.⚡|§.☔))?.*$"
     )
     val footerPattern by mainSb.pattern(
         "footer",
@@ -94,7 +100,7 @@ object ScoreboardPattern {
     private val dungeonSb = scoreboardGroup.group("dungeon")
     val m7dragonsPattern by dungeonSb.pattern(
         "m7dragons",
-        "^(§cNo Alive Dragons|§8- (§.)+[\\w\\s]+Dragon§a \\w+§.❤)$"
+        "^(§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+§.❤)$"
     )
     val keysPattern by dungeonSb.pattern(
         "keys",
@@ -169,9 +175,28 @@ object ScoreboardPattern {
 
     // mining
     private val miningSb = scoreboardGroup.group("mining")
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f: §235,448
+     * REGEX-TEST: §d᠅ §fGemstone§f: §d36,758
+     * REGEX-TEST: §b᠅ §fGlacite§f: §b29,537
+     * REGEX-TEST: §2᠅ §fMithril Powder§f: §235,448
+     * REGEX-TEST: §d᠅ §fGemstone Powder§f: §d36,758
+     * REGEX-TEST: §b᠅ §fGlacite Powder§f: §b29,537
+     */
     val powderPattern by miningSb.pattern(
         "powder",
-        "(§.)*᠅ §.(Gemstone|Mithril|Glacite)( Powder)?(§.)*:?.*$"
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)"
+    )
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f:§695
+     * REGEX-TEST: §d᠅ §fGemstone§f
+     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
+     */
+    val powderGreedyPattern by miningSb.pattern(
+        "powdergreedy",
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$"
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",
@@ -226,6 +251,18 @@ object ScoreboardPattern {
     )
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$"
+    )
+    val mineshaftNotStartedPattern by miningSb.pattern(
+        "mineshaft.notstarted",
+        "(?:§.)*Not started.*"
+    )
+    val fortunateFreezingBonusPattern by miningSb.pattern(
+        "fortunatefreezing.bonus",
+        "Event Bonus: §6\\+\\d+☘"
+    )
+    val fossilDustPattern by miningSb.pattern(
+        "fossildust",
+        "Fossil Dust: §f[\\d.,]+.*"
     )
 
     // combat
@@ -285,10 +322,6 @@ object ScoreboardPattern {
         "essence",
         "^\\s*.*Essence: §.(?<essence>-?\\d+(:?,\\d{3})*(?:\\.\\d+)?)$"
     )
-    val brokenRedstonePattern by miscSb.pattern(
-        "brokenredstone",
-        "\\s*(?:(?:§.)*⚡ (§.)*Redston|e: (?:§.)*\\d+%)\\s*"
-    )
     val redstonePattern by miscSb.pattern(
         "redstone",
         "\\s*(§.)*⚡ §cRedstone: (§.)*\\d{1,3}%$"
@@ -321,6 +354,14 @@ object ScoreboardPattern {
         "objective",
         "^(§.)*(Objective|Quest).*"
     )
+    val queuePattern by miscSb.pattern(
+        "queued",
+        "Queued:.*"
+    )
+    val queuePositionPattern by miscSb.pattern(
+        "queueposition",
+        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
+    )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
     val thirdObjectiveLinePattern by miscSb.pattern(
@@ -331,7 +372,7 @@ object ScoreboardPattern {
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
     val wtfAreThoseLinesPattern by miscSb.pattern(
         "wtfarethoselines",
-        "^§eMine 10 Rubies$"
+        "^(§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King)$"
     )
     val darkAuctionCurrentItemPattern by miscSb.pattern(
         "darkauction.currentitem",
@@ -370,7 +411,7 @@ object ScoreboardPattern {
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
-        "(§.)*Your Total Damage: §.\\d+( §e\\(#\\d+\\)?)?$"
+        "(§.)*Your Total Damage: §.\\d+.*$"
     )
     val winterCubeDmgPattern by eventsSb.pattern(
         "wintereventcubedmg",
@@ -391,7 +432,18 @@ object ScoreboardPattern {
         "hotdogeaten",
         "^Eaten: §.\\d+\\/\\d+$"
     )
-
+    val riftAveikxPattern by riftSb.pattern(
+        "aveikx",
+        "Time spent sitting|with Ävaeìkx: .*"
+    )
+    val riftHayEatenPattern by riftSb.pattern(
+        "hayeaten",
+        "^Hay Eaten: §.[\\d,.]+/[\\d,.]+\$"
+    )
+    val cluesPattern by riftSb.pattern(
+        "clues",
+        "Clues: §.\\d+/\\d+"
+    )
 
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
@@ -405,15 +457,15 @@ object ScoreboardPattern {
     )
     val mithrilPowderPattern by tablistGroup.pattern(
         "mithrilpowder",
-        "^\\s*Mithril Powder: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
+        "^\\s*Mithril(?: Powder)?: (?:§.)+(?<mithrilpowder>[\\d,\\.]+)$"
     )
     val gemstonePowderPattern by tablistGroup.pattern(
         "gemstonepowder",
-        "^\\s*Gemstone Powder: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
+        "^\\s*Gemstone(?: Powder)?: (?:§.)+(?<gemstonepowder>[\\d,\\.]+)$"
     )
     val glacitePowderPattern by tablistGroup.pattern(
         "glacitepowder",
-        "^\\s*Glacite Powder: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
+        "^\\s*Glacite(?: Powder)?: (?:§.)+(?<glacitepowder>[\\d,\\.]+)$"
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",
@@ -423,12 +475,8 @@ object ScoreboardPattern {
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$"
     )
-    val boosterCookieEffectsWidgetPattern by tablistGroup.pattern(
-        "boostereffects",
-        "\\s*(?:§.)*Cookie Buff(?:§.)*: (?:§r)*(?<time>.*)"
-    )
-    val cookieNotActivePattern by tablistGroup.pattern(
-        "cookienotactive",
-        "((?:§.)*Not active.*)|(§c§lINACTIVE)"
+    val eventTimeStartsPattern by tablistGroup.pattern(
+        "eventtimestarts",
+        "^\\s+Starts In: §r§e(?<time>.*)$"
     )
 }

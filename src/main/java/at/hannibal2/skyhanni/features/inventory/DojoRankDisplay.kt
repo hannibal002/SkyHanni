@@ -11,8 +11,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,6 +41,7 @@ class DojoRankDisplay {
 
     private fun drawDisplay(items: Collection<ItemStack>) = buildList {
         if (belts.isEmpty()) {
+            // TODO make clickable
             add("§cUnable to get Belts data, please run /shupdaterepo")
             return@buildList
         }
@@ -50,14 +52,12 @@ class DojoRankDisplay {
             testNamePattern.matchMatcher(name) {
                 val testColor = group("color")
                 val testName = group("name")
-                for (line in stack.getLore()) {
-                    testRankPattern.matchMatcher(line) {
-                        val rank = group("rank")
-                        val score = group("score").toInt()
-                        val color = if (score in 0..99) "§c" else "§a"
-                        totalScore += score
-                        add("$testColor$testName§f: $rank §7($color${score.addSeparators()}§7)")
-                    }
+                stack.getLore().matchFirst(testRankPattern) {
+                    val rank = group("rank")
+                    val score = group("score").toInt()
+                    val color = if (score in 0..99) "§c" else "§a"
+                    totalScore += score
+                    add("$testColor$testName§f: $rank §7($color${score.addSeparators()}§7)")
                 }
             }
         }

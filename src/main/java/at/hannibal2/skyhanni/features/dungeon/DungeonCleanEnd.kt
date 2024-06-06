@@ -10,8 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -33,7 +32,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
 
         val message = event.message
@@ -44,7 +43,7 @@ class DungeonCleanEnd {
     }
 
     private fun shouldBlock(): Boolean {
-        if (!LorenzUtils.inDungeons) return false
+        if (!DungeonAPI.inDungeon()) return false
         if (!config.enabled) return false
 
         if (!bossDone) return false
@@ -61,7 +60,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (bossDone) return
 
         if (lastBossId == -1) {
@@ -71,7 +70,7 @@ class DungeonCleanEnd {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
         if (bossDone) return
         if (lastBossId == -1) return

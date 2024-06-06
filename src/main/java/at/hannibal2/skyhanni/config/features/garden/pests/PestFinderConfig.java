@@ -3,10 +3,12 @@ package at.hannibal2.skyhanni.config.features.garden.pests;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class PestFinderConfig {
@@ -14,7 +16,7 @@ public class PestFinderConfig {
     @Expose
     @ConfigOption(
         name = "Display",
-        desc = "Show a display with all know pest locations."
+        desc = "Show a display with all known pest locations."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -28,6 +30,32 @@ public class PestFinderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showPlotInWorld = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Plot Visibility Type",
+        desc = "Choose how to show infested plots in the world."
+    )
+    @ConfigEditorDropdown
+    public VisibilityType visibilityType = VisibilityType.BOTH;
+
+    public enum VisibilityType {
+        BORDER("Border"),
+        NAME("Name"),
+        BOTH("Both"),
+        ;
+
+        private final String str;
+
+        VisibilityType(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(
@@ -47,6 +75,7 @@ public class PestFinderConfig {
     public int showBorderForSeconds = 1;
 
     @Expose
+    @ConfigLink(owner = PestFinderConfig.class, field = "showDisplay")
     public Position position = new Position(-350, 200, 1.3f);
 
     @Expose
@@ -58,4 +87,9 @@ public class PestFinderConfig {
     @ConfigOption(name = "Always Teleport", desc = "Allow teleporting with the Teleport Hotkey even when you're already in an infested plot.")
     @ConfigEditorBoolean
     public boolean alwaysTp = false;
+
+    @Expose
+    @ConfigOption(name = "Back to Garden", desc = "Make the Teleport Hotkey warp you to Garden if you don't have any pests.")
+    @ConfigEditorBoolean
+    public boolean backToGarden = false;
 }

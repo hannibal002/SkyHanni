@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -37,22 +36,28 @@ class RepoManager(private val configLocation: File) {
 
     companion object {
 
+        private val config get() = SkyHanniMod.feature.dev.repo
+
         val successfulConstants = mutableListOf<String>()
         val unsuccessfulConstants = mutableListOf<String>()
 
         private var lastConstant: String? = null
 
-        fun setlastConstant(constant: String) {
+        fun setLastConstant(constant: String) {
             lastConstant?.let {
                 successfulConstants.add(it)
             }
             lastConstant = constant
         }
+
+        fun getRepoLocation(): String {
+            return "${config.location.user}/${config.location.name}/${config.location.branch}"
+        }
     }
 
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
-        if (SkyHanniMod.feature.dev.repoAutoUpdate) {
+        if (config.repoAutoUpdate) {
             fetchRepository(false).thenRun(this::reloadRepository)
         } else {
             reloadRepository()
@@ -63,6 +68,7 @@ class RepoManager(private val configLocation: File) {
 
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
+        checkRepoLocation()
         fetchRepository(true).thenRun { this.reloadRepository("Repo updated successfully.") }
     }
 
@@ -178,7 +184,9 @@ class RepoManager(private val configLocation: File) {
             if (error) {
                 ChatUtils.clickableChat(
                     "Error with the repo detected, try /shupdaterepo to fix it!",
-                    "shupdaterepo",
+                    onClick = {
+                        SkyHanniMod.repo.updateRepo()
+                    },
                     prefixColor = "§c"
                 )
                 if (unsuccessfulConstants.isEmpty()) {
@@ -218,7 +226,7 @@ class RepoManager(private val configLocation: File) {
             if (unsuccessfulConstants.isNotEmpty()) {
                 ChatUtils.error(
                     "§7Repo Issue! Some features may not work. Please report this error on the Discord!\n"
-                        + "§7Repo Auto Update Value: §c${SkyHanniMod.feature.dev.repoAutoUpdate}\n"
+                        + "§7Repo Auto Update Value: §c${config.repoAutoUpdate}\n"
                         + "§7If you have Repo Auto Update turned off, please try turning that on.\n"
                         + "§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):"
                 )
@@ -233,8 +241,7 @@ class RepoManager(private val configLocation: File) {
             return
         }
         ChatUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
-//         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
-        if (successfulConstants.isNotEmpty()) LorenzUtils.chat(
+        if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a"
         )
@@ -266,15 +273,15 @@ class RepoManager(private val configLocation: File) {
     }
 
     private fun getCommitApiUrl(): String {
-        val repoUser = "hannibal002"
-        val repoName = "SkyHanni-REPO"
-        val repoBranch = "main"
+        val repoUser = config.location.user
+        val repoName = config.location.name
+        val repoBranch = config.location.branch
         return String.format("https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
     }
 
     private fun getDownloadUrl(commitId: String?): String {
-        val repoUser = "hannibal002"
-        val repoName = "SkyHanni-REPO"
+        val repoUser = config.location.user
+        val repoName = config.location.name
         return String.format("https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
     }
 
@@ -292,5 +299,38 @@ class RepoManager(private val configLocation: File) {
     @SubscribeEvent
     fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
         NeuRepositoryReloadEvent().postAndCatch()
+    }
+
+    fun resetRepositoryLocation(manual: Boolean = false) {
+        val defaultUser = "hannibal002"
+        val defaultName = "SkyHanni-Repo"
+        val defaultBranch = "main"
+
+        with(config.location) {
+            if (user == defaultUser && name == defaultName && branch == defaultBranch) {
+                if (manual) {
+                    ChatUtils.chat("Repo settings are already on default!")
+                }
+                return
+            }
+
+            user = defaultUser
+            name = defaultName
+            branch = defaultBranch
+            if (manual) {
+                ChatUtils.clickableChat("Reset Repo settings to default. " +
+                    "Click §aUpdate Repo Now §ein config or run /shupdaterepo to update!",
+                    onClick = {
+                        updateRepo()
+                    })
+            }
+        }
+    }
+
+    private fun checkRepoLocation() {
+        if (config.location.user.isEmpty() || config.location.name.isEmpty() || config.location.branch.isEmpty()) {
+            ChatUtils.userError("Invalid Repo settings detected, resetting default settings.")
+            resetRepositoryLocation()
+        }
     }
 }

@@ -3,47 +3,40 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.Item
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 // Delaying key presses by 300ms comes from NotEnoughUpdates
+@SkyHanniModule
 object HarpFeatures {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
     private const val closeButtonSlot = 40
-
-    private object KeyIterable : Iterable<Int> {
-
-        override fun iterator() = object : Iterator<Int> {
-            private var currentIndex = 0
-
-            override fun hasNext() = currentIndex < 7
-
-            override fun next() = getKey(currentIndex++) ?: throw NoSuchElementException("currentIndex: $currentIndex")
-        }
-    }
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
@@ -65,15 +58,18 @@ object HarpFeatures {
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
     @SubscribeEvent
-    fun onGui(event: GuiScreenEvent) {
+    fun onGui(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
-        val chest = event.gui as? GuiChest ?: return
+        val chest = event.guiContainer as? GuiChest ?: return
 
-        for ((index, key) in KeyIterable.withIndex()) {
+        for (index in 0..6) {
+            val key = getKey(index) ?: error("no key for index $index")
             if (!key.isKeyHeld()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
+
+            event.cancel()
 
             Minecraft.getMinecraft().playerController.windowClick(
                 chest.inventorySlots.windowId,
@@ -87,7 +83,7 @@ object HarpFeatures {
         }
     }
 
-    fun getKey(index: Int) = when (index) {
+    private fun getKey(index: Int) = when (index) {
         0 -> config.harpKeybinds.key1
         1 -> config.harpKeybinds.key2
         2 -> config.harpKeybinds.key3
@@ -135,7 +131,7 @@ object HarpFeatures {
     }
 
     @SubscribeEvent
-    fun onLeave(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
         unSetGUIScale()
     }
@@ -160,6 +156,17 @@ object HarpFeatures {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        if (isHarpGui(InventoryUtils.openInventoryName())) {
+            if (config.keybinds) {
+                // needed to not send duplicate clicks via keybind feature
+                if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) {
+                    event.cancel()
+                    return
+                }
+            }
+        }
+
         if (!config.quickRestart) return
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
         if (event.slot?.slotNumber != closeButtonSlot) return
@@ -197,5 +204,14 @@ object HarpFeatures {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.harpKeybinds", "inventory.helper.harp.keybinds")
         event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")
+    }
+
+    @SubscribeEvent
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.hideMelodyTooltip) return
+        if (!isHarpGui(InventoryUtils.openInventoryName())) return
+        if (event.slot.inventory !is ContainerLocalMenu) return
+            event.cancel()
     }
 }

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -88,11 +88,9 @@ class StatsTuning {
     }
 
     private fun points(stack: ItemStack, event: RenderInventoryItemTipEvent) {
-        for (line in stack.getLore()) {
-            statPointsPattern.matchMatcher(line) {
-                val points = group("amount")
-                event.stackTip = points
-            }
+        stack.getLore().matchFirst(statPointsPattern) {
+            val points = group("amount")
+            event.stackTip = points
         }
     }
 

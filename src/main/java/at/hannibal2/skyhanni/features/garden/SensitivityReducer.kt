@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object SensitivityReducer {
     private val config get() = SkyHanniMod.feature.garden.sensitivityReducerConfig
     private val storage get() = SkyHanniMod.feature.storage
@@ -160,7 +162,6 @@ object SensitivityReducer {
         } else restoreSensitivity()
         isToggled = state
     }
-
 
     fun doTheMath(input: Float, reverse: Boolean = false): Float {
         val divisor = config.reducingFactor.get()

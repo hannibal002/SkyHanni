@@ -4,21 +4,24 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object MythologicalCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
@@ -83,15 +86,15 @@ object MythologicalCreatureTracker {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tracker.modify {
                     it.count.addOrPut(creatureType, 1)
+
                     // TODO migrate to abstract feature in the future
-                    it.creaturesSinceLastInquisitor = when (creatureType) {
-                        MythologicalCreatureType.MINOS_INQUISITOR -> 0
-                        else -> it.creaturesSinceLastInquisitor + 1
-                    }
+                    if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
+                        event.chatComponent =
+                            ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                        it.creaturesSinceLastInquisitor = 0
+                    } else it.creaturesSinceLastInquisitor++
                 }
-                if (config.hideChat) {
-                    event.blockedReason = "mythological_creature_dug"
-                }
+                if (config.hideChat) event.blockedReason = "mythological_creature_dug"
             }
         }
     }
@@ -126,8 +129,8 @@ object MythologicalCreatureTracker {
         tracker.renderDisplay(config.position)
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetmythologicalcreatureracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled

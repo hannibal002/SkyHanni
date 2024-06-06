@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -25,8 +25,7 @@ class BasketWaypoints {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isHalloween) return
 
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (message.startsWith("§a§lYou found a Candy Basket! §r") || message == "§cYou already found this Candy Basket!") {
@@ -39,14 +38,11 @@ class BasketWaypoints {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            isHalloween = checkScoreboardHalloweenSpecific()
-        }
+        isHalloween = checkScoreboardHalloweenSpecific()
 
         if (isHalloween) {
             if (config.onlyClosest) {
@@ -61,8 +57,7 @@ class BasketWaypoints {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!isHalloween) return
 
         if (config.allWaypoints) {
@@ -81,8 +76,6 @@ class BasketWaypoints {
             }
             return
         }
-
-        if (LorenzUtils.skyBlockArea == "?") return
     }
 
     private fun Basket.shouldShow(): Boolean {
@@ -100,6 +93,8 @@ class BasketWaypoints {
         val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Baskets") }
         return a && b && c
     }
+
+    private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
+@SkyHanniModule
 object WikiManager {
     private const val OFFICIAL_URL_PREFIX = "https://wiki.hypixel.net/"
     private const val OFFICIAL_SEARCH_PREFIX = "index.php?search="
@@ -48,7 +50,7 @@ object WikiManager {
         }
         if (message == ("/wikithis")) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                LorenzUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.chat("§cYou must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, config.autoOpenWiki)
@@ -68,7 +70,7 @@ object WikiManager {
 
     private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useFandom: Boolean = config.useFandom) {
         val itemDisplayName =
-            (item.nameWithEnchantment ?: return).replace("§a✔ ", "").replace("§c✖ ", "")
+            item.itemName.replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 

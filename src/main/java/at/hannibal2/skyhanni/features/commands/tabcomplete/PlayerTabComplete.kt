@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object PlayerTabComplete {
 
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
@@ -28,6 +30,7 @@ object PlayerTabComplete {
     enum class PlayerCategory {
         FRIENDS,
         ISLAND_PLAYERS,
+        PARTY,
     }
 
     fun handleTabComplete(command: String): List<String>? {
@@ -46,6 +49,8 @@ object PlayerTabComplete {
 
             "pv" to listOf(), // NEU's Profile Viewer
             "shmarkplayer" to listOf(), // SkyHanni's Mark Player
+
+            "trade" to listOf(PlayerCategory.FRIENDS, PlayerCategory.PARTY)
         )
         val ignored = commands[command] ?: return null
 
@@ -62,7 +67,7 @@ object PlayerTabComplete {
                 }
             }
 
-            if (config.party) {
+            if (config.party && PlayerCategory.PARTY !in ignored) {
                 for (member in PartyAPI.partyMembers) {
                     add(member)
                 }

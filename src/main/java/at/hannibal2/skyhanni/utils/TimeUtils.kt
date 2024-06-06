@@ -2,8 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.time.Duration
@@ -82,12 +81,12 @@ object TimeUtils {
         return builder.toString().trim()
     }
 
-    @Deprecated("Do no longer use long for time", ReplaceWith("TimeUtils.getDuration(string)"))
-    fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
+    val Duration.inWholeTicks: Int
+        get() = (inWholeMilliseconds / 50).toInt()
 
-    fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
+    fun getDuration(string: String) = getMillis(string.replace("m", "m ").replace("  ", " ").trim())
 
-    private fun getMillis_(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
+    private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
         val days = group("d")?.toLong() ?: 0L
         val hours = group("h")?.toLong() ?: 0L
@@ -127,7 +126,7 @@ object TimeUtils {
             else -> {
                 throw RuntimeException("Invalid format: '$string'")
             }
-        }.toLong().toDuration(DurationUnit.MILLISECONDS)
+        }.milliseconds
     }
 
     fun SkyBlockTime.formatted(
@@ -166,6 +165,8 @@ object TimeUtils {
 
     val Long.ticks get() = (this * 50).milliseconds
     val Int.ticks get() = (this * 50).milliseconds
+
+    val Float.minutes get() = toDouble().minutes
 }
 
 private const val FACTOR_SECONDS = 1000L

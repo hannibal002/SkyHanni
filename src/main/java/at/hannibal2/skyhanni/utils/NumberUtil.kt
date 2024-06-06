@@ -1,17 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.NumberFormat
-import java.util.Locale
 import java.util.TreeMap
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
 object NumberUtil {
 
-    @JvmField
-    val nf: NumberFormat = NumberFormat.getInstance(Locale.US)
     private val suffixes = TreeMap<Long, String>().apply {
         this[1000L] = "k"
         this[1000000L] = "M"
@@ -20,6 +17,7 @@ object NumberUtil {
         this[1000000000000000L] = "P"
         this[1000000000000000000L] = "E"
     }
+
     private val romanSymbols = TreeMap(
         mapOf(
             1000 to "M",
@@ -48,7 +46,7 @@ object NumberUtil {
     fun format(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
+        // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
         if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
         if (value < 0) return "-" + format(-value, preciseBillions)
 
@@ -172,12 +170,12 @@ object NumberUtil {
         lastDecimal + decimal
     }
 
-    val pattern = "^[0-9]*$".toPattern()
-    val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
+    private val numberPattern = "^[0-9]*$".toPattern()
+    private val formatPattern = "^[0-9,.]*[kmb]?$".toPattern()
 
-    fun String.isInt(): Boolean {
-        return isNotEmpty() && pattern.matcher(this).matches()
-    }
+    fun String.isInt(): Boolean = isNotEmpty() && numberPattern.matcher(this).matches()
+
+    fun String.isDouble(): Boolean = runCatching { toDouble() }.getOrNull() != null
 
     fun String.isFormatNumber(): Boolean {
         return isNotEmpty() && formatPattern.matches(this)
@@ -200,10 +198,6 @@ object NumberUtil {
         return "${color.getChatColor()}$amount%"
     }
 
-    // TODO create new function formatLong, and eventually deprecate this function.
-    @Deprecated("renamed", ReplaceWith("this.formatLong()"))
-    fun String.formatNumber(): Long = formatLong()
-
     fun String.formatDouble(): Double =
         formatDoubleOrNull() ?: throw NumberFormatException("formatDouble failed for '$this'")
 
@@ -212,6 +206,9 @@ object NumberUtil {
 
     fun String.formatInt(): Int =
         formatDoubleOrNull()?.toInt() ?: throw NumberFormatException("formatInt failed for '$this'")
+
+    fun String.formatFloat(): Float =
+        formatDoubleOrNull()?.toFloat() ?: throw NumberFormatException("formatFloat failed for '$this'")
 
     fun String.formatDoubleOrUserError(): Double? = formatDoubleOrNull() ?: run {
         ChatUtils.userError("Not a valid number: '$this'")
@@ -224,6 +221,11 @@ object NumberUtil {
     }
 
     fun String.formatIntOrUserError(): Int? = formatDoubleOrNull()?.toInt() ?: run {
+        ChatUtils.userError("Not a valid number: '$this'")
+        return@run null
+    }
+
+    fun String.formatFloatOrUserError(): Float? = formatDoubleOrNull()?.toFloat() ?: run {
         ChatUtils.userError("Not a valid number: '$this'")
         return@run null
     }
@@ -246,12 +248,11 @@ object NumberUtil {
         }
     }
 
-
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
     private val Int.billion get() = this * 1_000_000_000.0
     val Double.million get() = (this * 1_000_000.0).toLong()
-    
+
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max

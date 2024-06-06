@@ -1,18 +1,21 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -21,27 +24,20 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PestProfitTracker {
     val config get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
-     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
-     */
-    private val pestLootPattern by patternGroup.pattern(
-        "loot",
-        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
-    )
-
-    /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)"
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)"
     )
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -81,7 +77,7 @@ object PestProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        pestLootPattern.matchMatcher(event.message) {
+        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
@@ -133,13 +129,21 @@ object PestProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
+        if (coins > 1000) return
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
             tracker.addCoins(coins.toInt())
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetpestprofittracker")
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.GARDEN) {
+            tracker.firstUpdate()
+        }
+    }
+
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled

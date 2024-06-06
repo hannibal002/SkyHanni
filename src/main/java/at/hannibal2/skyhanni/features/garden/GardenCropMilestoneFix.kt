@@ -7,34 +7,34 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class GardenCropMilestoneFix {
     private val patternGroup = RepoPattern.group("garden.cropmilestone.fix")
+
+    /**
+     * REGEX-TEST:  Cocoa Beans 31: §r§a68%
+     * REGEX-TEST:  Potato 32: §r§a97.7%
+     */
     private val tabListPattern by patternGroup.pattern(
         "tablist",
-        " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%"
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%"
     )
     private val levelUpPattern by patternGroup.pattern(
         "levelup",
         " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)"
     )
-    /**
-     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
-     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
-     */
-    private val pestLootPattern by patternGroup.pattern(
-        "pests.loot",
-        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
-    )
+
     /**
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      */
@@ -56,7 +56,7 @@ class GardenCropMilestoneFix {
             val crops = GardenCropMilestones.getCropsForTier(tier, crop)
             changedValue(crop, crops, "level up chat message", 0)
         }
-        pestLootPattern.matchMatcher(event.message) {
+        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
@@ -85,15 +85,12 @@ class GardenCropMilestoneFix {
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        for (line in event.tabList) {
-            tabListPattern.matchMatcher(line) {
-                val tier = group("tier").toInt()
-                val percentage = group("percentage").toDouble()
-                val cropName = group("crop")
+        event.tabList.matchFirst(tabListPattern) {
+            val tier = group("tier").toInt()
+            val percentage = group("percentage").toDouble()
+            val cropName = group("crop")
 
-                check(cropName, tier, percentage)
-                return
-            }
+            check(cropName, tier, percentage)
         }
     }
 

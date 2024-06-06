@@ -4,12 +4,13 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.features.chroma.ChromaManager;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorInfoText;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class ChromaConfig {
 
@@ -22,7 +23,7 @@ public class ChromaConfig {
     @ConfigOption(name = "Enabled", desc = "Toggle for SkyHanni's chroma. (Disables Patcher's Optimized Font Renderer while enabled)")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Chroma Size", desc = "Change the size of each color in the chroma.")

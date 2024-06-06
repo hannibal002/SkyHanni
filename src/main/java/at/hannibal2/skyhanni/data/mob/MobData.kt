@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -36,10 +38,15 @@ class MobData {
         const val DISPLAY_NPC_DETECTION_RANGE = 24.0 // 24.0
 
         var externRemoveOfRetryAmount = 0
+
+        val logger = LorenzLogger("mob/detection")
     }
 
     internal enum class Result {
-        Found, NotYetFound, Illegal, SomethingWentWrong
+        Found,
+        NotYetFound,
+        Illegal,
+        SomethingWentWrong,
     }
 
     internal class MobResult(val result: Result, val mob: Mob?) {
@@ -56,13 +63,18 @@ class MobData {
                 this?.let { armor ->
                     mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
                 } ?: notYetFound
+
+            fun List<EntityArmorStand?>.makeMobResult(mob: (List<EntityArmorStand>) -> Mob?) =
+                this.takeIfAllNotNull()?.let { armor ->
+                    mob.invoke(armor)?.let { found(it) } ?: somethingWentWrong
+                } ?: notYetFound
         }
     }
 
     internal class RetryEntityInstancing(
         var entity: EntityLivingBase,
         var times: Int,
-        val roughType: MobType
+        val roughType: MobType,
     ) {
         override fun hashCode() = entity.entityId
         override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()

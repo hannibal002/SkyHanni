@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.moulconfig.observer.Property
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -33,7 +33,7 @@ class GardenOptimalSpeed {
 
     /**
      * This speed value represents the walking speed, not the speed stat.
-     * blocks per second = 4.317 * speed / 100
+     * Blocks per second = 4.317 * speed / 100
      *
      * It has an absolute speed cap of 500, and items that normally increase the cap do not apply here:
      * (Black Cat pet, Cactus knife, Racing Helmet or Young Dragon Armor)

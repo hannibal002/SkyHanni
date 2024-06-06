@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneFeatures;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorText;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class LaneSwitchSoundSettings {
     @Expose

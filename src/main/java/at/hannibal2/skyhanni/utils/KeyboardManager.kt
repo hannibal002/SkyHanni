@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import io.github.moulberry.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.moulconfig.internal.KeybindHelper
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
+@SkyHanniModule
 object KeyboardManager {
 
     private var lastClickedMouseButton = -1
@@ -28,9 +30,11 @@ object KeyboardManager {
 
     private fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
 
-    fun isDeleteWordDown() = Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
+    fun isDeleteWordDown() =
+        Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
 
-    fun isDeleteLineDown() = Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown() && isShiftKeyDown()
+    fun isDeleteLineDown() =
+        Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown() && isShiftKeyDown()
 
     fun isShiftKeyDown() = Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld()
 
@@ -47,9 +51,11 @@ object KeyboardManager {
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
     @SubscribeEvent
-    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Post) {
+    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        GuiKeyPressEvent(guiScreen).postAndCatch()
+        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+            event.isCanceled = true
+        }
     }
 
     @SubscribeEvent
@@ -109,6 +115,21 @@ object KeyboardManager {
         } else {
             KeybindHelper.isKeyDown(this)
         }
+    }
+
+    private val pressedKeys = mutableMapOf<Int, Boolean>()
+
+    /** Can only be used once per click. Since the function locks itself until the key is no longer held*/
+    fun Int.isKeyClicked(): Boolean = if (this.isKeyHeld()) {
+        if (pressedKeys[this] != true) {
+            pressedKeys[this] = true
+            true
+        } else {
+            false
+        }
+    } else {
+        pressedKeys[this] = false
+        false
     }
 
     fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)

@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon;
-import at.hannibal2.skyhanni.utils.ChatUtils;
+import at.hannibal2.skyhanni.utils.HypixelCommands;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorButton;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class PlotIconConfig {
     @Expose
@@ -19,6 +19,6 @@ public class PlotIconConfig {
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable hardReset = () -> {
         GardenPlotIcon.INSTANCE.setHardReset(true);
-        ChatUtils.INSTANCE.sendCommandToServer("desk");
+        HypixelCommands.INSTANCE.gardenDesk();
     };
 }

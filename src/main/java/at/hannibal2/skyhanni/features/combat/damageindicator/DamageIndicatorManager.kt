@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
@@ -35,10 +36,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -54,7 +55,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
@@ -333,7 +333,7 @@ class DamageIndicatorManager {
     private fun checkEntity(entity: EntityLivingBase): Pair<UUID, EntityData>? {
         try {
             val entityData = grabData(entity) ?: return null
-            if (LorenzUtils.inDungeons) {
+            if (DungeonAPI.inDungeon()) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
 
@@ -850,7 +850,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onEntityJoin(event: EntityJoinWorldEvent) {
+    fun onEntityJoin(event: EntityEnterWorldEvent) {
         mobFinder?.handleNewEntity(event.entity)
     }
 

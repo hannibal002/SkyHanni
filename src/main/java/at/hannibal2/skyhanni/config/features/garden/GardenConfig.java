@@ -9,11 +9,12 @@ import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedCon
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
     @Expose
@@ -173,6 +174,7 @@ public class GardenConfig {
     public boolean farmingFortuneForContest = true;
 
     @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "farmingFortuneForContest")
     public Position farmingFortuneForContestPos = new Position(180, 156, false, true);
 
     @Expose
@@ -182,7 +184,7 @@ public class GardenConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean jacobContextTimes = true;
+    public boolean jacobContestTimes = true;
 
     @Expose
     @ConfigOption(
@@ -203,7 +205,8 @@ public class GardenConfig {
     public double jacobContestCustomBpsValue = 19.9;
 
     @Expose
-    public Position jacobContextTimesPos = new Position(-359, 149, false, true);
+    @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
+    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
 
     @Expose
     @ConfigOption(
@@ -214,11 +217,7 @@ public class GardenConfig {
     @FeatureToggle
     public boolean jacobContestSummary = true;
 
-    @Expose
-    @ConfigOption(name = "Always Finnegan", desc = "Forcefully set the Finnegan Farming Simulator perk to be active. This is useful if the auto mayor detection fails.")
-    @ConfigEditorBoolean
-    public boolean forcefullyEnabledAlwaysFinnegan = false;
-
+    // Does not have a config element!
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 
@@ -233,4 +232,14 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean copyMilestoneData = true;
+
+    @Expose
+    @ConfigOption(name = "Log Book Stats", desc = "Show total visited/accepted/denied visitors stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLogBookStats = true;
+
+    @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "showLogBookStats")
+    public Position logBookStatsPos = new Position(427, 92, false, true);
 }

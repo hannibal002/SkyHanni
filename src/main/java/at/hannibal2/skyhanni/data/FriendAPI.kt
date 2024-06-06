@@ -6,15 +6,17 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 
+@SkyHanniModule
 object FriendAPI {
     private val patternGroup = RepoPattern.group("data.friends")
     private val removedFriendPattern by patternGroup.pattern(
@@ -33,6 +35,7 @@ object FriendAPI {
         "addbest",
         ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*"
     )
+
     /**
      * REGEX-TEST:
      * §eClick here to view §bAaronL_Jackson§e's profile

@@ -46,6 +46,8 @@ public class Storage {
     public Map<UUID, PlayerSpecificStorage> players = new HashMap<>();
 
     @Expose
-    public String currentFameRank = null;
+    public String currentFameRank = "New player";
 
+    @Expose
+    public List<String> blacklistedUsers = new ArrayList<>();
 }

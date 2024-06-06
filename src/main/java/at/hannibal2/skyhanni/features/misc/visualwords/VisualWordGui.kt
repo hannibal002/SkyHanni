@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -67,18 +67,18 @@ open class VisualWordGui : GuiScreen() {
 
         val itemUp by lazy {
             ItemUtils.createSkull(
-                "§§Up",
-                "7f68dd73-1ff6-4193-b246-820975d6fab1",
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzczMzRjZGRmY" +
-                    "WI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0="
+                displayName = "§§Up",
+                uuid = "7f68dd73-1ff6-4193-b246-820975d6fab1",
+                value = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1" +
+                    "cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0="
             )
         }
 
         val itemDown by lazy {
             ItemUtils.createSkull(
-                "§§Down",
-                "e4ace6de-0629-4719-aea3-3e113314dd3f",
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMz" +
+                displayName = "§§Down",
+                uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
+                value = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMz" +
                     "RmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0="
             )
         }
@@ -491,8 +491,7 @@ open class VisualWordGui : GuiScreen() {
                 else if (KeyboardManager.isDeleteWordDown()) {
                     val lastSpaceIndex = currentText.trimEnd().removeSuffix(" ").lastIndexOf(' ')
                     if (lastSpaceIndex >= 0) currentText.substring(0, lastSpaceIndex + 1) else ""
-                }
-                else {
+                } else {
                     currentText.substring(0, currentText.length - 1)
                 }
                 saveTextChanges()

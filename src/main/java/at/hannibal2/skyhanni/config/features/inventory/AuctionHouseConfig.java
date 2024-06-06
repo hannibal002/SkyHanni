@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class AuctionHouseConfig {
@@ -49,4 +49,16 @@ public class AuctionHouseConfig {
     )
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int copyUnderbidKeybind = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Price Website", desc = "Adds a button to the Auction House that will open the item page in §csky.coflnet.com§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean openPriceWebsite = false;
+
+    @Expose
+    @ConfigOption(name = "Outbid alert", desc = "Sends a warning when you're outbid on an auction.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean auctionOutbid = false;
 }

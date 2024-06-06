@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.init;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.asm.mixin.injection.InjectionPoint;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -21,7 +22,7 @@ import java.util.zip.ZipInputStream;
 public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
-
+        InjectionPoint.register(BeforeForLoopInjectionPoint.class);
     }
 
     @Override

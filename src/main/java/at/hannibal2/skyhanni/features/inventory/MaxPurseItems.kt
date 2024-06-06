@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -42,21 +43,17 @@ class MaxPurseItems {
         for (item in Minecraft.getMinecraft().thePlayer.openContainer.inventory) {
             val name = item?.displayName ?: continue
             createOrderPattern.matchMatcher(name) {
-                for (info in item.getLore()) {
-                    orderPattern.matchMatcher(info) {
-                        // +0.1 because I expect people to use the gold nugget option
-                        buyOrderPrice = group("coins").formatDouble() + 0.1
-                        // If we get to this point, we have the instant price because instant is earlier in the list of items
-                        // So we can return
-                        return
-                    }
+                item.getLore().matchFirst(orderPattern) {
+                    // +0.1 because I expect people to use the gold nugget option
+                    buyOrderPrice = group("coins").formatDouble() + 0.1
+                    // If we get to this point, we have the instant price because instant is earlier in the list of items
+                    // So we can return
+                    return
                 }
             }
             createInstantPattern.matchMatcher(name) {
-                for (info in item.getLore()) {
-                    instantPattern.matchMatcher(info) {
-                        instantBuyPrice = group("coins").formatDouble()
-                    }
+                item.getLore().matchFirst(instantPattern) {
+                    instantBuyPrice = group("coins").formatDouble()
                 }
             }
         }

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 
@@ -123,7 +123,9 @@ object MobFactories {
                 baseEntity = baseEntity,
                 mobType = Mob.Type.SPECIAL,
                 armorStand = armorStand,
-                name = if (this.group("points").isNotEmpty()) "Points: " + this.group("points") else this.group("empty")
+                name = if (this.group("points")
+                        ?.isNotEmpty() == true
+                ) "Points: " + this.group("points") else this.group("empty").toString()
             )
         }
 

@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.data.Mayor;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class DebugConfig {
@@ -63,6 +66,11 @@ public class DebugConfig {
     public boolean showNpcPrice = false;
 
     @Expose
+    @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
+    @ConfigEditorBoolean
+    public boolean showBZPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     public boolean showItemUuid = false;
@@ -119,6 +127,11 @@ public class DebugConfig {
     public boolean currentAreaDebug = true;
 
     @Expose
+    @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
+    @ConfigEditorDropdown
+    public Property<Mayor> assumeMayor = Property.of(Mayor.DISABLED);
+
+    @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
     @ConfigEditorBoolean
     public boolean alwaysFunnyTime = false;
@@ -128,6 +141,11 @@ public class DebugConfig {
     @ConfigEditorBoolean
     public boolean neverFunnyTime = false;
 
+    // Does not have a config element!
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
+
+    // Also does not have a config element!
+    @Expose
+    public Position trackParticlePosition = new Position(0, 0);
 }
