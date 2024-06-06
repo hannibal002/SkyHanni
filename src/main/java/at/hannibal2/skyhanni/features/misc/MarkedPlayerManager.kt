@@ -34,7 +34,6 @@ object MarkedPlayerManager {
         val displayName = args[0]
         val name = displayName.lowercase()
 
-
         if (name == LorenzUtils.getPlayerName().lowercase()) {
             ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
             return
