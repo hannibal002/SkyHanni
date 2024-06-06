@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -17,7 +17,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PowerStoneGuideFeatures {
+@SkyHanniModule
+object PowerStoneGuideFeatures {
 
     private var missing = mutableMapOf<Int, NEUInternalName>()
     private var inInventory = false
@@ -60,7 +61,7 @@ class PowerStoneGuideFeatures {
         if (!inInventory) return
         val internalName = missing[event.slotId] ?: return
 
-        BazaarApi.searchForBazaarItem(internalName.itemName, 9)
+        BazaarApi.searchForBazaarItem(internalName, 9)
     }
 
     @SubscribeEvent

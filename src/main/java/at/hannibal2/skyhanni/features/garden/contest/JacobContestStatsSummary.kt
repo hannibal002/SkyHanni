@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.prettyRound
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -22,8 +23,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-class JacobContestStatsSummary {
-    private val config get() = GardenAPI.config.jacobContestStats
+@SkyHanniModule
+object JacobContestStatsSummary {
+
+    private val config get() = GardenAPI.config
     private var blocksBroken = 0
     private var startTimeIrl = SimpleTimeMark.farPast()
     private var startTimeRelative: Long? = null

@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -14,7 +16,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class DianaFixChat {
+@SkyHanniModule
+object DianaFixChat {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
@@ -23,9 +26,11 @@ class DianaFixChat {
     private var lastParticleQualityPrompt = SimpleTimeMark.farPast()
     private var lastToggleMusicPrompt = SimpleTimeMark.farPast()
     private var errorCounter = 0
+    private var successfulCounter = 0
 
     private var lastSpadeUse = SimpleTimeMark.farPast()
     private var lastErrorTime = SimpleTimeMark.farPast()
+    private var lastGuessPoint = SimpleTimeMark.farPast()
     private var foundGuess = false
 
     @SubscribeEvent
@@ -51,7 +56,9 @@ class DianaFixChat {
     private fun noGuessFound() {
         errorCounter++
         if (errorCounter == 1) {
-            ChatUtils.chat("Could not find Diana Guess using sound and particles, please try again. (Was this a funny sound easter egg?)")
+            if (successfulCounter < 5) {
+                ChatUtils.chat("Could not find Diana Guess using sound and particles, please try again. (Was this a funny sound easter egg?)")
+            }
             return
         }
 
@@ -86,7 +93,8 @@ class DianaFixChat {
                 ErrorManager.logErrorStateWithData(
                     "Could not find diana guess point",
                     "diana guess point failed to load after /pq and /togglemusic",
-                    "errorCounter" to errorCounter
+                    "errorCounter" to errorCounter,
+                    "successfulCounter" to successfulCounter,
                 )
             }
         }
@@ -118,6 +126,18 @@ class DianaFixChat {
         hasSetParticleQuality = false
         hasSetToggleMusic = false
         errorCounter = 0
+
+        // This ensures we only count successes after new spade clicks, not the repeated moved guess locations
+        if (lastGuessPoint != lastSpadeUse) {
+            lastGuessPoint = lastSpadeUse
+            lastGuessPoint = SimpleTimeMark.now()
+            successfulCounter++
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        successfulCounter = 0
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsSoopyGuess
