@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
+import java.util.regex.Matcher
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 /**
@@ -385,9 +387,9 @@ private fun getSpookyLines() = buildList {
 private fun getSpookyShowWhen(): Boolean = SbPattern.spookyPattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getTablistEvent(): String? {
-    TabListData.getTabList().matchFirst(SbPattern.eventNamePattern) {
-        return group("name")
-    } ?: return null
+    return SbPattern.eventNamePattern.firstMatcher(TabListData.getTabList()) {
+        group("name")
+    }
 }
 
 private fun getActiveEventLine(): List<String> {
@@ -397,9 +399,11 @@ private fun getActiveEventLine(): List<String> {
     // but from other locations like the scoreboard
     val blockedEvents = listOf("Spooky Festival")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
-    val currentActiveEventTime = TabListData.getTabList().matchFirst(SbPattern.eventTimeEndsPattern) {
-        group("time")
-    } ?: "§cUnknown"
+    val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(
+        TabListData.getTabList(),
+        fun Matcher.(): String? {
+            return group("time")
+        }) ?: "§cUnknown"
 
     return listOf(currentActiveEvent, " Ends in: §e$currentActiveEventTime")
 }

@@ -253,7 +253,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorRewardWarning
 import at.hannibal2.skyhanni.features.gui.MovableHotBar
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay
 import at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning
@@ -929,7 +928,6 @@ class SkyHanniMod {
         loadModule(EnchantParser)
         loadModule(PabloHelper())
         loadModule(FishingBaitWarnings())
-        loadModule(CustomScoreboard())
         loadModule(RepoPatternManager)
         loadModule(PestSpawn())
         loadModule(PestSpawnTimer)

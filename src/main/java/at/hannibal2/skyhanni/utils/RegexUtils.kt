@@ -10,14 +10,14 @@ object RegexUtils {
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
-    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer(it) }"))
+    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
     inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
         pattern.firstMatcher(this, consumer)
 
     inline fun <T> Pattern.firstMatcher(sequence: Sequence<String>, consumer: Matcher.() -> T): T? =
         firstMatcher(sequence.toList(), consumer)
 
-    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer(it) }"))
+    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
         pattern.firstMatcher(this, consumer)
 
@@ -28,7 +28,7 @@ object RegexUtils {
         return null
     }
 
-    @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer(it) }"))
+    @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer() }"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? =
         pattern.matchAll(this, consumer)
 
