@@ -156,7 +156,7 @@ object WardrobeAPI {
         var totalPrice = 0.0
         slot.armor.forEach {
             if (it != null) {
-                val price = EstimatedItemValueCalculator.calculate(it).first
+                val price = EstimatedItemValueCalculator.getTotalPrice(it)
                 add("  §7- ${it.name}: §6${NumberUtil.format(price)}")
                 totalPrice += price
             }
