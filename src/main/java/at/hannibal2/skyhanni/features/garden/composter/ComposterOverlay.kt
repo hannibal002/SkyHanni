@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -55,6 +56,7 @@ import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+@SkyHanniModule
 object ComposterOverlay {
 
     private var organicMatterFactors: Map<NEUInternalName, Double> = emptyMap()
@@ -546,7 +548,7 @@ object ComposterOverlay {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        organicMatter = data.organic_matter
+        organicMatter = data.organicMatter
         fuelFactors = data.fuel
         updateOrganicMatterFactors()
     }
@@ -575,7 +577,7 @@ object ComposterOverlay {
                 || internalName == "SIMPLE_CARROT_CANDY"
             ) continue
 
-            var (newId, amount) = NEUItems.getMultiplier(internalName.asInternalName())
+            var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
             if (amount <= 9) continue
             if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error

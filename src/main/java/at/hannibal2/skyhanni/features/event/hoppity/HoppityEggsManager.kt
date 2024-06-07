@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object HoppityEggsManager {
 
     val config get() = SkyHanniMod.feature.event.hoppityEggs
@@ -110,7 +112,7 @@ object HoppityEggsManager {
         HoppityEggsCompactChat.handleChat(event)
 
         eggFoundPattern.matchMatcher(event.message) {
-            HoppityUniqueEggLocations.saveNearestEgg()
+            HoppityEggLocations.saveNearestEgg()
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
             val note = group("note").removeColor()
@@ -194,9 +196,9 @@ object HoppityEggsManager {
         displayList.add(0, "§bUnclaimed Eggs:")
 
         if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
-            val totalEggs = HoppityEggLocator.getCurrentIslandEggLocations()?.size
-            if (totalEggs != null) {
-                val collectedEggs = HoppityUniqueEggLocations.collectedEggsThisIsland()
+            val totalEggs = HoppityEggLocations.islandLocations.size
+            if (totalEggs > 0) {
+                val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }

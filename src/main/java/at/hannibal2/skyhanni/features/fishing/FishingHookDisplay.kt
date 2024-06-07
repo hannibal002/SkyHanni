@@ -6,17 +6,19 @@ import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class FishingHookDisplay {
+@SkyHanniModule
+object FishingHookDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
     private var armorStand: EntityArmorStand? = null
-    private val potentionArmorStands = mutableListOf<EntityArmorStand>()
+    private val potentialArmorStands = mutableListOf<EntityArmorStand>()
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
 
     @SubscribeEvent
@@ -34,7 +36,7 @@ class FishingHookDisplay {
         if (!isEnabled()) return
 
         if (armorStand == null) {
-            val filter = potentionArmorStands.filter { it.hasCustomName() && it.hasCorrectName() }
+            val filter = potentialArmorStands.filter { it.hasCustomName() && it.hasCorrectName() }
             if (filter.size == 1) {
                 armorStand = filter[0]
             }
@@ -42,17 +44,17 @@ class FishingHookDisplay {
     }
 
     private fun reset() {
-        potentionArmorStands.clear()
+        potentialArmorStands.clear()
         armorStand = null
     }
 
     @SubscribeEvent
-    fun onJoinWorld(event: EntityJoinWorldEvent) {
+    fun onJoinWorld(event: EntityEnterWorldEvent) {
         if (!isEnabled()) return
-        val entity = event.entity ?: return
+        val entity = event.entity
         if (entity !is EntityArmorStand) return
 
-        potentionArmorStands.add(entity)
+        potentialArmorStands.add(entity)
     }
 
     @SubscribeEvent
@@ -61,7 +63,7 @@ class FishingHookDisplay {
         if (!config.hideArmorStand) return
 
         if (event.entity == armorStand) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

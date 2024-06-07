@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
@@ -31,6 +32,7 @@ import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GetFromSackAPI {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
@@ -56,10 +58,11 @@ object GetFromSackAPI {
     fun getFromChatMessageSackItems(
         item: PrimitiveItemStack,
         text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!",
+        hover: String = "§eClick to get from sacks!"
     ) =
-        ChatUtils.clickableChat(text, onClick = {
-            HypixelCommands.getFromSacks(item.internalName.asString(), item.amount)
-        }, "§eClick to get from sacks!")
+        ChatUtils.clickableChat(
+          text, onClick = { getFromSack(item) }, hover)
+        )
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
@@ -89,7 +92,8 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            HypixelCommands.getFromSacks(item.internalName.asString().replace('-', ':'), item.amount)
+            // TODO find a better workaround
+            ChatUtils.sendMessageToServer("/gfs ${item.internalName.asString().replace('-', ':')} ${item.amount}")
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
@@ -105,7 +109,7 @@ object GetFromSackAPI {
         if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
         inventoryMap.remove(event.slotId)
-        event.isCanceled = true
+        event.cancel()
     }
 
     @SubscribeEvent
@@ -128,11 +132,11 @@ object GetFromSackAPI {
         queuedHandler(replacedEvent)
         bazaarHandler(replacedEvent)
         if (replacedEvent.isCanceled) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
         if (replacedEvent !== event) {
-            event.isCanceled = true
+            event.cancel()
             ChatUtils.sendMessageToServer(replacedEvent.message)
         }
     }
@@ -150,7 +154,7 @@ object GetFromSackAPI {
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
             CommandResult.INTERNAL_ERROR -> {}
         }
-        event.isCanceled = true
+        event.cancel()
     }
 
     private fun bazaarHandler(event: MessageSendToServerEvent) {

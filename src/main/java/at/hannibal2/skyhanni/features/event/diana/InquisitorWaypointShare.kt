@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -32,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object InquisitorWaypointShare {
 
     private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
@@ -231,13 +233,13 @@ object InquisitorWaypointShare {
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
         partyOnlyCoordsPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
         diedPattern.matchMatcher(message) {

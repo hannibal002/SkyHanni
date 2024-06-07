@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text
@@ -23,6 +24,7 @@ import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
+@SkyHanniModule
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)

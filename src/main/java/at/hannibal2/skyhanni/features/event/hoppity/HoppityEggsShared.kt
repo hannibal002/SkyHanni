@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object HoppityEggsShared {
 
     private val config get() = HoppityEggsManager.config
@@ -47,7 +49,7 @@ object HoppityEggsShared {
 
     fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: HoppityEggType, note: String) {
         if (!isEnabled()) return
-        val islandEggsLocations = HoppityEggLocator.getCurrentIslandEggLocations() ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
 
         val x = closestEgg.x.toInt()
