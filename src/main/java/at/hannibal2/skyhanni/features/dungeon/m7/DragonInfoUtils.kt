@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.*
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LorenzDebug
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -16,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DragonInfoUtils {
     private var inPhase5 = false
+    val logger = LorenzLogger("dragons")
 
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -104,9 +108,13 @@ object DragonInfoUtils {
     @SubscribeEvent
     fun onEnd(event: DungeonCompleteEvent) {
         M7DragonInfo.clearSpawned()
-        debugOutput.add(currentRunInfo)
-        currentRun += 1
         if (inPhase5) inPhase5 = false
+
+        logLine("------ run $currentRun -------")
+        currentRunInfo.forEach {
+            logLine(it)
+        }
+        currentRun += 1
     }
 
     @SubscribeEvent
@@ -124,7 +132,6 @@ object DragonInfoUtils {
         }
 
         event.addData {
-            add("runCount: ${debugOutput.size}")
             add("currentRunInfo: ${currentRunInfo.size}")
             add("Power: ${M7DragonInfo.POWER.status}, ${M7DragonInfo.POWER.status.id}")
             add("Flame: ${M7DragonInfo.FLAME.status}, ${M7DragonInfo.FLAME.status.id}")
@@ -134,7 +141,6 @@ object DragonInfoUtils {
         }
     }
 
-    private var debugOutput = mutableListOf<MutableList<String>>()
     private var currentRunInfo = mutableListOf<String>()
 
     private fun logParticle(particle: S2APacketParticles, matchedType: M7DragonInfo?) {
@@ -179,13 +185,8 @@ object DragonInfoUtils {
         currentRunInfo.add(string)
     }
 
-    fun copyDebug() {
-        var finalString = ""
-        debugOutput.forEachIndexed { index, runInfo ->
-            finalString += "---- run $index ----\n"
-            finalString += runInfo.joinToString { "\n" }
-        }
-        OSUtils.copyToClipboard(finalString)
-        ChatUtils.chat("copied debug info to clipboard, ${debugOutput.size}")
+    private fun logLine(input: String) {
+        logger.log(input)
+        LorenzDebug.log(input)
     }
 }

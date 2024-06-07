@@ -535,10 +535,6 @@ object Commands {
             "shtoggleegglocationdebug",
             "Shows Hoppity egg locations with their internal API names and status."
         ) { HoppityEggLocations.toggleDebug() }
-        registerCommand(
-            "shdragoninfo",
-            "copy debug dragon info to your clipboard"
-        ) { DragonInfoUtils().copyDebug() }
     }
 
     private fun internalCommands() {
