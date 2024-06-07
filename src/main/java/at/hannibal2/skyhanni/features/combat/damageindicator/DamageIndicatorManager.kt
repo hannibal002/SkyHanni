@@ -870,7 +870,7 @@ class DamageIndicatorManager {
 
             if (entityData != null) {
                 if (config.hideDamageSplash) {
-                    event.isCanceled = true
+                    event.cancel()
                 }
                 if (entityData.bossType == BossType.DUMMY) {
                     val uuid = entity.uniqueID
@@ -887,7 +887,7 @@ class DamageIndicatorManager {
                 if (name.contains("Overflux")) return
                 if (name.contains("Mana Flux")) return
                 if (name.contains("Radiant")) return
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

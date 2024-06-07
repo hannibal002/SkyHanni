@@ -63,7 +63,7 @@ object FishingHookDisplay {
         if (!config.hideArmorStand) return
 
         if (event.entity == armorStand) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
