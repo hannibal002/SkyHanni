@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon.m7
 
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -12,7 +13,8 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DragonInfoUtils {
+@SkyHanniModule
+object DragonInfoUtils {
     private var inPhase5 = false
 
     @SubscribeEvent
