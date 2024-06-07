@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson.DropInfo
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -126,10 +126,10 @@ object ArmorDropTracker {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
-        armorDropInfo = data.special_crops
+        armorDropInfo = data.specialCrops
     }
 
-    private var armorDropInfo = mapOf<String, DropInfo>()
+    private var armorDropInfo = mapOf<String, ArmorDropInfo>()
     private var currentArmorDropChance = 0.0
     private var lastCalculationTime = SimpleTimeMark.farPast()
 
@@ -140,7 +140,7 @@ object ArmorDropTracker {
             lastCalculationTime = SimpleTimeMark.now()
 
             val armorDropName = crop.specialDropType
-            val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
+            val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
             val pieceCount = InventoryUtils.getArmor()
                 .mapNotNull { it?.getInternalName()?.asString() }
                 .count { it.contains(armorName) || it.contains("FERMENTO") }
