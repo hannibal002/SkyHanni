@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DARK_CACAO_TRUFFLE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -48,6 +50,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRanchersSpeed
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -55,6 +58,7 @@ import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
@@ -240,6 +244,11 @@ object ItemDisplayOverlayFeatures {
 
         if (BOTTLE_OF_JYRRE.isSelected() && internalName == "NEW_BOTTLE_OF_JYRRE".asInternalName()) {
             val seconds = item.getBottleOfJyrreSeconds() ?: 0
+            return "§a${(seconds / 3600)}"
+        }
+
+        if (DARK_CACAO_TRUFFLE.isSelected() && internalName == "DARK_CACAO_TRUFFLE".asInternalName()) {
+            val seconds = item.getSecondsHeld() ?: 0
             return "§a${(seconds / 3600)}"
         }
 

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object DungeonAPI {
 
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
@@ -47,6 +49,7 @@ object DungeonAPI {
 
     var dungeonFloor: String? = null
     var started = false
+    var completed = false
     var inBossRoom = false
     var playerClass: DungeonClass? = null
     var playerClassLevel = -1
@@ -211,6 +214,7 @@ object DungeonAPI {
         isUniqueClass = false
         playerClass = null
         playerClassLevel = -1
+        completed = false
         DungeonBlessings.reset()
     }
 
@@ -238,6 +242,7 @@ object DungeonAPI {
             return
         }
         dungeonComplete.matchMatcher(event.message) {
+            completed = true
             DungeonCompleteEvent(floor).postAndCatch()
             return
         }
