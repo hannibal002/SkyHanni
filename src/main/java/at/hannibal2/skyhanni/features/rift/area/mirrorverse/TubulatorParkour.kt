@@ -41,7 +41,7 @@ object TubulatorParkour {
 
         parkourHelper?.let {
             if (it.inParkour()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

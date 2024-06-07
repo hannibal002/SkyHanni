@@ -39,7 +39,7 @@ object GardenCropMilestonesCommunityFix {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        val map = data.crop_milestone_community_help ?: return
+        val map = data.cropMilestoneCommunityHelp
         for ((key, value) in map) {
             if (key == "show_wrong_data") {
                 showWrongData = value
