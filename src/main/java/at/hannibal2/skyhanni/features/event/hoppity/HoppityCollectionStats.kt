@@ -1,23 +1,34 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object HoppityCollectionStats {
 
     private val config get() = ChocolateFactoryAPI.config
@@ -27,28 +38,46 @@ object HoppityCollectionStats {
         "page.current",
         "\\((?<page>\\d+)/(?<maxPage>\\d+)\\) Hoppity's Collection"
     )
-    private val rabbitRarityPattern by patternGroup.pattern(
-        "rabbit.rarity",
-        "§.§L(?<rarity>\\w+) RABBIT"
-    )
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
         "§7Duplicates Found: §a(?<duplicates>[\\d,]+)"
     )
+
+    /**
+     * REGEX-TEST: §7§8You cannot find this rabbit until you
+     * REGEX-TEST: §7§8You have not found this rabbit yet!
+     */
     private val rabbitNotFoundPattern by patternGroup.pattern(
         "rabbit.notfound",
-        "(?:§.)+You have not found this rabbit yet!"
+        "(?:§.)+You (?:have not found this rabbit yet!|cannot find this rabbit until you)"
     )
+
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
     )
+    /**
+     * REGEX-TEST: §a✔ §7Requirement
+     */
+    private val requirementMet by patternGroup.pattern(
+        "rabbit.requirement.met",
+        "§a✔ §7Requirement"
+    )
+    /**
+     * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
+     * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
+     * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
+     */
+    private val requirementNotMet by patternGroup.pattern(
+        "rabbit.requirement.notmet",
+        "§c✖ §7Requirement.*",
+    )
 
     private var display = emptyList<Renderable>()
-    private val loggedRabbits = mutableMapOf<String, RabbitCollectionInfo>()
-    private var totalRabbits = 0
+    private val loggedRabbits
+        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
+
     var inInventory = false
-    private var currentPage = 0
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -62,14 +91,7 @@ object HoppityCollectionStats {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
-    }
-
-    @SubscribeEvent
-    fun onProfileChange(event: ProfileJoinEvent) {
         display = emptyList()
-        loggedRabbits.clear()
-        currentPage = 0
-        inInventory = false
     }
 
     @SubscribeEvent
@@ -83,14 +105,32 @@ object HoppityCollectionStats {
         )
     }
 
+    // TODO cache with inventory update event
+    @SubscribeEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!config.highlightRabbitsWithRequirement) return
+        if (!inInventory) return
+
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val lore = slot.stack.getLore()
+            if (lore.any { requirementMet.find(it) } && !config.onlyHighlightRequirementNotMet)
+                slot highlight LorenzColor.GREEN
+            if (lore.any { requirementNotMet.find(it) })
+                slot highlight LorenzColor.RED
+        }
+    }
+
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
-        val totalAmount = logRabbits(event)
+        logRabbits(event)
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
         newList.add(LorenzUtils.fillTable(getRabbitStats(), padding = 5))
 
-        if (totalAmount != totalRabbits) {
+        val loggedRabbitCount = loggedRabbits.size
+        val foundRabbitCount = getFoundRabbitsFromHypixel(event)
+
+        if (loggedRabbitCount < foundRabbitCount) {
             newList.add(Renderable.string(""))
             newList.add(
                 Renderable.wrappedString(
@@ -104,35 +144,47 @@ object HoppityCollectionStats {
     }
 
     private fun getRabbitStats(): MutableList<DisplayTableEntry> {
-        var totalAmountFound = 0
+        var totalUniquesFound = 0
         var totalDuplicates = 0
         var totalChocolatePerSecond = 0
         var totalChocolateMultiplier = 0.0
-        totalRabbits = 0
 
         val table = mutableListOf<DisplayTableEntry>()
         for (rarity in RabbitCollectionRarity.entries) {
-            val filtered = loggedRabbits.filter { it.value.rarity == rarity }
-
             val isTotal = rarity == RabbitCollectionRarity.TOTAL
 
+            val foundOfRarity = loggedRabbits.filterKeys {
+                HoppityCollectionData.getRarity(it) == rarity
+            }
+
             val title = "${rarity.displayName} Rabbits"
-            val amountFound = filtered.filter { it.value.found }.size
-            val totalOfRarity = filtered.size
-            val duplicates = filtered.values.sumOf { it.duplicates }
-            val chocolatePerSecond = rarity.chocolatePerSecond * amountFound
-            val chocolateMultiplier = (rarity.chocolateMultiplier * amountFound)
+            val uniquesFound = foundOfRarity.size
+            val duplicates = foundOfRarity.values.sum() - uniquesFound
+
+            val chocolateBonuses = foundOfRarity.keys.map {
+                HoppityCollectionData.getChocolateBonuses(it)
+            }
+
+            val chocolatePerSecond = chocolateBonuses.sumOf { it.chocolate }
+            val chocolateMultiplier = chocolateBonuses.sumOf { it.multiplier }
+
+            if (hasFoundRabbit("Sigma") && rarity == RabbitCollectionRarity.MYTHIC) {
+                totalChocolatePerSecond += uniquesFound * 5
+            }
 
             if (!isTotal) {
-                totalAmountFound += amountFound
-                totalRabbits += totalOfRarity
+                totalUniquesFound += uniquesFound
                 totalDuplicates += duplicates
                 totalChocolatePerSecond += chocolatePerSecond
                 totalChocolateMultiplier += chocolateMultiplier
             }
 
-            val displayFound = if (isTotal) totalAmountFound else amountFound
-            val displayTotal = if (isTotal) totalRabbits else totalOfRarity
+            val displayFound = if (isTotal) totalUniquesFound else uniquesFound
+            val displayTotal = if (isTotal) {
+                HoppityCollectionData.knownRabbitCount
+            } else {
+                HoppityCollectionData.knownRabbitsOfRarity(rarity)
+            }
             val displayDuplicates = if (isTotal) totalDuplicates else duplicates
             val displayChocolatePerSecond = if (isTotal) totalChocolatePerSecond else chocolatePerSecond
             val displayChocolateMultiplier = if (isTotal) totalChocolateMultiplier else chocolateMultiplier
@@ -144,14 +196,14 @@ object HoppityCollectionStats {
                 add("§7Duplicate Rabbits: §a$displayDuplicates")
                 add("§7Total Rabbits Found: §a${displayFound + displayDuplicates}")
                 add("")
-                add("§7Chocolate Per Second: §a$displayChocolatePerSecond")
+                add("§7Chocolate Per Second: §a${displayChocolatePerSecond.addSeparators()}")
                 add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
             }
             table.add(
                 DisplayTableEntry(
                     title,
                     "§a$displayFound§7/§a$displayTotal",
-                    displayFound.toDouble(),
+                    displayTotal.toDouble(),
                     rarity.item,
                     hover
                 )
@@ -160,65 +212,65 @@ object HoppityCollectionStats {
         return table
     }
 
-    private fun logRabbits(event: InventoryFullyOpenedEvent): Int {
-        var totalAmount = 0
-
-        for ((_, item) in event.inventoryItems) {
-            val itemName = item.displayName ?: continue
-            val itemLore = item.getLore()
-
-            var duplicatesFound = 0
-            var rabbitRarity: RabbitCollectionRarity? = null
-            var found = true
-
-            for (line in itemLore) {
-                rabbitRarityPattern.matchMatcher(line) {
-                    rabbitRarity = RabbitCollectionRarity.fromDisplayName(group("rarity"))
-                }
-                duplicatesFoundPattern.matchMatcher(line) {
-                    duplicatesFound = group("duplicates").formatInt()
-                }
-                if (rabbitNotFoundPattern.matches(line)) found = false
-
-                rabbitsFoundPattern.matchMatcher(line) {
-                    totalAmount = group("total").formatInt()
-                }
-            }
-
-            val rarity = rabbitRarity ?: continue
-
-            if (itemName == "§dEinstein" && found) {
-                ChocolateFactoryAPI.profileStorage?.timeTowerCooldown = 7
-            }
-
-            val duplicates = duplicatesFound.coerceAtLeast(0)
-            loggedRabbits[itemName] = RabbitCollectionInfo(rarity, found, duplicates)
-        }
-        return totalAmount
+    fun incrementRabbit(name: String) {
+        val rabbit = name.removeColor()
+        if (!HoppityCollectionData.isKnownRabbit(rabbit)) return
+        loggedRabbits[rabbit] = (loggedRabbits[rabbit] ?: 0) + 1
     }
+
+    // Gets the found rabbits according to the Hypixel progress bar
+    // used to make sure that mod data is synchronized with Hypixel
+    private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int {
+        return event.inventoryItems.firstNotNullOf {
+            it.value.getLore().matchFirst(rabbitsFoundPattern) {
+                group("current").formatInt()
+            }
+        }
+    }
+
+    private fun logRabbits(event: InventoryFullyOpenedEvent) {
+        for ((_, item) in event.inventoryItems) {
+            val itemName = item.displayName?.removeColor() ?: continue
+            val isRabbit = HoppityCollectionData.isKnownRabbit(itemName)
+
+            if (!isRabbit) continue
+
+            val itemLore = item.getLore()
+            val found = !rabbitNotFoundPattern.anyMatches(itemLore)
+
+            if (!found) continue
+
+            val duplicates = itemLore.matchFirst(duplicatesFoundPattern) {
+                group("duplicates").formatInt()
+            } ?: 0
+
+            loggedRabbits[itemName] = duplicates + 1
+        }
+    }
+
+
+    // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
+    fun clearSavedRabbits() {
+        loggedRabbits.clear()
+        ChatUtils.chat("Cleared saved rabbit data.")
+    }
+
+    fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 
-    private data class RabbitCollectionInfo(
-        val rarity: RabbitCollectionRarity,
-        val found: Boolean,
-        val duplicates: Int,
-    )
-
-    // todo in future make the amount and multiplier work with mythic rabbits (can't until I have some)
-    private enum class RabbitCollectionRarity(
+    enum class RabbitCollectionRarity(
         val displayName: String,
-        val chocolatePerSecond: Int,
-        val chocolateMultiplier: Double,
         val item: NEUInternalName,
     ) {
-        COMMON("§fCommon", 1, 0.002, "STAINED_GLASS".asInternalName()),
-        UNCOMMON("§aUncommon", 2, 0.003, "STAINED_GLASS-5".asInternalName()),
-        RARE("§9Rare", 4, 0.004, "STAINED_GLASS-11".asInternalName()),
-        EPIC("§5Epic", 10, 0.005, "STAINED_GLASS-10".asInternalName()),
-        LEGENDARY("§6Legendary", 0, 0.02, "STAINED_GLASS-1".asInternalName()),
-        MYTHIC("§dMythic", 0, 0.0, "STAINED_GLASS-6".asInternalName()),
-        TOTAL("§cTotal", 0, 0.0, "STAINED_GLASS-14".asInternalName()),
+        COMMON("§fCommon", "STAINED_GLASS".asInternalName()),
+        UNCOMMON("§aUncommon", "STAINED_GLASS-5".asInternalName()),
+        RARE("§9Rare", "STAINED_GLASS-11".asInternalName()),
+        EPIC("§5Epic", "STAINED_GLASS-10".asInternalName()),
+        LEGENDARY("§6Legendary", "STAINED_GLASS-1".asInternalName()),
+        MYTHIC("§dMythic", "STAINED_GLASS-6".asInternalName()),
+        DIVINE("§bDivine", "STAINED_GLASS-3".asInternalName()),
+        TOTAL("§cTotal", "STAINED_GLASS-14".asInternalName()),
         ;
 
         companion object {

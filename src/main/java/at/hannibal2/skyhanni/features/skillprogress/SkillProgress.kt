@@ -11,13 +11,14 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -41,6 +42,7 @@ import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object SkillProgress {
 
     val config get() = SkyHanniMod.feature.skillProgress
@@ -140,14 +142,12 @@ object SkillProgress {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
-        if (event.repeatSeconds(1)) {
-            allDisplay = formatAllDisplay(drawAllDisplay())
-            etaDisplay = drawETADisplay()
-        }
+        allDisplay = formatAllDisplay(drawAllDisplay())
+        etaDisplay = drawETADisplay()
 
         if (event.repeatSeconds(2)) {
             update()
@@ -287,7 +287,7 @@ object SkillProgress {
                 Renderable.clickAndHover(
                     "§cOpen your skills menu!",
                     listOf("§eClick here to execute §6/skills"),
-                    onClick = { ChatUtils.sendCommandToServer("skills") }
+                    onClick = { HypixelCommands.skills() }
                 )
             } else {
                 val tips = buildList {

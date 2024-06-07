@@ -32,22 +32,22 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import java.util.function.Supplier
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 internal var confirmedUnknownLines = mutableListOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(500.milliseconds) { onRemoval(it) }
+internal var unknownLinesSet = TimeLimitedSet<String>(2.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
     if (!unconfirmedUnknownLines.contains(line)) return
@@ -745,20 +745,34 @@ private fun getEventsDisplayPair(): List<ScoreboardElementType> {
 private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair() = buildList {
-    add(
-        ((MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) }
-            ?: "<hidden>") +
-            (if (mayorConfig.showTimeTillNextMayor) {
-                "§7 (§e${MayorAPI.timeTillNextMayor.format(maxUnits = 2)}§7)"
-            } else {
-                ""
-            })) to HorizontalAlignment.LEFT
-    )
+    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: "<hidden>"
+    val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
+        "§7 (§e${MayorAPI.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
+    } else {
+        ""
+    }
+
+    add((currentMayorName + timeTillNextMayor) to HorizontalAlignment.LEFT)
+
     if (mayorConfig.showMayorPerks) {
-        MayorAPI.currentMayor?.activePerks?.forEach {
-            add(" §7- §e${it.perkName}" to HorizontalAlignment.LEFT)
+        MayorAPI.currentMayor?.activePerks?.forEach { perk ->
+            add(" §7- §e${perk.perkName}" to HorizontalAlignment.LEFT)
         }
     }
+
+    if (!mayorConfig.showExtraMayor) return@buildList
+    val jerryExtraMayor = MayorAPI.jerryExtraMayor
+    val extraMayor = jerryExtraMayor.first ?: return@buildList
+
+    val extraMayorName = extraMayor.mayorName.let { MayorAPI.mayorNameWithColorCode(it) }
+    val extraTimeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
+        "§7 (§6${jerryExtraMayor.second.timeUntil().format(maxUnits = 2)}§7)"
+    } else {
+        ""
+    }
+
+    add((extraMayorName + extraTimeTillNextMayor) to HorizontalAlignment.LEFT)
+
 }
 
 private fun getMayorShowWhen() =

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,7 +27,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 
-class MinionXp {
+@SkyHanniModule
+object MinionXp {
 
     private val config get() = SkyHanniMod.feature.misc.minions
 
@@ -134,7 +136,7 @@ class MinionXp {
         )
 
         return positionsToCheck.any { position ->
-            val pos = minionPosition.add(position).toBlockPos()
+            val pos = (minionPosition + position).toBlockPos()
             val block = Minecraft.getMinecraft().theWorld.getBlockState(pos).block
             block is BlockChest
         }
