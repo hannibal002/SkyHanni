@@ -54,6 +54,9 @@ import java.util.Locale
 object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
+
+    private val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
+
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
         ::addReforgeStone,
@@ -92,9 +95,7 @@ object EstimatedItemValueCalculator {
         ::addEnchantments
     )
 
-    fun calculate(stack: ItemStack): Pair<Double, Double> {
-        return calculate(stack, mutableListOf())
-    }
+    fun getTotalPrice(stack: ItemStack): Double = EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first
 
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
@@ -105,13 +106,10 @@ object EstimatedItemValueCalculator {
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
         var internalName = stack.getInternalName().asString().removePrefix("VANQUISHED_")
-        val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
         var genericName = internalName
         if (kuudraSets.any { internalName.contains(it) }
             && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) }) {
-            for (prefix in listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")) {
-                internalName = internalName.removePrefix(prefix)
-            }
+            internalName = removeCrimsonArmorPrefix(internalName)
             genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
         if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
@@ -132,28 +130,67 @@ object EstimatedItemValueCalculator {
         if (attributes.size != 2) return 0.0
         val basePrice = internalName.asInternalName().getPriceOrNull() ?: 0.0
         var subTotal = 0.0
-        val combo = ("$internalName+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}").asInternalName()
-        val comboPrice = combo.getPriceOrNull()
-        if (comboPrice != null && comboPrice > basePrice) {
-            list.add("§7Attribute Combo: (§6${NumberUtil.format(comboPrice)}§7)")
-            subTotal += comboPrice - basePrice
+        val combo = ("$internalName+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
+        var comboPrice = combo.asInternalName().getPriceOrNull()
+
+        if (comboPrice != null) {
+            val useless = isUselessAttribute(combo)
+            val color = if (comboPrice > basePrice && !useless) "§6" else "§7"
+            list.add("§7Attribute Combo: ($color${NumberUtil.format(comboPrice)}§7)")
+            if (!useless) {
+                subTotal += addAttributePrice(comboPrice, basePrice)
+            }
         } else {
             list.add("§7Attributes:")
         }
         for (attr in attributes) {
+            val attributeName = "$genericName+ATTRIBUTE_${attr.first}"
             val price =
-                getPriceOrCompositePriceForAttribute("$genericName+ATTRIBUTE_${attr.first}", attr.second)
+                getPriceOrCompositePriceForAttribute(attributeName, attr.second)
+            var priceColor = "§7"
+            val useless = isUselessAttribute(attributeName)
+            var nameColor = if (!useless) "§9" else "§7"
             if (price != null) {
-                subTotal += price
+                if (price > basePrice && !useless) {
+                    subTotal += addAttributePrice(price, basePrice)
+                    priceColor = "§6"
+                }
+
             }
             val displayName = attr.first.fixMending()
             list.add(
-                "  §9${
+                "  $nameColor${
                     displayName.allLettersFirstUppercase()
-                } ${attr.second}§7: §6${if (price != null) NumberUtil.format(price) else "Unknown"}"
+                } ${attr.second}§7: $priceColor${if (price != null) NumberUtil.format(price) else "Unknown"}"
             )
         }
-        return subTotal
+        // Adding 0.1 so that we always show the estimated item value overlay
+        return subTotal + 0.1
+    }
+
+    private fun removeCrimsonArmorPrefix(original: String): String {
+        var internalName = original
+        for (prefix in listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")) {
+            internalName = internalName.removePrefix(prefix)
+        }
+        return internalName
+    }
+
+    private fun addAttributePrice(attributePrice: Double, basePrice: Double): Double =
+        if (attributePrice > basePrice) {
+            attributePrice - basePrice
+        } else {
+            0.0
+        }
+
+    private fun isUselessAttribute(internalName: String): Boolean {
+        if (internalName.contains("RESISTANCE")) return true
+        if (internalName.contains("SPEED")) return true
+        if (internalName.contains("EXPERIENCE")) return true
+        if (internalName.contains("FORTITUDE")) return true
+        if (internalName.contains("ENDER")) return true
+
+        return false
     }
 
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
@@ -493,7 +530,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getInternalName()
+        val internalName = removeCrimsonArmorPrefix(stack.getInternalName().asString()).asInternalName()
         var price = internalName.getPrice()
         if (price == -1.0) {
             price = 0.0

@@ -3,9 +3,6 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inCustomWardrobe
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.inWardrobe
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.wardrobeSlots
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -17,10 +14,10 @@ class EstimatedWardrobePrice {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.armor) return
-        if (!inWardrobe()) return
-        if (inCustomWardrobe) return
+        if (!WardrobeAPI.inWardrobe()) return
+        if (WardrobeAPI.inCustomWardrobe) return
 
-        val slot = wardrobeSlots.firstOrNull {
+        val slot = WardrobeAPI.wardrobeSlots.firstOrNull {
             event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()
         } ?: return
 
@@ -32,9 +29,7 @@ class EstimatedWardrobePrice {
         var index = 3
 
         tooltip.add(index++, "")
-        lore.forEach {
-            tooltip.add(index++, it)
-        }
+        tooltip.addAll(index, lore)
     }
 
     @SubscribeEvent

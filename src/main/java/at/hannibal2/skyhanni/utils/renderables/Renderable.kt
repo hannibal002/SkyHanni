@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -36,7 +35,7 @@ import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
@@ -299,10 +298,8 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = emptyList(),
             onHover: () -> Unit = {},
         ) = object : Renderable {
-            override val width: Int
-                get() = max(hovered.width, unhovered.width)
-            override val height: Int
-                get() = max(hovered.height, unhovered.height)
+            override val width = max(hovered.width, unhovered.width)
+            override val height = max(hovered.height, unhovered.height)
             override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
             override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
 
@@ -593,14 +590,14 @@ interface Renderable {
         }
 
         // TODO use this to render current boosted crop in next jacob contest crops
-        fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor()) = object : Renderable {
+        fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
             override val horizontalAlign = this@renderBounds.horizontalAlign
             override val verticalAlign = this@renderBounds.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, color.withAlpha(100))
+                Gui.drawRect(0, 0, width, height, color.rgb)
                 this@renderBounds.render(posX, posY)
             }
 
@@ -916,8 +913,8 @@ interface Renderable {
             }
         }
 
-        fun player(
-            entity: EntityLivingBase,
+        fun fakePlayer(
+            player: EntityPlayer,
             followMouse: Boolean = false,
             eyesX: Float = 0f,
             eyesY: Float = 0f,
@@ -932,31 +929,29 @@ interface Renderable {
             override val height = height + 2 * padding
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
+            val playerWidth = entityScale
+            val playerHeight = entityScale * 2
+            val playerX = width / 2 + padding
+            val playerY = height / 2 + playerHeight / 2 + padding
 
             override fun render(posX: Int, posY: Int) {
-                val playerWidth = entityScale
-                val playerHeight = entityScale * 2
-                val playerX = width / 2 + padding
-                val playerY = height / 2 + playerHeight / 2 + padding
-
                 GlStateManager.color(1f, 1f, 1f, 1f)
-                if (color != null) RenderLivingEntityHelper.setEntityColor(entity, color, colorCondition)
-                val mouse = currentRenderPassMousePosition
+                if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
+                val mouse = currentRenderPassMousePosition ?: return
                 val mouseXRelativeToPlayer =
-                    if (followMouse) (posX + playerX - (mouse?.first ?: Utils.getMouseX())).toFloat() else eyesX
+                    if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
                 val mouseYRelativeToPlayer =
-                    if (followMouse) (posY + playerY - (mouse?.second
-                        ?: Utils.getMouseY()) - 1.62 * entityScale).toFloat() else eyesY
-                GlStateManager.translate(0f, 0f, 500f)
+                    if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
+                GlStateManager.translate(0f, 0f, 100f)
                 drawEntityOnScreen(
                     playerX,
                     playerY,
                     entityScale,
                     mouseXRelativeToPlayer,
                     mouseYRelativeToPlayer,
-                    entity
+                    player
                 )
-                GlStateManager.translate(0f, 0f, -500f)
+                GlStateManager.translate(0f, 0f, -100f)
             }
         }
     }
