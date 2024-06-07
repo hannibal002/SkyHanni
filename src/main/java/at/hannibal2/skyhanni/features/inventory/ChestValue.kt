@@ -184,8 +184,7 @@ object ChestValue {
                 val internalName = stack.getInternalNameOrNull() ?: continue
                 if (internalName.getItemStackOrNull() == null) continue
                 val list = mutableListOf<String>()
-                val pair = EstimatedItemValueCalculator.calculate(stack, list)
-                var (total, _) = pair
+                var total = EstimatedItemValueCalculator.calculate(stack, list).first
                 val key = "$internalName+$total"
                 if (stack.item == Items.enchanted_book)
                     total /= 2
