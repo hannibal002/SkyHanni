@@ -160,7 +160,7 @@ object HideNotClickableItems {
         val stack = slot.stack
 
         if (hide(chestName, stack)) {
-            event.isCanceled = true
+            event.cancel()
 
             if (lastClickTime.passedSince() > 5.seconds) {
                 lastClickTime = SimpleTimeMark.now()
