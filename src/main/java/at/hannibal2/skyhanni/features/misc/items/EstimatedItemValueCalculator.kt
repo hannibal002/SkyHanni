@@ -55,7 +55,7 @@ object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
-    private val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW")
+    private val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
