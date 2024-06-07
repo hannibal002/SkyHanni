@@ -62,24 +62,24 @@ object GardenCropMilestoneFix {
             val amount = group("amount").toInt()
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + (amount * multiplier.second)
+                cropType.getCounter() + (amount * primitiveStack.amount)
             )
             GardenCropMilestoneDisplay.update()
         }
         pestRareDropPattern.matchMatcher(event.message) {
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + multiplier.second
+                cropType.getCounter() + primitiveStack.amount
             )
             GardenCropMilestoneDisplay.update()
         }

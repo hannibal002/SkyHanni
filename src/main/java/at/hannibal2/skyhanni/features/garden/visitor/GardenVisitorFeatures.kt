@@ -427,12 +427,12 @@ object GardenVisitorFeatures {
                 finalList[index] = "$formattedLine §7(§6$format§7)"
             }
             if (!readingShoppingList) continue
-            val multiplier = NEUItems.getMultiplier(internalName)
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(internalName)
 
-            val rawName = multiplier.first.itemNameWithoutColor
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = getByNameOrNull(rawName) ?: continue
 
-            val cropAmount = multiplier.second.toLong() * amount
+            val cropAmount = primitiveStack.amount.toLong() * amount
             val formattedName = "§e${cropAmount.addSeparators()}§7x ${cropType.cropName} "
             val formattedSpeed = cropType.getSpeed()?.let { speed ->
                 val duration = (cropAmount / speed).seconds
