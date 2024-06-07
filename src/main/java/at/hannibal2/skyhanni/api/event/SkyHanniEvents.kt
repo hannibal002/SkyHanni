@@ -52,7 +52,7 @@ object SkyHanniEvents {
     @SubscribeEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Events")
-        event.addIrrelevant() {
+        event.addIrrelevant {
             handlers.values.toMutableList()
                 .filter { it.invokeCount > 0 }
                 .sortedWith(compareBy({ -it.invokeCount }, { it.name }))
