@@ -187,7 +187,6 @@ object EstimatedItemValueCalculator {
         if (internalName.contains("RESISTANCE")) return true
         if (internalName.contains("SPEED")) return true
         if (internalName.contains("EXPERIENCE")) return true
-        if (internalName.contains("LIFELINE")) return true
         if (internalName.contains("FORTITUDE")) return true
         if (internalName.contains("ENDER")) return true
 
