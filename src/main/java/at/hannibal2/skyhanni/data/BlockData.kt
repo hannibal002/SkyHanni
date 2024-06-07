@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.network.play.server.S22PacketMultiBlockChange
 import net.minecraft.network.play.server.S23PacketBlockChange
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BlockData {
+@SkyHanniModule
+object BlockData {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     fun onBlockReceivePacket(event: PacketEvent.ReceiveEvent) {

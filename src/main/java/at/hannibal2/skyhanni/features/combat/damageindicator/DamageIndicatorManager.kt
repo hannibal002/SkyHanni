@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
@@ -54,7 +55,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
@@ -850,7 +850,7 @@ class DamageIndicatorManager {
     }
 
     @SubscribeEvent
-    fun onEntityJoin(event: EntityJoinWorldEvent) {
+    fun onEntityJoin(event: EntityEnterWorldEvent) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
@@ -870,7 +870,7 @@ class DamageIndicatorManager {
 
             if (entityData != null) {
                 if (config.hideDamageSplash) {
-                    event.isCanceled = true
+                    event.cancel()
                 }
                 if (entityData.bossType == BossType.DUMMY) {
                     val uuid = entity.uniqueID
@@ -887,7 +887,7 @@ class DamageIndicatorManager {
                 if (name.contains("Overflux")) return
                 if (name.contains("Mana Flux")) return
                 if (name.contains("Radiant")) return
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
