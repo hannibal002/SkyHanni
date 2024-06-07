@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -25,15 +26,13 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AnitaMedalProfit {
+@SkyHanniModule
+object AnitaMedalProfit {
 
     private val config get() = GardenAPI.config.anitaShop
     private var display = emptyList<Renderable>()
 
-    companion object {
-
-        var inInventory = false
-    }
+    var inInventory = false
 
     enum class MedalType(val displayName: String, val factorBronze: Int) {
         GOLD("§6Gold medal", 8),

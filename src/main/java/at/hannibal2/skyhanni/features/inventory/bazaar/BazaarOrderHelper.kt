@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarDataOrError
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -19,7 +20,8 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BazaarOrderHelper {
+@SkyHanniModule
+object BazaarOrderHelper {
     private val patternGroup = RepoPattern.group("bazaar.orderhelper")
     private val bazaarItemNamePattern by patternGroup.pattern(
         "itemname",
@@ -34,13 +36,10 @@ class BazaarOrderHelper {
         "§7Price per unit: §6(?<number>.*) coins"
     )
 
-    companion object {
-
-        fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
-            "Your Bazaar Orders" -> true
-            "Co-op Bazaar Orders" -> true
-            else -> false
-        }
+    fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
+        "Your Bazaar Orders" -> true
+        "Co-op Bazaar Orders" -> true
+        else -> false
     }
 
     @SubscribeEvent
