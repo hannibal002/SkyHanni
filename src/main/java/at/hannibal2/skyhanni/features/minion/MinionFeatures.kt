@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -59,6 +60,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
+@SkyHanniModule
 object MinionFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.minions
@@ -381,7 +383,7 @@ object MinionFeatures {
         if (entity.customNameTag.contains("§c❤")) {
             val loc = entity.getLorenzVec()
             if (minions.any { it.key.distance(loc) < 5 }) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

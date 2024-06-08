@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -22,6 +23,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()

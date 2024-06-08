@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,7 +27,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 
-class MinionXp {
+@SkyHanniModule
+object MinionXp {
 
     private val config get() = SkyHanniMod.feature.misc.minions
 
@@ -182,7 +184,7 @@ class MinionXp {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minion_xp.mapNotNull { xpType ->
+        xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minionXp.mapNotNull { xpType ->
             xpType.value.mapNotNull { it.key.asInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }
         }.flatten().toMap()
     }
