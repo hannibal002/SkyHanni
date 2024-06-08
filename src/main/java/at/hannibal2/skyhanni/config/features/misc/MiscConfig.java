@@ -199,7 +199,7 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
+    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim community shop account and profile upgrades when complete.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean accountUpgradeReminder = true;

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -60,7 +61,7 @@ object GuiData {
         preDrawEventCanceled = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         preDrawEventCanceled = false
     }

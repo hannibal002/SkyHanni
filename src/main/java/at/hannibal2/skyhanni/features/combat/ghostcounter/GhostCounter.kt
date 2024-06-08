@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatText
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
