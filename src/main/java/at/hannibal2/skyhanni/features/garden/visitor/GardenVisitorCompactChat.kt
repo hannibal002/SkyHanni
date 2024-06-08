@@ -76,10 +76,14 @@ object GardenVisitorCompactChat {
 
         fullyAcceptedPattern.matchMatcher(transformedMessage) {
             visitorAcceptedChat = mutableListOf()
+            rewardsList = mutableListOf()
             val visitorColor = groupOrNull("color") ?: "§7"
             val visitorName = group("name")
             visitorNameFormatted = "$visitorColor$visitorName"
         }
+
+        //If visitor name has not yet been matched, we aren't looking at a visitor accept message, and can ignore this.
+        if(visitorNameFormatted.isBlank()) return;
 
         //Match rewards and transform
         visitorRewardPattern.matchMatcher(transformedMessage) {
