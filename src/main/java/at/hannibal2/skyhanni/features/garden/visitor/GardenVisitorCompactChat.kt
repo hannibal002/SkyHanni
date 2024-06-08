@@ -14,11 +14,11 @@ object GardenVisitorCompactChat {
     private var visitorNameFormatted = "";
     private var rewardsList = mutableListOf<String>()
 
-    private fun compactChat(event: LorenzChatEvent, isFinalReward: Boolean) {
+    private fun compactChat(event: LorenzChatEvent) {
         if(!VisitorAPI.config.compactVisitorRewardChat) return
         event.blockedReason = "compact_visitor"
         visitorAcceptedChat.add(event.message)
-        if(isFinalReward || visitorAcceptedChat.size == 3){
+        if(visitorAcceptedChat.size == 3){
             DelayedRun.runDelayed(200.milliseconds){
                 sendCompact()
             }
@@ -43,14 +43,11 @@ object GardenVisitorCompactChat {
         return "§6§lOFFER ACCEPTED §7w/§r$visitorNameFormatted§6§l:$rewardsFormatted"
     }
 
-    private fun isFinalReward(eventMessage: String): Boolean{
-        return false; //Todo - there's some insane logic that needs to be done here.
-    }
-
     fun handleChat(event: LorenzChatEvent) {
         val transformedMessage = event.message.removeResets()
 
         GardenVisitorFeatures.fullyAcceptedPattern.matchMatcher(transformedMessage){
+            visitorAcceptedChat = mutableListOf()
             val visitorColor = groupOrNull("color") ?: "§7"
             val visitorName = group("name")
             visitorNameFormatted = "$visitorColor$visitorName"
@@ -84,6 +81,6 @@ object GardenVisitorCompactChat {
             )
         }
 
-        compactChat(event, isFinalReward(transformedMessage))
+        compactChat(event)
     }
 }
