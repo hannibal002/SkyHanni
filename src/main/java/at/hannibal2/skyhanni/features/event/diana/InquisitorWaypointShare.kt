@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
@@ -109,7 +110,7 @@ object InquisitorWaypointShare {
 
     val inquisitorTime = mutableListOf<SimpleTimeMark>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {
         val inquisitor = event.inquisitorEntity
         inquisitorsNearby = inquisitorsNearby.editCopy { add(inquisitor) }
@@ -232,13 +233,13 @@ object InquisitorWaypointShare {
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
         partyOnlyCoordsPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
         diedPattern.matchMatcher(message) {

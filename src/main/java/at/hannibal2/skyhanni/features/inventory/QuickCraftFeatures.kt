@@ -80,7 +80,7 @@ object QuickCraftFeatures {
 
         val clickedItem = event.slot?.stack ?: return
         if (!KeyboardManager.isModifierKeyDown() && needsQuickCraftConfirmation(clickedItem)) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

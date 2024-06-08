@@ -26,6 +26,7 @@ enum class IslandType(val displayName: String) {
     MINESHAFT("Mineshaft"),
 
     NONE(""),
+    ANY(""),
     UNKNOWN("???"),
     ;
 
