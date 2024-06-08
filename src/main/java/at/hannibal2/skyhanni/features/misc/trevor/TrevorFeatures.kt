@@ -313,7 +313,7 @@ object TrevorFeatures {
         if (!config.trapperTalkCooldown) return
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

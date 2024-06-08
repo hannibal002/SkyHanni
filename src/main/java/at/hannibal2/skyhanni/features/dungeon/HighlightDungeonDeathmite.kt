@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.LorenzColor
 import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightDungeonDeathmite {
+@SkyHanniModule
+object HighlightDungeonDeathmite {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {

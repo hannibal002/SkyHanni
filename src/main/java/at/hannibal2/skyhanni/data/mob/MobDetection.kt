@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData.Companion.logger
+import at.hannibal2.skyhanni.data.mob.MobData.logger
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -35,9 +36,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-private const val MAX_RETRIES = 20 * 5
 
-class MobDetection {
+@SkyHanniModule
+object MobDetection {
 
     /* Unsupported "Mobs"
         Nicked Players
@@ -52,6 +53,8 @@ class MobDetection {
         Wai
         Zee
      */
+
+    private const val MAX_RETRIES = 20 * 5
 
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
