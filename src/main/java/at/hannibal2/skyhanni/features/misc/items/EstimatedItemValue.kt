@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeStoneJson
@@ -64,9 +65,8 @@ object EstimatedItemValue {
         bookBundleAmount = data.bookBundleAmount
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
 

@@ -72,7 +72,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
-
 @SkyHanniModule
 object GardenVisitorFeatures {
 
@@ -242,7 +241,7 @@ object GardenVisitorFeatures {
     private fun addSackData(
         internalName: NEUInternalName,
         amount: Int,
-        list: MutableList<Any>
+        list: MutableList<Any>,
     ) {
         if (!config.shoppingList.showSackCount) return
 
