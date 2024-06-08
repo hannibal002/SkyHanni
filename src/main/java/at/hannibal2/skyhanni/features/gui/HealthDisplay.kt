@@ -2,11 +2,15 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -60,6 +64,7 @@ object HealthDisplay {
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (RiftAPI.inRift()) return
 
         maxHealth = ActionBarStatsData.MAX_HEALTH.value.replace(",", "").toDoubleOrNull() ?: return
         if (config.predictHealth) return
@@ -77,19 +82,27 @@ object HealthDisplay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.predictHealth) return
+        if (!RiftAPI.inRift() && !config.predictHealth) return
 
         val player = LorenzUtils.getPlayer() ?: return
         hasAbsorption = player.absorptionAmount > 0.0f
 
         healthLast = health
-        health = (player.health/player.maxHealth).toDouble()
-        healthTimer = SimpleTimeMark.now()
-        healthUpdate = healthUpdater((health * maxHealth).toInt() - actualHealth)
-        actualHealth = (health * maxHealth).toInt()
+        if (RiftAPI.inRift())  {
+            if (maxHealth < player.maxHealth) maxHealth = player.maxHealth.toDouble()
+            healthUpdate = healthUpdater(player.health.toInt() - actualHealth)
+            actualHealth = player.health.toInt()
+            health = actualHealth/maxHealth
+//             ChatUtils.chat("$health ; $actualHealth ; $maxHealth")
+            healthTimer = SimpleTimeMark.now()
+        } else {
+            health = (player.health/player.maxHealth).toDouble()
+            healthTimer = SimpleTimeMark.now()
+            healthUpdate = healthUpdater((health * maxHealth).toInt() - actualHealth)
+            actualHealth = (health * maxHealth).toInt()
+        }
 
         setColors()
-//         ChatUtils.chat("hp: ${player.health}; maxhp: ${player.maxHealth}; base maxhp: ${player.baseMaxHealth}")
     }
 
     private fun getColorList(input: Pair<HealthColors, HealthColors>): List<ColorRange> {
@@ -125,6 +138,15 @@ object HealthDisplay {
         }
         healthUpdateTimer = SimpleTimeMark.now()
         return update
+    }
+
+    @SubscribeEvent
+    fun onRiftEntry(event: IslandChangeEvent) {
+        if (event.newIsland != IslandType.THE_RIFT) return
+
+        val player = LorenzUtils.getPlayer() ?: return
+        maxHealth = player.maxHealth.toDouble()
+        ChatUtils.chat("maxHP: $maxHealth")
     }
 
     @SubscribeEvent

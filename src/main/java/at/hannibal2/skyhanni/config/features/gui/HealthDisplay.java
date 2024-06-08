@@ -46,4 +46,12 @@ public class HealthDisplay {
     )
     @ConfigEditorBoolean
     public Boolean healthUpdates = false;
+
+    @Expose
+    @ConfigOption(
+        name = "rift dynamic maxhp",
+        desc = "it makes maxhp dynamic in rift (wow)"
+    )
+    @ConfigEditorBoolean
+    public Boolean riftDynamicHP = false;
 }
