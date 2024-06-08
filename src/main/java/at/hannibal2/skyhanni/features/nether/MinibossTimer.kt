@@ -108,7 +108,7 @@ object MinibossTimer {
             it.area.isPlayerInside()
         }
         currentAreaBoss?.lastSeenArea = SimpleTimeMark.now()
-        val boss = currentAreaBoss ?: return)
+        val boss = currentAreaBoss ?: return
         if (boss.isTimerKnown()) return
 
         val isBossInArea = MobData.skyblockMobs.filter {
