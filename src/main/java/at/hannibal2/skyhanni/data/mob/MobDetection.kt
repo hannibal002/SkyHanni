@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
@@ -332,7 +333,7 @@ object MobDetection {
         allEntitiesViaPacketId.add(id)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         shouldClear.set(true)
     }

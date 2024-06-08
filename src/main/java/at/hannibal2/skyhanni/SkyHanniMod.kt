@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PreInitFinishedEvent
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -61,7 +61,7 @@ class SkyHanniMod {
 
         Commands.init()
 
-        PreInitFinishedEvent().postAndCatch()
+        PreInitFinishedEvent().post()
     }
 
     @Mod.EventHandler
