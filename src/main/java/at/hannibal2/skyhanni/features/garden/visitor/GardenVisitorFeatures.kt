@@ -98,6 +98,7 @@ object GardenVisitorFeatures {
         "partialaccepted",
         "§aYou gave some of the required items!"
     )
+
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
     private val greenThumb = "GREEN_THUMB;1".asInternalName()
