@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
+import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
+import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
