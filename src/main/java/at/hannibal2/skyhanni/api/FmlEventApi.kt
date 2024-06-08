@@ -12,12 +12,11 @@ object FmlEventApi {
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        ClientDisconnectEvent().postAndCatch()
+        ClientDisconnectEvent().post()
     }
 
-    // TODO when we have generic events, make this support generics
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
-        EntityEnterWorldEvent(event.entity).postAndCatch()
+        EntityEnterWorldEvent(event.entity).post()
     }
 }

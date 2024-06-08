@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
@@ -96,7 +96,7 @@ object BingoCardReader {
         }
         BingoAPI.lastBingoCardOpenTime = SimpleTimeMark.now()
 
-        BingoCardUpdateEvent().postAndCatch()
+        BingoCardUpdateEvent().post()
     }
 
     private fun bingoGoalDifference(bingoGoal: BingoGoal, new: Double) {
@@ -162,9 +162,9 @@ object BingoCardReader {
 
         val goal = BingoAPI.personalGoals.firstOrNull { it.displayName == name } ?: return
         goal.done = true
-        BingoGoalReachedEvent(goal).postAndCatch()
-        BingoCardUpdateEvent().postAndCatch()
+        BingoGoalReachedEvent(goal).post()
+        BingoCardUpdateEvent().post()
     }
 
-    private fun BingoJson.BingoData.getDescriptionLine() = "§7" + note.joinToString(" ")
+    private fun BingoData.getDescriptionLine() = "§7" + note.joinToString(" ")
 }

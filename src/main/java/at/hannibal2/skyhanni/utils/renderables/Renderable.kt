@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiIngameMenu
@@ -240,7 +239,7 @@ interface Renderable {
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
-                ToolTipData.lastSlot == null || GuiData.preDrawEventCanceled
+                ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
