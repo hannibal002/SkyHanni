@@ -58,7 +58,7 @@ object HarpFeatures {
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
-    @HandleEvent
+    @SubscribeEvent
     fun onGui(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
@@ -98,7 +98,7 @@ object HarpFeatures {
 
     private var openTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (config.quickRestart && isMenuGui(event.inventoryName)) {
@@ -124,14 +124,14 @@ object HarpFeatures {
         minecraft.currentScreen.setWorldAndResolution(minecraft, i, j)
     }
 
-    @HandleEvent
+    @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return
         unSetGUIScale()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
         unSetGUIScale()
@@ -154,7 +154,7 @@ object HarpFeatures {
         isGUIScaled = false
     }
 
-    @HandleEvent
+    @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -186,7 +186,7 @@ object HarpFeatures {
         }
     }
 
-    @HandleEvent
+    @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showNumbers) return
@@ -201,13 +201,13 @@ object HarpFeatures {
         event.stackTip = KeyboardManager.getKeyName(keyCode).take(3)
     }
 
-    @HandleEvent
+    @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.harpKeybinds", "inventory.helper.harp.keybinds")
         event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")
     }
 
-    @HandleEvent
+    @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.hideMelodyTooltip) return
