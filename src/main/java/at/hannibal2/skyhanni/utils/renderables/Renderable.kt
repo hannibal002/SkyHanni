@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -31,7 +33,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
@@ -292,10 +296,10 @@ interface Renderable {
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             highlightsOnHoverSlots: List<Int> = emptyList(),
+            onHover: () -> Unit = {},
         ) = object : Renderable {
-            override val width: Int
-                get() = max(hovered.width, unhovered.width)
-            override val height = 10
+            override val width = max(hovered.width, unhovered.width)
+            override val height = max(hovered.height, unhovered.height)
             override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
             override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
 
@@ -304,6 +308,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 val pair = Pair(posX, posY)
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    onHover()
                     hovered.render(posX, posY)
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
@@ -313,6 +318,29 @@ interface Renderable {
                     false
                 }
             }
+        }
+
+        /** Bottom Layer must be bigger then the top layer */
+        fun doubleLayered(
+            bottomLayer: Renderable,
+            topLayer: Renderable,
+            blockBottomHover: Boolean = true,
+        ) = object : Renderable {
+            override val width = bottomLayer.width
+            override val height = bottomLayer.height
+            override val horizontalAlign = bottomLayer.horizontalAlign
+            override val verticalAlign = bottomLayer.verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
+                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
+                    bottomLayer.width + 1 to bottomLayer.height + 1
+                } else {
+                    posX to posY
+                }
+                bottomLayer.render(posX, posY)
+            }
+
         }
 
         fun itemStackWithTip(
@@ -562,7 +590,7 @@ interface Renderable {
         }
 
         // TODO use this to render current boosted crop in next jacob contest crops
-        fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor()) = object : Renderable {
+        fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
             override val horizontalAlign = this@renderBounds.horizontalAlign
@@ -844,6 +872,86 @@ interface Renderable {
                 GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideRoundedRectWithOutline(
+            input: Renderable,
+            color: Color,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            topOutlineColor: Int,
+            bottomOutlineColor: Int,
+            borderOutlineThickness: Int,
+            blur: Float = 0.7f,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                RenderUtils.drawRoundRectOutline(
+                    0,
+                    0,
+                    width,
+                    height,
+                    topOutlineColor,
+                    bottomOutlineColor,
+                    borderOutlineThickness,
+                    radius,
+                    blur
+                )
+
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun fakePlayer(
+            player: EntityPlayer,
+            followMouse: Boolean = false,
+            eyesX: Float = 0f,
+            eyesY: Float = 0f,
+            width: Int = 50,
+            height: Int = 100,
+            entityScale: Int = 30,
+            padding: Int = 5,
+            color: Int? = null,
+            colorCondition: () -> Boolean = { true },
+        ) = object : Renderable {
+            override val width = width + 2 * padding
+            override val height = height + 2 * padding
+            override val horizontalAlign = HorizontalAlignment.LEFT
+            override val verticalAlign = VerticalAlignment.TOP
+            val playerWidth = entityScale
+            val playerHeight = entityScale * 2
+            val playerX = width / 2 + padding
+            val playerY = height / 2 + playerHeight / 2 + padding
+
+            override fun render(posX: Int, posY: Int) {
+                GlStateManager.color(1f, 1f, 1f, 1f)
+                if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
+                val mouse = currentRenderPassMousePosition ?: return
+                val mouseXRelativeToPlayer =
+                    if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
+                val mouseYRelativeToPlayer =
+                    if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
+                GlStateManager.translate(0f, 0f, 100f)
+                drawEntityOnScreen(
+                    playerX,
+                    playerY,
+                    entityScale,
+                    mouseXRelativeToPlayer,
+                    mouseYRelativeToPlayer,
+                    player
+                )
+                GlStateManager.translate(0f, 0f, -100f)
             }
         }
     }
