@@ -24,7 +24,8 @@ object GardenVisitorCompactChat {
      * REGEX-TEST:     §fDead Bush
      * REGEX-TEST:     §8+§52 Pelts
      * REGEX-TEST:     $8+§215 §7Garden Experience
-     * REGEX-TEST:     §8+§35.1k §7Farming Experience
+     * REGEX-TEST:     §8+§35k §7Farming XP
+     * REGEX-TEST:     §8+§311k §7Farming XP
      * REGEX-TEST:     §8+§c32 Copper
      * REGEX-TEST:     §7§aFine Flour §8x3
      * REGEX-TEST:     §7§9Turbo-Carrot I Book
