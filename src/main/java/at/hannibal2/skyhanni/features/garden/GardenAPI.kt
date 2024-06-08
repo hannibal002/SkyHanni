@@ -275,7 +275,7 @@ object GardenAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        gardenExperience = data.garden_exp
+        gardenExperience = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size
     }
 

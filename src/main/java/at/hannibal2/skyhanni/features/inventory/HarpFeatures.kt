@@ -174,7 +174,7 @@ object HarpFeatures {
         event.container.inventory.filterNotNull().indexOfFirst {
             songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
-            event.isCanceled = true
+            event.cancel()
             Minecraft.getMinecraft().playerController.windowClick(
                 event.container.windowId,
                 it,

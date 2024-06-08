@@ -55,7 +55,7 @@ object RiftMotesOrb {
             orb.counter++
             orb.pickedUp = false
             if (config.hideParticles && orb.isOrb) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

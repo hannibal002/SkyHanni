@@ -84,7 +84,7 @@ object LivingCaveLivingMetalHelper {
 
         pair?.let {
             if (it.second.distance(event.location) < 3) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
