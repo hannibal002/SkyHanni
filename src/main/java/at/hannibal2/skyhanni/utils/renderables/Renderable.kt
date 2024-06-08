@@ -513,13 +513,13 @@ interface Renderable {
         data class ColorRange(
             val startPercent: Double,
             val endPercent: Double,
-            val color: Color
+            val color: Color,
+            val isChroma: Boolean = false
         )
 
         fun progressBarMultipleColors(
             percent: Double,
             colorRanges: List<ColorRange>,
-            useChroma: Boolean = false,
             texture: SkillProgressBarConfig.TexturedBar.UsedTexture? = null,
             width: Int = 182,
             height: Int = 5,
@@ -537,15 +537,13 @@ interface Renderable {
                 if (texture == null) {
                     Gui.drawRect(posX, posY, posX + width, posY + height, 0xFF43464B.toInt())
 
-                    if (useChroma) {
-                        ChromaShaderManager.begin(ChromaType.STANDARD)
-                    }
-
                     val factor = 0.2
                     Gui.drawRect(posX + 1, posY + 1, posX + width - 1, posY + height - 1, Color.GRAY.darker(factor).rgb)
 
                     var currentWidth = 1
                     for (range in colorRanges) {
+                        if (range.isChroma) ChromaShaderManager.begin(ChromaType.STANDARD)
+
                         val rangeStart = (range.startPercent * (width - 1)).toInt()
                         val rangeEnd = (range.endPercent * (width - 1)).toInt()
                         if (currentWidth >= progress) break
@@ -557,10 +555,8 @@ interface Renderable {
                             Gui.drawRect(posX + drawStart, posY + 1, posX + drawEnd, posY + height - 1, range.color.rgb)
                         }
                         currentWidth = drawEnd
-                    }
 
-                    if (useChroma) {
-                        ChromaShaderManager.end()
+                        if (range.isChroma) ChromaShaderManager.end()
                     }
                 } else {
                     val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
@@ -574,19 +570,17 @@ interface Renderable {
                         posX, posY, textureX, textureY, width, height
                     )
 
-                    if (useChroma) {
-                        ChromaShaderManager.begin(ChromaType.TEXTURED)
-                    }
-
                     var currentWidth = 1
                     for (range in colorRanges) {
+                        if (range.isChroma) ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        
                         val rangeStart = (range.startPercent * (width - 2)).toInt()
                         val rangeEnd = (range.endPercent * (width - 2)).toInt()
                         if (currentWidth >= progress) break
 
 
                         val drawEnd = minOf(rangeEnd, progress)
-                        if (useChroma) {
+                        if (range.isChroma) {
                             GlStateManager.color(1f, 1f, 1f, 1f)
                         } else {
                             GlStateManager.color(
@@ -617,10 +611,8 @@ interface Renderable {
                             )
                         }
                         currentWidth = drawEnd
-                    }
 
-                    if (useChroma) {
-                        ChromaShaderManager.end()
+                        if (range.isChroma) ChromaShaderManager.end()
                     }
                 }
             }
