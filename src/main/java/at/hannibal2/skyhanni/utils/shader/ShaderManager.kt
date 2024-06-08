@@ -34,17 +34,10 @@ object ShaderManager {
         fun enableShader() = enableShader(this)
     }
 
-    private val shaders: MutableMap<String, Shader> = mutableMapOf()
     private var activeShader: Shader? = null
 
     fun enableShader(shader: Shaders) {
-        val shaderName = shader.name.lowercase()
-        var shaderInstance = shaders[shaderName]
-
-        if (shaderInstance == null) {
-            shaderInstance = shader.shader
-            shaders[shaderName] = shaderInstance
-        }
+        val shaderInstance = shader.shader
 
         if (!shaderInstance.created) return
 
