@@ -76,7 +76,7 @@ object TotemOfCorruption {
         for (totem in totems) {
             if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
                 if (totem.location.distance(event.location) < 4.0) {
-                    event.isCanceled = true
+                    event.cancel()
                 }
             }
         }
