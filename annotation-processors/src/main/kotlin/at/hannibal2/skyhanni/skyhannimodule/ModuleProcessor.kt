@@ -18,6 +18,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
     // TODO remove once all events are migrated to SkyHanniEvent
     private var skyHanniEvent: KSType? = null
     private var minecraftForgeEvent: KSType? = null
+    private val warnings = mutableListOf<String>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
 
@@ -61,6 +62,12 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
 
     // TODO use Kotlin Poet once KMixins is merged
     private fun generateFile(symbols: List<KSClassDeclaration>) {
+
+        if (warnings.isNotEmpty()) {
+            warnings.forEach { logger.warn(it) }
+            error("${warnings.size} errors related to event annotations found, please fix them before continuing")
+        }
+
         val dependencies = symbols.mapNotNull { it.containingFile }.toTypedArray()
         val deps = Dependencies(true, *dependencies)
 
@@ -88,19 +95,25 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         for (function in symbol.getDeclaredFunctions()) {
             if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
                 val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
-                isDeclarable(firstParameter!!, minecraftForgeEvent!!, "SubscribeEvent")
+                isDeclarable(symbol, firstParameter!!, minecraftForgeEvent!!, "SubscribeEvent")
             }
 
             if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
                 val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
-                isDeclarable(firstParameter!!, skyHanniEvent!!, "HandleEvent")
+                isDeclarable(symbol, firstParameter!!, skyHanniEvent!!, "HandleEvent")
             }
         }
     }
 
-    private fun isDeclarable(parameterType: KSType, targetType: KSType, annotationType: String) {
+    private fun isDeclarable(
+        clazz: KSClassDeclaration,
+        parameterType: KSType,
+        targetType: KSType,
+        annotationType: String
+    ) {
         if (!targetType.isAssignableFrom(parameterType)) {
-            error("Function parameter must be assignable from $targetType because it is annotated with @$annotationType")
+            val className = clazz.qualifiedName?.asString() ?: "unknown"
+            warnings.add("Function in $className must have the first parameter assignable from $targetType because it is annotated with @$annotationType")
         }
     }
 }
