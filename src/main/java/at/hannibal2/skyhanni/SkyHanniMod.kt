@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.features.chat.Translator
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -85,7 +84,6 @@ class SkyHanniMod {
         loadModule(BingoNextStepHelper())
         loadModule(FarmingWeightDisplay())
         loadModule(Translator())
-        loadModule(CustomScoreboard())
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
