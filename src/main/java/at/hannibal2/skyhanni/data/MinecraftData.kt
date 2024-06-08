@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -19,6 +20,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
+@SkyHanniModule
 object MinecraftData {
 
     @SubscribeEvent(receiveCanceled = true)
@@ -35,7 +37,7 @@ object MinecraftData {
                 packet.volume
             ).postAndCatch()
         ) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -61,7 +63,7 @@ object MinecraftData {
                 packet.particleArgs,
             ).postAndCatch()
         ) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

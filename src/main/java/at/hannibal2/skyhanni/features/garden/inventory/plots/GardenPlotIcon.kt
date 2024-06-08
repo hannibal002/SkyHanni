@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -17,6 +18,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object GardenPlotIcon {
 
     private val config get() = GardenAPI.config.plotIcon
@@ -88,7 +90,7 @@ object GardenPlotIcon {
         if (!isEnabled()) return
         lastClickedSlotId = event.slotId
         if (event.slotId == 53) {
-            event.isCanceled = true
+            event.cancel()
             if (event.clickedButton == 0) {
                 if (editMode == 2)
                     editMode = 0
@@ -104,7 +106,7 @@ object GardenPlotIcon {
         }
         if (editMode != 0) {
             if (event.slotId in 54..89) {
-                event.isCanceled = true
+                event.cancel()
                 copyStack = event.slot?.stack?.copy()?.also {
                     it.stackSize = 1
                 } ?: return
@@ -115,7 +117,7 @@ object GardenPlotIcon {
             if (event.slotId != 53) {
                 val plotList = plotList ?: return
                 if (!whitelistedSlot.contains(event.slotId)) return
-                event.isCanceled = true
+                event.cancel()
                 if (editMode == 2) {
                     plotList.remove(event.slotId)
                     return
