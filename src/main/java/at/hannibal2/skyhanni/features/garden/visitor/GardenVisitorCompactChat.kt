@@ -47,7 +47,7 @@ object GardenVisitorCompactChat {
     )
     private val discardRewardNamePattern by patternGroup.pattern(
         "disregardrewardname",
-        "^(Copper|Farming XP|Garden Experience|Bits)\$"
+        "^(Copper|Farming XP|Farming Experience|Garden Experience|Bits)\$"
     )
     private val rewardsTextPattern by patternGroup.pattern(
         "rewardstext",
