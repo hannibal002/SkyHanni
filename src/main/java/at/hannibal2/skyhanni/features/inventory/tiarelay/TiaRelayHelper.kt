@@ -35,7 +35,7 @@ object TiaRelayHelper {
         val soundName = event.soundName
 
         if (config.tiaRelayMute && soundName == "mob.wolf.whine") {
-            event.isCanceled = true
+            event.cancel()
         }
 
         if (!config.soundHelper) return

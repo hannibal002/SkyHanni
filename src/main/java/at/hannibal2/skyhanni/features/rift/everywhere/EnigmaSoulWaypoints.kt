@@ -147,9 +147,9 @@ object EnigmaSoulWaypoints {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
-        val areas = data.areas ?: error("'areas' is null in EnigmaSouls!")
+        val areas = data.areas
         soulLocations = buildMap {
-            for ((area, locations) in areas) {
+            for ((_, locations) in areas) {
                 for (location in locations) {
                     this[location.name] = location.position
                 }
