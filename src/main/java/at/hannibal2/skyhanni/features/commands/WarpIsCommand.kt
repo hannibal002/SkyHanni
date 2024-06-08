@@ -16,7 +16,7 @@ object WarpIsCommand {
         if (!SkyHanniMod.feature.misc.commands.replaceWarpIs) return
 
         if (event.message.lowercase() == "/warp is") {
-            event.isCanceled = true
+            event.cancel()
             HypixelCommands.island()
         }
     }

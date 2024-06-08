@@ -105,7 +105,7 @@ object ChatManager {
                 originatingModContainer
             ).postAndCatch()
         ) {
-            event.isCanceled = true
+            event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
         }
     }

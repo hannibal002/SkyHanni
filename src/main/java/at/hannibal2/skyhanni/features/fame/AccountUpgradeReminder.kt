@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -17,11 +18,17 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
-class AccountUpgradeReminder {
+@SkyHanniModule
+object AccountUpgradeReminder {
 
     private var inInventory = false
     private var duration: Duration? = null
     private var lastReminderSend = SimpleTimeMark.farPast()
+
+    // TODO repo patterns
+    private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
+    private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
+    private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()
 
     // TODO: find a way to save SimpleTimeMark directly in the config
     private var nextCompletionTime: SimpleTimeMark?
@@ -104,17 +111,10 @@ class AccountUpgradeReminder {
         nextCompletionTime = SimpleTimeMark.farPast()
     }
 
-    companion object {
+    private fun isEnabled() = SkyHanniMod.feature.misc.accountUpgradeReminder
 
-        private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
-        private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
-        private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()
-
-        private fun isEnabled() = SkyHanniMod.feature.misc.accountUpgradeReminder
-
-        fun disable() {
-            SkyHanniMod.feature.misc.accountUpgradeReminder = false
-            ChatUtils.chat("Disabled account upgrade reminder.")
-        }
+    fun disable() {
+        SkyHanniMod.feature.misc.accountUpgradeReminder = false
+        ChatUtils.chat("Disabled account upgrade reminder.")
     }
 }

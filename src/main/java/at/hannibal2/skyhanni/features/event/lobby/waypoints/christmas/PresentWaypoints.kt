@@ -120,9 +120,8 @@ object PresentWaypoints {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventWaypointsJson>("EventWaypoints")
-        presentLocations = loadEventWaypoints(data.presents ?: error("'presents' is null in EventWaypoints!"))
-        presentEntranceLocations =
-            loadEventWaypoints(data.presents_entrances ?: error("'presents_entrances' is null in EventWaypoints!"))
+        presentLocations = loadEventWaypoints(data.presents)
+        presentEntranceLocations = loadEventWaypoints(data.presentsEntrances)
     }
 
     private fun isEnabled(): Boolean =

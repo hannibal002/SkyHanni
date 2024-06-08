@@ -49,7 +49,7 @@ object BazaarOpenPriceWebsite {
         val lastItem = BazaarApi.currentlyOpenedProduct ?: return
 
         if (event.slotId == 22) {
-            event.isCanceled = true
+            event.cancel()
             if (lastClick.passedSince() > 0.3.seconds) {
                 val name = getSkyBlockBzName(lastItem)
                 OSUtils.openBrowser("https://www.skyblock.bz/product/$name")
