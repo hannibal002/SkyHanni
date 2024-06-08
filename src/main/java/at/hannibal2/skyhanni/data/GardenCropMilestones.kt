@@ -181,6 +181,6 @@ object GardenCropMilestones {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        cropMilestoneData = event.getConstant<GardenJson>("Garden").crop_milestones
+        cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
     }
 }

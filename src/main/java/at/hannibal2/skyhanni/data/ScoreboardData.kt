@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S3CPacketUpdateScore
@@ -71,8 +72,8 @@ class ScoreboardData {
 
     var dirty = false
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         if (event.packet is S3CPacketUpdateScore) {
             if (event.packet.objectiveName == "update") {
                 dirty = true

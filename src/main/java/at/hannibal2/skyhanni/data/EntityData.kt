@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -59,8 +60,8 @@ object EntityData {
         maxHealthMap.clear()
     }
 
-    @SubscribeEvent
-    fun onHealthUpdatePacket(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent
+    fun onHealthUpdatePacket(event: PacketReceivedEvent) {
         val packet = event.packet
 
         if (packet !is S1CPacketEntityMetadata) return
