@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
+import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
@@ -554,7 +555,7 @@ public class ProfileSpecificStorage {
         public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
-        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsList();
+        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.generateMaxChestAsList();
 
         public static class DungeonRunInfo {
 
@@ -604,7 +605,7 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
-        // TODO renmae
+        // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
     }
 
@@ -624,4 +625,6 @@ public class ProfileSpecificStorage {
     }
 
 
+    @Expose
+    public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 }

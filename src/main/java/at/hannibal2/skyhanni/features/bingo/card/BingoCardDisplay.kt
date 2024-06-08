@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -247,7 +248,7 @@ class BingoCardDisplay {
     private fun canEditDisplay() =
         Minecraft.getMinecraft().currentScreen is GuiInventory || InventoryUtils.openInventoryName() == "Bingo Card"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.isBingoProfile) return
