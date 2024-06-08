@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
@@ -22,7 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DragonInfoUtils {
     private var inPhase5 = false
-    val logger = LorenzLogger("dragons")
+    private val logger = LorenzLogger("dragons")
 
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -66,7 +67,7 @@ object DragonInfoUtils {
         logKill(event.mob, matchedType)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onParticles(event: PacketReceivedEvent) {
         if (!inPhase5) return
         if (event.packet !is S2APacketParticles) return
