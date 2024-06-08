@@ -33,7 +33,8 @@ object CrystalHollowsWalls {
 
     private const val EXPAND_TIMES = 20
 
-    // Heat is active at Y=64.0 and below, we draw it one above to show that you're inside
+    // Heat is active at Y=64.0 and below as of SkyBlock 0.20.1. We draw the line
+    // one above to accurately show whether the player is inside the Magma Fields.
     private const val HEAT_HEIGHT = 65.0
     private const val MAX_HEIGHT = 190.0
 
