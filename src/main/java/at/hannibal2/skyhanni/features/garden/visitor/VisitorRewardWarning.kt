@@ -66,7 +66,7 @@ object VisitorRewardWarning {
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
