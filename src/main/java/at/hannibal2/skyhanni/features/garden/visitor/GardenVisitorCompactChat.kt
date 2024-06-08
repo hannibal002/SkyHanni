@@ -58,7 +58,7 @@ object GardenVisitorCompactChat {
             val rewardColor = groupOrNull("rewardcolor")
             val amountColor = groupOrNull("amountcolor")
             val amount = groupOrNull("amount")
-            var altAmount = groupOrNull("altamount")
+            val altAmount = groupOrNull("altamount")
             val reward = group("reward")
 
             val fullTextColor = if(rewardColor.isNullOrBlank() || rewardColor == "§7"){
@@ -70,7 +70,7 @@ object GardenVisitorCompactChat {
                 if(GardenVisitorFeatures.discardRewardNamePattern.matcher(reward).matches()) "$amount"
                 else "$amount "
             } else {
-                altAmount ?: ""
+                if(altAmount == null) "" else "$altAmount "
             }
 
             //Don't add name for copper, farming XP, garden XP, or bits
