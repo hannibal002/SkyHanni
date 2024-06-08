@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -169,7 +170,7 @@ object PestParticleWaypoint {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
         if (PestAPI.scoreboardPests == 0) reset()
     }

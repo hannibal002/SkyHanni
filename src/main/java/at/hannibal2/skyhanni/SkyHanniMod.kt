@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PreInitFinishedEvent
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
@@ -96,7 +96,7 @@ class SkyHanniMod {
 
         Commands.init()
 
-        PreInitFinishedEvent().postAndCatch()
+        PreInitFinishedEvent().post()
     }
 
     @Mod.EventHandler
