@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -28,6 +29,7 @@ import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object DungeonLividFinder {
 
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
@@ -117,7 +119,7 @@ object DungeonLividFinder {
 
         if (entity != livid && entity != lividArmorStand) {
             if (entity.name.contains("Livid")) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
