@@ -132,7 +132,7 @@ object PowderTracker {
         if (!isEnabled()) return
         val msg = event.message
 
-        if (HotmData.GREAT_EXPLORER.let { it.enabled && it.activeLevel == 20 }) {
+        if (HotmData.GREAT_EXPLORER.let { it.enabled && it.isMaxLevel }) {
             uncoveredPattern.matchMatcher(msg) {
                 tracker.modify {
                     it.totalChestPicked += 1
