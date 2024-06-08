@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -221,8 +220,8 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onFirstChatEvent(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onFirstChatEvent(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         val packet = event.packet
         if (packet !is S02PacketChat) return
