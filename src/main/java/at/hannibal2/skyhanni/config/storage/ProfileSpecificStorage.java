@@ -629,7 +629,6 @@ public class ProfileSpecificStorage {
         public Integer currentWardrobeSlot = null;
     }
 
-
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 }

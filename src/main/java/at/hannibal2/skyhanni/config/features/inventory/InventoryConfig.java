@@ -110,7 +110,8 @@ public class InventoryConfig {
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
         LARVA_HOOK,
-        VACUUM_GARDEN));
+        VACUUM_GARDEN
+    ));
 
     public enum ItemNumberEntry implements HasLegacyId {
         MASTER_STAR_TIER("§bMaster Star Tier", 0),

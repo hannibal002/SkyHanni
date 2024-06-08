@@ -571,7 +571,6 @@ object CustomWardrobe {
             }?.toChromaColor()?.transformIf({ isInCurrentPage() }) { darker() }
                 ?: (if (!isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
                     .transformIf({ locked || isEmpty() }) { darker() }.addAlpha(100)
-
         }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && inWardrobe() && config.enabled
