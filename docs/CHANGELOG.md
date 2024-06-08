@@ -2230,7 +2230,7 @@
 + Auto-fixing plots marked as pests when killing all pests without SkyHanni earlier. - hannibal2
 + Fixed error message that nearest pests cannot get removed properly. - hannibal2
 + Fixed grammar in Jacob Contest chat messages. - Alexia Luna
-+ Fixed rarity error for items thrown around when using Sprayanator. - hannibal2
++ Fixed rarity error for items thrown around when using Sprayonator. - hannibal2
 + Added cooldown to Garden Warp Commands. - Empa
 + Fixed the detection of Anita and Jacob visitors. - hannibal2
 + Fixed the pets menu detection for /ff. - martimavocado
@@ -2514,7 +2514,7 @@
 + Show a Title when a pest spawns. - hannibal2
 + Show the time since the last pest spawned in your garden. - hannibal2
     + Option to only show the time while holding vacuum in the hand.
-+ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Show the pests that are attracted when changing the selected material of the Sprayonator. - hannibal2
 + Added Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
 + Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
 + Show a display with all known pest locations. - hannibal2
@@ -2600,7 +2600,7 @@
 + Added Waypoints for 2023 Lobby Presents. - walker
 + Added New Year Cake Reminder. - hannibal2
 
-#### Stranded Featuers
+#### Stranded Features
 
 + Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
 
@@ -2703,7 +2703,7 @@
 + Added toggle to hide autopet messages. - CalMWolfs
 + Not only Slayer, also Fishing and Diana item drops will now show in chat & title when over a custom defined price. -
   hannibal2
-+ Added Support to read Badlion sendcoords format. - Cad
++ Added Support to read BadLion sendcoords format. - Cad
 + Added an option to not show cooldown when ability is ready. - Obsidian
 + Added an option to highlight dungeon perm/vc parties. - Cad
 + Added Glowing Mush Mixin support to the Non-God Pod display. - jani
@@ -2730,7 +2730,7 @@
 + Show a text around the new year that the calendar is not loaded for the next Jacob Contest. - hannibal2
 + Fixed visitor reward item refuse inconsistencies. - hannibal2
 + Fixed wrong base 100ff calculations in the farming fortune needed display. - Alexia Luna
-+ Fixed showing Sprayanator plot grid overlay outside garden. - HiZe
++ Fixed showing Sprayonator plot grid overlay outside garden. - HiZe
 + Fixed an error message in the composter inventory when hovering over some items. - hannibal2
 + Correctly load the plot names of locked plots from inventory. - hannibal2
 + Fixed the boosted crop not being highlighted during contest participation. - Alexia Luna
@@ -2804,7 +2804,7 @@
 + Fixed the city project time remaining "soon!" error. - hannibal2
 + Fixed Slayer Profit Tracker display and price problems with Wisp's Ice Flavored Water Potion. - hannibal2
 + Fixed an error message when closing the wheat minion in the Hub. - Thunderblade73
-+ Fixed locraw sending outside Hypixel. - walker
++ Fixed /locraw sending outside Hypixel. - walker
 + Fixed finished city project still reminding and suggests buying items. - hannibal2
     + Open the city project inventory once again to fix warnings correctly.
 + Fixed kick alert triggering instantly. - Alexia Luna
@@ -2857,7 +2857,7 @@
 + Added test command /shsendtitle - Cad
 + Saving bingo goal data into the config. - hannibal2
 + Added WorldEdit region selection preview support. - nea
-    + Command /shworldedit and rigth/left clicking with a wood axe work.
+    + Command /shworldedit and right/left clicking with a wood axe work.
 + Fixed error message in the "/shconfig set" command. - Thunderblade73
 + Add a check for the SkyHanni repository ID in publish. - walker
 + Cleanup getItemsInOpenChest. - walker
@@ -3088,7 +3088,7 @@
 
 #### Events
 
-+ Highlight Jerries during the Jerrypoclaypse. - Erymanthus
++ Highlight Jerries during the Jerrypocalypse. - Erymanthus
 + Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
@@ -3288,7 +3288,7 @@
 + Fixed the leftStronghold area not getting detected. - hannibal2
 + Fixed error message with Ashfang Blazes. - hannibal2
 + Fixed crash with pet exp tooltip. - hannibal2
-+ Fixed dungeoneering showing as 0 in the skill menu. - hannibal2
++ Fixed Dungeoneering showing as 0 in the skill menu. - hannibal2
 + Fixed showing minion level as 101 in some menus. - hannibal2
 
 #### Config
@@ -3353,7 +3353,7 @@
 + **King Talisman Helper**
     + Show kings you have not talked to yet, and when the next missing king will appear.
 + **Harp Keybinds** - NetheriteMiner
-    + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
+    + In Melody's Harp, press buttons with your number row on the keyboard instead of clicking.
 + **Ender Node Tracker** - pretz
     + Tracks items and profit obtained from mining ender nodes and killing normal endermen.
 + **Fishing timer** now works in **Crystal Hollows** as well. (Worm fishing)
