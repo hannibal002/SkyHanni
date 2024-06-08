@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.skyhannimodule
 
+import com.google.devtools.ksp.getDeclaredFunctions
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -8,12 +9,24 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
 import java.io.OutputStreamWriter
 
 class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logger: KSPLogger) : SymbolProcessor {
 
+    // TODO remove once all events are migrated to SkyHanniEvent
+    private var skyHanniEvent: KSType? = null
+    private var minecraftForgeEvent: KSType? = null
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
+
+        skyHanniEvent =
+            resolver.getClassDeclarationByName(resolver.getKSNameFromString("at.hannibal2.skyhanni.api.event.SkyHanniEvent"))
+                ?.asStarProjectedType()
+        minecraftForgeEvent =
+            resolver.getClassDeclarationByName(resolver.getKSNameFromString("net.minecraftforge.fml.common.eventhandler.Event"))
+                ?.asStarProjectedType()
 
         val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
@@ -41,9 +54,12 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             return null
         }
 
+        checkCorrectEventAnnotations(symbol)
+
         return symbol
     }
 
+    // TODO use Kotlin Poet once KMixins is merged
     private fun generateFile(symbols: List<KSClassDeclaration>) {
         val dependencies = symbols.mapNotNull { it.containingFile }.toTypedArray()
         val deps = Dependencies(true, *dependencies)
@@ -64,5 +80,27 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         }
 
         logger.warn("Generated LoadedModules file with ${symbols.size} modules")
+    }
+
+    // TODO remove once all events are migrated to SkyHanniEvent
+    private fun checkCorrectEventAnnotations(symbol: KSClassDeclaration) {
+
+        for (function in symbol.getDeclaredFunctions()) {
+            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
+                isDeclarable(firstParameter!!, minecraftForgeEvent!!, "SubscribeEvent")
+            }
+
+            if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
+                isDeclarable(firstParameter!!, skyHanniEvent!!, "HandleEvent")
+            }
+        }
+    }
+
+    private fun isDeclarable(parameterType: KSType, targetType: KSType, annotationType: String) {
+        if (!targetType.isAssignableFrom(parameterType)) {
+            error("Function parameter must be assignable from $targetType because it is annotated with @$annotationType")
+        }
     }
 }
