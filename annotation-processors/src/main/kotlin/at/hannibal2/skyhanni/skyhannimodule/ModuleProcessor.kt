@@ -81,7 +81,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
 
         if (warnings.isNotEmpty()) {
             warnings.forEach { logger.warn(it) }
-            error("${warnings.size} errors related to event annotations found, please fix them before continuing")
+            error("${warnings.size} errors related to event annotations found, please fix them before continuing. Click on the kspKotlin build log for more information.")
         }
 
         val dependencies = symbols.mapNotNull { it.containingFile }.toTypedArray()
