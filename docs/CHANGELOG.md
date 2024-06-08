@@ -72,6 +72,9 @@
   raven (https://github.com/hannibal002/SkyHanni/pull/1738)
 + Wand of Strength cooldown is now displayed. - saga (https://github.com/hannibal002/SkyHanni/pull/1948)
     + The cooldown displayed is for the buff, not the item usage.
++ Added Favorite Power Stones. - saga (https://github.com/hannibal002/SkyHanni/pull/2002)
+    + Highlighted in the Thaumaturgy inventory.
+    + Shift-click to add/remove them.
 
 #### Fishing Features
 
@@ -158,6 +161,9 @@
 + Improved Bazaar re-buy order helper to also search in the Bazaar upon chat message click. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1946)
 + Clarified the maximum clicks message for experiments. - Luna (https://github.com/hannibal002/SkyHanni/pull/1963)
++ Improved Attribute Prices in Estimated Item Value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2020)
+    + Ignoring irrelevant attributes (Resistance, Speed, Experience, etc).
+    + No longer counting attribute combos or single attribute prices when cheaper than the base item price.
 
 #### Fishing Improvements
 
@@ -213,6 +219,8 @@
   L3Cache (https://github.com/hannibal002/SkyHanni/pull/1970)
 + Fixed Garden Visitor Drop Statistics not tracking new data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1976)
     + This may also fix the display not showing up.
++ Fixed Non-Craftable Items breaking the Visitor Shopping List. - jani/hannibal2/nea (https://github.com/hannibal002/SkyHanni/pull/2019)
++ Fixed stats in visitor inventory not showing under certain circumstances. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2018)
 
 #### Chocolate Factory & Hoppity Hunt Fixes
 
@@ -242,6 +250,7 @@
 
 + Fixed typo in /shclearkismet command. - fahr-plan (https://github.com/hannibal002/SkyHanni/pull/1912)
 + Fixed 'viewrecipe' lowercase not working. - Obsidian + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1939)
++ Fixed rare cases where queued /gfs didn't work. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1999)
 
 #### Fishing Fixes
 
@@ -285,6 +294,7 @@
 + Config no longer resets when an incorrect value is entered. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1979)
 + Config no longer resets when downgrading versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1979)
 + Fixed accidental hiding of boss bars. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1980)
++ Fixed Account Upgrade Reminder feature with simultaneous account and profile upgrades. - appable (https://github.com/hannibal002/SkyHanni/pull/2007)
 
 ### Technical Details
 
@@ -320,6 +330,20 @@
 + Moved json package inside the utils package. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1979)
 + Added Tab Widget abstraction. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1150)
 + Added EntityDisplayNameEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/1687)
++ Make build fail when event functions have wrong annotation. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2024)
++ Begin transitioning to the new event system. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2023)
++ Added custom event bus. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2008)
+    + Added live plugin to show when an event method is missing its annotation.
++ Changed Java to Kotlin for repository files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1543)
++ Made in-game date display use a pattern instead of repository. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1543)
++ All /gfs calls go through gfs API now. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1999)
++ Made ItemHoverEvent be called earlier. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2018)
++ Removed deprecated bazaar variables. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1987)
++ Removed another deprecated function. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1956)
++ Used event.cancel() over event.isCanceled = true for LorenzEvents. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1915)
++ Converted classes to objects, then used annotation. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1982)
++ Added annotations to objects. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1974)
++ Added module plugin. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1974)
 
 ## Version 0.25
 

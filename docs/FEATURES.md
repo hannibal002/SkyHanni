@@ -203,6 +203,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to remove enchant descriptions.
     + Option to change enchant formatting.
     + Also parses tooltips from /show.
++ Favorite Power Stones. - saga (https://github.com/hannibal002/SkyHanni/pull/2002)
+    + Highlighted in the Thaumaturgy inventory.
+    + Shift-click to add/remove them.
 
 </details>
 <details open><summary>
