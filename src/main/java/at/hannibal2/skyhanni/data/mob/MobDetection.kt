@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @SkyHanniModule
 object MobDetection {
 
-    /* Unsupported "Mobs"
+    /* Unsupported Entities
         Nicked Players
         Odanate
         Silk Worm
