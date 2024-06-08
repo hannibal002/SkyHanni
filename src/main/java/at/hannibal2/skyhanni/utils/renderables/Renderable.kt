@@ -365,7 +365,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 DarkenShader.darknessLevel = amount
-                ShaderManager.enableShader("darken")
+                ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
                 this@darken.render(posX, posY)
                 ShaderManager.disableShader()
             }
