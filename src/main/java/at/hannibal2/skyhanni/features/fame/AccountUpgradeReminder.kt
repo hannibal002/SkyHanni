@@ -25,6 +25,11 @@ object AccountUpgradeReminder {
     private var duration: Duration? = null
     private var lastReminderSend = SimpleTimeMark.farPast()
 
+    // TODO repo patterns
+    private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
+    private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
+    private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()
+
     // TODO: find a way to save SimpleTimeMark directly in the config
     private var nextCompletionTime: SimpleTimeMark?
         get() = ProfileStorageData.playerSpecific?.nextAccountUpgradeCompletionTime?.asTimeMark()
@@ -105,10 +110,6 @@ object AccountUpgradeReminder {
         playerSpecific.currentAccountUpgrade = null
         nextCompletionTime = SimpleTimeMark.farPast()
     }
-
-    private val durationRegex = "§8Duration: (\\d{1,3})d".toRegex()
-    private val startedRegex = "§eYou started the §r§a(.+) §r§eupgrade!".toRegex()
-    private val claimedRegex = "§eYou claimed the §r§a.+ §r§eupgrade!".toRegex()
 
     private fun isEnabled() = SkyHanniMod.feature.misc.accountUpgradeReminder
 

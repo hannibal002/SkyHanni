@@ -16,27 +16,27 @@ object WatchdogHider {
     private var blockedLines = 0
     private var startLineComponent: IChatComponent? = null
 
-    private const val WATCHDOG_START_LINE = "§f"
-    private const val WATCHDOG_ANNOUNCEMENT_LINE = "§4[WATCHDOG ANNOUNCEMENT]"
-    private const val WATCHDOG_END_LINE = "§c"
+    private const val START_LINE = "§f"
+    private const val ANNOUNCEMENT_LINE = "§4[WATCHDOG ANNOUNCEMENT]"
+    private const val END_LINE = "§c"
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
 
         when (event.message) {
-            WATCHDOG_START_LINE -> {
+            START_LINE -> {
                 startLineComponent = event.chatComponent
                 blockedLines = 0
             }
 
-            WATCHDOG_ANNOUNCEMENT_LINE -> {
+            ANNOUNCEMENT_LINE -> {
                 ChatManager.retractMessage(startLineComponent, "watchdog")
                 startLineComponent = null
                 inWatchdog = true
             }
 
-            WATCHDOG_END_LINE -> {
+            END_LINE -> {
                 event.blockedReason = "watchdog"
                 inWatchdog = false
             }

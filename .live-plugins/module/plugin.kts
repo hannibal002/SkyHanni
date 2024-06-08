@@ -54,6 +54,7 @@ class ModuleInspectionKotlin : AbstractKotlinInspection() {
             }
 
             override fun visitObjectDeclaration(declaration: KtObjectDeclaration) {
+                if (declaration.isCompanion()) return
                 val hasAnnotation = declaration.annotationEntries.any { it.shortName?.asString() == skyHanniModule }
                 if (hasAnnotation) return
 

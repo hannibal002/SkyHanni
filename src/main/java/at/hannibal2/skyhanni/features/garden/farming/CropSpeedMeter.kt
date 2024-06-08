@@ -103,7 +103,6 @@ object CropSpeedMeter {
                 val baseDrops = it.baseDrops
                 val farmingFortune = (cropsPerBlocks * 100 / baseDrops).round(3)
 
-
                 list.add(" §7Calculated farming Fortune: §e" + farmingFortune.addSeparators())
                 list.add("§cOpen /cropmilestones again to recalculate!")
 

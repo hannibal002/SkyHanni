@@ -44,6 +44,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CityProjectFeatures {
 
+    private val config get() = SkyHanniMod.feature.event.cityProject
+
     private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
@@ -58,9 +60,7 @@ object CityProjectFeatures {
         "§aProject is (?:being built|released)!"
     )
 
-
-    private val config get() = SkyHanniMod.feature.event.cityProject
-    private fun disable() {
+    fun disable() {
         config.dailyReminder = false
         ChatUtils.chat("Disabled city project reminder messages!")
     }

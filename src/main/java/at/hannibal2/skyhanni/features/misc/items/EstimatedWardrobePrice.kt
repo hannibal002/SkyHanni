@@ -39,7 +39,8 @@ object EstimatedWardrobePrice {
 
         var totalPrice = 0.0
         for (item in items) {
-            val price = EstimatedItemValueCalculator.calculate(item, mutableListOf()).first
+
+            val price = EstimatedItemValueCalculator.getTotalPrice(item)
             totalPrice += price
 
             toolTip.add(index++, "  §7- ${item.name}: §6${NumberUtil.format(price)}")
@@ -57,7 +58,7 @@ object EstimatedWardrobePrice {
 
         for ((slot, item) in event.inventoryItems) {
             item.getInternalNameOrNull() ?: continue
-            val price = EstimatedItemValueCalculator.calculate(item, mutableListOf()).first
+            val price = EstimatedItemValueCalculator.getTotalPrice(item)
             if (price == 0.0) continue
             val id = slot % 9
             val list = map.getOrPut(id) { mutableListOf() }

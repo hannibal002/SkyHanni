@@ -24,17 +24,17 @@ object HellionShieldHelper {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         hellionShieldMobs.clear()
     }
-}
 
-fun EntityLiving.setHellionShield(shield: HellionShield?) {
-    if (shield != null) {
-        HellionShieldHelper.hellionShieldMobs[this] = shield
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
-            this,
-            shield.color.toColor().withAlpha(80)
-        ) { LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.coloredMobs }
-    } else {
-        HellionShieldHelper.hellionShieldMobs.remove(this)
-        RenderLivingEntityHelper.removeCustomRender(this)
+    fun EntityLiving.setHellionShield(shield: HellionShield?) {
+        if (shield != null) {
+            hellionShieldMobs[this] = shield
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                this,
+                shield.color.toColor().withAlpha(80)
+            ) { LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.coloredMobs }
+        } else {
+            hellionShieldMobs.remove(this)
+            RenderLivingEntityHelper.removeCustomRender(this)
+        }
     }
 }

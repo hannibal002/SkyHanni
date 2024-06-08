@@ -41,8 +41,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
-            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
-            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.instantBuyPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.sellOfferPrice ?: name.getPriceOrNull() ?: 0.0
 
             else -> name.getNpcPriceOrNull() ?: 0.0
         }

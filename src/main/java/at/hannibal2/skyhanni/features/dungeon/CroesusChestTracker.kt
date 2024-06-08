@@ -272,17 +272,15 @@ object CroesusChestTracker {
         ChatUtils.chat("Kismet State was cleared!")
     }
 
-    fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(MAX_CHESTS)
-
     @JvmStatic
     fun generateMaxChestAsList(): List<DungeonRunInfo> = generateMaxChest().toList()
+    private fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(MAX_CHESTS)
 
     fun getLastActiveChest(includeDungeonKey: Boolean = false): Int =
         (croesusChests?.indexOfLast {
             it.floor != null &&
                 (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))
         } ?: -1) + 1
-
 
     enum class OpenedState {
         UNOPENED,
