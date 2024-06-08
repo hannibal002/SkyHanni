@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -117,8 +118,8 @@ object TabListData {
 
     var dirty = false
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         if (event.packet is S38PacketPlayerListItem) {
             dirty = true
         }

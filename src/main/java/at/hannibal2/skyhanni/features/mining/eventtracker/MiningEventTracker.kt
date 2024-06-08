@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -29,7 +30,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class MiningEventTracker {
+@SkyHanniModule
+object MiningEventTracker {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
 
     private val patternGroup = RepoPattern.group("mining.eventtracker")
@@ -59,11 +61,9 @@ class MiningEventTracker {
 
     private var canRequestAt = SimpleTimeMark.farPast()
 
-    companion object {
-        var apiErrorCount = 0
+    var apiErrorCount = 0
 
-        val apiError get() = apiErrorCount > 0
-    }
+    val apiError get() = apiErrorCount > 0
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

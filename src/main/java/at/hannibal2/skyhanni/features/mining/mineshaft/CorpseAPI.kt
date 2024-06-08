@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.mineshaft
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -10,7 +11,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CorpseAPI {
+@SkyHanniModule
+object CorpseAPI {
 
     private val patternGroup = RepoPattern.group("mining.mineshaft")
     private val chatPatternGroup = patternGroup.group("chat")

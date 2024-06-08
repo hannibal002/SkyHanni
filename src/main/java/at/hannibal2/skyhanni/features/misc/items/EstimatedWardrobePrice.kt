@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -12,7 +13,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EstimatedWardrobePrice {
+@SkyHanniModule
+object EstimatedWardrobePrice {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     var data = mutableMapOf<Int, MutableList<ItemStack>>()
@@ -37,7 +39,8 @@ class EstimatedWardrobePrice {
 
         var totalPrice = 0.0
         for (item in items) {
-            val price = EstimatedItemValueCalculator.calculate(item, mutableListOf()).first
+
+            val price = EstimatedItemValueCalculator.getTotalPrice(item)
             totalPrice += price
 
             toolTip.add(index++, "  §7- ${item.name}: §6${NumberUtil.format(price)}")
@@ -55,7 +58,7 @@ class EstimatedWardrobePrice {
 
         for ((slot, item) in event.inventoryItems) {
             item.getInternalNameOrNull() ?: continue
-            val price = EstimatedItemValueCalculator.calculate(item, mutableListOf()).first
+            val price = EstimatedItemValueCalculator.getTotalPrice(item)
             if (price == 0.0) continue
             val id = slot % 9
             val list = map.getOrPut(id) { mutableListOf() }
