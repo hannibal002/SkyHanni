@@ -21,9 +21,9 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companio
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLines.handleCustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.arrowConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.chunkedConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.customlineConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.customlineConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
