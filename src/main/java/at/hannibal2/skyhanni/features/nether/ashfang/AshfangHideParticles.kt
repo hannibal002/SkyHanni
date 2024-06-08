@@ -29,7 +29,7 @@ object AshfangHideParticles {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isEnabled()) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -44,7 +44,7 @@ object AshfangHideParticles {
                 val name = stack.name
                 if (name == "§aFairy Souls") continue
                 if (name == "Glowstone") {
-                    event.isCanceled = true
+                    event.cancel()
                 }
             }
         }

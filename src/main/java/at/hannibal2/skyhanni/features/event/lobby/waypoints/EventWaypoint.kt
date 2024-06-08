@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.event.lobby.waypoints
 
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointData
 import at.hannibal2.skyhanni.utils.LorenzVec
 
 data class EventWaypoint(
@@ -9,7 +9,7 @@ data class EventWaypoint(
     var isFound: Boolean = false,
 )
 
-fun loadEventWaypoints(waypoints: Map<String, List<EventWaypointsJson.Waypoint>>): Map<String, MutableSet<EventWaypoint>> {
+fun loadEventWaypoints(waypoints: Map<String, List<EventWaypointData>>): Map<String, MutableSet<EventWaypoint>> {
     return buildMap {
         waypoints.forEach { lobby ->
             val set = mutableSetOf<EventWaypoint>()

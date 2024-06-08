@@ -65,11 +65,11 @@ object DungeonHideItems {
         if (entity is EntityItem) {
             val stack = entity.entityItem
             if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
-                event.isCanceled = true
+                event.cancel()
             }
 
             if (config.hideJournalEntry && stack.cleanName() == "Journal Entry") {
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
@@ -79,44 +79,44 @@ object DungeonHideItems {
         val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
             if (entity.name.startsWith("§9Superboom TNT")) {
-                event.isCanceled = true
+                event.cancel()
             }
 
             if (head != null && head.cleanName() == "Superboom TNT") {
-                event.isCanceled = true
+                event.cancel()
                 hideParticles[entity] = System.currentTimeMillis()
             }
         }
 
         if (config.hideBlessing) {
             if (entity.name.startsWith("§dBlessing of ")) {
-                event.isCanceled = true
+                event.cancel()
             }
 
             if (skullTexture == BLESSING_TEXTURE) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
         if (config.hideReviveStone) {
             if (entity.name == "§6Revive Stone") {
-                event.isCanceled = true
+                event.cancel()
             }
 
             if (skullTexture == REVIVE_STONE_TEXTURE) {
-                event.isCanceled = true
+                event.cancel()
                 hideParticles[entity] = System.currentTimeMillis()
             }
         }
 
         if (config.hidePremiumFlesh) {
             if (entity.name == "§9Premium Flesh") {
-                event.isCanceled = true
+                event.cancel()
                 hideParticles[entity] = System.currentTimeMillis()
             }
 
             if (skullTexture == PREMIUM_FLESH_TEXTURE) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
@@ -127,15 +127,15 @@ object DungeonHideItems {
                 if (lastMove + 100 > System.currentTimeMillis()) {
                     return
                 }
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
         if (config.hideHealerOrbs) {
             when {
-                entity.name.startsWith("§c§lDAMAGE §e") -> event.isCanceled = true
-                entity.name.startsWith("§c§lABILITY DAMAGE §e") -> event.isCanceled = true
-                entity.name.startsWith("§a§lDEFENSE §e") -> event.isCanceled = true
+                entity.name.startsWith("§c§lDAMAGE §e") -> event.cancel()
+                entity.name.startsWith("§c§lABILITY DAMAGE §e") -> event.cancel()
+                entity.name.startsWith("§a§lDEFENSE §e") -> event.cancel()
             }
 
             when (skullTexture) {
@@ -143,7 +143,7 @@ object DungeonHideItems {
                 SUPPORT_ORB_TEXTURE,
                 DAMAGE_ORB_TEXTURE,
                 -> {
-                    event.isCanceled = true
+                    event.cancel()
                     hideParticles[entity] = System.currentTimeMillis()
                     return
                 }
@@ -153,14 +153,14 @@ object DungeonHideItems {
         if (config.hideHealerFairy) {
             // Healer Fairy texture is stored in id 0, not id 4 for some reasos.
             if (entity.inventory[0]?.getSkullTexture() == HEALER_FAIRY_TEXTURE) {
-                event.isCanceled = true
+                event.cancel()
                 return
             }
         }
 
         if (config.hideSoulweaverSkulls) {
             if (skullTexture == SOUL_WEAVER_HIDER) {
-                event.isCanceled = true
+                event.cancel()
                 return
             }
         }
@@ -176,10 +176,10 @@ object DungeonHideItems {
             val distance = packetLocation.distance(armorStand.getLorenzVec())
             if (distance < 2) {
                 if (event.type == EnumParticleTypes.FIREWORKS_SPARK) {
-                    event.isCanceled = true
+                    event.cancel()
                 }
                 if (event.type == EnumParticleTypes.REDSTONE) {
-                    event.isCanceled = true
+                    event.cancel()
                 }
             }
         }

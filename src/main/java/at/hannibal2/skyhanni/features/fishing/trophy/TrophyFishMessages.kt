@@ -47,7 +47,7 @@ object TrophyFishMessages {
         val trophyFishes = TrophyFishManager.fish ?: return
         val trophyFishCounts = trophyFishes.getOrPut(internalName) { mutableMapOf() }
         val amount = trophyFishCounts.addOrPut(rarity, 1)
-        TrophyFishCaughtEvent(internalName, rarity).postAndCatch()
+        TrophyFishCaughtEvent(internalName, rarity).post()
 
         if (shouldBlockTrophyFish(rarity, amount)) {
             event.blockedReason = "low_trophy_fish"
