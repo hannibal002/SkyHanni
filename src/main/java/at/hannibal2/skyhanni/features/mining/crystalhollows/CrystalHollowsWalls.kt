@@ -70,7 +70,7 @@ object CrystalHollowsWalls {
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val position = RenderUtils.getViewerPos(event.partialTicks)
-        if (position.y < HEAT_HEIGHT + yViewOffset) {
+        if (position.y <= HEAT_HEIGHT + yViewOffset) {
             drawHeat(event)
         } else if (nucleusBBOffsetY.isVecInside(position.toVec3())) {
             if (!config.nucleus) return
