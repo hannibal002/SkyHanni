@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.M7DragonChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -67,7 +67,7 @@ object DragonInfoUtils {
     }
 
     @SubscribeEvent
-    fun onParticles(event: PacketEvent.ReceiveEvent) {
+    fun onParticles(event: PacketReceivedEvent) {
         if (!inPhase5) return
         if (event.packet !is S2APacketParticles) return
 
