@@ -133,10 +133,7 @@ object PowderTracker {
         if (!isEnabled()) return
         val msg = event.message
 
-        val greatExplorerMaxed = HotmData.GREAT_EXPLORER.let { it.enabled && it.activeLevel == 20 }
-        ChatUtils.debug("Great Explorer maxed: $greatExplorerMaxed")
-
-        if (greatExplorerMaxed) {
+        if (HotmData.GREAT_EXPLORER.let { it.enabled && it.activeLevel == 20 }) {
             uncoveredPattern.matchMatcher(msg) {
                 tracker.modify {
                     it.totalChestPicked += 1
