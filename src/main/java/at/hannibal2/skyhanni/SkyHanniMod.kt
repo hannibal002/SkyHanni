@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -64,7 +63,6 @@ class SkyHanniMod {
 
         // data
         loadModule(HypixelData())
-        loadModule(ScoreboardData())
         loadModule(SkillExperience())
 
         // features
