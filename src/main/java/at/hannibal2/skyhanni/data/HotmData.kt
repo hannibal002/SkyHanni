@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -246,6 +247,9 @@ enum class HotmData(
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
         }
 
+    val isMaxLevel: Boolean
+        get() = activeLevel >= maxLevel // >= to account for +1 from Blue Cheese
+
     private fun blueEgg() = if (this != PEAK_OF_THE_MOUNTAIN && maxLevel != 1 && HotmAPI.isBlueEggActive) 1 else 0
 
     var enabled: Boolean
@@ -267,6 +271,7 @@ enum class HotmData(
 
     fun getReward() = rewardFun(activeLevel)
 
+    @SkyHanniModule
     companion object {
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree

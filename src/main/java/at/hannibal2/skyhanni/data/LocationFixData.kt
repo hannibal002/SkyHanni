@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.LocationFixJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object LocationFixData {
 
     private var locationFixes = mutableListOf<LocationFix>()
@@ -20,9 +22,9 @@ object LocationFixData {
         locationFixes.clear()
 
         for (fix in data.locationFixes.values) {
-            val island = IslandType.getByName(fix.island_name)
+            val island = IslandType.getByName(fix.islandName)
             val area = fix.a.axisAlignedTo(fix.b)
-            val realLocation = fix.real_location
+            val realLocation = fix.realLocation
 
             locationFixes.add(LocationFix(island, area, realLocation))
         }
