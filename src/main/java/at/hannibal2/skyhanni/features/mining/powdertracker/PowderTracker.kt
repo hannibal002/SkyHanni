@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
 import at.hannibal2.skyhanni.data.BossbarData
+import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -131,7 +133,10 @@ object PowderTracker {
         if (!isEnabled()) return
         val msg = event.message
 
-        if (config.greatExplorerMaxed) {
+        val greatExplorerMaxed = HotmData.GREAT_EXPLORER.let { it.enabled && it.activeLevel == 20 }
+        ChatUtils.debug("Great Explorer maxed: $greatExplorerMaxed")
+
+        if (greatExplorerMaxed) {
             uncoveredPattern.matchMatcher(msg) {
                 tracker.modify {
                     it.totalChestPicked += 1
