@@ -8,8 +8,12 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
@@ -224,15 +228,16 @@ class RepoManager(private val configLocation: File) {
     fun displayRepoStatus(joinEvent: Boolean) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
-                ChatUtils.error(
-                    "§7Repo Issue! Some features may not work. Please report this error on the Discord!\n"
-                        + "§7Repo Auto Update Value: §c${config.repoAutoUpdate}\n"
-                        + "§7If you have Repo Auto Update turned off, please try turning that on.\n"
-                        + "§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):"
-                )
+                val text = mutableListOf<IChatComponent>()
+                text.add("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. Please report this error on the Discord!".asComponent())
+                text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
+                text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
+                text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
+
                 for (constant in unsuccessfulConstants) {
-                    ChatUtils.chat("   §e- §7$constant")
+                    text.add("   §e- §7$constant".asComponent())
                 }
+                Text.multiline(text).send()
             }
             return
         }

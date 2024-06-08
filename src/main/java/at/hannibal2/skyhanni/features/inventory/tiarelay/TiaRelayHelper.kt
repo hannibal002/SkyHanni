@@ -75,7 +75,7 @@ object TiaRelayHelper {
         val name = sounds.values.first().name
         for (sound in sounds.toMutableMap()) {
             if (sound.value.name != name) {
-                ChatUtils.error("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
+                ChatUtils.userError("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
                 ChatUtils.clickableChat("Click here to run /togglemusic", onClick = {
                     HypixelCommands.toggleMusic()
                 })
