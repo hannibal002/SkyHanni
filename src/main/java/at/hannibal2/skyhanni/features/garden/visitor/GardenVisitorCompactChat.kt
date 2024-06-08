@@ -29,6 +29,7 @@ object GardenVisitorCompactChat {
      * REGEX-TEST:     §7§aFine Flour §8x3
      * REGEX-TEST:     §7§9Turbo-Carrot I Book
      * REGEX-TEST:     §7§8+§d1,241 Gemstone Powder
+     * REGEX-TEST:     §7§8+§2Crystal Hollows Pass
      */
     private val visitorRewardPattern by patternGroup.pattern(
         "visitorreward",
