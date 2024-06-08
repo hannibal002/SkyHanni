@@ -1,52 +1,32 @@
 package at.hannibal2.skyhanni
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands
-import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SkillExperience
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PreInitFinishedEvent
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
-import at.hannibal2.skyhanni.features.chat.WatchdogHider
-import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
-import at.hannibal2.skyhanni.features.fame.AccountUpgradeReminder
-import at.hannibal2.skyhanni.features.fame.CityProjectFeatures
-import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
-import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
-import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
-import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarOrderHelper
-import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
-import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
-import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -76,7 +56,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.6",
+    version = "0.26.Beta.7",
 )
 class SkyHanniMod {
 
@@ -92,51 +72,29 @@ class SkyHanniMod {
         // data
         loadModule(HypixelData())
         loadModule(ScoreboardData())
-        loadModule(SeaCreatureManager())
-        loadModule(MobData())
-//        loadModule(Year300RaffleEvent)
-        loadModule(TitleManager())
         loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
         loadModule(GuiEditManager())
-        loadModule(ActionBarStatsData)
-        loadModule(GardenBestCropTime())
-        loadModule(HotmData)
-
-        // APIs
-        loadModule(BazaarApi())
 
         // features
-        loadModule(BazaarOrderHelper())
         loadModule(DamageIndicatorManager())
-        loadModule(HellionShieldHelper())
-        loadModule(PlayerChatFilter())
         loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
-        loadModule(CroesusChestTracker())
         loadModule(CrimsonIsleReputationHelper(this))
-        loadModule(SkyblockGuideHighlightFeature)
         loadModule(BingoCardDisplay())
         loadModule(BingoNextStepHelper())
-        loadModule(SkyMartCopperPrice())
         loadModule(FarmingWeightDisplay())
-        loadModule(AnitaMedalProfit())
-        loadModule(CropSpeedMeter())
-        loadModule(MovementSpeedDisplay())
-        loadModule(CityProjectFeatures())
-        loadModule(KingTalismanHelper())
-        loadModule(WatchdogHider())
-        loadModule(AccountUpgradeReminder())
         loadModule(Translator())
         loadModule(CustomScoreboard())
-        loadModule(MiningEventTracker())
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
 
+        SkyHanniEvents.init(modules)
+
         Commands.init()
 
-        PreInitFinishedEvent().postAndCatch()
+        PreInitFinishedEvent().post()
     }
 
     @Mod.EventHandler

@@ -16,7 +16,7 @@ object ExpOrbsOnGroundHider {
         if (!SkyHanniMod.feature.misc.hideExpBottles) return
 
         if (event.entity is EntityXPOrb) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 }

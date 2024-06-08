@@ -34,19 +34,19 @@ object GardenWarpCommands {
         val message = event.message.lowercase()
 
         if (message == "/home") {
-            event.isCanceled = true
+            event.cancel()
             HypixelCommands.warp("garden")
             ChatUtils.chat("§aTeleported you to the spawn location!", prefix = false)
         }
 
         if (message == "/barn") {
-            event.isCanceled = true
+            event.cancel()
             HypixelCommands.teleportToPlot("barn")
             LockMouseLook.autoDisable()
         }
 
         tpPlotPattern.matchMatcher(event.message) {
-            event.isCanceled = true
+            event.cancel()
             val plotName = group("plot")
             HypixelCommands.teleportToPlot(plotName)
             LockMouseLook.autoDisable()
