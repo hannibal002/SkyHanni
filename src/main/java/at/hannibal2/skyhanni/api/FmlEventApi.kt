@@ -15,9 +15,8 @@ object FmlEventApi {
         ClientDisconnectEvent().postAndCatch()
     }
 
-    // TODO when we have generic events, make this support generics
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
-        EntityEnterWorldEvent(event.entity).postAndCatch()
+        EntityEnterWorldEvent(event.entity).post()
     }
 }
