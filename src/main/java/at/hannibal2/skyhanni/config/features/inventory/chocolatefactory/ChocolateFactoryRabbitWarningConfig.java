@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -33,6 +34,16 @@ public class ChocolateFactoryRabbitWarningConfig {
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")
     @ConfigEditorSlider(minValue = 1, maxValue = 20, minStep = 1)
     public int repeatSound = 20;
+
+    @Expose
+    @ConfigOption(name = "Flash Screen", desc = "Flash the screen in the given color when a special rabbit appear.")
+    @ConfigEditorBoolean
+    public boolean flashScreen = false;
+
+    @Expose
+    @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")
+    @ConfigEditorColour
+    public String flashColor = "0:127:0:238:255";
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")

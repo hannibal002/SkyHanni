@@ -2,11 +2,14 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -24,8 +27,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.sin
 
 @SkyHanniModule
 object ChocolateFactoryDataLoader {
@@ -148,6 +155,29 @@ object ChocolateFactoryDataLoader {
         ConditionalUtils.onToggle(soundProperty) {
             ChocolateFactoryAPI.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
         }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: SecondPassedEvent) {
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!config.rabbitWarning.flashScreen) return
+
+        ChocolateFactoryAPI.flashScreen =
+            InventoryUtils.getItemsInOpenChest().any { clickMeGoldenRabbitPattern.matches(it.stack.name) }
+    }
+
+    @SubscribeEvent
+    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!config.rabbitWarning.flashScreen) return
+        if (!ChocolateFactoryAPI.flashScreen) return
+        val mc = Minecraft.getMinecraft()
+        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0 .. 255)
+        Gui.drawRect(
+            0, 0, mc.displayWidth, mc.displayHeight,
+            (alpha shl 24) or (config.rabbitWarning.flashColor.toChromaColorInt() and 0xFFFFFF)
+        )
+        GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     private fun clearData() {
@@ -421,9 +451,10 @@ object ChocolateFactoryDataLoader {
                 && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
             ) {
                 SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
-            }
 
-            ChocolateFactoryAPI.clickRabbitSlot = slotIndex
+
+                ChocolateFactoryAPI.clickRabbitSlot = slotIndex
+            }
         }
     }
 

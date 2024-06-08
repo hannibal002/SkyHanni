@@ -75,6 +75,7 @@ object ChocolateFactoryAPI {
 
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("note.pling", 1f)
+    var flashScreen = false
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
