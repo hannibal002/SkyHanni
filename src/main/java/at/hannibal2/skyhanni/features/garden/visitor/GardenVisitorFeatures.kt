@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -91,6 +92,18 @@ object GardenVisitorFeatures {
         "gardenexperience",
         " §8\\+§2(?<amount>.*) §7Garden Experience"
     )
+    public val farmingXpPattern by patternGroup.pattern(
+        "farmingxp",
+        " §8\\+§3(?<amount>.*) §7Farming XP"
+    )
+    private val rewardsTextPattern by patternGroup.pattern(
+        "rewardstext",
+        "^ {2}§a§lREWARDS"
+    )
+    public val visitorRewardPattern by patternGroup.pattern(
+        "visitorreward",
+        "^ {4}((§.)?\\+)?(?:(?<amountcolor>§.)(?<amount>\\d+(\\.?\\dk)?)x? )?((?<rewardcolor>(?:§.)+)?(?<reward>.*?))(?: ((§.)?)?x(?<altamount>\\d+))?\$"
+    )
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
         "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*"
@@ -99,7 +112,14 @@ object GardenVisitorFeatures {
         "partialaccepted",
         "§aYou gave some of the required items!"
     )
-
+    public val fullyAcceptedPattern by patternGroup.pattern(
+        "fullyaccepted",
+        "§6§lOFFER ACCEPTED §8with (?<color>§.)?(?<name>.*) §8\\((?<rarity>.*)\\)"
+    )
+    public val discardRewardNamePattern by at.hannibal2.skyhanni.features.inventory.patternGroup.pattern(
+        "disregardrewardname",
+        "^(Copper|Farming XP|Garden Experience|Bits)\$"
+    )
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
     private val greenThumb = "GREEN_THUMB;1".asInternalName()
@@ -515,6 +535,15 @@ object GardenVisitorFeatures {
             partialAcceptedPattern.matchMatcher(event.message) {
                 ChatUtils.chat("Talk to the visitor again to update the number of items needed!")
             }
+        }
+
+        if (GardenAPI.inGarden() && config.compactVisitorRewardChat && (
+                fullyAcceptedPattern.matcher(event.message.removeResets()).matches() ||
+                visitorRewardPattern.matcher(event.message.removeResets()).matches() ||
+                rewardsTextPattern.matcher(event.message.removeResets()).matches()
+            )
+        ){
+            GardenVisitorCompactChat.handleChat(event)
         }
     }
 

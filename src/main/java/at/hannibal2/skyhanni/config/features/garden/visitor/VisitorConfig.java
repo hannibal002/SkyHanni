@@ -38,6 +38,12 @@ public class VisitorConfig {
     public boolean notificationChat = true;
 
     @Expose
+    @ConfigOption(name = "Compact Visitor Chat", desc = "Compact reward summary messages when you accept a visitor's offer.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactVisitorRewardChat = false;
+
+    @Expose
     @ConfigOption(name = "Notification Title", desc = "Show a title when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @FeatureToggle
