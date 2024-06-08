@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -17,7 +18,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class RiftMotesOrb {
+@SkyHanniModule
+object RiftMotesOrb {
 
     private val config get() = RiftAPI.config.motesOrbs
 
@@ -53,7 +55,7 @@ class RiftMotesOrb {
             orb.counter++
             orb.pickedUp = false
             if (config.hideParticles && orb.isOrb) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

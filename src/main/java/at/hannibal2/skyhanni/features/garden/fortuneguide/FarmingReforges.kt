@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+// TODO replace with ReforgeAPI
 enum class FarmingReforges(
     val reforgeName: String,
     val reforgeItem: String,

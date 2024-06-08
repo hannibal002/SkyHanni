@@ -2,10 +2,11 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson.TrophyFishInfo
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.event.HoverEvent
@@ -13,13 +14,14 @@ import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object TrophyFishManager {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<TrophyFishJson>("TrophyFish")
-        trophyFishInfo = data.trophy_fish
+        trophyFishInfo = data.trophyFish
     }
 
     val fish: MutableMap<String, MutableMap<TrophyRarity, Int>>?
@@ -85,15 +87,6 @@ object TrophyFishManager {
     fun getInfoByName(name: String) = trophyFishInfo.values.find { it.displayName == name }
 
     fun TrophyFishInfo.getFilletValue(rarity: TrophyRarity): Int {
-        if (fillet == null) {
-            ErrorManager.logErrorStateWithData(
-                "Error trying to read trophy fish info",
-                "fillet in TrophyFishInfo is null",
-                "displayName" to displayName,
-                "TrophyFishInfo" to this,
-            )
-            return -1
-        }
         return fillet.getOrDefault(rarity, -1)
     }
 
