@@ -59,10 +59,9 @@ object GetFromSackAPI {
         item: PrimitiveItemStack,
         text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!",
         hover: String = "§eClick to get from sacks!"
-    ) =
-        ChatUtils.clickableChat(
-          text, onClick = { getFromSack(item) }, hover)
-        )
+    ) = ChatUtils.clickableChat(
+        text, onClick = { getFromSack(item) }, hover
+    )
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
