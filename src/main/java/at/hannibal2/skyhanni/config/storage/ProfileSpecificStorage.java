@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
+import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
@@ -609,4 +610,7 @@ public class ProfileSpecificStorage {
 
     @Expose
     public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
+
+    @Expose
+    public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 }
