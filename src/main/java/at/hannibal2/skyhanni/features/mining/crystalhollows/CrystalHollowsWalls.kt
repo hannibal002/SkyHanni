@@ -33,7 +33,8 @@ object CrystalHollowsWalls {
 
     private const val EXPAND_TIMES = 20
 
-    private const val HEAT_HEIGHT = 64.0
+    // Heat is active at Y=64.0 and below, we draw it one above to show that you're inside
+    private const val HEAT_HEIGHT = 65.0
     private const val MAX_HEIGHT = 190.0
 
     private const val MIN_X = 0.0
@@ -70,7 +71,7 @@ object CrystalHollowsWalls {
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val position = RenderUtils.getViewerPos(event.partialTicks)
-        if (position.y <= HEAT_HEIGHT + yViewOffset) {
+        if (position.y < HEAT_HEIGHT + yViewOffset) {
             drawHeat(event)
         } else if (nucleusBBOffsetY.isVecInside(position.toVec3())) {
             if (!config.nucleus) return
