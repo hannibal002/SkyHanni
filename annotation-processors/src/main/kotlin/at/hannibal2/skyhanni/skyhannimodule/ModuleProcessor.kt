@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.skyhannimodule
 
+import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.getDeclaredFunctions
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -23,11 +24,9 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
     override fun process(resolver: Resolver): List<KSAnnotated> {
 
         skyHanniEvent =
-            resolver.getClassDeclarationByName(resolver.getKSNameFromString("at.hannibal2.skyhanni.api.event.SkyHanniEvent"))
-                ?.asStarProjectedType()
-        minecraftForgeEvent =
-            resolver.getClassDeclarationByName(resolver.getKSNameFromString("net.minecraftforge.fml.common.eventhandler.Event"))
-                ?.asStarProjectedType()
+            resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
+        minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
+            ?.asStarProjectedType()
 
         val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
@@ -55,7 +54,24 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             return null
         }
 
-        checkCorrectEventAnnotations(symbol)
+        // TODO remove once all events are migrated to SkyHanniEvent
+        val className = symbol.qualifiedName?.asString() ?: "unknown"
+
+        for (function in symbol.getDeclaredFunctions()) {
+            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
+                if (!minecraftForgeEvent!!.isAssignableFrom(firstParameter)) {
+                    warnings.add("Function in $className must have an event assignable from $minecraftForgeEvent because it is annotated with @SubscribeEvent")
+                }
+            }
+
+            if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
+                if (!skyHanniEvent!!.isAssignableFrom(firstParameter)) {
+                    warnings.add("Function in $className must have an event assignable from $skyHanniEvent because it is annotated with @HandleEvent")
+                }
+            }
+        }
 
         return symbol
     }
@@ -87,33 +103,5 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         }
 
         logger.warn("Generated LoadedModules file with ${symbols.size} modules")
-    }
-
-    // TODO remove once all events are migrated to SkyHanniEvent
-    private fun checkCorrectEventAnnotations(symbol: KSClassDeclaration) {
-
-        for (function in symbol.getDeclaredFunctions()) {
-            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
-                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
-                isDeclarable(symbol, firstParameter!!, minecraftForgeEvent!!, "SubscribeEvent")
-            }
-
-            if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
-                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
-                isDeclarable(symbol, firstParameter!!, skyHanniEvent!!, "HandleEvent")
-            }
-        }
-    }
-
-    private fun isDeclarable(
-        clazz: KSClassDeclaration,
-        parameterType: KSType,
-        targetType: KSType,
-        annotationType: String
-    ) {
-        if (!targetType.isAssignableFrom(parameterType)) {
-            val className = clazz.qualifiedName?.asString() ?: "unknown"
-            warnings.add("Function in $className must have the first parameter assignable from $targetType because it is annotated with @$annotationType")
-        }
     }
 }
