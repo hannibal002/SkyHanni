@@ -49,7 +49,6 @@ object GardenCropMilestoneDisplay {
     private val config get() = GardenAPI.config.cropMilestones
     private val overflowConfig get() = config.overflow
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
-    private val bestCropTime = GardenBestCropTime()
 
     private var lastPlaySoundTime = SimpleTimeMark.farPast()
     private var needsInventory = false
@@ -87,7 +86,7 @@ object GardenCropMilestoneDisplay {
         }
 
         if (config.next.bestDisplay) {
-            config.next.displayPos.renderStringsAndItems(bestCropTime.display, posLabel = "Best Crop Time")
+            config.next.displayPos.renderStringsAndItems(GardenBestCropTime.display, posLabel = "Best Crop Time")
         }
     }
 
@@ -138,14 +137,14 @@ object GardenCropMilestoneDisplay {
     fun update() {
         progressDisplay = emptyList()
         mushroomCowPerkDisplay = emptyList()
-        bestCropTime.display = emptyList()
+        GardenBestCropTime.display = emptyList()
         val currentCrop = GardenAPI.getCurrentlyFarmedCrop()
         currentCrop?.let {
             progressDisplay = drawProgressDisplay(it)
         }
 
         if (config.next.bestDisplay && config.next.bestAlwaysOn || currentCrop != null) {
-            bestCropTime.display = bestCropTime.drawBestDisplay(currentCrop)
+            GardenBestCropTime.display = GardenBestCropTime.drawBestDisplay(currentCrop)
         }
     }
 
