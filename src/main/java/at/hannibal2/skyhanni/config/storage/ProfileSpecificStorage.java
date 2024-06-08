@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -377,7 +378,7 @@ public class ProfileSpecificStorage {
             public int plotsUnlocked = -1;
 
             @Expose
-            public long cakeExpiring = -1L;
+            public SimpleTimeMark cakeExpiring = null;
 
             @Expose
             public Map<CropType, Boolean> carrolyn = new HashMap<>();
