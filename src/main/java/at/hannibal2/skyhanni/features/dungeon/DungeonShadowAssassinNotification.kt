@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBoarderPacket
@@ -14,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 object DungeonShadowAssassinNotification {
     private val config get() = SkyHanniMod.feature.dungeon
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onWorldBoarderChange(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         if (DungeonAPI.dungeonFloor?.contains("3") == true && DungeonAPI.inBossRoom) return
@@ -29,5 +30,5 @@ object DungeonShadowAssassinNotification {
         }
     }
 
-    private fun isEnabled() = DungeonAPI.inDungeon() && config.shadowAssassinJumpNotifier
+    private fun isEnabled() = config.shadowAssassinJumpNotifier
 }

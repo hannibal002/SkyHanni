@@ -32,7 +32,7 @@ object FixGhostEntities {
         recentlySpawnedEntities = ArrayDeque()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveCurrentShield(event: PacketReceivedEvent) {
         if (!isEnabled()) return
 
@@ -70,5 +70,5 @@ object FixGhostEntities {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.fixGhostEntities
+    fun isEnabled() = config.fixGhostEntities
 }

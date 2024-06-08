@@ -90,7 +90,7 @@ object HighlightVisitorsOutsideOfGarden {
     private fun isVisitorNearby(location: LorenzVec) =
         EntityUtils.getEntitiesNearby<EntityLivingBase>(location, 2.0).any { isVisitor(it) }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: PacketSentEvent) {
         if (!shouldBlock) return
         val world = Minecraft.getMinecraft().theWorld ?: return

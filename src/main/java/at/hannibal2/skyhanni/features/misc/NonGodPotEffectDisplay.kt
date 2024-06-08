@@ -220,7 +220,8 @@ object NonGodPotEffectDisplay {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
+    // TODO use TablistFooterUpdateEvent instead
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         val packet = event.packet
         if (!checkFooter) return

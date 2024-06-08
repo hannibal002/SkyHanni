@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object SpawnTimers {
+object ArachneSpawnTimer {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
 
@@ -80,8 +80,7 @@ object SpawnTimers {
         }
     }
 
-    // All this to detect "quickspawn" vs regular arachne spawn
-    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         if (!saveNextTickParticles) return
         if (searchTime.passedSince() < 3.seconds) return

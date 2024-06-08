@@ -55,7 +55,7 @@ object VisitorListener {
     }
 
     // TODO make event
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet
         if (packet !is C02PacketUseEntity) return
