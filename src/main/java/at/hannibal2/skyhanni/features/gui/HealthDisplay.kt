@@ -38,6 +38,7 @@ object HealthDisplay {
     private var healthUpdateTimer = SimpleTimeMark.farPast()
 
     private var actualHealth = 0
+    private var absorptionRate = 0.0
     private var hasAbsorption = false
 
     private enum class HealthColors(val range: ClosedFloatingPointRange<Double>, val color: Color) {
@@ -48,10 +49,10 @@ object HealthDisplay {
         ;
         companion object {
             fun getColors(input: Double): Pair<HealthColors?, HealthColors?> {
-                if (config.predictHealth) {
-                    return if (hasAbsorption) YELLOW to YELLOW
-                    else RED to RED
-                }
+//                 if (config.predictHealth) {
+//                     return if (hasAbsorption) YELLOW to YELLOW
+//                     else RED to RED
+//                 }
                 val color1 = entries.firstOrNull { input in it.range }
                 val color2 = if (color1 == RED) {
                     RED
@@ -67,9 +68,13 @@ object HealthDisplay {
         if (RiftAPI.inRift()) return
 
         maxHealth = ActionBarStatsData.MAX_HEALTH.value.replace(",", "").toDoubleOrNull() ?: return
-        if (config.predictHealth) return
-
         val hp = ActionBarStatsData.HEALTH.value.replace(",", "").toDoubleOrNull() ?: return
+        val player = LorenzUtils.getPlayer() ?: return
+
+        if (config.predictHealth) {
+            if (maxHealth < hp && player.absorptionAmount != 0.0f) absorptionRate = (hp-maxHealth)/player.absorptionAmount
+            return
+        }
         healthUpdate = healthUpdater(hp.toInt() - actualHealth)
         actualHealth = hp.toInt()
         healthLast = health
@@ -93,10 +98,10 @@ object HealthDisplay {
             healthUpdate = healthUpdater(player.health.toInt() - actualHealth)
             actualHealth = player.health.toInt()
             health = actualHealth/maxHealth
-//             ChatUtils.chat("$health ; $actualHealth ; $maxHealth")
             healthTimer = SimpleTimeMark.now()
         } else {
-            health = (player.health/player.maxHealth).toDouble()
+            health = (((player.health)/player.maxHealth).toDouble())
+            health += (player.absorptionAmount * absorptionRate)/maxHealth
             healthTimer = SimpleTimeMark.now()
             healthUpdate = healthUpdater((health * maxHealth).toInt() - actualHealth)
             actualHealth = (health * maxHealth).toInt()
@@ -183,7 +188,7 @@ object HealthDisplay {
             config.positionText.renderRenderables(listOf(textRenderable), posLabel = "HP Text")
         }
     }
-//     §65,213/4,584❤     §a1,279§a❈ Defense     §b3,861/3,861✎ Mana
+
     @SubscribeEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Health Display")
@@ -195,6 +200,11 @@ object HealthDisplay {
 
         val player = LorenzUtils.getPlayer() ?: return
         event.addData {
+            add("health: $health")
+            add("healthUpdate: $healthUpdate")
+            add("maxHealth: $maxHealth")
+
+            add("absorptionRate: $absorptionRate")
             add("has absorption: ${player.hasPotionEffect(Potion.absorption)}")
             add("absroption amt: ${player.absorptionAmount}")
         }
