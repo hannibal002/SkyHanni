@@ -294,7 +294,7 @@ object LorenzUtils {
             Minecraft.getMinecraft().playerController.windowClick(
                 container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
             )
-            isCanceled = true
+            this.cancel()
         }
     }
 
