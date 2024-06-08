@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.ColorRange
 import net.minecraft.potion.Potion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import scala.sys.process.ProcessBuilderImpl.Simple
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,12 +46,9 @@ object HealthDisplay {
         ORANGE(2.0..3.0, Color.ORANGE),
         MAX(3.0..1000.0, Color.green) //test
         ;
+
         companion object {
             fun getColors(input: Double): Pair<HealthColors?, HealthColors?> {
-//                 if (config.predictHealth) {
-//                     return if (hasAbsorption) YELLOW to YELLOW
-//                     else RED to RED
-//                 }
                 val color1 = entries.firstOrNull { input in it.range }
                 val color2 = if (color1 == RED) {
                     RED
@@ -72,7 +68,8 @@ object HealthDisplay {
         val player = LorenzUtils.getPlayer() ?: return
 
         if (config.predictHealth) {
-            if (maxHealth < hp && player.absorptionAmount != 0.0f) absorptionRate = (hp-maxHealth)/player.absorptionAmount
+            if (maxHealth < hp && player.absorptionAmount != 0.0f) absorptionRate =
+                (hp - maxHealth) / player.absorptionAmount
             return
         }
         healthUpdate = healthUpdater(hp.toInt() - actualHealth)
@@ -93,15 +90,15 @@ object HealthDisplay {
         hasAbsorption = player.absorptionAmount > 0.0f
 
         healthLast = health
-        if (RiftAPI.inRift())  {
+        if (RiftAPI.inRift()) {
             if (maxHealth < player.maxHealth) maxHealth = player.maxHealth.toDouble()
             healthUpdate = healthUpdater(player.health.toInt() - actualHealth)
             actualHealth = player.health.toInt()
-            health = actualHealth/maxHealth
+            health = actualHealth / maxHealth
             healthTimer = SimpleTimeMark.now()
         } else {
-            health = (((player.health)/player.maxHealth).toDouble())
-            health += (player.absorptionAmount * absorptionRate)/maxHealth
+            health = (((player.health) / player.maxHealth).toDouble())
+            health += (player.absorptionAmount * absorptionRate) / maxHealth
             healthTimer = SimpleTimeMark.now()
             healthUpdate = healthUpdater((health * maxHealth).toInt() - actualHealth)
             actualHealth = (health * maxHealth).toInt()
@@ -159,7 +156,8 @@ object HealthDisplay {
         if (!isEnabled()) return
 
         if (config.enabledBar) {
-            val interpolatedHealth = NumberUtil.interpolate(health.toFloat(), healthLast.toFloat(), healthTimer.toMillis()).toDouble()
+            val interpolatedHealth =
+                NumberUtil.interpolate(health.toFloat(), healthLast.toFloat(), healthTimer.toMillis()).toDouble()
             val barRenderable = Renderable.progressBarMultipleColors(
                 if (interpolatedHealth > 1.0) 1.0 else interpolatedHealth,
                 colorList,
