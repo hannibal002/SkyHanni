@@ -123,6 +123,9 @@ object GardenVisitorCompactChat {
     }
 
     private fun sendCompact() {
+        //This prevents commission rewards, crop milestone data, etc. from triggering incorrectly
+        if(visitorNameFormatted.isBlank()) return;
+
         if (visitorAcceptedChat.isNotEmpty()) {
             ChatUtils.hoverableChat(createCompactVisitorMessage(), hover = visitorAcceptedChat, prefix = false)
         }
