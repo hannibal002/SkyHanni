@@ -243,7 +243,7 @@ interface Renderable {
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
-                ToolTipData.lastSlot == null || GuiData.preDrawEventCanceled
+                ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 

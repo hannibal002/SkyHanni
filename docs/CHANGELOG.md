@@ -1872,7 +1872,7 @@
     + For better maintainability and automatic beta changelog creation.
 + Use less forge events throughout the mod to reduce possible crashes. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1085)
-+ Fix entity click not being canceled - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
++ Fix entity click not being cancelled - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
 + Cleanup ItemClickData. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1072)
 + Fixes minecraft bug where text that is bold can render weirdly. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1126)
@@ -4263,7 +4263,7 @@
 + Add two more chat filter categories: Powder Mining and Winter Gifts.
 + Add catacombs class level color to party finder.
 + Add wishing compass uses amount display.
-+ Saves missing items from canceled buy orders to clipboard for faster re-entry.
++ Saves missing items from cancelled buy orders to clipboard for faster re-entry.
 + Adds a visual highlight to the Croesus inventory that show what chests have not yet been opened.
 
 ### Removals
