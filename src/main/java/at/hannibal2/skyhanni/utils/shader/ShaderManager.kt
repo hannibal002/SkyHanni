@@ -31,7 +31,7 @@ object ShaderManager {
         DARKEN(DarkenShader.INSTANCE)
         ;
 
-        fun enableShader() = ShaderManager.enableShader(this)
+        fun enableShader() = enableShader(this)
     }
 
     private val shaders: MutableMap<String, Shader> = mutableMapOf()
