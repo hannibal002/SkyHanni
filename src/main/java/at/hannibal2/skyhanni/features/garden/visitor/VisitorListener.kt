@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
@@ -134,7 +136,7 @@ object VisitorListener {
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTooltip(event: ItemHoverEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
