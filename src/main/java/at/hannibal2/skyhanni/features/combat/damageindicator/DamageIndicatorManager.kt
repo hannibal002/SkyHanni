@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
@@ -48,6 +49,7 @@ import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -849,8 +851,8 @@ class DamageIndicatorManager {
         return maxHealth.getOrDefault(entity.uniqueID!!, 0L)
     }
 
-    @SubscribeEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent) {
+    @HandleEvent
+    fun onEntityJoin(event: EntityEnterWorldEvent<Entity>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
