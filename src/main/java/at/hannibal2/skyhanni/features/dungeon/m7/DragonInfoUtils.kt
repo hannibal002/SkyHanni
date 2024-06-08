@@ -1,15 +1,18 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.*
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.M7DragonChangeEvent
+import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.play.server.S2APacketParticles
@@ -30,7 +33,7 @@ object DragonInfoUtils {
         val location = event.mob.baseEntity.position.toLorenzVec()
         var matchedType: M7DragonInfo? = null
         M7DragonInfo.entries.filter { it.dragonLocation.spawnLocation == location }.forEach {
-            ChatUtils.debug("Spawned Dragon ${it.name}, id: ${event.mob.baseEntity.entityId}")
+            logLine("Spawned Dragon ${it.name}, id: ${event.mob.baseEntity.entityId}")
             M7DragonChangeEvent(it, M7SpawnedStatus.ALIVE).postAndCatch()
             it.status = M7SpawnedStatus.ALIVE
             it.status.id = event.mob.baseEntity.entityId
@@ -49,11 +52,11 @@ object DragonInfoUtils {
         var matchedType: M7DragonInfo? = null
         M7DragonInfo.entries.filter { it.status.id == event.mob.baseEntity.entityId }.forEach {
             if (it.dragonLocation.deathBox.isInside(location)) {
-                ChatUtils.debug("Killed Dragon ${it.name}, inside box, id: ${event.mob.baseEntity.entityId}")
+                logLine("Killed Dragon ${it.name}, inside box, id: ${event.mob.baseEntity.entityId}")
                 it.status = M7SpawnedStatus.DEFEATED
                 M7DragonChangeEvent(it, M7SpawnedStatus.DEFEATED).postAndCatch()
             } else {
-                ChatUtils.debug("Killed Dragon ${it.name}, outside box, id: ${event.mob.baseEntity.entityId}")
+                logLine("Killed Dragon ${it.name}, outside box, id: ${event.mob.baseEntity.entityId}")
                 it.status = M7SpawnedStatus.UNDEFEATED
                 M7DragonChangeEvent(it, M7SpawnedStatus.UNDEFEATED).postAndCatch()
             }
@@ -75,7 +78,7 @@ object DragonInfoUtils {
         M7DragonInfo.entries.filter { it.status == M7SpawnedStatus.UNDEFEATED }.forEach {
             if (it.dragonLocation.particleBox.isInside(event.packet.toLorenzVec())) {
                 it.status = M7SpawnedStatus.SPAWNING
-                ChatUtils.debug("${it.name} is now spawning")
+                logLine("${it.name} is now spawning")
                 M7DragonChangeEvent(it, M7SpawnedStatus.SPAWNING).postAndCatch()
                 matchedType = it
             }
@@ -99,7 +102,7 @@ object DragonInfoUtils {
     @SubscribeEvent
     fun onStart(event: DungeonM7Phase5Start) {
         if (inPhase5) return
-        ChatUtils.debug("Starting Phase5")
+        logLine("Starting Phase5")
         currentRunInfo.clear()
         inPhase5 = true
     }
