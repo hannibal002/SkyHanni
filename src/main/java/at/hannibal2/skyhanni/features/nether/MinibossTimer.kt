@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -15,6 +17,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -39,6 +42,8 @@ object MinibossTimer {
         "down",
         "§f\\s*§r§6§l(?<name>.+) DOWN!"
     )
+
+    private val currentArea: MiniBoss? = null
 
     var display: Renderable? = null
 
@@ -70,7 +75,14 @@ object MinibossTimer {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        updateOnArea()
         update()
+    }
+
+    private fun updateOnArea() {
+        MiniBoss.entries.firstOrNull {
+            it.area.isPlayerInside()
+        }
     }
 
     private fun update() {
@@ -100,13 +112,30 @@ object MinibossTimer {
 
     enum class MiniBoss(
         val displayName: String,
-        var timer: SimpleTimeMark? = null
+        val area: AxisAlignedBB,
+        var timer: SimpleTimeMark? = null,
+        var lastSeen: SimpleTimeMark = SimpleTimeMark.farPast()
     ) {
-        BLADESOUL("Bladesoul"),
-        MAGE_OUTLAW("Mage Outlaw"),
-        BARBARIAN_DUKE_X("Barbarian Duke X"),
-        ASHFANG("Ashfang"),
-        MAGMA_BOSS("Magma Boss"),
+        BLADESOUL(
+            "Bladesoul",
+            LorenzVec(0, 0, 0).axisAlignedTo(LorenzVec(0, 0, 0))
+        ),
+        MAGE_OUTLAW(
+            "Mage Outlaw",
+            LorenzVec(0, 0, 0).axisAlignedTo(LorenzVec(0, 0, 0))
+        ),
+        BARBARIAN_DUKE_X(
+            "Barbarian Duke X",
+            LorenzVec(0, 0, 0).axisAlignedTo(LorenzVec(0, 0, 0))
+        ),
+        ASHFANG(
+            "Ashfang",
+            LorenzVec(0, 0, 0).axisAlignedTo(LorenzVec(0, 0, 0))
+        ),
+        MAGMA_BOSS(
+            "Magma Boss",
+            LorenzVec(0, 0, 0).axisAlignedTo(LorenzVec(0, 0, 0))
+        ),
         ;
 
         override fun toString() = displayName
