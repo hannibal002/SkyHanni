@@ -32,7 +32,7 @@ object WatchdogHider {
             }
 
             ANNOUNCEMENT_LINE -> {
-                ChatUtils.deleteMessage("watchdog") { it.message == watchdogStartLine }
+                ChatUtils.deleteMessage("watchdog") { it.message == START_LINE }
                 startLineComponent = null
                 inWatchdog = true
             }
