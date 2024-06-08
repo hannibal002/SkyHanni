@@ -279,12 +279,6 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
-    @Deprecated("outdated", ReplaceWith("NEUItems.getPrimitiveMultiplier(internalName, tryCount)"))
-    fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
-        val (name, amount) = getPrimitiveMultiplier(internalName, tryCount)
-        return Pair(name, amount)
-    }
-
     fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }
         if (tryCount == 10) {

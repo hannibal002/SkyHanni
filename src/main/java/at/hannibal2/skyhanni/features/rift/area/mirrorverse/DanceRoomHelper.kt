@@ -131,7 +131,7 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
-        if (config.hideOriginalTitle && inRoom) event.isCanceled = true
+        if (config.hideOriginalTitle && inRoom) event.cancel()
     }
 
     private fun startCountdown(seconds: Int, milliseconds: Int) {
@@ -160,7 +160,7 @@ object DanceRoomHelper {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
             if (entity is EntityOtherPlayerMP && inRoom) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

@@ -191,7 +191,7 @@ object BlazeSlayerDaggerHelper {
                     it.updated = true
                 }
                 shield.active = true
-                event.isCanceled = true
+                event.cancel()
                 clientSideClicked = false
                 return
             }
