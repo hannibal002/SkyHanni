@@ -11,12 +11,14 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
 
+@Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
 abstract class LorenzEvent : Event() {
 
     private val eventName by lazy {
         this::class.simpleName!!
     }
 
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postAndCatch() = postAndCatchAndBlock {}
 
     companion object {
@@ -29,6 +31,7 @@ abstract class LorenzEvent : Event() {
         val isInGuardedEventHandler get() = eventHandlerDepth > 0 || LorenzUtils.isInDevEnvironment()
     }
 
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postAndCatchAndBlock(
         printError: Boolean = true,
         stopOnFirstError: Boolean = false,
@@ -67,9 +70,10 @@ abstract class LorenzEvent : Event() {
         return listenerList.getListeners(accessorEventBus.busId)
     }
 
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
 
-    // TODO let walker use this function for all 101 other uses
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun cancel() {
         isCanceled = true
     }
