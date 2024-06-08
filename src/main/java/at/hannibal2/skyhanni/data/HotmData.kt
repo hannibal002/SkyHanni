@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -271,6 +272,7 @@ enum class HotmData(
 
     val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
+    @SkyHanniModule
     companion object {
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree

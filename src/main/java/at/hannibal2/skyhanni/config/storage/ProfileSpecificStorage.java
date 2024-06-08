@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
@@ -151,6 +150,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
+
+        @Expose
+        public List<String> favoritePowers = new ArrayList<>();
     }
 
     @Expose
@@ -196,6 +198,18 @@ public class ProfileSpecificStorage {
                 ", lastClicked=" + lastClicked +
                 '}';
         }
+    }
+
+    @Expose
+    public BeaconPowerStorage beaconPower = new BeaconPowerStorage();
+
+    public static class BeaconPowerStorage {
+
+        @Expose
+        public Long beaconPowerExpiryTime = null;
+
+        @Expose
+        public String boostedStat = null;
     }
 
     @Expose
@@ -361,13 +375,7 @@ public class ProfileSpecificStorage {
             public long cakeExpiring = -1L;
 
             @Expose
-            public boolean carrotFortune = false;
-
-            @Expose
-            public boolean pumpkinFortune = false;
-
-            @Expose
-            public boolean cocoaBeansFortune = false;
+            public Map<CropType, Boolean> carrolyn = new HashMap<>();
 
             @Expose
             public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
@@ -545,7 +553,7 @@ public class ProfileSpecificStorage {
         public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
-        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsList();
+        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.generateMaxChestAsList();
 
         public static class DungeonRunInfo {
 

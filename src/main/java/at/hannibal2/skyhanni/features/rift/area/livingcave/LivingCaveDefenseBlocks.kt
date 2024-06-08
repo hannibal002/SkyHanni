@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -22,7 +23,8 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class LivingCaveDefenseBlocks {
+@SkyHanniModule
+object LivingCaveDefenseBlocks {
 
     private val config get() = RiftAPI.config.area.livingCave.defenseBlockConfig
     private var movingBlocks = mapOf<DefenseBlock, Long>()
@@ -50,12 +52,12 @@ class LivingCaveDefenseBlocks {
         // Ignore particles around blocks
         if (staticBlocks.any { it.location.distance(location) < 3 }) {
             if (config.hideParticles) {
-                event.isCanceled = true
+                event.cancel()
             }
             return
         }
         if (config.hideParticles && movingBlocks.keys.any { it.location.distance(location) < 3 }) {
-            event.isCanceled = true
+            event.cancel()
         }
 
         if (event.type == EnumParticleTypes.CRIT_MAGIC) {
@@ -84,7 +86,7 @@ class LivingCaveDefenseBlocks {
 
             movingBlocks = movingBlocks.editCopy { this[defenseBlock] = System.currentTimeMillis() + 250 }
             if (config.hideParticles) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

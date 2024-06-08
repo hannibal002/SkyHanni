@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -25,9 +27,10 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightVisitorsOutsideOfGarden {
+@SkyHanniModule
+object HighlightVisitorsOutsideOfGarden {
 
-    private var visitorJson = mapOf<String?, List<GardenJson.GardenVisitor>>()
+    private var visitorJson = mapOf<String?, List<GardenVisitor>>()
 
     private val config get() = GardenAPI.config.visitors
 
@@ -57,7 +60,7 @@ class HighlightVisitorsOutsideOfGarden {
         val possibleJsons = visitorJson[mode] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            (it.position == null || it.position!!.distance(entity.position.toLorenzVec()) < 1)
+            (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1)
                 && it.skinOrType == skinOrType
         }
     }
@@ -95,7 +98,7 @@ class HighlightVisitorsOutsideOfGarden {
         val packet = event.packet as? C02PacketUseEntity ?: return
         val entity = packet.getEntityFromWorld(world) ?: return
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
-            event.isCanceled = true
+            event.cancel()
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
                 ChatUtils.chatAndOpenConfig("Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                     GardenAPI.config.visitors::blockInteracting
