@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -88,6 +89,8 @@ class SkyHanniMod {
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())
+
+        SkyHanniEvents.init(modules)
 
         Commands.init()
 

@@ -60,7 +60,7 @@ object GetFromSackAPI {
         text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!",
     ) =
         ChatUtils.clickableChat(text, onClick = {
-            HypixelCommands.getFromSacks(item.internalName.asString(), item.amount)
+            getFromSack(item)
         })
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
@@ -91,7 +91,8 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            HypixelCommands.getFromSacks(item.internalName.asString().replace('-', ':'), item.amount)
+            // TODO find a better workaround
+            ChatUtils.sendMessageToServer("/gfs ${item.internalName.asString().replace('-', ':')} ${item.amount}")
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
