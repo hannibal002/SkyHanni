@@ -49,6 +49,7 @@ ktlint_standard_context-receiver-wrapping = disabled
 ktlint_standard_multiline-expression-wrapping = disabled
 ktlint_standard_string-template-indent = disabled
 ktlint_standard_no-trailing-spaces = disabled
+ktlint_standard_function-signature = disabled
 
 ktlint_standard_no-line-break-before-assignment = true
 ktlint_standard_no-wildcard-imports = enabled
