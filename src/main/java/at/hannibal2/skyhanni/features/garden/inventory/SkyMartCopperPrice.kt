@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -56,7 +57,7 @@ object SkyMartCopperPrice {
 
                 val internalName = item.getInternalName()
                 val useSellPrice = config.overlayPriceType == SkyMartConfig.OverlayPriceTypeEntry.SELL_ORDER
-                val itemPrice = internalName.getPrice(useSellPrice)
+                val itemPrice = internalName.getPriceOrNull(useSellPrice) ?: continue
                 val profit = itemPrice - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
