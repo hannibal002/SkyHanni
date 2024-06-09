@@ -340,7 +340,6 @@ interface Renderable {
                 }
                 bottomLayer.render(posX, posY)
             }
-
         }
 
         fun itemStackWithTip(
