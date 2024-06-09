@@ -85,41 +85,41 @@ object GraphEditor {
     @SubscribeEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.infoDisplay.renderStrings(
-            buildList {
-                add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
-                if (!inEditMode && !inTextMode) {
-                    add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
-                    add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
-                    add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
-                    add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
-                    add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
-                    add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
-                    add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
-                    add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
-                    add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
-                    add(" ")
-                    if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
-                }
-                if (!inTextMode && activeNode != null) {
-                    add("§eEdit: §6${KeyboardManager.getKeyName(config.editKey)}")
-                }
-                if (inEditMode) {
-                    add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.keyCode)}")
-                    add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.keyCode)}")
-                    add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.keyCode)}")
-                    add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.keyCode)}")
-                    add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.keyCode)}")
-                    add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.keyCode)}")
-                }
-                if (inTextMode) {
-                    add("§eFormat: ${textBox.finalText()}")
-                    add("§eRaw:     ${textBox.editText()}")
-                }
-            },
-            posLabel = "Graph Info",
-        )
+        config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
     }
+
+    private fun buildDisplay(): List<String> = buildList {
+        add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
+        if (!inEditMode && !inTextMode) {
+            add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
+            add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
+            add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
+            add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
+            add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
+            add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
+            add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
+            add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
+            add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
+            add(" ")
+            if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
+        }
+        if (!inTextMode && activeNode != null) {
+            add("§eEdit: §6${KeyboardManager.getKeyName(config.editKey)}")
+        }
+        if (inEditMode) {
+            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.keyCode)}")
+            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.keyCode)}")
+            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.keyCode)}")
+            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.keyCode)}")
+            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.keyCode)}")
+            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.keyCode)}")
+        }
+        if (inTextMode) {
+            add("§eFormat: ${textBox.finalText()}")
+            add("§eRaw:     ${textBox.editText()}")
+        }
+    }
+
 
     private fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
