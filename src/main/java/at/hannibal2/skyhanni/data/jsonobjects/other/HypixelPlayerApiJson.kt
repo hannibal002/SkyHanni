@@ -26,8 +26,7 @@ data class HypixelApiEasterEvent(
 )
 
 data class HypixelApiRabbits(
-    @Expose @SerializedName("collected_locations")
-    val collectedLocations: Map<String, List<String>>,
+    @Expose @SerializedName("collected_locations") val collectedLocations: Map<String, List<String>>,
 )
 
 data class HypixelApiTrophyFish(
