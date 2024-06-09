@@ -115,7 +115,8 @@ object GraphEditor {
                     add("§eFormat: ${textBox.finalText()}")
                     add("§eRaw:     ${textBox.editText()}")
                 }
-            }, posLabel = "Graph Info"
+            },
+            posLabel = "Graph Info",
         )
     }
 
@@ -139,7 +140,7 @@ object GraphEditor {
             node.getNodeColor(),
             seeThroughBlocks = seeThroughBlocks,
             minimumAlpha = 0.2f,
-            inverseAlphaScale = true
+            inverseAlphaScale = true,
         )
         if (node.name == null) return
         this.drawString(node.position, node.name!!, seeThroughBlocks)
@@ -150,7 +151,7 @@ object GraphEditor {
         edge.node2.position.add(0.5, 0.5, 0.5),
         if (edge !in highlightedEdges) edgeColor else edgeDijkstraColor,
         7,
-        !seeThroughBlocks
+        !seeThroughBlocks,
     )
 
     private fun GraphingNode.getNodeColor() = when (this) {
@@ -230,7 +231,7 @@ object GraphEditor {
                             e,
                             "Import of graph failed.",
                             "json" to it,
-                            ignoreErrorCache = true
+                            ignoreErrorCache = true,
                         )
                         null
                     }
@@ -270,7 +271,9 @@ object GraphEditor {
         }
         if (config.throughBlocksKey.isKeyClicked()) {
             seeThroughBlocks = !seeThroughBlocks
-            feedBackInTutorial(if (seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.")
+            feedBackInTutorial(
+                if (seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.",
+            )
         }
         if (config.dijkstraKey.isKeyClicked()) {
             feedBackInTutorial("Calculated shortest route and cleared active node.")
@@ -325,7 +328,7 @@ object GraphEditor {
     private fun getEdgeIndex(node1: GraphingNode?, node2: GraphingNode?) =
         if (node1 != null && node2 != null && node1 != node2) GraphingEdge(
             node1,
-            node2
+            node2,
         ).let { e -> edge.indexOfFirst { it == e }.takeIf { it != -1 } }
         else null
 
@@ -354,7 +357,7 @@ object GraphEditor {
         edge.addAll(
             graph.map { node ->
                 node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!) }
-            }.flatten().distinct()
+            }.flatten().distinct(),
         )
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
     }

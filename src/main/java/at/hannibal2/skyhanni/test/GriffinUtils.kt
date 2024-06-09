@@ -33,15 +33,14 @@ object GriffinUtils {
 
         GlStateManager.disableCull()
         RenderUtils.drawFilledBoundingBox(
+            @Suppress("ktlint:standard:argument-list-wrapping")
             AxisAlignedBB(
                 x - extraSize, y - extraSizeBottomY, z - extraSize,
-                x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize
+                x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
             ).expandBlock(),
             color,
-            if (inverseAlphaScale)
-                (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
-            else
-                (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
+            if (inverseAlphaScale) (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
+            else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
         )
         GlStateManager.disableTexture2D()
         if (distSq > 5 * 5 && beacon) RenderUtils.renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)

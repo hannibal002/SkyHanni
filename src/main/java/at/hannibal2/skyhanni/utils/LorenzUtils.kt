@@ -180,7 +180,7 @@ object LorenzUtils {
             val left = Renderable.hoverTips(
                 entry.left,
                 tips = entry.hover,
-                highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
             )
             val right = Renderable.string(entry.right)
             outerList.add(listOf(item, left, right))
@@ -241,9 +241,11 @@ object LorenzUtils {
                 add("§a[$display]")
             } else {
                 add("§e[")
-                add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
+                add(
+                    Renderable.link("§e$display") {
+                        onChange(entry)
+                    },
+                )
                 add("§e]")
             }
             add(" ")
@@ -264,25 +266,29 @@ object LorenzUtils {
                 lastButtonClicked = System.currentTimeMillis()
             }
         }
-        add(buildList {
-            add(prefix)
-            add("§a[")
-            if (tips.isEmpty()) {
-                add(Renderable.link("§e$getName", false, onClick))
-            } else {
-                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-            }
-            add("§a]")
-        })
+        add(
+            buildList {
+                add(prefix)
+                add("§a[")
+                if (tips.isEmpty()) {
+                    add(Renderable.link("§e$getName", false, onClick))
+                } else {
+                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                }
+                add("§a]")
+            },
+        )
     }
 
     fun GuiEditSign.isRancherSign(): Boolean {
         if (this !is AccessorGuiEditSign) return false
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
-        return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+        return (
+            tileSign.signText[1].unformattedText.removeColor() == "^^^^^^" &&
+                tileSign.signText[2].unformattedText.removeColor() == "Set your" &&
+                tileSign.signText[3].unformattedText.removeColor() == "speed cap!"
+            )
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
@@ -293,7 +299,11 @@ object LorenzUtils {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
-                container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
+                container.windowId,
+                slotNumber,
+                0,
+                1,
+                Minecraft.getMinecraft().thePlayer,
             )
             this.cancel()
         }
@@ -346,11 +356,11 @@ object LorenzUtils {
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
-    fun inAdvancedMiningIsland() =
-        IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
+    fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() ||
+        IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
-        || inAdvancedMiningIsland()
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() ||
+        IslandType.DEEP_CAVERNS.isInIsland() || inAdvancedMiningIsland()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 
