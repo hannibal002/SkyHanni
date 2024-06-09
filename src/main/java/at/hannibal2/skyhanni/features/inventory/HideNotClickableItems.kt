@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -49,7 +50,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class HideNotClickableItems {
+@SkyHanniModule
+object HideNotClickableItems {
 
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
@@ -74,10 +76,10 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
-        hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
-        hideInStorageFilter.load(hideNotClickable.hide_in_storage)
-        hidePlayerTradeFilter.load(hideNotClickable.hide_player_trade)
-        notAuctionableFilter.load(hideNotClickable.not_auctionable)
+        hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
+        hideInStorageFilter.load(hideNotClickable.hideInStorage)
+        hidePlayerTradeFilter.load(hideNotClickable.hidePlayerTrade)
+        notAuctionableFilter.load(hideNotClickable.notAuctionable)
         updateSalvageList(hideNotClickable.salvage)
     }
 
@@ -158,7 +160,7 @@ class HideNotClickableItems {
         val stack = slot.stack
 
         if (hide(chestName, stack)) {
-            event.isCanceled = true
+            event.cancel()
 
             if (lastClickTime.passedSince() > 5.seconds) {
                 lastClickTime = SimpleTimeMark.now()
