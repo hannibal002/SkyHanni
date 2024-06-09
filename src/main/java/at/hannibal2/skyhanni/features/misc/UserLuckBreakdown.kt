@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -15,10 +17,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -51,7 +51,7 @@ object UserLuckBreakdown {
     private var showAllStats = true
     private val showAllStatsPattern = RepoPattern.pattern(
         "misc.statsbreakdown.showallstats",
-        "§7Show all stats: §.(?<toggle>.*)"
+        "§7Show all stats: §.(?<toggle>.*)",
     )
 
     private val luckTooltipString = "§5§o §a✴ SkyHanni User Luck §f"
@@ -67,14 +67,14 @@ object UserLuckBreakdown {
         if (event.inventory !is ContainerLocalMenu) return
         if (!inMiscStats) return
 
-        if (event.slotNumber == replaceSlot && !inCustomBreakdown) {
+        if (event.slot == replaceSlot && !inCustomBreakdown) {
             val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
             if (limboUserLuck == 0.0f && !showAllStats) return
             if (itemCreateCoolDown.passedSince() > 3.seconds) {
                 itemCreateCoolDown = SimpleTimeMark.now()
                 createItems()
             }
-            event.replaceWith(mainLuckItem)
+            event.replace(mainLuckItem)
             return
         }
         if (inCustomBreakdown) {
@@ -82,24 +82,27 @@ object UserLuckBreakdown {
                 itemCreateCoolDown = SimpleTimeMark.now()
                 createItems()
             }
-            when (event.slotNumber) {
+            when (event.slot) {
                 48 -> return
                 49 -> return
                 10 -> {
-                    event.replaceWith(skillsItem)
+                    event.replace(skillsItem)
                     return
                 }
+
                 11 -> {
-                    event.replaceWith(limboItem)
+                    event.replace(limboItem)
                     return
                 }
+
                 in validItemSlots -> {
-                    event.replaceWith(null)
+                    event.replace(null)
                     return
                 }
+
                 in invalidItemSlots -> {
-                    if (event.original.item == limboID.getItemStack().item) return
-                    event.replaceWith(fillerItem)
+                    if (event.originalItem.item == limboID.getItemStack().item) return
+                    event.replace(fillerItem)
                     return
                 }
             }
@@ -161,13 +164,14 @@ object UserLuckBreakdown {
                 if (limboLuck == 0.0f && !showAllStats) return
 
                 val skillLuck = skillOverflowLuck.values.sum()
-                val totalLuck = skillLuck+limboLuck
+                val totalLuck = skillLuck + limboLuck
                 val lastIndex = event.toolTip.indexOfLast { it == "§5§o" }
                 if (lastIndex == -1) return
 
                 val luckString = tryTruncateFloat(totalLuck)
                 event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
             }
+
             "Your Stats Breakdown" -> {
                 if (!inMiscStats) return
                 if (inCustomBreakdown && event.slot.slotIndex == 48) {
@@ -177,10 +181,11 @@ object UserLuckBreakdown {
                 if (limboLuck == 0.0f && !showAllStats) return
 
                 val skillLuck = skillOverflowLuck.values.sum()
-                val totalLuck = skillLuck+limboLuck
+                val totalLuck = skillLuck + limboLuck
                 val luckString = tryTruncateFloat(totalLuck)
                 event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f$luckString")
             }
+
             "SkyBlock Menu" -> {
                 if (event.slot.slotIndex != 13) return
                 if (limboLuck == 0.0f) return
@@ -189,10 +194,11 @@ object UserLuckBreakdown {
                 if (lastIndex == -1) return
 
                 val skillLuck = skillOverflowLuck.values.sum()
-                val totalLuck = skillLuck+limboLuck
+                val totalLuck = skillLuck + limboLuck
                 val luckString = tryTruncateFloat(totalLuck)
                 event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
             }
+
             else -> return
         }
     }
@@ -216,10 +222,12 @@ object UserLuckBreakdown {
                 event.cancel()
                 inCustomBreakdown = true
             }
+
             48 -> {
                 if (!inCustomBreakdown) return
                 inCustomBreakdown = false
             }
+
             else -> return
         }
     }
@@ -233,22 +241,22 @@ object UserLuckBreakdown {
 
         val limboLuck = storage?.limbo?.userLuck ?: 0.0f
         val skillLuck = skillOverflowLuck.values.sum()
-        val totalLuck = skillLuck+limboLuck
+        val totalLuck = skillLuck + limboLuck
 
         mainLuckItem = Utils.createItemStack(
             mainLuckID.getItemStack().item,
             "$mainLuckName §f${tryTruncateFloat(totalLuck)}",
-            *createItemLore("mainMenu", totalLuck)
+            *createItemLore("mainMenu", totalLuck),
         )
         limboItem = Utils.createItemStack(
             limboID.getItemStack().item,
             limboName,
-            *createItemLore("limbo", limboLuck)
+            *createItemLore("limbo", limboLuck),
         )
         skillsItem = Utils.createItemStack(
             skillsID.getItemStack().item,
             skillsName,
-            *createItemLore("skills")
+            *createItemLore("skills"),
         )
     }
 
@@ -257,25 +265,28 @@ object UserLuckBreakdown {
         when (type) {
             "mainMenu" -> {
                 val luckString = tryTruncateFloat(luckInput.round(2))
-                return if (luckInput == 0.0f) { arrayOf(
-                    "§7SkyHanni User Luck is the best stat.",
-                    "",
-                    "§7Flat: §a+$luckString✴",
-                    "",
-                    "§8You have none of this stat!",
-                    "§eClick to view!"
-                )
-                } else { arrayOf(
-                    "§7SkyHanni User Luck increases",
-                    "§7your overall fortune",
-                    "§7fortune around Hypixel Skyblock.",
-                    "",
-                    "§7(Disclaimer: May not affect real drop chances)",
-                    "",
-                    "§eClick to view!"
-                )
+                return if (luckInput == 0.0f) {
+                    arrayOf(
+                        "§7SkyHanni User Luck is the best stat.",
+                        "",
+                        "§7Flat: §a+$luckString✴",
+                        "",
+                        "§8You have none of this stat!",
+                        "§eClick to view!",
+                    )
+                } else {
+                    arrayOf(
+                        "§7SkyHanni User Luck increases",
+                        "§7your overall fortune",
+                        "§7fortune around Hypixel Skyblock.",
+                        "",
+                        "§7(Disclaimer: May not affect real drop chances)",
+                        "",
+                        "§eClick to view!",
+                    )
                 }
             }
+
             "limbo" -> {
                 val luckString = tryTruncateFloat(luckInput.round(2))
                 return arrayOf(
@@ -284,19 +295,22 @@ object UserLuckBreakdown {
                     "§7Value: §a+$luckString✴",
                     "",
                     "§8Gain more by going to Limbo,",
-                    "§8and obtaining a higher Personal Best§8."
+                    "§8and obtaining a higher Personal Best§8.",
                 )
             }
+
             "skills" -> {
                 val luckString = skillOverflowLuck.values.sum()
                 val firstHalf = arrayOf(
                     "§8Grouped",
                     "",
                     "§7Value: §a+$luckString✴",
-                    "",)
+                    "",
+                )
                 val secondHalf = arrayOf(
                     "§8Stats from your overflow skills.",
-                    "§8Obtain more each 5 overflow levels!")
+                    "§8Obtain more each 5 overflow levels!",
+                )
                 val sourcesList = mutableListOf<String>()
                 for ((skillType, luck) in skillOverflowLuck) {
                     if (luck == 0) continue
@@ -311,6 +325,7 @@ object UserLuckBreakdown {
                 finalList.addAll(secondHalf)
                 return finalList.toTypedArray()
             }
+
             else -> return arrayOf("")
         }
     }
@@ -321,7 +336,7 @@ object UserLuckBreakdown {
         for ((skillType, skillInfo) in storage) {
             val level = skillInfo.level
             val overflow = skillInfo.overflowLevel
-            val luck = ((overflow-level)/5)*50
+            val luck = ((overflow - level) / 5) * 50
             skillOverflowLuck.addOrPut(skillType, luck)
         }
     }
