@@ -42,8 +42,8 @@ class VisitorListenerTest {
                     " §r§fJacob",
                     "ThePlayerName",
                     "",
-                )
-            )
+                ),
+            ),
         )
 
         verify { VisitorAPI.addVisitor("§fJacob") }
@@ -59,8 +59,8 @@ class VisitorListenerTest {
 
         listener.onTabListUpdate(
             fakeTabWidget(
-                mutableListOf("§b§lVisitors: §r§f(0)", "")
-            )
+                mutableListOf("§b§lVisitors: §r§f(0)", ""),
+            ),
         )
 
         verify { VisitorAPI.removeVisitor("§fJacob") }
@@ -76,8 +76,8 @@ class VisitorListenerTest {
 
         listener.onTabListUpdate(
             fakeTabWidget(
-                mutableListOf("§b§lVisitors: §r§f(0)", "")
-            )
+                mutableListOf("§b§lVisitors: §r§f(0)", ""),
+            ),
         )
 
         verify(exactly = 0) { VisitorAPI.removeVisitor("§fJacob") }
