@@ -5,11 +5,15 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.json.*
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -68,50 +72,39 @@ object ReforgeAPI {
 
         fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
 
-        fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) =
-            when (type) {
-                ReforgeType.SWORD -> setOf(
-                    ItemCategory.SWORD,
-                    ItemCategory.GAUNTLET,
-                    ItemCategory.LONGSWORD,
-                    ItemCategory.FISHING_WEAPON
-                ).contains(itemCategory)
+        fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) = when (type) {
+            ReforgeType.SWORD -> setOf(
+                ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_WEAPON
+            ).contains(itemCategory)
 
-                ReforgeType.BOW -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
-                ReforgeType.ARMOR -> setOf(
-                    ItemCategory.HELMET,
-                    ItemCategory.CHESTPLATE,
-                    ItemCategory.LEGGINGS,
-                    ItemCategory.BOOTS
-                ).contains(itemCategory)
+            ReforgeType.BOW -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
+            ReforgeType.ARMOR -> setOf(
+                ItemCategory.HELMET, ItemCategory.CHESTPLATE, ItemCategory.LEGGINGS, ItemCategory.BOOTS
+            ).contains(itemCategory)
 
-                ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
-                ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
-                ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
-                ReforgeType.AXE -> itemCategory == ItemCategory.AXE
-                ReforgeType.HOE -> itemCategory == ItemCategory.HOE
-                ReforgeType.AXE_AND_HOE -> itemCategory == ItemCategory.HOE || itemCategory == ItemCategory.AXE
-                ReforgeType.PICKAXE -> itemCategory == ItemCategory.PICKAXE || itemCategory == ItemCategory.DRILL || itemCategory == ItemCategory.GAUNTLET
-                ReforgeType.EQUIPMENT -> setOf(
-                    ItemCategory.CLOAK,
-                    ItemCategory.BELT,
-                    ItemCategory.NECKLACE,
-                    ItemCategory.BRACELET,
-                    ItemCategory.GLOVES
-                ).contains(itemCategory)
+            ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
+            ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
+            ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
+            ReforgeType.AXE -> itemCategory == ItemCategory.AXE
+            ReforgeType.HOE -> itemCategory == ItemCategory.HOE
+            ReforgeType.AXE_AND_HOE -> itemCategory == ItemCategory.HOE || itemCategory == ItemCategory.AXE
+            ReforgeType.PICKAXE -> itemCategory == ItemCategory.PICKAXE || itemCategory == ItemCategory.DRILL || itemCategory == ItemCategory.GAUNTLET
+            ReforgeType.EQUIPMENT -> setOf(
+                ItemCategory.CLOAK, ItemCategory.BELT, ItemCategory.NECKLACE, ItemCategory.BRACELET, ItemCategory.GLOVES
+            ).contains(itemCategory)
 
-                ReforgeType.ROD -> itemCategory == ItemCategory.FISHING_ROD || itemCategory == ItemCategory.FISHING_WEAPON
-                ReforgeType.SWORD_AND_ROD -> setOf(
-                    ItemCategory.SWORD,
-                    ItemCategory.GAUNTLET,
-                    ItemCategory.LONGSWORD,
-                    ItemCategory.FISHING_ROD,
-                    ItemCategory.FISHING_WEAPON
-                ).contains(itemCategory)
+            ReforgeType.ROD -> itemCategory == ItemCategory.FISHING_ROD || itemCategory == ItemCategory.FISHING_WEAPON
+            ReforgeType.SWORD_AND_ROD -> setOf(
+                ItemCategory.SWORD,
+                ItemCategory.GAUNTLET,
+                ItemCategory.LONGSWORD,
+                ItemCategory.FISHING_ROD,
+                ItemCategory.FISHING_WEAPON
+            ).contains(itemCategory)
 
-                ReforgeType.VACUUM -> itemCategory == ItemCategory.VACUUM
-                ReforgeType.SPECIAL_ITEMS -> specialItems?.contains(internalName) ?: false
-            }
+            ReforgeType.VACUUM -> itemCategory == ItemCategory.VACUUM
+            ReforgeType.SPECIAL_ITEMS -> specialItems?.contains(internalName) ?: false
+        }
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
