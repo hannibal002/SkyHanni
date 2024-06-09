@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.TypeAdapter
@@ -135,7 +136,7 @@ object NEUItems {
             name = name.removePrefix("§7[lvl 1➡100] ")
 
             if (name.contains("[lvl 1➡100]")) {
-                if (LorenzUtils.isInDevEnvironment()) {
+                if (PlatformUtils.isDevEnvironment) {
                     error("wrong name: '$name'")
                 }
                 println("wrong name: '$name'")
