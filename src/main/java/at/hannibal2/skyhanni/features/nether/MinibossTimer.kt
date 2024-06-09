@@ -148,17 +148,19 @@ object MinibossTimer {
 
     fun drawDisplay(): Renderable {
         val lines = MiniBoss.entries.map {
+            val timer = it.timer
             val possibleTimer = it.possibleTimer
             Renderable.string(buildString {
                 append("§b${it.displayName}: ")
                 if (it.isSpawned()) append("§aSPAWNED!")
+                if (timer != null && timer.isInPast() && timer.passedSince() < 10.seconds) append("§6Soon!")
                 else if (it.isTimerKnown()) append("§e${it.timer?.timeUntil()?.format()}")
                 else if (possibleTimer != null) {
                     val (start, end) = possibleTimer
                     if (start.timeUntil().isNegative()) append("§e~Now - ")
                     else append("§e~${start.timeUntil().format()} - ")
-                    if (end.timeUntil().isNegative()) append("§cNow")
-                    else append("§c${end.timeUntil().format()}")
+                    if (end.timeUntil().isNegative()) append("§eNow")
+                    else append("§e${end.timeUntil().format()}")
                 } else append("§cUnknown")
             })
         }
@@ -183,15 +185,16 @@ object MinibossTimer {
         event.addIrrelevant {
             add("Current Area Boss: ${currentAreaBoss?.displayName}")
             MiniBoss.entries.forEach {
+                add("")
                 add(it.displayName)
-                add("Timer ${it.timer?.timeUntil()?.format()}")
+                add("   Timer ${it.timer?.timeUntil()?.format()}")
                 add(
-                    "Possible Timer ${it.possibleTimer?.first?.timeUntil()?.format()} - " +
+                    "   Possible Timer ${it.possibleTimer?.first?.timeUntil()?.format()} - " +
                         "${it.possibleTimer?.second?.timeUntil()?.format()}"
                 )
-                add("Found Beacon ${it.foundBeacon}")
-                add("Spawned ${it.spawned}")
-                add("Last Seen Area ${it.lastSeenArea.passedSince().format()}")
+                add("   Found Beacon ${it.foundBeacon}")
+                add("   Spawned ${it.spawned}")
+                add("   Last Seen Area ${it.lastSeenArea.passedSince().format()}")
             }
         }
     }
