@@ -53,8 +53,12 @@ fun MethodSpec.Builder.addParameter(parameter: KSValueParameter): MethodSpec.Bui
 fun MethodSpec.Builder.addModifiers(add: Boolean, vararg modifiers: Modifier): MethodSpec.Builder =
     if (add) this.addModifiers(*modifiers) else this
 
-fun AnnotationSpec.Builder.addMember(add: Boolean, name: String, format: String, vararg args: Any): AnnotationSpec.Builder =
-    if (add) this.addMember(name, format, *args) else this
+fun AnnotationSpec.Builder.addMember(
+    add: Boolean,
+    name: String,
+    format: String,
+    vararg args: Any
+): AnnotationSpec.Builder = if (add) this.addMember(name, format, *args) else this
 
 fun AnnotationSpec.Builder.addAnnotation(
     name: String,

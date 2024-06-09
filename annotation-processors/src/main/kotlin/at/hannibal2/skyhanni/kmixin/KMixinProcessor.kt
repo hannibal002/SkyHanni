@@ -66,7 +66,9 @@ class KMixinProcessor(private val codeGenerator: CodeGenerator, private val logg
                 require(function.isPublic()) { "Mixin functions must be public" }
 
                 serializer.write(
-                    symbol, annotation, function,
+                    symbol,
+                    annotation,
+                    function,
                     { method -> methods.add(method.build()) },
                     { field -> fields.add(field.build()) }
                 )
