@@ -154,7 +154,7 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
+    fun NEUInternalName.getPrice(useSellPrice: Boolean = false) = getPriceOrNull(useSellPrice) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
@@ -168,20 +168,20 @@ object NEUItems {
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
-    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
+    fun NEUInternalName.getPriceOrNull(useSellPrice: Boolean = false): Double? {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
 
         getBazaarData()?.let {
-            return if (useSellingPrice) it.sellOfferPrice else it.instantBuyPrice
+            return if (useSellPrice) it.sellOfferPrice else it.instantBuyPrice
         }
 
         val result = manager.auctionManager.getLowestBin(asString())
         if (result != -1L) return result.toDouble()
 
         if (equals("JACK_O_LANTERN")) {
-            return "PUMPKIN".asInternalName().getPrice(useSellingPrice) + 1
+            return "PUMPKIN".asInternalName().getPrice(useSellPrice) + 1
         }
         if (equals("GOLDEN_CARROT")) {
             // 6.8 for some players
