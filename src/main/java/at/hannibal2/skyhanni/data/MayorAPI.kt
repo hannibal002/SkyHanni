@@ -131,7 +131,8 @@ object MayorAPI {
                 onClick = { HypixelCommands.calendar() },
             )
         }
-        if (Mayor.JERRY.isActive() && jerryExtraMayor.first == null && SkyHanniMod.feature.misc.unknownPerkpocalypseMayorWarning) {
+        val misc = SkyHanniMod.feature.misc
+        if (Mayor.JERRY.isActive() && jerryExtraMayor.first == null && misc.unknownPerkpocalypseMayorWarning) {
             if (lastJerryExtraMayorReminder.passedSince() < 5.minutes) return
             if (ReminderUtils.isBusy()) return
             lastJerryExtraMayorReminder = SimpleTimeMark.now()
@@ -161,30 +162,28 @@ object MayorAPI {
         val stack: ItemStack =
             event.inventoryItems.values.firstOrNull { jerryHeadPattern.matches(it.displayName) } ?: return
 
-        stack.getLore().nextAfter(
-            { perkpocalypsePerksPattern.matches(it) },
-        )?.let { perk ->
-            // This is one Perk of the Perkpocalypse Mayor
-            val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
+        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }) ?: return
+        // This is one Perk of the Perkpocalypse Mayor
+        val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
-            val lastMayorTimestamp = nextMayorTimestamp - SKYBLOCK_YEAR_MILLIS.milliseconds
+        val lastMayorTimestamp = nextMayorTimestamp - SKYBLOCK_YEAR_MILLIS.milliseconds
+          
+        val expireTime = (1..21)
+            .map { lastMayorTimestamp + (6.hours * it) }
+            .firstOrNull { it.isInFuture() }
+            ?.coerceAtMost(nextMayorTimestamp) ?: return
 
-            val expireTime = (1..21)
-                .map { lastMayorTimestamp + (6.hours * it) }
-                .firstOrNull { it.isInFuture() }
-                ?.coerceAtMost(nextMayorTimestamp) ?: return
+        ChatUtils.debug("Jerry Mayor found: ${jerryMayor.name} expiring at: ${expireTime.timeUntil()}")
 
-            ChatUtils.debug("Jerry Mayor found: ${jerryMayor.name} expiring at: ${expireTime.timeUntil()}")
-
-            jerryExtraMayor = jerryMayor to expireTime
-        }
+        jerryExtraMayor = jerryMayor to expireTime
     }
 
     private fun calculateNextMayorTime(): SimpleTimeMark {
-        var mayorYear = SkyBlockTime.now().year
+        val now = SkyBlockTime.now()
+        var mayorYear = now.year
 
         // Check if either the month is already over or the day after 27th in the third month
-        if (SkyBlockTime.now().month > ELECTION_END_MONTH || (SkyBlockTime.now().day >= ELECTION_END_DAY && SkyBlockTime.now().month == ELECTION_END_MONTH)) {
+        if (now.month > ELECTION_END_MONTH || (now.day >= ELECTION_END_DAY && now.month == ELECTION_END_MONTH)) {
             // If so, the next mayor will be in the next year
             mayorYear++
         }

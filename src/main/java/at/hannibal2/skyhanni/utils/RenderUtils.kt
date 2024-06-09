@@ -559,6 +559,7 @@ object RenderUtils {
         renderables: List<Renderable>,
         extraSpace: Int = 0,
         posLabel: String,
+        addToGuiManager: Boolean = true,
     ) {
         if (renderables.isEmpty()) return
         var longestY = 0
@@ -575,7 +576,21 @@ object RenderUtils {
 
             GlStateManager.popMatrix()
         }
-        GuiEditManager.add(this, posLabel, longestX, longestY)
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
+    }
+
+    fun Position.renderRenderable(
+        renderable: Renderable,
+        posLabel: String,
+        addToGuiManager: Boolean = true,
+    ) {
+        GlStateManager.pushMatrix()
+        val (x, y) = transform()
+        Renderable.withMousePosition(x, y) {
+            renderable.render(0, 0)
+        }
+        GlStateManager.popMatrix()
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, 0)
     }
 
     /**
