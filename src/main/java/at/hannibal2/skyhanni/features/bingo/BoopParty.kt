@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object BoopParty {
 
     val config get() = SkyHanniMod.feature.event.bingo.boopParty
-    val patternGroup = RepoPattern.group("misc")
+    val patternGroup = RepoPattern.group("bingo")
     private val boopPattern by patternGroup.pattern(
         "boop",
         "§dFrom.*§d§lBoop!"
