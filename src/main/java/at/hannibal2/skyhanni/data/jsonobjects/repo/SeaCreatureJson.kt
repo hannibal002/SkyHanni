@@ -11,8 +11,7 @@ data class SeaCreatureJson(
     @Expose @SerializedName("sea_creatures") val seaCreatures: Map<String, SeaCreatureInfo>,
 ) {
     companion object {
-        val TYPE: Type = object : TypeToken<Map<String?, SeaCreatureJson>>() {
-        }.type
+        val TYPE: Type = object : TypeToken<Map<String?, SeaCreatureJson>>() {}.type
     }
 }
 
