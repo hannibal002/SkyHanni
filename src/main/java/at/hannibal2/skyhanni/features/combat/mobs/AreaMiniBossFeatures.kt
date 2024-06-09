@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -24,7 +25,8 @@ import net.minecraft.entity.passive.EntityWolf
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class AreaMiniBossFeatures {
+@SkyHanniModule
+object AreaMiniBossFeatures {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
     private var lastSpawnTime = SimpleTimeMark.farPast()

@@ -119,6 +119,12 @@ public class MiscConfig {
     public boolean hideExpBottles = false;
 
     @Expose
+    @ConfigOption(name = "Armorstands", desc = "Hides Armorstands that are sometimes visible for a fraction of a second.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideTemporaryArmorstands = true;
+
+    @Expose
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
@@ -193,16 +199,10 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
+    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim community shop account and profile upgrades when complete.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean accountUpgradeReminder = true;
-
-    @Expose
-    @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairsClicksAlert = false;
 
     @Expose
     @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
@@ -265,6 +265,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceRomanNumerals = false;
+
+    @Expose
+    @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean unknownPerkpocalypseMayorWarning = true;
 
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion

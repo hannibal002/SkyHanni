@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.mineshaft
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -10,7 +11,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class CorpseAPI {
+@SkyHanniModule
+object CorpseAPI {
 
     private val patternGroup = RepoPattern.group("mining.mineshaft")
     private val chatPatternGroup = patternGroup.group("chat")
@@ -39,7 +41,7 @@ class CorpseAPI {
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
 
-    private var corpeType: CorpeType? = null
+    private var corpseType: CorpseType? = null
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -50,17 +52,17 @@ class CorpseAPI {
         startPattern.matchMatcher(message) {
             inLoot = true
             val name = group("name")
-            corpeType = CorpeType.valueOf(name)
+            corpseType = CorpseType.valueOf(name)
             return
         }
 
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
-            corpeType?.let {
+            corpseType?.let {
                 CorpseLootedEvent(it, loot.toList()).postAndCatch()
             }
-            corpeType = null
+            corpseType = null
             loot.clear()
             inLoot = false
             return

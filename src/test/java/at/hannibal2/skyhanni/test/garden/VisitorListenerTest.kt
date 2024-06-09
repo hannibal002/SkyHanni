@@ -27,7 +27,7 @@ class VisitorListenerTest {
         mockkObject(VisitorAPI)
         every { VisitorAPI.addVisitor(any()) } returns true
 
-        listener = VisitorListener()
+        listener = VisitorListener
     }
 
     @Test

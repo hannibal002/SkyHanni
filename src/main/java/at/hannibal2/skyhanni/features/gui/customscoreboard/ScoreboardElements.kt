@@ -17,13 +17,13 @@ import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.arrowConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.config
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.maxwellConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.mayorConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.partyConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.arrowConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.mayorConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.partyConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -47,7 +47,7 @@ import kotlin.time.Duration.Companion.seconds
 
 internal var confirmedUnknownLines = mutableListOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
+internal var unknownLinesSet = TimeLimitedSet<String>(2.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
     if (!unconfirmedUnknownLines.contains(line)) return
@@ -745,20 +745,34 @@ private fun getEventsDisplayPair(): List<ScoreboardElementType> {
 private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair() = buildList {
-    add(
-        ((MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) }
-            ?: "<hidden>") +
-            (if (mayorConfig.showTimeTillNextMayor) {
-                "§7 (§e${MayorAPI.timeTillNextMayor.format(maxUnits = 2)}§7)"
-            } else {
-                ""
-            })) to HorizontalAlignment.LEFT
-    )
+    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: "<hidden>"
+    val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
+        "§7 (§e${MayorAPI.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
+    } else {
+        ""
+    }
+
+    add((currentMayorName + timeTillNextMayor) to HorizontalAlignment.LEFT)
+
     if (mayorConfig.showMayorPerks) {
-        MayorAPI.currentMayor?.activePerks?.forEach {
-            add(" §7- §e${it.perkName}" to HorizontalAlignment.LEFT)
+        MayorAPI.currentMayor?.activePerks?.forEach { perk ->
+            add(" §7- §e${perk.perkName}" to HorizontalAlignment.LEFT)
         }
     }
+
+    if (!mayorConfig.showExtraMayor) return@buildList
+    val jerryExtraMayor = MayorAPI.jerryExtraMayor
+    val extraMayor = jerryExtraMayor.first ?: return@buildList
+
+    val extraMayorName = extraMayor.mayorName.let { MayorAPI.mayorNameWithColorCode(it) }
+    val extraTimeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
+        "§7 (§6${jerryExtraMayor.second.timeUntil().format(maxUnits = 2)}§7)"
+    } else {
+        ""
+    }
+
+    add((extraMayorName + extraTimeTillNextMayor) to HorizontalAlignment.LEFT)
+
 }
 
 private fun getMayorShowWhen() =

@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -59,7 +60,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class MinionFeatures {
+@SkyHanniModule
+object MinionFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
@@ -175,7 +177,6 @@ class MinionFeatures {
         val minions = minions ?: return
         val entity = lastClickedEntity ?: return
 
-
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
         if (!minions.contains(entity) && LorenzUtils.skyBlockIsland != IslandType.HUB) {
@@ -198,7 +199,7 @@ class MinionFeatures {
         lastMinionOpened = 0
     }
 
-    private fun removeBuggedMinions() {
+    fun removeBuggedMinions(isCommand: Boolean = false) {
         if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
@@ -212,8 +213,13 @@ class MinionFeatures {
         }
 
         val size = removedEntities.size
-        if (size == 0) return
-        Companion.minions = minions.editCopy {
+        if (size == 0) {
+            if (isCommand) {
+                ChatUtils.chat("No bugged minions found nearby.")
+            }
+            return
+        }
+        this.minions = minions.editCopy {
             for (removedEntity in removedEntities) {
                 remove(removedEntity)
             }
@@ -377,7 +383,7 @@ class MinionFeatures {
         if (entity.customNameTag.contains("§c❤")) {
             val loc = entity.getLorenzVec()
             if (minions.any { it.key.distance(loc) < 5 }) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
@@ -396,26 +402,18 @@ class MinionFeatures {
         }
     }
 
-    companion object {
+    var lastMinion: LorenzVec? = null
+    var lastStorage: LorenzVec? = null
+    var minionInventoryOpen = false
+    var minionStorageInventoryOpen = false
 
-        var lastMinion: LorenzVec? = null
-        var lastStorage: LorenzVec? = null
-        var minionInventoryOpen = false
-        var minionStorageInventoryOpen = false
-
-        private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
-            get() {
-                return ProfileStorageData.profileSpecific?.minions
-            }
-            set(value) {
-                ProfileStorageData.profileSpecific?.minions = value
-            }
-
-        fun clearMinionData() {
-            minions = mutableMapOf()
-            ChatUtils.chat("Manually reset all private island minion location data!")
+    private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
+        get() {
+            return ProfileStorageData.profileSpecific?.minions
         }
-    }
+        set(value) {
+            ProfileStorageData.profileSpecific?.minions = value
+        }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

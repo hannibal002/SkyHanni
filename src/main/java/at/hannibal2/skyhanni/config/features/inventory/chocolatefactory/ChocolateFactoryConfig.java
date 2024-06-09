@@ -71,11 +71,6 @@ public class ChocolateFactoryConfig {
     public boolean useMiddleClick = true;
 
     @Expose
-    @ConfigOption(name = "Rabbit Warning", desc = "Warn when the rabbit that needs to be clicked appears.")
-    @ConfigEditorBoolean
-    public boolean rabbitWarning = true;
-
-    @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
         desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
@@ -102,6 +97,12 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showDuplicateTime = false;
+
+    @Expose
+    @ConfigOption(name = "Stray Rabbit Time", desc = "Show the production time of chocolate gained from stray rabbits.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showStrayTime = false;
 
     @Expose
     @ConfigOption(name = "Time Tower Usage Warning", desc = "Notification when you have a new time tower usage available and " +
@@ -170,6 +171,34 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityMenuShortcut = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Requirement Rabbits", desc = "Highlight rabbits that have requirements.\n" +
+        "§cRed: Requirement not met.\n" +
+        "§aGreen: Requirement met.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightRabbitsWithRequirement = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Show Missing Location Rabbits",
+        desc = "Shows which in which locations you have not yet found enough egg locations to unlock the rabbit for that location."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLocationRequirementsRabbitsInHoppityStats = false;
+
+    @Expose
+    @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean onlyHighlightRequirementNotMet = true;
+
+    @Expose
+    @ConfigOption(name = "Rabbit Warning", desc = "")
+    @Accordion
+    public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
