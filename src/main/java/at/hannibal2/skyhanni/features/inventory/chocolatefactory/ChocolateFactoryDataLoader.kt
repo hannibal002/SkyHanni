@@ -212,7 +212,7 @@ object ChocolateFactoryDataLoader {
 
         profileStorage.rawChocPerSecond =
             (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
-        profileStorage.lastDataSave = SimpleTimeMark.now().toMillis()
+        profileStorage.lastDataSave = SimpleTimeMark.now()
 
         ChocolateFactoryStats.updateDisplay()
 
@@ -319,9 +319,9 @@ object ChocolateFactoryDataLoader {
 
                     val activeDuration = TimeUtils.getDuration(formattedGroup)
                     val activeUntil = SimpleTimeMark.now() + activeDuration
-                    profileStorage.currentTimeTowerEnds = activeUntil.toMillis()
+                    profileStorage.currentTimeTowerEnds = activeUntil
                 } else {
-                    profileStorage.currentTimeTowerEnds = 0
+                    profileStorage.currentTimeTowerEnds = SimpleTimeMark.farPast()
                 }
             }
             timeTowerRechargePattern.matchMatcher(line) {
@@ -330,7 +330,7 @@ object ChocolateFactoryDataLoader {
 
                 val timeUntilTower = TimeUtils.getDuration(formattedGroup)
                 val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
-                profileStorage.nextTimeTower = nextTimeTower.toMillis()
+                profileStorage.nextTimeTower = nextTimeTower
             }
         }
     }
@@ -467,7 +467,7 @@ object ChocolateFactoryDataLoader {
             list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
-        profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt?.toMillis() ?: 0
+        profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt ?: SimpleTimeMark.farPast()
         profileStorage.bestUpgradeCost = bestUpgrade?.price ?: 0
         ChocolateFactoryAPI.bestPossibleSlot = bestUpgrade?.getValidUpgradeIndex() ?: -1
 
