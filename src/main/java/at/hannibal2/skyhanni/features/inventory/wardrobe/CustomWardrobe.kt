@@ -106,6 +106,7 @@ object CustomWardrobe {
         DelayedRun.runDelayed(500.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
+                WardrobeAPI.currentPage = null
             }
         }
     }
