@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 object VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
         "garden.visitor.offersaccepted",
-        "§7Offers Accepted: §a(?<offersAccepted>\\d+)"
+        "§7Offers Accepted: §a(?<offersAccepted>\\d+)",
     )
 
     private val config get() = VisitorAPI.config

@@ -21,7 +21,7 @@ object FerocityDisplay {
      */
     private val ferocityPattern by RepoPattern.pattern(
         "combat.ferocity.tab",
-        " Ferocity: §r§c⫽(?<stat>.*)"
+        " Ferocity: §r§c⫽(?<stat>.*)",
     )
 
     private var display = ""

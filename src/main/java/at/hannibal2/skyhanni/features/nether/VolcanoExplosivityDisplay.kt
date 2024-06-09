@@ -23,7 +23,7 @@ object VolcanoExplosivityDisplay {
      */
     private val statusPattern by patternGroup.pattern(
         "tablistline",
-        " *Volcano: (?<status>(?:§.)*\\S+)"
+        " *Volcano: (?<status>(?:§.)*\\S+)",
     )
     private var display = ""
 

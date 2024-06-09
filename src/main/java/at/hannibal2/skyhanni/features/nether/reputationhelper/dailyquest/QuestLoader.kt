@@ -213,7 +213,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                     quest.haveAmount = haveAmount
                 } catch (e: IndexOutOfBoundsException) {
                     ErrorManager.logErrorWithData(
-                        e, "Error loading Crimson Isle Quests from config.",
+                        e,
+                        "Error loading Crimson Isle Quests from config.",
                         "text" to text,
                     )
                 }
