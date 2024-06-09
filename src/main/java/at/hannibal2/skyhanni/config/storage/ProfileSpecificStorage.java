@@ -622,11 +622,11 @@ public class ProfileSpecificStorage {
 
     public static class WardrobeStorage {
         @Expose
-        public Map<Integer, WardrobeAPI.WardrobeData> wardrobeData = new HashMap<>();
+        public Map<Integer, WardrobeAPI.WardrobeData> data = new HashMap<>();
 
         @Expose
         @Nullable
-        public Integer currentWardrobeSlot = null;
+        public Integer currentSlot = null;
     }
 
     @Expose

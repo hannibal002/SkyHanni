@@ -17,12 +17,12 @@ class EstimatedWardrobePrice {
         if (!WardrobeAPI.inWardrobe()) return
         if (WardrobeAPI.inCustomWardrobe) return
 
-        val slot = WardrobeAPI.wardrobeSlots.firstOrNull {
+        val slot = WardrobeAPI.slots.firstOrNull {
             event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()
         } ?: return
 
 
-        val lore = WardrobeAPI.createWardrobePriceLore(slot)
+        val lore = WardrobeAPI.createPriceLore(slot)
         if (lore.isEmpty()) return
 
         val tooltip = event.toolTip

@@ -170,8 +170,11 @@ public class InventoryConfig {
     public boolean vacuumBagCap = true;
 
     @Expose
-    @ConfigOption(name = "Quick Craft Confirmation", desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-        "(e.g. armor, weapons, accessories). Sack items can be crafted normally.")
+    @ConfigOption(name = "Quick Craft Confirmation",
+        desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+        "(e.g. armor, weapons, accessories). " +
+            "Sack items can be crafted normally."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean quickCraftingConfirmation = false;
