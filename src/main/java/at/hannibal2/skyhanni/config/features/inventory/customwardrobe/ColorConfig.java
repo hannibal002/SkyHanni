@@ -22,11 +22,6 @@ public class ColorConfig {
     public String favoriteColor = "0:127:255:85:85";
 
     @Expose
-    @ConfigOption(name = "Locked/Empty", desc = "Color of the wardrobe slots that are locked or empty.")
-    @ConfigEditorColour
-    public String lockedEmptyColor = "0:127:50:50:50";
-
-    @Expose
     @ConfigOption(name = "Same Page", desc = "Color of wardrobe slots in the same page.")
     @ConfigEditorColour
     public String samePageColor = "0:127:94:108:255";

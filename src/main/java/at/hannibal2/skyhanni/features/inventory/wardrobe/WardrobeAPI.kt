@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -47,91 +48,29 @@ object WardrobeAPI {
     private const val FIRST_CHESTPLATE_SLOT = 9
     private const val FIRST_LEGGINGS_SLOT = 18
     private const val FIRST_BOOTS_SLOT = 27
+    const val MAX_SLOT_PER_PAGE = 9
+    const val MAX_PAGES = 2
 
-    var wardrobeSlots = listOf<WardrobeSlot>()
+    var slots = listOf<WardrobeSlot>()
     var inCustomWardrobe = false
 
-    class WardrobeSlot(
-        val id: Int,
-        val page: Int,
-        val inventorySlot: Int,
-        val helmetSlot: Int,
-        val chestplateSlot: Int,
-        val leggingsSlot: Int,
-        val bootsSlot: Int,
-    ) {
-        private fun getData() = storage?.wardrobeData?.getOrPut(id) {
-            WardrobeData(
-                id,
-                (1..4).associateWith { null }.toMutableMap(),
-                locked = true,
-                favorite = false,
-            )
-        }
+    internal fun emptyArmor(): List<ItemStack?> = listOf(null, null, null, null)
 
-        var helmet: ItemStack?
-            get() = getData()?.armor?.get(1)
-            set(value) {
-                getData()?.armor?.set(1, value)
-            }
-
-        var chestplate: ItemStack?
-            get() = getData()?.armor?.get(2)
-            set(value) {
-                getData()?.armor?.set(2, value)
-            }
-
-        var leggings: ItemStack?
-            get() = getData()?.armor?.get(3)
-            set(value) {
-                getData()?.armor?.set(3, value)
-            }
-
-        var boots: ItemStack?
-            get() = getData()?.armor?.get(4)
-            set(value) {
-                getData()?.armor?.set(4, value)
-            }
-
-        var locked: Boolean
-            get() = getData()?.locked ?: true
-            set(value) {
-                getData()?.locked = value
-            }
-
-        var favorite: Boolean
-            get() = getData()?.favorite ?: false
-            set(value) {
-                getData()?.favorite = value
-            }
-
-        val armor get() = (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
-
-        fun isEmpty(): Boolean = armor.all { it == null }
-
-        fun isCurrentSlot() = getData()?.id == currentWardrobeSlot
-
-        fun isInCurrentPage() = (currentPage == null && page == 1) || (page == currentPage)
-    }
-
-
-    var currentWardrobeSlot: Int?
-        get() = storage?.currentWardrobeSlot
+    var currentSlot: Int?
+        get() = storage?.currentSlot
         set(value) {
-            storage?.currentWardrobeSlot = value
+            storage?.currentSlot = value
         }
 
     var currentPage: Int? = null
+    private var inWardrobe = false
 
     init {
         val list = mutableListOf<WardrobeSlot>()
-        val slotsPerPage = 9
-        val maxPages = 2
-
         var id = 0
 
-        for (page in 1..maxPages) {
-            for (slot in 0 until slotsPerPage) {
+        for (page in 1..MAX_PAGES) {
+            for (slot in 0 until MAX_SLOT_PER_PAGE) {
                 val inventorySlot = FIRST_SLOT + slot
                 val helmetSlot = FIRST_HELMET_SLOT + slot
                 val chestplateSlot = FIRST_CHESTPLATE_SLOT + slot
@@ -140,28 +79,34 @@ object WardrobeAPI {
                 list.add(WardrobeSlot(++id, page, inventorySlot, helmetSlot, chestplateSlot, leggingsSlot, bootsSlot))
             }
         }
-        wardrobeSlots = list
+        slots = list
     }
 
     private fun getWardrobeItem(itemStack: ItemStack?) =
         if (itemStack?.item == ItemStack(Blocks.stained_glass_pane).item || itemStack == null) null else itemStack
 
-    private fun getWardrobeSlotFromId(id: Int?) = wardrobeSlots.find { it.id == id }
+    private fun getWardrobeSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
+    fun inWardrobe() = InventoryUtils.inInventory() && inWardrobe
 
-    fun createWardrobePriceLore(slot: WardrobeSlot) = buildList {
+    fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
         add("§aEstimated Armor Value:")
         var totalPrice = 0.0
-        slot.armor.forEach {
-            if (it != null) {
-                val price = EstimatedItemValueCalculator.getTotalPrice(it)
-                add("  §7- ${it.name}: §6${NumberUtil.format(price)}")
-                totalPrice += price
-            }
+        for (stack in slot.armor.filterNotNull()) {
+            val price = EstimatedItemValueCalculator.getTotalPrice(stack)
+            add("  §7- ${stack.name}: §6${NumberUtil.format(price)}")
+            totalPrice += price
         }
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        inventoryPattern.matches(event.inventoryName).let {
+            inWardrobe = it
+            if (CustomWardrobe.config.enabled) inCustomWardrobe = it
+        }
     }
 
     @SubscribeEvent
@@ -169,55 +114,62 @@ object WardrobeAPI {
         if (!LorenzUtils.inSkyBlock) return
 
         inventoryPattern.matchMatcher(event.inventoryName) {
+            inWardrobe = true
             currentPage = group("currentPage").formatInt()
         } ?: return
-        if (currentPage == null) return
 
         val itemsList = event.inventoryItems
 
-        val allGrayDye = wardrobeSlots.all {
+        val allGrayDye = slots.all {
             itemsList[it.inventorySlot]?.itemDamage == EnumDyeColor.GRAY.dyeDamage || !it.isInCurrentPage()
         }
 
         if (allGrayDye) {
-            val allSlotsEmpty = wardrobeSlots.all {
-                (getWardrobeItem(itemsList[it.helmetSlot]) == null && getWardrobeItem(itemsList[it.chestplateSlot]) == null &&
-                    getWardrobeItem(itemsList[it.leggingsSlot]) == null && getWardrobeItem(itemsList[it.bootsSlot]) == null) ||
-                    !it.isInCurrentPage()
+            val allSlotsEmpty = slots.filter { it.isInCurrentPage() }.all { slot ->
+                (slot.inventorySlots.all { getWardrobeItem(itemsList[it]) == null })
             }
             if (allSlotsEmpty) {
-                wardrobeSlots.filter { it.isInCurrentPage() }.forEach {
-                    it.helmet = null
-                    it.chestplate = null
-                    it.leggings = null
-                    it.boots = null
+                for (slot in slots.filter { it.isInCurrentPage() }) {
+                    slot.getData()?.armor = emptyArmor()
                 }
             } else return
         }
 
+        val foundCurrentSlot = processSlots(slots, itemsList)
+        if (!foundCurrentSlot && getWardrobeSlotFromId(currentSlot)?.page == currentPage) {
+            currentSlot = null
+        }
+    }
+
+    private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, ItemStack>): Boolean {
         var foundCurrentSlot = false
 
-        for (slot in wardrobeSlots.filter { it.isInCurrentPage() }) {
-            slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
-            slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
-            slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
-            slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
+        for (slot in slots.filter { it.isInCurrentPage() }) {
+            slot.getData()?.armor = listOf(
+                getWardrobeItem(itemsList[slot.helmetSlot]),
+                getWardrobeItem(itemsList[slot.chestplateSlot]),
+                getWardrobeItem(itemsList[slot.leggingsSlot]),
+                getWardrobeItem(itemsList[slot.bootsSlot]),
+            )
             if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
-                currentWardrobeSlot = slot.id
+                currentSlot = slot.id
                 foundCurrentSlot = true
             }
             slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
-            if (slot.locked) wardrobeSlots.forEach { if (it.id > slot.id) it.locked = true }
+            if (slot.locked) slots.forEach { if (it.id > slot.id) it.locked = true }
         }
-        if (!foundCurrentSlot && getWardrobeSlotFromId(currentWardrobeSlot)?.page == currentPage) {
-            currentWardrobeSlot = null
-        }
+
+        return foundCurrentSlot
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        DelayedRun.runDelayed(500.milliseconds) {
-            if (!inWardrobe()) currentPage = null
+        if (!inWardrobe) return
+        DelayedRun.runDelayed(250.milliseconds) {
+            if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
+                inWardrobe = false
+                currentPage = null
+            }
         }
     }
 
@@ -225,7 +177,7 @@ object WardrobeAPI {
     fun onDebugCollect(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
-            wardrobeSlots.forEach { slot ->
+            for (slot in slots) {
                 val slotInfo = buildString {
                     append("Slot ${slot.id}")
                     if (slot.favorite) append(" - Favorite: true")
@@ -236,10 +188,11 @@ object WardrobeAPI {
                     add("$slotInfo is empty")
                 } else {
                     add(slotInfo)
-                    slot.helmet?.let { add("   Helmet: ${it.name}") }
-                    slot.chestplate?.let { add("   Chestplate: ${it.name}") }
-                    slot.leggings?.let { add("   Leggings: ${it.name}") }
-                    slot.boots?.let { add("   Boots: ${it.name}") }
+                    setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armourName ->
+                        slot.getData()?.armor?.get(id)?.name?.let { name ->
+                            add("   $armourName: $name")
+                        }
+                    }
                 }
             }
         }
@@ -247,7 +200,7 @@ object WardrobeAPI {
 
     class WardrobeData(
         @Expose val id: Int,
-        @Expose var armor: MutableMap<Int, ItemStack?>,
+        @Expose var armor: List<ItemStack?>,
         @Expose var locked: Boolean,
         @Expose var favorite: Boolean,
     )
