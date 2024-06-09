@@ -74,7 +74,10 @@ object ReforgeAPI {
 
         fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) = when (type) {
             ReforgeType.SWORD -> setOf(
-                ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_WEAPON,
+                ItemCategory.SWORD,
+                ItemCategory.GAUNTLET,
+                ItemCategory.LONGSWORD,
+                ItemCategory.FISHING_WEAPON,
             ).contains(itemCategory)
 
             ReforgeType.BOW -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
@@ -83,8 +86,7 @@ object ReforgeAPI {
                 ItemCategory.CHESTPLATE,
                 ItemCategory.LEGGINGS,
                 ItemCategory.BOOTS,
-            )
-                .contains(itemCategory)
+            ).contains(itemCategory)
 
             ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
             ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
