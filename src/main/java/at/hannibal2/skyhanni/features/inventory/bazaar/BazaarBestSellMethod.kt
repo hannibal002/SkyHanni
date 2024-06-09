@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarDataOrError
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -59,7 +59,7 @@ object BazaarBestSellMethod {
         if (having <= 0) return ""
 
         val data = internalName.getBazaarDataOrError()
-        val totalDiff = (data.buyPrice - data.sellPrice) * having
+        val totalDiff = (data.sellOfferPrice - data.instantBuyPrice) * having
         val result = NumberUtil.format(totalDiff.toInt())
 
         val name = internalName.itemName

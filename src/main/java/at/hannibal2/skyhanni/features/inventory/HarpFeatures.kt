@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
@@ -130,7 +131,7 @@ object HarpFeatures {
         unSetGUIScale()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
         unSetGUIScale()
@@ -174,7 +175,7 @@ object HarpFeatures {
         event.container.inventory.filterNotNull().indexOfFirst {
             songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
-            event.isCanceled = true
+            event.cancel()
             Minecraft.getMinecraft().playerController.windowClick(
                 event.container.windowId,
                 it,
