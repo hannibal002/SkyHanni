@@ -24,7 +24,7 @@ object TransferCooldown {
         if (!config.transferCooldown || lastRunCompleted.isInFuture()) return
         lastRunCompleted = DelayedRun.runDelayed(3.seconds) {
             if (config.transferCooldownMessage && LorenzUtils.inSkyBlock) ChatUtils.chat(
-                "§aPlayer Transfer Cooldown has ended."
+                "§aPlayer Transfer Cooldown has ended.",
             )
             action?.invoke()
             action = null
@@ -42,7 +42,9 @@ object TransferCooldown {
 
             "/warp" -> {
                 event.cancel()
-                action = { HypixelCommands.warp(event.splitMessage.subList(1, event.splitMessage.size).joinToString(" ")) }
+                action = {
+                    HypixelCommands.warp(event.splitMessage.subList(1, event.splitMessage.size).joinToString(" "))
+                }
             }
 
             "/warpforge" -> {
