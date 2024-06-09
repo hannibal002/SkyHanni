@@ -62,38 +62,14 @@ object WardrobeAPI {
         val leggingsSlot: Int,
         val bootsSlot: Int,
     ) {
-        private fun getData() = storage?.data?.getOrPut(id) {
+        fun getData() = storage?.data?.getOrPut(id) {
             WardrobeData(
                 id,
-                (1..4).associateWith { null }.toMutableMap(),
+                armor = emptyArmor(),
                 locked = true,
                 favorite = false,
             )
         }
-
-        var helmet: ItemStack?
-            get() = getData()?.armor?.get(1)
-            set(value) {
-                getData()?.armor?.set(1, value)
-            }
-
-        var chestplate: ItemStack?
-            get() = getData()?.armor?.get(2)
-            set(value) {
-                getData()?.armor?.set(2, value)
-            }
-
-        var leggings: ItemStack?
-            get() = getData()?.armor?.get(3)
-            set(value) {
-                getData()?.armor?.set(3, value)
-            }
-
-        var boots: ItemStack?
-            get() = getData()?.armor?.get(4)
-            set(value) {
-                getData()?.armor?.set(4, value)
-            }
 
         var locked: Boolean
             get() = getData()?.locked ?: true
@@ -107,7 +83,8 @@ object WardrobeAPI {
                 getData()?.favorite = value
             }
 
-        val armor get() = (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
+//         val armor get() = (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
+        val armor get() = getData()?.armor ?: emptyArmor()
 
         fun isEmpty(): Boolean = armor.all { it == null }
 
@@ -115,6 +92,8 @@ object WardrobeAPI {
 
         fun isInCurrentPage() = (currentPage == null && page == 1) || (page == currentPage)
     }
+
+    private fun emptyArmor(): List<ItemStack?> = listOf(null, null, null, null)
 
     var currentSlot: Int?
         get() = storage?.currentSlot
@@ -182,11 +161,8 @@ object WardrobeAPI {
                     !it.isInCurrentPage()
             }
             if (allSlotsEmpty) {
-                slots.filter { it.isInCurrentPage() }.forEach {
-                    it.helmet = null
-                    it.chestplate = null
-                    it.leggings = null
-                    it.boots = null
+                for (slot in slots.filter { it.isInCurrentPage() }) {
+                    slot.getData()?.armor = emptyArmor()
                 }
             } else return
         }
@@ -194,10 +170,12 @@ object WardrobeAPI {
         var foundCurrentSlot = false
 
         for (slot in slots.filter { it.isInCurrentPage() }) {
-            slot.helmet = getWardrobeItem(itemsList[slot.helmetSlot])
-            slot.chestplate = getWardrobeItem(itemsList[slot.chestplateSlot])
-            slot.leggings = getWardrobeItem(itemsList[slot.leggingsSlot])
-            slot.boots = getWardrobeItem(itemsList[slot.bootsSlot])
+            slot.getData()?.armor = listOf(
+                getWardrobeItem(itemsList[slot.helmetSlot]),
+                getWardrobeItem(itemsList[slot.chestplateSlot]),
+                getWardrobeItem(itemsList[slot.leggingsSlot]),
+                getWardrobeItem(itemsList[slot.bootsSlot]),
+            )
             if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
@@ -232,10 +210,11 @@ object WardrobeAPI {
                     add("$slotInfo is empty")
                 } else {
                     add(slotInfo)
-                    slot.helmet?.let { add("   Helmet: ${it.name}") }
-                    slot.chestplate?.let { add("   Chestplate: ${it.name}") }
-                    slot.leggings?.let { add("   Leggings: ${it.name}") }
-                    slot.boots?.let { add("   Boots: ${it.name}") }
+                    setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armourName ->
+                        slot.getData()?.armor?.get(id)?.name?.let { name ->
+                            add("   $armourName: $name")
+                        }
+                    }
                 }
             }
         }
@@ -243,7 +222,7 @@ object WardrobeAPI {
 
     class WardrobeData(
         @Expose val id: Int,
-        @Expose var armor: MutableMap<Int, ItemStack?>,
+        @Expose var armor: List<ItemStack?>,
         @Expose var locked: Boolean,
         @Expose var favorite: Boolean,
     )
