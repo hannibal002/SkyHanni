@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
+import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
+import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -559,6 +559,7 @@ object RenderUtils {
         renderables: List<Renderable>,
         extraSpace: Int = 0,
         posLabel: String,
+        addToGuiManager: Boolean = true,
     ) {
         if (renderables.isEmpty()) return
         var longestY = 0
@@ -575,7 +576,21 @@ object RenderUtils {
 
             GlStateManager.popMatrix()
         }
-        GuiEditManager.add(this, posLabel, longestX, longestY)
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
+    }
+
+    fun Position.renderRenderable(
+        renderable: Renderable,
+        posLabel: String,
+        addToGuiManager: Boolean = true,
+    ) {
+        GlStateManager.pushMatrix()
+        val (x, y) = transform()
+        Renderable.withMousePosition(x, y) {
+            renderable.render(0, 0)
+        }
+        GlStateManager.popMatrix()
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, 0)
     }
 
     /**

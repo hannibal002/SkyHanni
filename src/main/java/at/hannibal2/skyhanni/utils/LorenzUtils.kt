@@ -26,7 +26,6 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
-import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -326,9 +325,6 @@ object LorenzUtils {
         enumValues<T>().joinToString("|", transform = transform)
 
     inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
-
-    // TODO move to val by lazy
-    fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
 
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")

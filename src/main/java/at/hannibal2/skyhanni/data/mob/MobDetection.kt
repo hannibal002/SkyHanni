@@ -43,7 +43,7 @@ object MobDetection {
 
     /* Unsupported Entities
         Nicked Players
-        Odanate
+        Odonata
         Silk Worm
         Fairy (in Dungeon)
         Totem of Corruption
