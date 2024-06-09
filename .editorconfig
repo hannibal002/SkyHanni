@@ -32,8 +32,10 @@ ktlint_code_style = intellij_idea
 ij_kotlin_name_count_to_use_star_import = 2147483647
 ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
 ij_kotlin_enum_constants_wrap = split_into_lines
-ij_kotlin_allow_trailing_comma_on_call_site = false
+ij_kotlin_allow_trailing_comma_on_call_site = true
 ij_kotlin_allow_trailing_comma = true
+ij_kotlin_packages_to_use_import_on_demand = unset
+ktlint_standard_chain-wrapping = always
 
 ktlint_standard_multiline-if-else = disabled
 ktlint_standard_no-empty-first-line-in-class-body = disabled
@@ -46,12 +48,11 @@ ktlint_standard_string-template = disabled
 ktlint_standard_trailing-comma-on-call-site = disabled
 ktlint_standard_trailing-comma-on-declaration-site = disabled
 ktlint_standard_context-receiver-wrapping = disabled
-ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_multiline-expression-wrapping = false
 ktlint_standard_string-template-indent = disabled
 ktlint_standard_no-trailing-spaces = disabled
 ktlint_standard_function-signature = disabled
-ktlint_standard_wrapping = disabled
+ktlint_standard_wrapping = enabled
 
-ktlint_standard_no-line-break-before-assignment = true
 ktlint_standard_no-wildcard-imports = enabled
-ktlint_standard_function-expression-body = enabled
+ktlint_standard_function-expression-body = disabled
