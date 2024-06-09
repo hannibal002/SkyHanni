@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -22,12 +21,16 @@ object SnakeGame {
     private val config get() = SkyHanniMod.feature.inventory
     private var lastClick = SimpleTimeMark.farPast()
 
-    private val keys = mapOf(
-        Keyboard.KEY_A to 50,
-        Keyboard.KEY_W to 51,
-        Keyboard.KEY_D to 52,
-        Keyboard.KEY_S to 53,
-    )
+    private val mcConfig
+        get() = Minecraft.getMinecraft().gameSettings
+
+    private val keys
+        get() = mapOf(
+            mcConfig.keyBindLeft.keyCode to 50,
+            mcConfig.keyBindForward.keyCode to 51,
+            mcConfig.keyBindRight.keyCode to 52,
+            mcConfig.keyBindBack.keyCode to 53,
+        )
 
     @SubscribeEvent
     fun onGui(event: GuiKeyPressEvent) {
