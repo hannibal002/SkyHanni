@@ -73,8 +73,8 @@ object CityProjectFeatures {
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
-        if (playerSpecific.nextCityProjectParticipationTime == 0L) return
-        if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
+        if (playerSpecific.nextCityProjectParticipationTime.isFarPast()) return
+        if (playerSpecific.nextCityProjectParticipationTime.isInFuture()) return
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
@@ -131,7 +131,7 @@ object CityProjectFeatures {
                 if (item.name != "§eContribute this component!") continue
                 nextTime = now
             }
-            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime.toMillis()
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 

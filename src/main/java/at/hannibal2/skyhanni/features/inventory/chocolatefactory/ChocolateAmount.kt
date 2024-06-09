@@ -26,13 +26,13 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
     fun timeUntilGoal(goal: Long): Duration {
         val profileStorage = profileStorage ?: return Duration.ZERO
-        val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
+        val updatedAgo = profileStorage.lastDataSave.passedSince().inWholeSeconds
         return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo.seconds
     }
 
     companion object {
         fun chocolateSinceUpdate(): Long {
-            val lastUpdate = SimpleTimeMark(profileStorage?.lastDataSave ?: return 0)
+            val lastUpdate = profileStorage?.lastDataSave ?: return 0
             val currentTime = SimpleTimeMark.now()
             val secondsSinceUpdate = (currentTime - lastUpdate).inWholeSeconds
 
@@ -77,9 +77,9 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
         private fun updateBestUpgrade() {
             profileStorage?.let {
-                if (it.bestUpgradeAvailableAt == 0L || it.bestUpgradeCost == 0L) return
+                if (it.bestUpgradeAvailableAt.isFarPast() || it.bestUpgradeCost == 0L) return
                 val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
-                it.bestUpgradeAvailableAt = canAffordAt.toMillis()
+                it.bestUpgradeAvailableAt = canAffordAt
             }
         }
     }

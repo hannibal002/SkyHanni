@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -49,9 +48,9 @@ object BitsAPI {
         }
 
     var cookieBuffTime: SimpleTimeMark?
-        get() = profileStorage?.boosterCookieExpiryTime?.asTimeMark()
+        get() = profileStorage?.boosterCookieExpiryTime
         private set(value) {
-            profileStorage?.boosterCookieExpiryTime = value?.toMillis()
+            profileStorage?.boosterCookieExpiryTime = value
         }
 
     private const val defaultcookiebits = 4800
@@ -308,7 +307,9 @@ object BitsAPI {
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
-    private fun sendBitsGainEvent(difference: Int) = BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+    private fun sendBitsGainEvent(difference: Int) =
+        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+
     private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
     private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
 
