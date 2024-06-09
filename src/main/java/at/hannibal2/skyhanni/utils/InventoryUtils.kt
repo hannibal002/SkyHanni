@@ -34,7 +34,11 @@ object InventoryUtils {
         } else ""
     }
 
+    fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
+
+    fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 
     fun getItemsInOwnInventory() =
         getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
@@ -112,4 +116,10 @@ object InventoryUtils {
     }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+
+    fun clickSlot(slot: Int) {
+        val windowId = getWindowId() ?: return
+        val controller = Minecraft.getMinecraft().playerController
+        controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
+    }
 }
