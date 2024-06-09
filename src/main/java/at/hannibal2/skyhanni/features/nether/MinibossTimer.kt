@@ -62,10 +62,7 @@ object MinibossTimer {
         if (!isEnabled()) return
         val message = event.message
         downPattern.matchMatcher(message) {
-            val miniBoss = MiniBoss.fromName(group("name")) ?: run {
-                println("didnt detect from ${group("name")}")
-                return
-            }
+            val miniBoss = MiniBoss.fromName(group("name")) ?: return
             miniBoss.timer = SimpleTimeMark.now() + 2.minutes
             miniBoss.spawned = false
             miniBoss.possibleTimer = null
