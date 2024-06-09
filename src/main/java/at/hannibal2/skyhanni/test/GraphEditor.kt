@@ -218,7 +218,8 @@ object GraphEditor {
                 ChatUtils.chat("Copied nothing since the graph is empty.")
                 return
             }
-            OSUtils.copyToClipboard(compileGraph().toJson())
+            val json = compileGraph().toJson()
+            OSUtils.copyToClipboard(json)
             ChatUtils.chat("Copied Graph to Clipboard.")
             return
         }
@@ -244,7 +245,8 @@ object GraphEditor {
             return
         }
         if (config.clearKey.isKeyClicked()) {
-            OSUtils.copyToClipboard(compileGraph().toJson())
+            val json = compileGraph().toJson()
+            OSUtils.copyToClipboard(json)
             ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
             clear()
         }
