@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.nether
 
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -33,6 +33,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object MinibossTimer {
 
+    private val config get() = SkyHanniMod.feature.crimsonIsle
+
     private val patternGroup = RepoPattern.group("crimson.miniboss")
 
     /**
@@ -53,11 +55,11 @@ object MinibossTimer {
 
     private var currentAreaBoss: MiniBoss? = null
 
-    var display: Renderable? = null
+    private var display: Renderable? = null
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!isEnabled()) return
         val message = event.message
         downPattern.matchMatcher(message) {
             val miniBoss = MiniBoss.fromName(group("name")) ?: run {
@@ -83,14 +85,14 @@ object MinibossTimer {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!isEnabled()) return
         val renderable = display ?: drawDisplay()
-        Position(10, 10).renderRenderables(listOf(renderable), posLabel = "Miniboss Timer")
+        config.minibossTimerPosition.renderRenderables(listOf(renderable), posLabel = "Miniboss Timer")
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!isEnabled()) return
         updateArea()
         update()
     }
@@ -146,7 +148,7 @@ object MinibossTimer {
         display = drawDisplay()
     }
 
-    fun drawDisplay(): Renderable {
+    private fun drawDisplay(): Renderable {
         val lines = MiniBoss.entries.map {
             val timer = it.timer
             val possibleTimer = it.possibleTimer
@@ -183,6 +185,10 @@ object MinibossTimer {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Crimson Isle Miniboss")
         event.addIrrelevant {
+            if (!isEnabled()) {
+                add("Feature is Disabled")
+                return@addIrrelevant
+            }
             add("Current Area Boss: ${currentAreaBoss?.displayName}")
             MiniBoss.entries.forEach {
                 add("")
@@ -249,5 +255,7 @@ object MinibossTimer {
             }
         }
     }
+
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.minibossTimer
 
 }

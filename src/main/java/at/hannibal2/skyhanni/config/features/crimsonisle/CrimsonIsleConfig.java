@@ -27,6 +27,16 @@ public class CrimsonIsleConfig {
     public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
 
     @Expose
+    @ConfigOption(name = "Miniboss Timer", desc = "Shows a timer for when minibosses will spawn.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean minibossTimer = false;
+
+    @Expose
+    @ConfigLink(owner = CrimsonIsleConfig.class, field = "minibossTimer")
+    public Position minibossTimerPosition = new Position(20, 50);
+
+    @Expose
     @ConfigOption(name = "Pablo NPC Helper", desc = "Shows a clickable message that grabs the flower needed from your sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
