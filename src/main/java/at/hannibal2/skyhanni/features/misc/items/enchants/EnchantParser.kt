@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -22,12 +24,14 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
 /**
  * Modified Enchant Parser from [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/enchants/EnchantManager.java)
  */
+@SkyHanniModule
 object EnchantParser {
 
     private val config get() = SkyHanniMod.feature.inventory.enchantParsing
@@ -58,6 +62,8 @@ object EnchantParser {
 
     private val loreCache: Cache = Cache()
 
+    val isSbaLoaded by lazy { Loader.isModLoaded("skyblockaddons") }
+
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()
 
@@ -79,6 +85,7 @@ object EnchantParser {
             config.commaFormat,
             config.hideVanillaEnchants,
             config.hideEnchantDescriptions,
+            ChromaManager.config.enabled,
         ) {
             markCacheDirty()
         }

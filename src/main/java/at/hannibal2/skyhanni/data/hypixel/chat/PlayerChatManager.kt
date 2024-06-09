@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
@@ -23,7 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
  */
-class PlayerChatManager {
+@SkyHanniModule
+object PlayerChatManager {
 
     private val patternGroup = RepoPattern.group("data.chat.player")
 
@@ -96,7 +98,7 @@ class PlayerChatManager {
      */
     private val privateIslandRankPattern by patternGroup.pattern(
         "privateislandrank",
-        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\])(?<suffix>.*)"
+        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?<suffix>.*)"
     )
 
     /**

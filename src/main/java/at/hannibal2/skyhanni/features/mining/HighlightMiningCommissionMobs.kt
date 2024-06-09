@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
@@ -20,25 +21,28 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntitySlime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightMiningCommissionMobs {
+@SkyHanniModule
+object HighlightMiningCommissionMobs {
 
     private val config get() = SkyHanniMod.feature.mining
-    // TODO Commissin API
+
+    // TODO Commission API
     private var active = listOf<MobType>()
 
-    // TODO Commissin API
+    // TODO Commission API
     enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
 
         // Dwarven Mines
         DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Goblin " }),
         STAR_PUNCHER("Star Sentry Puncher", { it.name == "Crystal Sentry" }),
-        ICE_WALKER("Ice Walker Slayer", { it.name == "Ice Walker" }),
+        ICE_WALKER("Glacite Walker Slayer", { it.name == "Ice Walker" }),
         GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.contains("Golden Goblin") }),
+        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
         AUTOMATON("Automaton Slayer", { it is EntityIronGolem }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
-        YOG("Yog Slayer", { it is EntityMagmaCube }),
+        YOG("Yog Slayer", { it is EntityMagmaCube && it.hasMaxHealth(35_000) }),
         THYST("Thyst Slayer", { it is EntityEndermite && it.hasMaxHealth(5_000) }),
         CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name == "Team Treasurite" }),
         SLUDGE("Sludge Slayer", {
@@ -51,7 +55,7 @@ class HighlightMiningCommissionMobs {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
 

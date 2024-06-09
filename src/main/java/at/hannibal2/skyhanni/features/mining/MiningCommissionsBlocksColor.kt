@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockCarpet
@@ -26,6 +26,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object MiningCommissionsBlocksColor {
 
     private val config get() = SkyHanniMod.feature.mining.commissionsBlocksColor
@@ -106,7 +107,6 @@ object MiningCommissionsBlocksColor {
             if (block.highlight != newValue) {
                 if (newValue && block in ignoredTabListCommissions) continue
                 block.highlight = newValue
-                ChatUtils.debug("changed from tab list: ${block.displayName} -> $newValue")
                 dirty = true
             }
         }
@@ -124,21 +124,21 @@ object MiningCommissionsBlocksColor {
             block.highlight = false
             dirty = true
             ignoredTabListCommissions.add(block)
-            ChatUtils.debug("finished from chat: $name")
         }
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (LorenzUtils.lastWorldSwitch.passedSince() > 4.seconds) {
-            inGlaciteArea = MiningAPI.inGlaciteArea()
-            inDwarvenMines = IslandType.DWARVEN_MINES.isInIsland() && !(inGlaciteArea ||
-                HypixelData.skyBlockArea.equalsOneOf("Dwarven Base Camp", "Fossil Research Center")
-                )
+            inGlaciteArea = MiningAPI.inGlaciteArea() && !IslandType.MINESHAFT.isInIsland()
+            inDwarvenMines = IslandType.DWARVEN_MINES.isInIsland() &&
+                !(inGlaciteArea || HypixelData.skyBlockArea.equalsOneOf("Dwarven Base Camp", "Fossil Research Center"))
             inCrystalHollows = IslandType.CRYSTAL_HOLLOWS.isInIsland() && HypixelData.skyBlockArea != "Crystal Nucleus"
         }
 
-        val newEnabled = (inDwarvenMines || inCrystalHollows || inGlaciteArea) && config.enabled
+        // TODO add dwarven mines support
+//         val newEnabled = (inDwarvenMines || inCrystalHollows || inGlaciteArea) && config.enabled
+        val newEnabled = (inCrystalHollows || inGlaciteArea) && config.enabled
         var reload = false
         if (newEnabled != enabled) {
             enabled = newEnabled

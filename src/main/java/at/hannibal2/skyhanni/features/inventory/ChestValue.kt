@@ -10,8 +10,11 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -32,7 +35,8 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ChestValue {
+@SkyHanniModule
+object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
@@ -62,6 +66,7 @@ class ChestValue {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (!inInventory) return
         if (event.isMod(5)) {
             update()
         }
@@ -179,8 +184,7 @@ class ChestValue {
                 val internalName = stack.getInternalNameOrNull() ?: continue
                 if (internalName.getItemStackOrNull() == null) continue
                 val list = mutableListOf<String>()
-                val pair = EstimatedItemValueCalculator.calculate(stack, list)
-                var (total, _) = pair
+                var total = EstimatedItemValueCalculator.calculate(stack, list).first
                 val key = "$internalName+$total"
                 if (stack.item == Items.enchanted_book)
                     total /= 2
@@ -227,6 +231,10 @@ class ChestValue {
     private fun isValidStorage(): Boolean {
         val name = InventoryUtils.openInventoryName().removeColor()
         if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
+        if (BazaarApi.inBazaarInventory) return false
+        if (MinionFeatures.minionInventoryOpen) return false
+        if (MinionFeatures.minionStorageInventoryOpen) return false
+
 
         if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest (")) &&
             !InventoryUtils.isNeuStorageEnabled.getValue()

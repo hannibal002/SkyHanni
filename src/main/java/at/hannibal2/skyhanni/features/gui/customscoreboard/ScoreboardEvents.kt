@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.Companion.eventsConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
@@ -12,9 +12,10 @@ import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigi
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
@@ -113,7 +114,9 @@ enum class ScoreboardEvents(
     SPOOKY(
         ::getSpookyLines,
         ::getSpookyShowWhen,
-        "§7(All Spooky Event Lines)"
+        "§6Spooky Festival§f 50:54\n" +
+            "§7Your Candy:\n" +
+            "§a1 Green§7, §50 Purple §7(§61 §7pts.)"
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
@@ -384,6 +387,12 @@ private fun getTablistEvent(): String? =
 
 private fun getActiveEventLine(): List<String> {
     val currentActiveEvent = getTablistEvent() ?: return emptyList()
+
+    // Some Active Events are better not shown from the tablist,
+    // but from other locations like the scoreboard
+    val blockedEvents = listOf("Spooky Festival")
+    if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
+
     val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
         ?.let {
             SbPattern.eventTimeEndsPattern.matchMatcher(it) {

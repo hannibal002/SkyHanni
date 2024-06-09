@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
@@ -11,9 +11,13 @@ import org.apache.logging.log4j.core.Filter
 import org.apache.logging.log4j.core.LogEvent
 import org.apache.logging.log4j.core.Logger
 import org.apache.logging.log4j.core.LoggerContext
+import org.apache.logging.log4j.core.filter.AbstractFilter
 import org.apache.logging.log4j.message.Message
 
-class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
+class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFilter(
+    /* onMatch = */ Filter.Result.ACCEPT,
+    /* onMismatch = */ Filter.Result.DENY,
+) {
 
     private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
     private val filterConfig get() = config.consoleFilter
@@ -34,9 +38,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
             }
         }
     }
-
-    // prevents error sending on every shutdown
-    fun stop() {}
 
     override fun filter(event: LogEvent?): Filter.Result {
         if (event == null) return Filter.Result.ACCEPT
@@ -203,14 +204,6 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : Filter {
         if (config.printFilteredReason) {
             LorenzUtils.consoleLog("filtered console: $message")
         }
-    }
-
-    override fun getOnMismatch(): Filter.Result {
-        return Filter.Result.DENY
-    }
-
-    override fun getOnMatch(): Filter.Result {
-        return Filter.Result.ACCEPT
     }
 
     override fun filter(

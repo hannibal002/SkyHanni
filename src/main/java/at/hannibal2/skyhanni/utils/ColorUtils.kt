@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import java.awt.Color
-import kotlin.math.max
 
 object ColorUtils {
 
-    /** transfer string colors from the config to java.awt.Color */
+    /** Transfer string colors from the config to [Color] */
     fun String.toChromaColor() = Color(toChromaColorInt(), true)
     fun String.toChromaColorInt() = SpecialColour.specialToChromaRGB(this)
 
@@ -25,14 +24,15 @@ object ColorUtils {
         (start.blue * (1 - percent) + end.blue * percent).toInt()
     )
 
-    fun Color.darker(factor: Double): Color {
-        return Color(
-            max((red * factor).toInt(), 0),
-            max((green * factor).toInt(), 0),
-            max((blue * factor).toInt(), 0),
-            alpha
-        )
-    }
+    /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
+    fun Color.darker(factor: Double = 0.7) = Color(
+        (red * factor).toInt().coerceIn(0, 255),
+        (green * factor).toInt().coerceIn(0, 255),
+        (blue * factor).toInt().coerceIn(0, 255),
+        alpha
+    )
 
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+
+    fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 }

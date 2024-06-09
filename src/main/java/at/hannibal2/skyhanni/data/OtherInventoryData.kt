@@ -1,17 +1,20 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object OtherInventoryData {
 
     private var currentInventory: Inventory? = null
@@ -36,8 +39,8 @@ object OtherInventoryData {
         }
     }
 
-    @SubscribeEvent
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent
+    fun onInventoryDataReceiveEvent(event: PacketReceivedEvent) {
         val packet = event.packet
 
         if (packet is S2EPacketCloseWindow) {

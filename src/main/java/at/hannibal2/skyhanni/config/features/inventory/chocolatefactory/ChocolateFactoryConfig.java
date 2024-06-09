@@ -50,6 +50,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.MULTIPLIER,
         ChocolateFactoryStat.BARN,
         ChocolateFactoryStat.TIME_TOWER,
+        ChocolateFactoryStat.TIME_TOWER_FULL,
         ChocolateFactoryStat.LEADERBOARD_POS,
         ChocolateFactoryStat.TIME_TO_BEST_UPGRADE
     ));
@@ -70,17 +71,20 @@ public class ChocolateFactoryConfig {
     public boolean useMiddleClick = true;
 
     @Expose
-    @ConfigOption(name = "Rabbit Warning", desc = "Warn when the rabbit that needs to be clicked appears.")
-    @ConfigEditorBoolean
-    public boolean rabbitWarning = true;
-
-    @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
         desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int barnCapacityThreshold = 6;
+
+    @Expose
+    @ConfigOption(
+        name = "Rabbit Crush During Hoppity",
+        desc = "Only warn about rabbit crush when the Hoppity event is active."
+    )
+    @ConfigEditorBoolean
+    public boolean rabbitCrushOnlyDuringHoppity = false;
 
     @Expose
     @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")
@@ -95,11 +99,23 @@ public class ChocolateFactoryConfig {
     public boolean showDuplicateTime = false;
 
     @Expose
-    @ConfigOption(name = "Time Tower Warning", desc = "Notification when you have a new time tower usage available and " +
+    @ConfigOption(name = "Stray Rabbit Time", desc = "Show the production time of chocolate gained from stray rabbits.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showStrayTime = false;
+
+    @Expose
+    @ConfigOption(name = "Time Tower Usage Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeTowerWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Time Tower Reminder", desc = "Notification a minute before the time tower ends.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeTowerReminder = true;
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
@@ -111,13 +127,13 @@ public class ChocolateFactoryConfig {
     public Position position = new Position(163, 160, false, true);
 
     @Expose
-    @ConfigOption(name = "Compact On Click", desc = "Compact the item toolip when clicking on the chocolate.")
+    @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactOnClick = true;
 
     @Expose
-    @ConfigOption(name = "Always Compact", desc = "Always Compact the item toolip on the chocolate. Requires the above option to be enabled.")
+    @ConfigOption(name = "Always Compact", desc = "Always Compact the item tooltip on the chocolate. Requires the above option to be enabled.")
     @ConfigEditorBoolean
     public boolean compactOnClickAlways = false;
 
@@ -155,6 +171,34 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityMenuShortcut = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Requirement Rabbits", desc = "Highlight rabbits that have requirements.\n" +
+        "§cRed: Requirement not met.\n" +
+        "§aGreen: Requirement met.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightRabbitsWithRequirement = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Show Missing Location Rabbits",
+        desc = "Shows which in which locations you have not yet found enough egg locations to unlock the rabbit for that location."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLocationRequirementsRabbitsInHoppityStats = false;
+
+    @Expose
+    @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean onlyHighlightRequirementNotMet = true;
+
+    @Expose
+    @ConfigOption(name = "Rabbit Warning", desc = "")
+    @Accordion
+    public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")

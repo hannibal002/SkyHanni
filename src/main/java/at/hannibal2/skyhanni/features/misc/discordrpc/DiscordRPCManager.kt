@@ -5,6 +5,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.logger
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
@@ -17,6 +18,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -32,9 +35,9 @@ import com.jagrosh.discordipc.entities.RichPresenceButton
 import com.jagrosh.discordipc.entities.pipe.PipeStatus
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object DiscordRPCManager : IPCListener {
 
     private const val APPLICATION_ID = 1093298182735282176L
@@ -85,8 +88,8 @@ object DiscordRPCManager : IPCListener {
             logger.warn("Failed to connect to RPC!", ex)
             ChatUtils.clickableChat(
                 "Discord Rich Presence was unable to start! " +
-                            "This usually happens when you join SkyBlock when Discord is not started. " +
-                            "Please run /shrpcstart to retry once you have launched Discord.",
+                    "This usually happens when you join SkyBlock when Discord is not started. " +
+                    "Please run /shrpcstart to retry once you have launched Discord.",
                 onClick = {
                     startCommand()
                 }
@@ -164,7 +167,7 @@ object DiscordRPCManager : IPCListener {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        // the mod has already started the connection process. this variable is my way of running a function when
+        // The mod has already started the connection process. This variable is my way of running a function when
         // the player joins SkyBlock but only running it again once they join and leave.
         if (started || !isEnabled()) return
         if (LorenzUtils.inSkyBlock) {
@@ -184,8 +187,8 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    @HandleEvent
+    fun onDisconnect(event: ClientDisconnectEvent) {
         stop()
     }
 
