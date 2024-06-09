@@ -41,7 +41,7 @@ object GraphEditor {
     private var id = 0
 
     private val nodes = mutableListOf<GraphingNode>()
-    private val edge = mutableListOf<GraphingEdge>()
+    private val edges = mutableListOf<GraphingEdge>()
 
     private var activeNode: GraphingNode? = null
     private var closedNode: GraphingNode? = null
@@ -79,7 +79,7 @@ object GraphEditor {
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
-        edge.forEach { event.drawEdge(it) }
+        edges.forEach { event.drawEdge(it) }
     }
 
     @SubscribeEvent
@@ -268,7 +268,7 @@ object GraphEditor {
                 addEdge(activeNode, closedNode)
                 feedBackInTutorial("Added new edge.")
             } else {
-                this.edge.removeAt(edge)
+                this.edges.removeAt(edge)
                 feedBackInTutorial("Removed edge.")
             }
         }
@@ -315,7 +315,7 @@ object GraphEditor {
         if (closedNode != null && closedNode.position.distanceSqToPlayer() < 9.0) {
             feedBackInTutorial("Removed node, since you where closer than 3 blocks from a node.")
             nodes.remove(closedNode)
-            edge.removeIf { it.isInEdge(closedNode) }
+            edges.removeIf { it.isInEdge(closedNode) }
             if (closedNode == activeNode) activeNode = null
             this.closedNode = null
             return
@@ -332,11 +332,11 @@ object GraphEditor {
         if (node1 != null && node2 != null && node1 != node2) GraphingEdge(
             node1,
             node2,
-        ).let { e -> edge.indexOfFirst { it == e }.takeIf { it != -1 } }
+        ).let { e -> edges.indexOfFirst { it == e }.takeIf { it != -1 } }
         else null
 
     private fun addEdge(node1: GraphingNode?, node2: GraphingNode?) =
-        if (node1 != null && node2 != null && node1 != node2) edge.add(GraphingEdge(node1, node2)) else false
+        if (node1 != null && node2 != null && node1 != node2) edges.add(GraphingEdge(node1, node2)) else false
 
     /** Has a side effect on the graphing graph, since it runs [prune] on the graphing graph*/
     private fun compileGraph(): Graph {
@@ -344,7 +344,7 @@ object GraphEditor {
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name) }
         val neighbours = this.nodes.map { node ->
-            edge.filter { it.isInEdge(node) }.map { edge ->
+            edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
@@ -357,7 +357,7 @@ object GraphEditor {
         clear()
         nodes.addAll(graph.map { GraphingNode(it.id, it.position, it.name) })
         val translation = graph.mapIndexed { index, it -> it to nodes[index] }.toMap()
-        edge.addAll(
+        edges.addAll(
             graph.map { node ->
                 node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!) }
             }.flatten().distinct(),
@@ -386,21 +386,21 @@ object GraphEditor {
         val inGraph = path.map { nodes[it.id] }
         highlightedNodes.addAll(inGraph)
 
-        val edge = edge.filter { highlightedNodes.contains(it.node1) && highlightedNodes.contains(it.node2) }
+        val edge = edges.filter { highlightedNodes.contains(it.node1) && highlightedNodes.contains(it.node2) }
         highlightedEdges.addAll(edge)
     }
 
     private fun clear() {
         id = 0
         nodes.clear()
-        edge.clear()
+        edges.clear()
         activeNode = null
         closedNode = null
     }
 
     private fun prune() { //TODO fix
         val hasNeighbours = nodes.associateWith { false }.toMutableMap()
-        edge.forEach {
+        edges.forEach {
             hasNeighbours[it.node1] = true
             hasNeighbours[it.node2] = true
         }
