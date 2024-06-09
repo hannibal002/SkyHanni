@@ -34,7 +34,7 @@ ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
 ij_kotlin_enum_constants_wrap = split_into_lines
 ij_kotlin_allow_trailing_comma_on_call_site = false
 ij_kotlin_allow_trailing_comma = true
-ij_kotlin_packages_to_use_import_on_demand = 999
+ij_kotlin_packages_to_use_import_on_demand = unset
 
 ktlint_standard_multiline-if-else = disabled
 ktlint_standard_no-empty-first-line-in-class-body = disabled
@@ -55,4 +55,4 @@ ktlint_standard_wrapping = disabled
 
 ktlint_standard_no-line-break-before-assignment = true
 ktlint_standard_no-wildcard-imports = enabled
-ktlint_standard_function-expression-body = disabled
+ktlint_standard_function-expression-body = enabled
