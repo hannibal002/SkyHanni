@@ -89,7 +89,7 @@ object MayorAPI {
     private var lastMayor: Mayor? = null
     var jerryExtraMayor: Pair<Mayor?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
         private set
-    var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
+    private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
     private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
@@ -167,8 +167,11 @@ object MayorAPI {
         val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
         val lastMayorTimestamp = nextMayorTimestamp - SKYBLOCK_YEAR_MILLIS.milliseconds
-
-        val expireTime = (1..21).map { lastMayorTimestamp + (6.hours * it) }.first { it.isInFuture() }
+          
+        val expireTime = (1..21)
+            .map { lastMayorTimestamp + (6.hours * it) }
+            .firstOrNull { it.isInFuture() }
+            ?.coerceAtMost(nextMayorTimestamp) ?: return
 
         ChatUtils.debug("Jerry Mayor found: ${jerryMayor.name} expiring at: ${expireTime.timeUntil()}")
 
