@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.getFakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getWindowId
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -59,12 +60,13 @@ object CustomWardrobe {
             displayRenderable ?: return
         }
 
-        // Change global wardrobe scale if its taller or wider than the screen
-        if (renderable.width > gui.width || renderable.height > gui.height) {
-            if (config.spacing.globalScale <= 1) return
-            val newScale = (config.spacing.globalScale * (0.9 / max(
-                renderable.width.toDouble() / gui.width,
-                renderable.height.toDouble() / gui.height
+        val gui = event.gui
+        val screenSize = gui.width to gui.height
+
+        if (screenSize != lastScreenSize) {
+            lastScreenSize = screenSize
+            val shouldUpdate = updateScreenSize(screenSize)
+            if (shouldUpdate) {
                 update()
                 return
             }
@@ -363,13 +365,15 @@ object CustomWardrobe {
         val exitButton = createLabeledButton(
             "§cClose",
             onClick = {
-                clickSlot(49, getWindowId() ?: -1)
-                reset()
-                currentPage = null
                 InventoryUtils.clickSlot(49)
+                reset()
+                WardrobeAPI.currentPage = null
+            }
+        )
 
         val greenColor = Color(85, 255, 85, 200)
         val redColor = Color(255, 85, 85, 200)
+
         val onlyFavoriteButton = createLabeledButton(
             "§eFavorite",
             hoveredColor = if (config.onlyFavorites) greenColor else redColor,
