@@ -28,7 +28,8 @@ class KMixinProcessor(private val codeGenerator: CodeGenerator, private val logg
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
 
-        val symbols = resolver.getSymbolsWithAnnotation(KMixin::class.qualifiedName!!).toList() + resolver.getSymbolsWithAnnotation(KPseudoMixin::class.qualifiedName!!).toList()
+        val symbols = resolver.getSymbolsWithAnnotation(KMixin::class.qualifiedName!!).toList() +
+            resolver.getSymbolsWithAnnotation(KPseudoMixin::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
 
         generateFile(validSymbols)

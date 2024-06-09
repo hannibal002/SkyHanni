@@ -27,17 +27,18 @@ import javax.lang.model.element.Modifier
 
 object InjectSerializer : InjectionSerializer {
 
-    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec = with(annotation) {
-        AnnotationSpec.builder(INJECT_CLASS)
-            .addMember("method", "\"${getAs<String>("method")}\"")
-            .addAnnotation("at", AT_CLASS) {
-                add("value", "\$S", getAsEnum<InjectionKind>("kind").name)
-            }
-            .addMember("cancellable", "\$L", getAs<Boolean>("cancellable"))
-            .addMember("remap", "\$L", getAs<Boolean>("remap"))
-            .addMember(getAs<Boolean>("captureLocals"), "locals", "\$T.CAPTURE_FAILHARD", LOCAL_CAPTURE_CLASS)
-            .build()
-    }
+    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec =
+        with(annotation) {
+            AnnotationSpec.builder(INJECT_CLASS)
+                .addMember("method", "\"${getAs<String>("method")}\"")
+                .addAnnotation("at", AT_CLASS) {
+                    add("value", "\$S", getAsEnum<InjectionKind>("kind").name)
+                }
+                .addMember("cancellable", "\$L", getAs<Boolean>("cancellable"))
+                .addMember("remap", "\$L", getAs<Boolean>("remap"))
+                .addMember(getAs<Boolean>("captureLocals"), "locals", "\$T.CAPTURE_FAILHARD", LOCAL_CAPTURE_CLASS)
+                .build()
+        }
 
     override fun write(
         klass: KSClassDeclaration,

@@ -26,20 +26,21 @@ import javax.lang.model.element.Modifier
 
 object InjectAtSerializer : InjectionSerializer {
 
-    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec = with(annotation) {
-        AnnotationSpec.builder(INJECT_CLASS)
-            .addMember("method", "\"${getAs<String>("method")}\"")
-            .addAnnotation("at", AT_CLASS) {
-                add("value", "\$S", "INVOKE")
-                add("ordinal", "\$L", getAs<Int>("ordinal"))
-                add("shift", "\$T.Shift.${getAsEnum<TargetShift>("shift").name}", AT_CLASS)
-                add("target", "\$S", getAs<String>("target"))
-            }
-            .addMember("cancellable", "\$L", getAs<Boolean>("cancellable"))
-            .addMember("remap", "\$L", getAs<Boolean>("remap"))
-            .addMember(getAs<Boolean>("captureLocals"), "locals", "\$T.CAPTURE_FAILHARD", LOCAL_CAPTURE_CLASS)
-            .build()
-    }
+    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec =
+        with(annotation) {
+            AnnotationSpec.builder(INJECT_CLASS)
+                .addMember("method", "\"${getAs<String>("method")}\"")
+                .addAnnotation("at", AT_CLASS) {
+                    add("value", "\$S", "INVOKE")
+                    add("ordinal", "\$L", getAs<Int>("ordinal"))
+                    add("shift", "\$T.Shift.${getAsEnum<TargetShift>("shift").name}", AT_CLASS)
+                    add("target", "\$S", getAs<String>("target"))
+                }
+                .addMember("cancellable", "\$L", getAs<Boolean>("cancellable"))
+                .addMember("remap", "\$L", getAs<Boolean>("remap"))
+                .addMember(getAs<Boolean>("captureLocals"), "locals", "\$T.CAPTURE_FAILHARD", LOCAL_CAPTURE_CLASS)
+                .build()
+        }
 
     override fun write(
         klass: KSClassDeclaration,

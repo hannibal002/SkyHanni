@@ -25,19 +25,20 @@ import javax.lang.model.element.Modifier
 
 object RedirectFieldSerializer : InjectionSerializer {
 
-    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec = with(annotation) {
-        val opcode = if (function.returnType!!.isType(TypeName.VOID)) "PUTFIELD" else "GETFIELD"
-        AnnotationSpec.builder(REDIRECT_CLASS)
-            .addMember("method", "\$S", getAs<String>("method"))
-            .addAnnotation("at", AT_CLASS) {
-                add("value", "\$S", "FIELD")
-                add("target", "\$S", getAs<String>("target"))
-                add("ordinal", "\$L", getAs<Int>("ordinal"))
-                add("opcode", "\$T.${opcode}", OPCODES_CLASS)
-            }
-            .addMember("remap", "\$L", getAs<Boolean>("remap"))
-            .build()
-    }
+    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec =
+        with(annotation) {
+            val opcode = if (function.returnType!!.isType(TypeName.VOID)) "PUTFIELD" else "GETFIELD"
+            AnnotationSpec.builder(REDIRECT_CLASS)
+                .addMember("method", "\$S", getAs<String>("method"))
+                .addAnnotation("at", AT_CLASS) {
+                    add("value", "\$S", "FIELD")
+                    add("target", "\$S", getAs<String>("target"))
+                    add("ordinal", "\$L", getAs<Int>("ordinal"))
+                    add("opcode", "\$T.${opcode}", OPCODES_CLASS)
+                }
+                .addMember("remap", "\$L", getAs<Boolean>("remap"))
+                .build()
+        }
 
     override fun write(
         klass: KSClassDeclaration,

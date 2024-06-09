@@ -23,17 +23,18 @@ import javax.lang.model.element.Modifier
 
 object RedirectMethodSerializer : InjectionSerializer {
 
-    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec = with(annotation) {
-        AnnotationSpec.builder(REDIRECT_CLASS)
-            .addMember("method", "\$S", getAs<String>("method"))
-            .addAnnotation("at", AT_CLASS) {
-                add("value", "\$S", "INVOKE")
-                add("target", "\$S", getAs<String>("target"))
-                add("ordinal", "\$L", getAs<Int>("ordinal"))
-            }
-            .addMember("remap", "\$L", getAs<Boolean>("remap"))
-            .build()
-    }
+    override fun readAnnotation(function: KSFunctionDeclaration, annotation: KSAnnotation): AnnotationSpec =
+        with(annotation) {
+            AnnotationSpec.builder(REDIRECT_CLASS)
+                .addMember("method", "\$S", getAs<String>("method"))
+                .addAnnotation("at", AT_CLASS) {
+                    add("value", "\$S", "INVOKE")
+                    add("target", "\$S", getAs<String>("target"))
+                    add("ordinal", "\$L", getAs<Int>("ordinal"))
+                }
+                .addMember("remap", "\$L", getAs<Boolean>("remap"))
+                .build()
+        }
 
     override fun write(
         klass: KSClassDeclaration,
