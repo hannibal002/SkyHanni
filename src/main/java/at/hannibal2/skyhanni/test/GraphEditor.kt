@@ -98,6 +98,7 @@ object GraphEditor {
                     add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
                     add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
                     add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
+                    add(" ")
                     if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
                 }
                 if (!inTextMode && activeNode != null) {
@@ -122,7 +123,7 @@ object GraphEditor {
 
     private fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
-            ChatUtils.sendMessageToServer(text)
+            ChatUtils.chat(text)
         }
     }
 
@@ -279,7 +280,7 @@ object GraphEditor {
             feedBackInTutorial("Calculated shortest route and cleared active node.")
             testDijkstra()
         }
-        if (config.tutorialKey.isKeyHeld()) {
+        if (config.tutorialKey.isKeyClicked()) {
             inTutorialMode = !inTutorialMode
             ChatUtils.chat("Tutorial mode is now ${if (inTutorialMode) "active" else "inactive"}.")
         }

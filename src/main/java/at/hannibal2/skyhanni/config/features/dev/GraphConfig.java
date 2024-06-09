@@ -17,7 +17,7 @@ public class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Place Key", desc = "Places a new node at the current position. If a node is active automatically connects." +
-        "Deletes a node if you are only 3 blocks away instead of placing a new one")
+        "Deletes a node if you are only 3 blocks away instead of placing a new one.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_F)
     public int placeKey = Keyboard.KEY_F;
 
@@ -37,7 +37,7 @@ public class GraphConfig {
     public int exitKey = Keyboard.KEY_HOME;
 
     @Expose
-    @ConfigOption(name = "Edit Key", desc = "While holding the Key edit the position of the active node with the minecraft movement controls.")
+    @ConfigOption(name = "Edit Key", desc = "While holding the Key, edit the position of the active node with the minecraft movement controls.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_TAB)
     public int editKey = Keyboard.KEY_TAB;
 
@@ -47,7 +47,7 @@ public class GraphConfig {
     public int textKey = Keyboard.KEY_Y;
 
     @Expose
-    @ConfigOption(name = "Test Dijkstra", desc = "On Keypress shows the shortest path between the nearest node and the active node.")
+    @ConfigOption(name = "Test Dijkstra", desc = "On key press, shows the shortest path between the nearest node and the active node.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_G)
     public int dijkstraKey = Keyboard.KEY_G;
 
@@ -67,7 +67,7 @@ public class GraphConfig {
     public int clearKey = Keyboard.KEY_P;
 
     @Expose
-    @ConfigOption(name = "Vision Key", desc = "Toggles if the graph should render trough blocks.")
+    @ConfigOption(name = "Vision Key", desc = "Toggles if the graph, should render trough blocks.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_M)
     public int throughBlocksKey = Keyboard.KEY_M;
 
