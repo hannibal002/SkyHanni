@@ -161,15 +161,12 @@ object Commands {
         registerCommand0(
             "shdefaultoptions",
             "Select default options",
-            {
-                DefaultConfigFeatures.onCommand(
-                    it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null",
-                )
-            },
+            { DefaultConfigFeatures.onCommand(it) },
             DefaultConfigFeatures::onComplete,
         )
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
+
 
     private fun usersNormal() {
         registerCommand(
