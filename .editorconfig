@@ -16,7 +16,7 @@ ij_any_block_comment_add_space = true
 ij_any_line_comment_add_space = true
 
 # Max line length
-max_line_length = 140
+max_line_length = 120
 
 # Java Files
 [*.java]
