@@ -411,7 +411,8 @@ enum class HotmData(
         // but the value might be useful in the future or for debugging
 
         val perkCostPattern by patternGroup.pattern(
-            "perk.cost", "(?:§.)*§7Cost"
+            "perk.cost",
+            "(?:§.)*§7Cost",
         )
 
         private val resetChatPattern by patternGroup.pattern(
@@ -584,16 +585,14 @@ enum class HotmData(
         private fun handelSkyMall(lore: List<String>) {
             if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
             else {
-                val index = (
-                    lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
-                        ErrorManager.logErrorStateWithData(
-                            "Could not read the skymall effect from the hotm tree",
-                            "skyMallCurrentEffect didn't match",
-                            "lore" to lore,
-                        )
-                        return
-                    }
-                    ) + 1
+                val index = (lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from the hotm tree",
+                        "skyMallCurrentEffect didn't match",
+                        "lore" to lore,
+                    )
+                    return
+                }) + 1
                 skymallPattern.matchMatcher(lore[index]) {
                     val perk = group("perk")
                     HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
