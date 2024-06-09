@@ -18,11 +18,13 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class UserLuckBreakdown {
+@SkyHanniModule
+object UserLuckBreakdown {
     private var inMiscStats = false
     private var replaceSlot = -1
     private var itemCreateCoolDown = SimpleTimeMark.farPast()
