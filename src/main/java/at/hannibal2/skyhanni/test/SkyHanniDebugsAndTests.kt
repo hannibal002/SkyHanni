@@ -200,7 +200,7 @@ class SkyHanniDebugsAndTests {
                     resetConfig()
                 },
                 prefix = false,
-                oneTimeClick = true
+                oneTimeClick = true,
             )
         }
 
@@ -511,7 +511,7 @@ class SkyHanniDebugsAndTests {
         if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
-                posLabel = "SkyBlock Area (Debug)"
+                posLabel = "SkyBlock Area (Debug)",
             )
         }
 
@@ -533,28 +533,32 @@ class SkyHanniDebugsAndTests {
 
     private fun dragAbleTest() {
         val bone = ItemStack(Items.bone, 1).toDragItem()
-        val leave = ItemStack(Blocks.leaves, 1).toDragItem()
+        val leaf = ItemStack(Blocks.leaves, 1).toDragItem()
 
         config.debugItemPos.renderRenderables(
             listOf(
                 DragNDrop.dragAble(Renderable.string("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.dragAble(Renderable.string("A Leave"), { leave }),
+                DragNDrop.dragAble(Renderable.string("A Leaf"), { leaf }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.dropAble(Renderable.string("Feed Dog"), object : DropAble {
-                    override fun handle(drop: Any?) {
-                        val unit = drop as ItemStack
-                        if (unit.item == Items.bone) {
-                            LorenzDebug.chatAndLog("Oh, a bone!")
-                        } else {
-                            LorenzDebug.chatAndLog("Disgusting that is not a bone!")
+                DragNDrop.dropAble(
+                    Renderable.string("Feed Dog"),
+                    object : DropAble {
+                        override fun handle(drop: Any?) {
+                            val unit = drop as ItemStack
+                            if (unit.item == Items.bone) {
+                                LorenzDebug.chatAndLog("Oh, a bone!")
+                            } else {
+                                LorenzDebug.chatAndLog("Disgusting that is not a bone!")
+                            }
                         }
-                    }
 
-                    override fun validTarget(item: Any?) = item is ItemStack
+                        override fun validTarget(item: Any?) = item is ItemStack
 
-                })
-            ), posLabel = "Item Debug"
+                    },
+                ),
+            ),
+            posLabel = "Item Debug",
         )
     }
 
@@ -562,7 +566,7 @@ class SkyHanniDebugsAndTests {
         val scale = 0.1
         val renderables = listOf(
             ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block)
+            ItemStack(Blocks.melon_block),
         ).map { item ->
             generateSequence(scale) { it + 0.1 }.take(25).map {
                 Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
@@ -570,7 +574,8 @@ class SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList()
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }
+                    .toList(),
             )
         }
         config.debugItemPos.renderRenderables(
@@ -579,10 +584,12 @@ class SkyHanniDebugsAndTests {
                 Renderable.horizontalContainer(
                     listOf(
                         Renderable.string("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds()
-                    ), spacing = 1
-                )
-            ), posLabel = "Item Debug"
+                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
+                    ),
+                    spacing = 1,
+                ),
+            ),
+            posLabel = "Item Debug",
         )
     }
 
