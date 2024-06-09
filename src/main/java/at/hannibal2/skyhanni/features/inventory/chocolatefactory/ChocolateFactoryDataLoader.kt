@@ -161,9 +161,11 @@ object ChocolateFactoryDataLoader {
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.rabbitWarning.flashScreen) return
-
         ChocolateFactoryAPI.flashScreen =
-            InventoryUtils.getItemsInOpenChest().any { clickMeGoldenRabbitPattern.matches(it.stack.name) }
+            InventoryUtils.getItemsInOpenChest().any {
+                clickMeGoldenRabbitPattern.matches(it.stack.name) || it.stack.getSkullTexture() in specialRabbitTextures
+                    || clickMeRabbitPattern.matches(it.stack.name)
+            }
     }
 
     @SubscribeEvent
@@ -451,10 +453,9 @@ object ChocolateFactoryDataLoader {
                 && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
             ) {
                 SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
-
-
-                ChocolateFactoryAPI.clickRabbitSlot = slotIndex
             }
+
+            ChocolateFactoryAPI.clickRabbitSlot = slotIndex
         }
     }
 
