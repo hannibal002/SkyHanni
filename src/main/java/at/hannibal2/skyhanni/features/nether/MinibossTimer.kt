@@ -219,7 +219,7 @@ object MinibossTimer {
         ),
         ASHFANG(
             "Ashfang",
-            LorenzVec(-453, 155, -1050).axisAlignedTo(LorenzVec(-523, 131, -980))
+            LorenzVec(-462, 155, -1035).axisAlignedTo(LorenzVec(-507, 131, -955))
         ),
         MAGMA_BOSS(
             "Magma Boss",
