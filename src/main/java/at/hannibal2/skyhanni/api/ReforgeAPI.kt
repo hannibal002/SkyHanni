@@ -79,8 +79,12 @@ object ReforgeAPI {
 
             ReforgeType.BOW -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
             ReforgeType.ARMOR -> setOf(
-                ItemCategory.HELMET, ItemCategory.CHESTPLATE, ItemCategory.LEGGINGS, ItemCategory.BOOTS,
-            ).contains(itemCategory)
+                ItemCategory.HELMET,
+                ItemCategory.CHESTPLATE,
+                ItemCategory.LEGGINGS,
+                ItemCategory.BOOTS,
+            )
+                .contains(itemCategory)
 
             ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
             ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
@@ -88,9 +92,10 @@ object ReforgeAPI {
             ReforgeType.AXE -> itemCategory == ItemCategory.AXE
             ReforgeType.HOE -> itemCategory == ItemCategory.HOE
             ReforgeType.AXE_AND_HOE -> itemCategory == ItemCategory.HOE || itemCategory == ItemCategory.AXE
-            ReforgeType.PICKAXE -> itemCategory == ItemCategory.PICKAXE
-                || itemCategory == ItemCategory.DRILL
-                || itemCategory == ItemCategory.GAUNTLET
+            ReforgeType.PICKAXE ->
+                itemCategory == ItemCategory.PICKAXE ||
+                    itemCategory == ItemCategory.DRILL ||
+                    itemCategory == ItemCategory.GAUNTLET
 
             ReforgeType.EQUIPMENT -> setOf(
                 ItemCategory.CLOAK,
