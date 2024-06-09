@@ -20,7 +20,6 @@ object EstimatedWardrobePrice {
             event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()
         } ?: return
 
-
         val lore = WardrobeAPI.createPriceLore(slot)
         if (lore.isEmpty()) return
 
