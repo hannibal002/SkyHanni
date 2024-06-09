@@ -211,7 +211,7 @@ object MiningAPI {
 
         val extraBlocks = surroundingMinedBlocks.filter { it.confirmed }.countBy { it.ore }
 
-        OreMinedEvent(originalBlock.ore, extraBlocks).postAndCatch()
+        OreMinedEvent(originalBlock.ore, extraBlocks).post()
 
         surroundingMinedBlocks = mutableListOf()
         recentClickedBlocks.removeIf { it.time.passedSince() >= originalBlock.time.passedSince() }

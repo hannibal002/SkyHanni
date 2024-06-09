@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.IslandType
@@ -78,7 +79,7 @@ object MineshaftPityDisplay {
 
     private const val MAX_COUNTER = 2000
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOreMined(event: OreMinedEvent) {
         if (!isEnabled()) return
 
@@ -317,7 +318,6 @@ object MineshaftPityDisplay {
             8,
             ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata)
         ),
-
         ;
 
         companion object {
