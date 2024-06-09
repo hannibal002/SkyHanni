@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 enum class ChocolateAmount(val chocolate: () -> Long) {
     CURRENT({ profileStorage?.currentChocolate ?: 0 }),
@@ -26,8 +25,8 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
     fun timeUntilGoal(goal: Long): Duration {
         val profileStorage = profileStorage ?: return Duration.ZERO
-        val updatedAgo = profileStorage.lastDataSave.passedSince().inWholeSeconds
-        return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo.seconds
+        val updatedAgo = profileStorage.lastDataSave.passedSince()
+        return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo
     }
 
     companion object {

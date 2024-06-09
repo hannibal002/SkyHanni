@@ -73,8 +73,9 @@ object CityProjectFeatures {
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
-        if (playerSpecific.nextCityProjectParticipationTime.isFarPast()) return
-        if (playerSpecific.nextCityProjectParticipationTime.isInFuture()) return
+        playerSpecific.nextCityProjectParticipationTime.let {
+            if (it.isFarPast() || it.isInFuture()) return
+        }
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 

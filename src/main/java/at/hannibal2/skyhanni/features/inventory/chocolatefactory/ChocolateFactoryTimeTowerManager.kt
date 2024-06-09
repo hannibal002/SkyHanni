@@ -44,7 +44,7 @@ object ChocolateFactoryTimeTowerManager {
         if (nextCharge.isInPast() && !nextCharge.isFarPast() && currentCharges() < maxCharges()) {
             profileStorage.currentTimeTowerUses++
 
-            val nextTimeTower = profileStorage.nextTimeTower + (profileStorage.timeTowerCooldown).hours
+            val nextTimeTower = profileStorage.nextTimeTower + profileStorage.timeTowerCooldown.hours
             profileStorage.nextTimeTower = nextTimeTower
 
             if (!config.timeTowerWarning) return
@@ -103,9 +103,7 @@ object ChocolateFactoryTimeTowerManager {
         return endTime > currentTime
     }
 
-    private fun timeTowerEnds(): SimpleTimeMark {
-        return profileStorage?.currentTimeTowerEnds ?: SimpleTimeMark.farPast()
-    }
+    private fun timeTowerEnds(): SimpleTimeMark = profileStorage?.currentTimeTowerEnds ?: SimpleTimeMark.farPast()
 
     private fun timeTowerReminder() {
         if (lastTimeTowerReminder.passedSince() < 20.seconds) return
@@ -139,8 +137,7 @@ object ChocolateFactoryTimeTowerManager {
         val currentTime = profileStorage?.lastDataSave ?: SimpleTimeMark.farPast()
         val endTime = profileStorage?.currentTimeTowerEnds ?: SimpleTimeMark.farPast()
 
-        val duration = endTime - currentTime
-        return duration
+        return endTime - currentTime
     }
 
     @SubscribeEvent
