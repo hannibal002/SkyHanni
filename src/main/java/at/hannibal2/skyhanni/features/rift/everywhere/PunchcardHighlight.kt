@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -43,15 +43,15 @@ object PunchcardHighlight {
     private val patternGroup = RepoPattern.group("rift.punchcard")
     private val punchedPattern by patternGroup.pattern(
         "new",
-        "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25ф Rift Time§r§e!"
+        "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25ф Rift Time§r§e!",
     )
     private val repeatPattern by patternGroup.pattern(
         "repeat",
-        "§c§lAWKWARD! §r§cThis player has already been punched by you... somehow!"
+        "§c§lAWKWARD! §r§cThis player has already been punched by you... somehow!",
     )
     private val limitPattern by patternGroup.pattern(
         "limit",
-        "§c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!"
+        "§c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!",
     )
 
     private val playerList: MutableSet<String> = mutableSetOf()
@@ -107,7 +107,7 @@ object PunchcardHighlight {
         val color = config.color.get().toChromaColor().withAlpha(alpha)
         RenderLivingEntityHelper.setEntityColor(
             entity,
-            color
+            color,
         ) { IslandType.THE_RIFT.isInIsland() }
     }
 
@@ -157,7 +157,7 @@ object PunchcardHighlight {
                 "queuedName" to queuedName,
                 "capturedName" to name,
                 noStackTrace = true,
-                betaOnly = true
+                betaOnly = true,
             )
             return
         }
@@ -189,7 +189,7 @@ object PunchcardHighlight {
             if (!config.compact.get()) add("Punchcard Artifact: ")
 
             val amount = if (!config.reverseGUI.get()) playerList.size
-                        else 20 - playerList.size
+            else 20 - playerList.size
             add("§d$amount")
         }
     }
