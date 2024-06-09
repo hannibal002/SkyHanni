@@ -159,7 +159,8 @@ object Commands {
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { HelpCommand.onCommand(it, commands) }
         registerCommand0(
-            "shdefaultoptions", "Select default options",
+            "shdefaultoptions",
+            "Select default options",
             {
                 DefaultConfigFeatures.onCommand(
                     it.getOrNull(0) ?: "null", it.getOrNull(1) ?: "null",
@@ -178,7 +179,8 @@ object Commands {
         registerCommand("shtrackcollection", "Tracks your collection gain over time") { CollectionTracker.command(it) }
         registerCommand(
             "shcroptime",
-            "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items",
+            "Calculates with your current crop per second speed " +
+                "how long you need to farm a crop to collect this amount of items",
         ) { GardenCropTimeCommand.onCommand(it) }
         registerCommand(
             "shcropsin",
@@ -524,7 +526,9 @@ object Commands {
         ) { TitleManager.command(it) }
         registerCommand(
             "shresetconfig",
-            "Reloads the config manager and rendering processors of MoulConfig. This §cWILL RESET §7your config, but also updating the java config files (names, description, orderings and stuff).",
+            "Reloads the config manager and rendering processors of MoulConfig. " +
+                "This §cWILL RESET §7your config, but also updating the java config files " +
+                "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
             "readcropmilestonefromclipboard",
@@ -596,7 +600,9 @@ object Commands {
             else -> currentStream
         }
 
-        if (updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())) {
+        val switchingToBeta = updateStream == UpdateStream.BETA &&
+            (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {

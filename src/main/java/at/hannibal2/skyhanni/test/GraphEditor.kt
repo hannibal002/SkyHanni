@@ -433,7 +433,8 @@ private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode) {
 
         other as GraphingEdge
 
-        return (this.node1 == other.node1 && this.node2 == other.node2) || (this.node1 == other.node2 && this.node2 == other.node1)
+        return (this.node1 == other.node1 && this.node2 == other.node2) ||
+            (this.node1 == other.node2 && this.node2 == other.node1)
     }
 
     override fun hashCode(): Int {
