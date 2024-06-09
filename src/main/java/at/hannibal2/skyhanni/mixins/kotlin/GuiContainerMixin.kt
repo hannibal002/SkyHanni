@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.kmixin.annotations.KSelf
 import at.hannibal2.skyhanni.kmixin.annotations.KShadow
 import at.hannibal2.skyhanni.kmixin.annotations.TargetShift
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.DelayedRun
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
@@ -52,7 +53,9 @@ object GuiContainerMixin {
             GuiData.preDrawEventCancelled = true
             ci.cancel()
         } else {
-            GuiData.preDrawEventCancelled = false
+            DelayedRun.runNextTick {
+                GuiData.preDrawEventCancelled = false
+            }
         }
     }
 
