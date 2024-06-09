@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo.neu;
+package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.utils.LorenzRarity

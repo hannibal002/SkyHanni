@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
@@ -58,7 +59,7 @@ object TrophyFishDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTrophyFishCaught(event: TrophyFishCaughtEvent) {
         recentlyDroppedTrophies[getInternalName(event.trophyFishName)] = event.rarity
         update()

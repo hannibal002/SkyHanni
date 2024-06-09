@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.TypeAdapter
@@ -137,7 +138,7 @@ object NEUItems {
             name = name.removePrefix("§7[lvl 1➡100] ")
 
             if (name.contains("[lvl 1➡100]")) {
-                if (LorenzUtils.isInDevEnvironment()) {
+                if (PlatformUtils.isDevEnvironment) {
                     error("wrong name: '$name'")
                 }
                 println("wrong name: '$name'")
@@ -156,7 +157,7 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
+    fun NEUInternalName.getPrice(useSellPrice: Boolean = false) = getPriceOrNull(useSellPrice) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
@@ -170,20 +171,20 @@ object NEUItems {
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
-    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
+    fun NEUInternalName.getPriceOrNull(useSellPrice: Boolean = false): Double? {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
 
         getBazaarData()?.let {
-            return if (useSellingPrice) it.sellOfferPrice else it.instantBuyPrice
+            return if (useSellPrice) it.sellOfferPrice else it.instantBuyPrice
         }
 
         val result = manager.auctionManager.getLowestBin(asString())
         if (result != -1L) return result.toDouble()
 
         if (equals("JACK_O_LANTERN")) {
-            return "PUMPKIN".asInternalName().getPrice(useSellingPrice) + 1
+            return "PUMPKIN".asInternalName().getPrice(useSellPrice) + 1
         }
         if (equals("GOLDEN_CARROT")) {
             // 6.8 for some players
