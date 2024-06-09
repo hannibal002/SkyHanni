@@ -81,7 +81,8 @@ object GuiContainerMixin {
 
     @KInjectAt(
         method = "handleMouseClick",
-        target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;",
+        target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;" +
+            "windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;",
         cancellable = true
     )
     fun onMouseClick(

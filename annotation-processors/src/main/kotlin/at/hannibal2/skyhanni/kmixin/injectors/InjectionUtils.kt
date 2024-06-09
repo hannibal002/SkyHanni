@@ -18,11 +18,10 @@ import kotlin.reflect.KClass
 
 object InjectionUtils {
 
-    fun KSAnnotated.getAnnotation(annotation: KClass<out Annotation>): KSAnnotation {
-        return this.annotations.first {
+    fun KSAnnotated.getAnnotation(annotation: KClass<out Annotation>): KSAnnotation =
+        this.annotations.first {
             it.annotationType.resolve().declaration.qualifiedName!!.asString() == annotation.qualifiedName
         }
-    }
 
     fun gatherShadows(
         function: KSFunctionDeclaration,
@@ -67,8 +66,8 @@ object InjectionUtils {
             }
     }
 
-    fun createParameterList(function: KSFunctionDeclaration): String {
-        return function.parameters.joinToString(", ") {
+    fun createParameterList(function: KSFunctionDeclaration): String =
+        function.parameters.joinToString(", ") {
             when {
                 it.hasAnnotation(KSelf::class) -> "(${it.type.toJava()}) (Object) this"
                 it.hasAnnotation(KShadow::class) -> {
@@ -81,5 +80,4 @@ object InjectionUtils {
                 else -> it.name!!.asString()
             }
         }
-    }
 }

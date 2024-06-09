@@ -36,7 +36,12 @@ object InjectSerializer : InjectionSerializer {
                 }
                 .addMember("cancellable", "\$L", getAs<Boolean>("cancellable"))
                 .addMember("remap", "\$L", getAs<Boolean>("remap"))
-                .addMember(getAs<Boolean>("captureLocals"), "locals", "\$T.CAPTURE_FAILHARD", LOCAL_CAPTURE_CLASS)
+                .addMember(
+                    getAs<Boolean>("captureLocals"),
+                    "locals",
+                    "\$T.CAPTURE_FAILHARD",
+                    LOCAL_CAPTURE_CLASS
+                )
                 .build()
         }
 
