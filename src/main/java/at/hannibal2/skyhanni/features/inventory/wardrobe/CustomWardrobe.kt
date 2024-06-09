@@ -64,8 +64,11 @@ object CustomWardrobe {
 
         if (screenSize != lastScreenSize) {
             lastScreenSize = screenSize
-            val didUpdate = updateScreenSize(screenSize)
-            if (didUpdate) return
+            val shouldUpdate = updateScreenSize(screenSize)
+            if (shouldUpdate) {
+                update()
+                return
+            }
         }
 
         val (width, height) = renderable.width to renderable.height
@@ -151,10 +154,8 @@ object CustomWardrobe {
         val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
 
         activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
-        return if (activeScale != previousActiveScale) {
-            update()
-            true
-        } else false
+
+        return activeScale != previousActiveScale
     }
 
     private fun createWarning(list: List<WardrobeSlot>): Pair<String?, List<WardrobeSlot>> {
@@ -183,7 +184,7 @@ object CustomWardrobe {
     private fun createArmorTooltipRenderable(
         slot: WardrobeSlot,
         containerHeight: Int,
-        containerWidth: Int
+        containerWidth: Int,
     ): Renderable {
         val loreList = mutableListOf<Renderable>()
         val height = containerHeight - 3
@@ -217,7 +218,7 @@ object CustomWardrobe {
         slot: WardrobeSlot,
         playerWidth: Double,
         containerHeight: Int,
-        containerWidth: Int
+        containerWidth: Int,
     ): Renderable {
         val fakePlayer = getFakePlayer()
         var scale = playerWidth
