@@ -102,6 +102,7 @@ object CustomWardrobe {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
+        if (!isEnabled()) return
         DelayedRun.runDelayed(500.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
@@ -155,25 +156,92 @@ object CustomWardrobe {
         } else false
     }
 
-    private fun createRenderables(): Renderable {
-        var list = WardrobeAPI.slots
+    private fun createWarning(list: List<WardrobeSlot>): Pair<String?, List<WardrobeSlot>> {
         var wardrobeWarning: String? = null
+        var wardrobeSlots = list
 
-        if (list.isEmpty()) wardrobeWarning = "§cYour wardrobe is empty :("
+        if (wardrobeSlots.isEmpty()) wardrobeWarning = "§cYour wardrobe is empty :("
 
         if (config.hideLockedSlots) {
-            list = list.filter { !it.locked }
-            if (list.isEmpty()) wardrobeWarning = "§cAll your slots are locked? Somehow"
+            wardrobeSlots = wardrobeSlots.filter { !it.locked }
+            if (wardrobeSlots.isEmpty()) wardrobeWarning = "§cAll your slots are locked? Somehow"
         }
 
         if (config.hideEmptySlots) {
-            list = list.filter { !it.isEmpty() }
-            if (list.isEmpty()) wardrobeWarning = "§cAll slots are empty :("
+            wardrobeSlots = wardrobeSlots.filter { !it.isEmpty() }
+            if (wardrobeSlots.isEmpty()) wardrobeWarning = "§cAll slots are empty :("
         }
         if (config.onlyFavorites) {
-            list = list.filter { it.favorite || it.isCurrentSlot() }
-            if (list.isEmpty()) wardrobeWarning = "§cDidn't set any favorites"
+            wardrobeSlots = wardrobeSlots.filter { it.favorite || it.isCurrentSlot() }
+            if (wardrobeSlots.isEmpty()) wardrobeWarning = "§cDidn't set any favorites"
         }
+
+        return wardrobeWarning to wardrobeSlots
+    }
+
+    private fun createArmorTooltipRenderable(
+        slot: WardrobeSlot,
+        containerHeight: Int,
+        containerWidth: Int
+    ): Renderable {
+        val loreList = mutableListOf<Renderable>()
+        val height = containerHeight - 3
+
+        // This is needed to keep the background size the same as the player renderable size
+        val hoverableSizes = MutableList(4) { height / 4 }.apply {
+            for (k in 0 until height % 4) this[k]++
+        }
+
+        for (armorIndex in 0 until 4) {
+            val stack = slot.armor[armorIndex]?.copy()
+            if (stack == null) {
+                loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
+            } else {
+                loreList.add(
+                    Renderable.hoverable(
+                        Renderable.hoverTips(
+                            Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
+                            stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+                        ),
+                        Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
+                        bypassChecks = true
+                    )
+                )
+            }
+        }
+        return Renderable.verticalContainer(loreList, spacing = 1)
+    }
+
+    private fun createFakePlayerRenderable(
+        slot: WardrobeSlot,
+        playerWidth: Double,
+        containerHeight: Int,
+        containerWidth: Int
+    ): Renderable {
+        val fakePlayer = getFakePlayer()
+        var scale = playerWidth
+
+        fakePlayer.inventory.armorInventory =
+            slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+
+        val playerColor = if (!slot.isInCurrentPage()) {
+            scale *= 0.9
+            Color.GRAY.withAlpha(100)
+        } else null
+
+        return Renderable.fakePlayer(
+            fakePlayer,
+            followMouse = config.eyesFollowMouse,
+            width = containerWidth,
+            height = containerHeight,
+            entityScale = scale.toInt(),
+            padding = 0,
+            color = playerColor,
+        )
+    }
+
+    private fun createRenderables(): Renderable {
+        val (wardrobeWarning, list) = createWarning(WardrobeAPI.slots)
 
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
         val maxPlayersRows = ((MAX_SLOT_PER_PAGE * MAX_PAGES - 1) / maxPlayersPerRow) + 1
@@ -216,38 +284,10 @@ object CustomWardrobe {
 
         val rowsRenderables = chunkedList.map { row ->
             val slotsRenderables = row.map { slot ->
-                var scale = playerWidth
-                val armorTooltipRenderable = {
-                    val loreList = mutableListOf<Renderable>()
-                    val height = containerHeight - 3
-
-                    // This is needed to keep the background size the same as the player renderable size
-                    val hoverableSizes = MutableList(4) { height / 4 }.apply {
-                        for (k in 0 until height % 4) this[k]++
-                    }
-
-                    for (armorIndex in 0 until 4) {
-                        val stack = slot.armor[armorIndex]?.copy()
-                        if (stack == null) {
-                            loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
-                        } else {
-                            loreList.add(
-                                Renderable.hoverable(
-                                    Renderable.hoverTips(
-                                        Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                                        stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
-                                    ),
-                                    Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                                    bypassChecks = true
-                                )
-                            )
-                        }
-                    }
-                    Renderable.verticalContainer(loreList, spacing = 1)
-                }
+                val armorTooltipRenderable = createArmorTooltipRenderable(slot, containerHeight, containerWidth)
 
                 val playerBackground = createHoverableRenderable(
-                    armorTooltipRenderable.invoke(),
+                    armorTooltipRenderable,
                     topLayerRenderable = addSlotHoverableButtons(slot),
                     hoveredColor = slot.getSlotColor(),
                     borderOutlineThickness = config.spacing.outlineThickness.get(),
@@ -255,25 +295,7 @@ object CustomWardrobe {
                     onClick = { slot.clickSlot() }
                 )
 
-                val fakePlayer = getFakePlayer()
-
-                fakePlayer.inventory.armorInventory =
-                    slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
-
-                val playerColor = if (!slot.isInCurrentPage()) {
-                    scale *= 0.9
-                    Color.GRAY.withAlpha(100)
-                } else null
-
-                val playerRenderable = Renderable.fakePlayer(
-                    fakePlayer,
-                    followMouse = config.eyesFollowMouse,
-                    width = containerWidth,
-                    height = containerHeight,
-                    entityScale = scale.toInt(),
-                    padding = 0,
-                    color = playerColor,
-                )
+                val playerRenderable = createFakePlayerRenderable(slot, playerWidth, containerHeight, containerWidth)
 
                 Renderable.doubleLayered(playerBackground, playerRenderable, false)
             }
@@ -399,7 +421,7 @@ object CustomWardrobe {
         )
     }
 
-    private fun addSlotHoverableButtons(wardrobeSlot: WardrobeAPI.WardrobeSlot): Renderable {
+    private fun addSlotHoverableButtons(wardrobeSlot: WardrobeSlot): Renderable {
         val list = mutableListOf<Renderable>()
         val textScale = 1.5 * (activeScale / 100.0)
         list.add(
@@ -534,7 +556,7 @@ object CustomWardrobe {
             onHover = { onHover() }
         )
 
-    private fun WardrobeAPI.WardrobeSlot.clickSlot() {
+    private fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = WardrobeAPI.currentPage ?: return
@@ -556,7 +578,7 @@ object CustomWardrobe {
         update()
     }
 
-    private fun WardrobeAPI.WardrobeSlot.getSlotColor(): Color = with(config.color) {
+    private fun WardrobeSlot.getSlotColor(): Color = with(config.color) {
         when {
             isCurrentSlot() -> equippedColor
             favorite -> favoriteColor
@@ -566,5 +588,5 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && WardrobeAPI.inWardrobe() && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WardrobeAPI.inWardrobe()
 }

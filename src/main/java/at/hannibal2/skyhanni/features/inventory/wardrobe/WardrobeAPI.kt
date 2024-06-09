@@ -53,47 +53,7 @@ object WardrobeAPI {
     var slots = listOf<WardrobeSlot>()
     var inCustomWardrobe = false
 
-    class WardrobeSlot(
-        val id: Int,
-        val page: Int,
-        val inventorySlot: Int,
-        val helmetSlot: Int,
-        val chestplateSlot: Int,
-        val leggingsSlot: Int,
-        val bootsSlot: Int,
-    ) {
-        fun getData() = storage?.data?.getOrPut(id) {
-            WardrobeData(
-                id,
-                armor = emptyArmor(),
-                locked = true,
-                favorite = false,
-            )
-        }
-
-        var locked: Boolean
-            get() = getData()?.locked ?: true
-            set(value) {
-                getData()?.locked = value
-            }
-
-        var favorite: Boolean
-            get() = getData()?.favorite ?: false
-            set(value) {
-                getData()?.favorite = value
-            }
-
-//         val armor get() = (1..4).associateWith { getData()?.armor?.get(it) }.toSortedMap().values.toList()
-        val armor get() = getData()?.armor ?: emptyArmor()
-
-        fun isEmpty(): Boolean = armor.all { it == null }
-
-        fun isCurrentSlot() = getData()?.id == currentSlot
-
-        fun isInCurrentPage() = (currentPage == null && page == 1) || (page == currentPage)
-    }
-
-    private fun emptyArmor(): List<ItemStack?> = listOf(null, null, null, null)
+    internal fun emptyArmor(): List<ItemStack?> = listOf(null, null, null, null)
 
     var currentSlot: Int?
         get() = storage?.currentSlot
@@ -131,10 +91,12 @@ object WardrobeAPI {
         if (slot.isEmpty()) return@buildList
         add("§aEstimated Armor Value:")
         var totalPrice = 0.0
-        for (stack in slot.armor.filterNotNull()) {
-            val price = EstimatedItemValueCalculator.getTotalPrice(stack)
-            add("  §7- ${stack.name}: §6${NumberUtil.format(price)}")
-            totalPrice += price
+        slot.armor.forEach {
+            if (it != null) {
+                val price = EstimatedItemValueCalculator.getTotalPrice(it)
+                add("  §7- ${it.name}: §6${NumberUtil.format(price)}")
+                totalPrice += price
+            }
         }
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
     }
@@ -146,7 +108,6 @@ object WardrobeAPI {
         inventoryPattern.matchMatcher(event.inventoryName) {
             currentPage = group("currentPage").formatInt()
         } ?: return
-        if (currentPage == null) return
 
         val itemsList = event.inventoryItems
 
@@ -167,6 +128,13 @@ object WardrobeAPI {
             } else return
         }
 
+        val foundCurrentSlot = processSlots(slots, itemsList)
+        if (!foundCurrentSlot && getWardrobeSlotFromId(currentSlot)?.page == currentPage) {
+            currentSlot = null
+        }
+    }
+
+    private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, ItemStack>): Boolean {
         var foundCurrentSlot = false
 
         for (slot in slots.filter { it.isInCurrentPage() }) {
@@ -183,13 +151,13 @@ object WardrobeAPI {
             slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
             if (slot.locked) slots.forEach { if (it.id > slot.id) it.locked = true }
         }
-        if (!foundCurrentSlot && getWardrobeSlotFromId(currentSlot)?.page == currentPage) {
-            currentSlot = null
-        }
+
+        return foundCurrentSlot
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (!inCustomWardrobe) return
         DelayedRun.runDelayed(500.milliseconds) {
             if (!inWardrobe()) currentPage = null
         }

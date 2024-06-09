@@ -3,19 +3,18 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EstimatedWardrobePrice {
+@SkyHanniModule
+object EstimatedWardrobePrice {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.armor) return
-        if (!WardrobeAPI.inWardrobe()) return
-        if (WardrobeAPI.inCustomWardrobe) return
+        if (!isEnabled()) return
 
         val slot = WardrobeAPI.slots.firstOrNull {
             event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()
@@ -31,6 +30,8 @@ class EstimatedWardrobePrice {
         tooltip.add(index++, "")
         tooltip.addAll(index, lore)
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.armor && WardrobeAPI.inWardrobe()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
