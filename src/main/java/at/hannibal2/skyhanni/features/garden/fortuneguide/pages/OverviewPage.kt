@@ -26,7 +26,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
     fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
         val content = mutableListOf<MutableList<Renderable>>()
         val footer = mutableListOf<Renderable>()
-        val timeUntilCakes = FFStats.cakeExpireTime.passedSince().format(TimeUnit.HOUR, false, false, -1)
+        val timeUntilCakes = FFStats.cakeExpireTime.timeUntil().format(TimeUnit.HOUR, maxUnits = 1)
 
         content.addTable(
             0,
