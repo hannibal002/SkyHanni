@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -50,7 +53,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        send("gfs $itemName $amount")
+        GetFromSackAPI.getFromSack(itemName.asInternalName(), amount)
     }
 
     fun widget() {

@@ -95,12 +95,12 @@ object JacobFarmingContestsInventory {
             "Your Contests" -> {
                 val (year, month, day) = FarmingContestAPI.getSbDateFromItemName(itemName) ?: return
                 openContest(year, month, day)
-                event.isCanceled = true
+                event.cancel()
             }
 
             "Jacob's Farming Contests" -> {
                 openFromJacobMenu(itemName)
-                event.isCanceled = true
+                event.cancel()
             }
 
             else -> {
@@ -156,7 +156,7 @@ object JacobFarmingContestsInventory {
                 OSUtils.openBrowser("https://elitebot.dev/contests/upcoming#$timestamp")
                 ChatUtils.chat("Opening upcoming contests in elitebot.dev")
             }
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
