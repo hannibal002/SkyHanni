@@ -5,15 +5,11 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
+import at.hannibal2.skyhanni.utils.json.*
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -37,7 +33,21 @@ object ReforgeAPI {
         private set
 
     enum class ReforgeType {
-        SWORD, BOW, ARMOR, CHESTPLATE, HELMET, CLOAK, AXE, HOE, AXE_AND_HOE, PICKAXE, EQUIPMENT, ROD, SWORD_AND_ROD, SPECIAL_ITEMS, VACUUM
+        SWORD,
+        BOW,
+        ARMOR,
+        CHESTPLATE,
+        HELMET,
+        CLOAK,
+        AXE,
+        HOE,
+        AXE_AND_HOE,
+        PICKAXE,
+        EQUIPMENT,
+        ROD,
+        SWORD_AND_ROD,
+        SPECIAL_ITEMS,
+        VACUUM
     }
 
     class Reforge(
@@ -47,7 +57,7 @@ object ReforgeAPI {
         val reforgeStone: NEUInternalName? = null,
         val specialItems: List<NEUInternalName>? = null,
         val extraProperty: Map<LorenzRarity, String> = emptyMap(),
-        val costs: Map<LorenzRarity, Long>? = null
+        val costs: Map<LorenzRarity, Long>? = null,
     ) {
 
         val isReforgeStone = reforgeStone != null
