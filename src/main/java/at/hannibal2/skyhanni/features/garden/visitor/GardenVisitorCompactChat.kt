@@ -83,7 +83,7 @@ object GardenVisitorCompactChat {
         }
 
         //If visitor name has not yet been matched, we aren't looking at a visitor accept message, and can ignore this.
-        if(visitorNameFormatted.isBlank()) return;
+        if (visitorNameFormatted.isBlank()) return;
 
         //Match rewards and transform
         visitorRewardPattern.matchMatcher(transformedMessage) {
@@ -129,7 +129,7 @@ object GardenVisitorCompactChat {
 
     private fun sendCompact() {
         //This prevents commission rewards, crop milestone data, etc. from triggering incorrectly
-        if(visitorNameFormatted.isBlank()) return;
+        if (visitorNameFormatted.isBlank()) return;
 
         if (visitorAcceptedChat.isNotEmpty()) {
             ChatUtils.hoverableChat(createCompactVisitorMessage(), hover = visitorAcceptedChat, prefix = false)
