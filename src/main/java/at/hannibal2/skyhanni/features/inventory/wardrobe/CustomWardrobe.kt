@@ -92,6 +92,7 @@ object CustomWardrobe {
         event.cancel()
     }
 
+    // Edit button in normal wardrobe while in edit mode
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -147,10 +148,10 @@ object CustomWardrobe {
             return true
         }
         val previousActiveScale = activeScale
-        val unscaledRenderableWidth = 100 * (renderable.first / activeScale.toDouble())
-        val unscaledRenderableHeight = 100 * (renderable.second / activeScale.toDouble())
-        val autoScaleWidth = 100 * ((gui.first * 0.9) / unscaledRenderableWidth)
-        val autoScaleHeight = 10_000 * ((gui.second * 0.9) / unscaledRenderableHeight)
+        val unscaledRenderableWidth = renderable.first / activeScale
+        val unscaledRenderableHeight = renderable.second / activeScale
+        val autoScaleWidth = 0.95 * gui.first / unscaledRenderableWidth
+        val autoScaleHeight = 0.95 * gui.second / unscaledRenderableHeight
         val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
 
         activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
@@ -180,7 +181,7 @@ object CustomWardrobe {
             if (list.isEmpty()) wardrobeWarning = "§cDidn't set any favorites"
         }
 
-        val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get()
+        val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
         val maxPlayersRows = ((MAX_SLOT_PER_PAGE * MAX_PAGES - 1) / maxPlayersPerRow) + 1
         val containerWidth = (config.spacing.slotWidth.get() * (activeScale / 100.0)).toInt()
         val containerHeight = (config.spacing.slotHeight.get() * (activeScale / 100.0)).toInt()
@@ -203,8 +204,9 @@ object CustomWardrobe {
         currentMaxSize = maxRenderableWidth to maxRenderableHeight
 
         wardrobeWarning?.let { text ->
-            val warningRenderable = Renderable.string(
+            val warningRenderable = Renderable.wrappedString(
                 text,
+                maxRenderableWidth,
                 3.0 * (activeScale / 100.0),
                 horizontalAlign = HorizontalAlignment.CENTER
             )
