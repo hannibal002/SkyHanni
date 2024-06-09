@@ -22,10 +22,10 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
-import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
@@ -58,7 +58,7 @@ object PunchcardHighlight {
     private var playerQueue = mutableListOf<String>()
 
     private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
-    private var display = mutableListOf<Any>()
+    private var display: Renderable = Renderable.string("hello")
 
     @SubscribeEvent
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
@@ -180,18 +180,23 @@ object PunchcardHighlight {
     fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui) return
         if (!RiftAPI.inRift()) return
-        config.position.renderSingleLineWithItems(display, "Punchcard Overlay")
+
+        config.position.renderRenderable(display ?: return, "Punchcard Overlay")
     }
 
-    private fun drawDisplay(): MutableList<Any> {
-        return mutableListOf<Any>().apply {
-            addItemIcon(displayIcon)
-            if (!config.compact.get()) add("Punchcard Artifact: ")
+    private fun drawDisplay(): Renderable {
+        var string = ""
+        if (!config.compact.get()) string += "Punchcard Artifact: "
+        string += "§d" + if (!config.reverseGUI.get()) playerList.size
+        else 20 - playerList.size
 
-            val amount = if (!config.reverseGUI.get()) playerList.size
-            else 20 - playerList.size
-            add("§d$amount")
-        }
+        return Renderable.horizontalContainer(
+            listOf(
+                Renderable.itemStack(displayIcon),
+                Renderable.string(string),
+            ),
+            spacing = 1,
+        )
     }
 
     private fun reloadColors() {
