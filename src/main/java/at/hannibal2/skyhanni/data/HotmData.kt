@@ -585,15 +585,15 @@ enum class HotmData(
         private fun handelSkyMall(lore: List<String>) {
             if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
             else {
-                val index = (lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                val index = lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Could not read the skymall effect from the hotm tree",
                         "skyMallCurrentEffect didn't match",
                         "lore" to lore,
                     )
                     return
-                }) + 1
-                skymallPattern.matchMatcher(lore[index]) {
+                }
+                skymallPattern.matchMatcher(lore[index + 1]) {
                     val perk = group("perk")
                     HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
                         ErrorManager.logErrorStateWithData(
