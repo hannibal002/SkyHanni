@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -337,7 +338,7 @@ object CaptureFarmingGear {
             return
         }
         cakePattern.matchMatcher(msg) {
-            storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
+            FFStats.cakeExpireTime = 2.days.fromNow()
             return
         }
         CarrolynTable.entries.forEach {
