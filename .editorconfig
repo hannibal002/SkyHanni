@@ -54,4 +54,4 @@ ktlint_standard_wrapping = disabled
 
 ktlint_standard_no-line-break-before-assignment = true
 ktlint_standard_no-wildcard-imports = enabled
-ktlint_standard_function-expression-body = enabled
+ktlint_standard_function-expression-body = disabled
