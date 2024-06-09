@@ -74,12 +74,12 @@ object ReforgeAPI {
 
         fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) = when (type) {
             ReforgeType.SWORD -> setOf(
-                ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_WEAPON
+                ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_WEAPON,
             ).contains(itemCategory)
 
             ReforgeType.BOW -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
             ReforgeType.ARMOR -> setOf(
-                ItemCategory.HELMET, ItemCategory.CHESTPLATE, ItemCategory.LEGGINGS, ItemCategory.BOOTS
+                ItemCategory.HELMET, ItemCategory.CHESTPLATE, ItemCategory.LEGGINGS, ItemCategory.BOOTS,
             ).contains(itemCategory)
 
             ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
@@ -88,9 +88,16 @@ object ReforgeAPI {
             ReforgeType.AXE -> itemCategory == ItemCategory.AXE
             ReforgeType.HOE -> itemCategory == ItemCategory.HOE
             ReforgeType.AXE_AND_HOE -> itemCategory == ItemCategory.HOE || itemCategory == ItemCategory.AXE
-            ReforgeType.PICKAXE -> itemCategory == ItemCategory.PICKAXE || itemCategory == ItemCategory.DRILL || itemCategory == ItemCategory.GAUNTLET
+            ReforgeType.PICKAXE -> itemCategory == ItemCategory.PICKAXE
+                || itemCategory == ItemCategory.DRILL
+                || itemCategory == ItemCategory.GAUNTLET
+
             ReforgeType.EQUIPMENT -> setOf(
-                ItemCategory.CLOAK, ItemCategory.BELT, ItemCategory.NECKLACE, ItemCategory.BRACELET, ItemCategory.GLOVES
+                ItemCategory.CLOAK,
+                ItemCategory.BELT,
+                ItemCategory.NECKLACE,
+                ItemCategory.BRACELET,
+                ItemCategory.GLOVES,
             ).contains(itemCategory)
 
             ReforgeType.ROD -> itemCategory == ItemCategory.FISHING_ROD || itemCategory == ItemCategory.FISHING_WEAPON
@@ -99,7 +106,7 @@ object ReforgeAPI {
                 ItemCategory.GAUNTLET,
                 ItemCategory.LONGSWORD,
                 ItemCategory.FISHING_ROD,
-                ItemCategory.FISHING_WEAPON
+                ItemCategory.FISHING_WEAPON,
             ).contains(itemCategory)
 
             ReforgeType.VACUUM -> itemCategory == ItemCategory.VACUUM
@@ -146,27 +153,30 @@ object ReforgeAPI {
 
     private val reforgeGson: Gson = BaseGsonBuilder.gson()
         .registerTypeAdapter(SkyblockStat::class.java, SkyHanniTypeAdapters.SKYBLOCK_STAT.nullSafe())
-        .registerTypeAdapter(SkyblockStatList::class.java, object : TypeAdapter<SkyblockStatList>() {
-            override fun write(out: JsonWriter, value: SkyblockStatList) {
-                out.beginObject()
-                value.entries.forEach {
-                    out.name(it.key.name.lowercase()).value(it.value)
+        .registerTypeAdapter(
+            SkyblockStatList::class.java,
+            object : TypeAdapter<SkyblockStatList>() {
+                override fun write(out: JsonWriter, value: SkyblockStatList) {
+                    out.beginObject()
+                    value.entries.forEach {
+                        out.name(it.key.name.lowercase()).value(it.value)
+                    }
+                    out.endObject()
                 }
-                out.endObject()
-            }
 
-            override fun read(reader: JsonReader): SkyblockStatList {
-                reader.beginObject()
-                val list = SkyblockStatList()
-                while (reader.hasNext()) {
-                    val name = reader.nextName()
-                    val value = reader.nextDouble()
-                    list[SkyblockStat.valueOf(name.uppercase())] = value
+                override fun read(reader: JsonReader): SkyblockStatList {
+                    reader.beginObject()
+                    val list = SkyblockStatList()
+                    while (reader.hasNext()) {
+                        val name = reader.nextName()
+                        val value = reader.nextDouble()
+                        list[SkyblockStat.valueOf(name.uppercase())] = value
+                    }
+                    reader.endObject()
+                    return list
                 }
-                reader.endObject()
-                return list
-            }
-        }).create()
+            },
+        ).create()
 
     private fun mapReforge(it: NeuReforgeJson): Reforge {
         val type = it.itemType
@@ -177,7 +187,7 @@ object ReforgeAPI {
             reforgeStone = it.internalName,
             specialItems = type.second.takeIf { it.isNotEmpty() },
             extraProperty = it.reforgeAbility,
-            costs = it.reforgeCosts
+            costs = it.reforgeCosts,
         )
     }
 }
