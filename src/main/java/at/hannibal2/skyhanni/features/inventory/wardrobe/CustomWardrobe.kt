@@ -456,9 +456,10 @@ object CustomWardrobe {
                         "§2$",
                         scale = textScale,
                         horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER
-                    ), lore
-                )
+                        verticalAlign = VerticalAlignment.CENTER,
+                    ),
+                    lore,
+                ),
             )
         }
 
@@ -535,8 +536,9 @@ object CustomWardrobe {
                 Renderable.doubleLayered(
                     Renderable.clickable(
                         hoveredRenderable,
-                        onClick
-                    ), topLayerRenderable
+                        onClick,
+                    ),
+                    topLayerRenderable,
                 ),
                 hoveredColor,
                 padding = padding,
@@ -545,7 +547,7 @@ object CustomWardrobe {
                 borderOutlineThickness = borderOutlineThickness,
                 blur = borderOutlineBlur,
                 horizontalAlign = horizontalAlignment,
-                verticalAlign = verticalAlignment
+                verticalAlign = verticalAlignment,
             ),
             Renderable.drawInsideRoundedRect(
                 unhoveredRenderable,
@@ -554,7 +556,7 @@ object CustomWardrobe {
                 horizontalAlign = horizontalAlignment,
                 verticalAlign = verticalAlignment
             ),
-            onHover = { onHover() }
+            onHover = { onHover() },
         )
 
     private fun WardrobeSlot.clickSlot() {

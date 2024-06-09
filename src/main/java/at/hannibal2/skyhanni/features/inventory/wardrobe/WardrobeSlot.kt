@@ -32,6 +32,8 @@ class WardrobeSlot(
 
     val armor get() = getData()?.armor ?: WardrobeAPI.emptyArmor()
 
+    val inventorySlots = listOf(helmetSlot, chestplateSlot, leggingsSlot, bootsSlot)
+
     fun isEmpty(): Boolean = armor.all { it == null }
 
     fun isCurrentSlot() = getData()?.id == WardrobeAPI.currentSlot

@@ -125,10 +125,8 @@ object WardrobeAPI {
         }
 
         if (allGrayDye) {
-            val allSlotsEmpty = slots.all {
-                (getWardrobeItem(itemsList[it.helmetSlot]) == null && getWardrobeItem(itemsList[it.chestplateSlot]) == null &&
-                    getWardrobeItem(itemsList[it.leggingsSlot]) == null && getWardrobeItem(itemsList[it.bootsSlot]) == null) ||
-                    !it.isInCurrentPage()
+            val allSlotsEmpty = slots.filter { it.isInCurrentPage() }.all { slot ->
+                (slot.inventorySlots.all { getWardrobeItem(itemsList[it]) == null })
             }
             if (allSlotsEmpty) {
                 for (slot in slots.filter { it.isInCurrentPage() }) {
