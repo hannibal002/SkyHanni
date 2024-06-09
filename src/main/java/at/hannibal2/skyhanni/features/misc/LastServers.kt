@@ -33,7 +33,7 @@ object LastServers {
                 }
             }
 
-            ChatUtils.chat("Adding $serverId to last servers.")
+            ChatUtils.debug("Adding $serverId to last servers.")
 
             lastServers[serverId] = SimpleTimeMark.now()
             lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
