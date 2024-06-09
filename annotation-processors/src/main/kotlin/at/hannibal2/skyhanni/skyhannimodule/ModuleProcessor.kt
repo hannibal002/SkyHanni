@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.skyhannimodule
 
+import com.google.devtools.ksp.getClassDeclarationByName
+import com.google.devtools.ksp.getDeclaredFunctions
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -8,12 +10,23 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
 import java.io.OutputStreamWriter
 
 class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logger: KSPLogger) : SymbolProcessor {
 
+    // TODO remove once all events are migrated to SkyHanniEvent
+    private var skyHanniEvent: KSType? = null
+    private var minecraftForgeEvent: KSType? = null
+    private val warnings = mutableListOf<String>()
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
+
+        skyHanniEvent =
+            resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
+        minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
+            ?.asStarProjectedType()
 
         val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
@@ -41,10 +54,42 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             return null
         }
 
+        // TODO remove once all events are migrated to SkyHanniEvent
+        val className = symbol.qualifiedName?.asString() ?: "unknown"
+
+        for (function in symbol.getDeclaredFunctions()) {
+            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
+                if (!minecraftForgeEvent!!.isAssignableFrom(firstParameter)) {
+                    warnings.add("Function in $className must have an event assignable from $minecraftForgeEvent because it is annotated with @SubscribeEvent")
+                }
+            }
+
+            if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
+                if (!skyHanniEvent!!.isAssignableFrom(firstParameter)) {
+                    warnings.add("Function in $className must have an event assignable from $skyHanniEvent because it is annotated with @HandleEvent")
+                }
+            }
+        }
+
         return symbol
     }
 
+    //TODO remove when KMixins added as it contains KSP annotation helpers.
+    private fun isDevAnnotation(klass: KSClassDeclaration): Boolean {
+        val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
+        return annotation.arguments.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
+    }
+
+    // TODO use Kotlin Poet once KMixins is merged
     private fun generateFile(symbols: List<KSClassDeclaration>) {
+
+        if (warnings.isNotEmpty()) {
+            warnings.forEach { logger.warn(it) }
+            error("${warnings.size} errors related to event annotations found, please fix them before continuing. Click on the kspKotlin build log for more information.")
+        }
+
         val dependencies = symbols.mapNotNull { it.containingFile }.toTypedArray()
         val deps = Dependencies(true, *dependencies)
 
@@ -53,13 +98,18 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         OutputStreamWriter(file).use {
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
             it.write("object LoadedModules {\n")
-            it.write("    val modules: List<Any> = listOf(\n")
+            it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
+            it.write("    val modules: List<Any> = buildList {\n")
 
             symbols.forEach { symbol ->
-                it.write("        ${symbol.qualifiedName!!.asString()},\n")
+                if (isDevAnnotation(symbol)) {
+                    it.write("        if (isDev) add(${symbol.qualifiedName!!.asString()})\n")
+                } else {
+                    it.write("        add(${symbol.qualifiedName!!.asString()})\n")
+                }
             }
 
-            it.write("    )\n")
+            it.write("    }\n")
             it.write("}\n")
         }
 

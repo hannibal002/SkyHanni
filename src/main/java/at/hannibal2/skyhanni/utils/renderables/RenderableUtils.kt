@@ -48,25 +48,28 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int) {
+    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         GlStateManager.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
         this.render(posX + xOffset, posY + yOffset)
         GlStateManager.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
+        return xOffset to yOffset
     }
 
-    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int) {
+    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         GlStateManager.translate(xOffset.toFloat(), 0f, 0f)
         this.render(posX + xOffset, posY)
         GlStateManager.translate(-xOffset.toFloat(), 0f, 0f)
+        return xOffset
     }
 
-    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int) {
+    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         GlStateManager.translate(0f, yOffset.toFloat(), 0f)
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
+        return yOffset
     }
 }

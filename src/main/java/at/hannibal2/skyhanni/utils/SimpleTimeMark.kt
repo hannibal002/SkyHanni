@@ -33,9 +33,10 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
-    override fun toString(): String {
-        if (millis == 0L) return "The Far Past"
-        return Instant.ofEpochMilli(millis).toString()
+    override fun toString(): String = when (this) {
+        farPast() -> "The Far Past"
+        farFuture() -> "The Far Future"
+        else -> Instant.ofEpochMilli(millis).toString()
     }
 
     fun formattedDate(pattern: String): String {
@@ -60,6 +61,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     companion object {
 
         fun now() = SimpleTimeMark(System.currentTimeMillis())
+
+        @JvmStatic
+        @JvmName("farPast")
         fun farPast() = SimpleTimeMark(0)
         fun farFuture() = SimpleTimeMark(Long.MAX_VALUE)
 
