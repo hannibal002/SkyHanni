@@ -244,7 +244,7 @@ class ConfigManager {
                 unit.toPath(),
                 file.toPath(),
                 StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.ATOMIC_MOVE
+                StandardCopyOption.ATOMIC_MOVE,
             )
         } catch (e: AccessDeniedException) {
             if (loop == 5) {
