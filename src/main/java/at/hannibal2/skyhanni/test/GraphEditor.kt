@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
@@ -144,7 +144,15 @@ object GraphEditor {
             inverseAlphaScale = true,
         )
         if (node.name == null) return
-        this.drawString(node.position, node.name!!, seeThroughBlocks)
+        this.drawDynamicText(
+            node.position,
+            node.name!!,
+            0.8,
+            ignoreBlocks = seeThroughBlocks,
+            smallestDistanceVew = 12.0,
+            ignoreY = true,
+            yOff = -15f,
+        )
     }
 
     private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) = this.draw3DLine_nea(
