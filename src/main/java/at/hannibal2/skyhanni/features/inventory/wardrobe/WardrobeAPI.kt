@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -62,6 +63,7 @@ object WardrobeAPI {
         }
 
     var currentPage: Int? = null
+    private var inWardrobe = false
 
     init {
         val list = mutableListOf<WardrobeSlot>()
@@ -85,20 +87,26 @@ object WardrobeAPI {
 
     private fun getWardrobeSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inWardrobe() = inventoryPattern.matches(InventoryUtils.openInventoryName())
+    fun inWardrobe() = InventoryUtils.inInventory() && inWardrobe
 
     fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
         add("§aEstimated Armor Value:")
         var totalPrice = 0.0
-        slot.armor.forEach {
-            if (it != null) {
-                val price = EstimatedItemValueCalculator.getTotalPrice(it)
-                add("  §7- ${it.name}: §6${NumberUtil.format(price)}")
-                totalPrice += price
-            }
+        for (stack in slot.armor.filterNotNull()) {
+            val price = EstimatedItemValueCalculator.getTotalPrice(stack)
+            add("  §7- ${stack.name}: §6${NumberUtil.format(price)}")
+            totalPrice += price
         }
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        inventoryPattern.matches(event.inventoryName).let {
+            inWardrobe = it
+            if (CustomWardrobe.config.enabled) inCustomWardrobe = it
+        }
     }
 
     @SubscribeEvent
@@ -106,6 +114,7 @@ object WardrobeAPI {
         if (!LorenzUtils.inSkyBlock) return
 
         inventoryPattern.matchMatcher(event.inventoryName) {
+            inWardrobe = true
             currentPage = group("currentPage").formatInt()
         } ?: return
 
@@ -157,9 +166,12 @@ object WardrobeAPI {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!inCustomWardrobe) return
-        DelayedRun.runDelayed(500.milliseconds) {
-            if (!inWardrobe()) currentPage = null
+        if (!inWardrobe) return
+        DelayedRun.runDelayed(250.milliseconds) {
+            if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
+                inWardrobe = false
+                currentPage = null
+            }
         }
     }
 

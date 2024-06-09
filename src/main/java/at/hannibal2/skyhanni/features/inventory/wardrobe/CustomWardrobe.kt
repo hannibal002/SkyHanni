@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object CustomWardrobe {
 
-    private val config get() = SkyHanniMod.feature.inventory.customWardrobe
+    val config get() = SkyHanniMod.feature.inventory.customWardrobe
 
     private var displayRenderable: Renderable? = null
     private var inventoryButton: Renderable? = null
@@ -106,10 +106,9 @@ object CustomWardrobe {
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
         if (!isEnabled()) return
-        DelayedRun.runDelayed(500.milliseconds) {
+        DelayedRun.runDelayed(250.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
-                WardrobeAPI.currentPage = null
             }
         }
     }
