@@ -173,7 +173,7 @@ object ChocolateFactoryDataLoader {
         if (!config.rabbitWarning.flashScreen) return
         if (!ChocolateFactoryAPI.flashScreen) return
         val mc = Minecraft.getMinecraft()
-        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0 .. 255)
+        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
         Gui.drawRect(
             0,
             0,
