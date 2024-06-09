@@ -164,7 +164,6 @@ object ChocolateFactoryDataLoader {
         ChocolateFactoryAPI.flashScreen =
             InventoryUtils.getItemsInOpenChest().any {
                 clickMeGoldenRabbitPattern.matches(it.stack.name) || it.stack.getSkullTexture() in specialRabbitTextures
-                    || clickMeRabbitPattern.matches(it.stack.name)
             }
     }
 
