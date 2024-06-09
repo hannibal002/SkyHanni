@@ -194,6 +194,29 @@ object CollectionUtils {
         }
     }
 
+    inline fun <T, R> Iterator<T>.consumeWhile(block: (T) -> R): R? {
+        while (hasNext()) {
+            return block(next()) ?: continue
+        }
+        return null
+    }
+
+    inline fun <T> Iterator<T>.collectWhile(block: (T) -> Boolean): List<T> {
+        return collectWhileTo(mutableListOf(), block)
+    }
+
+    inline fun <T, C : MutableCollection<T>> Iterator<T>.collectWhileTo(collection: C, block: (T) -> Boolean): C {
+        while (hasNext()) {
+            val element = next()
+            if (block(element)) {
+                collection.add(element)
+            } else {
+                break
+            }
+        }
+        return collection
+    }
+
     /** Removes the first element that matches the given [predicate] in the list. */
     fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
         val mutableList = this.toMutableList()

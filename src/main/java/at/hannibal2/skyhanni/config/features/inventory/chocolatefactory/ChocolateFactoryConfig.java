@@ -175,6 +175,15 @@ public class ChocolateFactoryConfig {
     public boolean highlightRabbitsWithRequirement = false;
 
     @Expose
+    @ConfigOption(
+        name = "Show Missing Location Rabbits",
+        desc = "Shows which in which locations you have not yet found enough egg locations to unlock the rabbit for that location."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLocationRequirementsRabbitsInHoppityStats = false;
+
+    @Expose
     @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
     @ConfigEditorBoolean
     @FeatureToggle
