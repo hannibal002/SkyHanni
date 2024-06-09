@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -20,21 +21,21 @@ import org.lwjgl.input.Keyboard
 @SkyHanniModule
 object GuiData {
 
-    var preDrawEventCanceled = false
+    var preDrawEventCancelled = false
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onNeuRenderEvent(event: NEURenderEvent) {
-        if (preDrawEventCanceled) event.cancel()
+        if (preDrawEventCancelled) event.cancel()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (preDrawEventCanceled) event.cancel()
+        if (preDrawEventCancelled) event.cancel()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGuiClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (preDrawEventCanceled) event.isCanceled = true
+        if (preDrawEventCancelled) event.isCanceled = true
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -43,31 +44,31 @@ object GuiData {
             Keyboard.KEY_ESCAPE to it.keyBindInventory.keyCode
         }
         if (escKey.isKeyHeld() || invKey.isKeyHeld()) return
-        if (preDrawEventCanceled) event.isCanceled = true
+        if (preDrawEventCancelled) event.isCanceled = true
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
             if (Minecraft.getMinecraft().currentScreen !is GuiChest) {
-                preDrawEventCanceled = false
+                preDrawEventCancelled = false
             }
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        preDrawEventCanceled = false
+        preDrawEventCancelled = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
-        preDrawEventCanceled = false
+        preDrawEventCancelled = false
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onGuiOpen(event: GuiOpenEvent) {
-        if (preDrawEventCanceled) {
+        if (preDrawEventCancelled) {
             NEUApi.setInventoryButtonsToDisabled()
         }
     }

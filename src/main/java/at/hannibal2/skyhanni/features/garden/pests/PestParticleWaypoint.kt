@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
@@ -119,10 +121,10 @@ object PestParticleWaypoint {
         ++particles
     }
 
-    @SubscribeEvent
-    fun onFireWorkSpawn(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onFireWorkSpawn(event: PacketReceivedEvent) {
         if (event.packet !is S0EPacketSpawnObject) return
-        if (!GardenAPI.inGarden() || !config.hideParticles) return
+        if (!config.hideParticles) return
         val fireworkId = 76
         if (event.packet.type == fireworkId) event.cancel()
     }
@@ -169,7 +171,7 @@ object PestParticleWaypoint {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
         if (PestAPI.scoreboardPests == 0) reset()
     }
