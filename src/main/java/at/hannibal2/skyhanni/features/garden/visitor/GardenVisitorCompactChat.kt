@@ -34,7 +34,7 @@ object GardenVisitorCompactChat {
      */
     private val visitorRewardPattern by patternGroup.pattern(
         "visitorreward",
-        "^ {4}((§.)+\\+)?(?:(?<amountcolor>§.)(?<amount>[\\d,]+(\\.?(\\d)?k)?)x? )?((?<rewardcolor>(?:§.)+)?(?<reward>.*?))(?: ((§.)?)?x(?<altamount>\\d+))?\$"
+        "^ {4}(?:(?:§.)+\\+)?(?:(?<amountcolor>§.)(?<amount>[\\d,]+(?:\\.?(?:\\d)?k)?)x? )?(?:(?<rewardcolor>(?:§.)+)?(?<reward>.*?))(?: (?:(?:§.)?)?x(?<altamount>\\d+))?\$"
     )
 
     /**
