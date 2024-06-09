@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.model
 
-import at.hannibal2.skyhanni.config.ConfigManager.Companion.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
+import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
@@ -36,8 +36,7 @@ value class Graph(
     override fun lastIndexOf(element: GraphNode) = graph.lastIndexOf(element)
 
     companion object {
-        val gson = GsonBuilder().setPrettyPrinting()
-            /* ConfigManager.createBaseGsonBuilder() */.registerTypeAdapter<Graph>({ out, value ->
+        val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>({ out, value ->
                 out.beginObject()
                 value.forEach {
                     out.name(it.id.toString()).beginObject()

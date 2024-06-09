@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
@@ -30,7 +30,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!reputationHelper.showLocations()) return
         if (allKuudraDone) return
 

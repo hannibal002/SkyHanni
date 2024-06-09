@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+@SkyHanniModule
 object ScoreboardPattern {
     val group = RepoPattern.group("features.gui.customscoreboard")
 
@@ -38,9 +40,13 @@ object ScoreboardPattern {
         "date",
         "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?.*"
     )
+    /*
+      * REGEX-TEST:  §78:50am
+      * REGEX-TEST:  §75:50am §b☽
+    */
     val timePattern by mainSb.pattern(
         "time",
-        "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm) (?<symbol>(§b☽|§e☀|§.⚡|§.☔)).*$"
+        "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm)\\s*(?<symbol>(§b☽|§e☀|§.⚡|§.☔))?.*$"
     )
     val footerPattern by mainSb.pattern(
         "footer",
@@ -169,9 +175,28 @@ object ScoreboardPattern {
 
     // mining
     private val miningSb = scoreboardGroup.group("mining")
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f: §235,448
+     * REGEX-TEST: §d᠅ §fGemstone§f: §d36,758
+     * REGEX-TEST: §b᠅ §fGlacite§f: §b29,537
+     * REGEX-TEST: §2᠅ §fMithril Powder§f: §235,448
+     * REGEX-TEST: §d᠅ §fGemstone Powder§f: §d36,758
+     * REGEX-TEST: §b᠅ §fGlacite Powder§f: §b29,537
+     */
     val powderPattern by miningSb.pattern(
         "powder",
-        "(§.)*᠅ §.(Gemstone|Mithril|Glacite)( Powder)?(§.)*:?.*$"
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)"
+    )
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f:§695
+     * REGEX-TEST: §d᠅ §fGemstone§f
+     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
+     */
+    val powderGreedyPattern by miningSb.pattern(
+        "powdergreedy",
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$"
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",

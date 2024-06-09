@@ -26,7 +26,6 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
-import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -34,8 +33,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
-import java.util.Timer
-import java.util.TimerTask
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -296,7 +293,7 @@ object LorenzUtils {
             Minecraft.getMinecraft().playerController.windowClick(
                 container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
             )
-            isCanceled = true
+            this.cancel()
         }
     }
 
@@ -308,14 +305,6 @@ object LorenzUtils {
     fun Int.derpy() = if (isDerpy) this / 2 else this
 
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
-
-    fun runDelayed(duration: Duration, runnable: () -> Unit) {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runnable()
-            }
-        }, duration.inWholeMilliseconds)
-    }
 
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
@@ -337,9 +326,6 @@ object LorenzUtils {
 
     inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
 
-    // TODO move to val by lazy
-    fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
-
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
         reason?.let {
@@ -352,8 +338,10 @@ object LorenzUtils {
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
      */
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
     fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
 
+    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun inAdvancedMiningIsland() =

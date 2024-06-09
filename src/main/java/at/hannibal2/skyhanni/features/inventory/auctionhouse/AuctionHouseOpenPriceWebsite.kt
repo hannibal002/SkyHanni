@@ -4,14 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
@@ -19,7 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class AuctionHouseOpenPriceWebsite {
+@SkyHanniModule
+object AuctionHouseOpenPriceWebsite {
 
     private val config get() = SkyHanniMod.feature.inventory.auctions
     private var lastClick = SimpleTimeMark.farPast()
@@ -65,9 +67,9 @@ class AuctionHouseOpenPriceWebsite {
         if (!isEnabled()) return
         if (event.inventory is InventoryPlayer) return
 
-        if (event.slotNumber == 8) {
+        if (event.slot == 8) {
             displayItem?.let {
-                event.replaceWith(it)
+                event.replace(it)
             }
         }
     }
@@ -77,7 +79,7 @@ class AuctionHouseOpenPriceWebsite {
         if (!isEnabled()) return
         displayItem ?: return
         if (event.slotId != 8) return
-        event.isCanceled = true
+        event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
             val url = "https://sky.coflnet.com/api/mod/open/$searchTerm"
             OSUtils.openBrowser(url)

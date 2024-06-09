@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -9,16 +11,19 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -27,7 +32,6 @@ import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,7 +40,7 @@ class HypixelData {
     private val patternGroup = RepoPattern.group("data.hypixeldata")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
-        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
     )
 
     private var lastLocRaw = SimpleTimeMark.farPast()
@@ -45,43 +49,51 @@ class HypixelData {
         private val patternGroup = RepoPattern.group("data.hypixeldata")
         private val serverIdScoreboardPattern by patternGroup.pattern(
             "serverid.scoreboard",
-            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
         )
         private val serverIdTablistPattern by patternGroup.pattern(
             "serverid.tablist",
-            " Server: §r§8(?<serverid>\\S+)"
+            " Server: §r§8(?<serverid>\\S+)",
         )
         private val lobbyTypePattern by patternGroup.pattern(
             "lobbytype",
-            "(?<lobbyType>.*lobby)\\d+"
+            "(?<lobbyType>.*lobby)\\d+",
         )
         private val playerAmountPattern by patternGroup.pattern(
             "playeramount",
-            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
         )
         private val playerAmountCoopPattern by patternGroup.pattern(
             "playeramount.coop",
-            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
         )
         private val playerAmountGuestingPattern by patternGroup.pattern(
             "playeramount.guesting",
-            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
+        )
+
+        /**
+         * REGEX-TEST:           §r§b§lParty §r§f(4)
+         */
+        private val dungeonPartyAmountPattern by patternGroup.pattern(
+            "playeramount.dungeonparty",
+            "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
         )
         private val soloProfileAmountPattern by patternGroup.pattern(
             "solo.profile.amount",
-            "^\\s*(?:§.)*Island\\s*$"
+            "^\\s*(?:§.)*Island\\s*$",
         )
         private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
             "scoreboard.visiting.amount",
-            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)"
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
         )
         private val guestPattern by patternGroup.pattern(
             "guesting.scoreboard",
-            "SKYBLOCK GUEST"
+            "SKYBLOCK GUEST",
         )
         private val scoreboardTitlePattern by patternGroup.pattern(
             "scoreboard.title",
-            "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?",
         )
 
         /**
@@ -90,7 +102,7 @@ class HypixelData {
          */
         private val skyblockAreaPattern by patternGroup.pattern(
             "skyblock.area",
-            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
+            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
         )
 
         var hypixelLive = false
@@ -116,14 +128,14 @@ class HypixelData {
 
         // Data from locraw
         var locrawData: JsonObject? = null
-        private var locraw: MutableMap<String, String> = mutableMapOf(
-            "server" to "",
-            "gametype" to "",
-            "lobbyname" to "",
-            "lobbytype" to "",
-            "mode" to "",
-            "map" to ""
-        )
+        private var locraw: MutableMap<String, String> = listOf(
+            "server",
+            "gametype",
+            "lobbyname",
+            "lobbytype",
+            "mode",
+            "map",
+        ).associateWith { "" }.toMutableMap()
 
         val server get() = locraw["server"] ?: ""
         val gameType get() = locraw["gametype"] ?: ""
@@ -150,20 +162,24 @@ class HypixelData {
             }
 
             ErrorManager.logErrorWithData(
-                Exception("NoServerId"), "Could not find server id",
+                Exception("NoServerId"),
+                "Could not find server id",
                 "islandType" to LorenzUtils.skyBlockIsland,
                 "tablist" to TabListData.getTabList(),
-                "scoreboard" to ScoreboardData.sidebarLinesFormatted
+                "scoreboard" to ScoreboardData.sidebarLinesFormatted,
             )
         }
 
         fun getPlayersOnCurrentServer(): Int {
             var amount = 0
-            val playerPatternList = listOf(
+            val playerPatternList = mutableListOf(
                 playerAmountPattern,
                 playerAmountCoopPattern,
-                playerAmountGuestingPattern
+                playerAmountGuestingPattern,
             )
+            if (DungeonAPI.inDungeon()) {
+                playerPatternList.add(dungeonPartyAmountPattern)
+            }
 
             out@ for (pattern in playerPatternList) {
                 for (line in TabListData.getTabList()) {
@@ -238,8 +254,8 @@ class HypixelData {
         skyBlockAreaWithSymbol = null
     }
 
-    @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    @HandleEvent
+    fun onDisconnect(event: ClientDisconnectEvent) {
         hypixelLive = false
         hypixelAlpha = false
         skyBlock = false
@@ -282,6 +298,7 @@ class HypixelData {
         }
     }
 
+    // TODO rewrite everything in here
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
@@ -290,10 +307,7 @@ class HypixelData {
             // So, as requested by Hannibal, use locraw from
             // NEU and have NEU send it.
             // Remove this when NEU dependency is removed
-            if (LorenzUtils.onHypixel &&
-                locrawData == null &&
-                lastLocRaw.passedSince() > 15.seconds
-            ) {
+            if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
                 lastLocRaw = SimpleTimeMark.now()
                 thread(start = true) {
                     Thread.sleep(1000)
@@ -302,20 +316,20 @@ class HypixelData {
             }
         }
 
-        if (LorenzUtils.inSkyBlock) {
-            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                skyblockAreaPattern.matchMatcher(line) {
-                    val originalLocation = group("area")
-                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
-                    skyBlockAreaWithSymbol = line.trim()
-                    break@loop
+        if (LorenzUtils.onHypixel) {
+            if (LorenzUtils.inSkyBlock) {
+                loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                    skyblockAreaPattern.matchMatcher(line) {
+                        val originalLocation = group("area")
+                        skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                        skyBlockAreaWithSymbol = line.trim()
+                        break@loop
+                    }
                 }
+
+                checkProfileName()
             }
-
-            checkProfileName()
         }
-
-        if (!event.isMod(5)) return
 
         if (!LorenzUtils.onHypixel) {
             checkHypixel()
@@ -326,15 +340,24 @@ class HypixelData {
         }
         if (!LorenzUtils.onHypixel) return
 
+        if (!event.isMod(5)) return
+
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
-            checkIsland()
             checkSidebar()
             checkCurrentServerId()
         }
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+    }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        when (event.widget) {
+            TabWidget.AREA -> checkIsland(event)
+            else -> Unit
+        }
     }
 
     private fun checkProfileName() {
@@ -378,18 +401,23 @@ class HypixelData {
         noTrade = ironman || stranded || bingo
     }
 
-    private fun checkIsland() {
-        var foundIsland = ""
-        TabListData.fullyLoaded = false
+    private fun checkIsland(event: WidgetUpdateEvent) {
+        val islandType: IslandType
+        val foundIsland: String
+        if (event.isClear()) {
 
-        TabListData.getTabList().matchFirst(islandNamePattern) {
-            foundIsland = group("island").removeColor()
+            TabListData.fullyLoaded = false
+            islandType = IslandType.NONE
+            foundIsland = ""
+
+        } else {
             TabListData.fullyLoaded = true
+            // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+            val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
+            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
+            islandType = getIslandType(foundIsland, guesting)
         }
 
-        // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
-        val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-        val islandType = getIslandType(foundIsland, guesting)
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
@@ -399,6 +427,9 @@ class HypixelData {
                 loggerIslandChange.log(islandType.name)
             }
             skyBlockIsland = islandType
+            if (TabListData.fullyLoaded) {
+                TabWidget.reSendEvents()
+            }
         }
     }
 

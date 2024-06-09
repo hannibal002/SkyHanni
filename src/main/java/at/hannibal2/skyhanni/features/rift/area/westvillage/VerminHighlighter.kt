@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -20,15 +21,16 @@ import net.minecraft.entity.monster.EntitySilverfish
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
-class VerminHighlighter {
+@SkyHanniModule
+object VerminHighlighter {
     private val config get() = RiftAPI.config.area.westVillage.verminHighlight
 
-    private val checkedEntites = TimeLimitedSet<Int>(1.minutes)
+    private val checkedEntities = TimeLimitedSet<Int>(1.minutes)
 
     // TODO repo
-    private val fly =
+    private const val FLY_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTMwYWMxZjljNjQ5Yzk5Y2Q2MGU0YmZhNTMzNmNjMTg1MGYyNzNlYWI5ZjViMGI3OTQwZDRkNGQ3ZGM4MjVkYyJ9fX0="
-    private val spider =
+    private const val SPIDER_TEXTURE =
         "ewogICJ0aW1lc3RhbXAiIDogMTY1MDU1NjEzMTkxNywKICAicHJvZmlsZUlkIiA6ICI0ODI5MmJkMjI1OTc0YzUwOTZiMTZhNjEyOGFmMzY3NSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLVVJPVE9ZVEIyOCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84ZmRmNjJkNGUwM2NhNTk0YzhjZDIxZGQxNzUzMjdmMWNmNzdjNGJjMDU3YTA5NTk2MDNkODNhNjhiYTI3MDA4IgogICAgfQogIH0KfQ=="
 
     @SubscribeEvent
@@ -37,8 +39,8 @@ class VerminHighlighter {
 
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
             val id = entity.entityId
-            if (id in checkedEntites) continue
-            checkedEntites.add(id)
+            if (id in checkedEntities) continue
+            checkedEntities.add(id)
 
             if (!isVermin(entity)) continue
             val color = config.color.get().toChromaColor().withAlpha(60)
@@ -50,12 +52,12 @@ class VerminHighlighter {
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.color) {
             // running setEntityColorWithNoHurtTime() again
-            checkedEntites.clear()
+            checkedEntities.clear()
         }
     }
 
     private fun isVermin(entity: EntityLivingBase): Boolean = when (entity) {
-        is EntityArmorStand -> entity.hasSkullTexture(fly) || entity.hasSkullTexture(spider)
+        is EntityArmorStand -> entity.hasSkullTexture(FLY_TEXTURE) || entity.hasSkullTexture(SPIDER_TEXTURE)
         is EntitySilverfish -> entity.baseMaxHealth == 8
 
         else -> false

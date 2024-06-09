@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -20,7 +22,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -28,6 +29,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object EnigmaSoulWaypoints {
 
     private val config get() = RiftAPI.config.enigmaSoulWaypoints
@@ -53,8 +55,8 @@ object EnigmaSoulWaypoints {
         if (!isEnabled()) return
 
         if (inventoryUnfound.isEmpty()) return
-        if (event.inventory is ContainerLocalMenu && inInventory && event.slotNumber == 31) {
-            event.replaceWith(item)
+        if (event.inventory is ContainerLocalMenu && inInventory && event.slot == 31) {
+            event.replace(item)
         }
     }
 
@@ -145,9 +147,9 @@ object EnigmaSoulWaypoints {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
-        val areas = data.areas ?: error("'areas' is null in EnigmaSouls!")
+        val areas = data.areas
         soulLocations = buildMap {
-            for ((area, locations) in areas) {
+            for ((_, locations) in areas) {
                 for (location in locations) {
                     this[location.name] = location.position
                 }

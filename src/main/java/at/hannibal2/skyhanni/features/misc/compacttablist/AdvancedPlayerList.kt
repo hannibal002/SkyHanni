@@ -11,13 +11,14 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,6 +27,7 @@ import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object AdvancedPlayerList {
 
     val tabPlayerData = mutableMapOf<String, PlayerData>()
@@ -197,7 +199,7 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
-        ContributorManager.getTabListSuffix(data.name)?.let {
+        ContributorManager.getSuffix(data.name)?.let {
             suffix += " $it"
         }
 
@@ -210,14 +212,8 @@ object AdvancedPlayerList {
 
     private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
-    private fun getRandomOrder(name: String): Int {
-        val saved = randomOrderCache.getOrNull(name)
-        if (saved != null) {
-            return saved
-        }
-        val r = (Random.nextDouble() * 500).toInt()
-        randomOrderCache.put(name, r)
-        return r
+    private fun getRandomOrder(name: String) = randomOrderCache.getOrPut(name) {
+        (Random.nextDouble() * 500).toInt()
     }
 
     private fun getSocialIcon(name: String) = when {
