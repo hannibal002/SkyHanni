@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -203,7 +204,7 @@ object HoppityEggLocator {
         lastParticlePosition = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -39,7 +41,7 @@ object DungeonHighlightClickedBlocks {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
         if (!DungeonAPI.inDungeon()) return

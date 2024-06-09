@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
@@ -355,7 +356,7 @@ object GriffinBurrowHelper {
         event.move(2, "diana", "event.diana")
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 

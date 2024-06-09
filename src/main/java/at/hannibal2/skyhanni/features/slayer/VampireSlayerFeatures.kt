@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.EntityClickEvent
@@ -197,7 +198,7 @@ object VampireSlayerFeatures {
         return toChromaColor().withAlpha(config.withAlpha)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return

@@ -212,7 +212,7 @@ object GardenAPI {
 
     private var lastLocation: LorenzVec? = null
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
         if (!inGarden()) return
 
