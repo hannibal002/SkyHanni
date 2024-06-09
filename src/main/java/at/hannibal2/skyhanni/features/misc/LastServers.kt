@@ -26,17 +26,15 @@ object LastServers {
         DelayedRun.runDelayed(5.seconds) {
             val serverId = HypixelData.serverId ?: return@runDelayed
 
-            val lastTime = lastServers[serverId]?.passedSince()
-            if (lastTime != null) {
-                if (lastTime <= config.warnTime.seconds) {
-                    ChatUtils.chat("§7You joined this server §e${lastTime.format()}§7 ago.")
-                }
+            lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
+
+            lastServers[serverId]?.passedSince()?.let {
+                ChatUtils.chat("§7You joined this server §e${it.format()}§7 ago.")
             }
 
             ChatUtils.debug("Adding $serverId to last servers.")
 
             lastServers[serverId] = SimpleTimeMark.now()
-            lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
         }
     }
 
