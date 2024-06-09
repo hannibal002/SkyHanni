@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -130,10 +132,13 @@ public class ProfileSpecificStorage {
         public String targetName = null;
 
         @Expose
-        public Map<String, Integer> rabbitCounts = new HashMap();
+        public Map<String, Integer> rabbitCounts = new HashMap<>();
 
         @Expose
-        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap();
+        public Map<String, HoppityCollectionStats.LocationRabbit> locationRabbitRequirements = new HashMap<>();
+
+        @Expose
+        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap<>();
 
         @Expose
         public Integer hoppityShopYearOpened = null;
@@ -373,7 +378,7 @@ public class ProfileSpecificStorage {
             public int plotsUnlocked = -1;
 
             @Expose
-            public long cakeExpiring = -1L;
+            public SimpleTimeMark cakeExpiring = null;
 
             @Expose
             public Map<CropType, Boolean> carrolyn = new HashMap<>();
