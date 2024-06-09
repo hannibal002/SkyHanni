@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomLinesGui
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -66,6 +67,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
+import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -531,6 +533,10 @@ object Commands {
             "Add all ever found burrow locations from clipboard"
         ) { AllBurrowsList.addFromClipboard() }
         registerCommand(
+            "shgraph",
+            "Enables the graph editor"
+        ) { GraphEditor.commandIn() }
+        registerCommand(
             "shtoggleegglocationdebug",
             "Shows Hoppity egg locations with their internal API names and status."
         ) { HoppityEggLocations.toggleDebug() }
@@ -538,6 +544,7 @@ object Commands {
 
     private fun internalCommands() {
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
+        registerCommand("shcustomlines", "Opens the config list for modifying custom lines") { openCustomLines() }
     }
 
     private fun shortenedCommands() {
@@ -565,6 +572,15 @@ object Commands {
         } else {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
+        }
+    }
+
+    @JvmStatic
+    fun openCustomLines() {
+        if (!LorenzUtils.onHypixel) {
+            ChatUtils.userError("You need to join Hypixel to use this feature!")
+        } else {
+            SkyHanniMod.screenToOpen = CustomLinesGui()
         }
     }
 

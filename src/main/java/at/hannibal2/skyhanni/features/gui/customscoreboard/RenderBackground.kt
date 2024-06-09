@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11
 
 class RenderBackground {
 
-    fun renderBackground() {
+    internal fun renderBackground() {
         val alignmentConfig = CustomScoreboard.alignmentConfig
         val backgroundConfig = CustomScoreboard.backgroundConfig
         val outlineConfig = backgroundConfig.outline

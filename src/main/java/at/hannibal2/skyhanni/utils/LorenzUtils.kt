@@ -15,10 +15,12 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -351,6 +353,16 @@ object LorenzUtils {
         || inAdvancedMiningIsland()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+
+    private var lastGuiTime = SimpleTimeMark.farPast()
+
+    fun isAnyGuiActive(): Boolean {
+        val gui = Minecraft.getMinecraft().currentScreen != null
+        if (gui) {
+            lastGuiTime = 3.ticks.fromNow()
+        }
+        return !lastGuiTime.isInPast()
+    }
 
     fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)

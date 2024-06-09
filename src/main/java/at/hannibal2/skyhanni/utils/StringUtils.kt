@@ -381,6 +381,12 @@ object StringUtils {
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
+    fun String.insert(pos: Int, chars: CharSequence): String =
+        this.substring(0, pos) + chars + this.substring(pos)
+
+    fun String.insert(pos: Int, char: Char): String =
+        this.substring(0, pos) + char + this.substring(pos)
+
     fun replaceIfNeeded(
         original: ChatComponentText,
         newText: String,

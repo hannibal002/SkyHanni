@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
+import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
@@ -11,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
@@ -40,6 +43,41 @@ object CustomScoreboardUtils {
     }
 
     internal fun String.formatNum() = this.formatDouble().formatNum()
+
+    internal fun getPurse() = PurseAPI.currentPurse.formatNum()
+
+    internal fun getMotes() =
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes").formatNum()
+
+    internal fun getBank() =
+        getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank").formatNum()
+
+    internal fun getBits() = BitsAPI.bits.coerceAtLeast(0).formatNum()
+
+    internal fun getBitsAvailable() = BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
+
+    internal fun getBitsLine() = if (displayConfig.showUnclaimedBits) {
+        "§b${getBits()}§7/§b${getBitsAvailable()}"
+    } else {
+        "§b${getBits()}"
+    }
+
+    internal fun getCopper() =
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper").formatNum()
+
+    internal fun getGems() =
+        getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems").formatNum()
+
+    internal fun getHeat() =
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.heatPattern, "heat").formatNum()
+
+    internal fun getNorthStars() =
+        getGroupFromPattern(
+            ScoreboardData.sidebarLinesFormatted,
+            ScoreboardPattern.northstarsPattern,
+            "northstars"
+        ).formatNum()
+
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
 }
