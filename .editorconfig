@@ -26,7 +26,7 @@ ij_java_class_count_to_use_import_on_demand = 2147483647
 ij_java_packages_to_use_import_on_demand = 2147483647
 
 [*.kt]
-ktlint_code_style=intellij_idea
+ktlint_code_style = intellij_idea
 
 # Kotlin files should not use wildcard imports
 ij_kotlin_name_count_to_use_star_import = 2147483647
