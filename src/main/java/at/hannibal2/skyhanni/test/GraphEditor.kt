@@ -120,7 +120,6 @@ object GraphEditor {
         }
     }
 
-
     private fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
             ChatUtils.chat(text)
@@ -222,13 +221,7 @@ object GraphEditor {
             return
         }
         if (config.saveKey.isKeyClicked()) {
-            if (nodes.isEmpty()) {
-                ChatUtils.chat("Copied nothing since the graph is empty.")
-                return
-            }
-            val json = compileGraph().toJson()
-            OSUtils.copyToClipboard(json)
-            ChatUtils.chat("Copied Graph to Clipboard.")
+            save()
             return
         }
         if (config.loadKey.isKeyClicked()) {
@@ -293,6 +286,23 @@ object GraphEditor {
         if (config.tutorialKey.isKeyClicked()) {
             inTutorialMode = !inTutorialMode
             ChatUtils.chat("Tutorial mode is now ${if (inTutorialMode) "active" else "inactive"}.")
+        }
+    }
+
+    private fun save() {
+        if (nodes.isEmpty()) {
+            ChatUtils.chat("Copied nothing since the graph is empty.")
+            return
+        }
+        val json = compileGraph().toJson()
+        OSUtils.copyToClipboard(json)
+        ChatUtils.chat("Copied Graph to Clipboard.")
+        if (config.showsStats) {
+            ChatUtils.chat(
+                "§lStats\n§r§eNodes: ${nodes.size}\nEdges: ${edges.size}\nLength: ${
+                    edges.sumOf { it.node1.position.distance(it.node2.position) }
+                }",
+            )
         }
     }
 

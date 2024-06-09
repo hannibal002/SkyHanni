@@ -79,4 +79,9 @@ public class GraphConfig {
     @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
     public Position infoDisplay = new Position(20, 20);
+
+    @Expose
+    @ConfigOption(name = "Shows Stats", desc = "Shows funny extra statistics on save. May lag the game a bit.")
+    @ConfigEditorBoolean
+    public boolean showsStats = true;
 }
