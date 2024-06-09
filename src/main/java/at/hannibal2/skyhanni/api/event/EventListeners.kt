@@ -60,10 +60,5 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
     fun getListeners(): List<Listener> = listeners
 
-    class Listener(
-        val name: String,
-        val invoker: Consumer<Any>,
-        val options: HandleEvent,
-        val generic: Class<*>?
-    )
+    class Listener(val name: String, val invoker: Consumer<Any>, val options: HandleEvent, val generic: Class<*>?)
 }
