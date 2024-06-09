@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.core.config;
+package at.hannibal2.skyhanni.config.core.config
 
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 
-class PositionList() : MutableList<Position>, ArrayList<Position>() {
+class PositionList() : ArrayList<Position>(), MutableList<Position> {
 
     constructor(init: Collection<Position>) : this() {
         this.addAll(init)

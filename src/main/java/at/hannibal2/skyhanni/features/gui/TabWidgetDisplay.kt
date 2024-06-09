@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -54,7 +54,8 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
             if (config?.displayPositions == null) return
             config.display.forEach { widget ->
                 widget.position.renderStrings(
-                    widget.widgets.flatMap { it.lines }, posLabel = "Display Widget: ${widget.name}"
+                    widget.widgets.flatMap { it.lines },
+                    posLabel = "Display Widget: ${widget.name}",
                 )
             }
         }
@@ -68,7 +69,7 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
                 ErrorManager.skyHanniError(
                     "Invalid State of config.displayPositions",
                     "Display" to TabWidgetDisplay.entries,
-                    "Positions" to config.displayPositions
+                    "Positions" to config.displayPositions,
                 )
             } else {
                 config.displayPositions.addAll(generateSequence { Position() }.take(sizeDiff))
