@@ -564,16 +564,15 @@ object CustomWardrobe {
         update()
     }
 
-    private fun WardrobeAPI.WardrobeSlot.getSlotColor() =
-        with(config.color) {
-            when {
-                isCurrentSlot() -> equippedColor
-                favorite -> favoriteColor
-                else -> null
-            }?.toChromaColor()?.transformIf({ isInCurrentPage() }) { darker() }
-                ?: (if (!isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
-                    .transformIf({ locked || isEmpty() }) { darker() }.addAlpha(100)
-        }
+    private fun WardrobeAPI.WardrobeSlot.getSlotColor() = with(config.color) {
+        when {
+            isCurrentSlot() -> equippedColor
+            favorite -> favoriteColor
+            else -> null
+        }?.toChromaColor()?.transformIf({ isInCurrentPage() }) { darker() }
+            ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
+                .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
+    }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && inWardrobe() && config.enabled
 }
