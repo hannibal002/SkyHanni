@@ -49,7 +49,7 @@ object MayorAPI {
     // TODO: Add Regex-test
     val foxyExtraEventPattern by group.pattern(
         "foxy.extraevent",
-        "Schedules an extra §.(?<event>.*) §.event during the year\\."
+        "Schedules an extra §.(?<event>.*) §.event during the year\\.",
     )
 
     /**
@@ -57,7 +57,7 @@ object MayorAPI {
      */
     private val electionOverPattern by group.pattern(
         "election.over",
-        "§eThe election room is now closed\\. Clerk Seraphine is doing a final count of the votes\\.\\.\\."
+        "§eThe election room is now closed\\. Clerk Seraphine is doing a final count of the votes\\.\\.\\.",
     )
 
     /**
@@ -65,7 +65,7 @@ object MayorAPI {
      */
     private val calendarGuiPattern by group.pattern(
         "calendar.gui",
-        "Calendar and Events"
+        "Calendar and Events",
     )
 
     /**
@@ -73,7 +73,7 @@ object MayorAPI {
      */
     private val jerryHeadPattern by group.pattern(
         "jerry.head",
-        "§dMayor Jerry"
+        "§dMayor Jerry",
     )
 
     /**
@@ -81,7 +81,7 @@ object MayorAPI {
      */
     private val perkpocalypsePerksPattern by group.pattern(
         "perkpocalypse",
-        "§9Perkpocalypse Perks:"
+        "§9Perkpocalypse Perks:",
     )
 
     var currentMayor: Mayor? = null
@@ -89,7 +89,7 @@ object MayorAPI {
     private var lastMayor: Mayor? = null
     var jerryExtraMayor: Pair<Mayor?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
         private set
-    var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
+    private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
     private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
@@ -128,7 +128,7 @@ object MayorAPI {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor has expired! Click here to update the new temporary Mayor.",
-                onClick = { HypixelCommands.calendar() }
+                onClick = { HypixelCommands.calendar() },
             )
         }
         if (Mayor.JERRY.isActive() && jerryExtraMayor.first == null && SkyHanniMod.feature.misc.unknownPerkpocalypseMayorWarning) {
@@ -137,7 +137,7 @@ object MayorAPI {
             lastJerryExtraMayorReminder = SimpleTimeMark.now()
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
-                onClick = { HypixelCommands.calendar() }
+                onClick = { HypixelCommands.calendar() },
             )
         }
     }
@@ -162,14 +162,17 @@ object MayorAPI {
             event.inventoryItems.values.firstOrNull { jerryHeadPattern.matches(it.displayName) } ?: return
 
         stack.getLore().nextAfter(
-            { perkpocalypsePerksPattern.matches(it) }
+            { perkpocalypsePerksPattern.matches(it) },
         )?.let { perk ->
             // This is one Perk of the Perkpocalypse Mayor
             val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
             val lastMayorTimestamp = nextMayorTimestamp - SKYBLOCK_YEAR_MILLIS.milliseconds
 
-            val expireTime = (1..21).map { lastMayorTimestamp + (6.hours * it) }.first { it.isInFuture() }
+            val expireTime = (1..21)
+                .map { lastMayorTimestamp + (6.hours * it) }
+                .firstOrNull { it.isInFuture() }
+                ?.coerceAtMost(nextMayorTimestamp) ?: return
 
             ChatUtils.debug("Jerry Mayor found: ${jerryMayor.name} expiring at: ${expireTime.timeUntil()}")
 
