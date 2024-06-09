@@ -117,7 +117,6 @@ object GardenVisitorCompactChat {
     }
 
     private fun compactChat(event: LorenzChatEvent) {
-        if (!VisitorAPI.config.compactRewardChat) return
         event.blockedReason = "compact_visitor"
         visitorAcceptedChat.add(event.message)
         if (visitorAcceptedChat.size == 3) {
