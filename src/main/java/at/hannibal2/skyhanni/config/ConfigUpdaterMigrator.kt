@@ -12,7 +12,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 47
+    const val CONFIG_VERSION = 49
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -111,6 +111,7 @@ object ConfigUpdaterMigrator {
         val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lastVersion > CONFIG_VERSION) {
             logger.log("Attempted to downgrade config version")
+            config.add("lastVersion", JsonPrimitive(CONFIG_VERSION))
             return config
         }
         if (lastVersion == CONFIG_VERSION) return config

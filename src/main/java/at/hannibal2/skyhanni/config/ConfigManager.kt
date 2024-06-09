@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -128,7 +129,7 @@ class ConfigManager {
             }
             val configLink = field.getAnnotation(ConfigLink::class.java)
             if (configLink == null) {
-                if (LorenzUtils.isInDevEnvironment()) {
+                if (PlatformUtils.isDevEnvironment) {
                     var name = "${field.declaringClass.name}.${field.name}"
                     name = name.replace("at.hannibal2.skyhanni.config.", "")
                     if (name !in ignoredMissingConfigLinks) {
@@ -176,7 +177,7 @@ class ConfigManager {
                     val jsonObject = lenientGson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }
-                    if (LorenzUtils.isInDevEnvironment()) {
+                    if (PlatformUtils.isDevEnvironment) {
                         try {
                             run()
                         } catch (e: Throwable) {

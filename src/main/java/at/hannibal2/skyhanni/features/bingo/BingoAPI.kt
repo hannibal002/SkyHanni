@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -18,10 +20,11 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
+@SkyHanniModule
 object BingoAPI {
 
     private var ranks = mapOf<String, Int>()
-    private var data: Map<String, BingoJson.BingoData> = emptyMap()
+    private var data: Map<String, BingoData> = emptyMap()
 
     val bingoGoals get() = bingoStorage.goals
     val personalGoals get() = bingoGoals.values.filter { it.type == GoalType.PERSONAL }
@@ -67,7 +70,7 @@ object BingoAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         ranks = event.getConstant<BingoRanksJson>("BingoRanks").ranks
-        data = event.getConstant<BingoJson>("Bingo").bingo_tips
+        data = event.getConstant<BingoJson>("Bingo").bingoTips
     }
 
     fun getRankFromScoreboard(text: String) = if (detectionPattern.matches(text)) getRank(text) else null
@@ -82,7 +85,7 @@ object BingoAPI {
     fun getData(itemName: String) =
         data.filter { itemName.startsWith(it.key.split(" (Community Goal)")[0]) }.values.firstOrNull()
 
-    fun BingoGoal.getData(): BingoJson.BingoData? = if (type == GoalType.COMMUNITY) {
+    fun BingoGoal.getData(): BingoData? = if (type == GoalType.COMMUNITY) {
         getData(displayName)
     } else {
         data[displayName]
