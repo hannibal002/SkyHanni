@@ -148,7 +148,7 @@ object GraphEditor {
             node.position,
             node.name!!,
             0.8,
-            ignoreBlocks = seeThroughBlocks,
+            ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
