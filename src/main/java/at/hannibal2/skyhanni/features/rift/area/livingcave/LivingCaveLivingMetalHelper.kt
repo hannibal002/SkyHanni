@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -23,7 +24,7 @@ object LivingCaveLivingMetalHelper {
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var startTime = 0L
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.clickType == ClickType.LEFT_CLICK) {

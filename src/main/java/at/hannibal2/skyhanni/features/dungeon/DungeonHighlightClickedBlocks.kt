@@ -44,7 +44,6 @@ object DungeonHighlightClickedBlocks {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onBlockClick(event: BlockClickEvent) {
         if (!SkyHanniMod.feature.dungeon.highlightClickedBlocks) return
-        if (!DungeonAPI.inDungeon()) return
         if (DungeonAPI.inBossRoom) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
