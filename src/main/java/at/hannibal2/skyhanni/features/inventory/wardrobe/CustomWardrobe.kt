@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object CustomWardrobe {
 
-    private val config get() = SkyHanniMod.feature.inventory.customWardrobe
+    val config get() = SkyHanniMod.feature.inventory.customWardrobe
 
     private var displayRenderable: Renderable? = null
     private var inventoryButton: Renderable? = null
