@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDrops
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -54,12 +54,12 @@ object DianaProfitTracker {
         @Expose
         var burrowsDug: Long = 0
 
-        override fun getDescription(timesDropped: Long): List<String> {
-            val percentage = timesDropped.toDouble() / burrowsDug
+        override fun getDescription(timesGained: Long): List<String> {
+            val percentage = timesGained.toDouble() / burrowsDug
             val perBurrow = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
 
             return listOf(
-                "§7Dropped §e${timesDropped.addSeparators()} §7times.",
+                "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop chance per burrow: §c$perBurrow",
             )
         }
@@ -148,7 +148,7 @@ object DianaProfitTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
+        allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }
 
     fun resetCommand() {

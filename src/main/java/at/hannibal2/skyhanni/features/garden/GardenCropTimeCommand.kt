@@ -41,7 +41,7 @@ object GardenCropTimeCommand {
             val internalName = entry.key
             val itemName = internalName.itemName
             if (itemName.removeColor().lowercase().contains(searchName)) {
-                val (baseId, baseAmount) = NEUItems.getMultiplier(internalName)
+                val (baseId, baseAmount) = NEUItems.getPrimitiveMultiplier(internalName)
                 val baseName = baseId.itemName
                 val crop = CropType.getByName(baseName.removeColor())
 

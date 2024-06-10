@@ -19,7 +19,7 @@ object AshfangHideDamageIndicator {
         if (!isEnabled()) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

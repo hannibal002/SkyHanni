@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -160,7 +160,7 @@ object CropMoneyDisplay {
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
-                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160 else (bazaarData.sellPrice + bazaarData.buyPrice) / 320
+                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160 else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
                 extraDicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
@@ -343,8 +343,8 @@ object CropMoneyDisplay {
             val bazaarData = internalName.getBazaarData() ?: continue
 
             var npcPrice = internalName.getNpcPrice() * cropsPerHour
-            var sellOffer = bazaarData.buyPrice * cropsPerHour
-            var instantSell = bazaarData.sellPrice * cropsPerHour
+            var sellOffer = bazaarData.sellOfferPrice * cropsPerHour
+            var instantSell = bazaarData.instantBuyPrice * cropsPerHour
             if (debug) {
                 debugList.addAsSingletonList(" npcPrice: ${npcPrice.addSeparators()}")
                 debugList.addAsSingletonList(" sellOffer: ${sellOffer.addSeparators()}")
@@ -361,10 +361,10 @@ object CropMoneyDisplay {
                         if (debug) {
                             debugList.addAsSingletonList(" added seedsPerHour: $seedsPerHour")
                         }
-                        val factor = NEUItems.getMultiplier(internalName).second
+                        val factor = NEUItems.getPrimitiveMultiplier(internalName).amount
                         npcPrice += "SEEDS".asInternalName().getNpcPrice() * seedsPerHour / factor
-                        sellOffer += it.buyPrice * seedsPerHour
-                        instantSell += it.sellPrice * seedsPerHour
+                        sellOffer += it.sellOfferPrice * seedsPerHour
+                        instantSell += it.instantBuyPrice * seedsPerHour
                     }
                 }
             }
@@ -421,7 +421,7 @@ object CropMoneyDisplay {
                 val internalName = rawInternalName.asInternalName()
                 if (!internalName.isBazaarItem()) continue
 
-                val (newId, amount) = NEUItems.getMultiplier(internalName)
+                val (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName)
                 val itemName = newId.itemNameWithoutColor
                 val crop = getByNameOrNull(itemName)
                 crop?.let {
