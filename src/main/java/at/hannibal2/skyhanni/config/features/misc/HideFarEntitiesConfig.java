@@ -27,4 +27,9 @@ public class HideFarEntitiesConfig {
     @ConfigOption(name = "Exclude Garden", desc = "Disable this feature while in the Garden.")
     @ConfigEditorBoolean
     public boolean excludeGarden = false;
+
+    @Expose
+    @ConfigOption(name = "Exclude Dungeon", desc = "Disable this feature while in Dungeon.")
+    @ConfigEditorBoolean
+    public boolean excludeDungeon = false;
 }

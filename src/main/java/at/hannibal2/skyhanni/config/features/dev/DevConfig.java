@@ -109,6 +109,10 @@ public class DevConfig {
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
     @Expose
+    @Category(name = "Dev Tools", desc = "Tooling for devs")
+    public DevToolConfig devTool = new DevToolConfig();
+
+    @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     public DebugMobConfig mobDebug = new DebugMobConfig();
 

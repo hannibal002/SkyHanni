@@ -99,6 +99,12 @@ public class ChocolateFactoryConfig {
     public boolean showDuplicateTime = false;
 
     @Expose
+    @ConfigOption(name = "Stray Rabbit Time", desc = "Show the production time of chocolate gained from stray rabbits.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showStrayTime = false;
+
+    @Expose
     @ConfigOption(name = "Time Tower Usage Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean

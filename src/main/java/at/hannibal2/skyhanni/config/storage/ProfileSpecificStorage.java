@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
+import at.hannibal2.skyhanni.utils.GenericWrapper;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
@@ -50,6 +52,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class ProfileSpecificStorage {
+
+    private static SimpleTimeMark SimpleTimeMarkFarPast() {
+        return GenericWrapper.getSimpleTimeMark(SimpleTimeMark.farPast()).getIt();
+    }
 
     @Expose
     public String currentPet = "";
@@ -86,10 +92,10 @@ public class ProfileSpecificStorage {
         public int timeTowerLevel = 0;
 
         @Expose
-        public long currentTimeTowerEnds = 0;
+        public SimpleTimeMark currentTimeTowerEnds = SimpleTimeMarkFarPast();
 
         @Expose
-        public long nextTimeTower = 0;
+        public SimpleTimeMark nextTimeTower = SimpleTimeMarkFarPast();
 
         @Expose
         public int currentTimeTowerUses = -1;
@@ -104,20 +110,21 @@ public class ProfileSpecificStorage {
         public boolean hasMuRabbit = false;
 
         @Expose
-        public long bestUpgradeAvailableAt = 0;
+        public SimpleTimeMark bestUpgradeAvailableAt = SimpleTimeMarkFarPast();
 
         @Expose
         public long bestUpgradeCost = 0;
 
         @Expose
-        public long lastDataSave = 0;
+        public SimpleTimeMark lastDataSave = SimpleTimeMarkFarPast();
 
         @Expose
         public PositionChange positionChange = new PositionChange();
 
         public static class PositionChange {
             @Expose
-            public Long lastTime = null;
+            @Nullable
+            public SimpleTimeMark lastTime = null;
 
             @Expose
             public int lastPosition = -1;
@@ -184,7 +191,8 @@ public class ProfileSpecificStorage {
         public int bitsAvailable = -1;
 
         @Expose
-        public Long boosterCookieExpiryTime = null;
+        @Nullable
+        public SimpleTimeMark boosterCookieExpiryTime = null;
     }
 
     @Expose
@@ -195,6 +203,7 @@ public class ProfileSpecificStorage {
         @Expose
         public String displayName = "";
 
+        // TODO use SimpleTimeMark
         @Expose
         public long lastClicked = -1;
 
@@ -213,7 +222,8 @@ public class ProfileSpecificStorage {
     public static class BeaconPowerStorage {
 
         @Expose
-        public Long beaconPowerExpiryTime = null;
+        @Nullable
+        public SimpleTimeMark beaconPowerExpiryTime = null;
 
         @Expose
         public String boostedStat = null;
@@ -268,16 +278,16 @@ public class ProfileSpecificStorage {
         public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();
 
         @Expose
-        public long informedAboutLowMatter = 0;
+        public SimpleTimeMark informedAboutLowMatter = SimpleTimeMarkFarPast();
 
         @Expose
-        public long informedAboutLowFuel = 0;
+        public SimpleTimeMark informedAboutLowFuel = SimpleTimeMarkFarPast();
 
         @Expose
         public long visitorInterval = 15 * 60_000L;
 
         @Expose
-        public long nextSixthVisitorArrival = 0;
+        public SimpleTimeMark nextSixthVisitorArrival = SimpleTimeMarkFarPast();
 
         @Expose
         public ArmorDropTracker.Data armorDropTracker = new ArmorDropTracker.Data();
@@ -389,10 +399,10 @@ public class ProfileSpecificStorage {
         }
 
         @Expose
-        public long composterEmptyTime = 0;
+        public SimpleTimeMark composterEmptyTime = SimpleTimeMarkFarPast();
 
         @Expose
-        public long lastComposterEmptyWarningTime = 0;
+        public SimpleTimeMark lastComposterEmptyWarningTime = SimpleTimeMarkFarPast();
 
         @Expose
         public GardenStorage.FarmingWeightConfig farmingWeight = new GardenStorage.FarmingWeightConfig();
@@ -631,6 +641,18 @@ public class ProfileSpecificStorage {
 
     @Expose
     public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
+
+    @Expose
+    public WardrobeStorage wardrobe = new WardrobeStorage();
+
+    public static class WardrobeStorage {
+        @Expose
+        public Map<Integer, WardrobeAPI.WardrobeData> data = new HashMap<>();
+
+        @Expose
+        @Nullable
+        public Integer currentSlot = null;
+    }
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
