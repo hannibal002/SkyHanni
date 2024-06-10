@@ -258,8 +258,9 @@ private fun isHardStoneHollows(state: IBlockState): Boolean {
 }
 
 private fun isHardstoneGlacite(state: IBlockState): Boolean {
-    return ((state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) ||
-        state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY)
+    return (
+        (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) ||
+            state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY)
 }
 
 private fun isRedSand(state: IBlockState): Boolean {

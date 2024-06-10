@@ -91,8 +91,12 @@ object MiningAPI {
         IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(LorenzUtils.skyBlockArea)
 
     fun inCustomMiningIsland() = inAnyIsland(
-        IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.CRYSTAL_HOLLOWS,
-        IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.SPIDER_DEN
+        IslandType.DWARVEN_MINES,
+        IslandType.MINESHAFT,
+        IslandType.CRYSTAL_HOLLOWS,
+        IslandType.THE_END,
+        IslandType.CRIMSON_ISLE,
+        IslandType.SPIDER_DEN,
     )
 
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)

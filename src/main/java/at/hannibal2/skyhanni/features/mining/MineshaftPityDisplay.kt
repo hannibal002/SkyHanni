@@ -115,8 +115,8 @@ object MineshaftPityDisplay {
             minedBlocks.forEach {
                 hover.add(
                     "    §7${it.pityBlock.displayName} mined: " +
-                        "§e${it.blocksBroken.addSeparators()} [+${it.efficientMiner.addSeparators()} efficient miner] " +
-                        "§6(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})"
+                        "§e${it.blocksBroken.addSeparators()} [+${it.efficientMiner.addSeparators()} efficient miner]" +
+                        " §6(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})",
                 )
             }
             hover.add("")
@@ -178,9 +178,10 @@ object MineshaftPityDisplay {
                     Renderable.horizontalContainer(
                         listOf(
                             Renderable.horizontalContainer(iconsList),
-                            Renderable.string("§b${pityCounter / multiplier}")
-                        ), 2
-                    )
+                            Renderable.string("§b${pityCounter / multiplier}"),
+                        ),
+                        2,
+                    ),
                 )
             }
         }
@@ -203,7 +204,9 @@ object MineshaftPityDisplay {
             put(MineshaftPityLines.COUNTER, Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"))
             put(
                 MineshaftPityLines.CHANCE,
-                Renderable.string("§3Chance: §e1§6/§e${chance.round(1)} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)")
+                Renderable.string(
+                    "§3Chance: §e1§6/§e${chance.round(1)} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
+                ),
             )
             put(MineshaftPityLines.NEEDED_TO_PITY, neededToPityRenderable)
             put(
@@ -212,7 +215,9 @@ object MineshaftPityDisplay {
             )
             put(
                 MineshaftPityLines.AVERAGE_BLOCKS_MINESHAFT,
-                Renderable.string("§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}")
+                Renderable.string(
+                    "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
+                ),
             )
         }
 

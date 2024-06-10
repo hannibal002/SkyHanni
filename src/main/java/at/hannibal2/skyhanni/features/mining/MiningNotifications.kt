@@ -83,7 +83,10 @@ object MiningNotifications {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
         }
-        if (MiningAPI.inMineshaft() && config.getAscensionRope && event.cold >= config.coldAmount && !hasSentAscensionRope) {
+        if (
+            MiningAPI.inMineshaft() && config.getAscensionRope && event.cold >= config.coldAmount &&
+            !hasSentAscensionRope
+        ) {
             hasSentAscensionRope = true
             DelayedRun.runDelayed(0.5.seconds) {
                 GetFromSackAPI.getFromChatMessageSackItems(ASCENSION_ROPE)

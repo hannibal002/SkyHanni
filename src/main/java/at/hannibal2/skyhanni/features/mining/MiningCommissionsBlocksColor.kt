@@ -248,8 +248,8 @@ object MiningCommissionsBlocksColor {
         companion object {
 
             fun CommissionBlock.onColor(state: IBlockState): IBlockState {
-                return if (this.oreType.isGemstone()) glass(state, this.highlight)
-                else block(state, this.highlight)
+                return if (oreType.isGemstone()) glass(state, highlight)
+                else block(state, highlight)
             }
 
         }
