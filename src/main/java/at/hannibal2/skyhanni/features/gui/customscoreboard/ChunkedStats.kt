@@ -30,7 +30,7 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardElement.PURSE.showWhen()
         },
-        "§6Purse"
+        "§6Purse",
     ),
     MOTES(
         {
@@ -39,7 +39,7 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && getMotes() == "0") && ScoreboardElement.MOTES.showWhen()
         },
-        "§dMotes"
+        "§dMotes",
     ),
     BANK(
         {
@@ -48,15 +48,16 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && ScoreboardElement.BANK.showWhen()
         },
-        "§6Bank"
+        "§6Bank",
     ),
     BITS(
         {
             getBitsLine()
-        }, {
+        },
+        {
             !(hideEmptyLines && getBits() == "0" && getBitsAvailable() == "0") && ScoreboardElement.BITS.showWhen()
         },
-        "§bBits"
+        "§bBits",
     ),
     COPPER(
         {
@@ -65,7 +66,7 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && getCopper() == "0") && ScoreboardElement.COPPER.showWhen()
         },
-        "§cCopper"
+        "§cCopper",
     ),
     GEMS(
         {
@@ -74,7 +75,7 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && getGems() == "0") && ScoreboardElement.GEMS.showWhen()
         },
-        "§aGems"
+        "§aGems",
     ),
     HEAT(
         {
@@ -83,7 +84,7 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardElement.HEAT.showWhen()
         },
-        "§cHeat"
+        "§cHeat",
     ),
     COLD(
         {
@@ -92,7 +93,7 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && getCold() == 0) && ScoreboardElement.COLD.showWhen()
         },
-        "§bCold"
+        "§bCold",
     ),
     NORTH_STARS(
         {
@@ -101,7 +102,7 @@ enum class ChunkedStats(
         {
             !(hideEmptyLines && getNorthStars() == "0") && ScoreboardElement.NORTH_STARS.showWhen()
         },
-        "§dNorth Stars"
+        "§dNorth Stars",
     ),
     ;
 

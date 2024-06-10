@@ -107,10 +107,10 @@ public class InventoryConfig {
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
-            NEW_YEAR_CAKE,
-            RANCHERS_BOOTS_SPEED,
-            LARVA_HOOK,
-            VACUUM_GARDEN));
+        NEW_YEAR_CAKE,
+        RANCHERS_BOOTS_SPEED,
+        LARVA_HOOK,
+        VACUUM_GARDEN));
 
     public enum ItemNumberEntry implements HasLegacyId {
         MASTER_STAR_TIER("§bMaster Star Tier", 0),
@@ -170,9 +170,9 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(name = "Quick Craft Confirmation", desc = "Require Ctrl+Click to craft items that aren't often quick crafted "
-            +
-            "(e.g. armor, weapons, accessories). " +
-            "Sack items can be crafted normally.")
+        +
+        "(e.g. armor, weapons, accessories). " +
+        "Sack items can be crafted normally.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean quickCraftingConfirmation = false;

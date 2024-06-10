@@ -26,9 +26,9 @@ object CustomLines {
         Triple(
             "%year%",
             { SkyBlockTime.now().formatted(dayAndMonthElement = false, hoursAndMinutesElement = false) },
-            "Year"
+            "Year",
         ),
-        Triple("%time%", { SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false) }, "Time")
+        Triple("%time%", { SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false) }, "Time"),
     )
 
     internal fun String.handleCustomLine(): List<String> {

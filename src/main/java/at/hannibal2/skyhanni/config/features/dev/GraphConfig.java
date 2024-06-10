@@ -27,6 +27,11 @@ public class GraphConfig {
     public int selectKey = -98;
 
     @Expose
+    @ConfigOption(name = "Connect Key", desc = "Connects the nearest node with the active node. If the nodes are already connected removes the connection.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_C)
+    public int connectKey = Keyboard.KEY_C;
+
+    @Expose
     @ConfigOption(name = "Exit Key", desc = "Exit out of stuff. If nothing active disables the graph editor.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_HOME)
     public int exitKey = Keyboard.KEY_HOME;

@@ -258,12 +258,16 @@ object GraphEditor {
         if (config.selectKey.isKeyClicked()) {
             activeNode = if (activeNode == closedNode) {
                 feedBackInTutorial("De selected active node.")
+                null
+            } else {
+                feedBackInTutorial("Selected new active node.")
                 closedNode
             }
         }
         if (activeNode != closedNode && config.connectKey.isKeyClicked()) {
             val edge = getEdgeIndex(activeNode, closedNode)
             if (edge == null) {
+                addEdge(activeNode, closedNode)
                 feedBackInTutorial("Added new edge.")
             } else {
                 this.edges.removeAt(edge)
