@@ -80,24 +80,24 @@ object GardenVisitorFeatures {
 
     private val patternGroup = RepoPattern.group("garden.visitor")
     private val visitorArrivePattern by patternGroup.pattern(
-            "visitorarrive",
-            ".* §r§ehas arrived on your §r§bGarden§r§e!",
+        "visitorarrive",
+        ".* §r§ehas arrived on your §r§bGarden§r§e!"
     )
     private val copperPattern by patternGroup.pattern(
-            "copper",
-            " §8\\+§c(?<amount>.*) Copper",
+        "copper",
+        " §8\\+§c(?<amount>.*) Copper"
     )
     private val gardenExperiencePattern by patternGroup.pattern(
-            "gardenexperience",
-            " §8\\+§2(?<amount>.*) §7Garden Experience",
+        "gardenexperience",
+        " §8\\+§2(?<amount>.*) §7Garden Experience"
     )
     private val visitorChatMessagePattern by patternGroup.pattern(
-            "visitorchat",
-            "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*",
+        "visitorchat",
+        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*"
     )
     private val partialAcceptedPattern by patternGroup.pattern(
-            "partialaccepted",
-            "§aYou gave some of the required items!",
+        "partialaccepted",
+        "§aYou gave some of the required items!"
     )
 
     private val logger = LorenzLogger("garden/visitors")
@@ -126,11 +126,11 @@ object GardenVisitorFeatures {
 
             val (itemName, amount) = ItemUtils.readItemAmount(line) ?: run {
                 ErrorManager.logErrorStateWithData(
-                        "Could not read Shopping List in Visitor Inventory", "ItemUtils.readItemAmount returns null",
-                        "line" to line,
-                        "offerItem" to offerItem,
-                        "lore" to lore,
-                        "visitor" to visitor,
+                    "Could not read Shopping List in Visitor Inventory", "ItemUtils.readItemAmount returns null",
+                    "line" to line,
+                    "offerItem" to offerItem,
+                    "lore" to lore,
+                    "visitor" to visitor
                 )
                 continue
             }
@@ -194,18 +194,13 @@ object GardenVisitorFeatures {
             list.add(" §7- ")
             list.add(itemStack)
 
-            list.add(
-                    Renderable.optionalLink(
-                            "$name §ex${amount.addSeparators()}",
-                            {
-                                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                                    LorenzUtils.setTextIntoSign("$amount")
-                                } else {
-                                    BazaarApi.searchForBazaarItem(name, amount)
-                                }
-                            },
-                    ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
-            )
+            list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
+                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                    LorenzUtils.setTextIntoSign("$amount")
+                } else {
+                    BazaarApi.searchForBazaarItem(name, amount)
+                }
+            }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
 
             if (config.shoppingList.showPrice) {
                 val price = internalName.getPrice() * amount
@@ -259,22 +254,19 @@ object GardenVisitorFeatures {
             }
         }
         if (hasIngredients) {
-            val leftToCraft = amount - amountInSacks
+            val leftToCraft = amount - amountInSacks;
             list.add(" §7(")
-            list.add(
-                    Renderable.optionalLink(
-                            "§aCraftable!",
-                            {
-                                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                                    LorenzUtils.setTextIntoSign("$leftToCraft")
-                                } else {
-                                    //  Possibly extract to a RecipeAPI object?
-                                    //  TBD whether internal name or 'display name' as itemName better suited here?
-                                    HypixelCommands.recipe(internalName.itemName)
-                                }
-                            },
-                    ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
-            )
+            list.add(Renderable.optionalLink(
+                "§aCraftable!", {
+                    if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                        LorenzUtils.setTextIntoSign("$leftToCraft")
+                    } else {
+                        //  Possibly extract to a RecipeAPI object?
+                        //  TBD whether internal name or 'display name' as itemName better suited here?
+                        HypixelCommands.recipe(internalName.itemName)
+                    }
+                }
+            ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
             list.add("§7)")
         }
     }
@@ -576,8 +568,8 @@ object GardenVisitorFeatures {
                 val color = visitor.status.color
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(
-                            entity,
-                            color,
+                        entity,
+                        color
                     ) { config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH }
                 }
                 // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
@@ -694,9 +686,9 @@ object GardenVisitorFeatures {
         event.move(3, "garden.visitorRewardWarning.notifyInChat", "garden.visitors.rewardWarning.notifyInChat")
         event.move(3, "garden.visitorRewardWarning.showOverName", "garden.visitors.rewardWarning.showOverName")
         event.move(
-                3,
-                "garden.visitorRewardWarning.preventRefusing",
-                "garden.visitors.rewardWarning.preventRefusing",
+            3,
+            "garden.visitorRewardWarning.preventRefusing",
+            "garden.visitors.rewardWarning.preventRefusing"
         )
         event.move(3, "garden.visitorRewardWarning.bypassKey", "garden.visitors.rewardWarning.bypassKey")
         event.move(3, "garden.visitorRewardWarning.drops", "garden.visitors.rewardWarning.drops")
