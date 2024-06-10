@@ -113,13 +113,14 @@ internal enum class FFInfos(
     constructor(
         sumTo: FFInfos?,
         current: () -> Number,
-        max: Number
+        max: Number,
     ) : this(sumTo, current, { max })
 
     constructor(
         sumTo: FFInfos?,
         from: () -> Map<FFTypes, Double>,
-        what: FFTypes, max: Number
+        what: FFTypes,
+        max: Number,
     ) : this(sumTo, { from()[what] ?: 0.0 }, { max })
 
     constructor(

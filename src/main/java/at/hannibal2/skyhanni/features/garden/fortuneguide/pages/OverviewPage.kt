@@ -57,7 +57,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             3,
             FFInfos.GARDEN_PLOTS.bar(
                 "§2Garden Plots",
-                if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
+                if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n" +
+                    "§eOpen /desk and view your plots to set it!"
                 else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked"
             )
         )
@@ -65,7 +66,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         content.addTable(
             4,
             FFInfos.ANITA_BUFF.bar(
-                "§2Anita Buff", if (FFTypes.ANITA.notSaved()) "§cAnita buff not saved\n§eVisit Anita to set it!"
+                "§2Anita Buff",
+                if (FFTypes.ANITA.notSaved()) "§cAnita buff not saved\n§eVisit Anita to set it!"
                 else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
             )
         )
@@ -74,7 +76,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             5,
             FFInfos.COMMUNITY_SHOP.bar(
                 "§2Community upgrades",
-                if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
+                if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n" +
+                    "§eVisit Elizabeth to set it!"
                 else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier"
             )
         )
@@ -83,22 +86,24 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             6,
             FFInfos.CAKE_BUFF.bar(
                 "§2Cake Buff", when {
-                    FFStats.cakeExpireTime.isFarPast() -> "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
+                    FFStats.cakeExpireTime.isFarPast() -> "§eYou have not eaten a cake since\n" +
+                        "§edownloading this update, assuming the\n§ebuff is active!"
                     FFStats.cakeExpireTime.isInPast() -> "§cYour cake buff has run out\nGo eat some cake!"
-                    else -> "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n§2Time until cake buff runs out: $timeUntilCakes"
+                    else -> "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n" +
+                        "§2Time until cake buff runs out: $timeUntilCakes"
                 }
             )
         )
 
-        val armorName = FarmingItems.currentArmor?.getItem()?.displayName ?: ""
-
+        val moreInfo = "§2Select a piece for more info"
         val wordArmor = if (FarmingItems.currentArmor == null) "Armor" else "Piece"
+        val armorName = FarmingItems.currentArmor?.getItem()?.displayName ?: ""
 
         content.addTable(
             1,
             FFInfos.TOTAL_ARMOR.bar(
                 "§2Total $wordArmor Fortune",
-                if (FarmingItems.currentArmor == null) "§7§2Total fortune from your armor\n§2Select a piece for more info"
+                if (FarmingItems.currentArmor == null) "§7§2Total fortune from your armor\n$moreInfo"
                 else "§7§2Total fortune from your\n$armorName"
             )
         )
@@ -107,7 +112,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             2,
             FFInfos.BASE_ARMOR.bar(
                 "§2Base $wordArmor Fortune",
-                if (FarmingItems.currentArmor == null) "§7§2The base fortune from your armor\n§2Select a piece for more info"
+                if (FarmingItems.currentArmor == null) "§7§2The base fortune from your armor\n$moreInfo"
                 else "§7§2Base fortune from your\n$armorName"
             )
         )
@@ -116,7 +121,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             3,
             FFInfos.ABILITY_ARMOR.bar(
                 "§2$wordArmor Ability",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's ability\n§2Select a piece for more info"
+                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's ability\n$moreInfo"
                 else "§7§2Ability fortune from your\n$armorName"
             )
         )
@@ -125,7 +130,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             4,
             FFInfos.REFORGE_ARMOR.bar(
                 "§2$wordArmor Reforge",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's reforge\n§2Select a piece for more info"
+                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's reforge\n$moreInfo"
                 else "§7§2Reforge fortune from your\n$armorName}"
             )
         )
@@ -134,7 +139,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             5,
             FFInfos.ENCHANT_ARMOR.bar(
                 "§2$wordArmor Enchantment",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's enchantments\n§2Select a piece for more info"
+                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's enchantments\n$moreInfo"
                 else "§7§2Enchantment fortune from your\n$armorName}"
             )
         )
@@ -143,7 +148,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             6,
             FFInfos.GEMSTONE_ARMOR.bar(
                 "§2$wordArmor Gemstones",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's gemstones\n§2Select a piece for more info"
+                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's gemstones\n$moreInfo"
                 else "§7§2Gemstone fortune from your\n$armorName}"
             )
         )
@@ -180,7 +185,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             1,
             FFInfos.TOTAL_EQUIP.bar(
                 "§2Total $wordEquip Fortune",
-                if (FarmingItems.currentEquip == null) "§7§2Total fortune from your equipment\n§2Select a piece for more info"
+                if (FarmingItems.currentEquip == null) "§7§2Total fortune from your equipment\n$moreInfo"
                 else "§7§2Total fortune from your\n$equipmentName"
             )
         )
@@ -189,7 +194,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             2,
             FFInfos.BASE_EQUIP.bar(
                 "§2$wordEquip Base Fortune",
-                if (FarmingItems.currentEquip == null) "§7§2The base fortune from your equipment\n§2Select a piece for more info"
+                if (FarmingItems.currentEquip == null) "§7§2The base fortune from your equipment\n$moreInfo"
                 else "§7§2Base fortune from your\n$equipmentName"
             )
         )
@@ -198,7 +203,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             3,
             FFInfos.ABILITY_EQUIP.bar(
                 "§2$wordEquip Ability",
-                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's abilities\n§2Select a piece for more info"
+                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's abilities\n$moreInfo"
                 else "§7§2Ability fortune from your\n$equipmentName"
             )
         )
@@ -207,7 +212,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             4,
             FFInfos.REFORGE_EQUIP.bar(
                 "§2$wordEquip Reforge",
-                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's reforges\n§2Select a piece for more info"
+                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's reforges\n$moreInfo"
                 else "§7§2Reforge fortune from your\n$equipmentName"
             )
         )
@@ -216,7 +221,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             5,
             FFInfos.ENCHANT_EQUIP.bar(
                 "§2$wordEquip Enchantment",
-                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's enchantments\n§2Select a piece for more info"
+                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's enchantments\n$moreInfo"
                 else "§7§2Enchantment fortune from your\n$equipmentName"
             )
         )
