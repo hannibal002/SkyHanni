@@ -86,11 +86,13 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             6,
             FFInfos.CAKE_BUFF.bar(
                 "§2Cake Buff", when {
-                    FFStats.cakeExpireTime.isFarPast() -> "§eYou have not eaten a cake since\n" +
-                        "§edownloading this update, assuming the\n§ebuff is active!"
-                    FFStats.cakeExpireTime.isInPast() -> "§cYour cake buff has run out\nGo eat some cake!"
-                    else -> "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n" +
-                        "§2Time until cake buff runs out: $timeUntilCakes"
+                    FFStats.cakeExpireTime.isFarPast() ->
+                        "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
+                    FFStats.cakeExpireTime.isInPast() ->
+                        "§cYour cake buff has run out\nGo eat some cake!"
+                    else ->
+                        "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n" +
+                            "§2Time until cake buff runs out: $timeUntilCakes"
                 }
             )
         )
