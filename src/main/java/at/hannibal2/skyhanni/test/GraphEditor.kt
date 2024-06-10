@@ -22,9 +22,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
@@ -41,7 +42,7 @@ object GraphEditor {
     private var id = 0
 
     private val nodes = mutableListOf<GraphingNode>()
-    private val edge = mutableListOf<GraphingEdge>()
+    private val edges = mutableListOf<GraphingEdge>()
 
     private var activeNode: GraphingNode? = null
     private var closedNode: GraphingNode? = null
@@ -63,6 +64,8 @@ object GraphEditor {
             }
         }
 
+    private var inTutorialMode = false
+
     private val textBox = TextInput()
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
@@ -77,43 +80,51 @@ object GraphEditor {
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
-        edge.forEach { event.drawEdge(it) }
+        edges.forEach { event.drawEdge(it) }
     }
 
     @SubscribeEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.infoDisplay.renderStrings(
-            buildList {
-                add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
-                if (!inEditMode && !inTextMode) {
-                    add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
-                    add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
-                    add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
-                    add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
-                    add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
-                    add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
-                    add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
-                    add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
-                    if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
-                }
-                if (!inTextMode && activeNode != null) {
-                    add("§eEdit: §6${KeyboardManager.getKeyName(config.editKey)}")
-                }
-                if (inEditMode) {
-                    add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.keyCode)}")
-                    add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.keyCode)}")
-                    add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.keyCode)}")
-                    add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.keyCode)}")
-                    add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.keyCode)}")
-                    add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.keyCode)}")
-                }
-                if (inTextMode) {
-                    add("§eFormat: ${textBox.finalText()}")
-                    add("§eRaw:     ${textBox.editText()}")
-                }
-            }, posLabel = "Graph Info"
-        )
+        config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
+    }
+
+    private fun buildDisplay(): List<String> = buildList {
+        add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
+        if (!inEditMode && !inTextMode) {
+            add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
+            add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
+            add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
+            add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
+            add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
+            add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
+            add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
+            add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
+            add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
+            add(" ")
+            if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
+        }
+        if (!inTextMode && activeNode != null) {
+            add("§eEdit: §6${KeyboardManager.getKeyName(config.editKey)}")
+        }
+        if (inEditMode) {
+            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.keyCode)}")
+            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.keyCode)}")
+            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.keyCode)}")
+            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.keyCode)}")
+            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.keyCode)}")
+            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.keyCode)}")
+        }
+        if (inTextMode) {
+            add("§eFormat: ${textBox.finalText()}")
+            add("§eRaw:     ${textBox.editText()}")
+        }
+    }
+
+    private fun feedBackInTutorial(text: String) {
+        if (inTutorialMode) {
+            ChatUtils.chat(text)
+        }
     }
 
     @SubscribeEvent
@@ -130,10 +141,18 @@ object GraphEditor {
             node.getNodeColor(),
             seeThroughBlocks = seeThroughBlocks,
             minimumAlpha = 0.2f,
-            inverseAlphaScale = true
+            inverseAlphaScale = true,
         )
         if (node.name == null) return
-        this.drawString(node.position, node.name!!, seeThroughBlocks)
+        this.drawDynamicText(
+            node.position,
+            node.name!!,
+            0.8,
+            ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
+            smallestDistanceVew = 12.0,
+            ignoreY = true,
+            yOff = -15f,
+        )
     }
 
     private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) = this.draw3DLine_nea(
@@ -141,7 +160,7 @@ object GraphEditor {
         edge.node2.position.add(0.5, 0.5, 0.5),
         if (edge !in highlightedEdges) edgeColor else edgeDijkstraColor,
         7,
-        !seeThroughBlocks
+        !seeThroughBlocks,
     )
 
     private fun GraphingNode.getNodeColor() = when (this) {
@@ -154,24 +173,26 @@ object GraphEditor {
     fun commandIn() {
         config.enabled = !config.enabled
         if (config.enabled) {
-            ChatUtils.chat("Graph Editor is now active")
+            ChatUtils.chat("Graph Editor is now active.")
         } else {
             chatAtDisable()
         }
     }
 
     private fun chatAtDisable() =
-        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate", ::commandIn)
+        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.", ::commandIn)
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
         if (config.exitKey.isKeyClicked()) {
             if (inTextMode) {
                 inTextMode = false
+                feedBackInTutorial("Exited Text Mode.")
                 return
             }
             if (inEditMode) {
                 inEditMode = false
+                feedBackInTutorial("Exited Edit Mode.")
                 return
             }
             config.enabled = false
@@ -189,6 +210,7 @@ object GraphEditor {
         }
         if (activeNode != null && config.textKey.isKeyClicked()) {
             inTextMode = true
+            feedBackInTutorial("Entered Text Mode.")
             return
         }
         if (inEditMode) {
@@ -200,12 +222,7 @@ object GraphEditor {
             return
         }
         if (config.saveKey.isKeyClicked()) {
-            if (nodes.isEmpty()) {
-                ChatUtils.chat("Copied nothing since the graph is empty")
-                return
-            }
-            OSUtils.copyToClipboard(compileGraph().toJson())
-            ChatUtils.chat("Copied Graph to Clipboard")
+            save()
             return
         }
         if (config.loadKey.isKeyClicked()) {
@@ -216,40 +233,75 @@ object GraphEditor {
                     } catch (e: Exception) {
                         ErrorManager.logErrorWithData(
                             e,
-                            "Import of graph failed",
+                            "Import of graph failed.",
                             "json" to it,
-                            ignoreErrorCache = true
+                            ignoreErrorCache = true,
                         )
                         null
                     }
-                }?.let { import(it) }
+                }?.let {
+                    import(it)
+                    ChatUtils.chat("Loaded Graph from clip board.")
+                }
             }
             return
         }
         if (config.clearKey.isKeyClicked()) {
-            OSUtils.copyToClipboard(compileGraph().toJson())
-            ChatUtils.chat("Copied Graph to Clipboard and cleared the graph")
+            val json = compileGraph().toJson()
+            OSUtils.copyToClipboard(json)
+            ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
             clear()
         }
         if (config.placeKey.isKeyClicked()) {
             addNode()
         }
         if (config.selectKey.isKeyClicked()) {
-            activeNode = if (activeNode == closedNode) null else closedNode
+            activeNode = if (activeNode == closedNode) {
+                feedBackInTutorial("De selected active node.")
+                closedNode
+            }
         }
         if (activeNode != closedNode && config.connectKey.isKeyClicked()) {
             val edge = getEdgeIndex(activeNode, closedNode)
             if (edge == null) {
-                addEdge(activeNode, closedNode)
+                feedBackInTutorial("Added new edge.")
             } else {
-                this.edge.removeAt(edge)
+                this.edges.removeAt(edge)
+                feedBackInTutorial("Removed edge.")
             }
         }
         if (config.throughBlocksKey.isKeyClicked()) {
             seeThroughBlocks = !seeThroughBlocks
+            feedBackInTutorial(
+                if (seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.",
+            )
         }
         if (config.dijkstraKey.isKeyClicked()) {
+            feedBackInTutorial("Calculated shortest route and cleared active node.")
             testDijkstra()
+        }
+        if (config.tutorialKey.isKeyClicked()) {
+            inTutorialMode = !inTutorialMode
+            ChatUtils.chat("Tutorial mode is now ${if (inTutorialMode) "active" else "inactive"}.")
+        }
+    }
+
+    private fun save() {
+        if (nodes.isEmpty()) {
+            ChatUtils.chat("Copied nothing since the graph is empty.")
+            return
+        }
+        val json = compileGraph().toJson()
+        OSUtils.copyToClipboard(json)
+        ChatUtils.chat("Copied Graph to Clipboard.")
+        if (config.showsStats) {
+            val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
+            ChatUtils.chat(
+                "§lStats\n" +
+                    "§eNodes: ${nodes.size}\n" +
+                    "§eEdges: ${edges.size}\n" +
+                    "§eLength: $length",
+            )
         }
     }
 
@@ -278,15 +330,17 @@ object GraphEditor {
     private fun addNode() {
         val closedNode = closedNode
         if (closedNode != null && closedNode.position.distanceSqToPlayer() < 9.0) {
+            feedBackInTutorial("Removed node, since you where closer than 3 blocks from a node.")
             nodes.remove(closedNode)
-            edge.removeIf { it.isInEdge(closedNode) }
+            edges.removeIf { it.isInEdge(closedNode) }
             if (closedNode == activeNode) activeNode = null
             this.closedNode = null
             return
         }
-        val position = LocationUtils.playerLocation().round(0)
+        val position = LocationUtils.playerEyeLocation().roundLocationToBlock()
         val node = GraphingNode(id++, position)
         nodes.add(node)
+        feedBackInTutorial("Added graph node.")
         if (activeNode == null) return
         addEdge(activeNode, node)
     }
@@ -294,12 +348,12 @@ object GraphEditor {
     private fun getEdgeIndex(node1: GraphingNode?, node2: GraphingNode?) =
         if (node1 != null && node2 != null && node1 != node2) GraphingEdge(
             node1,
-            node2
-        ).let { e -> edge.indexOfFirst { it == e }.takeIf { it != -1 } }
+            node2,
+        ).let { e -> edges.indexOfFirst { it == e }.takeIf { it != -1 } }
         else null
 
     private fun addEdge(node1: GraphingNode?, node2: GraphingNode?) =
-        if (node1 != null && node2 != null && node1 != node2) edge.add(GraphingEdge(node1, node2)) else false
+        if (node1 != null && node2 != null && node1 != node2) edges.add(GraphingEdge(node1, node2)) else false
 
     /** Has a side effect on the graphing graph, since it runs [prune] on the graphing graph*/
     private fun compileGraph(): Graph {
@@ -307,7 +361,7 @@ object GraphEditor {
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name) }
         val neighbours = this.nodes.map { node ->
-            edge.filter { it.isInEdge(node) }.map { edge ->
+            edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
@@ -320,10 +374,10 @@ object GraphEditor {
         clear()
         nodes.addAll(graph.map { GraphingNode(it.id, it.position, it.name) })
         val translation = graph.mapIndexed { index, it -> it to nodes[index] }.toMap()
-        edge.addAll(
+        edges.addAll(
             graph.map { node ->
                 node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!) }
-            }.flatten().distinct()
+            }.flatten().distinct(),
         )
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
     }
@@ -349,21 +403,21 @@ object GraphEditor {
         val inGraph = path.map { nodes[it.id] }
         highlightedNodes.addAll(inGraph)
 
-        val edge = edge.filter { highlightedNodes.contains(it.node1) && highlightedNodes.contains(it.node2) }
+        val edge = edges.filter { highlightedNodes.contains(it.node1) && highlightedNodes.contains(it.node2) }
         highlightedEdges.addAll(edge)
     }
 
     private fun clear() {
         id = 0
         nodes.clear()
-        edge.clear()
+        edges.clear()
         activeNode = null
         closedNode = null
     }
 
     private fun prune() { //TODO fix
         val hasNeighbours = nodes.associateWith { false }.toMutableMap()
-        edge.forEach {
+        edges.forEach {
             hasNeighbours[it.node1] = true
             hasNeighbours[it.node2] = true
         }
@@ -399,7 +453,8 @@ private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode) {
 
         other as GraphingEdge
 
-        return (this.node1 == other.node1 && this.node2 == other.node2) || (this.node1 == other.node2 && this.node2 == other.node1)
+        return (this.node1 == other.node1 && this.node2 == other.node2) ||
+            (this.node1 == other.node2 && this.node2 == other.node1)
     }
 
     override fun hashCode(): Int {
