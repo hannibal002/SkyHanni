@@ -73,19 +73,21 @@ object ReminderManager {
 
         text.add(createDivider())
 
-        text.add(Text.join(
-            if (listPage > 1) "§6§l<<".asComponent {
-                hover = "§eClick to view page ${listPage - 1}".asComponent()
-                command = "/shremind list ${listPage - 1}"
-            } else null,
-            " ",
-            "§6Reminders (Page $listPage of $maxPage)",
-            " ",
-            if (listPage < maxPage) "§6§l>>".asComponent {
-                hover = "§eClick to view page ${listPage + 1}".asComponent()
-                command = "/shremind list ${listPage + 1}"
-            } else null
-        ).center())
+        text.add(
+            Text.join(
+                if (listPage > 1) "§6§l<<".asComponent {
+                    hover = "§eClick to view page ${listPage - 1}".asComponent()
+                    command = "/shremind list ${listPage - 1}"
+                } else null,
+                " ",
+                "§6Reminders (Page $listPage of $maxPage)",
+                " ",
+                if (listPage < maxPage) "§6§l>>".asComponent {
+                    hover = "§eClick to view page ${listPage + 1}".asComponent()
+                    command = "/shremind list ${listPage + 1}"
+                } else null
+            ).center()
+        )
 
         if (reminders.isNotEmpty()) {
             for (i in (listPage - 1) * REMINDERS_PER_PAGE until listPage * REMINDERS_PER_PAGE) {
@@ -225,14 +227,16 @@ object ReminderManager {
                 storage.remove(id)
             }
 
-            remindersToSend.add(Text.join(
-                "§e[Reminder]".asComponent {
-                    hover = "§7Reminders by SkyHanni".asComponent()
-                },
-                actionsComponent,
-                " ",
-                "§6${reminder.reason}"
-            ))
+            remindersToSend.add(
+                Text.join(
+                    "§e[Reminder]".asComponent {
+                        hover = "§7Reminders by SkyHanni".asComponent()
+                    },
+                    actionsComponent,
+                    " ",
+                    "§6${reminder.reason}"
+                )
+            )
         }
 
         if (remindersToSend.isNotEmpty()) {
