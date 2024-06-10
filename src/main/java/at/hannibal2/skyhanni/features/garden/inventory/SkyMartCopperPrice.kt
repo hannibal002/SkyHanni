@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.SkyMartConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -55,7 +56,8 @@ object SkyMartCopperPrice {
                 } ?: continue
 
                 val internalName = item.getInternalName()
-                val itemPrice = internalName.getPriceOrNull() ?: continue
+                val useSellPrice = config.overlayPriceType == SkyMartConfig.OverlayPriceTypeEntry.SELL_ORDER
+                val itemPrice = internalName.getPriceOrNull(useSellPrice) ?: continue
                 val profit = itemPrice - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
