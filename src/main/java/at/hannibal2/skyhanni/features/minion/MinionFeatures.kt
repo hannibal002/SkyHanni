@@ -108,7 +108,7 @@ object MinionFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -116,7 +116,7 @@ object MinionFeatures {
         lastClickedEntity = event.clickedEntity?.getLorenzVec() ?: return
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBlockClick(event: BlockClickEvent) {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return

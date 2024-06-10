@@ -143,7 +143,7 @@ object SlayerQuestWarning {
         return (getSlayerData().lastSlayerType == slayerType) && isSlayer
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
         val internalName = event.itemInHand?.getInternalNameOrNull()
 
