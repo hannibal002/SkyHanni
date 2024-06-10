@@ -230,19 +230,21 @@ object StringUtils {
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
-    fun String.splitLines(width: Int): String {
-        val fr = Minecraft.getMinecraft().fontRendererObj
-        return GuiUtilRenderComponents.splitText(
-            ChatComponentText(this), width, fr, false, false
-        ).joinToString("\n") {
-            val text = it.formattedText
-            val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
-            formatCode.matchAt(text, 0)?.let { matcher ->
-                val codes = matcher.value.replace("\\s".toRegex(), "")
-                codes + text.removeRange(matcher.range)
-            } ?: text
-        }
+    fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
+        ChatComponentText(this),
+        width,
+        Minecraft.getMinecraft().fontRendererObj,
+        false,
+        false,
+    ).joinToString("\n") {
+        val text = it.formattedText
+        val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
+        formatCode.matchAt(text, 0)?.let { matcher ->
+            val codes = matcher.value.replace("\\s".toRegex(), "")
+            codes + text.removeRange(matcher.range)
+        } ?: text
     }
+
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -380,6 +382,10 @@ object StringUtils {
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
+
+    fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
     fun replaceIfNeeded(
         original: ChatComponentText,
