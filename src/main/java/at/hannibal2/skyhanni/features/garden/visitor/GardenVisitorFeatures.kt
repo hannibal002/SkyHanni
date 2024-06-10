@@ -254,19 +254,21 @@ object GardenVisitorFeatures {
             }
         }
         if (hasIngredients) {
-            val leftToCraft = amount - amountInSacks;
+            val leftToCraft = amount - amountInSacks
             list.add(" §7(")
-            list.add(Renderable.optionalLink(
+            list.add(
+                Renderable.optionalLink(
                 "§aCraftable!", {
-                    if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                        LorenzUtils.setTextIntoSign("$leftToCraft")
-                    } else {
-                        //  Possibly extract to a RecipeAPI object?
-                        //  TBD whether internal name or 'display name' as itemName better suited here?
-                        HypixelCommands.recipe(internalName.itemName)
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            LorenzUtils.setTextIntoSign("$leftToCraft")
+                        } else {
+                            //  Possibly extract to a RecipeAPI object?
+                            //  TBD whether internal name or 'display name' as itemName better suited here?
+                            HypixelCommands.recipe(internalName.itemName)
+                        }
                     }
-                }
-            ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
+                ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() }
+            )
             list.add("§7)")
         }
     }
