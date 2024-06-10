@@ -138,7 +138,8 @@ enum class ScoreboardElement(
     ),
     EMPTY_LINE(
         ::getEmptyLineDisplayPair,
-        { true }, ""
+        { true },
+        "",
     ),
     ISLAND(
         ::getIslandDisplayPair,
@@ -192,7 +193,8 @@ enum class ScoreboardElement(
     ),
     EMPTY_LINE2(
         ::getEmptyLineDisplayPair,
-        { true }, ""
+        { true },
+        "",
     ),
     OBJECTIVE(
         ::getObjectiveDisplayPair,
@@ -349,8 +351,10 @@ private fun getTitleDisplayPair(): List<ScoreboardElementType> =
         ).flatten()
     }
 
-private fun getProfileDisplayPair() =
-    listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
+private fun getProfileDisplayPair() = listOf(
+    CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase()
+        to HorizontalAlignment.LEFT,
+)
 
 private fun getPurseDisplayPair(): List<ScoreboardElementType> {
     var purse = PurseAPI.currentPurse.formatNum()
@@ -488,8 +492,8 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
-    && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
+private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT) &&
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
     val northStars =
@@ -547,7 +551,8 @@ fun getPlayerAmountDisplayPair() = buildList {
 
 private fun getVisitDisplayPair() =
     listOf(
-        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.visitingPattern.matches(it) } to HorizontalAlignment.LEFT
+        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.visitingPattern.matches(it) } to
+            HorizontalAlignment.LEFT,
     )
 
 private fun getVisitShowWhen() =
@@ -679,14 +684,14 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
     if (QuiverAPI.currentArrow == NONE_ARROW_TYPE)
         return listOf("No Arrows selected" to HorizontalAlignment.LEFT)
 
-    val amountString = (if (arrowConfig.colorArrowAmount) {
-        percentageColor(
-            QuiverAPI.currentAmount.toLong(),
-            QuiverAPI.MAX_ARROW_AMOUNT.toLong()
-        ).getChatColor()
-    } else {
-        ""
-    }) + if (QuiverAPI.wearingSkeletonMasterChestplate) {
+    val amountString = (
+        if (arrowConfig.colorArrowAmount) {
+            percentageColor(
+                QuiverAPI.currentAmount.toLong(),
+                QuiverAPI.MAX_ARROW_AMOUNT.toLong(),
+            ).getChatColor()
+        } else ""
+        ) + if (QuiverAPI.wearingSkeletonMasterChestplate) {
         "∞"
     } else {
         when (arrowConfig.arrowAmountDisplay) {
@@ -713,26 +718,32 @@ private fun getQuiverShowWhen(): Boolean {
 private fun getPowderDisplayPair() = buildList {
     val powderTypes: List<Triple<String, String, String>> = listOf(
         Triple(
-            "Mithril", "§2", getGroupFromPattern(
+            "Mithril",
+            "§2",
+            getGroupFromPattern(
                 TabListData.getTabList(),
                 ScoreboardPattern.mithrilPowderPattern,
-                "mithrilpowder"
-            )?.formatNum() ?: "0"
+                "mithrilpowder",
+            )?.formatNum() ?: "0",
         ),
         Triple(
-            "Gemstone", "§d", getGroupFromPattern(
+            "Gemstone",
+            "§d",
+            getGroupFromPattern(
                 TabListData.getTabList(),
                 ScoreboardPattern.gemstonePowderPattern,
-                "gemstonepowder"
-            )?.formatNum() ?: "0"
+                "gemstonepowder",
+            )?.formatNum() ?: "0",
         ),
         Triple(
-            "Glacite", "§b", getGroupFromPattern(
+            "Glacite",
+            "§b",
+            getGroupFromPattern(
                 TabListData.getTabList(),
                 ScoreboardPattern.glacitePowderPattern,
-                "glacitepowder"
-            )?.formatNum() ?: "0"
-        )
+                "glacitepowder",
+            )?.formatNum() ?: "0",
+        ),
     )
 
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third == "0" }) {
@@ -831,17 +842,19 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
 }
 
 private fun getFooterDisplayPair(): List<ScoreboardElementType> =
-    listOf(displayConfig.titleAndFooter.customFooter.get().toString()
-        .replace("&", "§")
-        .split("\\n")
-        .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+    listOf(
+        displayConfig.titleAndFooter.customFooter.get().toString()
+            .replace("&", "§")
+            .split("\\n")
+            .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
     ).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (confirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
     amountOfUnknownLines = confirmedUnknownLines.size
 
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + confirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) +
+        confirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
 }
 
 private fun getExtraShowWhen(): Boolean {
