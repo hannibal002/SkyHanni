@@ -76,7 +76,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
         horizontalTabs.firstOrNull()?.fakeClick()
         verticalTabs.firstOrNull()?.fakeClick()
-
     }
 
     private fun GuideTab.pageSwitchHorizontal() {
@@ -91,6 +90,5 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         OVERVIEW,
         CROP,
         UPGRADES,
-
     }
 }

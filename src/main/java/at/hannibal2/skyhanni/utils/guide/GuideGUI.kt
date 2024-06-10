@@ -97,6 +97,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
 
             Renderable.string(
                 "§7SkyHanni ",
+                scale = 0.8,
                 horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
             ).renderXYAligned(0, 0, sizeX, sizeY)

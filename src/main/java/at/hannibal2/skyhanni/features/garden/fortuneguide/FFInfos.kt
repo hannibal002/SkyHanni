@@ -12,15 +12,16 @@ internal enum class FFInfos(
         val backupEquip = FarmingItems.currentEquip
         FarmingItems.currentArmor = null
         FarmingItems.currentEquip = null
-        val total = maxSumToThis(it) + 100
+        val total = maxSumToThis(it)
         FarmingItems.currentArmor = backupArmor
         FarmingItems.currentEquip = backupEquip
         total
     }),
-    ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
     FARMING_LEVEL(UNIVERSAL, { FFStats.baseFF }, FFTypes.FARMING_LVL, 240),
-    COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
+    BESTIARY(UNIVERSAL, { FFStats.baseFF }, FFTypes.BESTIARY, 60),
     GARDEN_PLOTS(UNIVERSAL, { FFStats.baseFF }, FFTypes.PLOTS, 72),
+    ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
+    COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
     CAKE_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.CAKE, 5),
     TOTAL_ARMOR(UNIVERSAL, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.TOTAL),
     BASE_ARMOR(TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.BASE, {
@@ -63,7 +64,7 @@ internal enum class FFInfos(
     PET_BASE(TOTAL_PET, { FarmingItems.currentPet.getFFData() }, FFTypes.BASE, {
         when (FarmingItems.currentPet) {
             FarmingItems.ELEPHANT -> 150
-            FarmingItems.MOOSHROOM_COW -> 157
+            FarmingItems.MOOSHROOM_COW -> 158
             FarmingItems.BEE -> 30
             else -> 0
         }
@@ -109,11 +110,17 @@ internal enum class FFInfos(
 
     fun bar(label: String, tooltip: String) = GuiRenderUtils.getFarmingBar(label, tooltip, current, max, 90)
 
-    constructor(sumTo: FFInfos?, current: () -> Number, max: Number) : this(sumTo, current, { max })
-    constructor(sumTo: FFInfos?, from: () -> Map<FFTypes, Double>, what: FFTypes, max: Number) : this(sumTo, {
-        from()[what] ?: 0.0
-    }, { max }
-    )
+    constructor(
+        sumTo: FFInfos?,
+        current: () -> Number,
+        max: Number
+    ) : this(sumTo, current, { max })
+
+    constructor(
+        sumTo: FFInfos?,
+        from: () -> Map<FFTypes, Double>,
+        what: FFTypes, max: Number
+    ) : this(sumTo, { from()[what] ?: 0.0 }, { max })
 
     constructor(
         sumTo: FFInfos?,
@@ -121,8 +128,7 @@ internal enum class FFInfos(
         what: FFTypes,
         x4: () -> Boolean,
         max: Number,
-    ) : this(sumTo, { from()[what] ?: 0.0 }, { if (x4()) max.toDouble() * 4 else max }
-    )
+    ) : this(sumTo, { from()[what] ?: 0.0 }, { if (x4()) max.toDouble() * 4 else max })
 
     constructor(
         sumTo: FFInfos?,
@@ -130,24 +136,20 @@ internal enum class FFInfos(
         what: FFTypes,
         x4: () -> Boolean,
         max: () -> Number,
-    ) : this(sumTo, { from()[what] ?: 0.0 }, { if (x4()) max().toDouble() * 4 else max() }
-    )
+    ) : this(sumTo, { from()[what] ?: 0.0 }, { if (x4()) max().toDouble() * 4 else max() })
 
     constructor(
         sumTo: FFInfos?,
         from: () -> Map<FFTypes, Double>,
         what: FFTypes,
         max: (FFInfos) -> Number,
-    ) : this(
-        sumTo, { from()[what] ?: 0.0 }, max
-    )
+    ) : this(sumTo, { from()[what] ?: 0.0 }, max)
 
     constructor(
         sumTo: FFInfos?,
         from: () -> Map<FFTypes, Double>,
         what: FFTypes,
     ) : this(sumTo, { from()[what] ?: 0.0 }, ::maxSumToThis)
-
 }
 
 private fun maxSumToThis(self: FFInfos): Double = FFInfos.entries.filter { it.sumTo == self }.sumOf { it.max }
