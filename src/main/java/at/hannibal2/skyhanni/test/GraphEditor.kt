@@ -338,7 +338,7 @@ object GraphEditor {
             this.closedNode = null
             return
         }
-        val position = LocationUtils.playerLocation().round(0)
+        val position = LocationUtils.playerEyeLocation().roundLocationToBlock()
         val node = GraphingNode(id++, position)
         nodes.add(node)
         feedBackInTutorial("Added graph node.")
