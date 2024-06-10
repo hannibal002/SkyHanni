@@ -149,19 +149,21 @@ object MinibossTimer {
         val lines = MiniBoss.entries.map {
             val timer = it.timer
             val possibleTimer = it.possibleTimer
-            Renderable.string(buildString {
-                append("§b${it.displayName}: ")
-                if (it.isSpawned()) append("§aSPAWNED!")
-                if (timer != null && timer.isInPast() && timer.passedSince() < 10.seconds) append("§6Soon!")
-                else if (it.isTimerKnown()) append("§e${it.timer?.timeUntil()?.format()}")
-                else if (possibleTimer != null) {
-                    val (start, end) = possibleTimer
-                    if (start.timeUntil().isNegative()) append("§e~Now - ")
-                    else append("§e~${start.timeUntil().format()} - ")
-                    if (end.timeUntil().isNegative()) append("§eNow")
-                    else append("§e${end.timeUntil().format()}")
-                } else append("§cUnknown")
-            })
+            Renderable.string(
+                buildString {
+                    append("§b${it.displayName}: ")
+                    if (it.isSpawned()) append("§aSPAWNED!")
+                    if (timer != null && timer.isInPast() && timer.passedSince() < 10.seconds) append("§6Soon!")
+                    else if (it.isTimerKnown()) append("§e${it.timer?.timeUntil()?.format()}")
+                    else if (possibleTimer != null) {
+                        val (start, end) = possibleTimer
+                        if (start.timeUntil().isNegative()) append("§e~Now - ")
+                        else append("§e~${start.timeUntil().format()} - ")
+                        if (end.timeUntil().isNegative()) append("§eNow")
+                        else append("§e${end.timeUntil().format()}")
+                    } else append("§cUnknown")
+                },
+            )
         }
         return Renderable.verticalContainer(lines)
     }
