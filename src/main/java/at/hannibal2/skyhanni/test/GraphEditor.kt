@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -298,10 +299,12 @@ object GraphEditor {
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
         if (config.showsStats) {
+            val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
             ChatUtils.chat(
-                "§lStats\n§r§eNodes: ${nodes.size}\nEdges: ${edges.size}\nLength: ${
-                    edges.sumOf { it.node1.position.distance(it.node2.position) }
-                }",
+                "§lStats\n" +
+                    "§eNodes: ${nodes.size}\n" +
+                    "§eEdges: ${edges.size}\n" +
+                    "§eLength: $length",
             )
         }
     }
