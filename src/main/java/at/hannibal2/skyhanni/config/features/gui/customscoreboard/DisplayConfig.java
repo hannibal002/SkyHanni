@@ -97,7 +97,7 @@ public class DisplayConfig {
     }
 
     @Expose
-    @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr Format rather than 12h Format.")
+    @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")
     @ConfigEditorBoolean
     public boolean skyblockTime24hFormat = false;
 
