@@ -62,67 +62,67 @@ object MaxwellAPI {
     private val patternGroup = RepoPattern.group("data.maxwell")
     private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
-        "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!"
+        "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!",
     )
     private val chatPowerUnlockedPattern by patternGroup.pattern(
         "chat.power.unlocked",
-        "§eYour selected power was set to (?:§r)*§a(?<power>.*)(?:§r)*§e!"
+        "§eYour selected power was set to (?:§r)*§a(?<power>.*)(?:§r)*§e!",
     )
     private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
-        "§7Selected Power: §a(?<power>.*)"
+        "§7Selected Power: §a(?<power>.*)",
     )
     private val inventoryMPPattern by patternGroup.pattern(
         "inventory.magicalpower",
-        "§7Magical Power: §6(?<mp>[\\d,]+)"
+        "§7Magical Power: §6(?<mp>[\\d,]+)",
     )
     private val thaumaturgyGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy",
-        "Accessory Bag Thaumaturgy"
+        "Accessory Bag Thaumaturgy",
     )
     private val thaumaturgyStartPattern by patternGroup.pattern(
         "gui.thaumaturgy.start",
-        "§7Your tuning:"
+        "§7Your tuning:",
     )
     private val thaumaturgyDataPattern by patternGroup.pattern(
         "gui.thaumaturgy.data",
-        "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)"
+        "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)",
     )
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
-        "§7Total: §6(?<mp>[\\d.,]+) Magical Power"
+        "§7Total: §6(?<mp>[\\d.,]+) Magical Power",
     )
     private val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
-        "Stats Tuning"
+        "Stats Tuning",
     )
     private val statsTuningDataPattern by patternGroup.pattern(
         "thaumaturgy.statstuning",
-        "§7You have: .+ §7\\+ §(?<color>.)(?<amount>[^ ]+) (?<icon>.)"
+        "§7You have: .+ §7\\+ §(?<color>.)(?<amount>[^ ]+) (?<icon>.)",
     )
     private val tuningAutoAssignedPattern by patternGroup.pattern(
         "tuningpoints.chat.autoassigned",
-        "§aYour §r§eTuning Points §r§awere auto-assigned as convenience!"
+        "§aYour §r§eTuning Points §r§awere auto-assigned as convenience!",
     )
     private val yourBagsGuiPattern by patternGroup.pattern(
         "gui.yourbags",
-        "Your Bags"
+        "Your Bags",
     )
     private val powerSelectedPattern by patternGroup.pattern(
         "gui.selectedpower",
-        "§aPower is selected!"
+        "§aPower is selected!",
     )
     private val noPowerSelectedPattern by patternGroup.pattern(
         "gui.noselectedpower",
-        "(?:§.)*Visit Maxwell in the Hub to learn"
+        "(?:§.)*Visit Maxwell in the Hub to learn",
     )
     private val accessoryBagStack by patternGroup.pattern(
         "stack.accessorybag",
-        "§.Accessory Bag"
+        "§.Accessory Bag",
     )
     private val redstoneCollectionRequirementPattern by patternGroup.pattern(
         "collection.redstone.requirement",
-        "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\."
+        "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.",
     )
 
     fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
@@ -138,7 +138,9 @@ object MaxwellAPI {
             if (tunings.isNullOrEmpty()) return
             val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
             if (tuningsInScoreboard) {
-                ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
+                ChatUtils.chat(
+                    "Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.",
+                )
             }
         }
     }
@@ -150,7 +152,7 @@ object MaxwellAPI {
                 UnknownMaxwellPower("Unknown power: $power"),
                 "Unknown power: $power",
                 "power" to power,
-                "message" to message
+                "message" to message,
             )
         }
     }
@@ -186,7 +188,7 @@ object MaxwellAPI {
                     } ?: ErrorManager.skyHanniError(
                         "found no name in thaumaturgy",
                         "stack name" to stack.name,
-                        "line" to line
+                        "line" to line,
                     )
                     map.add(it)
                 }
@@ -218,7 +220,7 @@ object MaxwellAPI {
                 "Unknown power: $displayName",
                 "displayName" to displayName,
                 "lore" to selectedPowerStack.getLore(),
-                noStackTrace = true
+                noStackTrace = true,
             )
     }
 
@@ -256,7 +258,10 @@ object MaxwellAPI {
         var foundMagicalPower = false
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {
-                ChatUtils.chat("Seems like you don't have the Requirement for the Accessory Bag yet, setting power to No Power and magical power to 0.")
+                ChatUtils.chat(
+                    "Seems like you don't have the Requirement for the Accessory Bag yet, " +
+                        "setting power to No Power and magical power to 0.",
+                )
                 currentPower = getPowerByNameOrNull("No Power")
                 magicalPower = 0
                 return
@@ -281,7 +286,7 @@ object MaxwellAPI {
                         "Unknown power: ${stack.displayName}",
                         "displayName" to stack.displayName,
                         "lore" to stack.getLore(),
-                        noStackTrace = true
+                        noStackTrace = true,
                     )
             }
         }
