@@ -53,6 +53,7 @@ ktlint_standard_string-template-indent = disabled
 ktlint_standard_no-trailing-spaces = disabled
 ktlint_standard_function-signature = disabled
 ktlint_standard_wrapping = enabled
+ktlint_standard_argument-list-wrapping = disabled
 
 ktlint_standard_no-wildcard-imports = enabled
 ktlint_standard_function-expression-body = disabled
