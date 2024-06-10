@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.formatText
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGhostCounter
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
@@ -264,10 +264,10 @@ object GhostCounter {
         addAsSingletonList(etaFormatting.base.formatText(eta).formatText(killETA))
 
         val rate = 0.12 * (1 + (avgMagicFind.toDouble() / 100))
-        val sorrowValue = SORROW.getBazaarData()?.buyPrice?.toLong() ?: 0L
+        val sorrowValue = SORROW.getBazaarData()?.sellOfferPrice?.toLong() ?: 0L
         val final: String = (killInterp * sorrowValue * (rate / 100)).toLong().addSeparators()
-        val plasmaValue = PLASMA.getBazaarData()?.buyPrice?.toLong() ?: 0L
-        val voltaValue = VOLTA.getBazaarData()?.buyPrice?.toLong() ?: 0L
+        val plasmaValue = PLASMA.getBazaarData()?.sellOfferPrice?.toLong() ?: 0L
+        val voltaValue = VOLTA.getBazaarData()?.sellOfferPrice?.toLong() ?: 0L
         var moneyMade: Long = 0
         val priceMap = listOf(
             Triple("Sorrow", Option.SORROWCOUNT.getInt(), sorrowValue),

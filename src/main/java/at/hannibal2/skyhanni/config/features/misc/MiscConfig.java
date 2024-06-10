@@ -204,7 +204,7 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
+    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim community shop account and profile upgrades when complete.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean accountUpgradeReminder = true;
@@ -270,6 +270,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceRomanNumerals = false;
+
+    @Expose
+    @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean unknownPerkpocalypseMayorWarning = true;
 
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion

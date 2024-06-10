@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -11,36 +12,35 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeMap
 import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
 
-class MobData {
+@SkyHanniModule
+object MobData {
 
     class MobSet : HashSet<Mob>() {
         val entityList get() = this.flatMap { listOf(it.baseEntity) + (it.extraEntities) }
     }
 
-    companion object {
 
-        val players = MobSet()
-        val displayNPCs = MobSet()
-        val skyblockMobs = MobSet()
-        val summoningMobs = MobSet()
-        val special = MobSet()
-        val currentMobs = MobSet()
+    val players = MobSet()
+    val displayNPCs = MobSet()
+    val skyblockMobs = MobSet()
+    val summoningMobs = MobSet()
+    val special = MobSet()
+    val currentMobs = MobSet()
 
-        val entityToMob = mutableMapOf<EntityLivingBase, Mob>()
+    val entityToMob = mutableMapOf<EntityLivingBase, Mob>()
 
-        internal val currentEntityLiving = mutableSetOf<EntityLivingBase>()
-        internal val previousEntityLiving = mutableSetOf<EntityLivingBase>()
+    internal val currentEntityLiving = mutableSetOf<EntityLivingBase>()
+    internal val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
-        internal val retries = TreeMap<Int, RetryEntityInstancing>()
+    internal val retries = TreeMap<Int, RetryEntityInstancing>()
 
-        const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
-        const val DETECTION_RANGE = 22.0
-        const val DISPLAY_NPC_DETECTION_RANGE = 24.0 // 24.0
+    const val ENTITY_RENDER_RANGE_IN_BLOCKS = 80.0 // Entity DeRender after ~5 Chunks
+    const val DETECTION_RANGE = 22.0
+    const val DISPLAY_NPC_DETECTION_RANGE = 24.0 // 24.0
 
-        var externRemoveOfRetryAmount = 0
+    var externRemoveOfRetryAmount = 0
 
-        val logger = LorenzLogger("mob/detection")
-    }
+    val logger = LorenzLogger("mob/detection")
 
     internal enum class Result {
         Found,

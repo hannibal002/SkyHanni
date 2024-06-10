@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -40,7 +41,10 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class CityProjectFeatures {
+@SkyHanniModule
+object CityProjectFeatures {
+
+    private val config get() = SkyHanniMod.feature.event.cityProject
 
     private var display = emptyList<List<Any>>()
     private var inInventory = false
@@ -56,13 +60,9 @@ class CityProjectFeatures {
         "§aProject is (?:being built|released)!"
     )
 
-    companion object {
-
-        private val config get() = SkyHanniMod.feature.event.cityProject
-        fun disable() {
-            config.dailyReminder = false
-            ChatUtils.chat("Disabled city project reminder messages!")
-        }
+    fun disable() {
+        config.dailyReminder = false
+        ChatUtils.chat("Disabled city project reminder messages!")
     }
 
     @SubscribeEvent
@@ -73,8 +73,9 @@ class CityProjectFeatures {
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
-        if (playerSpecific.nextCityProjectParticipationTime == 0L) return
-        if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
+        playerSpecific.nextCityProjectParticipationTime.let {
+            if (it.isFarPast() || it.isInFuture()) return
+        }
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
@@ -131,7 +132,7 @@ class CityProjectFeatures {
                 if (item.name != "§eContribute this component!") continue
                 nextTime = now
             }
-            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime.toMillis()
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 

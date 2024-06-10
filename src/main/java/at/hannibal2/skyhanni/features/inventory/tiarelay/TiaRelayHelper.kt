@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -16,7 +17,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
-class TiaRelayHelper {
+@SkyHanniModule
+object TiaRelayHelper {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.tiaRelay
     private var inInventory = false
@@ -33,7 +35,7 @@ class TiaRelayHelper {
         val soundName = event.soundName
 
         if (config.tiaRelayMute && soundName == "mob.wolf.whine") {
-            event.isCanceled = true
+            event.cancel()
         }
 
         if (!config.soundHelper) return
