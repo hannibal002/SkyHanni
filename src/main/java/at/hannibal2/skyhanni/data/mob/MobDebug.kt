@@ -40,7 +40,7 @@ object MobDebug {
     private fun MobData.MobSet.showName(event: LorenzRenderWorldEvent) =
         this.filter { it.canBeSeen() && it.isNotInvisible() }.map { it.boundingBox.getTopCenter() to it.name }.forEach {
             event.drawString(
-                it.first.add(y = 0.5), "§5" + it.second, seeThroughBlocks = true
+                it.first.up(0.5), "§5" + it.second, seeThroughBlocks = true,
             )
         }
 

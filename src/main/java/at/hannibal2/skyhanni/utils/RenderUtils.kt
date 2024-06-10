@@ -1065,6 +1065,15 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    fun LorenzRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
+        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        return exactLocation(player) + add
+    }
+
+    fun LorenzRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
+    }
+
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks

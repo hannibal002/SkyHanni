@@ -21,9 +21,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
@@ -106,11 +106,10 @@ object HoppityEggLocator {
     }
 
     private fun LorenzRenderWorldEvent.drawGuessLocations() {
-        val eyeLocation = exactPlayerEyeLocation()
         for ((index, eggLocation) in possibleEggLocations.withIndex()) {
             drawEggWaypoint(eggLocation, "§aGuess #${index + 1}")
             if (config.showLine) {
-                draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
             }
         }
     }
@@ -122,7 +121,7 @@ object HoppityEggLocator {
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
                 val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
                 drawColor(eggLocation, LorenzColor.RED, false, alpha)
-                drawDynamicText(eggLocation.add(y = 1), "§cDuplicate Location!", 1.5)
+                drawDynamicText(eggLocation.up(), "§cDuplicate Location!", 1.5)
             }
         }
     }
@@ -138,11 +137,11 @@ object HoppityEggLocator {
                             LorenzColor.GREEN.toColor(),
                             seeThroughBlocks = true,
                         )
-                        drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
+                        drawDynamicText(it.up(), "§aGuess", 1.5)
                     }
                     if (!drawLocations) {
                         if (config.showLine) {
-                            draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                            drawLineToEye(it.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
                         }
                     }
                 }
@@ -159,7 +158,7 @@ object HoppityEggLocator {
         } else {
             drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
         }
-        drawDynamicText(location.add(y = 1), possibleDuplicateLabel, 1.5)
+        drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
 
     private fun shouldShowAllEggs() =

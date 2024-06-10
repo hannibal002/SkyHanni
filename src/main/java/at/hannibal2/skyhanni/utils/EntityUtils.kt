@@ -55,7 +55,7 @@ object EntityUtils {
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().add(y = 3), radius).filter {
+    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
         it.name.contains(contains)
     }
 
@@ -74,7 +74,7 @@ object EntityUtils {
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
     ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = y)
+        val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
@@ -158,7 +158,7 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull() ?: emptySequence()
 
-    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
+    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().up(0.5).canBeSeen(radius)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 

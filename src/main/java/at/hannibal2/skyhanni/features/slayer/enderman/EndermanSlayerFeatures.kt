@@ -25,11 +25,10 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -113,12 +112,11 @@ object EndermanSlayerFeatures {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
+                event.drawLineToEye(
                     location.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor.toChromaColor(),
-                    beaconConfig.lineWidth,
-                    true
+                    1,
+                    true,
                 )
             }
 
@@ -127,24 +125,22 @@ object EndermanSlayerFeatures {
                 val durationFormat = duration.format(showMilliSeconds = true)
                 event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
                 event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
-                event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
+                event.drawDynamicText(location.up(), "§4Beacon §b$durationFormat", 1.8)
             }
         }
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
+            val beaconLocation = event.exactLocation(beacon)
             if (beaconConfig.highlightBeacon) {
-                val beaconLocation = event.exactLocation(beacon)
-                event.drawDynamicText(beaconLocation.add(y = 1), "§4Beacon", 1.8)
+                event.drawDynamicText(beaconLocation.up(), "§4Beacon", 1.8)
             }
 
             if (beaconConfig.showLine) {
-                val beaconLocation = event.exactLocation(beacon)
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
+                event.drawLineToEye(
                     beaconLocation.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
-                    true
+                    true,
                 )
             }
         }

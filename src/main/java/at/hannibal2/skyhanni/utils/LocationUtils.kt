@@ -31,7 +31,7 @@ object LocationUtils {
     fun playerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val vec = player.getLorenzVec()
-        return vec.add(y = player.getEyeHeight().toDouble())
+        return vec.up(player.getEyeHeight().toDouble())
     }
 
     fun AxisAlignedBB.isInside(vec: LorenzVec) = isVecInside(vec.toVec3())
@@ -49,7 +49,7 @@ object LocationUtils {
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
         yOffsetRange.any { offset ->
-            this.add(y = offset).canBeSeen(radius)
+            up(offset).canBeSeen(radius)
         }
 
     fun AxisAlignedBB.minBox() = LorenzVec(minX, minY, minZ)
@@ -95,7 +95,7 @@ object LocationUtils {
 
     fun AxisAlignedBB.getCenter() = getEdgeLengths() * 0.5 + minBox()
 
-    fun AxisAlignedBB.getTopCenter() = getCenter().add(y = (maxY - minY) / 2)
+    fun AxisAlignedBB.getTopCenter() = getCenter().up((maxY - minY) / 2)
 
     fun AxisAlignedBB.clampTo(other: AxisAlignedBB): AxisAlignedBB {
         val minX = max(this.minX, other.minX)

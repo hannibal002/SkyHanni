@@ -23,12 +23,14 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getAllNameTagsInRadiusWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -254,20 +256,17 @@ object VampireSlayerFeatures {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        val start = LocationUtils.playerLocation()
 
         if (config.drawLine) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
                 if (it.isHighlighted()) {
                     val vec = event.exactLocation(it)
-                    val distance = start.distance(vec)
-                    if (distance <= 15) {
-                        event.draw3DLine(
-                            event.exactPlayerEyeLocation(),
-                            vec.add(y = 1.54),
+                    if (vec.distanceToPlayer() < 15) {
+                        event.drawLineToEye(
+                            vec.up(1.54),
                             config.lineColor.toChromaColor(),
                             config.lineWidth,
-                            true
+                            true,
                         )
                     }
                 }
@@ -276,7 +275,7 @@ object VampireSlayerFeatures {
         if (configBloodIchor.highlight || configKillerSpring.highlight) {
             Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
                 val vec = stand.position.toLorenzVec()
-                val distance = start.distance(vec)
+                val distance = vec.distanceToPlayer()
                 val isIchor = stand.hasSkullTexture(bloodIchorTexture)
                 val isSpring = stand.hasSkullTexture(killerSpringTexture)
                 if ((isIchor && config.bloodIchor.highlight) || (isSpring && config.killerSpring.highlight)) {
@@ -292,9 +291,9 @@ object VampireSlayerFeatures {
                             (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toChromaColor()
                         val text = if (isIchor) "§4Ichor" else "§4Spring"
                         event.drawColor(
-                            stand.position.toLorenzVec().add(y = 2.0),
+                            stand.position.toLorenzVec().up(2.0),
                             LorenzColor.DARK_RED,
-                            alpha = 1f
+                            alpha = 1f,
                         )
                         event.drawDynamicText(
                             stand.position.toLorenzVec().add(0.5, 2.5, 0.5),
@@ -305,13 +304,13 @@ object VampireSlayerFeatures {
                         for ((player, stand2) in standList) {
                             if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
                                 event.draw3DLine(
-                                    event.exactLocation(player).add(y = 1.5),
-                                    event.exactLocation(stand2).add(y = 1.5),
-                                    // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
+                                    event.exactPlayerEyeLocation(player),
+                                    event.exactPlayerEyeLocation(stand2),
                                     linesColorStart,
                                     3,
-                                    true
+                                    true,
                                 )
+
                         }
                     }
                     if (configBloodIchor.renderBeam && isIchor && stand.isEntityAlive) {

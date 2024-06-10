@@ -121,7 +121,7 @@ class ParkourHelper(
                     if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
                 }
                 if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
-                    event.drawString(location.offsetCenter().add(y = 1), "§a§l$index", seeThroughBlocks = true)
+                    event.drawString(location.offsetCenter().up(1), "§a§l$index", seeThroughBlocks = true)
                 }
             }
         } catch (e: Throwable) {

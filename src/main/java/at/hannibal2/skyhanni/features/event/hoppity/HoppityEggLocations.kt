@@ -142,9 +142,9 @@ object HoppityEggLocations {
             val nameColorCode = (if (name != null) LorenzColor.GREEN else LorenzColor.RED).getChatColor()
 
             event.drawColor(location, color, false, 0.5f)
-            event.drawDynamicText(location.add(y = 0.5), "$nameColorCode$name", 1.2)
+            event.drawDynamicText(location.up(0.5), "$nameColorCode$name", 1.2)
             if (location.distanceSqToPlayer() < 100) {
-                event.drawDynamicText(location.add(y = 0.5), location.toCleanString(), 1.0, yOff = 12f)
+                event.drawDynamicText(location.up(0.5), location.toCleanString(), 1.0, yOff = 12f)
             }
         }
     }

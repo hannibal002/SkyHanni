@@ -31,10 +31,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -275,34 +274,32 @@ object GriffinBurrowHelper {
                 if (distance > 10) {
                     // TODO use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor §e${formattedDistance}m", 1.7)
+                    event.drawDynamicText(location.up(), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {
-                    event.drawDynamicText(location.add(y = 1), "§d§lInquisitor", 1.7)
+                    event.drawDynamicText(location.up(), "§d§lInquisitor", 1.7)
                 }
                 if (distance < 5) {
                     InquisitorWaypointShare.maybeRemove(inquis)
                 }
-                event.drawDynamicText(location.add(y = 1), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
+                event.drawDynamicText(location.up(), "§eFrom §b${inquis.displayName}", 1.6, yOff = 9f)
 
                 if (config.inquisitorSharing.showDespawnTime) {
                     val spawnTime = inquis.spawnTime
                     val format = (75.seconds - spawnTime.passedSince()).format()
-                    event.drawDynamicText(location.add(y = 1), "§eDespawns in §b$format", 1.6, yOff = 18f)
+                    event.drawDynamicText(location.up(), "§eDespawns in §b$format", 1.6, yOff = 18f)
                 }
             }
         }
 
         val currentWarp = BurrowWarpHelper.currentWarp
         if (config.lineToNext) {
-            val player = event.exactPlayerEyeLocation()
-
             var color: LorenzColor?
             val renderLocation = if (currentWarp != null) {
                 color = LorenzColor.AQUA
                 currentWarp.location
             } else {
                 color = if (shouldFocusOnInquis) LorenzColor.LIGHT_PURPLE else LorenzColor.WHITE
-                targetLocation?.add(0.5, 0.5, 0.5) ?: return
+                targetLocation?.blockCenter() ?: return
             }
 
             val lineWidth = if (targetLocation in particleBurrows) {
@@ -310,7 +307,7 @@ object GriffinBurrowHelper {
                 3
             } else 2
             if (currentWarp == null) {
-                event.draw3DLine(player, renderLocation, color.toColor(), lineWidth, false)
+                event.drawLineToEye(renderLocation, color.toColor(), lineWidth, false)
             }
         }
 
@@ -324,7 +321,7 @@ object GriffinBurrowHelper {
                 val distance = location.distance(playerLocation)
                 val burrowType = burrow.value
                 event.drawColor(location, burrowType.color, distance > 10)
-                event.drawDynamicText(location.add(y = 1), burrowType.text, 1.5)
+                event.drawDynamicText(location.up(), burrowType.text, 1.5)
             }
         }
 
@@ -334,10 +331,10 @@ object GriffinBurrowHelper {
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
                 val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
-                event.drawDynamicText(guessLocation.add(y = 1), "${color}Guess", 1.5)
+                event.drawDynamicText(guessLocation.up(), "${color}Guess", 1.5)
                 if (distance > 5) {
                     val formattedDistance = distance.toInt().addSeparators()
-                    event.drawDynamicText(guessLocation.add(y = 1), "§e${formattedDistance}m", 1.7, yOff = 10f)
+                    event.drawDynamicText(guessLocation.up(), "§e${formattedDistance}m", 1.7, yOff = 10f)
                 }
             }
         }

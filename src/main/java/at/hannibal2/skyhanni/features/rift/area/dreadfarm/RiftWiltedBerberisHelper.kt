@@ -50,7 +50,7 @@ object RiftWiltedBerberisHelper {
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
-            val block = LocationUtils.playerLocation().add(y = -1).getBlockAt()
+            val block = LorenzVec.getBlockBelowPlayer().getBlockAt()
             val currentY = LocationUtils.playerLocation().y
             isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
         }
@@ -121,7 +121,7 @@ object RiftWiltedBerberisHelper {
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
                     event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.YELLOW, 0.7f)
-                    event.drawDynamicText(location.add(y = 1), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+                    event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
                     event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {

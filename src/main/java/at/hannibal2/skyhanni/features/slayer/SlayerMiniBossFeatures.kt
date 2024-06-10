@@ -14,8 +14,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityCreature
 import net.minecraft.entity.monster.EntityBlaze
@@ -61,12 +60,11 @@ object SlayerMiniBossFeatures {
             if (mob.isDead) continue
             if (mob.distanceToPlayer() > 10) continue
 
-            event.draw3DLine(
-                event.exactPlayerEyeLocation(),
-                mob.getLorenzVec().add(y = 1),
+            event.drawLineToEye(
+                mob.getLorenzVec().up(),
                 LorenzColor.AQUA.toColor(),
                 3,
-                true
+                true,
             )
         }
     }

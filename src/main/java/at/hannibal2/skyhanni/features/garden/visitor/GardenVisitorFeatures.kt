@@ -329,12 +329,12 @@ object GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        event.parent.drawString(location.add(y = 2.23), text)
+        event.parent.drawString(location.up(2.23), text)
         if (config.rewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 
-                event.parent.drawString(location.add(y = 2.73), "§c!$name§c!")
+                event.parent.drawString(location.up(2.73), "§c!$name§c!")
             }
         }
     }
