@@ -33,5 +33,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .enableComplexMapKeySerialization()
 
-    fun lenientGson(): GsonBuilder = gson().registerTypeAdapterFactory(SkippingTypeAdapterFactory)
+    fun lenientGson(): GsonBuilder = gson()
+        .registerTypeAdapterFactory(SkippingTypeAdapterFactory)
+        .registerTypeAdapterFactory(ListEnumSkippingTypeAdapterFactory)
 }

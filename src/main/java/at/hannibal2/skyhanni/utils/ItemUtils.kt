@@ -123,6 +123,13 @@ object ItemUtils {
     // Checks for hypixel enchantments in the attributes
     fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
+    fun ItemStack.removeEnchants(): ItemStack = apply {
+        val tag = tagCompound ?: NBTTagCompound()
+        tag.removeTag("ench")
+        tag.removeTag("StoredEnchantments")
+        tagCompound = tag
+    }
+
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
         if (tagCompound == null) return null

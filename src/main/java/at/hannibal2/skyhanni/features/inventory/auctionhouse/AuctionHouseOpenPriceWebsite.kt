@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -19,7 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class AuctionHouseOpenPriceWebsite {
+@SkyHanniModule
+object AuctionHouseOpenPriceWebsite {
 
     private val config get() = SkyHanniMod.feature.inventory.auctions
     private var lastClick = SimpleTimeMark.farPast()
@@ -77,7 +79,7 @@ class AuctionHouseOpenPriceWebsite {
         if (!isEnabled()) return
         displayItem ?: return
         if (event.slotId != 8) return
-        event.isCanceled = true
+        event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
             val url = "https://sky.coflnet.com/api/mod/open/$searchTerm"
             OSUtils.openBrowser(url)
