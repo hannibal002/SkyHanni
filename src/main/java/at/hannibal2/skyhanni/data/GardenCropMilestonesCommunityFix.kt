@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object GardenCropMilestonesCommunityFix {
     private val amountPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount",
-        ".*§e(?<having>.*)§6/§e(?<max>.*)"
+        ".*§e(?<having>.*)§6/§e(?<max>.*)",
     )
 
     private var showWrongData = false
@@ -67,7 +67,7 @@ object GardenCropMilestonesCommunityFix {
             ChatUtils.chat(
                 "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
                     "Correct data got put into clipboard. " +
-                    "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e."
+                    "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e.",
             )
             OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
         } else {
@@ -93,8 +93,8 @@ object GardenCropMilestonesCommunityFix {
 //         debug("crop: $crop")
 //         debug("realTier: $realTier")
 
-        val guessNextMax = GardenCropMilestones.getCropsForTier(realTier + 1, crop) - GardenCropMilestones.getCropsForTier(realTier, crop)
-//         debug("guessNextMax: ${guessNextMax.addSeparators()}")
+        val guessNextMax = nextMax(realTier, crop)
+        //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
         val nextMax = amountPattern.matchMatcher(next) {
             group("max").formatLong()
         } ?: return
@@ -114,7 +114,7 @@ object GardenCropMilestonesCommunityFix {
 //         debug("$crop total offf by: ${totalOffBy.addSeparators()}")
     }
 
-//     fun debug(message: String) {
+    //     fun debug(message: String) {
 //         if (SkyHanniMod.feature.dev.debug.enabled) {
 //             println(message)
 //         }
@@ -162,13 +162,16 @@ object GardenCropMilestonesCommunityFix {
     }
 
     private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {
-        val guessNextMax = GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(tier, crop)
+        val guessNextMax = nextMax(tier, crop)
         if (guessNextMax.toInt() == amount) return false
         GardenCropMilestones.cropMilestoneData = GardenCropMilestones.cropMilestoneData.editCopy {
             fix(crop, this, tier, amount)
         }
         return true
     }
+
+    private fun nextMax(tier: Int, crop: CropType): Long =
+        GardenCropMilestones.getCropsForTier(tier + 1, crop) - GardenCropMilestones.getCropsForTier(tier, crop)
 
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
         map[crop] = map[crop]!!.editCopy {
