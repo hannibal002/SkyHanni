@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -173,6 +174,11 @@ enum class ScoreboardEvents(
         ::getRedstoneShowWhen,
         "§e§l⚡ §cRedstone: §e§b7%"
     ),
+    ANNIVERSARY(
+        ::getAnniversaryLines,
+        ::getAnniversaryShowWhen,
+        "§d5th Anniversary§f 167:59:54",
+    )
     ;
 
     override fun toString() = configLine
@@ -390,7 +396,7 @@ private fun getActiveEventLine(): List<String> {
 
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
-    val blockedEvents = listOf("Spooky Festival")
+    val blockedEvents = listOf("Spooky Festival", "5th SkyBlock Anniversary")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
 
     val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
@@ -529,3 +535,9 @@ private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getS
 private fun getRedstoneLines(): List<String> = listOf(getSbLines().first { SbPattern.redstonePattern.matches(it) })
 
 private fun getRedstoneShowWhen(): Boolean = SbPattern.redstonePattern.anyMatches(getSbLines())
+
+private fun getAnniversaryLines() = buildList {
+    addIfNotNull(getSbLines().firstOrNull { SbPattern.anniversaryPattern.matches(it) })
+}
+
+private fun getAnniversaryShowWhen(): Boolean = getSbLines().any { SbPattern.anniversaryPattern.matches(it) }

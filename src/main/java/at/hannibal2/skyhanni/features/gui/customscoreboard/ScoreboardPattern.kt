@@ -360,7 +360,11 @@ object ScoreboardPattern {
     )
     val queuePositionPattern by miscSb.pattern(
         "queueposition",
-        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*"
+        "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*",
+    )
+    val anniversaryPattern by miscSb.pattern(
+        "anniversary",
+        "§d\\d+(?:st|nd|rd|th) Anniversary§f (?:\\d|:)+",
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
