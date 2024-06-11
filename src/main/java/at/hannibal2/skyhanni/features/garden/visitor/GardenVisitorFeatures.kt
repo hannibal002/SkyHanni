@@ -258,7 +258,8 @@ object GardenVisitorFeatures {
             list.add(" §7(")
             list.add(
                 Renderable.optionalLink(
-                "§aCraftable!", {
+                    "§aCraftable!",
+                    {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$leftToCraft")
                         } else {
@@ -266,8 +267,8 @@ object GardenVisitorFeatures {
                             //  TBD whether internal name or 'display name' as itemName better suited here?
                             HypixelCommands.recipe(internalName.itemName)
                         }
-                    }
-                ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() }
+                    },
+                ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
             )
             list.add("§7)")
         }
