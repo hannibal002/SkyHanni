@@ -178,7 +178,7 @@ enum class ScoreboardEvents(
         ::getAnniversaryLines,
         ::getAnniversaryShowWhen,
         "§d5th Anniversary§f 167:59:54",
-    )
+    ),
     ;
 
     override fun toString() = configLine
@@ -540,4 +540,4 @@ private fun getAnniversaryLines() = buildList {
     addIfNotNull(getSbLines().firstOrNull { SbPattern.anniversaryPattern.matches(it) })
 }
 
-private fun getAnniversaryShowWhen(): Boolean = getSbLines().any { SbPattern.anniversaryPattern.matches(it) }
+private fun getAnniversaryShowWhen(): Boolean = SbPattern.anniversaryPattern.anyMatches(getSbLines())
