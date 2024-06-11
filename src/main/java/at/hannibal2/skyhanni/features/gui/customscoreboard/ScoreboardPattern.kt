@@ -362,6 +362,10 @@ object ScoreboardPattern {
         "queueposition",
         "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*",
     )
+
+    /**
+     * REGEX-TEST: §d5th Anniversary§f 167:59:54
+     */
     val anniversaryPattern by miscSb.pattern(
         "anniversary",
         "§d\\d+(?:st|nd|rd|th) Anniversary§f (?:\\d|:)+",
