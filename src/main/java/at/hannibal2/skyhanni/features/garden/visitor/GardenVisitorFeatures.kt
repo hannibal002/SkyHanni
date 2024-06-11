@@ -265,7 +265,7 @@ object GardenVisitorFeatures {
                         } else {
                             //  Possibly extract to a RecipeAPI object?
                             //  TBD whether internal name or 'display name' as itemName better suited here?
-                            HypixelCommands.recipe(internalName.itemName)
+                            HypixelCommands.viewRecipe(internalName.toString())
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
