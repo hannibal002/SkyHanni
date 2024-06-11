@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack
 class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
     override val sizeX = 360
-    override val sizeY = 180
+    override val sizeY = 200
 
     companion object {
 
@@ -45,7 +45,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         FarmingItems.setDefaultPet()
 
         pageList = mapOf(
-            FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY - 2),
+            FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
             FortuneGuidePage.CROP to CropPage({ currentCrop!! }, sizeX, sizeY),
             FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )

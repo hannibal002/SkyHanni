@@ -12,10 +12,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
     GuideTablePage(
-        sizeX,
-        sizeY,
-        paddingX,
-        paddingY
+        sizeX, sizeY, paddingX, paddingY
     ) {
 
     val crop get() = crop0()
@@ -41,11 +38,7 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
 
     private fun header(): List<Renderable> = buildList {
         add(FortuneStats.BASE.getFarmingBar())
-
-        add(
-            FortuneStats.CROP_TOTAL.getFarmingBar(110)
-        )
-
+        add(FortuneStats.CROP_TOTAL.getFarmingBar(110))
         add(FortuneStats.CROP_UPGRADE.getFarmingBar())
     }
 
@@ -76,7 +69,7 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
                 2,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
             ),
-            144,
+            50,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
         )
