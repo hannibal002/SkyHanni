@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -188,27 +188,33 @@ object GuiRenderUtils {
         val current = currentValue.toDouble().coerceAtLeast(0.0)
         val percent = current.fractionOf(maxValue)
         val scale = textScale.toDouble()
-        return Renderable.hoverTips(Renderable.verticalContainer(
-            listOf(
-                Renderable.string(label, scale = scale),
-                Renderable.fixedSizeLine(
-                    listOf(
-                        Renderable.string(
-                            "§2${DecimalFormat("0.##").format(current)} / ${
-                                DecimalFormat(
-                                    "0.##"
-                                ).format(maxValue)
-                            }☘", scale = scale, horizontalAlign = HorizontalAlignment.LEFT
+        return Renderable.hoverTips(
+            Renderable.verticalContainer(
+                listOf(
+                    Renderable.string(label, scale = scale),
+                    Renderable.fixedSizeLine(
+                        listOf(
+                            Renderable.string(
+                                "§2${DecimalFormat("0.##").format(current)} / ${
+                                    DecimalFormat(
+                                        "0.##"
+                                    ).format(maxValue)
+                                }☘",
+                                scale = scale, horizontalAlign = HorizontalAlignment.LEFT
+                            ),
+                            Renderable.string(
+                                "§2${(percent * 100).roundTo(1)}%",
+                                scale = scale,
+                                horizontalAlign = HorizontalAlignment.RIGHT,
+                            ),
                         ),
-                        Renderable.string(
-                            "§2${(percent * 100).round(1)}%",
-                            scale = scale,
-                            horizontalAlign = HorizontalAlignment.RIGHT
-                        ),
-                    ), width
-                ), Renderable.progressBar(percent, width = width)
-            )
-        ), tooltip.split('\n').map { Renderable.string(it) })
+                        width,
+                    ),
+                    Renderable.progressBar(percent, width = width),
+                ),
+            ),
+            tooltip.split('\n').map { Renderable.string(it) },
+        )
     }
 
     private fun barColorGradient(double: Double): Int {

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
@@ -50,7 +50,7 @@ value class Graph(
                     out.beginObject()
                     it.neighbours.forEach { (node, weight) ->
                         val id = node.id.toString()
-                        out.name(id).value(weight.round(2))
+                        out.name(id).value(weight.roundTo(2))
                     }
                     out.endObject()
                     out.endObject()
