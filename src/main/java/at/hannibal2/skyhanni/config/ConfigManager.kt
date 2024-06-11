@@ -203,6 +203,11 @@ class ConfigManager {
         if (output == defaultValue) {
             logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
         }
+        @Suppress("SENSELESS_COMPARISON")
+        if (output == null) {
+            logger.log("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
+            output = defaultValue
+        }
 
         return output
     }
