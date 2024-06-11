@@ -26,48 +26,49 @@ enum class ChunkedStats(
     PURSE(
         displayPair = { "§6${PurseAPI.currentPurse.formatNum()}" },
         showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardElement.PURSE.showWhen() },
-        configLine = "§6Purse"
+        configLine = "§6Purse",
     ),
     MOTES(
         displayPair = { "§b${getMotes()}" },
         showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardElement.MOTES.showWhen() },
-        configLine = "§dMotes"
+        configLine = "§dMotes",
     ),
     BANK(
         displayPair = { "§6${getBank()}" },
         showWhen = { !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && ScoreboardElement.BANK.showWhen() },
-        configLine = "§6Bank"
+        configLine = "§6Bank",
     ),
     BITS(
         displayPair = { getBitsLine() },
         showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && ScoreboardElement.BITS.showWhen() },
-        configLine = "§bBits"
+        configLine = "§bBits",
     ),
     COPPER(
         displayPair = { "§c${getCopper()}" },
         showWhen = { !(hideEmptyLines && getCopper() == "0") && ScoreboardElement.COPPER.showWhen() },
-        configLine = "§cCopper"
+        configLine = "§cCopper",
     ),
     GEMS(
         displayPair = { "§a${getGems()}" },
         showWhen = { !(hideEmptyLines && getGems() == "0") && ScoreboardElement.GEMS.showWhen() },
-        configLine = "§aGems"
+        configLine = "§aGems",
     ),
     HEAT(
         displayPair = { "§c${getHeat()}" },
         showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardElement.HEAT.showWhen() },
-        configLine = "§cHeat"
+        configLine = "§cHeat",
     ),
     COLD(
         displayPair = { "§b${getCold()} ❄" },
         showWhen = { !(hideEmptyLines && getCold() == 0) && ScoreboardElement.COLD.showWhen() },
-        configLine = "§bCold"
+        configLine = "§bCold",
     ),
     NORTH_STARS(
         displayPair = { "§d${getNorthStars()}" },
         showWhen = { !(hideEmptyLines && getNorthStars() == "0") && ScoreboardElement.NORTH_STARS.showWhen() },
-        configLine = "§dNorth Stars"
-    );
+        configLine = "§dNorth Stars",
+    ),
+    ;
 
     override fun toString() = configLine
 
