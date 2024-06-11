@@ -708,7 +708,7 @@ private fun getPowderDisplayPair() = buildList {
         )
     )
 
-    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third.first == "0" && it.third.second == "0" }) {
+    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third.second == "0" }) {
         return listOf("<hidden>" to HorizontalAlignment.LEFT)
     }
 
@@ -716,25 +716,22 @@ private fun getPowderDisplayPair() = buildList {
 
     val displayNumbersFirst = displayConfig.displayNumbersFirst
 
-    for ((type, color, value) in powderTypes) {
-        val (current, total) = value
+    for ((type, color, powder) in powderTypes) {
+        val (current, total) = powder
 
         when (displayConfig.powderDisplay) {
             PowderDisplay.AVAILABLE -> {
-                if (current != "0") {
-                    add(" §7- ${if (displayNumbersFirst) "$color$current $type" else "§f$type: $color$current"}" to HorizontalAlignment.LEFT)
-                }
+                add(" §7- ${if (displayNumbersFirst) "$color$current $type" else "§f$type: $color$current"}" to HorizontalAlignment.LEFT)
             }
+
             PowderDisplay.TOTAL -> {
-                if (total != "0") {
-                    add(" §7- ${if (displayNumbersFirst) "$color$total $type" else "§f$type: $color$total"}" to HorizontalAlignment.LEFT)
-                }
+                add(" §7- ${if (displayNumbersFirst) "$color$total $type" else "§f$type: $color$total"}" to HorizontalAlignment.LEFT)
             }
+
             PowderDisplay.BOTH -> {
-                if (current != "0" && total != "0") {
-                    add(" §7- ${if (displayNumbersFirst) "$color$current/$total $type" else "§f$type: $color$current/$total"}" to HorizontalAlignment.LEFT)
-                }
+                add(" §7- ${if (displayNumbersFirst) "$color$current/$total $type" else "§f$type: $color$current/$total"}" to HorizontalAlignment.LEFT)
             }
+
             null -> {}
         }
     }
