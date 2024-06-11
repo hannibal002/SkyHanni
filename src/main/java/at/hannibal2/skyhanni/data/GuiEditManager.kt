@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
@@ -31,9 +32,14 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class GuiEditManager {
+@SkyHanniModule
+object GuiEditManager {
 
     private var lastHotkeyPressed = SimpleTimeMark.farPast()
+
+    private var currentPositions = TimeLimitedCache<String, Position>(15.seconds)
+    private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+    private var lastMovedGui: String? = null
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
@@ -71,77 +77,70 @@ class GuiEditManager {
         }
     }
 
-    companion object {
-
-        private var currentPositions = TimeLimitedCache<String, Position>(15.seconds)
-        private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
-        private var lastMovedGui: String? = null
-
-        @JvmStatic
-        fun add(position: Position, posLabel: String, x: Int, y: Int) {
-            var name = position.internalName
-            if (name == null) {
-                name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
-                position.internalName = name
-            }
-            currentPositions[name] = position
-            currentBorderSize[posLabel] = Pair(x, y)
+    @JvmStatic
+    fun add(position: Position, posLabel: String, x: Int, y: Int) {
+        var name = position.internalName
+        if (name == null) {
+            name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
+            position.internalName = name
         }
+        currentPositions[name] = position
+        currentBorderSize[posLabel] = Pair(x, y)
+    }
 
-        private var lastHotkeyReminded = SimpleTimeMark.farPast()
+    private var lastHotkeyReminded = SimpleTimeMark.farPast()
 
-        @JvmStatic
-        fun openGuiPositionEditor(hotkeyReminder: Boolean) {
-            SkyHanniMod.screenToOpen = GuiPositionEditor(
-                currentPositions.values().toList(),
-                2,
-                Minecraft.getMinecraft().currentScreen as? GuiContainer
+    @JvmStatic
+    fun openGuiPositionEditor(hotkeyReminder: Boolean) {
+        SkyHanniMod.screenToOpen = GuiPositionEditor(
+            currentPositions.values().toList(),
+            2,
+            Minecraft.getMinecraft().currentScreen as? GuiContainer
+        )
+        if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
+            lastHotkeyReminded = SimpleTimeMark.now()
+            ChatUtils.chat(
+                "§eTo edit hidden GUI elements:\n" +
+                    " §7- §e1. Set a key in /sh edit.\n" +
+                    " §7- §e2. Click that key while the GUI element is visible."
             )
-            if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
-                lastHotkeyReminded = SimpleTimeMark.now()
-                ChatUtils.chat(
-                    "§eTo edit hidden GUI elements:\n" +
-                        " §7- §e1. Set a key in /sh edit.\n" +
-                        " §7- §e2. Click that key while the GUI element is visible."
-                )
-            }
         }
+    }
 
-        @JvmStatic
-        fun renderLast() {
-            if (!isInGui()) return
-            if (!SkyHanniDebugsAndTests.globalRender) return
+    @JvmStatic
+    fun renderLast() {
+        if (!isInGui()) return
+        if (!SkyHanniDebugsAndTests.globalRender) return
 
-            GlStateManager.translate(0f, 0f, 200f)
+        GlStateManager.translate(0f, 0f, 200f)
 
-            GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
 
-            GlStateManager.pushMatrix()
-            GlStateManager.enableDepth()
-            GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
-            GlStateManager.popMatrix()
+        GlStateManager.pushMatrix()
+        GlStateManager.enableDepth()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
+        GlStateManager.popMatrix()
 
-            GlStateManager.translate(0f, 0f, -200f)
-        }
+        GlStateManager.translate(0f, 0f, -200f)
+    }
 
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
+    fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
 
-        fun Position.getDummySize(random: Boolean = false): Vector2i {
-            if (random) return Vector2i(5, 5)
-            val (x, y) = currentBorderSize[internalName] ?: return Vector2i(1, 1)
-            return Vector2i((x * effectiveScale).toInt(), (y * effectiveScale).toInt())
-        }
+    fun Position.getDummySize(random: Boolean = false): Vector2i {
+        if (random) return Vector2i(5, 5)
+        val (x, y) = currentBorderSize[internalName] ?: return Vector2i(1, 1)
+        return Vector2i((x * effectiveScale).toInt(), (y * effectiveScale).toInt())
+    }
 
-        fun Position.getAbsX() = getAbsX0(getDummySize(true).x)
+    fun Position.getAbsX() = getAbsX0(getDummySize(true).x)
 
-        fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
+    fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
 
-        fun GuiProfileViewer.anyTextBoxFocused() =
-            this.getPropertiesWithType<GuiElementTextField>().any { it.focus }
+    fun GuiProfileViewer.anyTextBoxFocused() =
+        this.getPropertiesWithType<GuiElementTextField>().any { it.focus }
 
-        fun handleGuiPositionMoved(guiName: String) {
-            lastMovedGui = guiName
-        }
+    fun handleGuiPositionMoved(guiName: String) {
+        lastMovedGui = guiName
     }
 }
 

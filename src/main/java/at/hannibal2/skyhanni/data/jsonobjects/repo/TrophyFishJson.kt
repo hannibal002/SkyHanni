@@ -5,12 +5,12 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class TrophyFishJson(
-    @Expose @SerializedName("trophy_fish") val trophyFish: Map<String, TrophyFishInfo>
+    @Expose @SerializedName("trophy_fish") val trophyFish: Map<String, TrophyFishInfo>,
 )
 
 data class TrophyFishInfo(
-    val displayName: String,
-    val description: String,
-    val rate: Int?,
-    val fillet: Map<TrophyRarity, Int>
+    @Expose val displayName: String,
+    @Expose val description: String,
+    @Expose val rate: Int?,
+    @Expose val fillet: Map<TrophyRarity, Int>,
 )

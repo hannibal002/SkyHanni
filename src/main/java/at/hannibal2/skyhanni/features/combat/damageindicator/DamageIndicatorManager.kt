@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
@@ -18,7 +19,8 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
-import at.hannibal2.skyhanni.features.slayer.blaze.setHellionShield
+import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -48,6 +50,7 @@ import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -62,7 +65,8 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class DamageIndicatorManager {
+@SkyHanniModule
+object DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
     private val maxHealth = mutableMapOf<UUID, Long>()
@@ -70,45 +74,42 @@ class DamageIndicatorManager {
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
-    companion object {
+    private var data = mapOf<UUID, EntityData>()
+    private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
-        private var data = mapOf<UUID, EntityData>()
-        private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
+    fun isBoss(entity: EntityLivingBase) = data.values.any { it.entity == entity }
 
-        fun isBoss(entity: EntityLivingBase) = data.values.any { it.entity == entity }
+    fun isDamageSplash(entity: EntityLivingBase): Boolean {
+        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
+        if (!entity.hasCustomName()) return false
+        if (entity.isDead) return false
+        val name = entity.customNameTag.removeColor().replace(",", "")
 
-        fun isDamageSplash(entity: EntityLivingBase): Boolean {
-            if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
-            if (!entity.hasCustomName()) return false
-            if (entity.isDead) return false
-            val name = entity.customNameTag.removeColor().replace(",", "")
+        return damagePattern.matcher(name).matches()
+    }
 
-            return damagePattern.matcher(name).matches()
-        }
+    fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
 
-        fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
+    fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 
-        fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
-
-        fun getDistanceTo(vararg types: BossType): Double {
-            val playerLocation = LocationUtils.playerLocation()
-            return data.values.filter { it.bossType in types }
-                .map { it.entity.getLorenzVec().distance(playerLocation) }
-                .let { list ->
-                    if (list.isEmpty()) Double.MAX_VALUE else list.minOf { it }
-                }
-        }
-
-        fun getNearestDistanceTo(location: LorenzVec): Double {
-            return data.values
-                .map { it.entity.getLorenzVec() }
-                .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
-        }
-
-        fun removeDamageIndicator(type: BossType) {
-            data = data.editCopy {
-                values.removeIf { it.bossType == type }
+    fun getDistanceTo(vararg types: BossType): Double {
+        val playerLocation = LocationUtils.playerLocation()
+        return data.values.filter { it.bossType in types }
+            .map { it.entity.getLorenzVec().distance(playerLocation) }
+            .let { list ->
+                if (list.isEmpty()) Double.MAX_VALUE else list.minOf { it }
             }
+    }
+
+    fun getNearestDistanceTo(location: LorenzVec): Double {
+        return data.values
+            .map { it.entity.getLorenzVec() }
+            .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
+    }
+
+    fun removeDamageIndicator(type: BossType) {
+        data = data.editCopy {
+            values.removeIf { it.bossType == type }
         }
     }
 
@@ -849,8 +850,8 @@ class DamageIndicatorManager {
         return maxHealth.getOrDefault(entity.uniqueID!!, 0L)
     }
 
-    @SubscribeEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent) {
+    @HandleEvent
+    fun onEntityJoin(event: EntityEnterWorldEvent<Entity>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
