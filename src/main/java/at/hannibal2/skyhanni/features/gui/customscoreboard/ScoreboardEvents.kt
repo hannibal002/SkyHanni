@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
-import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -536,8 +535,6 @@ private fun getRedstoneLines(): List<String> = listOf(getSbLines().first { SbPat
 
 private fun getRedstoneShowWhen(): Boolean = SbPattern.redstonePattern.anyMatches(getSbLines())
 
-private fun getAnniversaryLines() = buildList {
-    addIfNotNull(getSbLines().firstOrNull { SbPattern.anniversaryPattern.matches(it) })
-}
+private fun getAnniversaryLines() = listOf(getSbLines().first { SbPattern.anniversaryPattern.matches(it) })
 
 private fun getAnniversaryShowWhen(): Boolean = SbPattern.anniversaryPattern.anyMatches(getSbLines())
