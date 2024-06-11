@@ -204,8 +204,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        content.addTable(
-            7,
+        footer.add(
             Renderable.horizontalContainer(
                 FarmingItems.getPetsDisplay(true),
                 4,
@@ -214,16 +213,23 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        content.addTable(
-            7,
+        footer.add(
             FFInfos.TOTAL_PET.bar(
                 "§2Total Pet Fortune",
                 "§7§2The total fortune from your pet and its item",
+                71
             )
         )
 
-        content.addTable(
-            7,
+        footer.add(
+            FFInfos.PET_BASE.bar(
+                "§2Base Pet Fortune",
+                "§7§2The base fortune from your pet",
+                71
+            )
+        )
+
+        footer.add(
             FFInfos.PET_ITEM.bar(
                 "§2Pet Item",
                 when (FFStats.currentPetItem) {
@@ -231,7 +237,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                     "YELLOW_BANDANA" -> "§7§2The fortune from your pet's item"
                     "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
                     else -> "No fortune boosting pet item"
-                }
+                },
+                71
             )
         )
 

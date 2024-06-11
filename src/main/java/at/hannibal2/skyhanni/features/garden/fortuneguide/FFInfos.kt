@@ -108,7 +108,8 @@ internal enum class FFInfos(
     val current get() = currentF().toDouble()
     val max get() = maxF(this).toDouble()
 
-    fun bar(label: String, tooltip: String) = GuiRenderUtils.getFarmingBar(label, tooltip, current, max, 90)
+    fun bar(label: String, tooltip: String, width: Int = 90) =
+        GuiRenderUtils.getFarmingBar(label, tooltip, current, max, width)
 
     constructor(
         sumTo: FFInfos?,

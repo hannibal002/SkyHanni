@@ -45,7 +45,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         FarmingItems.setDefaultPet()
 
         pageList = mapOf(
-            FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
+            FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY - 2),
             FortuneGuidePage.CROP to CropPage({ currentCrop!! }, sizeX, sizeY),
             FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )
