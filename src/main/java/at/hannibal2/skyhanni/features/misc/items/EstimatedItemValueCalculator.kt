@@ -103,13 +103,15 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
+    private fun isKuudraSet(internalName: String) =
+        (kuudraSets.any { internalName.contains(it) }
+         && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) })
+
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
-        var internalName = stack.getInternalName().asString().removePrefix("VANQUISHED_")
+        var internalName = removeKuudraArmorPrefix(stack.getInternalName().asString().removePrefix("VANQUISHED_"))
         var genericName = internalName
-        if (kuudraSets.any { internalName.contains(it) }
-            && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) }) {
-            internalName = removeCrimsonArmorPrefix(internalName)
+        if (isKuudraSet(internalName)) {
             genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
         if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
@@ -168,7 +170,9 @@ object EstimatedItemValueCalculator {
         return subTotal + 0.1
     }
 
-    private fun removeCrimsonArmorPrefix(original: String): String {
+    private fun removeKuudraArmorPrefix(original: String): String {
+        if (!isKuudraSet(original)) return original
+
         var internalName = original
         for (prefix in listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")) {
             internalName = internalName.removePrefix(prefix)
@@ -530,7 +534,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = removeCrimsonArmorPrefix(stack.getInternalName().asString()).asInternalName()
+        val internalName = removeKuudraArmorPrefix(stack.getInternalName().asString()).asInternalName()
         var price = internalName.getPrice()
         if (price == -1.0) {
             price = 0.0
