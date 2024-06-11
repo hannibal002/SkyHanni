@@ -155,30 +155,6 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             )
         )
 
-        footer.add(
-            Renderable.horizontalContainer(
-                FarmingItems.getPetsDisplay(true),
-                4,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            )
-        )
-
-        footer.add(
-            FFInfos.TOTAL_PET.bar("§2Total Pet Fortune", "§7§2The total fortune from your pet and its item")
-        )
-
-        footer.add(
-            FFInfos.PET_ITEM.bar(
-                "§2Pet Item", when (FFStats.currentPetItem) {
-                    "GREEN_BANDANA" -> "§7§2The fortune from your pet's item\n§2Grants 4☘ per garden level"
-                    "YELLOW_BANDANA" -> "§7§2The fortune from your pet's item"
-                    "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
-                    else -> "No fortune boosting pet item"
-                }
-            )
-        )
-
         val wordEquip = if (FarmingItems.currentEquip == null) "Equipment" else "Piece"
 
         val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName ?: ""
@@ -225,6 +201,37 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                 "§2$wordEquip Enchantment",
                 if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's enchantments\n$moreInfo"
                 else "§7§2Enchantment fortune from your\n$equipmentName"
+            )
+        )
+
+        content.addTable(
+            7,
+            Renderable.horizontalContainer(
+                FarmingItems.getPetsDisplay(true),
+                4,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+            )
+        )
+
+        content.addTable(
+            7,
+            FFInfos.TOTAL_PET.bar(
+                "§2Total Pet Fortune",
+                "§7§2The total fortune from your pet and its item",
+            )
+        )
+
+        content.addTable(
+            7,
+            FFInfos.PET_ITEM.bar(
+                "§2Pet Item",
+                when (FFStats.currentPetItem) {
+                    "GREEN_BANDANA" -> "§7§2The fortune from your pet's item\n§2Grants 4☘ per garden level"
+                    "YELLOW_BANDANA" -> "§7§2The fortune from your pet's item"
+                    "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
+                    else -> "No fortune boosting pet item"
+                }
             )
         )
 
