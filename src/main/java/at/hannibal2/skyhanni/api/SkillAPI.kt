@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -301,7 +301,8 @@ object SkillAPI {
             }
 
             maxSkillTabPattern.matchMatcher(line) {
-                tablistLevel = group("level").toInt()
+
+            tablistLevel = group("level").toInt()
                 if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
             }
 

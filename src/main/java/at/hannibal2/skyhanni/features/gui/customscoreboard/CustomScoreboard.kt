@@ -78,8 +78,8 @@ object CustomScoreboard {
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
-                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
+                    verticalAlignment != VerticalAlignment.DONT_ALIGN
                 ) {
                     horizontalAlignment = HorizontalAlignment.DONT_ALIGN
                     verticalAlignment = VerticalAlignment.DONT_ALIGN

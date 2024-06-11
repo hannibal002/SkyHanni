@@ -6,10 +6,9 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
-import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
+import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
@@ -18,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -240,8 +238,7 @@ private fun getVotingLines() = buildList {
     }
 }
 
-private fun getVotingShowWhen(): Boolean =
-    SbPattern.yearVotesPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getVotingShowWhen(): Boolean = SbPattern.yearVotesPattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getServerCloseLines() = buildList {
     ServerRestartTitle.restartingGreedyPattern.firstMatches(getSbLines())?.let {
@@ -249,8 +246,8 @@ private fun getServerCloseLines() = buildList {
     }
 }
 
-private fun getServerCloseShowWhen(): Boolean =
-    ServerRestartTitle.restartingGreedyPattern.anyMatches(getSbLines()) // is empty on top already
+// is empty on top already
+private fun getServerCloseShowWhen(): Boolean = ServerRestartTitle.restartingGreedyPattern.anyMatches(getSbLines())
 
 private fun getDungeonsLines() = listOf(
     SbPattern.m7dragonsPattern,
@@ -285,15 +282,14 @@ private fun getDojoLines() = listOf(
     SbPattern.dojoTimePattern
 ).allMatches(getSbLines())
 
-private fun getDojoShowWhen(): Boolean =
-    SbPattern.dojoChallengePattern.anyMatches(getSbLines()) // is empty on top already
+private fun getDojoShowWhen(): Boolean = SbPattern.dojoChallengePattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getDarkAuctionLines() = buildList {
     addAll(listOf(SbPattern.startingInPattern, SbPattern.timeLeftPattern).allMatches(getSbLines()))
 
     SbPattern.darkAuctionCurrentItemPattern.firstMatches(getSbLines())?.let {
         add(it)
-        addIfNotNull(getSbLines().nextAfter(it))
+        addNotNull(getSbLines().nextAfter(it))
     }
 }
 
@@ -308,60 +304,46 @@ private fun getJacobContestLines() = buildList {
     }
 }
 
-private fun getJacobContestShowWhen(): Boolean =
-    SbPattern.jacobsContestPattern.anyMatches(getSbLines())  // is empty on top already
+private fun getJacobContestShowWhen(): Boolean = SbPattern.jacobsContestPattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getJacobMedalsLines(): List<String> = SbPattern.medalsPattern.allMatches(getSbLines())
 
-private fun getJacobMedalsShowWhen(): Boolean =
-    SbPattern.medalsPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getJacobMedalsShowWhen(): Boolean = SbPattern.medalsPattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getTrapperLines() = buildList {
-    addIfNotNull(SbPattern.peltsPattern.firstMatches(getSbLines()))
+    addNotNull(SbPattern.peltsPattern.firstMatches(getSbLines()))
     SbPattern.mobLocationPattern.firstMatches(getSbLines())?.let {
         add("Tracker Mob Location:")
-        addIfNotNull(getSbLines().nextAfter(it))
+        addNotNull(getSbLines().nextAfter(it))
     }
 }
 
-private fun getTrapperShowWhen(): Boolean =
-    listOf(
-        ScoreboardPattern.peltsPattern,
-        ScoreboardPattern.mobLocationPattern
-    ).anyMatches(getSbLines())  // is empty on top already
+private fun getTrapperShowWhen(): Boolean = listOf(
+    SbPattern.peltsPattern,
+    SbPattern.mobLocationPattern,
+).anyMatches(getSbLines()) // is empty on top already
 
-private fun getGardenCleanUpLines() = buildList {
-    addIfNotNull(SbPattern.cleanUpPattern.firstMatches(getSbLines())?.trim())
-}
+private fun getGardenCleanUpLines() = listOfNotNull(SbPattern.cleanUpPattern.firstMatches(getSbLines())?.trim())
 
-private fun getGardenCleanUpShowWhen(): Boolean =
-    SbPattern.cleanUpPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getGardenCleanUpShowWhen(): Boolean = SbPattern.cleanUpPattern.anyMatches(getSbLines()) // is empty on top already
 
-private fun getGardenPastingLines() = buildList {
-    addIfNotNull(SbPattern.pastingPattern.firstMatches(getSbLines())?.trim())
-}
+private fun getGardenPastingLines() = listOfNotNull(SbPattern.pastingPattern.firstMatches(getSbLines())?.trim())
 
-private fun getGardenPastingShowWhen(): Boolean =
-    SbPattern.pastingPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getGardenPastingShowWhen(): Boolean = SbPattern.pastingPattern.anyMatches(getSbLines()) // is empty on top already
 
 // Doesn't exist anymore
-private fun getFlightDurationLines() = buildList {
-    addIfNotNull(SbPattern.flightDurationPattern.firstMatches(getSbLines())?.trim())
-}
+private fun getFlightDurationLines() = listOfNotNull(SbPattern.flightDurationPattern.firstMatches(getSbLines())?.trim())
 
-private fun getFlightDurationShowWhen(): Boolean =
-    SbPattern.flightDurationPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getFlightDurationShowWhen(): Boolean = SbPattern.flightDurationPattern.anyMatches(getSbLines()) // is empty on top already
 
-private fun getWinterLines() = buildList {
-    addAll(listOf(
-        SbPattern.winterEventStartPattern,
-        SbPattern.winterNextWavePattern,
-        SbPattern.winterWavePattern,
-        SbPattern.winterMagmaLeftPattern,
-        SbPattern.winterTotalDmgPattern,
-        SbPattern.winterCubeDmgPattern
-    ).allMatches(getSbLines()).filter { !it.endsWith("Soon!") })
-}
+private fun getWinterLines() = listOf(
+    SbPattern.winterEventStartPattern,
+    SbPattern.winterNextWavePattern,
+    SbPattern.winterWavePattern,
+    SbPattern.winterMagmaLeftPattern,
+    SbPattern.winterTotalDmgPattern,
+    SbPattern.winterCubeDmgPattern,
+).allMatches(getSbLines()).filter { !it.endsWith("Soon!") }
 
 private fun getWinterShowWhen(): Boolean = // is empty on top already
     listOf(
@@ -413,7 +395,7 @@ private fun getActiveEventShowWhen(): Boolean =
 
 private fun getSoonEventLine(): List<String> {
     val soonActiveEvent = getTablistEvent() ?: return emptyList()
-    val soonActiveEventTime = TabListData.getTabList().matchFirst(SbPattern.eventTimeStartsPattern) {
+    val soonActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabListData.getTabList()) {
         group("time")
     } ?: "§cUnknown"
 
@@ -424,12 +406,9 @@ private fun getSoonEventShowWhen(): Boolean =
     getTablistEvent() != null && TabListData.getTabList()
         .any { SbPattern.eventTimeStartsPattern.matches(it) } // is empty on top already
 
-private fun getBroodmotherLines() = buildList {
-    addIfNotNull(SbPattern.broodmotherPattern.firstMatches(getSbLines()))
-}
+private fun getBroodmotherLines() = listOfNotNull((SbPattern.broodmotherPattern.firstMatches(getSbLines())))
 
-private fun getBroodmotherShowWhen(): Boolean =
-    SbPattern.broodmotherPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getBroodmotherShowWhen(): Boolean = SbPattern.broodmotherPattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getMiningEventsLines() = buildList {
     // Wind
@@ -480,19 +459,16 @@ private fun getMiningEventsLines() = buildList {
     )
 
     // Fortunate Freezing
-    addIfNotNull(SbPattern.fortunateFreezingBonusPattern.firstMatches(getSbLines()))
+    addNotNull(SbPattern.fortunateFreezingBonusPattern.firstMatches(getSbLines()))
 
     // Fossil Dust
-    addIfNotNull(SbPattern.fossilDustPattern.firstMatches(getSbLines()))
+    addNotNull(SbPattern.fossilDustPattern.firstMatches(getSbLines()))
 }
 
-private fun getDamageLines(): List<String> =
-    listOf(
-        listOf(
-            SbPattern.bossHPPattern,
-            SbPattern.bossDamagePattern
-        ).allMatches(getSbLines()).joinToString("")
-    )
+private fun getDamageLines(): List<String> = listOf(
+    SbPattern.bossHPPattern,
+    SbPattern.bossDamagePattern,
+).allMatches(getSbLines())
 
 private fun getDamageShowWhen(): Boolean =
     listOf(
@@ -524,9 +500,7 @@ private fun getRiftLines() = listOf(
 
 private fun getRiftShowWhen(): Boolean = IslandType.THE_RIFT.isInIsland()
 
-private fun getEssenceLines() = buildList {
-    addIfNotNull(SbPattern.essencePattern.firstMatches(getSbLines()))
-}
+private fun getEssenceLines() = listOfNotNull(SbPattern.essencePattern.firstMatches(getSbLines()))
 
 private fun getEssenceShowWhen(): Boolean = SbPattern.essencePattern.anyMatches(getSbLines()) // is empty on top already
 
@@ -537,8 +511,6 @@ private fun getQueueLines(): List<String> = listOf(
 
 private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getSbLines()) // is empty on top already
 
-private fun getRedstoneLines() = buildList {
-    addIfNotNull(SbPattern.redstonePattern.firstMatches(getSbLines()))
-}
+private fun getRedstoneLines() = listOfNotNull(SbPattern.redstonePattern.firstMatches(getSbLines()))
 
 private fun getRedstoneShowWhen(): Boolean = SbPattern.redstonePattern.anyMatches(getSbLines())

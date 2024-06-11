@@ -38,12 +38,13 @@ object ScoreboardPattern {
     )
     val datePattern by mainSb.pattern(
         "date",
-        "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?.*"
+        "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?.*",
     )
-    /*
-      * REGEX-TEST:  §78:50am
-      * REGEX-TEST:  §75:50am §b☽
-    */
+
+    /**
+     * REGEX-TEST:  §78:50am
+     * REGEX-TEST:  §75:50am §b☽
+     */
     val timePattern by mainSb.pattern(
         "time",
         "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm)\\s*(?<symbol>(§b☽|§e☀|§.⚡|§.☔))?.*$"
@@ -186,7 +187,7 @@ object ScoreboardPattern {
      */
     val powderPattern by miningSb.pattern(
         "powder",
-        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)"
+        "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)",
     )
 
     /**
@@ -196,7 +197,7 @@ object ScoreboardPattern {
      */
     val powderGreedyPattern by miningSb.pattern(
         "powdergreedy",
-        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$"
+        "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$",
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",
@@ -430,7 +431,7 @@ object ScoreboardPattern {
     )
     val riftHotdogEatenPattern by riftSb.pattern(
         "hotdogeaten",
-        "^Eaten: §.\\d+\\/\\d+$"
+        "^Eaten: §.\\d+/\\d+$",
     )
     val riftAveikxPattern by riftSb.pattern(
         "aveikx",
@@ -453,7 +454,7 @@ object ScoreboardPattern {
     )
     val bankPattern by tablistGroup.pattern(
         "bank",
-        "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 \\/ §6(?<coop>[\\w.,]+))?)$"
+        "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 / §6(?<coop>[\\w.,]+))?)$",
     )
     val soulflowPattern by tablistGroup.pattern(
         "soulflow",
