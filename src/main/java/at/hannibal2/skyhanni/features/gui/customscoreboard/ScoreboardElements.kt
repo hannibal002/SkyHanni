@@ -501,7 +501,8 @@ private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
 private fun getNorthStarsShowWhen() = inAnyIsland(IslandType.WINTER)
 
 private fun getChunkedStatsDisplayPair(): List<ScoreboardElementType> =
-    getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
+    getChunkedStats()
+        .chunked(chunkedConfig.maxStatsPerLine)
         .map { it.joinToString(" §f| ") to HorizontalAlignment.LEFT }
 
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.LEFT)
