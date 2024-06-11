@@ -309,6 +309,8 @@ object RenderUtils {
         extraSize: Double = 0.0,
         extraSizeTopY: Double = extraSize,
         extraSizeBottomY: Double = extraSize,
+        minimumAlpha: Float = 0.2f,
+        inverseAlphaScale: Boolean = false,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
@@ -318,24 +320,27 @@ object RenderUtils {
 
         if (seeThroughBlocks) {
             GlStateManager.disableDepth()
-            GlStateManager.disableCull()
         }
+
+        GlStateManager.disableCull()
         drawFilledBoundingBox(
+            @Suppress("ktlint:standard:argument-list-wrapping")
             AxisAlignedBB(
                 x - extraSize, y - extraSizeBottomY, z - extraSize,
-                x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize
+                x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
             ).expandBlock(),
             color,
-            (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
+            if (inverseAlphaScale) (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
+            else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
         )
         GlStateManager.disableTexture2D()
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
+        GlStateManager.enableCull()
 
         if (seeThroughBlocks) {
             GlStateManager.enableDepth()
-            GlStateManager.enableCull()
         }
     }
 
