@@ -69,7 +69,7 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
                 2,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
             ),
-            50,
+            164,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
         )
