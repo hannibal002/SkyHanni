@@ -71,13 +71,11 @@ enum class ChunkedStats(
 
     override fun toString() = configLine
 
-    fun getDisplay() = displayPair.get()
-
     companion object {
         fun getChunkedStats() = buildList {
             chunkedConfig.chunkedStats.forEach { stat ->
                 if (stat.showWhen()) {
-                    add(stat.getDisplay())
+                    add(stat.displayPair.get())
                 }
             }
         }
