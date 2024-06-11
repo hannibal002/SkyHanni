@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
@@ -85,7 +86,7 @@ object ComposterDisplay {
 
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
-            GardenAPI.storage?.composterEmptyTime = (SimpleTimeMark.now() + emptyTime).toMillis()
+            GardenAPI.storage?.composterEmptyTime = emptyTime.fromNow()
             val format = emptyTime.format()
             listOf(bucket, "§b$format")
         } else {
@@ -128,22 +129,21 @@ object ComposterDisplay {
 
         val storage = storage ?: return
 
-        if (ComposterAPI.getOrganicMatter() <= config.notifyLow.organicMatter && System.currentTimeMillis() >= storage.informedAboutLowMatter) {
+        if (ComposterAPI.getOrganicMatter() <= config.notifyLow.organicMatter && storage.informedAboutLowMatter.isInPast()) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
             ChatUtils.chat("§cYour Organic Matter is low!")
-            storage.informedAboutLowMatter = System.currentTimeMillis() + 60_000 * 5
+            storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
-        if (ComposterAPI.getFuel() <= config.notifyLow.fuel &&
-            System.currentTimeMillis() >= storage.informedAboutLowFuel
+        if (ComposterAPI.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()
         ) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
             ChatUtils.chat("§cYour Fuel is low!")
-            storage.informedAboutLowFuel = System.currentTimeMillis() + 60_000 * 5
+            storage.informedAboutLowFuel = 5.0.minutes.fromNow()
         }
     }
 
@@ -160,14 +160,13 @@ object ComposterDisplay {
 
     private fun checkWarningsAndOutsideGarden() {
         val format = GardenAPI.storage?.let {
-            val composterEmpty = SimpleTimeMark(it.composterEmptyTime)
-            if (!composterEmpty.isFarPast()) {
-                val timeUntilEmpty = composterEmpty.timeUntil()
-                if (timeUntilEmpty.isPositive()) {
-                    if (timeUntilEmpty < 20.minutes) {
+            if (!it.composterEmptyTime.isFarPast()) {
+                val duration = it.composterEmptyTime.timeUntil()
+                if (duration > 0.0.seconds) {
+                    if (duration < 20.0.minutes) {
                         warn("Your composter in the garden is almost empty!")
                     }
-                    timeUntilEmpty.format(maxUnits = 3)
+                    duration.format(maxUnits = 3)
                 } else {
                     warn("Your composter is empty!")
                     "§cComposter is empty!"
@@ -189,8 +188,8 @@ object ComposterDisplay {
 
         if (ReminderUtils.isBusy()) return
 
-        if (System.currentTimeMillis() < storage.lastComposterEmptyWarningTime + 1000 * 60 * 2) return
-        storage.lastComposterEmptyWarningTime = System.currentTimeMillis()
+        if (storage.lastComposterEmptyWarningTime.passedSince() >= 2.0.minutes) return
+        storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
         if (IslandType.GARDEN.isInIsland()) {
             ChatUtils.chat(warningMessage)
         } else {
