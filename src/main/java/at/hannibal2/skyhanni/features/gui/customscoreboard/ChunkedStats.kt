@@ -59,7 +59,7 @@ enum class ChunkedStats(
         configLine = "§cHeat",
     ),
     COLD(
-        displayPair = { "§b${getCold()} ❄" },
+        displayPair = { "§b${getCold()}❄" },
         showWhen = { !(hideEmptyLines && getCold() == 0) && ScoreboardElement.COLD.showWhen() },
         configLine = "§bCold",
     ),
