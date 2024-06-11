@@ -35,7 +35,7 @@ object DianaAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
         if (event.entity.name == "Minos Inquisitor") {
-            InquisitorFoundEvent(event.entity).postAndCatch()
+            InquisitorFoundEvent(event.entity).post()
         }
     }
 }
