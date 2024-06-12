@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.data.QuiverAPI.asArrowPercentage
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.getChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
@@ -243,8 +244,8 @@ enum class ScoreboardElement(
     ),
     EVENTS(
         ::getEventsDisplayPair,
-        ::getEventsShowWhen,
-        "§7Wide Range of Events\n§7(too much to show all)"
+        { true },
+        "§7Wide Range of Events\n§7(too much to show all)",
     ),
     MAYOR(
         ::getMayorDisplayPair,
@@ -504,7 +505,7 @@ private fun getNorthStarsDisplayPair(): List<String> {
     )
 }
 
-private fun getNorthStarsShowWhen() = inAnyIsland(IslandType.WINTER)
+private fun getNorthStarsShowWhen() = WinterAPI.inWorkshop()
 
 private fun getChunkedStatsDisplayPair(): List<String> =
     getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
@@ -732,13 +733,11 @@ private fun getPowderDisplayPair() = buildList {
 
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
-private fun getEventsDisplayPair(): List<Any> {
+private fun getEventsDisplayPair(): List<ScoreboardElementType> {
     return ScoreboardEvents.getEvent()
         .filterNotNull()
         .flatMap { it.getLines() }
 }
-
-private fun getEventsShowWhen() = ScoreboardEvents.getEvent().filterNotNull().isNotEmpty() // is empty on top already
 
 private fun getMayorDisplayPair() = buildList {
     val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: HIDDEN

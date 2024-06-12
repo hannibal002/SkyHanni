@@ -3,16 +3,22 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -45,23 +51,23 @@ enum class ScoreboardEvents(
 ) {
     VOTING(
         ::getVotingLines,
-        ::getVotingShowWhen,
-        "§7(All Voting Lines)"
+        { IslandType.HUB.isInIsland() },
+        "§7(All Voting Lines)",
     ),
     SERVER_CLOSE(
         ::getServerCloseLines,
-        ::getServerCloseShowWhen,
-        "§cServer closing soon!"
+        { true },
+        "§cServer closing soon!",
     ),
     DUNGEONS(
         ::getDungeonsLines,
-        ::getDungeonsShowWhen,
-        "§7(All Dungeons Lines)"
+        { DungeonAPI.inDungeon() },
+        "§7(All Dungeons Lines)",
     ),
     KUUDRA(
         ::getKuudraLines,
-        ::getKuudraShowWhen,
-        "§7(All Kuudra Lines)"
+        { KuudraAPI.inKuudra() },
+        "§7(All Kuudra Lines)",
     ),
     DOJO(
         ::getDojoLines,
@@ -70,17 +76,17 @@ enum class ScoreboardEvents(
     ),
     DARK_AUCTION(
         ::getDarkAuctionLines,
-        ::getDarkAuctionShowWhen,
+        { IslandType.DARK_AUCTION.isInIsland() },
         "Time Left: §b11\n" +
             "Current Item:\n" +
-            " §5Travel Scroll to Sirius"
+            " §5Travel Scroll to Sirius",
     ),
     JACOB_CONTEST(
         ::getJacobContestLines,
-        ::getJacobContestShowWhen,
+        { true },
         "§eJacob's Contest\n" +
             "§e○ §fCarrot §a18m17s\n" +
-            " Collected §e8,264"
+            " Collected §e8,264",
     ),
     JACOB_MEDALS(
         ::getJacobMedalsLines,
@@ -91,20 +97,20 @@ enum class ScoreboardEvents(
     ),
     TRAPPER(
         ::getTrapperLines,
-        ::getTrapperShowWhen,
+        { inAnyIsland(IslandType.THE_FARMING_ISLANDS) },
         "Pelts: §5711\n" +
             "Tracker Mob Location:\n" +
-            "§bMushroom Gorge"
+            "§bMushroom Gorge",
     ),
     GARDEN_CLEAN_UP(
         ::getGardenCleanUpLines,
-        ::getGardenCleanUpShowWhen,
-        "Cleanup: §c12.6%"
+        { GardenAPI.inGarden() },
+        "Cleanup: §c12.6%",
     ),
     GARDEN_PASTING(
         ::getGardenPastingLines,
-        ::getGardenPastingShowWhen,
-        "§fBarn Pasting§7: §e12.3%"
+        { GardenAPI.inGarden() },
+        "§fBarn Pasting§7: §e12.3%",
     ),
     FLIGHT_DURATION(
         ::getFlightDurationLines,
@@ -113,20 +119,20 @@ enum class ScoreboardEvents(
     ),
     WINTER(
         ::getWinterLines,
-        ::getWinterShowWhen,
-        "§7(All Winter Event Lines)"
+        { WinterAPI.inWorkshop() },
+        "§7(All Winter Event Lines)",
     ),
     SPOOKY(
         ::getSpookyLines,
-        ::getSpookyShowWhen,
+        { true },
         "§6Spooky Festival§f 50:54\n" +
             "§7Your Candy:\n" +
-            "§a1 Green§7, §50 Purple §7(§61 §7pts.)"
+            "§a1 Green§7, §50 Purple §7(§61 §7pts.)",
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
-        ::getBroodmotherShowWhen,
-        "§4Broodmother§7: §eDormant"
+        { IslandType.SPIDER_DEN.isInIsland() },
+        "§4Broodmother§7: §eDormant",
     ),
     MINING_EVENTS(
         ::getMiningEventsLines,
@@ -135,9 +141,9 @@ enum class ScoreboardEvents(
     ),
     DAMAGE(
         ::getDamageLines,
-        ::getDamageShowWhen,
+        { true },
         "Dragon HP: §a6,180,925 §c❤\n" +
-            "Your Damage: §c375,298.5"
+            "Your Damage: §c375,298.5",
     ),
     MAGMA_BOSS(
         ::getMagmaBossLines,
@@ -149,19 +155,19 @@ enum class ScoreboardEvents(
     ),
     RIFT(
         ::getRiftLines,
-        ::getRiftShowWhen,
-        "§7(All Rift Lines)"
+        { RiftAPI.inRift() },
+        "§7(All Rift Lines)",
     ),
     ESSENCE(
         ::getEssenceLines,
-        ::getEssenceShowWhen,
-        "Dragon Essence: §d1,285"
+        { true },
+        "Dragon Essence: §d1,285",
     ),
     QUEUE(
         ::getQueueLines,
-        ::getQueueShowWhen,
+        { true },
         "Queued: Glacite Mineshafts\n" +
-            "Position: §b#45 §fSince: §a00:00"
+            "Position: §b#45 §fSince: §a00:00",
     ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
@@ -170,13 +176,13 @@ enum class ScoreboardEvents(
     ),
     STARTING_SOON_TABLIST_EVENTS(
         ::getSoonEventLine,
-        ::getSoonEventShowWhen,
-        "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
+        { true },
+        "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min",
     ),
     REDSTONE(
         ::getRedstoneLines,
-        ::getRedstoneShowWhen,
-        "§e§l⚡ §cRedstone: §e§b7%"
+        { IslandType.PRIVATE_ISLAND.isInIsland() },
+        "§e§l⚡ §cRedstone: §e§b7%",
     ),
     ;
 
@@ -239,16 +245,11 @@ private fun getVotingLines() = buildList {
     }
 }
 
-private fun getVotingShowWhen(): Boolean = SbPattern.yearVotesPattern.anyMatches(getSbLines()) // is empty on top already
-
 private fun getServerCloseLines() = buildList {
     ServerRestartTitle.restartingGreedyPattern.firstMatches(getSbLines())?.let {
         add(it.split("§8")[0])
     }
 }
-
-// is empty on top already
-private fun getServerCloseShowWhen(): Boolean = ServerRestartTitle.restartingGreedyPattern.anyMatches(getSbLines())
 
 private fun getDungeonsLines() = listOf(
     SbPattern.m7dragonsPattern,
@@ -262,8 +263,6 @@ private fun getDungeonsLines() = listOf(
     SbPattern.floor3GuardiansPattern
 ).allMatches(getSbLines()).map { it.removePrefix("§r") }
 
-private fun getDungeonsShowWhen(): Boolean = DungeonAPI.inDungeon()
-
 private fun getKuudraLines() = listOf(
     SbPattern.autoClosingPattern,
     SbPattern.startingInPattern,
@@ -274,8 +273,6 @@ private fun getKuudraLines() = listOf(
     SbPattern.submergesPattern
 ).allMatches(getSbLines())
 
-private fun getKuudraShowWhen(): Boolean = IslandType.KUUDRA_ARENA.isInIsland()
-
 private fun getDojoLines() = listOf(
     SbPattern.dojoChallengePattern,
     SbPattern.dojoDifficultyPattern,
@@ -283,7 +280,7 @@ private fun getDojoLines() = listOf(
     SbPattern.dojoTimePattern
 ).allMatches(getSbLines())
 
-private fun getDojoShowWhen(): Boolean = SbPattern.dojoChallengePattern.anyMatches(getSbLines()) // is empty on top already
+private fun getDojoShowWhen(): Boolean = IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Dojo"
 
 private fun getDarkAuctionLines() = buildList {
     addAll(listOf(SbPattern.startingInPattern, SbPattern.timeLeftPattern).allMatches(getSbLines()))
@@ -294,8 +291,6 @@ private fun getDarkAuctionLines() = buildList {
     }
 }
 
-private fun getDarkAuctionShowWhen(): Boolean = IslandType.DARK_AUCTION.isInIsland()
-
 private fun getJacobContestLines() = buildList {
     SbPattern.jacobsContestPattern.firstMatches(getSbLines())?.let { line ->
         add(line)
@@ -305,11 +300,11 @@ private fun getJacobContestLines() = buildList {
     }
 }
 
-private fun getJacobContestShowWhen(): Boolean = SbPattern.jacobsContestPattern.anyMatches(getSbLines()) // is empty on top already
-
 private fun getJacobMedalsLines(): List<String> = SbPattern.medalsPattern.allMatches(getSbLines())
 
-private fun getJacobMedalsShowWhen(): Boolean = SbPattern.medalsPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getJacobMedalsShowWhen(): Boolean =
+    GardenAPI.inGarden() || IslandType.HUB.isInIsland() ||
+        inAnyIsland(IslandType.GARDEN, IslandType.HUB)
 
 private fun getTrapperLines() = buildList {
     addNotNull(SbPattern.peltsPattern.firstMatches(getSbLines()))
@@ -319,23 +314,14 @@ private fun getTrapperLines() = buildList {
     }
 }
 
-private fun getTrapperShowWhen(): Boolean = listOf(
-    SbPattern.peltsPattern,
-    SbPattern.mobLocationPattern,
-).anyMatches(getSbLines()) // is empty on top already
-
 private fun getGardenCleanUpLines() = listOfNotNull(SbPattern.cleanUpPattern.firstMatches(getSbLines())?.trim())
 
-private fun getGardenCleanUpShowWhen(): Boolean = SbPattern.cleanUpPattern.anyMatches(getSbLines()) // is empty on top already
-
 private fun getGardenPastingLines() = listOfNotNull(SbPattern.pastingPattern.firstMatches(getSbLines())?.trim())
-
-private fun getGardenPastingShowWhen(): Boolean = SbPattern.pastingPattern.anyMatches(getSbLines()) // is empty on top already
 
 // Doesn't exist anymore
 private fun getFlightDurationLines() = listOfNotNull(SbPattern.flightDurationPattern.firstMatches(getSbLines())?.trim())
 
-private fun getFlightDurationShowWhen(): Boolean = SbPattern.flightDurationPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getFlightDurationShowWhen(): Boolean = SbPattern.flightDurationPattern.anyMatches(getSbLines()) // will get replaced soon
 
 private fun getWinterLines() = listOf(
     SbPattern.winterEventStartPattern,
@@ -345,13 +331,6 @@ private fun getWinterLines() = listOf(
     SbPattern.winterTotalDmgPattern,
     SbPattern.winterCubeDmgPattern,
 ).allMatches(getSbLines()).filter { !it.endsWith("Soon!") }
-
-private fun getWinterShowWhen(): Boolean = // is empty on top already
-    listOf(
-        SbPattern.winterEventStartPattern,
-        SbPattern.winterNextWavePattern,
-        SbPattern.winterWavePattern
-    ).anyMatches(getSbLines())
 
 private fun getSpookyLines() = buildList {
     SbPattern.spookyPattern.firstMatches(getSbLines())?.let { // Time
@@ -366,8 +345,6 @@ private fun getSpookyLines() = buildList {
         ) // Candy
     }
 }
-
-private fun getSpookyShowWhen(): Boolean = SbPattern.spookyPattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getTablistEvent(): String? {
     return SbPattern.eventNamePattern.firstMatcher(TabListData.getTabList()) {
@@ -389,8 +366,7 @@ private fun getActiveEventLine(): List<String> {
     return listOf(currentActiveEvent, " Ends in: §e$currentActiveEventTime")
 }
 
-private fun getActiveEventShowWhen(): Boolean =
-    getTablistEvent() != null && SbPattern.eventTimeEndsPattern.anyMatches(TabListData.getTabList()) // is empty on top already
+private fun getActiveEventShowWhen(): Boolean = true
 
 private fun getSoonEventLine(): List<String> {
     val soonActiveEvent = getTablistEvent() ?: return emptyList()
@@ -401,12 +377,7 @@ private fun getSoonEventLine(): List<String> {
     return listOf(soonActiveEvent, " Starts in: §e$soonActiveEventTime")
 }
 
-private fun getSoonEventShowWhen(): Boolean =
-    getTablistEvent() != null && TabListData.getTabList().any { SbPattern.eventTimeStartsPattern.matches(it) } // is empty on top already
-
-private fun getBroodmotherLines() = listOfNotNull((SbPattern.broodmotherPattern.firstMatches(getSbLines())))
-
-private fun getBroodmotherShowWhen(): Boolean = SbPattern.broodmotherPattern.anyMatches(getSbLines()) // is empty on top already
+private fun getBroodmotherLines() = listOfNotNull(SbPattern.broodmotherPattern.firstMatches(getSbLines()))
 
 private fun getMiningEventsLines() = buildList {
     // Wind
@@ -468,12 +439,6 @@ private fun getDamageLines(): List<String> = listOf(
     SbPattern.bossDamagePattern,
 ).allMatches(getSbLines())
 
-private fun getDamageShowWhen(): Boolean =
-    listOf(
-        SbPattern.bossHPPattern,
-        SbPattern.bossDamagePattern
-    ).anyMatches(getSbLines()) // is empty on top already
-
 private fun getMagmaBossLines() = listOf(
     SbPattern.magmaBossPattern,
     SbPattern.damageSoakedPattern,
@@ -484,7 +449,8 @@ private fun getMagmaBossLines() = listOf(
     SbPattern.bossHealthBarPattern
 ).allMatches(getSbLines())
 
-private fun getMagmaBossShowWhen(): Boolean = SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
+private fun getMagmaBossShowWhen(): Boolean = inAnyIsland(IslandType.CRIMSON_ISLE) &&
+    SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 
 private fun getRiftLines() = listOf(
     RiftBloodEffigies.heartsPattern,
@@ -496,19 +462,11 @@ private fun getRiftLines() = listOf(
     SbPattern.cluesPattern
 ).allMatches(getSbLines())
 
-private fun getRiftShowWhen(): Boolean = IslandType.THE_RIFT.isInIsland()
-
 private fun getEssenceLines() = listOfNotNull(SbPattern.essencePattern.firstMatches(getSbLines()))
-
-private fun getEssenceShowWhen(): Boolean = SbPattern.essencePattern.anyMatches(getSbLines()) // is empty on top already
 
 private fun getQueueLines(): List<String> = listOf(
     SbPattern.queuePattern,
     SbPattern.queuePositionPattern
 ).allMatches(getSbLines())
 
-private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getSbLines()) // is empty on top already
-
 private fun getRedstoneLines() = listOfNotNull(SbPattern.redstonePattern.firstMatches(getSbLines()))
-
-private fun getRedstoneShowWhen(): Boolean = SbPattern.redstonePattern.anyMatches(getSbLines())
