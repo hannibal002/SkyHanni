@@ -23,5 +23,7 @@ class TimeLimitedSet<T : Any>(
 
     fun clear() = cache.clear()
 
-    fun toSet(): Set<T> = cache.keys().toSet()
+    fun toSet(): Set<T> = cache.keys().let { keys ->
+        if (keys.isEmpty()) emptySet() else keys.toSet()
+    }
 }

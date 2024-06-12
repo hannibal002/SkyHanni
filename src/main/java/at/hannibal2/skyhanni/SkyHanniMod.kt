@@ -6,10 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands
-import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -18,16 +16,10 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
-import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.Translator
-import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -56,7 +48,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.7",
+    version = "0.26.Beta.8",
 )
 class SkyHanniMod {
 
@@ -71,21 +63,13 @@ class SkyHanniMod {
 
         // data
         loadModule(HypixelData())
-        loadModule(ScoreboardData())
-        loadModule(RenderLivingEntityHelper())
         loadModule(SkillExperience())
-        loadModule(GuiEditManager())
 
         // features
-        loadModule(DamageIndicatorManager())
-        loadModule(BurrowWarpHelper())
         loadModule(CollectionTracker())
         loadModule(CrimsonIsleReputationHelper(this))
-        loadModule(BingoCardDisplay())
-        loadModule(BingoNextStepHelper())
         loadModule(FarmingWeightDisplay())
         loadModule(Translator())
-        loadModule(CustomScoreboard())
 
         // test stuff
         loadModule(SkyHanniDebugsAndTests())

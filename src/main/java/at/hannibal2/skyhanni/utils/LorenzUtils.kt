@@ -15,10 +15,12 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
@@ -26,7 +28,6 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
-import net.minecraft.launchwrapper.Launch
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -179,7 +180,7 @@ object LorenzUtils {
             val left = Renderable.hoverTips(
                 entry.left,
                 tips = entry.hover,
-                highlightsOnHoverSlots = entry.highlightsOnHoverSlots
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
             )
             val right = Renderable.string(entry.right)
             outerList.add(listOf(item, left, right))
@@ -240,9 +241,11 @@ object LorenzUtils {
                 add("§a[$display]")
             } else {
                 add("§e[")
-                add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
+                add(
+                    Renderable.link("§e$display") {
+                        onChange(entry)
+                    },
+                )
                 add("§e]")
             }
             add(" ")
@@ -263,25 +266,29 @@ object LorenzUtils {
                 lastButtonClicked = System.currentTimeMillis()
             }
         }
-        add(buildList {
-            add(prefix)
-            add("§a[")
-            if (tips.isEmpty()) {
-                add(Renderable.link("§e$getName", false, onClick))
-            } else {
-                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-            }
-            add("§a]")
-        })
+        add(
+            buildList {
+                add(prefix)
+                add("§a[")
+                if (tips.isEmpty()) {
+                    add(Renderable.link("§e$getName", false, onClick))
+                } else {
+                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                }
+                add("§a]")
+            },
+        )
     }
 
     fun GuiEditSign.isRancherSign(): Boolean {
         if (this !is AccessorGuiEditSign) return false
 
         val tileSign = (this as AccessorGuiEditSign).tileSign
-        return (tileSign.signText[1].unformattedText.removeColor() == "^^^^^^"
-            && tileSign.signText[2].unformattedText.removeColor() == "Set your"
-            && tileSign.signText[3].unformattedText.removeColor() == "speed cap!")
+        return (
+            tileSign.signText[1].unformattedText.removeColor() == "^^^^^^" &&
+                tileSign.signText[2].unformattedText.removeColor() == "Set your" &&
+                tileSign.signText[3].unformattedText.removeColor() == "speed cap!"
+            )
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
@@ -292,7 +299,11 @@ object LorenzUtils {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
             Minecraft.getMinecraft().playerController.windowClick(
-                container.windowId, slotNumber, 0, 1, Minecraft.getMinecraft().thePlayer
+                container.windowId,
+                slotNumber,
+                0,
+                1,
+                Minecraft.getMinecraft().thePlayer,
             )
             this.cancel()
         }
@@ -327,9 +338,6 @@ object LorenzUtils {
 
     inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
 
-    // TODO move to val by lazy
-    fun isInDevEnvironment() = ((Launch.blackboard ?: mapOf())["fml.deobfuscatedEnvironment"] as Boolean?) ?: true
-
     fun shutdownMinecraft(reason: String? = null) {
         System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
         reason?.let {
@@ -348,13 +356,23 @@ object LorenzUtils {
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
-    fun inAdvancedMiningIsland() =
-        IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
+    fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() ||
+        IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland()
-        || inAdvancedMiningIsland()
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() ||
+        IslandType.DEEP_CAVERNS.isInIsland() || inAdvancedMiningIsland()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+
+    private var lastGuiTime = SimpleTimeMark.farPast()
+
+    fun isAnyGuiActive(): Boolean {
+        val gui = Minecraft.getMinecraft().currentScreen != null
+        if (gui) {
+            lastGuiTime = 3.ticks.fromNow()
+        }
+        return !lastGuiTime.isInPast()
+    }
 
     fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)
