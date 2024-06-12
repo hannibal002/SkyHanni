@@ -157,7 +157,7 @@ class ConfigManager {
     private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {
         val fileName = fileType.fileName
         logger.log("Trying to load $fileName from $file")
-        var output: Any = defaultValue
+        var output: Any? = defaultValue
 
         if (file!!.exists()) {
             try {
@@ -203,7 +203,6 @@ class ConfigManager {
         if (output == defaultValue) {
             logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
         }
-        @Suppress("SENSELESS_COMPARISON")
         if (output == null) {
             logger.log("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
             output = defaultValue
