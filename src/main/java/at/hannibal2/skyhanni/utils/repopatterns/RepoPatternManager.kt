@@ -43,7 +43,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf()
+            else regexes?.regexes ?: mapOf(),
         )
 
     /**
@@ -77,7 +77,7 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+    val localLoading: Boolean get() = config.forceLocal.get() xor (!insideTest && PlatformUtils.isDevEnvironment)
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.
@@ -122,7 +122,7 @@ object RepoPatternManager {
                             " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +
                             " tried to use at ${owner.ownerClass} / ${owner.property}" +
                             if (parentKeyHolder != null) "with parentKeyHolder ${parentKeyHolder.ownerClass} / ${parentKeyHolder.property}"
-                            else ""
+                            else "",
                     )
                 }
             }
@@ -141,7 +141,7 @@ object RepoPatternManager {
                 if (!config.tolerateDuplicateUsage) crash(
                     "Non unique access to array regex at \"$key\"." +
                         " First obtained by ${preRegistered.ownerClass} / ${preRegistered.property}," +
-                        " tried to use at ${owner.ownerClass} / ${owner.property}"
+                        " tried to use at ${owner.ownerClass} / ${owner.property}",
                 )
             }
         }
@@ -243,8 +243,8 @@ object RepoPatternManager {
             ConfigManager.gson.toJson(
                 RepoPatternDump(
                     sourceLabel,
-                    usedKeys.values.flatMap { it.dump().toList() }.toMap()
-                )
+                    usedKeys.values.flatMap { it.dump().toList() }.toMap(),
+                ),
             )
         file.parentFile.mkdirs()
         file.writeText(data)
@@ -300,7 +300,7 @@ object RepoPatternManager {
      * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
      * */
     internal fun getUnusedPatterns(prefix: String): List<Pattern> {
-        if (config.forceLocal.get()) return emptyList()
+        if (localLoading) return emptyList()
         try {
             verifyKeyShape(prefix)
         } catch (e: IllegalArgumentException) {
