@@ -57,7 +57,7 @@ object MaxwellAPI {
             storage?.maxwell?.favoritePowers = value
         }
 
-    private val NO_POWER get() = getPowerByNameOrNull("No Power")
+    private val NO_POWER by lazy { getPowerByNameOrNull("No Power") }
     private var powers = mutableListOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
