@@ -199,32 +199,14 @@ object CustomWardrobe {
 
         for (armorIndex in 0 until 4) {
             val stack = slot.armor[armorIndex]?.copy()
-            if (stack == null) {
-                loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
-            } else {
-                try {
-                    loreList.add(
-                        Renderable.hoverable(
-                            Renderable.hoverTips(
-                                Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                                getToolTip(stack, slot, armorIndex)
-                            ),
-                            Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                            bypassChecks = true,
-                        ),
-                    )
-                } catch (e: Exception) {
-                    loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
-                    ErrorManager.logErrorWithData(
-                        Exception("Failed to get tooltip for armor piece in CustomWardrobe"),
-                        "Failed to get tooltip for armor piece in CustomWardrobe",
-                        "Armor" to stack,
-                        "Slot" to slot,
-                        "Lore" to stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
-                        "Exception" to e,
-                    )
+            var renderable = Renderable.placeholder(containerWidth, hoverableSizes[armorIndex])
+            if (stack != null) {
+                val toolTip = getToolTip(stack, slot, armorIndex)
+                if (toolTip != null) {
+                    renderable = Renderable.hoverTips(renderable, tips = toolTip)
                 }
             }
+            loreList.add(renderable)
         }
         return Renderable.verticalContainer(loreList, spacing = 1)
     }
@@ -233,18 +215,29 @@ object CustomWardrobe {
         stack: ItemStack,
         slot: WardrobeSlot,
         armorIndex: Int,
-    ): List<String> {
-        // Get tooltip from minecraft and other mods
-        // TODO add support for advanced tooltip (F3+H)
-        val toolTips = stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+    ): List<String>? {
+        try {
+            // Get tooltip from minecraft and other mods
+            // TODO add support for advanced tooltip (F3+H)
+            val toolTips = stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
 
-        // Modify tooltip via SkyHanni Events
-        val mcSlotId = slot.inventorySlots[armorIndex]
-        // if the slot is null, we don't fire LorenzToolTipEvent at all.
-        val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
-        LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
+            // Modify tooltip via SkyHanni Events
+            val mcSlotId = slot.inventorySlots[armorIndex]
+            // if the slot is null, we don't fire LorenzToolTipEvent at all.
+            val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
+            LorenzToolTipEvent(mcSlot, stack, toolTips).postWithoutCatch()
 
-        return toolTips
+            return toolTips
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to get tooltip for armor piece in CustomWardrobe",
+                "Armor" to stack,
+                "Slot" to slot,
+                "Lore" to stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+            )
+            return null
+        }
     }
 
     private fun createFakePlayerRenderable(
