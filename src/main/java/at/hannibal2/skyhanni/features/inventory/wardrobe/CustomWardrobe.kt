@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.min
@@ -181,6 +183,7 @@ object CustomWardrobe {
         return wardrobeWarning to wardrobeSlots
     }
 
+    // TODO don't initialize all 18 slots at once, load them lazily when first time hovering over the item.
     private fun createArmorTooltipRenderable(
         slot: WardrobeSlot,
         containerHeight: Int,
@@ -204,7 +207,7 @@ object CustomWardrobe {
                         Renderable.hoverable(
                             Renderable.hoverTips(
                                 Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                                stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                                getToolTip(stack, slot, armorIndex)
                             ),
                             Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
                             bypassChecks = true,
@@ -224,6 +227,24 @@ object CustomWardrobe {
             }
         }
         return Renderable.verticalContainer(loreList, spacing = 1)
+    }
+
+    private fun getToolTip(
+        stack: ItemStack,
+        slot: WardrobeSlot,
+        armorIndex: Int,
+    ): List<String> {
+        // Get tooltip from minecraft and other mods
+        // TODO add support for advanced tooltip (F3+H)
+        val toolTips = stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+
+        // Modify tooltip via SkyHanni Events
+        val mcSlotId = slot.inventorySlots[armorIndex]
+        // if the slot is null, we don't fire LorenzToolTipEvent at all.
+        val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
+        LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
+
+        return toolTips
     }
 
     private fun createFakePlayerRenderable(
@@ -599,7 +620,7 @@ object CustomWardrobe {
             isCurrentSlot() -> equippedColor
             favorite -> favoriteColor
             else -> null
-        }?.toChromaColor()?.transformIf({ isInCurrentPage() }) { darker() }
+        }?.toChromaColor()?.transformIf({ !isInCurrentPage() }) { darker() }
             ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }

@@ -88,6 +88,7 @@ object UnknownLinesHandler {
             SbPattern.slayerQuestPattern,
             SbPattern.essencePattern,
             SbPattern.redstonePattern,
+            SbPattern.anniversaryPattern,
             SbPattern.visitingPattern,
             SbPattern.flightDurationPattern,
             SbPattern.dojoChallengePattern,
@@ -121,6 +122,14 @@ object UnknownLinesHandler {
             SbPattern.riftHayEatenPattern,
             SbPattern.fossilDustPattern,
             SbPattern.cluesPattern,
+            SbPattern.carnivalPattern,
+            SbPattern.carnivalTasksPattern,
+            SbPattern.carnivalTokensPattern,
+            SbPattern.carnivalFruitsPattern,
+            SbPattern.carnivalScorePattern,
+            SbPattern.carnivalCatchStreakPattern,
+            SbPattern.carnivalAccuracyPattern,
+            SbPattern.carnivalKillsPattern,
         )
 
         unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { line ->
@@ -173,7 +182,7 @@ object UnknownLinesHandler {
 
 
         /*
-         * handle broken scoreboard lines
+         * Handle broken scoreboard lines
          */
         confirmedUnknownLines.forEach { line ->
             if (!unconfirmedUnknownLines.contains(line)) {
