@@ -584,7 +584,7 @@ object CustomWardrobe {
     private fun WardrobeSlot.getSlotColor(): Color = with(config.color) {
         when {
             isCurrentSlot() -> equippedColor
-            favorite -> favoriteColor
+            favorite && !config.onlyFavorites -> favoriteColor
             else -> null
         }?.toChromaColor()?.transformIf({ !isInCurrentPage() }) { darker() }
             ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
