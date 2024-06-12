@@ -586,7 +586,7 @@ object CustomWardrobe {
             isCurrentSlot() -> equippedColor
             favorite -> favoriteColor
             else -> null
-        }?.toChromaColor()?.transformIf({ isInCurrentPage() }) { darker() }
+        }?.toChromaColor()?.transformIf({ !isInCurrentPage() }) { darker() }
             ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
