@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -8,9 +9,12 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.collectWhile
+import at.hannibal2.skyhanni.utils.CollectionUtils.consumeWhile
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -20,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.find
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -56,6 +61,7 @@ object HoppityCollectionStats {
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
     )
+
     /**
      * REGEX-TEST: §a✔ §7Requirement
      */
@@ -63,6 +69,7 @@ object HoppityCollectionStats {
         "rabbit.requirement.met",
         "§a✔ §7Requirement"
     )
+
     /**
      * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
      * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
@@ -73,9 +80,49 @@ object HoppityCollectionStats {
         "§c✖ §7Requirement.*",
     )
 
+    /**
+     * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
+     * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
+     * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
+     */
+    private val requirementAmountNotMet by patternGroup.pattern(
+        "rabbit.requirement.notmet.amount",
+        "§c✖ §7Requirement §e(?<acquired>[\\d,]+)§7/§a(?<required>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
+     */
+    private val locationRequirementDescription by patternGroup.pattern(
+        "rabbit.requirement.location",
+        "Find 15 unique egg locations in (the )?(?<location>.*)\\..*"
+    )
+
     private var display = emptyList<Renderable>()
     private val loggedRabbits
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
+
+    @KSerializable
+    data class LocationRabbit(
+        val locationName: String,
+        val loreFoundCount: Int,
+        val requiredCount: Int,
+    ) {
+        private fun getSkyhanniFoundCount(): Int {
+            val islandType = IslandType.getByNameOrNull(locationName) ?: return 0
+            val foundLocations = HoppityEggLocations.getEggsIn(islandType)
+            return foundLocations.size
+        }
+
+        val foundCount get() = maxOf(getSkyhanniFoundCount(), loreFoundCount)
+
+        fun hasMetRequirements(): Boolean {
+            return foundCount >= requiredCount
+        }
+    }
+
+    private val locationRabbitRequirements: MutableMap<String, LocationRabbit>
+        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.locationRabbitRequirements ?: mutableMapOf()
 
     var inInventory = false
 
@@ -120,12 +167,36 @@ object HoppityCollectionStats {
         }
     }
 
+    private fun addLocationRequirementRabbitsToHud(newList: MutableList<Renderable>) {
+        if (!config.showLocationRequirementsRabbitsInHoppityStats) return
+        val missingLocationRabbits = locationRabbitRequirements.values.filter { !it.hasMetRequirements() }
+
+        val tips = locationRabbitRequirements.map {
+            it.key + " §7(§e" + it.value.locationName + "§7): " + (if (it.value.hasMetRequirements()) "§a" else "§c") +
+                it.value.foundCount + "§7/§a" + it.value.requiredCount
+        }
+
+        newList.add(Renderable.hoverTips(
+            if (missingLocationRabbits.isEmpty())
+                Renderable.wrappedString("§aFound enough eggs in all locations", width = 200)
+            else
+                Renderable.wrappedString(
+                    "§cMissing Locations§7:§c " +
+                        missingLocationRabbits.joinToString("§7, §c") {
+                        it.locationName
+                    }, width = 200),
+            tips
+        ))
+    }
+
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
         logRabbits(event)
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
         newList.add(LorenzUtils.fillTable(getRabbitStats(), padding = 5))
+
+        addLocationRequirementRabbitsToHud(newList)
 
         val loggedRabbitCount = loggedRabbits.size
         val foundRabbitCount = getFoundRabbitsFromHypixel(event)
@@ -228,14 +299,39 @@ object HoppityCollectionStats {
         }
     }
 
+    private fun saveLocationRabbit(rabbitName: String, lore: List<String>) {
+        val iterator = lore.iterator()
+
+        val requirement = iterator.consumeWhile { line ->
+            val requirementMet = requirementMet.matches(line)
+            if (requirementMet) Pair(15, 15) // This is kind of hardcoded?
+            else requirementAmountNotMet.findMatcher(line) {
+                group("acquired").formatInt() to group("required").formatInt()
+            }
+        } ?: return
+
+        val requirementDescriptionCollate = iterator.collectWhile { line ->
+            line.isNotEmpty()
+        }.joinToString(" ") { it.removeColor() }
+
+        val location = locationRequirementDescription.findMatcher(requirementDescriptionCollate) {
+            group("location")
+        } ?: return
+
+        locationRabbitRequirements[rabbitName] = LocationRabbit(location, requirement.first, requirement.second)
+    }
+
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
-        for ((_, item) in event.inventoryItems) {
+        for (item in event.inventoryItems.values) {
             val itemName = item.displayName?.removeColor() ?: continue
             val isRabbit = HoppityCollectionData.isKnownRabbit(itemName)
 
             if (!isRabbit) continue
 
             val itemLore = item.getLore()
+
+            saveLocationRabbit(itemName, itemLore)
+
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
 
             if (!found) continue

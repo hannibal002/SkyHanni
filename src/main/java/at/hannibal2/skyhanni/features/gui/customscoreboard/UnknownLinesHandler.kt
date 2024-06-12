@@ -88,6 +88,7 @@ object UnknownLinesHandler {
             SbPattern.slayerQuestPattern,
             SbPattern.essencePattern,
             SbPattern.redstonePattern,
+            SbPattern.anniversaryPattern,
             SbPattern.visitingPattern,
             SbPattern.flightDurationPattern,
             SbPattern.dojoChallengePattern,
@@ -173,7 +174,7 @@ object UnknownLinesHandler {
 
 
         /*
-         * handle broken scoreboard lines
+         * Handle broken scoreboard lines
          */
         confirmedUnknownLines.forEach { line ->
             if (!unconfirmedUnknownLines.contains(line)) {

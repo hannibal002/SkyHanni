@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
@@ -47,7 +48,8 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
-class CustomScoreboard {
+@SkyHanniModule
+object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
@@ -104,18 +106,16 @@ class CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    companion object {
-        internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-        internal val displayConfig get() = config.display
-        internal val alignmentConfig get() = displayConfig.alignment
-        internal val arrowConfig get() = displayConfig.arrow
-        internal val eventsConfig get() = displayConfig.events
-        internal val mayorConfig get() = displayConfig.mayor
-        internal val partyConfig get() = displayConfig.party
-        internal val maxwellConfig get() = displayConfig.maxwell
-        internal val informationFilteringConfig get() = config.informationFiltering
-        internal val backgroundConfig get() = config.background
-    }
+    internal val config get() = SkyHanniMod.feature.gui.customScoreboard
+    internal val displayConfig get() = config.display
+    internal val alignmentConfig get() = displayConfig.alignment
+    internal val arrowConfig get() = displayConfig.arrow
+    internal val eventsConfig get() = displayConfig.events
+    internal val mayorConfig get() = displayConfig.mayor
+    internal val partyConfig get() = displayConfig.party
+    internal val maxwellConfig get() = displayConfig.maxwell
+    internal val informationFilteringConfig get() = config.informationFiltering
+    internal val backgroundConfig get() = config.background
 
     private fun createLines() = buildList<ScoreboardElementType> {
         if (!LorenzUtils.inSkyBlock) {
@@ -291,6 +291,11 @@ class CustomScoreboard {
             }
 
             newArray
+        }
+        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
+            array
         }
 
         event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {

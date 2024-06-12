@@ -267,6 +267,12 @@ public class MiscConfig {
     @FeatureToggle
     public boolean replaceRomanNumerals = false;
 
+    @Expose
+    @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean unknownPerkpocalypseMayorWarning = true;
+
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion
     @Expose

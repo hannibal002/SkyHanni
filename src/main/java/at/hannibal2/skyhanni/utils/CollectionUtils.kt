@@ -133,6 +133,9 @@ object CollectionUtils {
         return newList
     }
 
+    /**
+     * This does not work inside a [buildList] block
+     */
     fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
@@ -183,6 +186,30 @@ object CollectionUtils {
             }
         }
     }
+
+    inline fun <T, R> Iterator<T>.consumeWhile(block: (T) -> R): R? {
+        while (hasNext()) {
+            return block(next()) ?: continue
+        }
+        return null
+    }
+
+    inline fun <T> Iterator<T>.collectWhile(block: (T) -> Boolean): List<T> {
+        return collectWhileTo(mutableListOf(), block)
+    }
+
+    inline fun <T, C : MutableCollection<T>> Iterator<T>.collectWhileTo(collection: C, block: (T) -> Boolean): C {
+        while (hasNext()) {
+            val element = next()
+            if (block(element)) {
+                collection.add(element)
+            } else {
+                break
+            }
+        }
+        return collection
+    }
+
 
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {

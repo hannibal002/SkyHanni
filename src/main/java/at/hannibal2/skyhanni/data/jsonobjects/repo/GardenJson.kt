@@ -13,7 +13,7 @@ data class GardenJson(
     @Expose @SerializedName("crop_milestone_community_help") val cropMilestoneCommunityHelp: Map<String, Boolean>,
     @Expose val visitors: Map<String, GardenVisitor>,
     @Expose @SerializedName("organic_matter") val organicMatter: Map<NEUInternalName, Double>,
-    @Expose val fuel: Map<NEUInternalName, Double>
+    @Expose val fuel: Map<NEUInternalName, Double>,
 )
 
 data class GardenVisitor(
@@ -22,5 +22,5 @@ data class GardenVisitor(
     @Expose val position: LorenzVec?,
     @Expose var skinOrType: String?,
     @Expose val mode: String,
-    @Expose @SerializedName("need_items") val needItems: List<String>
+    @Expose @SerializedName("need_items") val needItems: List<String>,
 )

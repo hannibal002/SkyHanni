@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -45,9 +44,9 @@ object BeaconPower {
     )
 
     private var expiryTime: SimpleTimeMark
-        get() = storage?.beaconPowerExpiryTime?.asTimeMark() ?: SimpleTimeMark.farPast()
+        get() = storage?.beaconPowerExpiryTime ?: SimpleTimeMark.farPast()
         set(value) {
-            storage?.beaconPowerExpiryTime = value.toMillis()
+            storage?.beaconPowerExpiryTime = value
         }
 
     private var stat: String?
@@ -117,7 +116,6 @@ object BeaconPower {
             if (config.beaconPowerStat) append(" §7(${stat ?: "§cNo stat"}§7)")
         }
     }
-
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.beaconPower
 }
