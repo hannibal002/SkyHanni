@@ -639,5 +639,9 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
+    @Nullable
+    public Long flightDuration = null;
+
+    @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.data.FlightDurationAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import java.util.function.Supplier
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
@@ -318,10 +320,9 @@ private fun getGardenCleanUpLines() = listOfNotNull(SbPattern.cleanUpPattern.fir
 
 private fun getGardenPastingLines() = listOfNotNull(SbPattern.pastingPattern.firstMatches(getSbLines())?.trim())
 
-// Doesn't exist anymore
-private fun getFlightDurationLines() = listOfNotNull(SbPattern.flightDurationPattern.firstMatches(getSbLines())?.trim())
+private fun getFlightDurationLines() = listOf("Flight Duration: §a${FlightDurationAPI.flightDuration.format(maxUnits = 2)}")
 
-private fun getFlightDurationShowWhen(): Boolean = SbPattern.flightDurationPattern.anyMatches(getSbLines()) // will get replaced soon
+private fun getFlightDurationShowWhen(): Boolean = FlightDurationAPI.isFlyingActive()
 
 private fun getWinterLines() = listOf(
     SbPattern.winterEventStartPattern,
