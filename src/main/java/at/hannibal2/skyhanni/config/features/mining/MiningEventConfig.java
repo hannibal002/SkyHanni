@@ -19,7 +19,7 @@ public class MiningEventConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Show Outside Mining Islands", desc = "Shows the event tracker when you are not inside of the Dwarven Mines or Crystal Hollows.")
+    @ConfigOption(name = "Show Outside Mining Islands", desc = "Show the event tracker when you are not inside of the Dwarven Mines or Crystal Hollows.")
     @ConfigEditorBoolean
     public boolean outsideMining = false;
 
@@ -29,18 +29,18 @@ public class MiningEventConfig {
     public ShowType showType = ShowType.ALL;
 
     @Expose
-    @ConfigOption(name = "Compressed Format", desc = "Compresses the event names so that they are shorter.")
+    @ConfigOption(name = "Compressed Format", desc = "Compress the event names so that they are shorter.")
     @ConfigEditorDropdown
     public CompressFormat compressedFormat = CompressFormat.DEFAULT;
 
     @Expose
-    @ConfigOption(name = "Compressed Island", desc = "Shows the islands only as icon.")
+    @ConfigOption(name = "Compressed Island", desc = "Show the islands only as an icon.")
     @ConfigEditorBoolean
     public boolean islandAsIcon = false;
 
     @Expose
-    @ConfigOption(name = "Show Passed Events", desc = "Shows the most recent passed event at the start greyed out. " +
-        "§eTakes a little while to save last event.")
+    @ConfigOption(name = "Show Passed Events", desc = "Show the most recently passed event at the start, greyed out.\n" +
+        "§eTakes a little while to save the last event.")
     @ConfigEditorBoolean
     public boolean passedEvents = false;
 
