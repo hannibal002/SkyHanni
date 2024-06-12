@@ -40,7 +40,14 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Mark Duplicate Locations", desc = "Mark egg location waypoints which you have already found in red.")
+    @ConfigOption(name = "Hide Duplicate Waypoints", desc = "Hides egg waypoints you have found.\n" +
+        "§eOnly works when you don't have an Egglocator in your inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideDuplicateWaypoints = false;
+
+    @Expose
+    @ConfigOption(name = "Mark Duplicate Locations", desc = "Marks egg location waypoints which you have already found in red.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightDuplicateEggLocations = false;

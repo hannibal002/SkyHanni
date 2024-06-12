@@ -54,6 +54,8 @@ ktlint_standard_no-trailing-spaces = disabled
 ktlint_standard_function-signature = disabled
 ktlint_standard_wrapping = disabled
 ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_class-signature = disabled
+ktlint_standard_final-newline = disabled
 
 ktlint_standard_no-wildcard-imports = enabled
 ktlint_standard_function-expression-body = disabled
