@@ -850,16 +850,15 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
     ).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
-    if (confirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
-    amountOfUnknownLines = confirmedUnknownLines.size
+    if (unconfirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    amountOfUnknownLines = unconfirmedUnknownLines.size
 
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) +
-        confirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unconfirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
 }
 
 private fun getExtraShowWhen(): Boolean {
-    if (confirmedUnknownLines.isEmpty()) {
+    if (unconfirmedUnknownLines.isEmpty()) {
         amountOfUnknownLines = 0
     }
-    return confirmedUnknownLines.isNotEmpty()
+    return unconfirmedUnknownLines.isNotEmpty()
 }
