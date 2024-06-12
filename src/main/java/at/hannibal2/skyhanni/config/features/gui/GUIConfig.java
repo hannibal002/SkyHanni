@@ -51,7 +51,7 @@ public class GUIConfig {
     public float globalScale = 1F;
 
     @Expose
-    @ConfigOption(name = "Time Format", desc = "Change Skyhanni to use 24h time instead of 12h time.")
+    @ConfigOption(name = "Time Format", desc = "Change SkyHanni to use 24h time instead of 12h time.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeFormat24h = false;

@@ -39,7 +39,7 @@ public class InventoryConfig {
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
-    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
+    @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
     public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose

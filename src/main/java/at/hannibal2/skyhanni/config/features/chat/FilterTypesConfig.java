@@ -94,7 +94,7 @@ public class FilterTypesConfig {
 
     @Expose
     @ConfigOption(name = "Factory Upgrade", desc = "Hide §nHypixel's§r chocolate factory upgrade and employee promotion messages. " +
-        "§eTo turn off Skyhanni upgrade messages search §lUpgrade Warning")
+        "§eTo turn off SkyHanni upgrade messages search §lUpgrade Warning")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean factoryUpgrade = false;
