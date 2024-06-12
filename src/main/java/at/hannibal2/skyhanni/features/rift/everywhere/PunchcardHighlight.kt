@@ -87,7 +87,9 @@ object PunchcardHighlight {
         display = drawDisplay()
         DelayedRun.runDelayed(1500.milliseconds) {
             reloadColors()
-            if (IslandType.THE_RIFT.isInIsland() && HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
+            if (IslandType.THE_RIFT.isInIsland() &&
+                HypixelData.server.isNotEmpty() &&
+                lastRiftServer != HypixelData.server) {
                 lastRiftServer = HypixelData.server
                 playerList.clear()
             }
@@ -151,7 +153,9 @@ object PunchcardHighlight {
         val queuedName = playerQueue[0]
         punchedPattern.matchMatcher(message) {
             val name = group("name")
-            if (queuedName == name) addPunch(name)
+            if (queuedName == name) {
+                addPunch(name)
+            }
             else ErrorManager.logErrorStateWithData(
                 "Error finding punched player", "queuedName and capturedName were different",
                 "queuedName" to queuedName,
