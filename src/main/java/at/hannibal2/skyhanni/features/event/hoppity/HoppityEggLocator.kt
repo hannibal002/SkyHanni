@@ -93,9 +93,14 @@ object HoppityEggLocator {
             }
         }
 
-        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
+        var islandEggsLocations = HoppityEggLocations.islandLocations ?: return
 
         if (shouldShowAllEggs()) {
+            if (config.hideDuplicateWaypoints) {
+                islandEggsLocations = islandEggsLocations.filter {
+                    !HoppityEggLocations.hasCollectedEgg(it)
+                }.toSet()
+            }
             for (eggLocation in islandEggsLocations) {
                 event.drawEggWaypoint(eggLocation, "§aEgg")
             }
@@ -115,7 +120,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>, ) {
+    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
         if (!config.highlightDuplicateEggLocations || !config.showNearbyDuplicateEggLocations) return
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
