@@ -80,7 +80,7 @@ object CustomWardrobe {
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.string(
                 "§cLoading...",
-                scale = activeScale / 100.0
+                scale = activeScale / 100.0,
             )
             val loadingPos =
                 Position(pos.rawX + (width - loadingRenderable.width) / 2, pos.rawY - loadingRenderable.height)
@@ -301,12 +301,12 @@ object CustomWardrobe {
                 text,
                 maxRenderableWidth,
                 3.0 * (activeScale / 100.0),
-                horizontalAlign = HorizontalAlignment.CENTER
+                horizontalAlign = HorizontalAlignment.CENTER,
             )
             val withButtons = Renderable.verticalContainer(
                 listOf(warningRenderable, button),
                 buttonVerticalSpacing,
-                horizontalAlign = HorizontalAlignment.CENTER
+                horizontalAlign = HorizontalAlignment.CENTER,
             )
             return addGuiBackground(withButtons, backgroundPadding)
         }
@@ -323,7 +323,7 @@ object CustomWardrobe {
                     hoveredColor = slot.getSlotColor(),
                     borderOutlineThickness = config.spacing.outlineThickness.get(),
                     borderOutlineBlur = config.spacing.outlineBlur.get(),
-                    onClick = { slot.clickSlot() }
+                    onClick = { slot.clickSlot() },
                 )
 
                 val playerRenderable = createFakePlayerRenderable(slot, playerWidth, containerHeight, containerWidth)
@@ -336,13 +336,13 @@ object CustomWardrobe {
         val allSlotsRenderable = Renderable.verticalContainer(
             rowsRenderables,
             verticalSpacing,
-            horizontalAlign = HorizontalAlignment.CENTER
+            horizontalAlign = HorizontalAlignment.CENTER,
         )
 
         val withButtons = Renderable.verticalContainer(
             listOf(allSlotsRenderable, button),
             buttonVerticalSpacing,
-            horizontalAlign = HorizontalAlignment.CENTER
+            horizontalAlign = HorizontalAlignment.CENTER,
         )
 
         return addGuiBackground(withButtons, backgroundPadding)
@@ -357,18 +357,18 @@ object CustomWardrobe {
                         "§7SkyHanni",
                         horizontalAlign = HorizontalAlignment.RIGHT,
                         verticalAlign = VerticalAlignment.BOTTOM,
-                        scale = 1.0 * (activeScale / 100.0)
+                        scale = 1.0 * (activeScale / 100.0),
                     ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
                     onClick = {
                         config::enabled.jumpToEditor()
                         reset()
                         WardrobeAPI.currentPage = null
-                    }
+                    },
                 ),
-                blockBottomHover = false
+                blockBottomHover = false,
             ),
             config.color.backgroundColor.toChromaColor(),
-            padding = borderPadding
+            padding = borderPadding,
         )
 
     private fun reset() {
@@ -389,7 +389,7 @@ object CustomWardrobe {
                 InventoryUtils.clickSlot(48)
                 reset()
                 WardrobeAPI.currentPage = null
-            }
+            },
         )
         val exitButton = createLabeledButton(
             "§cClose",
@@ -397,7 +397,7 @@ object CustomWardrobe {
                 InventoryUtils.clickSlot(49)
                 reset()
                 WardrobeAPI.currentPage = null
-            }
+            },
         )
 
         val greenColor = Color(85, 255, 85, 200)
@@ -409,7 +409,7 @@ object CustomWardrobe {
             onClick = {
                 config.onlyFavorites = !config.onlyFavorites
                 update()
-            }
+            },
         )
 
         val editButton = createLabeledButton(
@@ -419,7 +419,7 @@ object CustomWardrobe {
                     reset()
                     editMode = true
                 }
-            }
+            },
         )
 
         val row = Renderable.horizontalContainer(
@@ -432,7 +432,7 @@ object CustomWardrobe {
             listOf(row, editButton),
             verticalSpacing.toInt(),
             horizontalAlign = HorizontalAlignment.CENTER,
-            verticalAlign = VerticalAlignment.CENTER
+            verticalAlign = VerticalAlignment.CENTER,
         )
 
         return total
@@ -448,7 +448,7 @@ object CustomWardrobe {
                 WardrobeAPI.inCustomWardrobe = false
                 editMode = false
                 update()
-            }
+            },
         )
     }
 
@@ -462,20 +462,20 @@ object CustomWardrobe {
                         (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
                         scale = textScale,
                         horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER
+                        verticalAlign = VerticalAlignment.CENTER,
                     ),
                     Renderable.string(
                         (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
                         scale = textScale,
                         horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER
-                    )
+                        verticalAlign = VerticalAlignment.CENTER,
+                    ),
                 ),
                 onClick = {
                     wardrobeSlot.favorite = !wardrobeSlot.favorite
                     update()
-                }
-            )
+                },
+            ),
         )
 
         if (config.estimatedValue && !wardrobeSlot.isEmpty()) {
@@ -511,13 +511,13 @@ object CustomWardrobe {
                 Renderable.doubleLayered(
                     Renderable.clickable(
                         Renderable.placeholder(buttonWidth, buttonHeight),
-                        onClick
+                        onClick,
                     ),
                     Renderable.string(
                         text,
                         horizontalAlign = HorizontalAlignment.CENTER,
                         verticalAlign = VerticalAlignment.CENTER,
-                        scale = textScale
+                        scale = textScale,
                     ),
                     false,
                 ),
@@ -526,7 +526,7 @@ object CustomWardrobe {
                 topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
                 bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
                 borderOutlineThickness = 2,
-                horizontalAlign = HorizontalAlignment.CENTER
+                horizontalAlign = HorizontalAlignment.CENTER,
             ),
             Renderable.drawInsideRoundedRect(
                 Renderable.doubleLayered(
@@ -535,13 +535,13 @@ object CustomWardrobe {
                         text,
                         horizontalAlign = HorizontalAlignment.CENTER,
                         verticalAlign = VerticalAlignment.CENTER,
-                        scale = textScale
+                        scale = textScale,
                     ),
                 ),
                 unhoveredColor.darker(0.57),
                 padding = 0,
-                horizontalAlign = HorizontalAlignment.CENTER
-            )
+                horizontalAlign = HorizontalAlignment.CENTER,
+            ),
         )
 
         return renderable
@@ -584,7 +584,7 @@ object CustomWardrobe {
                 unHoveredColor,
                 padding = padding,
                 horizontalAlign = horizontalAlignment,
-                verticalAlign = verticalAlignment
+                verticalAlign = verticalAlignment,
             ),
             onHover = { onHover() },
         )
