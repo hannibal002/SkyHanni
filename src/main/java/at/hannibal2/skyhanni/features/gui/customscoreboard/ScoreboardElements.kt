@@ -800,15 +800,15 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
     ).flatten()
 
 private fun getExtraDisplayPair(): List<String> {
-    if (confirmedUnknownLines.isEmpty()) return listOf(HIDDEN)
-    amountOfUnknownLines = confirmedUnknownLines.size
+    if (unconfirmedUnknownLines.isEmpty()) return listOf(HIDDEN)
+    amountOfUnknownLines = unconfirmedUnknownLines.size
 
-    return listOf("§cUndetected Lines:") + confirmedUnknownLines
+    return listOf("§cUndetected Lines:") + unconfirmedUnknownLines
 }
 
 private fun getExtraShowWhen(): Boolean {
-    if (confirmedUnknownLines.isEmpty()) {
+    if (unconfirmedUnknownLines.isEmpty()) {
         amountOfUnknownLines = 0
     }
-    return confirmedUnknownLines.isNotEmpty()
+    return unconfirmedUnknownLines.isNotEmpty()
 }

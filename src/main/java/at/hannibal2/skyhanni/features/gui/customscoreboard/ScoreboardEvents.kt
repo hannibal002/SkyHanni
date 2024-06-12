@@ -185,6 +185,11 @@ enum class ScoreboardEvents(
         { IslandType.PRIVATE_ISLAND.isInIsland() },
         "§e§l⚡ §cRedstone: §e§b7%",
     ),
+    ANNIVERSARY(
+        ::getAnniversaryLines,
+        ::getAnniversaryShowWhen,
+        "§d5th Anniversary§f 167:59:54",
+    ),
     ;
 
     override fun toString() = configLine
@@ -357,7 +362,7 @@ private fun getActiveEventLine(): List<String> {
 
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
-    val blockedEvents = listOf("Spooky Festival")
+    val blockedEvents = listOf("Spooky Festival", "5th SkyBlock Anniversary")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
     val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabListData.getTabList()) {
         group("time")
@@ -470,3 +475,7 @@ private fun getQueueLines(): List<String> = listOf(
 ).allMatches(getSbLines())
 
 private fun getRedstoneLines() = listOfNotNull(SbPattern.redstonePattern.firstMatches(getSbLines()))
+
+private fun getAnniversaryLines() = listOf(getSbLines().first { SbPattern.anniversaryPattern.matches(it) })
+
+private fun getAnniversaryShowWhen(): Boolean = SbPattern.anniversaryPattern.anyMatches(getSbLines())

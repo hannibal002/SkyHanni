@@ -376,16 +376,19 @@ public class ProfileSpecificStorage {
             public Map<FarmingItems, Boolean> outdatedItems = new HashMap<>();
 
             @Expose
+            public int farmingLevel = -1;
+
+            @Expose
+            public double bestiary = -1.0;
+
+            @Expose
+            public int plotsUnlocked = -1;
+
+            @Expose
             public int anitaUpgrade = -1;
 
             @Expose
             public int farmingStrength = -1;
-
-            @Expose
-            public int farmingLevel = -1;
-
-            @Expose
-            public int plotsUnlocked = -1;
 
             @Expose
             public SimpleTimeMark cakeExpiring = null;
