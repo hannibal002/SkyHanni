@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
@@ -181,19 +182,7 @@ enum class ScoreboardEvents(
 
     override fun toString() = configLine
 
-    fun getLines(): List<ScoreboardElementType> {
-        return try {
-            displayLine.get().map {
-                when (it) {
-                    is String -> it to HorizontalAlignment.LEFT
-                    is Pair<*, *> -> it.first as String to it.second as HorizontalAlignment
-                    else -> HIDDEN to HorizontalAlignment.LEFT
-                }
-            }
-        } catch (e: NoSuchElementException) {
-            listOf(HIDDEN to HorizontalAlignment.LEFT)
-        }
-    }
+    fun getLines(): List<ScoreboardElementType> = displayLine.get().map { it.getElementFromAny() }
 
     companion object {
         fun getEvent() = buildList<ScoreboardEvents?> {

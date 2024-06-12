@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroup
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
@@ -306,19 +307,7 @@ enum class ScoreboardElement(
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf(HIDDEN to HorizontalAlignment.LEFT)
 
-    private fun getPair(): List<ScoreboardElementType> {
-        return try {
-            displayPair.get().map {
-                when (it) {
-                    is String -> it to HorizontalAlignment.LEFT
-                    is Pair<*, *> -> it.first as String to it.second as HorizontalAlignment
-                    else -> HIDDEN to HorizontalAlignment.LEFT
-                }
-            }
-        } catch (e: NoSuchElementException) {
-            listOf(HIDDEN to HorizontalAlignment.LEFT)
-        }
-    }
+    private fun getPair(): List<ScoreboardElementType> = displayPair.get().map { it.getElementFromAny() }
 
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true
@@ -479,8 +468,8 @@ private fun getHeatDisplayPair(): List<String> {
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> HIDDEN
-            displayConfig.displayNumbersFirst -> heat?.let { "$heat Heat" } ?: "§c♨ 0 Heat"
-            else -> heat?.let { "Heat: $heat" } ?: "§c♨ 0 Heat"
+            displayConfig.displayNumbersFirst -> (heat ?: "§c♨ 0") + " Heat"
+            else -> "Heat: " + (heat ?: "§c♨ 0")
         },
     )
 }

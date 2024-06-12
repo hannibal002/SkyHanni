@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import java.util.regex.Pattern
@@ -59,6 +60,12 @@ object CustomScoreboardUtils {
     internal fun getHeat() = ScoreboardPattern.heatPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "heat")
 
     internal fun getNorthStars() = ScoreboardPattern.northstarsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "northStars") ?: "0"
+
+    internal fun Any.getElementFromAny(): ScoreboardElementType = when (this) {
+        is String -> this to HorizontalAlignment.LEFT
+        is Pair<*, *> -> this.first as String to this.second as HorizontalAlignment
+        else -> HIDDEN to HorizontalAlignment.LEFT
+    }
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
 }
