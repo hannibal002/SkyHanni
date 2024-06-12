@@ -135,7 +135,9 @@ object CustomWardrobe {
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!isEnabled() || editMode) return
-        update()
+        DelayedRun.runNextTick {
+            update()
+        }
     }
 
     private fun update() {
