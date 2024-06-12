@@ -227,7 +227,8 @@ object CustomWardrobe {
 
         // Modify tooltip via SkyHanni Events
         val mcSlotId = slot.inventorySlots[armorIndex]
-        val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: error("slot is null at mcSlotId $mcSlotId")
+        // if the slot is null, we don't fire LorenzToolTipEvent at all.
+        val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
         LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
 
         return toolTips
