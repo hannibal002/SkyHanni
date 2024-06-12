@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI.getCold
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonNull
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -136,7 +138,7 @@ object MiningNotifications {
             sendNotification(MiningNotificationList.COLD)
         }
         if (IslandType.MINESHAFT.isInIsland() && config.getAscensionRope && config.coldAmount == event.cold) {
-            DelayedRun.runDelayed(0.5.seconds) {
+            runDelayed(0.5.seconds) {
                 GetFromSackAPI.getFromChatMessageSackItems(ASCENSION_ROPE)
             }
         }
@@ -151,6 +153,20 @@ object MiningNotifications {
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.coldThreshold) {
             if (getCold() != config.coldThreshold.get()) hasSentCold = false
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(51, "mining.notifications.notifications") {
+            val array = JsonArray()
+            for (entry in it.asJsonArray) {
+                if (entry is JsonNull) continue
+                if (entry.asString != "MINESHAFT_SPAWN") {
+                    array.add(entry)
+                }
+            }
+            array
         }
     }
 
