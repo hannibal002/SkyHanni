@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -16,7 +17,7 @@ public class CombatConfig {
     public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost counter settings")
+    @Category(name = "Ghost Counter", desc = "Ghost Counter settings")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
@@ -55,7 +56,7 @@ public class CombatConfig {
     public FlareConfig flare = new FlareConfig();
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in Skyblock.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideDamageSplash = false;

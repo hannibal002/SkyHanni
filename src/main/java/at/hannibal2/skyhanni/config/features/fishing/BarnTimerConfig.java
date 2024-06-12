@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.config.features.fishing;
 
+import org.lwjgl.input.Keyboard;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
 
 public class BarnTimerConfig {
     @Expose
@@ -39,7 +41,7 @@ public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Winter Fishing",
-        desc = "Show the Barn Fishing Timer on the Jerry's Workshop."
+        desc = "Show the Barn Fishing Timer on the Jerry's Workshop island."
     )
     @ConfigEditorBoolean
     public boolean winterIsland = true;

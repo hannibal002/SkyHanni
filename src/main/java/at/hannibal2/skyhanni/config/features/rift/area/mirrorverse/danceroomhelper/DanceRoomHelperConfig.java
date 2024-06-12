@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.config.features.rift.area.mirrorverse.danceroomhelper;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.rift.area.mirrorverse.danceroomhelper.danceroomformatting.DanceRoomFormattingConfig;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -13,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class DanceRoomHelperConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
+    @ConfigOption(name = "Enabled", desc = "Help to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

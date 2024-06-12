@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden.pests;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -13,7 +14,7 @@ public class StereoHarmonyConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Shows a display of what pest is being boosted by your vinyl."
+        desc = "Show a display of what pest is being boosted by your vinyl."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -22,7 +23,7 @@ public class StereoHarmonyConfig {
     @Expose
     @ConfigOption(
         name = "Always Show",
-        desc = "Shows the display even while not farming."
+        desc = "Show the display even while not farming."
     )
     @ConfigEditorBoolean
     public boolean alwaysShow = false;
@@ -35,8 +36,7 @@ public class StereoHarmonyConfig {
     @Expose
     @ConfigOption(
         name = "Show Crop Icon",
-        desc = "Show the icon of the crops dropped by the pests\n" +
-            "being boosted."
+        desc = "Show the icon of the crops dropped by the pests being boosted."
     )
     @ConfigEditorBoolean
     public Property<Boolean> showCrop = Property.of(true);

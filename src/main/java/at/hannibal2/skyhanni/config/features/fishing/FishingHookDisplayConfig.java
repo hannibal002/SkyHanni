@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.fishing;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -19,8 +20,7 @@ public class FishingHookDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Custom Alert",
-        desc = "Replaces the default §c§l!!!§r Hypixel\n" +
-            "§7alert with your own custom one."
+        desc = "Replaces the default §c§l!!! §7Hypixel alert with your own custom one."
     )
     @ConfigEditorText
     public String customAlertText = "&c&l!!!";

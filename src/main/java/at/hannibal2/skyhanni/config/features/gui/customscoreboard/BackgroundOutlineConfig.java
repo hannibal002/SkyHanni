@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import com.google.gson.annotations.Expose;
+
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -11,7 +12,7 @@ public class BackgroundOutlineConfig {
     @Expose
     @ConfigOption(
         name = "Outline",
-        desc = "Shows an outline around the scoreboard."
+        desc = "Show an outline around the scoreboard."
     )
     @ConfigEditorBoolean
     public boolean enabled = false;

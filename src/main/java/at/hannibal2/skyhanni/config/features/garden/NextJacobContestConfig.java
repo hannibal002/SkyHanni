@@ -1,19 +1,20 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.garden.CropType;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class NextJacobContestConfig {
     @Expose
@@ -87,7 +88,7 @@ public class NextJacobContestConfig {
     public int warnTime = 60 * 2;
 
     @Expose
-    @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
+    @ConfigOption(name = "Popup Warning", desc = "Create a popup when the warning time is reached and Minecraft is not in focus.")
     @ConfigEditorBoolean
     public boolean warnPopup = false;
 

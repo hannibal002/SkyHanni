@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.event;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
@@ -20,7 +21,7 @@ public class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Waypoints Immediately",
-        desc = "Show a raw estimate waypoint immediately after clicking. " +
+        desc = "Show a raw estimate waypoint immediately after clicking.\n" +
             "§cThis might cause issues with other particle sources."
     )
     @ConfigEditorBoolean
@@ -39,7 +40,7 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Mark Duplicate Locations", desc = "Marks egg location waypoints which you have already found in red.")
+    @ConfigOption(name = "Mark Duplicate Locations", desc = "Mark egg location waypoints which you have already found in red.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightDuplicateEggLocations = false;
@@ -57,13 +58,14 @@ public class HoppityEggsConfig {
     public boolean loadFromNeuPv = true;
 
     @Expose
-    @ConfigOption(name = "Show Unclaimed Eggs", desc = "Displays which eggs haven't been found in the last SkyBlock day.")
+    @ConfigOption(name = "Show Unclaimed Eggs", desc = "Display which eggs haven't been found in the last Skyblock day.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Show Collected Locations", desc = "Shows the number of found egg locations on this island. §eThis is not retroactive and may not be fully synced with Hypixel's count.")
+    @ConfigOption(name = "Show Collected Locations", desc = "Show the number of found egg locations on this island.\n" +
+        "§eThis is not retroactive and may not be fully synced with Hypixel's count.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showCollectedLocationCount = false;
@@ -75,7 +77,7 @@ public class HoppityEggsConfig {
     public boolean warnUnclaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Click to Warp", desc = "Makes the eggs ready chat message clickable to warp you to an island.")
+    @ConfigOption(name = "Click to Warp", desc = "Make the eggs ready chat message clickable to warp you to an island.")
     @ConfigEditorBoolean
     public boolean warpUnclaimedEggs = false;
 
@@ -118,7 +120,7 @@ public class HoppityEggsConfig {
     public boolean highlightHoppityShop = true;
 
     @Expose
-    @ConfigOption(name = "Hoppity Shop Reminder", desc = "Reminds you to open the Hoppity Shop each year.")
+    @ConfigOption(name = "Hoppity Shop Reminder", desc = "Remind you to open the Hoppity Shop each year.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityShopReminder = true;

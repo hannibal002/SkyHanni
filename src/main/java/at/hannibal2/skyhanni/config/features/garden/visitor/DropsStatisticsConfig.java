@@ -1,18 +1,5 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.ACCEPTED;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COINS_SPENT;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER;
@@ -26,12 +13,26 @@ import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisti
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.TOTAL_VISITORS;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.VISITORS_BY_RARITY;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
 public class DropsStatisticsConfig {
 
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tallies up statistic about visitors and the rewards you have received from them."
+        desc = "Tally statistics about visitors and the rewards you have received from them."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -116,19 +117,19 @@ public class DropsStatisticsConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
+    @ConfigOption(name = "Display Numbers First", desc = "Whether the number or drop name displays first.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = true;
 
     @Expose
-    @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
+    @ConfigOption(name = "Display Icons", desc = "Replace the drop names with icons.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayIcons = false;
 
     @Expose
-    @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+    @ConfigOption(name = "Only on Barn Plot", desc = "Only show the overlay while on the Barn plot.")
     @ConfigEditorBoolean
     public boolean onlyOnBarn = true;
 

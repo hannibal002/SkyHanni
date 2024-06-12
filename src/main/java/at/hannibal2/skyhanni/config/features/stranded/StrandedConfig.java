@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.stranded;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -15,7 +16,7 @@ public class StrandedConfig {
     public boolean highlightPlaceableNpcs = false;
 
     @Expose
-    @ConfigOption(name = "In Water Display", desc = "Displays if the Player is in water.")
+    @ConfigOption(name = "In Water Display", desc = "Display if the player is in water.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean inWaterDisplay = false;

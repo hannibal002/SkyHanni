@@ -1,23 +1,5 @@
 package at.hannibal2.skyhanni.config.features.combat.ghostcounter;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting.TextFormattingConfig;
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.AVG_MAGIC_FIND;
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.GHOSTS_KILLED;
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.GHOST_PER_SORROW;
@@ -28,10 +10,29 @@ import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCou
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.SORROW;
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.TITLE;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting.TextFormattingConfig;
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
 public class GhostCounterConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the ghost counter (invisible creepers in the Dwarven Mines The Mist area).")
+    @ConfigOption(name = "Enabled", desc = "Enable the ghost counter (invisible creepers in The Mist in the Dwarven Mines area)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -107,7 +108,7 @@ public class GhostCounterConfig {
     public TextFormattingConfig textFormatting = new TextFormattingConfig();
 
     @Expose
-    @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
+    @ConfigOption(name = "Extra Spaces", desc = "Spaces between each line of text.")
     @ConfigEditorSlider(
         minValue = -5,
         maxValue = 10,
@@ -115,7 +116,7 @@ public class GhostCounterConfig {
     public int extraSpace = 1;
 
     @Expose
-    @ConfigOption(name = "Pause Timer", desc = "How many seconds does it wait before pausing.")
+    @ConfigOption(name = "Pause Timer", desc = "How many seconds to wait before pausing.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 20,
@@ -129,7 +130,7 @@ public class GhostCounterConfig {
     public boolean onlyOnMist = true;
 
     @Expose
-    @ConfigOption(name = "Maxed Bestiary", desc = "Show progress to max bestiary instead of next level.")
+    @ConfigOption(name = "Max Bestiary", desc = "Show progress to max bestiary instead of next level.")
     @ConfigEditorBoolean
     public boolean showMax = false;
 

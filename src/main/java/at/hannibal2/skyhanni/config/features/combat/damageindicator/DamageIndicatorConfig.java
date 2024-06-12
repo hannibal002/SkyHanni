@@ -1,18 +1,5 @@
 package at.hannibal2.skyhanni.config.features.combat.damageindicator;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.ARACHNE;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DIANA_MOBS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.GARDEN_PESTS;
@@ -28,6 +15,20 @@ import static at.hannibal2.skyhanni.config.features.combat.damageindicator.Damag
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.VANQUISHER;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.VOIDGLOOM_SERAPH;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
 public class DamageIndicatorConfig {
 
     @Expose
@@ -37,14 +38,14 @@ public class DamageIndicatorConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Healing Chat Message", desc = "Sends a chat message when a boss heals themself.")
+    @ConfigOption(name = "Healing Chat Message", desc = "Send a chat message when a boss heals themself.")
     @ConfigEditorBoolean
     public boolean healingMessage = false;
 
     @Expose
     @ConfigOption(
         name = "Boss Name",
-        desc = "Change how the boss name should be displayed.")
+        desc = "Change how boss names are displayed.")
     @ConfigEditorDropdown
     public NameVisibility bossName = NameVisibility.FULL_NAME;
 
@@ -81,7 +82,7 @@ public class DamageIndicatorConfig {
     @Expose
     @ConfigOption(
         name = "Select Boss",
-        desc = "Change what type of boss you want the damage indicator be enabled for."
+        desc = "Change what bosses the damage indicator should be enabled for."
     )
     @ConfigEditorDraggableList
     //TODO only show currently working and tested features
@@ -156,7 +157,7 @@ public class DamageIndicatorConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hiding damage splashes near the damage indicator.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes near the damage indicator.")
     @ConfigEditorBoolean
     public boolean hideDamageSplash = false;
 
@@ -166,7 +167,7 @@ public class DamageIndicatorConfig {
     public boolean showDamageOverTime = false;
 
     @Expose
-    @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of damage indicator bosses.")
+    @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of bosses with damage indicator enabled.")
     @ConfigEditorBoolean
     public boolean hideVanillaNametag = false;
 

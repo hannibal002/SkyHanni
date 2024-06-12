@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.config.features.garden.cropmilestones;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -15,7 +16,7 @@ public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Best Crop Time",
-        desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
+        desc = "List all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean bestDisplay = false;
@@ -87,7 +88,7 @@ public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Hide Title",
-        desc = "Hides the 'Best Crop Time' line entirely.")
+        desc = "Hide the 'Best Crop Time' line entirely.")
     @ConfigEditorBoolean
     public boolean bestHideTitle = false;
 

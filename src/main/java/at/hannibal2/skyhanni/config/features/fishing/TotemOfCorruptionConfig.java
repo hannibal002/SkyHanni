@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.fishing;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -16,7 +17,7 @@ public class TotemOfCorruptionConfig {
     @Expose
     @ConfigOption(name = "Show Overlay", desc = "Show the Totem of Corruption overlay." +
         "\nShows the totem, in which effective area you are in, with the longest time left." +
-        "\n§cThis needs to be enabled for the other options to work.")
+        "\n§eThis needs to be enabled for the other options to work.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> showOverlay = Property.of(true);

@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.itemability;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -38,7 +39,7 @@ public class ItemAbilityConfig {
 
     @Expose
     @ConfigOption(name = "Depleted Bonzo's Masks",
-        desc = "Highlights used Bonzo's Masks and Spirit Masks with a background.")
+        desc = "Highlight used Bonzo's Masks and Spirit Masks with a background.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean depletedBonzosMasks = false;

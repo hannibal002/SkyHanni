@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -25,7 +26,7 @@ public class MatriarchHelperConfig {
     public String highlightColor = "0:114:126:255:41";
 
     @Expose
-    @ConfigOption(name = "Draw Line", desc = "Draw Line to the lowest Heavy Pearl.")
+    @ConfigOption(name = "Draw Line", desc = "Draw a line to the lowest Heavy Pearl.")
     @ConfigEditorBoolean
     public boolean line = true;
 

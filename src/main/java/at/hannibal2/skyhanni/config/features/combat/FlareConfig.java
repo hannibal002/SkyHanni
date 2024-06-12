@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -42,7 +43,7 @@ public class FlareConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Display Type", desc = "Where to show the timer, as GUI element or in the world")
+    @ConfigOption(name = "Display Type", desc = "Where to show the timer.")
     @ConfigEditorDropdown
     public DisplayType displayType = DisplayType.GUI;
 
@@ -65,7 +66,7 @@ public class FlareConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the Flare.")
+    @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the flare.")
     @ConfigEditorDropdown
     public OutlineType outlineType = OutlineType.NONE;
 

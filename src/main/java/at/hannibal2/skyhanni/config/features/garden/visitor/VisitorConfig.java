@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
+import org.lwjgl.input.Keyboard;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
 
 public class VisitorConfig {
     @Expose
@@ -103,7 +105,7 @@ public class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Accept Hotkey",
-        desc = "Accept a visitor when you press this keybind while in the visitor GUI. " +
+        desc = "Accept a visitor when you press this keybind while in the visitor GUI.\n" +
             "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event."
     )
     @ConfigEditorKeybind(
@@ -114,8 +116,8 @@ public class VisitorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Highlight Visitors in SkyBlock",
-        desc = "Highlights Visitors outside of the Garden"
+        name = "Highlight Visitors in Skyblock",
+        desc = "Highlight visitors outside of the Garden."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -124,7 +126,7 @@ public class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Block Interacting with Visitors",
-        desc = "Blocks you from interacting with / unlocking Visitors to allow for Dedication Cycling"
+        desc = "Prevent interacting with / unlocking Visitors to allow for Dedication Cycling."
     )
     @ConfigEditorDropdown
     public VisitorBlockBehaviour blockInteracting = VisitorBlockBehaviour.DONT;

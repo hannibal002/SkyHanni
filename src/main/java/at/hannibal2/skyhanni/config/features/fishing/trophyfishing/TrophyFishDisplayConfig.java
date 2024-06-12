@@ -1,8 +1,15 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.lwjgl.input.Keyboard;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -11,11 +18,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
-import org.lwjgl.input.Keyboard;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class TrophyFishDisplayConfig {
 
@@ -158,7 +160,7 @@ public class TrophyFishDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Show ✖",
-        desc = "instead of the number 0, show §c✖ §7 if not found."
+        desc = "Instead of the number 0, show §c✖ §7if not found."
     )
     @ConfigEditorBoolean
     public Property<Boolean> showCross = Property.of(false);
@@ -166,7 +168,7 @@ public class TrophyFishDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Show ✔",
-        desc = "instead of the exact numbers, show §e§l✔ §7 if found."
+        desc = "Instead of the exact numbers, show §e§l✔ §7if found."
     )
     @ConfigEditorBoolean
     public Property<Boolean> showCheckmark = Property.of(false);

@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -14,7 +15,7 @@ public class ChocolateUpgradeWarningsConfig {
     public boolean upgradeWarning = false;
 
     @Expose
-    @ConfigOption(name = "Upgrade Warning Sound", desc = "Also plays a sound when an upgrade is available. " +
+    @ConfigOption(name = "Upgrade Warning Sound", desc = "Also play a sound when an upgrade is available.\n" +
         "§eUpgrade warning must be turned on.")
     @ConfigEditorBoolean
     public boolean upgradeWarningSound = false;

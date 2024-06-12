@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -66,8 +67,8 @@ public class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Area Boss Timer",
-        desc = "Show a timer when Area Bosses respawn. " +
-            "§cMay take 20-30 seconds to calibrate correctly."
+        desc = "Show a timer when Area Bosses respawn.\n" +
+            "§eMay take 20 - 30 seconds to calibrate correctly."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -76,8 +77,8 @@ public class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Arachne Spawn Timer",
-        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long " +
-            "until the boss will spawn. §cTimer may be 1-2 seconds off."
+        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long until the boss will spawn.\n" +
+            "§eTimer may be 1 - 2 seconds off."
     )
     @ConfigEditorBoolean
     @FeatureToggle

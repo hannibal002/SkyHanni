@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -11,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class DeepCavernsGuideConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows a guide to the bottom of the Deep Caverns and to Rhys.")
+    @ConfigOption(name = "Enabled", desc = "Show a guide to the bottom of the Deep Caverns and to Rhys.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

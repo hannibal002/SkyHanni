@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.dungeon;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -42,7 +43,7 @@ public class DungeonConfig {
     public CleanEndConfig cleanEnd = new CleanEndConfig();
 
     @Expose
-    @ConfigOption(name = "Boss Damage Splash", desc = "Hides damage splashes while inside the boss room (fixes a Skytils feature).")
+    @ConfigOption(name = "Boss Damage Splash", desc = "Hide damage splashes while inside the boss room (fixes a Skytils feature).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean damageSplashBoss = false;
@@ -61,7 +62,7 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Architect Notifier",
-        desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed. " +
+        desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.\n" +
             "§cOnly works when having enough §5Architect First Drafts §cin the sack.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -116,7 +117,7 @@ public class DungeonConfig {
     public DungeonChestConfig chest = new DungeonChestConfig();
 
     @Expose
-    @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
+    @ConfigOption(name = "Croesus Chest", desc = "Add a visual highlight to the Croesus inventory that " +
         "shows unopened chests.") // TODO move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
     @ConfigEditorBoolean
     @FeatureToggle

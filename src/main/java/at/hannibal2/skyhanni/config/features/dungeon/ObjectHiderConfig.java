@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.dungeon;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -43,7 +44,7 @@ public class ObjectHiderConfig {
     public boolean hideSkeletonSkull = true;
 
     @Expose
-    @ConfigOption(name = "Hide Healer Orbs", desc = "Hides the damage, ability damage and defensive orbs that spawn when the Healer kills mobs.")
+    @ConfigOption(name = "Hide Healer Orbs", desc = "Hide the damage, ability damage and defensive orbs that spawn when the Healer kills mobs.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideHealerOrbs = false;

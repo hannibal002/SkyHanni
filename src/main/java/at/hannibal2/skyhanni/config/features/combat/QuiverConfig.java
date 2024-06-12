@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -16,8 +17,7 @@ public class QuiverConfig {
     @Expose
     @ConfigOption(
         name = "Low Quiver Alert",
-        desc = "Notifies you when your quiver\n" +
-            "reaches an amount of arrows."
+        desc = "Notifies you when your quiver reaches a set amount of arrows."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -26,8 +26,7 @@ public class QuiverConfig {
     @Expose
     @ConfigOption(
         name = "Reminder After Run",
-        desc = "Reminds you to buy arrows after\n" +
-            "a Dungeons/Kuudra run if you're low."
+        desc = "Reminds you to buy arrows after a Dungeons/Kuudra run if you're low."
     )
     @ConfigEditorBoolean
     @FeatureToggle

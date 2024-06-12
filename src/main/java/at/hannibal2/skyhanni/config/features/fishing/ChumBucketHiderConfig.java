@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.fishing;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
@@ -20,7 +21,7 @@ public class ChumBucketHiderConfig {
     public Property<Boolean> hideBucket = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Hide Own", desc = "Hides your own Chum/Chumcap Bucket.")
+    @ConfigOption(name = "Hide Own", desc = "Hide your own Chum/Chumcap Bucket.")
     @ConfigEditorBoolean
     public Property<Boolean> hideOwn = Property.of(false);
 }

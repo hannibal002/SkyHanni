@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.lwjgl.input.Keyboard;
+
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChatConfig {
 
@@ -33,7 +35,7 @@ public class ChatConfig {
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
 
     @Expose
-    @ConfigOption(name = "Dungeon Filter", desc = "Hide specific message types in Dungeons.")
+    @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     public List<DungeonMessageTypes> dungeonFilteredMessageTypes = new ArrayList<>();
 
@@ -65,14 +67,13 @@ public class ChatConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in the Dungeon.")
+    @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean dungeonBossMessages = false;
 
     @Expose
-    @ConfigOption(name = "Hide Far Deaths", desc = "Hide other players' death messages, " +
-        "except for players who are nearby or during Dungeons/a Kuudra fight.")
+    @ConfigOption(name = "Hide Far Deaths", desc = "Hide other players' death messages when they're not nearby (except during Dungeons/Kuudra fights)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideFarDeathMessages = false;
@@ -84,22 +85,22 @@ public class ChatConfig {
     public CompactPotionConfig compactPotionMessages = new CompactPotionConfig();
 
     @Expose
-    @ConfigOption(name = "Compact Bestiary Message", desc = "Shorten the Bestiary level up message, showing additional information when hovering.")
+    @ConfigOption(name = "Compact Bestiary Messages", desc = "Compact the Bestiary level up message, only showing additional information when hovering.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactBestiaryMessage = true;
 
     @Expose
-    @ConfigOption(name = "Arachne Hider", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")
+    @ConfigOption(name = "Arachne Fight Messages", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideArachneMessages = false;
 
     @Expose
     @ConfigOption(
-        name = "Sacks Hider",
-        desc = "Hide the chat's sack change message with this, " +
-            "not in Hypixel settings, for mods to access sack data in new features."
+        name = "Sack Change Messages",
+        desc = "Hide the sack change message while allowing mods to continue accessing sack data.\n" +
+            "§eUse this instead of the toggle in Hypixel Settings."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -108,8 +109,8 @@ public class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Translator",
-        desc = "Click on a message to translate it to English. " +
-            "Use §e/shcopytranslation§7 to translate from English. " +
+        desc = "Click on a message to translate it to English.\n" +
+            "Use §e/shcopytranslation§7 to translate from English.\n" +
             "§cTranslation is not guaranteed to be 100% accurate."
     )
     @ConfigEditorBoolean
@@ -117,27 +118,27 @@ public class ChatConfig {
     public boolean translator = false;
 
     @Expose
-    @ConfigOption(name = "Skyblock XP Chat", desc = "Sends the Skyblock XP message into the chat.")
+    @ConfigOption(name = "Skyblock XP in Chat", desc = "Send the Skyblock XP messages into the chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean skyBlockXPInChat = true;
 
     @Expose
-    @ConfigOption(name = "Jacob's Event", desc = "Hide Anita Accessories' fortune bonus messages outside the Garden.")
+    @ConfigOption(name = "Anita's Accessory Messages", desc = "Hide Anita's Accessories' fortune bonus messages outside the Garden.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideJacob = true;
 
     @Expose
-    @ConfigOption(name = "Sky Mall", desc = "Hides the Sky Mall message outside Mining Islands.")
+    @ConfigOption(name = "Sky Mall Messages", desc = "Hide the Sky Mall messages outside of Mining Islands.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideSkyMall = true;
 
     @Expose
     @ConfigOption(
-        name = "Pet Drop Rarity",
-        desc = "Shows what rarity the pet drop is in the pet drop message.\n" +
+        name = "Show Pet Drop Rarity",
+        desc = "Show the rarity of the Pet Drop in the message.\n" +
             "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
     )
     @ConfigEditorBoolean

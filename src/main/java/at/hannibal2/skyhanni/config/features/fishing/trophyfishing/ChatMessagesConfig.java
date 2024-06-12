@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -12,7 +13,7 @@ public class ChatMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Trophy Counter",
-        desc = "Counts Trophy messages from chat and tells you how many you have found."
+        desc = "Count Trophy messages from chat and tells you how many you have found."
     )
     @ConfigEditorBoolean
     @FeatureToggle

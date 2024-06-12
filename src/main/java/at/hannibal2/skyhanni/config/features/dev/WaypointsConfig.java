@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import org.lwjgl.input.Keyboard;
+
 import com.google.gson.annotations.Expose;
+
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
 
 public class WaypointsConfig {
 
@@ -24,7 +26,7 @@ public class WaypointsConfig {
     public boolean showPlatformNumber = false;
 
     @Expose
-    @ConfigOption(name = "Show Outside SB", desc = "Make parkour waypoints outside of SkyBlock too.")
+    @ConfigOption(name = "Show Outside SB", desc = "Make parkour waypoints outside of Skyblock too.")
     @ConfigEditorBoolean
     public boolean parkourOutsideSB = false;
 }

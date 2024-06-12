@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.gui;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -13,8 +14,8 @@ public class InGameDateConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show the in-game date of SkyBlock (like in Apec, §ebut with mild delays§7).\n" +
-            "(Though this one includes the SkyBlock year!)"
+        desc = "Show the in-game date of Skyblock (like in Apec, §ebut with mild delays§7).\n" +
+            "(Though this one includes the Skyblock year!)"
     )
     @ConfigEditorBoolean
     @FeatureToggle

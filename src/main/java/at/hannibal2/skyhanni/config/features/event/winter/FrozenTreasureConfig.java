@@ -1,18 +1,5 @@
 package at.hannibal2.skyhanni.config.features.event.winter;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry.COMPACT_PROCS;
 import static at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry.ENCHANTED_ICE;
 import static at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry.ENCHANTED_PACKED_ICE;
@@ -27,12 +14,26 @@ import static at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureC
 import static at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry.TREASURES_MINED;
 import static at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry.WHITE_GIFT;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
 public class FrozenTreasureConfig {
 
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tracks all of your drops from Frozen Treasure in the Glacial Caves.\n" +
+        desc = "Track all of your drops from Frozen Treasure in the Glacial Caves.\n" +
             "§eIce calculations are an estimate but are relatively accurate."
     )
     @ConfigEditorBoolean
@@ -107,18 +108,18 @@ public class FrozenTreasureConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Only in Glacial Cave", desc = "Only shows the overlay while in the Glacial Cave.")
+    @ConfigOption(name = "Only in Glacial Cave", desc = "Only show the overlay while in the Glacial Cave.")
     @ConfigEditorBoolean
     public boolean onlyInCave = true;
 
     @Expose
-    @ConfigOption(name = "Show as Drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
+    @ConfigOption(name = "Show as Drops", desc = "Multiply the numbers on the display by the base drop.\n" +
         "E.g. 3 Ice Bait -> 48 Ice Bait")
     @ConfigEditorBoolean
     public boolean showAsDrops = false;
 
     @Expose
-    @ConfigOption(name = "Hide Chat Messages", desc = "Hides the chat messages from Frozen Treasures.")
+    @ConfigOption(name = "Hide Chat Messages", desc = "Hide the chat messages from Frozen Treasures.")
     @ConfigEditorBoolean
     public boolean hideMessages = false;
 

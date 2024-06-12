@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.config.features.commands;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
+import org.lwjgl.input.Keyboard;
+
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
 
 public class BetterWikiCommandConfig {
 
@@ -21,7 +23,7 @@ public class BetterWikiCommandConfig {
 
     // TODO Make this method not suck
     @Expose
-    @ConfigOption(name = "SkyBlock Guide", desc = "Use SkyHanni's method in the SkyBlock Guide.")
+    @ConfigOption(name = "Skyblock Guide", desc = "Use SkyHanni's method in the Skyblock Guide.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sbGuide = false;
@@ -30,7 +32,7 @@ public class BetterWikiCommandConfig {
     @ConfigOption(
         name = "Use Fandom Wiki",
         desc = "Use Fandom Wiki (§ehypixel-skyblock.fandom.com§7) instead of " +
-            "the Hypixel wiki (§ewiki.hypixel.net§7) in most wiki-related chat messages."
+            "the Hypixel Wiki (§ewiki.hypixel.net§7) in most wiki-related chat messages."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -39,7 +41,7 @@ public class BetterWikiCommandConfig {
     @Expose
     @ConfigOption(
         name = "Auto Open",
-        desc = "Directly opens the Wiki when running the command instead of having to click a message in chat."
+        desc = "Directly open the Wiki when running the command instead of having to click a message in chat."
     )
     @ConfigEditorBoolean
     public boolean autoOpenWiki = false;
@@ -47,14 +49,14 @@ public class BetterWikiCommandConfig {
     @Expose
     @ConfigOption(
         name = "Open from Menus",
-        desc = "Directly opens the Wiki from menus instead of having to click a message in chat."
+        desc = "Directly open the Wiki from menus instead of having to click a message in chat."
     )
     @ConfigEditorBoolean
     public boolean menuOpenWiki = false;
 
     @Expose
     @ConfigOption(name = "Fandom Wiki Key", desc = "Search for an item on Wiki with this keybind.\n" +
-        "§4For optimal experiences, do §lNOT§r §4bind this to a mouse button.")
+        "§cFor an optimal experience, do §lNOT §cbind this to a mouse button.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int wikiKeybind = Keyboard.KEY_NONE;
 }

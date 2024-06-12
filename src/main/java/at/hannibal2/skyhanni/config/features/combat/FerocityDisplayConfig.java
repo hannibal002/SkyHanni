@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -12,8 +13,8 @@ public class FerocityDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show ferocity stat as single gui element. " +
-        "Requires tab list widget enabled and ferocity selected to work."
+        desc = "Show ferocity stat as single GUI element.\n" +
+        "§eRequires tab list widget enabled and ferocity selected to work."
     )
     @ConfigEditorBoolean
     @FeatureToggle

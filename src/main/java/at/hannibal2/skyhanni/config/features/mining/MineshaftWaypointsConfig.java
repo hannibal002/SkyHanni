@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -13,12 +14,12 @@ public class MineshaftWaypointsConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Entrance Location", desc = "Marks the location of the entrance with a waypoint.")
+    @ConfigOption(name = "Entrance Location", desc = "Mark the location of the entrance with a waypoint.")
     @ConfigEditorBoolean
     public boolean entranceLocation = false;
 
     @Expose
-    @ConfigOption(name = "Ladder Location", desc = "Marks the location of the ladders at the bottom of the entrance with a waypoint.")
+    @ConfigOption(name = "Ladder Location", desc = "Mark the location of the ladders at the bottom of the entrance with a waypoint.")
     @ConfigEditorBoolean
     public boolean ladderLocation = false;
 }

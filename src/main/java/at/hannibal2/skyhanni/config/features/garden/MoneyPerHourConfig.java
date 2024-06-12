@@ -1,27 +1,28 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
+import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.INSTANT_SELL;
+import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.NPC_PRICE;
+import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.SELL_OFFER;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.INSTANT_SELL;
-import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.NPC_PRICE;
-import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry.SELL_OFFER;
-
 public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(name = "Show Money per Hour",
-        desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
+        desc = "Display the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.\n" +
             "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -124,35 +125,35 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Include Bountiful",
-        desc = "Includes the coins from Bountiful in the calculation.")
+        desc = "Include the coins from Bountiful in the calculation.")
     @ConfigEditorBoolean
     public boolean bountiful = true;
 
     @Expose
     @ConfigOption(
         name = "Include Mooshroom Cow",
-        desc = "Includes the coins you get from selling the mushrooms from your Mooshroom Cow pet.")
+        desc = "Include the coins you get from selling the mushrooms from your Mooshroom Cow pet.")
     @ConfigEditorBoolean
     public boolean mooshroom = true;
 
     @Expose
     @ConfigOption(
         name = "Include Armor Drops",
-        desc = "Includes the average coins/hr from your armor.")
+        desc = "Include the average coins/hr from your armor.")
     @ConfigEditorBoolean
     public boolean armor = true;
 
     @Expose
     @ConfigOption(
         name = "Include Dicer Drops",
-        desc = "Includes the average coins/hr from your melon or pumpkin dicer.")
+        desc = "Include the average coins/hr from your melon or pumpkin dicer.")
     @ConfigEditorBoolean
     public boolean dicer = true;
 
     @Expose
     @ConfigOption(
         name = "Hide Title",
-        desc = "Hides the first line of 'Money Per Hour' entirely.")
+        desc = "Hide the first line of 'Money Per Hour' entirely.")
     @ConfigEditorBoolean
     public boolean hideTitle = false;
 

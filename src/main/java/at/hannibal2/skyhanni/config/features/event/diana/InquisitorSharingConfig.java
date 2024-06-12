@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.config.features.event.diana;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
+import org.lwjgl.input.Keyboard;
+
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
 
 public class InquisitorSharingConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shares your Inquisitor and receiving other Inquisitors via Party Chat.")
+    @ConfigOption(name = "Enabled", desc = "Share your Inquisitor and receiving other Inquisitors via Party Chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

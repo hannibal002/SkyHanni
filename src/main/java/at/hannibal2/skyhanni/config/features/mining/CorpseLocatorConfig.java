@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CorpseLocatorConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Locates Corpses that are within line of sight then mark it with a waypoint.")
+    @ConfigOption(name = "Enabled", desc = "Locate corpses that are within line of sight then mark it with a waypoint.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

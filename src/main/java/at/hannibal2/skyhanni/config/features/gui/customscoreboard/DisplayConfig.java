@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -48,14 +49,14 @@ public class DisplayConfig {
 
 
     @Expose
-    @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard." +
-        "\n§cUsing mods that add their own scoreboard will not be affected by this setting!")
+    @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.\n" +
+        "§cUsing mods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideVanillaScoreboard = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or line name displays first. " +
+    @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or line name displays first.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = false;

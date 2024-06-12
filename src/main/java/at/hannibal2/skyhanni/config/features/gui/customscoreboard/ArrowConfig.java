@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import com.google.gson.annotations.Expose;
+
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArrowConfig {
     @Expose
-    @ConfigOption(name = "Arrow Amount Display", desc = "Determines how the arrow amount is displayed.")
+    @ConfigOption(name = "Arrow Amount Display", desc = "Determine how the arrow amount is displayed.")
     @ConfigEditorDropdown
     public ArrowAmountDisplay arrowAmountDisplay = ArrowAmountDisplay.NUMBER;
 

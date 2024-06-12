@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -21,14 +22,14 @@ public class QuiverDisplayConfig {
     public Position quiverDisplayPos = new Position(260, -15);
 
     @Expose
-    @ConfigOption(name = "Show arrow icon", desc = "Displays an icon next to the Quiver Display.")
+    @ConfigOption(name = "Show arrow icon", desc = "Display an icon next to the Quiver Display.")
     @ConfigEditorBoolean
     public Property<Boolean> showIcon = Property.of(true);
 
     @Expose
     @ConfigOption(
         name = "When to show",
-        desc = "Decides in what conditions to show the display."
+        desc = "Decide in what conditions to show the display."
     )
     @ConfigEditorDropdown
     public Property<ShowWhen> whenToShow = Property.of(ShowWhen.ONLY_BOW_HAND);

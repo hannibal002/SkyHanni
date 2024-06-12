@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.event.winter;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -22,7 +23,7 @@ public class WinterConfig {
 
     @Accordion
     @Expose
-    @ConfigOption(name = "Unique Gift Counter", desc = "Keep track how many unique players you have given gifts to.")
+    @ConfigOption(name = "Unique Gift Counter", desc = "Keep track of how many unique players you have given gifts to.")
     public UniqueGiftConfig uniqueGiftCounter = new UniqueGiftConfig();
 
     @Accordion
@@ -41,7 +42,7 @@ public class WinterConfig {
     public Position islandCloseTimePosition = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "New Year Cake Reminder", desc = "Reminds while the new year cake can be collected in the hub.")
+    @ConfigOption(name = "New Year Cake Reminder", desc = "Send a reminder while the New Year Cake can be collected in the hub.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean newYearCakeReminder = true;

@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -10,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class QuickModMenuSwitchConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Adding a mod list, allowing to quickly switch between different mod menus.")
+    @ConfigOption(name = "Enabled", desc = "Add a mod list, allowing quick switching between different mod menus.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

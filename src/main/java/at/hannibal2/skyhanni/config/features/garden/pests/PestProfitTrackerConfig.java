@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden.pests;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -22,7 +23,7 @@ public class PestProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Hide messages",
-        desc = "Hides regular pest drop messages."
+        desc = "Hide regular pest drop messages."
     )
     @ConfigEditorBoolean
     public boolean hideChat = true;

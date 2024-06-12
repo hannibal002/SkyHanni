@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -14,12 +15,12 @@ public class BitsConfig {
     public boolean enableWarning = true;
 
     @Expose
-    @ConfigOption(name = "Notification Sound", desc = "Plays a notification sound when you get a warning.")
+    @ConfigOption(name = "Notification Sound", desc = "Play a notification sound when you get a warning.")
     @ConfigEditorBoolean
     public boolean notificationSound = true;
 
     @Expose
-    @ConfigOption(name = "Bits Gain Chat Message", desc = "Shows a chat message when you gain bits.")
+    @ConfigOption(name = "Bits Gain Chat Message", desc = "Show a chat message when you gain bits.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean bitsGainChatMessage = true;

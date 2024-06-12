@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
+import org.lwjgl.input.Keyboard;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
@@ -10,12 +13,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
-import org.lwjgl.input.Keyboard;
 
 public class TunnelMapsConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enables the tunnel maps, which give you a path to any location you want. Open the Inventory to select a destination.")
+    @ConfigOption(name = "Enable", desc = "Enable the tunnel maps, which give you a path to any location you want. Open your inventory to select a destination.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enable = true;
@@ -25,7 +27,7 @@ public class TunnelMapsConfig {
     public Position position = new Position(20, 20);
 
     @Expose
-    @ConfigOption(name = "Auto Commission", desc = "Takes the first collector commission as target when opening the commissions inventory, also works when completing commissions.")
+    @ConfigOption(name = "Auto Commission", desc = "Take the first collector commission as target when opening the commissions inventory, also works when completing commissions.")
     @ConfigEditorBoolean
     public boolean autoCommission = false;
 
@@ -35,7 +37,7 @@ public class TunnelMapsConfig {
     public int campfireKey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Travel Scroll", desc = "Lets the mod know that you have unlocked the travel scroll to basecamp.")
+    @ConfigOption(name = "Travel Scroll", desc = "Let SkyHanni know that you have unlocked the §eTravel Scroll to Dwarven Base Camp§7.")
     @ConfigEditorBoolean
     public boolean travelScroll = false;
 
@@ -65,7 +67,7 @@ public class TunnelMapsConfig {
     public float pathWidth = 4.0f;
 
     @Expose
-    @ConfigOption(name = "Distance at First", desc = "Shows the distance at the first edge instead of the end.")
+    @ConfigOption(name = "Distance at First", desc = "Show the distance at the first edge instead of the end.")
     @ConfigEditorBoolean
     public boolean distanceFirst = false;
 
@@ -75,7 +77,7 @@ public class TunnelMapsConfig {
     public Property<Boolean> compactGemstone = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Exclude Fairy", desc = "Excludes the fairy soul spots from the selection list.")
+    @ConfigOption(name = "Exclude Fairy", desc = "Exclude the fairy soul spots from the selection list.")
     @ConfigEditorBoolean
     public Property<Boolean> excludeFairy = Property.of(false);
 }

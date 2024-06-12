@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.rift.area.mirrorverse;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -11,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class LavaMazeConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Helps solving the lava maze in the Mirrorverse by showing the correct way.")
+    @ConfigOption(name = "Enabled", desc = "Help solve the lava maze in the Mirrorverse by showing the correct way.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

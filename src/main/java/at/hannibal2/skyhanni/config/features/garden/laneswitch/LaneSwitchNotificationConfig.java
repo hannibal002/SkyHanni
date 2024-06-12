@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -11,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class LaneSwitchNotificationConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Sends a notification when approaching the end of a lane and you should switch lanes.")
+    @ConfigOption(name = "Enabled", desc = "Send a notification when approaching the end of a lane and you should switch lanes.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

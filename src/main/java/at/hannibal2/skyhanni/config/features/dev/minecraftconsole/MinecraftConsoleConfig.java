@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev.minecraftconsole;
 
 import com.google.gson.annotations.Expose;
+
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -18,8 +19,8 @@ public class MinecraftConsoleConfig {
 
     @Expose
     @ConfigOption(
-        name = "Outside SkyBlock",
-        desc = "Print the debug information for unfiltered console messages outside SkyBlock too."
+        name = "Outside Skyblock",
+        desc = "Print the debug information for unfiltered console messages outside Skyblock too."
     )
     @ConfigEditorBoolean
     public boolean printUnfilteredDebugsOutsideSkyBlock = false;

@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.crimsonisle.ashfang;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -9,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class GravityOrbsConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows the Gravity Orbs more clearly.")
+    @ConfigOption(name = "Enabled", desc = "Show the Gravity Orbs more clearly.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

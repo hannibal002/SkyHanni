@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -11,8 +12,7 @@ public class AnitaShopConfig {
     @Expose
     @ConfigOption(
         name = "Medal Prices",
-        desc = "Helps to identify profitable items to buy at the Anita item shop " +
-            "and potential profit from selling the item in the Auction House."
+        desc = "Help to identify profitable items to buy at the Anita item shop and potential profit from selling the item in the Auction House."
     )
     @ConfigEditorBoolean
     @FeatureToggle

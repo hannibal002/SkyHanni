@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.config.features.gui;
 
+import org.lwjgl.input.Keyboard;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
@@ -9,7 +13,6 @@ import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
 import at.hannibal2.skyhanni.data.GuiEditManager;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -18,7 +21,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
 
 public class GUIConfig {
 
@@ -87,7 +89,7 @@ public class GUIConfig {
     public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
-    @ConfigOption(name = "Beacon Power", desc = "Displays the current beacon power duration and what stat is boosted.")
+    @ConfigOption(name = "Beacon Power", desc = "Display the current beacon power duration and what stat is boosted.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean beaconPower = false;

@@ -1,18 +1,19 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CustomScoreboardConfig {
     @Expose
@@ -48,7 +49,7 @@ public class CustomScoreboardConfig {
     public InformationFilteringConfig informationFiltering = new InformationFilteringConfig();
 
     @Expose
-    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")
+    @ConfigOption(name = "Unknown Lines warning", desc = "Give a chat warning when unknown lines are found in the scoreboard.")
     @ConfigEditorBoolean
     public boolean unknownLinesWarning = true;
 

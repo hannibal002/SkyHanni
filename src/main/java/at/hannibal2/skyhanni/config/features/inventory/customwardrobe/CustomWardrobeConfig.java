@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -9,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CustomWardrobeConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enables the Custom Wardrobe GUI.")
+    @ConfigOption(name = "Enable", desc = "Enable the Custom Wardrobe GUI.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -20,12 +21,12 @@ public class CustomWardrobeConfig {
     public boolean eyesFollowMouse = true;
 
     @Expose
-    @ConfigOption(name = "Hide Empty Slots", desc = "Hides wardrobe slots with no armor.")
+    @ConfigOption(name = "Hide Empty Slots", desc = "Hide wardrobe slots with no armor.")
     @ConfigEditorBoolean
     public boolean hideEmptySlots = false;
 
     @Expose
-    @ConfigOption(name = "Hide Locked Slots", desc = "Hides locked wardrobe slots.")
+    @ConfigOption(name = "Hide Locked Slots", desc = "Hide locked wardrobe slots.")
     @ConfigEditorBoolean
     public boolean hideLockedSlots = false;
 
@@ -38,7 +39,7 @@ public class CustomWardrobeConfig {
     public boolean estimatedValue = true;
 
     @Expose
-    @ConfigOption(name = "Loading text", desc = "Shows a \"§cLoading...\" §7text when the wardrobe page hasn't fully loaded in yet.")
+    @ConfigOption(name = "Loading text", desc = "Show a \"§cLoading...§7\" text when the wardrobe page hasn't fully loaded in yet.")
     @ConfigEditorBoolean
     public boolean loadingText = true;
 

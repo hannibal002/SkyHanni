@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.utils.LorenzColor;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -87,7 +88,7 @@ public class EnchantParsingConfig {
     public Property<Boolean> hideVanillaEnchants = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Hide Enchant Description", desc = "Hides the enchant description after each enchant if available.")
+    @ConfigOption(name = "Hide Enchant Description", desc = "Hide the enchant description after each enchant if available.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideEnchantDescriptions = Property.of(false);

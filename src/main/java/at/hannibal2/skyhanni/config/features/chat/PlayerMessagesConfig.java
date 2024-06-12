@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class PlayerMessagesConfig {
 
@@ -74,7 +75,7 @@ public class PlayerMessagesConfig {
     public boolean playerRankHider = false;
 
     @Expose
-    @ConfigOption(name = "Ignore YouTube", desc = "Do not remove the rank for YouTubers in chat.")
+    @ConfigOption(name = "Ignore YouTube Rank", desc = "Do not remove the YouTube rank from chat.")
     @ConfigEditorBoolean
     public boolean ignoreYouTube = false;
 
@@ -85,7 +86,7 @@ public class PlayerMessagesConfig {
     public boolean chatFilter = false;
 
     @Expose
-    @ConfigOption(name = "Same Chat Color", desc = "All players, also those with ranks, write with the same, white chat color.")
+    @ConfigOption(name = "Same Chat Color", desc = "Make all chat messages white regardless of rank.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sameChatColor = true;

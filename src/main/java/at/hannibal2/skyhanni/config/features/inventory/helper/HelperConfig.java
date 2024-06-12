@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory.helper;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -14,7 +15,7 @@ public class HelperConfig {
 
     public static class HarpConfig {
         @Expose
-        @ConfigOption(name = "GUI Scale", desc = "Automatically sets the GUI scale to \"AUTO\" when entering the Harp.")
+        @ConfigOption(name = "GUI Scale", desc = "Automatically set the GUI scale to \"AUTO\" when entering the Harp.")
         @ConfigEditorBoolean
         public boolean guiScale = false;
 
@@ -36,7 +37,7 @@ public class HelperConfig {
         public boolean showNumbers = false;
 
         @Expose
-        @ConfigOption(name = "Hide Tooltip", desc = "Hides the item tooltips inside the Harp.")
+        @ConfigOption(name = "Hide Tooltip", desc = "Hide the item tooltips inside the Harp.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean hideMelodyTooltip = false;
@@ -65,7 +66,7 @@ public class HelperConfig {
         public boolean superpairsClicksAlert = false;
 
         @Expose
-        @ConfigOption(name = "ULTRA-RARE Book Alert", desc = "Sends a chat message, title and sound when you find an ULTRA-RARE book.")
+        @ConfigOption(name = "ULTRA-RARE Book Alert", desc = "Send a chat message, title and sound when you find an ULTRA-RARE book.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean ultraRareBookAlert = false;

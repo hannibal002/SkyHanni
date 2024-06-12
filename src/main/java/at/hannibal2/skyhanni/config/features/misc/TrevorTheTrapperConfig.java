@@ -1,20 +1,5 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.lwjgl.input.Keyboard;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.ELUSIVE;
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.ENDANGERED;
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.KILLED;
@@ -27,12 +12,29 @@ import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.UNDETECTED;
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.UNTRACKABLE;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.lwjgl.input.Keyboard;
+
+import com.google.gson.annotations.Expose;
+
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.core.config.Position;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
 public class TrevorTheTrapperConfig {
 
     @Expose
     @ConfigOption(
         name = "Enable Data Tracker",
-        desc = "Tracks all of your data from doing Trevor Quests.\n" +
+        desc = "Track all of your data from doing Trevor Quests.\n" +
             "Shows based on the setting below."
     )
     @ConfigEditorBoolean
@@ -42,7 +44,7 @@ public class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Show Between Quests",
-        desc = "Shows the tracker during and between quests otherwise it will only show during them." +
+        desc = "Show the tracker during and between quests otherwise it will only show during them.\n" +
             "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
     )
     @ConfigEditorBoolean
@@ -112,7 +114,8 @@ public class TrevorTheTrapperConfig {
     public Position position = new Position(10, 80, false, true);
 
     @Expose
-    @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
+    @ConfigOption(name = "Trapper Solver", desc = "Assist in finding Trevor's mobs.\n" +
+        "§eNote: May not always work as expected.\n" +
         "§cWill not help you to find rabbits or sheep in the Oasis!")
     @ConfigEditorBoolean
     @FeatureToggle

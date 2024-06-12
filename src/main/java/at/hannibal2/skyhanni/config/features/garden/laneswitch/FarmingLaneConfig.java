@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 
+import com.google.gson.annotations.Expose;
+
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
@@ -22,7 +23,7 @@ public class FarmingLaneConfig {
     public LaneSwitchNotificationConfig laneSwitchNotification = new LaneSwitchNotificationConfig();
 
     @Expose
-    @ConfigOption(name = "Distance Display", desc = "Shows the remaining distance and time until you reach the end of the current lane.")
+    @ConfigOption(name = "Distance Display", desc = "Show the remaining distance and time until you reach the end of the current lane.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean distanceDisplay = false;
