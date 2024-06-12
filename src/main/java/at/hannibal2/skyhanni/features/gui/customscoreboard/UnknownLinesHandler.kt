@@ -174,7 +174,7 @@ object UnknownLinesHandler {
 
 
         /*
-         * handle broken scoreboard lines
+         * Handle broken scoreboard lines
          */
         confirmedUnknownLines.forEach { line ->
             if (!unconfirmedUnknownLines.contains(line)) {
