@@ -39,6 +39,7 @@ import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
+// TODO add support for estimated item value
 @SkyHanniModule
 object CustomWardrobe {
 
