@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -101,7 +102,9 @@ object MiningNotifications {
             val type = MiningAbilities.findByType(group("type")) ?: return
             sendNotification(MiningNotificationList.PICKAXE_ABILITY_START, type.type)
             val currentServer = HypixelData.serverId
-            runDelayed(type.cooldown.seconds) {
+            val cooldown = if (HotmAPI.skymall == HotmAPI.SkymallPerk.ABILITY_COOLDOWN) type.cooldown.seconds * 0.8
+            else type.cooldown.seconds
+            runDelayed(cooldown) {
                 if (HypixelData.serverId != currentServer) return@runDelayed
                 sendNotification(MiningNotificationList.PICKAXE_ABILITY_READY, type.type)
             }
