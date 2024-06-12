@@ -38,6 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 class HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
+    // TODO add regex tests
     private val serverNameConnectionPattern by patternGroup.pattern(
         "servername.connection",
         "(?<prefix>.+\\.)?hypixel\\.net",
