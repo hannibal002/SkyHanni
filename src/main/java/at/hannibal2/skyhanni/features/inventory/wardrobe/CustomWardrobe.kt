@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -198,20 +199,14 @@ object CustomWardrobe {
 
         for (armorIndex in 0 until 4) {
             val stack = slot.armor[armorIndex]?.copy()
-            if (stack == null) {
-                loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
-            } else {
-                loreList.add(
-                    Renderable.hoverable(
-                        Renderable.hoverTips(
-                            Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                            getToolTip(stack, slot, armorIndex)
-                        ),
-                        Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                        bypassChecks = true
-                    )
-                )
+            var renderable = Renderable.placeholder(containerWidth, hoverableSizes[armorIndex])
+            if (stack != null) {
+                val toolTip = getToolTip(stack, slot, armorIndex)
+                if (toolTip != null) {
+                    renderable = Renderable.hoverTips(renderable, tips = toolTip)
+                }
             }
+            loreList.add(renderable)
         }
         return Renderable.verticalContainer(loreList, spacing = 1)
     }
@@ -220,18 +215,29 @@ object CustomWardrobe {
         stack: ItemStack,
         slot: WardrobeSlot,
         armorIndex: Int,
-    ): List<String> {
-        // Get tooltip from minecraft and other mods
-        // TODO add support for advanced tooltip (F3+H)
-        val toolTips = stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+    ): List<String>? {
+        try {
+            // Get tooltip from minecraft and other mods
+            // TODO add support for advanced tooltip (F3+H)
+            val toolTips = stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
 
-        // Modify tooltip via SkyHanni Events
-        val mcSlotId = slot.inventorySlots[armorIndex]
-        // if the slot is null, we don't fire LorenzToolTipEvent at all.
-        val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
-        LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
+            // Modify tooltip via SkyHanni Events
+            val mcSlotId = slot.inventorySlots[armorIndex]
+            // if the slot is null, we don't fire LorenzToolTipEvent at all.
+            val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
+            LorenzToolTipEvent(mcSlot, stack, toolTips).postWithoutCatch()
 
-        return toolTips
+            return toolTips
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to get tooltip for armor piece in CustomWardrobe",
+                "Armor" to stack,
+                "Slot" to slot,
+                "Lore" to stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+            )
+            return null
+        }
     }
 
     private fun createFakePlayerRenderable(
