@@ -40,10 +40,11 @@ object ScoreboardPattern {
         "date",
         "^\\s*(Late |Early )?(Spring|Summer|Autumn|Winter) \\d{1,2}(st|nd|rd|th)?.*"
     )
-    /*
-      * REGEX-TEST:  §78:50am
-      * REGEX-TEST:  §75:50am §b☽
-    */
+
+    /**
+     * REGEX-TEST:  §78:50am
+     * REGEX-TEST:  §75:50am §b☽
+     */
     val timePattern by mainSb.pattern(
         "time",
         "^\\s*§7\\d{1,2}:\\d{2}(?:am|pm)\\s*(?<symbol>(§b☽|§e☀|§.⚡|§.☔))?.*$"
@@ -72,6 +73,10 @@ object ScoreboardPattern {
         "profiletype",
         "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo).*$"
     )
+    val emptyLinesPattern by mainSb.pattern(
+        "emptylines",
+        "^\\s*$"
+    )
 
     // multi use
     private val multiUseSb = scoreboardGroup.group("multiuse")
@@ -93,7 +98,7 @@ object ScoreboardPattern {
     )
     val timeLeftPattern by multiUseSb.pattern(
         "timeleft",
-        "(§.)*Time Left: (§.)*[\\w:,.]*$"
+        "(?:§.)*Time Left: (?:§.)*[\\w:,.\\s]+$"
     )
 
     // dungeon scoreboard
@@ -451,6 +456,76 @@ object ScoreboardPattern {
     val cluesPattern by riftSb.pattern(
         "clues",
         "Clues: §.\\d+/\\d+"
+    )
+
+    private val carnivalSb = scoreboardGroup.group("carnival")
+
+    /**
+     * REGEX-TEST: §eCarnival§f 85:33:57
+     */
+    val carnivalPattern by carnivalSb.pattern(
+        "carnival",
+        "§eCarnival§f (?:\\d+:?)*"
+    )
+
+    /**
+     * REGEX-TEST: §3§lCatch a Fish
+     * REGEX-TEST: §6§lFruit Diggin§6§lg
+     * REGEX-TEST: §c§lZombie Shoot§c§lout
+     */
+    val carnivalTasksPattern by carnivalSb.pattern(
+        "tasks",
+        "§.§l(?:Catch a Fish|Fruit Diggin|Zombie Shoot)(?:§.§l(?:g|out))?"
+    )
+
+    /**
+     * REGEX-TEST: §fCarnival Tokens: §e129
+     */
+    val carnivalTokensPattern by carnivalSb.pattern(
+        "tokens",
+        "(?:§f)*Carnival Tokens: §e\\d+"
+    )
+
+    /**
+     * REGEX-TEST: §fFruits: §a2§7/§c10
+     */
+    val carnivalFruitsPattern by carnivalSb.pattern(
+        "fruits",
+        "(?:§f)?Fruits: §.\\d+§.\\/§.\\d+"
+    )
+
+    /**
+     * REGEX-TEST: §fScore: §e600 §6(+300)
+     * REGEX-TEST: §fScore: §e600
+     */
+    val carnivalScorePattern by carnivalSb.pattern(
+        "score",
+        "(?:§f)?Score: §.\\d+.*"
+    )
+
+    /**
+     * REGEX-TEST: §fCatch Streak: §a0
+     */
+    val carnivalCatchStreakPattern by carnivalSb.pattern(
+        "catchstreak",
+        "(?:§f)?Catch Streak: §.\\d+"
+    )
+
+    /**
+     * REGEX-TEST: §fAccuracy: §a81.82%
+     * REGEX-TEST: §fAccuracy: §a81%
+     */
+    val carnivalAccuracyPattern by carnivalSb.pattern(
+        "accuracy",
+        "(?:§f)?Accuracy: §.\\d+(?:\\.\\d+)?%"
+    )
+
+    /**
+     * REGEX-TEST: §fKills: §a8
+     */
+    val carnivalKillsPattern by carnivalSb.pattern(
+        "kills",
+        "(?:§f)?Kills: §.\\d+"
     )
 
     // Stats from the tablist
