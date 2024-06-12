@@ -155,8 +155,7 @@ object PunchcardHighlight {
             val name = group("name")
             if (queuedName == name) {
                 addPunch(name)
-            }
-            else ErrorManager.logErrorStateWithData(
+            } else ErrorManager.logErrorStateWithData(
                 "Error finding punched player", "queuedName and capturedName were different",
                 "queuedName" to queuedName,
                 "capturedName" to name,
