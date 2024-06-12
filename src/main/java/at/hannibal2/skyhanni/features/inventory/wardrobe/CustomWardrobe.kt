@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -198,16 +199,28 @@ object CustomWardrobe {
             if (stack == null) {
                 loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
             } else {
-                loreList.add(
-                    Renderable.hoverable(
-                        Renderable.hoverTips(
+                try {
+                    loreList.add(
+                        Renderable.hoverable(
+                            Renderable.hoverTips(
+                                Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
+                                stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                            ),
                             Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                            stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+                            bypassChecks = true,
                         ),
-                        Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]),
-                        bypassChecks = true
                     )
-                )
+                } catch (e: Exception) {
+                    loreList.add(Renderable.placeholder(containerWidth, hoverableSizes[armorIndex]))
+                    ErrorManager.logErrorWithData(
+                        Exception("Failed to get tooltip for armor piece in CustomWardrobe"),
+                        "Failed to get tooltip for armor piece in CustomWardrobe",
+                        "Armor" to stack,
+                        "Slot" to slot,
+                        "Lore" to stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                        "Exception" to e,
+                    )
+                }
             }
         }
         return Renderable.verticalContainer(loreList, spacing = 1)
