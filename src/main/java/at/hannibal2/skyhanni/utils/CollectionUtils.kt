@@ -154,7 +154,7 @@ object CollectionUtils {
         return newList
     }
 
-    fun MutableList<String>.addNotNull(element: String?) = element?.let { add(it) }
+    fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()

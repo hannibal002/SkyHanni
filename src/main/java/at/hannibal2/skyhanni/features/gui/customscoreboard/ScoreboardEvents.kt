@@ -18,11 +18,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 import java.util.function.Supplier
-import java.util.regex.Matcher
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 /**
@@ -38,7 +38,7 @@ private fun getSbLines(): List<String> {
 }
 
 enum class ScoreboardEvents(
-    private val displayLine: Supplier<List<String>>,
+    private val displayLine: Supplier<List<Any>>,
     private val showWhen: () -> Boolean,
     private val configLine: String,
 ) {
@@ -181,7 +181,19 @@ enum class ScoreboardEvents(
 
     override fun toString() = configLine
 
-    fun getLines(): List<String> = displayLine.get()
+    fun getLines(): List<ScoreboardElementType> {
+        return try {
+            displayLine.get().map {
+                when (it) {
+                    is String -> it to HorizontalAlignment.LEFT
+                    is Pair<*, *> -> it.first as String to it.second as HorizontalAlignment
+                    else -> HIDDEN to HorizontalAlignment.LEFT
+                }
+            }
+        } catch (e: NoSuchElementException) {
+            listOf(HIDDEN to HorizontalAlignment.LEFT)
+        }
+    }
 
     companion object {
         fun getEvent() = buildList<ScoreboardEvents?> {
@@ -381,11 +393,9 @@ private fun getActiveEventLine(): List<String> {
     // but from other locations like the scoreboard
     val blockedEvents = listOf("Spooky Festival")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
-    val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(
-        TabListData.getTabList(),
-        fun Matcher.(): String? {
-            return group("time")
-        }) ?: "§cUnknown"
+    val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabListData.getTabList()) {
+        group("time")
+    } ?: "§cUnknown"
 
     return listOf(currentActiveEvent, " Ends in: §e$currentActiveEventTime")
 }
@@ -403,8 +413,7 @@ private fun getSoonEventLine(): List<String> {
 }
 
 private fun getSoonEventShowWhen(): Boolean =
-    getTablistEvent() != null && TabListData.getTabList()
-        .any { SbPattern.eventTimeStartsPattern.matches(it) } // is empty on top already
+    getTablistEvent() != null && TabListData.getTabList().any { SbPattern.eventTimeStartsPattern.matches(it) } // is empty on top already
 
 private fun getBroodmotherLines() = listOfNotNull((SbPattern.broodmotherPattern.firstMatches(getSbLines())))
 
@@ -416,7 +425,7 @@ private fun getMiningEventsLines() = buildList {
         SbPattern.windCompassArrowPattern.firstMatches(getSbLines())
     if (compassTitle != null && compassArrow != null) {
         add(compassTitle)
-        add("| $compassArrow §f|")
+        add(compassArrow to HorizontalAlignment.CENTER)
     }
 
     // Better Together

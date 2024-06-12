@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
@@ -57,6 +58,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import java.util.function.Supplier
 import kotlin.time.Duration.Companion.seconds
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 internal var confirmedUnknownLines = mutableListOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
@@ -86,7 +88,7 @@ private fun onRemoval(line: String) {
 internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
-    private val displayPair: Supplier<List<ScoreboardElementType>>,
+    private val displayPair: Supplier<List<Any>>,
     val showWhen: () -> Boolean,
     private val configLine: String,
 ) {
@@ -306,7 +308,13 @@ enum class ScoreboardElement(
 
     private fun getPair(): List<ScoreboardElementType> {
         return try {
-            displayPair.get()
+            displayPair.get().map {
+                when (it) {
+                    is String -> it to HorizontalAlignment.LEFT
+                    is Pair<*, *> -> it.first as String to it.second as HorizontalAlignment
+                    else -> HIDDEN to HorizontalAlignment.LEFT
+                }
+            }
         } catch (e: NoSuchElementException) {
             listOf(HIDDEN to HorizontalAlignment.LEFT)
         }
@@ -368,10 +376,9 @@ private fun getTitleDisplayPair(): List<ScoreboardElementType> =
         ).flatten()
     }
 
-private fun getProfileDisplayPair() =
-    listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
+private fun getProfileDisplayPair() = listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase())
 
-private fun getPurseDisplayPair(): List<ScoreboardElementType> {
+private fun getPurseDisplayPair(): List<String> {
     var purse = PurseAPI.currentPurse.formatNum()
 
     if (!displayConfig.hideCoinsDifference) {
@@ -385,13 +392,13 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && purse == "0" -> HIDDEN
             displayConfig.displayNumbersFirst -> "§6$purse Purse"
             else -> "Purse: §6$purse"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
-private fun getMotesDisplayPair(): List<ScoreboardElementType> {
+private fun getMotesDisplayPair(): List<String> {
     val motes = getMotes().formatNum()
 
     return listOf(
@@ -399,13 +406,13 @@ private fun getMotesDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && motes == "0" -> HIDDEN
             displayConfig.displayNumbersFirst -> "§d$motes Motes"
             else -> "Motes: §d$motes"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getMotesShowWhen() = inAnyIsland(IslandType.THE_RIFT)
 
-private fun getBankDisplayPair(): List<ScoreboardElementType> {
+private fun getBankDisplayPair(): List<String> {
     val bank = getBank()
 
     return listOf(
@@ -413,13 +420,13 @@ private fun getBankDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && (bank == "0" || bank == "0§7 / §60") -> HIDDEN
             displayConfig.displayNumbersFirst -> "§6$bank Bank"
             else -> "Bank: §6$bank"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
-private fun getBitsDisplayPair(): List<ScoreboardElementType> {
+private fun getBitsDisplayPair(): List<String> {
     val bits = BitsAPI.bits.coerceAtLeast(0).formatNum()
     val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {
         "§cOpen Sbmenu§b"
@@ -432,13 +439,13 @@ private fun getBitsDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && bits == "0" && bitsToClaim == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "${getBitsLine()} Bits"
             else -> "Bits: ${getBitsLine()}"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getBitsShowWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 
-private fun getCopperDisplayPair(): List<ScoreboardElementType> {
+private fun getCopperDisplayPair(): List<String> {
     val copper = getCopper().formatNum()
 
     return listOf(
@@ -446,13 +453,13 @@ private fun getCopperDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && copper == "0" -> HIDDEN
             displayConfig.displayNumbersFirst -> "§c$copper Copper"
             else -> "Copper: §c$copper"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getCopperShowWhen() = inAnyIsland(IslandType.GARDEN)
 
-private fun getGemsDisplayPair(): List<ScoreboardElementType> {
+private fun getGemsDisplayPair(): List<String> {
     val gems = getGems()
 
     return listOf(
@@ -460,13 +467,13 @@ private fun getGemsDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && gems == "0" -> HIDDEN
             displayConfig.displayNumbersFirst -> "§a$gems Gems"
             else -> "Gems: §a$gems"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getGemsShowWhen() = !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 
-private fun getHeatDisplayPair(): List<ScoreboardElementType> {
+private fun getHeatDisplayPair(): List<String> {
     val heat = getHeat()
 
     return listOf(
@@ -474,14 +481,14 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> HIDDEN
             displayConfig.displayNumbersFirst -> heat?.let { "$heat Heat" } ?: "§c♨ 0 Heat"
             else -> heat?.let { "Heat: $heat" } ?: "§c♨ 0 Heat"
-        } to HorizontalAlignment.LEFT,
+        },
     )
 }
 
 private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
-    ScoreboardPattern.heatPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
+    SbPattern.heatPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
-private fun getColdDisplayPair(): List<ScoreboardElementType> {
+private fun getColdDisplayPair(): List<String> {
     val cold = -getCold()
 
     return listOf(
@@ -489,14 +496,14 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && cold == 0 -> HIDDEN
             displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
             else -> "Cold: §b$cold❄"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT) &&
-    ScoreboardPattern.coldPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
+    SbPattern.coldPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
-private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
+private fun getNorthStarsDisplayPair(): List<String> {
     val northStars = getNorthStars().formatNum()
 
     return listOf(
@@ -504,40 +511,36 @@ private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && northStars == "0" -> HIDDEN
             displayConfig.displayNumbersFirst -> "§d$northStars North Stars"
             else -> "North Stars: §d$northStars"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getNorthStarsShowWhen() = inAnyIsland(IslandType.WINTER)
 
-private fun getChunkedStatsDisplayPair(): List<ScoreboardElementType> =
+private fun getChunkedStatsDisplayPair(): List<String> =
     getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
         .map { it.joinToString(" §f| ") }
-        .map { it to HorizontalAlignment.LEFT }
 
-private fun getSoulflowDisplayPair(): List<ScoreboardElementType> {
-    val soulflow = ScoreboardPattern.soulflowPattern.getGroup(TabListData.getTabList(), "soulflow")?.formatNum() ?: "0"
+private fun getSoulflowDisplayPair(): List<String> {
+    val soulflow = SbPattern.soulflowPattern.getGroup(TabListData.getTabList(), "soulflow")?.formatNum() ?: "0"
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && soulflow == "0" -> HIDDEN
             displayConfig.displayNumbersFirst -> "§3$soulflow Soulflow"
             else -> "Soulflow: §3$soulflow"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
 private fun getSoulflowDisplayWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
-private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.LEFT)
+private fun getEmptyLineDisplayPair() = listOf(EMPTY)
 
-private fun getIslandDisplayPair() = listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
+private fun getIslandDisplayPair() = listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName)
 
 private fun getLocationDisplayPair() = buildList {
-    HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }
-
-    ScoreboardPattern.plotPattern.firstMatches(ScoreboardData.sidebarLinesFormatted)?.let {
-        add(it to HorizontalAlignment.LEFT)
-    }
+    addNotNull(HypixelData.skyBlockAreaWithSymbol)
+    addNotNull(SbPattern.plotPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
 }
 
 fun getPlayerAmountDisplayPair() = buildList {
@@ -545,37 +548,33 @@ fun getPlayerAmountDisplayPair() = buildList {
         "§7/§a${getMaxPlayersForCurrentServer()}"
     } else ""
     if (displayConfig.displayNumbersFirst) {
-        add("§a${getPlayersOnCurrentServer()}$max Players" to HorizontalAlignment.LEFT)
-    } else add("§7Players: §a${getPlayersOnCurrentServer()}$max" to HorizontalAlignment.LEFT)
+        add("§a${getPlayersOnCurrentServer()}$max Players")
+    } else add("§7Players: §a${getPlayersOnCurrentServer()}$max")
 }
 
-private fun getVisitDisplayPair() = listOf(
-    (ScoreboardPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted) ?: "") to HorizontalAlignment.LEFT,
-)
+private fun getVisitDisplayPair() = listOfNotNull(SbPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
 
-private fun getVisitShowWhen() = ScoreboardPattern.visitingPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
+private fun getVisitShowWhen() = SbPattern.visitingPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
-private fun getDateDisplayPair() = listOf(
-    SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to HorizontalAlignment.LEFT,
-)
+private fun getDateDisplayPair() = listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false))
 
-private fun getTimeDisplayPair(): List<ScoreboardElementType> {
-    val symbol = ScoreboardPattern.timePattern.getGroup(ScoreboardData.sidebarLinesFormatted, "symbol") ?: ""
+private fun getTimeDisplayPair(): List<String> {
+    val symbol = SbPattern.timePattern.getGroup(ScoreboardData.sidebarLinesFormatted, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
             .formatted(
                 dayAndMonthElement = false,
                 yearElement = false,
-                timeFormat24h = displayConfig.skyblockTime24hFormat
-            ) + " $symbol" to HorizontalAlignment.LEFT
+                timeFormat24h = displayConfig.skyblockTime24hFormat,
+            ) + " $symbol",
     )
 }
 
-private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
+private fun getLobbyDisplayPair(): List<String> {
     val lobbyCode = HypixelData.serverId
     val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
     val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: HIDDEN
-    return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
+    return listOf(lobbyDisplay)
 }
 
 private fun getPowerDisplayPair() = listOf(
@@ -584,12 +583,12 @@ private fun getPowerDisplayPair() = listOf(
         if (displayConfig.displayNumbersFirst) {
             "§a${it.replace(" Power", "")} Power $mp"
         } else "Power: §a$it $mp"
-    } ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT,
+    } ?: "§cOpen \"Your Bags\"!"),
 )
 
-private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
-    val tunings = MaxwellAPI.tunings ?: return listOf("§cTalk to \"Maxwell\"!" to HorizontalAlignment.LEFT)
-    if (tunings.isEmpty()) return listOf("§cNo Maxwell Tunings :(" to HorizontalAlignment.LEFT)
+private fun getTuningDisplayPair(): List<String> {
+    val tunings = MaxwellAPI.tunings ?: return listOf("§cTalk to \"Maxwell\"!")
+    if (tunings.isEmpty()) return listOf("§cNo Maxwell Tunings :(")
 
     val title = pluralize(tunings.size, "Tuning", "Tunings")
     return if (maxwellConfig.compactTuning) {
@@ -606,8 +605,7 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
         listOf(
             (if (displayConfig.displayNumbersFirst) {
                 "$tuning §f$title"
-            } else "$title: $tuning")
-                to HorizontalAlignment.LEFT,
+            } else "$title: $tuning"),
         )
     } else {
         val tuning = tunings
@@ -619,7 +617,7 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
                     } else "$name: $color$value$icon"
                 }
             }.toTypedArray()
-        listOf("$title:", *tuning).map { it to HorizontalAlignment.LEFT }
+        listOf("$title:", *tuning)
     }
 }
 
@@ -628,7 +626,7 @@ private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 private fun getCookieDisplayPair() = listOf(
     "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
         if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
-    } ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT,
+    } ?: "§cOpen SbMenu!"),
 )
 
 private fun getCookieShowWhen(): Boolean {
@@ -637,35 +635,31 @@ private fun getCookieShowWhen(): Boolean {
 }
 
 private fun getObjectiveDisplayPair() = buildList {
-    val objective = ScoreboardPattern.objectivePattern.firstMatches(ScoreboardData.sidebarLinesFormatted) ?: return@buildList
+    val objective = SbPattern.objectivePattern.firstMatches(ScoreboardData.sidebarLinesFormatted) ?: return@buildList
 
-    add(objective to HorizontalAlignment.LEFT)
-    add((ScoreboardData.sidebarLinesFormatted.nextAfter(objective) ?: HIDDEN) to HorizontalAlignment.LEFT)
+    add(objective)
+    add(ScoreboardData.sidebarLinesFormatted.nextAfter(objective) ?: HIDDEN)
 
-    if (ScoreboardPattern.thirdObjectiveLinePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)) {
-        add(
-            (
-                ScoreboardData.sidebarLinesFormatted.nextAfter(objective, 2)
-                    ?: "Second objective here") to HorizontalAlignment.LEFT,
-        )
+    if (SbPattern.thirdObjectiveLinePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)) {
+        add(ScoreboardData.sidebarLinesFormatted.nextAfter(objective, 2) ?: "Second objective here")
     }
 }
 
-private fun getObjectiveShowWhen(): Boolean = ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
+private fun getObjectiveShowWhen(): Boolean = SbPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
-private fun getSlayerDisplayPair(): List<ScoreboardElementType> = buildList {
-    add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else HIDDEN) to HorizontalAlignment.LEFT)
-    add(" §7- §e${SlayerAPI.latestSlayerCategory.trim()}" to HorizontalAlignment.LEFT)
-    add(" §7- §e${SlayerAPI.latestSlayerProgress.trim()}" to HorizontalAlignment.LEFT)
+private fun getSlayerDisplayPair() = buildList {
+    add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else HIDDEN))
+    add(" §7- §e${SlayerAPI.latestSlayerCategory.trim()}")
+    add(" §7- §e${SlayerAPI.latestSlayerProgress.trim()}")
 }
 
 private fun getSlayerShowWhen() = if (informationFilteringConfig.hideIrrelevantLines) SlayerAPI.isInCorrectArea else true
 
-private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
+private fun getQuiverDisplayPair(): List<String> {
     if (QuiverAPI.currentArrow == null)
-        return listOf("§cChange your Arrow once" to HorizontalAlignment.LEFT)
+        return listOf("§cChange your Arrow once")
     if (QuiverAPI.currentArrow == NONE_ARROW_TYPE)
-        return listOf("No Arrows selected" to HorizontalAlignment.LEFT)
+        return listOf("No Arrows selected")
 
     val amountString = (if (arrowConfig.colorArrowAmount) {
         percentageColor(
@@ -687,7 +681,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
             "$amountString ${QuiverAPI.currentArrow?.arrow}s"
         } else {
             "Arrows: $amountString ${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}"
-        } to HorizontalAlignment.LEFT
+        },
     )
 }
 
@@ -716,10 +710,10 @@ private fun getPowderDisplayPair() = buildList {
     )
 
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third.second == "0" }) {
-        return listOf(HIDDEN to HorizontalAlignment.LEFT)
+        return listOf(HIDDEN)
     }
 
-    add("§9§lPowder" to HorizontalAlignment.LEFT)
+    add("§9§lPowder")
 
     val displayNumbersFirst = displayConfig.displayNumbersFirst
 
@@ -729,23 +723,17 @@ private fun getPowderDisplayPair() = buildList {
         when (displayConfig.powderDisplay) {
             PowderDisplay.AVAILABLE -> {
                 if (current != "0") {
-                    add(
-                        " §7- ${if (displayNumbersFirst) "$color$current $type" else "§f$type: $color$current"}"
-                            to HorizontalAlignment.LEFT,
-                    )
+                    add(" §7- ${if (displayNumbersFirst) "$color$current $type" else "§f$type: $color$current"}")
                 }
             }
             PowderDisplay.TOTAL -> {
                 if (total != "0") {
-                    add(" §7- ${if (displayNumbersFirst) "$color$total $type" else "§f$type: $color$total"}" to HorizontalAlignment.LEFT)
+                    add(" §7- ${if (displayNumbersFirst) "$color$total $type" else "§f$type: $color$total"}")
                 }
             }
             PowderDisplay.BOTH -> {
                 if (current != "0" && total != "0") {
-                    add(
-                        " §7- ${if (displayNumbersFirst) "$color$current/$total $type" else "§f$type: $color$current/$total"}"
-                            to HorizontalAlignment.LEFT,
-                    )
+                    add(" §7- ${if (displayNumbersFirst) "$color$current/$total $type" else "§f$type: $color$current/$total"}")
                 }
             }
             null -> {}
@@ -755,26 +743,25 @@ private fun getPowderDisplayPair() = buildList {
 
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
-private fun getEventsDisplayPair(): List<ScoreboardElementType> {
+private fun getEventsDisplayPair(): List<Any> {
     return ScoreboardEvents.getEvent()
         .filterNotNull()
-        .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
-        .takeIf { it.isNotEmpty() } ?: listOf(HIDDEN to HorizontalAlignment.LEFT)
+        .flatMap { it.getLines() }
 }
 
-private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
+private fun getEventsShowWhen() = ScoreboardEvents.getEvent().filterNotNull().isNotEmpty() // is empty on top already
 
 private fun getMayorDisplayPair() = buildList {
-    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: "<hidden>"
+    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: HIDDEN
     val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
         "§7 (§e${MayorAPI.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
     } else ""
 
-    add((currentMayorName + timeTillNextMayor) to HorizontalAlignment.LEFT)
+    add(currentMayorName + timeTillNextMayor)
 
     if (mayorConfig.showMayorPerks) {
         MayorAPI.currentMayor?.activePerks?.forEach { perk ->
-            add(" §7- §e${perk.perkName}" to HorizontalAlignment.LEFT)
+            add(" §7- §e${perk.perkName}")
         }
     }
 
@@ -787,24 +774,21 @@ private fun getMayorDisplayPair() = buildList {
         "§7 (§6${jerryExtraMayor.second.timeUntil().format(maxUnits = 2)}§7)"
     } else ""
 
-    add((extraMayorName + extraTimeTillNextMayor) to HorizontalAlignment.LEFT)
+    add(extraMayorName + extraTimeTillNextMayor)
 
 }
 
-private fun getMayorShowWhen() =
-    !inAnyIsland(IslandType.THE_RIFT) && MayorAPI.currentMayor != null
+private fun getMayorShowWhen() = !inAnyIsland(IslandType.THE_RIFT) && MayorAPI.currentMayor != null
 
 private fun getPartyDisplayPair() =
-    if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) {
-        listOf(HIDDEN to HorizontalAlignment.LEFT)
-    } else {
-        val title =
-            if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
+    if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) listOf(HIDDEN)
+    else {
+        val title = if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
         val partyList = PartyAPI.partyMembers
             .take(partyConfig.maxPartyList.get())
             .map { " §7- §f$it" }
             .toTypedArray()
-        listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
+        listOf(title, *partyList)
     }
 
 private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
@@ -827,11 +811,11 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> =
         .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
     ).flatten()
 
-private fun getExtraDisplayPair(): List<ScoreboardElementType> {
-    if (confirmedUnknownLines.isEmpty()) return listOf(HIDDEN to HorizontalAlignment.LEFT)
+private fun getExtraDisplayPair(): List<String> {
+    if (confirmedUnknownLines.isEmpty()) return listOf(HIDDEN)
     amountOfUnknownLines = confirmedUnknownLines.size
 
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + confirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
+    return listOf("§cUndetected Lines:") + confirmedUnknownLines
 }
 
 private fun getExtraShowWhen(): Boolean {

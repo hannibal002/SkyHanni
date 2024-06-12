@@ -45,7 +45,7 @@ object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
-    private val guiName = "Custom Scoreboard"
+    private const val GUI_NAME = "Custom Scoreboard"
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -71,12 +71,12 @@ object CustomScoreboard {
         RenderBackground.updatePosition(finalRenderable)
 
         // TODO: change to renderRenderable when custom wardrobe gets merged
-        config.position.renderRenderables(listOf(finalRenderable), posLabel = guiName)
+        config.position.renderRenderables(listOf(finalRenderable), posLabel = GUI_NAME)
     }
 
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
-        if (event.guiName == guiName) {
+        if (event.guiName == GUI_NAME) {
             with(alignmentConfig) {
                 if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
                     verticalAlignment != VerticalAlignment.DONT_ALIGN
@@ -125,13 +125,13 @@ object CustomScoreboard {
             // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == EMPTY && lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
 
             // Adds empty lines
-            if (lines.first().first == "<empty>") {
+            if (lines.first().first == EMPTY) {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
