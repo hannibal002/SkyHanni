@@ -146,9 +146,7 @@ object ReforgeAPI {
             return result
         }
 
-        override fun toString(): String {
-            return "Reforge $name"
-        }
+        override fun toString(): String = "Reforge $name"
     }
 
     @SubscribeEvent

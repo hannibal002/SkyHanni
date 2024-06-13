@@ -14,7 +14,7 @@ class NeuRepositoryReloadEvent : LorenzEvent() {
         return manager.getJsonFromFile(File(manager.repoLocation, "constants/$file.json"))
     }
 
-    inline fun <reified T : Any> readConstant(file: String, gson: Gson): T {
+    inline fun <reified T : Any> readConstant(file: String, gson: Gson = ConfigManager.gson): T {
         val data = getConstant(file) ?: ErrorManager.skyHanniError("$file failed to load from neu repo!")
         return try {
             gson.fromJson<T>(data)
@@ -26,6 +26,4 @@ class NeuRepositoryReloadEvent : LorenzEvent() {
             throw e
         }
     }
-
-    inline fun <reified T : Any> readConstant(file: String): T = readConstant<T>(file, ConfigManager.gson)
 }
