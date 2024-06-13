@@ -55,7 +55,7 @@ object DraconicSacrificeTracker {
         var essences = 0
 
         @Expose
-        var bonusRewards: MutableMap<BonusReward, Long> = mutableMapOf();
+        var bonusRewards: MutableMap<BonusReward, Long> = mutableMapOf()
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -117,10 +117,7 @@ object DraconicSacrificeTracker {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    enum class BonusReward(
-        val internalName: NEUInternalName,
-        val displayName: String,
-    ) {
+    enum class BonusReward(val internalName: NEUInternalName, val displayName: String) {
         RITUAL_RESIDUE("RITUAL_RESIDUE".asInternalName(), "§5Ritual Residue"),
         SUMMONING_EYE("SUMMONING_EYE".asInternalName(), "§5Summoning Eye"),
         DRAGON_HORN("DRAGON_HORN".asInternalName(), "§5Dragon Horn"),
@@ -137,6 +134,5 @@ object DraconicSacrificeTracker {
         PROTECTOR_DRAGON_FRAGMENT("PROTECTOR_FRAGMENT".asInternalName(), "§5Protector Dragon Fragment"),
         SUPERIOR_DRAGON_FRAGMENT("SUPERIOR_FRAGMENT".asInternalName(), "§5Superior Dragon Fragment"),
         HOLY_DRAGON_FRAGMENT("HOLY_FRAGMENT".asInternalName(), "§5Holy Dragon Fragment"),
-        ;
     }
 }
