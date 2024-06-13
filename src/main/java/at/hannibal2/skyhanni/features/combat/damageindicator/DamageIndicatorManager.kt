@@ -74,6 +74,7 @@ object DamageIndicatorManager {
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
+
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
@@ -206,7 +207,7 @@ object DamageIndicatorManager {
                     data.nameAbove,
                     sizeNameAbove,
                     -18f,
-                    smallestDistanceVew = smallestDistanceVew
+                    smallestDistanceVew = smallestDistanceVew,
                 )
             }
 
@@ -244,7 +245,7 @@ object DamageIndicatorManager {
                         finalResult,
                         sizeFinalResults,
                         diff,
-                        smallestDistanceVew = smallestDistanceVew
+                        smallestDistanceVew = smallestDistanceVew,
                     )
                     diff += 9f
                 }
@@ -263,7 +264,7 @@ object DamageIndicatorManager {
                         finalResult,
                         sizeFinalResults,
                         diff,
-                        smallestDistanceVew = smallestDistanceVew
+                        smallestDistanceVew = smallestDistanceVew,
                     )
                     diff += 9f
                 }
@@ -302,7 +303,7 @@ object DamageIndicatorManager {
 
             if (now > damageCounter.firstTick + 1_000) {
                 damageCounter.oldDamages.add(
-                    0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing)
+                    0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing),
                 )
                 damageCounter.firstTick = 0L
                 damageCounter.currentDamage = 0
@@ -327,7 +328,9 @@ object DamageIndicatorManager {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         data = data.editCopy {
-            EntityUtils.getEntities<EntityLivingBase>().mapNotNull(::checkEntity).forEach { this put it }
+            EntityUtils.getEntities<EntityLivingBase>()
+                .mapNotNull(::checkEntity)
+                .forEach { this put it }
         }
     }
 
@@ -439,7 +442,7 @@ object DamageIndicatorManager {
                 entity as EntityMagmaCube,
                 entityData,
                 health.toInt(),
-                maxHealth.toInt()
+                maxHealth.toInt(),
             )
 
             BossType.SLAYER_ZOMBIE_5 -> {
@@ -528,7 +531,7 @@ object DamageIndicatorManager {
         }
 
         return NumberUtil.percentageColor(
-            calcHealth.toLong(), calcMaxHealth.toLong()
+            calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + NumberUtil.format(calcHealth)
     }
 
@@ -649,7 +652,7 @@ object DamageIndicatorManager {
             else -> return null
         }
         var result = NumberUtil.percentageColor(
-            calcHealth.toLong(), calcMaxHealth.toLong()
+            calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + NumberUtil.format(calcHealth)
 
         if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
@@ -830,7 +833,7 @@ object DamageIndicatorManager {
             entityResult.delayedStart?.asTimeMark(),
             entityResult.finalDungeonBoss,
             entityResult.bossType,
-            foundTime = SimpleTimeMark.now()
+            foundTime = SimpleTimeMark.now(),
         )
         DamageIndicatorDetectedEvent(entityData).postAndCatch()
         return entityData
