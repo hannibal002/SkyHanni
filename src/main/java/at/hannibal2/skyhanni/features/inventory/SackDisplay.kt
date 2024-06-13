@@ -174,7 +174,7 @@ object SackDisplay {
             else -> sackItems.sortedByDescending { it.second.stored }
         }.toMap().toMutableMap()
 
-        sortedPairs.toList().forEach { (k, v) ->
+        for ((k, v) in sortedPairs.toList()) {
             if (v.stored == 0 && !config.showEmpty) {
                 sortedPairs.remove(k)
             }

@@ -26,10 +26,11 @@ object BlobbercystsHighlight {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
-            if (it.name == BLOBBER_NAME) {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, Color.RED.withAlpha(80)) { isEnabled() }
-                entityList.add(it)
+        val color = Color.RED.withAlpha(80)
+        for (player in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
+            if (player.name == BLOBBER_NAME) {
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(player, color) { isEnabled() }
+                entityList.add(player)
             }
         }
     }
