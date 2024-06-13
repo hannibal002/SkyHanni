@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
