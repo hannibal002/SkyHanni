@@ -57,6 +57,7 @@ object MaxwellAPI {
             storage?.maxwell?.favoritePowers = value
         }
 
+    private val NO_POWER by lazy { getPowerByNameOrNull("No Power") }
     private var powers = mutableListOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
@@ -258,23 +259,24 @@ object MaxwellAPI {
         var foundMagicalPower = false
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {
+                if (magicalPower == 0 && currentPower == NO_POWER) return
                 ChatUtils.chat(
                     "Seems like you don't have the Requirement for the Accessory Bag yet, " +
                         "setting power to No Power and magical power to 0.",
                 )
-                currentPower = getPowerByNameOrNull("No Power")
+                currentPower = NO_POWER
                 magicalPower = 0
+                tunings = listOf()
                 return
             }
 
-            if (noPowerSelectedPattern.matches(line)) currentPower = getPowerByNameOrNull("No Power")
+            if (noPowerSelectedPattern.matches(line)) currentPower = NO_POWER
 
             inventoryMPPattern.matchMatcher(line) {
                 // MagicalPower is boosted in catacombs
                 if (DungeonAPI.inDungeon()) return@matchMatcher
 
-                val mp = group("mp")
-                magicalPower = mp.formatInt()
+                magicalPower = group("mp").formatInt()
                 foundMagicalPower = true
             }
 
@@ -292,7 +294,10 @@ object MaxwellAPI {
         }
 
         // If Magical Power isn't in the lore
-        if (!foundMagicalPower) magicalPower = 0
+        if (!foundMagicalPower) {
+            magicalPower = 0
+            tunings = listOf()
+        }
     }
 
     fun getPowerByNameOrNull(name: String) = powers.find { it == name }
