@@ -263,7 +263,6 @@ private fun getDungeonsLines() = listOf(
     SbPattern.keysPattern,
     SbPattern.timeElapsedPattern,
     SbPattern.clearedPattern,
-    SbPattern.emptyLinesPattern, // Forcing an empty line
     SbPattern.soloPattern,
     SbPattern.teammatesPattern,
     SbPattern.floor3GuardiansPattern
@@ -521,7 +520,6 @@ private fun getMagmaBossShowWhen(): Boolean = SbPattern.magmaChamberPattern.matc
 private fun getCarnivalLines() = listOf(
     SbPattern.carnivalPattern,
     SbPattern.carnivalTokensPattern,
-    SbPattern.emptyLinesPattern, // Forcing an empty line
     SbPattern.carnivalTasksPattern,
     SbPattern.timeLeftPattern,
     SbPattern.carnivalCatchStreakPattern,
