@@ -457,44 +457,45 @@ object CustomWardrobe {
     }
 
     private fun addSlotHoverableButtons(wardrobeSlot: WardrobeSlot): Renderable {
-        val list = mutableListOf<Renderable>()
         val textScale = 1.5 * (activeScale / 100.0)
-        list.add(
-            Renderable.clickable(
-                Renderable.hoverable(
-                    Renderable.string(
-                        (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
-                        scale = textScale,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER,
+        val shouldRender = !wardrobeSlot.isEmpty() && !wardrobeSlot.locked
+        if (!shouldRender && !wardrobeSlot.favorite) return Renderable.placeholder(0, 0)
+        val list = buildList {
+            add(
+                Renderable.clickable(
+                    Renderable.hoverable(
+                        Renderable.string(
+                            (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
+                            scale = textScale,
+                            horizontalAlign = HorizontalAlignment.CENTER,
+                            verticalAlign = VerticalAlignment.CENTER,
+                        ),
+                        Renderable.string(
+                            (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
+                            scale = textScale,
+                            horizontalAlign = HorizontalAlignment.CENTER,
+                            verticalAlign = VerticalAlignment.CENTER,
+                        ),
                     ),
-                    Renderable.string(
-                        (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
-                        scale = textScale,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER,
-                    ),
-                ),
-                onClick = {
-                    wardrobeSlot.favorite = !wardrobeSlot.favorite
-                    update()
-                },
-            ),
-        )
-
-        if (config.estimatedValue && !wardrobeSlot.isEmpty()) {
-            val lore = WardrobeAPI.createPriceLore(wardrobeSlot)
-            list.add(
-                Renderable.hoverTips(
-                    Renderable.string(
-                        "§2$",
-                        scale = textScale,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER,
-                    ),
-                    lore,
+                    onClick = {
+                        wardrobeSlot.favorite = !wardrobeSlot.favorite
+                        update()
+                    },
                 ),
             )
+            if (config.estimatedValue && shouldRender) {
+                add(
+                    Renderable.hoverTips(
+                        Renderable.string(
+                            "§2$",
+                            scale = textScale,
+                            horizontalAlign = HorizontalAlignment.CENTER,
+                            verticalAlign = VerticalAlignment.CENTER,
+                        ),
+                        WardrobeAPI.createPriceLore(wardrobeSlot),
+                    ),
+                )
+            }
         }
 
         return Renderable.verticalContainer(list, 1, HorizontalAlignment.RIGHT)
