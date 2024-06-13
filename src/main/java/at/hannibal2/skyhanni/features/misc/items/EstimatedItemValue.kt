@@ -40,7 +40,7 @@ import kotlin.math.roundToLong
 @SkyHanniModule
 object EstimatedItemValue {
 
-    private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
+    val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
@@ -90,7 +90,7 @@ object EstimatedItemValue {
         renderedItems = 0
     }
 
-    private fun tryRendering() {
+    fun tryRendering() {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
@@ -133,7 +133,7 @@ object EstimatedItemValue {
         updateItem(event.stack)
     }
 
-    private fun updateItem(item: ItemStack) {
+    fun updateItem(item: ItemStack) {
         cache[item]?.let {
             display = it
             lastToolTipTime = System.currentTimeMillis()

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -210,8 +211,14 @@ object CustomWardrobe {
                     renderable = Renderable.hoverTips(
                         renderable,
                         tips = toolTip,
+                        stack = stack,
                         condition = {
                             !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
+                        },
+                        onHover = {
+                            if (EstimatedItemValue.config.enabled) {
+                                EstimatedItemValue.updateItem(stack)
+                            }
                         },
                     )
                 }
