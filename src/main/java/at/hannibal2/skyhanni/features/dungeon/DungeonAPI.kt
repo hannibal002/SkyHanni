@@ -101,9 +101,9 @@ object DungeonAPI {
         }
     }
 
-    fun inDungeon() = IslandType.CATACOMBS.isInIsland()
+    fun inDungeon(): Boolean = IslandType.CATACOMBS.isInIsland()
 
-    fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
+    fun isOneOf(vararg floors: String): Boolean = dungeonFloor?.equalsOneOf(*floors) == true
 
     fun handleBossMessage(rawMessage: String) {
         if (!inDungeon()) return
@@ -132,21 +132,19 @@ object DungeonAPI {
         return bossName.endsWith(correctBoss)
     }
 
-    fun getTime(): String =
-        ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
-            "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
-        } ?: ""
+    fun getTime(): String = ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
+        "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
+    } ?: ""
 
     fun getCurrentBoss(): DungeonFloor? {
         val floor = dungeonFloor ?: return null
         return DungeonFloor.valueOf(floor.replace("M", "F"))
     }
 
-    fun getRoomID(): String? {
-        return ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
-            group("roomId")
-        }
+    fun getRoomID(): String? = ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
+        group("roomId")
     }
+
 
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
