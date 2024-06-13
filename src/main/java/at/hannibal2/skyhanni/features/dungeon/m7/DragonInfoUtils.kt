@@ -53,7 +53,7 @@ object DragonInfoUtils {
         logSpawn(event.mob, matchedDragon)
 
         matchedDragon.status = M7SpawnedStatus.ALIVE
-        matchedDragon.status.id = id
+        matchedDragon.id = id
     }
 
     @SubscribeEvent
@@ -65,7 +65,7 @@ object DragonInfoUtils {
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         val id = event.mob.baseEntity.entityId
-        val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.status.id == id }
+        val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.id == id }
         if (matchedDragon == null) {
             logLine("dragon $id died, no matched dragon")
             ChatUtils.debug("Unknown dragon $id died at ${location.toCleanString()}")
@@ -78,7 +78,7 @@ object DragonInfoUtils {
         matchedDragon.status = status
         logKill(event.mob, matchedDragon)
 
-        matchedDragon.status.id = null
+        matchedDragon.id = null
     }
 
     @HandleEvent
@@ -144,11 +144,11 @@ object DragonInfoUtils {
         }
 
         event.addData {
-            add("Power: ${WitheredDragonInfo.POWER.status}, ${WitheredDragonInfo.POWER.status.id}")
-            add("Flame: ${WitheredDragonInfo.FLAME.status}, ${WitheredDragonInfo.FLAME.status.id}")
-            add("Apex: ${WitheredDragonInfo.APEX.status}, ${WitheredDragonInfo.APEX.status.id}")
-            add("Ice: ${WitheredDragonInfo.ICE.status}, ${WitheredDragonInfo.ICE.status.id}")
-            add("Soul: ${WitheredDragonInfo.SOUL.status}, ${WitheredDragonInfo.SOUL.status.id}")
+            add("Power: ${WitheredDragonInfo.POWER.status}, ${WitheredDragonInfo.POWER.id}")
+            add("Flame: ${WitheredDragonInfo.FLAME.status}, ${WitheredDragonInfo.FLAME.id}")
+            add("Apex: ${WitheredDragonInfo.APEX.status}, ${WitheredDragonInfo.APEX.id}")
+            add("Ice: ${WitheredDragonInfo.ICE.status}, ${WitheredDragonInfo.ICE.id}")
+            add("Soul: ${WitheredDragonInfo.SOUL.status}, ${WitheredDragonInfo.SOUL.id}")
         }
     }
 

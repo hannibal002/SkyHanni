@@ -13,6 +13,7 @@ enum class WitheredDragonInfo(
     val deathBox: AxisAlignedBB,
     val spawnLocation: LorenzVec,
     var status: M7SpawnedStatus = M7SpawnedStatus.UNDEFEATED,
+    var id: Int? = null,
 ) {
     POWER(
         "Red",
@@ -64,13 +65,13 @@ enum class WitheredDragonInfo(
         fun clearSpawned() {
             entries.forEach {
                 it.status = M7SpawnedStatus.UNDEFEATED
-                it.status.id = null
+                it.id = null
             }
         }
     }
 }
 
-enum class M7SpawnedStatus(var id: Int? = null) {
+enum class M7SpawnedStatus {
     UNDEFEATED,
     SPAWNING,
     ALIVE,
