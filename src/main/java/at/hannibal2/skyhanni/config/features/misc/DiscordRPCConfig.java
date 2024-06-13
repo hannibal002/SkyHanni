@@ -1,26 +1,25 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
-import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry.NOTHING;
-import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.AFK;
-import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.CROP_MILESTONES;
-import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.DUNGEONS;
-import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.SLAYER;
-import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.STACKING_ENCHANT;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry.NOTHING;
+import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.AFK;
+import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.CROP_MILESTONES;
+import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.DUNGEONS;
+import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.SLAYER;
+import static at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry.STACKING_ENCHANT;
 
 public class DiscordRPCConfig {
 

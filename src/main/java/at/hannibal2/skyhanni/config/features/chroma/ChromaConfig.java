@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.config.features.chroma;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.features.chroma.ChromaManager;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;

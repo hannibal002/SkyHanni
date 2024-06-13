@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.utils.OSUtils;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;

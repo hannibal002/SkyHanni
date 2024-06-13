@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;

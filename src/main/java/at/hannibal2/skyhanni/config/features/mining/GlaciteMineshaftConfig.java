@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
-import org.lwjgl.input.Keyboard;
-
 import com.google.gson.annotations.Expose;
-
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class GlaciteMineshaftConfig {
     @Expose

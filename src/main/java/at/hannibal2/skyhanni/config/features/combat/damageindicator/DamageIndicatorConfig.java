@@ -1,5 +1,18 @@
 package at.hannibal2.skyhanni.config.features.combat.damageindicator;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.ARACHNE;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DIANA_MOBS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.GARDEN_PESTS;
@@ -14,20 +27,6 @@ import static at.hannibal2.skyhanni.config.features.combat.damageindicator.Damag
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.THE_RIFT_BOSSES;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.VANQUISHER;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.VOIDGLOOM_SERAPH;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.google.gson.annotations.Expose;
-
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class DamageIndicatorConfig {
 

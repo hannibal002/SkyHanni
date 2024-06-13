@@ -1,5 +1,19 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import javax.swing.text.Position;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.ACCEPTED;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COINS_SPENT;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER;
@@ -12,20 +26,6 @@ import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisti
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.TITLE;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.TOTAL_VISITORS;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.VISITORS_BY_RARITY;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.google.gson.annotations.Expose;
-
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class DropsStatisticsConfig {
 

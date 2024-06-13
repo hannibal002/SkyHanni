@@ -1,5 +1,21 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
+
+import javax.swing.text.Position;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.ELUSIVE;
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.ENDANGERED;
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.KILLED;
@@ -11,23 +27,6 @@ import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.TRACKABLE;
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.UNDETECTED;
 import static at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry.UNTRACKABLE;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-
-import com.google.gson.annotations.Expose;
-
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class TrevorTheTrapperConfig {
 

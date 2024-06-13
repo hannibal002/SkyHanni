@@ -1,5 +1,24 @@
 package at.hannibal2.skyhanni.config.features.combat.ghostcounter;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting.TextFormattingConfig;
+import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
+import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import javax.swing.text.Position;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.AVG_MAGIC_FIND;
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.GHOSTS_KILLED;
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.GHOST_PER_SORROW;
@@ -9,25 +28,6 @@ import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCou
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.SCAVENGER_COINS;
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.SORROW;
 import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry.TITLE;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.google.gson.annotations.Expose;
-
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting.TextFormattingConfig;
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GhostCounterConfig {
 

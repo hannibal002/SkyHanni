@@ -1,15 +1,13 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
-import org.lwjgl.input.Keyboard;
-
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class TooltipTweaksConfig {
     @Expose

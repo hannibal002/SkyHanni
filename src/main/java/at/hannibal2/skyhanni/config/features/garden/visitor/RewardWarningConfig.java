@@ -1,20 +1,18 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RewardWarningConfig {
 

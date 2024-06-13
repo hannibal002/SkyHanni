@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.config.features.slayer;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig;
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig;
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;

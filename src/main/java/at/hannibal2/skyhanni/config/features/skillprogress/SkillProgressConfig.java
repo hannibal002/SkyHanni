@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -10,6 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+
+import javax.swing.text.Position;
 
 public class SkillProgressConfig {
 

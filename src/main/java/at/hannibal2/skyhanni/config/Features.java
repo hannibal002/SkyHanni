@@ -20,13 +20,13 @@ import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import at.hannibal2.skyhanni.config.storage.Storage;
 import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.Social;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign;
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
 import net.minecraft.util.ResourceLocation;
 
+import java.io.ObjectInputFilter.Config;
 import java.util.Arrays;
 import java.util.List;
 

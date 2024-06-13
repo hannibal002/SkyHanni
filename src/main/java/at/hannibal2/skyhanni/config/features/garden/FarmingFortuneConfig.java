@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.commands.Commands;
-import at.hannibal2.skyhanni.config.core.config.Position;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import javax.swing.text.Position;
 
 public class FarmingFortuneConfig {
     @Expose

@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.google.gson.annotations.Expose;
-
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.jetbrains.annotations.NotNull;
 
 public class PartyCommandsConfig {
 

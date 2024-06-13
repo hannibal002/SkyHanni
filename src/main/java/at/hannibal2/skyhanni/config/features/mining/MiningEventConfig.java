@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import javax.swing.text.Position;
 
 public class MiningEventConfig {
 

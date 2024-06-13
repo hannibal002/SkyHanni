@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostFormatting;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;

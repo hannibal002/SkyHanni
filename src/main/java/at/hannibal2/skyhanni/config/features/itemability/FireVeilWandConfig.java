@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.config.features.itemability;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
