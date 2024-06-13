@@ -28,7 +28,7 @@ object PowderPerHotmPerk {
 
         if (perk.getLevelUpCost() == null) return
 
-        if (config.powderSpent) event.toolTip.add(2, handlePowderSpend(event, perk))
+        if (config.powderSpent) event.toolTip.add(2, handlePowderSpend(perk))
         if (config.powderFor10Levels) handlePowderFor10Levels(event, perk)
     }
 
@@ -45,7 +45,7 @@ object PowderPerHotmPerk {
         event.toolTip.add(indexOfCost + 2, "§7Powder for 10 levels: §e${powderFor10Levels.addSeparators()}")
     }
 
-    private fun handlePowderSpend(event: LorenzToolTipEvent, perk: HotmData): String {
+    private fun handlePowderSpend(perk: HotmData): String {
         val currentPowderSpend = perk.calculateTotalCost(perk.activeLevel)
         val maxPowderNeeded = perk.totalCostMaxLevel
         val percentage = (currentPowderSpend.fractionOf(maxPowderNeeded) * 100).round(2)
@@ -85,6 +85,6 @@ object PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() =
-        (config.powderSpent || config.powderFor10Levels) && LorenzUtils.inSkyBlock && HotmData.inInventory
+    private fun isEnabled() = (config.powderSpent || config.powderFor10Levels) &&
+        LorenzUtils.inSkyBlock && HotmData.inInventory
 }

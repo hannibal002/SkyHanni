@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.jetbrains.annotations.NotNull;
 
 public class HotmConfig {
 
@@ -36,7 +37,7 @@ public class HotmConfig {
     @Expose
     @ConfigOption(name = "Powder Spent Design", desc = "Changes the design of the powder spent display.")
     @ConfigEditorDropdown
-    public PowderSpentDesign powderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE;
+    public @NotNull PowderSpentDesign powderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE;
 
     @Expose
     @ConfigOption(name = "Powder for 10 Levels", desc = "Shows the amount of powder needed to level a perk 10 times when pressing shift.")
