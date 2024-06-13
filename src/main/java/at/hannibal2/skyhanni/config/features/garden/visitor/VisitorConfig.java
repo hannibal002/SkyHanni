@@ -114,7 +114,7 @@ public class VisitorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Highlight Visitors in Skyblock",
+        name = "Highlight Visitors in SkyBlock",
         desc = "Highlight visitors outside of the Garden."
     )
     @ConfigEditorBoolean

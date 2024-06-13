@@ -9,7 +9,7 @@ public class CompactChatConfig {
 
     @Expose
     @ConfigOption(name = "Enable", desc = "Shorten chat messages about skill level ups, collection gains, " +
-        "new area discoveries and Skyblock level up messages while on Bingo.")
+        "new area discoveries and SkyBlock level up messages while on Bingo.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

@@ -15,7 +15,7 @@ public class KickDurationConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show in the Hypixel lobby since when you were last kicked from Skyblock " +
+        desc = "Show in the Hypixel lobby since when you were last kicked from SkyBlock " +
             "(useful if you get blocked because of '§cYou were kicked while joining that server!§7')."
     )
     @ConfigEditorBoolean
@@ -23,7 +23,7 @@ public class KickDurationConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a Skyblock kick.")
+    @ConfigOption(name = "Warn Time", desc = "Send warning and sound this seconds after a SkyBlock kick.")
     @ConfigEditorSlider(
         minValue = 5,
         maxValue = 300,

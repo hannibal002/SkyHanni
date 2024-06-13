@@ -18,8 +18,8 @@ public class MinecraftConsoleConfig {
 
     @Expose
     @ConfigOption(
-        name = "Outside Skyblock",
-        desc = "Print the debug information for unfiltered console messages outside Skyblock too."
+        name = "Outside SkyBlock",
+        desc = "Print the debug information for unfiltered console messages outside SkyBlock too."
     )
     @ConfigEditorBoolean
     public boolean printUnfilteredDebugsOutsideSkyBlock = false;

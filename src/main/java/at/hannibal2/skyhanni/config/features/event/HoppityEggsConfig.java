@@ -65,7 +65,7 @@ public class HoppityEggsConfig {
     public boolean loadFromNeuPv = true;
 
     @Expose
-    @ConfigOption(name = "Show Unclaimed Eggs", desc = "Display which eggs haven't been found in the last Skyblock day.")
+    @ConfigOption(name = "Show Unclaimed Eggs", desc = "Display which eggs haven't been found in the last SkyBlock day.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
@@ -100,7 +100,7 @@ public class HoppityEggsConfig {
     public boolean showDuringContest = false;
 
     @Expose
-    @ConfigOption(name = "Show outside Skyblock", desc = "Show on Hypixel even when not playing Skyblock.")
+    @ConfigOption(name = "Show outside SkyBlock", desc = "Show on Hypixel even when not playing SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showOutsideSkyblock = false;

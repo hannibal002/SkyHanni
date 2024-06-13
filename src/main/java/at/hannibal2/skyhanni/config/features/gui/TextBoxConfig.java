@@ -12,7 +12,7 @@ import javax.swing.text.Position;
 public class TextBoxConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable showing the textbox while in Skyblock.")
+    @ConfigOption(name = "Enabled", desc = "Enable showing the textbox while in SkyBlock.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 

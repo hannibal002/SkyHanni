@@ -27,7 +27,7 @@ import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.It
 public class InventoryConfig {
 
     @Expose
-    @Category(name = "Skyblock Guide", desc = "Help find stuff to do in SkyBlock.")
+    @Category(name = "SkyBlock Guide", desc = "Help find stuff to do in SkyBlock.")
     public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
 
     @Expose

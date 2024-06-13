@@ -21,7 +21,7 @@ public class BetterWikiCommandConfig {
 
     // TODO Make this method not suck
     @Expose
-    @ConfigOption(name = "Skyblock Guide", desc = "Use SkyHanni's method in the Skyblock Guide.")
+    @ConfigOption(name = "SkyBlock Guide", desc = "Use SkyHanni's method in the SkyBlock Guide.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sbGuide = false;

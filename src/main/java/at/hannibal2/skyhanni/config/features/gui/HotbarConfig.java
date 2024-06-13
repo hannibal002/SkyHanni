@@ -26,7 +26,7 @@ public class HotbarConfig {
     public Position hotbar = new Position(20, 20);
 
     @Expose
-    @ConfigOption(name = "Show Outside Skyblock", desc = "Enable the hotbar to be edited even outside of SkyBlock.")
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Enable the hotbar to be edited even outside of SkyBlock.")
     @ConfigEditorBoolean
     public boolean showOutsideSkyblock = false;
 }

@@ -55,7 +55,7 @@ public class CombatConfig {
     public FlareConfig flare = new FlareConfig();
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in Skyblock.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideDamageSplash = false;

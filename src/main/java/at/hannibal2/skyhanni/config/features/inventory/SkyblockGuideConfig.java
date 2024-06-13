@@ -9,7 +9,7 @@ public class SkyblockGuideConfig {
 
     @Expose
     @ConfigOption(name = "Menu Highlight",
-        desc = "Highlight the top level of non-completed task in the Skyblock guide.")
+        desc = "Highlight the top level of non-completed task in the SkyBlock guide.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean menuGuide = true;
