@@ -6,9 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.Commands
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -16,12 +14,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.features.chat.Translator
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
@@ -48,7 +42,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.9",
+    version = "0.26.Beta.7",
 )
 class SkyHanniMod {
 
@@ -61,18 +55,7 @@ class SkyHanniMod {
         loadModule(this)
         LoadedModules.modules.forEach { loadModule(it) }
 
-        // data
-        loadModule(HypixelData())
-        loadModule(SkillExperience())
-
-        // features
-        loadModule(CollectionTracker())
         loadModule(CrimsonIsleReputationHelper(this))
-        loadModule(FarmingWeightDisplay())
-        loadModule(Translator())
-
-        // test stuff
-        loadModule(SkyHanniDebugsAndTests())
 
         SkyHanniEvents.init(modules)
 
