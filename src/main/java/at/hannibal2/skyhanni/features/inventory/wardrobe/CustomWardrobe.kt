@@ -464,18 +464,8 @@ object CustomWardrobe {
             add(
                 Renderable.clickable(
                     Renderable.hoverable(
-                        Renderable.string(
-                            (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
-                            scale = textScale,
-                            horizontalAlign = HorizontalAlignment.CENTER,
-                            verticalAlign = VerticalAlignment.CENTER,
-                        ),
-                        Renderable.string(
-                            (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
-                            scale = textScale,
-                            horizontalAlign = HorizontalAlignment.CENTER,
-                            verticalAlign = VerticalAlignment.CENTER,
-                        ),
+                        centerString((if (wardrobeSlot.favorite) "§c" else "§7") + "❤", scale = textScale),
+                        centerString((if (wardrobeSlot.favorite) "§4" else "§8") + "❤", scale = textScale),
                     ),
                     onClick = {
                         wardrobeSlot.favorite = !wardrobeSlot.favorite
@@ -486,12 +476,7 @@ object CustomWardrobe {
             if (config.estimatedValue && shouldRender) {
                 add(
                     Renderable.hoverTips(
-                        Renderable.string(
-                            "§2$",
-                            scale = textScale,
-                            horizontalAlign = HorizontalAlignment.CENTER,
-                            verticalAlign = VerticalAlignment.CENTER,
-                        ),
+                        centerString("§2$", scale = textScale),
                         WardrobeAPI.createPriceLore(wardrobeSlot),
                     ),
                 )
@@ -518,12 +503,7 @@ object CustomWardrobe {
                         Renderable.placeholder(buttonWidth, buttonHeight),
                         onClick,
                     ),
-                    Renderable.string(
-                        text,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER,
-                        scale = textScale,
-                    ),
+                    centerString(text, scale = textScale),
                     false,
                 ),
                 hoveredColor,
@@ -536,12 +516,7 @@ object CustomWardrobe {
             Renderable.drawInsideRoundedRect(
                 Renderable.doubleLayered(
                     Renderable.placeholder(buttonWidth, buttonHeight),
-                    Renderable.string(
-                        text,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER,
-                        scale = textScale,
-                    ),
+                    centerString(text, scale = textScale),
                 ),
                 unhoveredColor.darker(0.57),
                 padding = 0,
@@ -638,4 +613,10 @@ object CustomWardrobe {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WardrobeAPI.inWardrobe()
+
+    fun centerString(
+        text: String,
+        scale: Double = 1.0,
+        color: Color = Color.WHITE,
+    ) = Renderable.string(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
 }
