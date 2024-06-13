@@ -21,6 +21,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -32,7 +33,7 @@ object WardrobeAPI {
     private val repoGroup = RepoPattern.group("inventory.wardrobe")
     private val inventoryPattern by repoGroup.pattern(
         "inventory.name",
-        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)"
+        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
     )
 
     /**
@@ -40,7 +41,7 @@ object WardrobeAPI {
      */
     private val equippedSlotPattern by repoGroup.pattern(
         "equippedslot",
-        "§7Slot \\d+: §aEquipped"
+        "§7Slot \\d+: §aEquipped",
     )
 
     private const val FIRST_SLOT = 36
@@ -109,7 +110,7 @@ object WardrobeAPI {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
