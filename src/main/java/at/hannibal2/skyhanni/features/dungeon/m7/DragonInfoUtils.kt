@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.events.M7DragonChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.boss.EntityDragon
@@ -40,7 +40,7 @@ object DragonInfoUtils {
 
         val location = event.mob.baseEntity.position.toLorenzVec()
 
-        val matchedDragon = M7DragonInfo.entries.firstOrNull { it.dragonLocation.particleBox.isInside(location) }
+        val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.particleBox.isInside(location) }
         if (matchedDragon == null) {
             logLine("[Spawn] dragon ${event.mob.baseEntity.entityId}, '${location.toCleanString()}', no spawn matched")
             return
@@ -62,12 +62,12 @@ object DragonInfoUtils {
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         val id = event.mob.baseEntity.entityId
-        val matchedDragon = M7DragonInfo.entries.firstOrNull { it.status.id == id }
+        val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.status.id == id }
         if (matchedDragon == null) {
             logLine("dragon $id died, no matched dragon")
             return
         }
-        val status = if (matchedDragon.dragonLocation.deathBox.isInside(location)) M7SpawnedStatus.DEFEATED
+        val status = if (matchedDragon.deathBox.isInside(location)) M7SpawnedStatus.DEFEATED
         else M7SpawnedStatus.UNDEFEATED
         M7DragonChangeEvent(matchedDragon, status)
 
@@ -86,7 +86,7 @@ object DragonInfoUtils {
         if (!checkParticle(particle)) return
         val location = particle.toLorenzVec()
 
-        val matchedDragon = M7DragonInfo.entries.firstOrNull { it.dragonLocation.particleBox.isInside(location) }
+        val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.particleBox.isInside(location) }
         logParticle(particle, matchedDragon)
         if (matchedDragon == null) return
 
@@ -121,13 +121,13 @@ object DragonInfoUtils {
 
     @SubscribeEvent
     fun onEnd(event: DungeonCompleteEvent) {
-        M7DragonInfo.clearSpawned()
+        WitheredDragonInfo.clearSpawned()
         if (inPhase5) inPhase5 = false
     }
 
     @SubscribeEvent
     fun onLeave(event: LorenzWorldChangeEvent) {
-        M7DragonInfo.clearSpawned()
+        WitheredDragonInfo.clearSpawned()
         if (inPhase5) inPhase5 = false
     }
 
@@ -140,15 +140,15 @@ object DragonInfoUtils {
         }
 
         event.addData {
-            add("Power: ${M7DragonInfo.POWER.status}, ${M7DragonInfo.POWER.status.id}")
-            add("Flame: ${M7DragonInfo.FLAME.status}, ${M7DragonInfo.FLAME.status.id}")
-            add("Apex: ${M7DragonInfo.APEX.status}, ${M7DragonInfo.APEX.status.id}")
-            add("Ice: ${M7DragonInfo.ICE.status}, ${M7DragonInfo.ICE.status.id}")
-            add("Soul: ${M7DragonInfo.SOUL.status}, ${M7DragonInfo.SOUL.status.id}")
+            add("Power: ${WitheredDragonInfo.POWER.status}, ${WitheredDragonInfo.POWER.status.id}")
+            add("Flame: ${WitheredDragonInfo.FLAME.status}, ${WitheredDragonInfo.FLAME.status.id}")
+            add("Apex: ${WitheredDragonInfo.APEX.status}, ${WitheredDragonInfo.APEX.status.id}")
+            add("Ice: ${WitheredDragonInfo.ICE.status}, ${WitheredDragonInfo.ICE.status.id}")
+            add("Soul: ${WitheredDragonInfo.SOUL.status}, ${WitheredDragonInfo.SOUL.status.id}")
         }
     }
 
-    private fun logParticle(particle: S2APacketParticles, matchedType: M7DragonInfo?) {
+    private fun logParticle(particle: S2APacketParticles, matchedType: WitheredDragonInfo?) {
         val location = particle.toLorenzVec()
 
         var string = "[Particle] $location"
@@ -161,7 +161,7 @@ object DragonInfoUtils {
         logLine(string)
     }
 
-    private fun logSpawn(mob: Mob, matchedType: M7DragonInfo?) {
+    private fun logSpawn(mob: Mob, matchedType: WitheredDragonInfo?) {
         val location = mob.baseEntity.position.toLorenzVec()
 
         var string = "[Spawn] $location, ${mob.baseEntity.entityId}"
@@ -173,7 +173,7 @@ object DragonInfoUtils {
         logLine(string)
     }
 
-    private fun logKill(mob: Mob, matchedType: M7DragonInfo?) {
+    private fun logKill(mob: Mob, matchedType: WitheredDragonInfo?) {
         val location = mob.baseEntity.position.toLorenzVec()
 
         val baseEntity = mob.baseEntity
@@ -198,10 +198,10 @@ object DragonInfoUtils {
     fun renderBoxes(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!SkyHanniMod.feature.dev.debug.enabled) return
-        M7DragonInfo.entries.forEach {
-            event.drawFilledBoundingBox_nea(it.dragonLocation.particleBox, it.color.toColor().addAlpha(100))
-            event.drawWaypointFilled(it.dragonLocation.spawnLocation, it.color.toColor(), true)
-            event.drawString(it.dragonLocation.spawnLocation.add(y = 1), it.colorName, true)
+        WitheredDragonInfo.entries.forEach {
+            event.drawFilledBoundingBox_nea(it.particleBox, it.color.toColor().addAlpha(100))
+            event.drawWaypointFilled(it.spawnLocation, it.color.toColor(), true)
+            event.drawString(it.spawnLocation.add(y = 1), it.colorName, true)
         }
     }
 }
