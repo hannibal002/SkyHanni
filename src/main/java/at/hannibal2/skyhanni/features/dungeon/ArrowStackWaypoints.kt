@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.dungeon
 
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonClass
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 
 /*
 [
@@ -104,11 +104,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
  */
 
 // TODO: Add spawn locations
-enum class WitheredDragon(val spawnLocation: LorenzVec, val color: LorenzColor) { // bmh -> ogrbp <- at
-    FLAME(LorenzVec(85.0, 14.0, 56.0), LorenzColor.GOLD),       // orange
-    APEX(LorenzVec(27.0, 14.0, 94.0), LorenzColor.GREEN),       // green
-    POWER(LorenzVec(27.0, 14.0, 59.0), LorenzColor.DARK_RED),   // red
-    ICE(LorenzVec(84.0, 14.0, 94.0), LorenzColor.AQUA),         // blue
+enum class WitheredDragon(val spawnLocation: LorenzVec, val color: LorenzColor) {
+    // bmh -> ogrbp <- at
+    FLAME(LorenzVec(85.0, 14.0, 56.0), LorenzColor.GOLD), // orange
+    APEX(LorenzVec(27.0, 14.0, 94.0), LorenzColor.GREEN), // green
+    POWER(LorenzVec(27.0, 14.0, 59.0), LorenzColor.DARK_RED), // red
+    ICE(LorenzVec(84.0, 14.0, 94.0), LorenzColor.AQUA), // blue
     SOUL(LorenzVec(56.0, 14.0, 125.0), LorenzColor.DARK_PURPLE) // purple
 }
 
@@ -120,13 +121,13 @@ object ArrowStackWaypoints {
     private val spawnPattern = "§c§lThe §\\w§\\w(?<name>[A-Z]+) §c§ldragon is spawning!".toPattern()
 
     val locations = arrayOf(
-        ArrowStackLocation(WitheredDragon.ICE, LorenzVec(48,5,110)),
-        ArrowStackLocation(WitheredDragon.APEX, LorenzVec(25,6,119)),
-        ArrowStackLocation(WitheredDragon.FLAME, LorenzVec(53,4,90)),
-        ArrowStackLocation(WitheredDragon.POWER, LorenzVec(18,5,84)),
-        ArrowStackLocation(WitheredDragon.POWER, LorenzVec(10,6,83)),
-        ArrowStackLocation(WitheredDragon.SOUL, LorenzVec(31,5,97)),
-        ArrowStackLocation(WitheredDragon.SOUL, LorenzVec(81,5,99))
+        ArrowStackLocation(WitheredDragon.ICE, LorenzVec(48, 5, 110)),
+        ArrowStackLocation(WitheredDragon.APEX, LorenzVec(25, 6, 119)),
+        ArrowStackLocation(WitheredDragon.FLAME, LorenzVec(53, 4, 90)),
+        ArrowStackLocation(WitheredDragon.POWER, LorenzVec(18, 5, 84)),
+        ArrowStackLocation(WitheredDragon.POWER, LorenzVec(10, 6, 83)),
+        ArrowStackLocation(WitheredDragon.SOUL, LorenzVec(31, 5, 97)),
+        ArrowStackLocation(WitheredDragon.SOUL, LorenzVec(81, 5, 99))
     )
 
     val dragons = arrayListOf<WitheredDragon>()
