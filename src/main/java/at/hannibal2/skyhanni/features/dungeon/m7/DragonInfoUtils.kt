@@ -78,7 +78,7 @@ object DragonInfoUtils {
         matchedDragon.status = status
         logKill(event.mob, matchedDragon)
 
-        matchedDragon.status.id = -1
+        matchedDragon.status.id = null
     }
 
     @HandleEvent
@@ -207,5 +207,10 @@ object DragonInfoUtils {
             event.drawWaypointFilled(it.spawnLocation, it.color.toColor(), true)
             event.drawString(it.spawnLocation.add(y = 1), it.colorName, true)
         }
+    }
+
+    @HandleEvent
+    fun onDragonChange(event: M7DragonChangeEvent) {
+        ChatUtils.debug("${event.dragon} ${event.state}")
     }
 }

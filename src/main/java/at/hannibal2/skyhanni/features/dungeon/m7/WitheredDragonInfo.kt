@@ -64,13 +64,13 @@ enum class WitheredDragonInfo(
         fun clearSpawned() {
             entries.forEach {
                 it.status = M7SpawnedStatus.UNDEFEATED
-                it.status.id = -1
+                it.status.id = null
             }
         }
     }
 }
 
-enum class M7SpawnedStatus(var id: Int = -1) {
+enum class M7SpawnedStatus(var id: Int? = null) {
     UNDEFEATED,
     SPAWNING,
     ALIVE,
