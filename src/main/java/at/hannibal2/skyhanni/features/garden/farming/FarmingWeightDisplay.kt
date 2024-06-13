@@ -95,7 +95,7 @@ object FarmingWeightDisplay {
         event.move(
             3,
             "garden.eliteFarmingWeightOffScreenDropMessage",
-            "garden.eliteFarmingWeights.offScreenDropMessage"
+            "garden.eliteFarmingWeights.offScreenDropMessage",
         )
         event.move(3, "garden.eliteFarmingWeightOvertakeETAAlways", "garden.eliteFarmingWeights.overtakeETAAlways")
         event.move(3, "garden.eliteFarmingWeightETAGoalRank", "garden.eliteFarmingWeights.ETAGoalRank")
@@ -141,20 +141,23 @@ object FarmingWeightDisplay {
             Renderable.clickAndHover(
                 "§cFarming Weight error: Cannot load",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate
-            ), Renderable.clickAndHover(
+                onClick = recalculate,
+            ),
+            Renderable.clickAndHover(
                 "§cdata from Elite Farmers!",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate
-            ), Renderable.clickAndHover(
+                onClick = recalculate,
+            ),
+            Renderable.clickAndHover(
                 "§eRejoin the garden or",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate
-            ), Renderable.clickAndHover(
+                onClick = recalculate,
+            ),
+            Renderable.clickAndHover(
                 "§eclick here to fix it.",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate
-            )
+                onClick = recalculate,
+            ),
         )
     }
 
@@ -193,8 +196,8 @@ object FarmingWeightDisplay {
             Renderable.clickAndHover(
                 "§6Farming Weight§7: $weight$leaderboard",
                 listOf("§eClick to open your Farming Profile."),
-                onClick = { openWebsite(LorenzUtils.getPlayerName()) }
-            )
+                onClick = { openWebsite(LorenzUtils.getPlayerName()) },
+            ),
         )
 
         if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
@@ -244,7 +247,7 @@ object FarmingWeightDisplay {
             ChatUtils.chatAndOpenConfig(
                 "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                     "to a valid number [1-10000] to use this feature!",
-                GardenAPI.config.eliteFarmingWeights::etaGoalRank
+                GardenAPI.config.eliteFarmingWeights::etaGoalRank,
             )
             config.etaGoalRank = goal.toString()
         } else {
@@ -265,7 +268,7 @@ object FarmingWeightDisplay {
         val nextPlayer = nextPlayer ?: return Renderable.clickAndHover(
             "§cWaiting for leaderboard update...",
             listOf("§eClick here to load new data right now!"),
-            onClick = recalculate
+            onClick = recalculate,
         )
         val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
         var nextName =
@@ -301,7 +304,7 @@ object FarmingWeightDisplay {
             return Renderable.clickAndHover(
                 "§cRejoin the garden to show ETA!",
                 listOf("Click here to calculate the data right now!"),
-                onClick = recalculate
+                onClick = recalculate,
             )
         }
 
@@ -319,7 +322,7 @@ object FarmingWeightDisplay {
             Renderable.clickAndHover(
                 text,
                 listOf("§eClick to open the Farming Profile of §b$nextName."),
-                onClick = { openWebsite(nextName) }
+                onClick = { openWebsite(nextName) },
             )
         }
     }
@@ -347,7 +350,7 @@ object FarmingWeightDisplay {
                 "§eClick to open your Farming Weight",
                 "§eprofile on §celitebot.dev",
             ),
-            "shfarmingprofile ${LorenzUtils.getPlayerName()}"
+            "shfarmingprofile ${LorenzUtils.getPlayerName()}",
         )
     }
 
@@ -417,7 +420,7 @@ object FarmingWeightDisplay {
         farmingChatMessage(
             "§7Since your last visit to the §aGarden§7, " +
                 "you have $direction §7on the §dFarming Leaderboard§7. " +
-                "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)"
+                "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)",
         )
     }
 
@@ -444,7 +447,7 @@ object FarmingWeightDisplay {
             ErrorManager.logErrorWithData(
                 e, "Error getting weight leaderboard position",
                 "url" to url,
-                "apiResponse" to apiResponse
+                "apiResponse" to apiResponse,
             )
         }
         return -1
@@ -496,7 +499,7 @@ object FarmingWeightDisplay {
                 "§cIf this message repeats, please report it on Discord!\n",
             "url" to url,
             "apiResponse" to apiResponse,
-            "localProfile" to localProfile
+            "localProfile" to localProfile,
         )
     }
 
@@ -567,7 +570,7 @@ object FarmingWeightDisplay {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error getting crop weights from elitebot.dev",
-                "apiResponse" to apiResponse
+                "apiResponse" to apiResponse,
             )
         }
     }
