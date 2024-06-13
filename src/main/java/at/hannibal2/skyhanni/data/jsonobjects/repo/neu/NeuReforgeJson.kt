@@ -32,7 +32,7 @@ data class NeuReforgeJson(
 
                 is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
                     LorenzRarity.valueOf(
-                        it.key.uppercase().replace(" ", "_")
+                        it.key.uppercase().replace(" ", "_"),
                     )
                 } ?: emptyMap()
 

@@ -21,7 +21,7 @@ class NeuRepositoryReloadEvent : LorenzEvent() {
         } catch (e: JsonSyntaxException) {
             ErrorManager.logErrorWithData(
                 e, "$file failed to read from neu repo!",
-                "data" to data
+                "data" to data,
             )
             throw e
         }

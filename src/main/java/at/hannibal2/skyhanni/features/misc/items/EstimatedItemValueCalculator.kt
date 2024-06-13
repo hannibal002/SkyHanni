@@ -122,7 +122,7 @@ object EstimatedItemValueCalculator {
             )
             if (price != null) {
                 val name = attributes[0].first.fixMending().allLettersFirstUppercase()
-                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)",)
+                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)")
                 return price
             }
         }

@@ -57,7 +57,6 @@ enum class SkyblockStat(val icon: String) {
             entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
         }
     }
-
 }
 
 class SkyblockStatList : EnumMap<SkyblockStat, Double>(SkyblockStat::class.java), Map<SkyblockStat, Double> {
