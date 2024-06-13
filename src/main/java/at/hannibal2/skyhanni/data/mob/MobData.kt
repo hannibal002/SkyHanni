@@ -19,7 +19,6 @@ object MobData {
         val entityList get() = this.flatMap { listOf(it.baseEntity) + (it.extraEntities) }
     }
 
-
     val players = MobSet()
     val displayNPCs = MobSet()
     val skyblockMobs = MobSet()

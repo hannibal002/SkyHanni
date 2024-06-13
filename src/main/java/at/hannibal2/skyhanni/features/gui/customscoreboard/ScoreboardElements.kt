@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig.ArrowAmountDisplay
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getMaxPlayersForCurrentServer
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getMaxPlayersForCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
@@ -78,200 +80,200 @@ enum class ScoreboardElement(
     TITLE(
         ::getTitleDisplayPair,
         { true },
-        "§6§lSKYBLOCK"
+        "§6§lSKYBLOCK",
     ),
     PROFILE(
         ::getProfileDisplayPair,
         { true },
-        "§7♲ Blueberry"
+        "§7♲ Blueberry",
     ),
     PURSE(
         ::getPurseDisplayPair,
         ::getPurseShowWhen,
-        "Purse: §652,763,737"
+        "Purse: §652,763,737",
     ),
     MOTES(
         ::getMotesDisplayPair,
         ::getMotesShowWhen,
-        "Motes: §d64,647"
+        "Motes: §d64,647",
     ),
     BANK(
         ::getBankDisplayPair,
         ::getBankShowWhen,
-        "Bank: §6249M"
+        "Bank: §6249M",
     ),
     BITS(
         ::getBitsDisplayPair,
         ::getBitsShowWhen,
-        "Bits: §b59,264"
+        "Bits: §b59,264",
     ),
     COPPER(
         ::getCopperDisplayPair,
         ::getCopperShowWhen,
-        "Copper: §c23,495"
+        "Copper: §c23,495",
     ),
     GEMS(
         ::getGemsDisplayPair,
         ::getGemsShowWhen,
-        "Gems: §a57,873"
+        "Gems: §a57,873",
     ),
     HEAT(
         ::getHeatDisplayPair,
         ::getHeatShowWhen,
-        "Heat: §c♨ 0"
+        "Heat: §c♨ 0",
     ),
     COLD(
         ::getColdDisplayPair,
         ::getColdShowWhen,
-        "Cold: §b0❄"
+        "Cold: §b0❄",
     ),
     NORTH_STARS(
         ::getNorthStarsDisplayPair,
         ::getNorthStarsShowWhen,
-        "North Stars: §d756"
+        "North Stars: §d756",
     ),
     EMPTY_LINE(
         ::getEmptyLineDisplayPair,
-        { true }, ""
+        { true }, "",
     ),
     ISLAND(
         ::getIslandDisplayPair,
         { true },
-        "§7㋖ §aHub"
+        "§7㋖ §aHub",
     ),
     LOCATION(
         ::getLocationDisplayPair,
         { true },
-        "§7⏣ §bVillage"
+        "§7⏣ §bVillage",
     ),
     PLAYER_AMOUNT(
         ::getPlayerAmountDisplayPair,
         { true },
-        "§7Players: §a69§7/§a80"
+        "§7Players: §a69§7/§a80",
     ),
     VISITING(
         ::getVisitDisplayPair,
         ::getVisitShowWhen,
-        " §a✌ §7(§a1§7/6)"
+        " §a✌ §7(§a1§7/6)",
     ),
     DATE(
         ::getDateDisplayPair,
         { true },
-        "Late Summer 11th"
+        "Late Summer 11th",
     ),
     TIME(
         ::getTimeDisplayPair,
         { true },
-        "§710:40pm §b☽"
+        "§710:40pm §b☽",
     ),
     LOBBY_CODE(
         ::getLobbyDisplayPair,
         { true },
-        "§8mega77CK"
+        "§8mega77CK",
     ),
     POWER(
         ::getPowerDisplayPair,
         ::getPowerShowWhen,
-        "Power: §aSighted §7(§61.263§7)"
+        "Power: §aSighted §7(§61.263§7)",
     ),
     TUNING(
         ::getTuningDisplayPair,
         ::getPowerShowWhen,
-        "Tuning: §c❁34§7, §e⚔20§7, and §9☣7"
+        "Tuning: §c❁34§7, §e⚔20§7, and §9☣7",
     ),
     COOKIE(
         ::getCookieDisplayPair,
         ::getCookieShowWhen,
-        "§dCookie Buff§f: 3d 17h"
+        "§dCookie Buff§f: 3d 17h",
     ),
     EMPTY_LINE2(
         ::getEmptyLineDisplayPair,
-        { true }, ""
+        { true }, "",
     ),
     OBJECTIVE(
         ::getObjectiveDisplayPair,
         ::getObjectiveShowWhen,
-        "Objective:\n§eStar SkyHanni on Github"
+        "Objective:\n§eStar SkyHanni on Github",
     ),
     SLAYER(
         ::getSlayerDisplayPair,
         ::getSlayerShowWhen,
-        "Slayer Quest\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills"
+        "Slayer Quest\n §7- §cVoidgloom Seraph III\n §7- §e12§7/§c120 §7Kills",
     ),
     EMPTY_LINE3(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     QUIVER(
         ::getQuiverDisplayPair,
         ::getQuiverShowWhen,
-        "Flint Arrow: §f1,234"
+        "Flint Arrow: §f1,234",
     ),
     POWDER(
         ::getPowderDisplayPair,
         ::getPowderShowWhen,
-        "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234"
+        "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234",
     ),
     EVENTS(
         ::getEventsDisplayPair,
         ::getEventsShowWhen,
-        "§7Wide Range of Events\n§7(too much to show all)"
+        "§7Wide Range of Events\n§7(too much to show all)",
     ),
     MAYOR(
         ::getMayorDisplayPair,
         ::getMayorShowWhen,
-        "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
+        "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff",
     ),
     PARTY(
         ::getPartyDisplayPair,
         ::getPartyShowWhen,
-        "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fSkirtwearer"
+        "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fSkirtwearer",
     ),
     FOOTER(
         ::getFooterDisplayPair,
         { true },
-        "§ewww.hypixel.net"
+        "§ewww.hypixel.net",
     ),
     EXTRA(
         ::getExtraDisplayPair,
         ::getExtraShowWhen,
-        "§cUnknown lines the mod is not detecting"
+        "§cUnknown lines the mod is not detecting",
     ),
     EMPTY_LINE4(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     EMPTY_LINE5(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     EMPTY_LINE6(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     EMPTY_LINE7(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     EMPTY_LINE8(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     EMPTY_LINE9(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     EMPTY_LINE10(
         ::getEmptyLineDisplayPair,
         { true },
-        ""
+        "",
     ),
     ;
 
@@ -327,7 +329,7 @@ enum class ScoreboardElement(
             MAYOR,
             PARTY,
             FOOTER,
-            EXTRA
+            EXTRA,
         )
     }
 }
@@ -336,10 +338,11 @@ private fun getTitleDisplayPair(): List<ScoreboardElementType> =
     if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
         listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
     } else {
-        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
-            .replace("&", "§")
-            .split("\\n")
-            .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
+        listOf(
+            displayConfig.titleAndFooter.customTitle.get().toString()
+                .replace("&", "§")
+                .split("\\n")
+                .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
         ).flatten()
     }
 
@@ -360,7 +363,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && purse == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§6$purse Purse"
             else -> "Purse: §6$purse"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -375,7 +378,7 @@ private fun getMotesDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && motes == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§d$motes Motes"
             else -> "Motes: §d$motes"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -389,7 +392,7 @@ private fun getBankDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && (bank == "0" || bank == "0§7 / §60") -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§6$bank Bank"
             else -> "Bank: §6$bank"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -421,7 +424,7 @@ private fun getBitsDisplayPair(): List<ScoreboardElementType> {
                     "Bits: §b$bits"
                 }
             }
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -436,7 +439,7 @@ private fun getCopperDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && copper == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§c$copper Copper"
             else -> "Copper: §c$copper"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -450,7 +453,7 @@ private fun getGemsDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && gems == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§a$gems Gems"
             else -> "Gems: §a$gems"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -464,7 +467,7 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> "<hidden>"
             displayConfig.displayNumbersFirst/* && heat != "§6IMMUNE" */ -> if (heat == "0") "§c♨ 0 Heat" else "$heat Heat"
             else -> if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -479,7 +482,7 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && cold == 0 -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
             else -> "Cold: §b$cold❄"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -496,7 +499,7 @@ private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && northStars == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§d$northStars North Stars"
             else -> "North Stars: §d$northStars"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -528,7 +531,7 @@ fun getPlayerAmountDisplayPair() = buildList {
 
 private fun getVisitDisplayPair() =
     listOf(
-        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.visitingPattern.matches(it) } to HorizontalAlignment.LEFT
+        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.visitingPattern.matches(it) } to HorizontalAlignment.LEFT,
     )
 
 private fun getVisitShowWhen() =
@@ -536,7 +539,7 @@ private fun getVisitShowWhen() =
 
 private fun getDateDisplayPair() =
     listOf(
-        SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to HorizontalAlignment.LEFT
+        SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false) to HorizontalAlignment.LEFT,
     )
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
@@ -544,7 +547,7 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     if (symbol == "0") symbol = ""
     return listOf(
         "§7" + SkyBlockTime.now()
-            .formatted(dayAndMonthElement = false, yearElement = false) + " $symbol" to HorizontalAlignment.LEFT
+            .formatted(dayAndMonthElement = false, yearElement = false) + " $symbol" to HorizontalAlignment.LEFT,
     )
 }
 
@@ -564,7 +567,7 @@ private fun getPowerDisplayPair() = listOf(
             "Power: §a$it $mp"
         }
     }
-        ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT
+        ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT,
 )
 
 private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
@@ -590,7 +593,7 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
                 "$tuning §f$title"
             } else {
                 "$title: $tuning"
-            } to HorizontalAlignment.LEFT
+            } to HorizontalAlignment.LEFT,
         )
     } else {
         val tuning = tunings
@@ -615,7 +618,7 @@ private fun getCookieDisplayPair() = listOf(
     "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
         if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
     }
-        ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT
+        ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT,
 )
 
 private fun getCookieShowWhen(): Boolean {
@@ -633,7 +636,7 @@ private fun getObjectiveDisplayPair() = buildList {
     if (ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
         add(
             (ScoreboardData.sidebarLinesFormatted.nextAfter(objective, 2)
-                ?: "Second objective here") to HorizontalAlignment.LEFT
+                ?: "Second objective here") to HorizontalAlignment.LEFT,
         )
     }
 }
@@ -659,7 +662,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
     val amountString = (if (arrowConfig.colorArrowAmount) {
         percentageColor(
             QuiverAPI.currentAmount.toLong(),
-            QuiverAPI.MAX_ARROW_AMOUNT.toLong()
+            QuiverAPI.MAX_ARROW_AMOUNT.toLong(),
         ).getChatColor()
     } else {
         ""
@@ -678,7 +681,7 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
             "$amountString ${QuiverAPI.currentArrow?.arrow}s"
         } else {
             "Arrows: $amountString ${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 
@@ -688,59 +691,49 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes: List<Triple<String, String, String>> = listOf(
-        Triple(
-            "Mithril", "§2", getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.mithrilPowderPattern,
-                "mithrilpowder"
-            ).formatNum()
-        ),
-        Triple(
-            "Gemstone", "§d", getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.gemstonePowderPattern,
-                "gemstonepowder"
-            ).formatNum()
-        ),
-        Triple(
-            "Glacite", "§b", getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.glacitePowderPattern,
-                "glacitepowder"
-            ).formatNum()
-        )
-    )
+    val powderTypes = HotmAPI.Powder.values()
+    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
+        return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    }
 
-    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third == "0" }) {
-        add("<hidden>" to HorizontalAlignment.LEFT)
-    } else {
-        add("§9§lPowder" to HorizontalAlignment.LEFT)
+    add("§9§lPowder" to HorizontalAlignment.LEFT)
 
-        if (displayConfig.displayNumbersFirst) {
-            for ((type, color, value) in powderTypes) {
-                if (value != "0") {
-                    add(" §7- $color$value $type" to HorizontalAlignment.LEFT)
-                }
+    val displayNumbersFirst = displayConfig.displayNumbersFirst
+
+    for (type in powderTypes) {
+        val name = type.displayName
+        val color = type.color
+        val current = type.getCurrent().formatNum()
+        val total = type.getTotal().formatNum()
+
+        when (displayConfig.powderDisplay) {
+            PowderDisplay.AVAILABLE -> {
+                add(" §7- ${if (displayNumbersFirst) "$color$current $name" else "§f$name: $color$current"}" to HorizontalAlignment.LEFT)
             }
-        } else {
-            for ((type, color, value) in powderTypes) {
-                if (value != "0") {
-                    add(" §7- §f$type: $color$value" to HorizontalAlignment.LEFT)
-                }
+
+            PowderDisplay.TOTAL -> {
+                add(" §7- ${if (displayNumbersFirst) "$color$total $name" else "§f$name: $color$total"}" to HorizontalAlignment.LEFT)
             }
+
+            PowderDisplay.BOTH -> {
+                add(
+                    " §7- ${if (displayNumbersFirst) "$color$current/$total $name" else "§f$name: $color$current/$total"}"
+                        to HorizontalAlignment.LEFT,
+                )
+            }
+
+            null -> {}
         }
     }
 }
 
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
-private fun getEventsDisplayPair(): List<ScoreboardElementType> {
-    return ScoreboardEvents.getEvent()
-        .filterNotNull()
-        .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
-        .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
-}
+private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEvents.getEvent()
+    .filterNotNull()
+    .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
+    .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
+
 
 private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
@@ -802,17 +795,17 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
         inAnyIsland(
             IslandType.DUNGEON_HUB,
             IslandType.KUUDRA_ARENA,
-            IslandType.CRIMSON_ISLE
+            IslandType.CRIMSON_ISLE,
         )
     }
 }
 
-private fun getFooterDisplayPair(): List<ScoreboardElementType> =
-    listOf(displayConfig.titleAndFooter.customFooter.get().toString()
+private fun getFooterDisplayPair(): List<ScoreboardElementType> = listOf(
+    displayConfig.titleAndFooter.customFooter.get().toString()
         .replace("&", "§")
         .split("\\n")
-        .map { it to displayConfig.titleAndFooter.alignTitleAndFooter }
-    ).flatten()
+        .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
+).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unconfirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
