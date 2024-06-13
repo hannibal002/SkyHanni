@@ -48,7 +48,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.26.Beta.8",
+    version = "0.26.Beta.9",
 )
 class SkyHanniMod {
 
@@ -129,13 +129,13 @@ class SkyHanniMod {
         val version: String
             get() = Loader.instance().indexedModList[MODID]!!.version
 
-        @JvmStatic
-        val feature: Features get() = configManager.features
-        val sackData: SackData get() = configManager.sackData
-        val friendsData: FriendsJson get() = configManager.friendsData
-        val knownFeaturesData: KnownFeaturesJson get() = configManager.knownFeaturesData
-        val jacobContestsData: JacobContestsJson get() = configManager.jacobContestData
-        val visualWordsData: VisualWordsJson get() = configManager.visualWordsData
+        @JvmField
+        var feature: Features = Features()
+        lateinit var sackData: SackData
+        lateinit var friendsData: FriendsJson
+        lateinit var knownFeaturesData: KnownFeaturesJson
+        lateinit var jacobContestsData: JacobContestsJson
+        lateinit var visualWordsData: VisualWordsJson
 
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager

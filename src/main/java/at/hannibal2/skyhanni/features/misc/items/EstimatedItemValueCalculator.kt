@@ -92,7 +92,7 @@ object EstimatedItemValueCalculator {
         ::addDrillUpgrades,
         ::addGemstoneSlotUnlockCost,
         ::addGemstones,
-        ::addEnchantments
+        ::addEnchantments,
     )
 
     fun getTotalPrice(stack: ItemStack): Double = EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first
@@ -103,27 +103,25 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
+    private fun isKuudraSet(internalName: String) =
+        (kuudraSets.any { internalName.contains(it) } &&
+            listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) })
+
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
-        var internalName = stack.getInternalName().asString().removePrefix("VANQUISHED_")
+        var internalName = removeKuudraArmorPrefix(stack.getInternalName().asString().removePrefix("VANQUISHED_"))
         var genericName = internalName
-        if (kuudraSets.any { internalName.contains(it) }
-            && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) }) {
-            internalName = removeCrimsonArmorPrefix(internalName)
+        if (isKuudraSet(internalName)) {
             genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
         if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
-            val price =
-                getPriceOrCompositePriceForAttribute(
-                    "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
-                    attributes[0].second
-                )
+            val price = getPriceOrCompositePriceForAttribute(
+                "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
+                attributes[0].second,
+            )
             if (price != null) {
-                list.add(
-                    "§7Attribute §9${
-                        attributes[0].first.fixMending().allLettersFirstUppercase()
-                    } ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)"
-                )
+                val name = attributes[0].first.fixMending().allLettersFirstUppercase()
+                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)",)
                 return price
             }
         }
@@ -161,14 +159,16 @@ object EstimatedItemValueCalculator {
             list.add(
                 "  $nameColor${
                     displayName.allLettersFirstUppercase()
-                } ${attr.second}§7: $priceColor${if (price != null) NumberUtil.format(price) else "Unknown"}"
+                } ${attr.second}§7: $priceColor${if (price != null) NumberUtil.format(price) else "Unknown"}",
             )
         }
         // Adding 0.1 so that we always show the estimated item value overlay
         return subTotal + 0.1
     }
 
-    private fun removeCrimsonArmorPrefix(original: String): String {
+    private fun removeKuudraArmorPrefix(original: String): String {
+        if (!isKuudraSet(original)) return original
+
         var internalName = original
         for (prefix in listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")) {
             internalName = internalName.removePrefix(prefix)
@@ -530,7 +530,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = removeCrimsonArmorPrefix(stack.getInternalName().asString()).asInternalName()
+        val internalName = removeKuudraArmorPrefix(stack.getInternalName().asString()).asInternalName()
         var price = internalName.getPrice()
         if (price == -1.0) {
             price = 0.0
