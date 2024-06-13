@@ -93,7 +93,7 @@ public class TrophyFishDisplayConfig {
         SILVER_AMOUNT("Silver Amount"),
         GOLD_AMOUNT("Gold Amount"),
         DIAMOND_AMOUNT("Diamond Amount"),
-        HIGHEST_RARITY("Highest Rariy"),
+        HIGHEST_RARITY("Highest Rarity"),
         NAME("Name Alphabetical"),
         ;
 

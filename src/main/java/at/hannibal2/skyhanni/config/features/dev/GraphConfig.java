@@ -62,7 +62,7 @@ public class GraphConfig {
     public int loadKey = Keyboard.KEY_I;
 
     @Expose
-    @ConfigOption(name = "Clear Key", desc = "Clear the graph. Also saves the graph to the clipboard, just in case you misclicked.")
+    @ConfigOption(name = "Clear Key", desc = "Clear the graph. Also saves the graph to the clipboard, in case of a misclick.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_P)
     public int clearKey = Keyboard.KEY_P;
 

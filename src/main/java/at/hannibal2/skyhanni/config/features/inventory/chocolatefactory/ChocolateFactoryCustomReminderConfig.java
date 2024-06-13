@@ -26,7 +26,7 @@ public class ChocolateFactoryCustomReminderConfig {
     public boolean always = false;
 
     @Expose
-    @ConfigOption(name = "Hide No Chocolate Message", desc = "Hide the chat message telling you you dont have enough chocolate to buy/purchase something.")
+    @ConfigOption(name = "Hide No Chocolate Message", desc = "Hide the chat message about not having enough chocolate to buy/purchase something.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideChat = true;
