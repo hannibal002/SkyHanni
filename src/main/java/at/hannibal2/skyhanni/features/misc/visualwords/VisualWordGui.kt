@@ -23,8 +23,11 @@ import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileReader
 import java.io.IOException
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
 open class VisualWordGui : GuiScreen() {
 
@@ -563,7 +566,8 @@ open class VisualWordGui : GuiScreen() {
     private fun tryImportFromSBE() {
         if (!drawImport) return
         try {
-            val json = ConfigManager.gson.fromJson(FileReader(sbeConfigPath), JsonObject::class.java)
+            val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)
+            val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
             var importedWords = 0
             var skippedWords = 0
             val lists = json["custom"].asJsonObject["visualWords"].asJsonArray
