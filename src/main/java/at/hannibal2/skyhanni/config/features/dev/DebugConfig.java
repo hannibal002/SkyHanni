@@ -106,7 +106,7 @@ public class DebugConfig {
     public boolean hotSwapDetection = false;
 
     @Expose
-    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always oudated.")
+    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")
     @ConfigEditorBoolean
     public boolean alwaysOutdated = false;
 
@@ -117,12 +117,12 @@ public class DebugConfig {
     public boolean eventCounter = false;
 
     @Expose
-    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled whie pressing this hotkey.")
+    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled while pressing this hotkey.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int bypassAdvancedPlayerTabList = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
+    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while F3 is open.")
     @ConfigEditorBoolean
     public boolean currentAreaDebug = true;
 
