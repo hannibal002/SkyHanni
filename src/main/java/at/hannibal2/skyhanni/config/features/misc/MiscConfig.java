@@ -108,6 +108,11 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
+    @ConfigOption(name = "Dragonic Sacrifice Tracker", desc = "")
+    @Accordion
+    public DraconicSacrificeTrackerConfig draconicSacrificeTracker = new DraconicSacrificeTrackerConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();

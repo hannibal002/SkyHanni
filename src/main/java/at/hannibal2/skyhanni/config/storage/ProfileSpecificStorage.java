@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
+import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
@@ -637,6 +638,9 @@ public class ProfileSpecificStorage {
         @Nullable
         public Integer currentSlot = null;
     }
+
+    @Expose
+    public DraconicSacrificeTracker.Data draconicSacrificeTracker = new DraconicSacrificeTracker.Data();
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
