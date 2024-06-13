@@ -227,7 +227,7 @@ object HypixelData {
                 val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
                 if (obj.has("server")) {
                     locrawData = obj
-                    locraw.keys.forEach { key ->
+                    for (key in locraw.keys) {
                         locraw[key] = obj[key]?.asString ?: ""
                     }
                     inLimbo = locraw["server"] == "limbo"

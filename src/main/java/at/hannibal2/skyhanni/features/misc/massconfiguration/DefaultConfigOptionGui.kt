@@ -104,19 +104,19 @@ class DefaultConfigOptionGui(
             mc.displayGuiScreen(null)
         }
         button("Turn all on", listOf()) {
-            resetSuggestionState.entries.forEach { entry ->
+            for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_ON)
                 orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
         }
         button("Turn all off", listOf()) {
-            resetSuggestionState.entries.forEach { entry ->
+            for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_OFF)
                 orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
         }
         button("Leave all untouched", listOf()) {
-            resetSuggestionState.entries.forEach { entry ->
+            for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
                 orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
