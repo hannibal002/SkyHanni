@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.combat.ghostcounter;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting.TextFormattingConfig;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil;
 import com.google.gson.annotations.Expose;
@@ -12,8 +13,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import javax.swing.text.Position;
 
 import java.util.ArrayList;
 import java.util.Arrays;

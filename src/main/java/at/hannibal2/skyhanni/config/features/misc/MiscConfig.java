@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
@@ -14,8 +15,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import javax.swing.text.Position;
 
 import java.util.ArrayList;
 import java.util.List;

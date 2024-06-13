@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
 import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
@@ -18,8 +19,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
-
-import javax.swing.text.Position;
 
 public class GUIConfig {
 

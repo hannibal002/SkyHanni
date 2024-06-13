@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -9,8 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
-
-import javax.swing.text.Position;
 
 public class SensitivityReducerConfig {
     @Expose

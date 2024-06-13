@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -9,8 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import javax.swing.text.Position;
 
 import java.util.ArrayList;
 import java.util.Arrays;
