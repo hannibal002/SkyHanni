@@ -726,12 +726,11 @@ private fun getPowderDisplayPair() = buildList {
 
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
-private fun getEventsDisplayPair(): List<ScoreboardElementType> {
-    return ScoreboardEvents.getEvent()
-        .filterNotNull()
-        .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
-        .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
-}
+private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEvents.getEvent()
+    .filterNotNull()
+    .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
+    .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
+
 
 private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
