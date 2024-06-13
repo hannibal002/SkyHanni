@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
-import com.google.gson.annotations.Expose;
-
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
