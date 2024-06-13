@@ -100,7 +100,7 @@ public class HoppityEggsConfig {
     public boolean showDuringContest = false;
 
     @Expose
-    @ConfigOption(name = "Show outside SkyBlock", desc = "Show on Hypixel even when not playing SkyBlock.")
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Show on Hypixel even when not playing SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showOutsideSkyblock = false;
