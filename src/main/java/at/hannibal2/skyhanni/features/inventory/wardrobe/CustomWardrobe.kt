@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PE
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -316,6 +317,7 @@ object CustomWardrobe {
         val rowsRenderables = chunkedList.map { row ->
             val slotsRenderables = row.map { slot ->
                 val armorTooltipRenderable = createArmorTooltipRenderable(slot, containerHeight, containerWidth)
+                val (topOutline, bottomOutline) = slot.getOutlineColor()
 
                 val playerBackground = createHoverableRenderable(
                     armorTooltipRenderable,
@@ -324,6 +326,8 @@ object CustomWardrobe {
                     borderOutlineThickness = config.spacing.outlineThickness.get(),
                     borderOutlineBlur = config.spacing.outlineBlur.get(),
                     onClick = { slot.clickSlot() },
+                    topOutlineColor = topOutline,
+                    bottomOutlineColor = bottomOutline,
                 )
 
                 val playerRenderable = createFakePlayerRenderable(slot, playerWidth, containerHeight, containerWidth)
@@ -560,6 +564,8 @@ object CustomWardrobe {
         borderOutlineBlur: Float = 0.5f,
         onClick: () -> Unit,
         onHover: () -> Unit = {},
+        topOutlineColor: Color,
+        bottomOutlineColor: Color,
     ): Renderable =
         Renderable.hoverable(
             Renderable.drawInsideRoundedRectWithOutline(
@@ -572,8 +578,8 @@ object CustomWardrobe {
                 ),
                 hoveredColor,
                 padding = padding,
-                topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
-                bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
+                topOutlineColor = topOutlineColor.rgb,
+                bottomOutlineColor = bottomOutlineColor.rgb,
                 borderOutlineThickness = borderOutlineThickness,
                 blur = borderOutlineBlur,
                 horizontalAlign = horizontalAlignment,
@@ -588,6 +594,15 @@ object CustomWardrobe {
             ),
             onHover = { onHover() },
         )
+
+    private fun WardrobeSlot.getOutlineColor(): Pair<Color, Color> {
+        val (top, bottom) = config.color.topBorderColor.toChromaColor() to config.color.bottomBorderColor.toChromaColor()
+        return when {
+            isEmpty() -> ColorUtils.TRANSPARENT_COLOR to ColorUtils.TRANSPARENT_COLOR
+            !isInCurrentPage() -> top.darker(0.5) to bottom.darker(0.5)
+            else -> top to bottom
+        }
+    }
 
     private fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
