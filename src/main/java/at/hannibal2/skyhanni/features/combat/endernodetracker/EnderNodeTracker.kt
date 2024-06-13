@@ -171,7 +171,7 @@ object EnderNodeTracker {
         if (!ProfileStorageData.loaded) return emptyMap()
 
         val newProfit = mutableMapOf<EnderNode, Double>()
-        storage.lootCount.forEach { (item, amount) ->
+        for ((item, amount) in storage.lootCount) {
             val price = if (isEnderArmor(item)) {
                 10_000.0
             } else {
