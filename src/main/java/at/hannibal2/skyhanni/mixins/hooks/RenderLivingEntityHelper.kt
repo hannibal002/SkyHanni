@@ -12,14 +12,14 @@ object RenderLivingEntityHelper {
     private val entityColorMap = mutableMapOf<EntityLivingBase, Int>()
     private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
-    private val entityNoHurTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+    private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         entityColorMap.clear()
         entityColorCondition.clear()
 
-        entityNoHurTimeCondition.clear()
+        entityNoHurtTimeCondition.clear()
     }
 
     fun <T : EntityLivingBase> removeEntityColor(entity: T) {
@@ -33,7 +33,7 @@ object RenderLivingEntityHelper {
     }
 
     fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
-        entityNoHurTimeCondition[entity] = condition
+        entityNoHurtTimeCondition[entity] = condition
     }
 
     fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Int, condition: () -> Boolean) {
@@ -42,7 +42,7 @@ object RenderLivingEntityHelper {
     }
 
     fun <T : EntityLivingBase> removeNoHurtTime(entity: T) {
-        entityNoHurTimeCondition.remove(entity)
+        entityNoHurtTimeCondition.remove(entity)
     }
 
     fun <T : EntityLivingBase> removeCustomRender(entity: T) {
@@ -66,7 +66,7 @@ object RenderLivingEntityHelper {
     fun <T : EntityLivingBase> internalChangeHurtTime(entity: T): Int {
         if (!SkyHanniDebugsAndTests.globalRender) return entity.hurtTime
         run {
-            val condition = entityNoHurTimeCondition[entity] ?: return@run
+            val condition = entityNoHurtTimeCondition[entity] ?: return@run
             if (condition.invoke()) {
                 return 0
             }

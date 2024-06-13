@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
@@ -40,9 +40,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 @SkyHanniModule
 object MobDetection {
 
-    /* Unsupported "Mobs"
+    /* Unsupported Entities
         Nicked Players
-        Odanate
+        Odonata
         Silk Worm
         Fairy (in Dungeon)
         Totem of Corruption
@@ -311,8 +311,8 @@ object MobDetection {
         return true
     }
 
-    @SubscribeEvent
-    fun onEntitySpawnPacket(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent
+    fun onEntitySpawnPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)

@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -89,8 +90,8 @@ object HighlightVisitorsOutsideOfGarden {
     private fun isVisitorNearby(location: LorenzVec) =
         EntityUtils.getEntitiesNearby<EntityLivingBase>(location, 2.0).any { isVisitor(it) }
 
-    @SubscribeEvent
-    fun onClickEntity(event: PacketEvent.SendEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onClickEntity(event: PacketSentEvent) {
         if (!shouldBlock) return
         val world = Minecraft.getMinecraft().theWorld ?: return
         val player = Minecraft.getMinecraft().thePlayer ?: return

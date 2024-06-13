@@ -40,32 +40,42 @@ import kotlin.time.Duration.Companion.seconds
 object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
+    // TODO add regex tests
+    private val serverNameConnectionPattern by patternGroup.pattern(
+        "servername.connection",
+        "(?<prefix>.+\\.)?hypixel\\.net",
+    )
+    private val serverNameScoreboardPattern by patternGroup.pattern(
+        "servername.scoreboard",
+        "§e(?<prefix>.+\\.)?hypixel\\.net",
+    )
     private val islandNamePattern by patternGroup.pattern(
-        "islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+        "islandname",
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
     )
     private val serverIdScoreboardPattern by patternGroup.pattern(
         "serverid.scoreboard",
-        "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
+        "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
     )
     private val serverIdTablistPattern by patternGroup.pattern(
         "serverid.tablist",
-        " Server: §r§8(?<serverid>\\S+)"
+        " Server: §r§8(?<serverid>\\S+)",
     )
     private val lobbyTypePattern by patternGroup.pattern(
         "lobbytype",
-        "(?<lobbyType>.*lobby)\\d+"
+        "(?<lobbyType>.*lobby)\\d+",
     )
     private val playerAmountPattern by patternGroup.pattern(
         "playeramount",
-        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
     )
     private val playerAmountCoopPattern by patternGroup.pattern(
         "playeramount.coop",
-        "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
     )
     private val playerAmountGuestingPattern by patternGroup.pattern(
         "playeramount.guesting",
-        "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+        "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
     )
 
     /**
@@ -73,23 +83,23 @@ object HypixelData {
      */
     private val dungeonPartyAmountPattern by patternGroup.pattern(
         "playeramount.dungeonparty",
-        "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+        "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
     )
     private val soloProfileAmountPattern by patternGroup.pattern(
         "solo.profile.amount",
-        "^\\s*(?:§.)*Island\\s*$"
+        "^\\s*(?:§.)*Island\\s*$",
     )
     private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
-        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)"
+        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
     )
     private val guestPattern by patternGroup.pattern(
         "guesting.scoreboard",
-        "SKYBLOCK GUEST"
+        "SKYBLOCK GUEST",
     )
     private val scoreboardTitlePattern by patternGroup.pattern(
         "scoreboard.title",
-        "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+        "SK[YI]BLOCK(?: CO-OP| GUEST)?",
     )
 
     /**
@@ -98,7 +108,7 @@ object HypixelData {
      */
     private val skyblockAreaPattern by patternGroup.pattern(
         "skyblock.area",
-        "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
+        "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
     private var lastLocRaw = SimpleTimeMark.farPast()
@@ -127,7 +137,12 @@ object HypixelData {
         // Data from locraw
         var locrawData: JsonObject? = null
     private var locraw: MutableMap<String, String> = listOf(
-        "server", "gametype", "lobbyname", "lobbytype", "mode", "map"
+        "server",
+            "gametype",
+            "lobbyname",
+            "lobbytype",
+            "mode",
+            "map",
     ).associateWith { "" }.toMutableMap()
 
     val server get() = locraw["server"] ?: ""
@@ -159,7 +174,7 @@ object HypixelData {
                 "Could not find server id",
                 "islandType" to LorenzUtils.skyBlockIsland,
                 "tablist" to TabListData.getTabList(),
-                "scoreboard" to ScoreboardData.sidebarLinesFormatted
+                "scoreboard" to ScoreboardData.sidebarLinesFormatted,
             )
         }
 
@@ -290,8 +305,8 @@ object HypixelData {
         }
     }
 
-    @SubscribeEvent
     // TODO rewrite everything in here
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             // Modified from NEU.
@@ -362,12 +377,34 @@ object HypixelData {
     }
 
     private fun checkHypixel() {
-        val list = ScoreboardData.sidebarLinesFormatted
-        if (list.isEmpty()) return
+        val mc = Minecraft.getMinecraft()
+        val player = mc.thePlayer ?: return
 
-        val last = list.last()
-        hypixelLive = last == "§ewww.hypixel.net"
-        hypixelAlpha = last == "§ealpha.hypixel.net"
+        var hypixel = false
+
+        player.clientBrand?.let {
+            if (it.contains("hypixel", ignoreCase = true)) {
+                hypixel = true
+            }
+        }
+
+        serverNameConnectionPattern.matchMatcher(mc.getCurrentServerData().serverIP) {
+            hypixel = true
+            if (group("prefix") == "alpha.") {
+                hypixelAlpha = true
+            }
+        }
+
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            serverNameScoreboardPattern.matchMatcher(line) {
+                hypixel = true
+                if (group("prefix") == "alpha.") {
+                    hypixelAlpha = true
+                }
+            }
+        }
+
+        hypixelLive = hypixel && !hypixelAlpha
     }
 
     private fun checkSidebar() {

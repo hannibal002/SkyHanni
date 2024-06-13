@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
@@ -17,26 +18,17 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object ScoreboardData {
 
+    var sidebarLinesFormatted: List<String> = emptyList()
+
+    private var sidebarLines: List<String> = emptyList() // TODO rename to raw
+    var sidebarLinesRaw: List<String> = emptyList() // TODO delete
+    var objectiveTitle = ""
+
+    private var dirty = false
+
     private val minecraftColorCodesPattern = "(?i)[0-9a-fkmolnr]".toPattern()
 
-    // TODO USE SH-REPO
-    private val splitIcons = listOf(
-        "\uD83C\uDF6B",
-        "\uD83D\uDCA3",
-        "\uD83D\uDC7D",
-        "\uD83D\uDD2E",
-        "\uD83D\uDC0D",
-        "\uD83D\uDC7E",
-        "\uD83C\uDF20",
-        "\uD83C\uDF6D",
-        "⚽",
-        "\uD83C\uDFC0",
-        "\uD83D\uDC79",
-        "\uD83C\uDF81",
-        "\uD83C\uDF89",
-        "\uD83C\uDF82",
-        "\uD83D\uDD2B",
-    )
+
 
     fun formatLines(rawList: List<String>): List<String> {
         val list = mutableListOf<String>()
@@ -62,16 +54,8 @@ object ScoreboardData {
         return list
     }
 
-    var sidebarLinesFormatted: List<String> = emptyList()
-
-    var sidebarLines: List<String> = emptyList() // TODO rename to raw
-    var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    var objectiveTitle = ""
-
-    var dirty = false
-
-    @SubscribeEvent(receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         if (event.packet is S3CPacketUpdateScore) {
             if (event.packet.objectiveName == "update") {
                 dirty = true
@@ -125,4 +109,23 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
     }
+
+    // TODO USE SH-REPO
+    private val splitIcons = listOf(
+        "\uD83C\uDF6B",
+        "\uD83D\uDCA3",
+        "\uD83D\uDC7D",
+        "\uD83D\uDD2E",
+        "\uD83D\uDC0D",
+        "\uD83D\uDC7E",
+        "\uD83C\uDF20",
+        "\uD83C\uDF6D",
+        "⚽",
+        "\uD83C\uDFC0",
+        "\uD83D\uDC79",
+        "\uD83C\uDF81",
+        "\uD83C\uDF89",
+        "\uD83C\uDF82",
+        "\uD83D\uDD2B",
+    )
 }

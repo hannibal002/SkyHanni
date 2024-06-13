@@ -37,6 +37,10 @@ object GuiEditManager {
 
     private var lastHotkeyPressed = SimpleTimeMark.farPast()
 
+    private var currentPositions = TimeLimitedCache<String, Position>(15.seconds)
+    private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+    private var lastMovedGui: String? = null
+
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
@@ -72,10 +76,6 @@ object GuiEditManager {
             lastMovedGui = null
         }
     }
-
-    private var currentPositions = TimeLimitedCache<String, Position>(15.seconds)
-    private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
-    private var lastMovedGui: String? = null
 
     @JvmStatic
     fun add(position: Position, posLabel: String, x: Int, y: Int) {
