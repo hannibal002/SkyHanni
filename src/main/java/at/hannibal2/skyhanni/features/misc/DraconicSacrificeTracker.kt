@@ -56,7 +56,6 @@ object DraconicSacrificeTracker {
 
         @Expose
         var bonusRewards: MutableMap<BonusReward, Long> = mutableMapOf();
-
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
@@ -73,12 +72,14 @@ object DraconicSacrificeTracker {
         addAsSingletonList(Renderable.string("§6${data.itemsSacrifice.addSeparators()} Items Sacrified"))
         addAsSingletonList(Renderable.string("§b${data.essences.addSeparators()} §5Dragon Essences"))
 
-        for (reward in BonusReward.entries){
+        for (reward in BonusReward.entries) {
             val count = data.bonusRewards[reward] ?: 0
-            add(buildList {
-                add(Renderable.itemStack(reward.internalName.getItemStack()))
-                add("§b${count} ${reward.displayName}")
-            })
+            add(
+                buildList {
+                    add(Renderable.itemStack(reward.internalName.getItemStack()))
+                    add("§b${count} ${reward.displayName}")
+                },
+            )
         }
     }
 
