@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -55,26 +56,33 @@ object DungeonAPI {
     var isUniqueClass = false
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-    private val timePattern =
-        "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
 
     private val patternGroup = RepoPattern.group("dungeon")
 
+    /**
+     * REGEX-TEST: Time Elapsed: §a01m 17s
+     * REGEX-TEST: Time Elapsed: §a14s
+     */
+    private val timePattern by patternGroup.pattern(
+        "time",
+        "Time Elapsed: §.(?:(?<minutes>\\d+)m )?(?<seconds>\\d+)s",
+    )
+
     private val dungeonComplete by patternGroup.pattern(
         "complete",
-        "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
+        "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
     private val dungeonRoomPattern by patternGroup.pattern(
         "room",
-        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)"
+        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
     )
     private val blessingPattern by patternGroup.pattern(
         "blessings",
-        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r"
+        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
     )
     private val noBlessingPattern by patternGroup.pattern(
         "noblessings",
-        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r"
+        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r",
     )
 
     enum class DungeonBlessings(var power: Int) {
@@ -124,12 +132,10 @@ object DungeonAPI {
         return bossName.endsWith(correctBoss)
     }
 
-    fun getTime(): String {
+    fun getTime(): String =
         ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
-            return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
-        }
-        return ""
-    }
+            "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
+        } ?: ""
 
     fun getCurrentBoss(): DungeonFloor? {
         val floor = dungeonFloor ?: return null
@@ -321,8 +327,8 @@ object DungeonAPI {
             add("playerClassLevel: $playerClassLevel")
             add("")
             add("Blessings: ")
-            for (blessing in DungeonBlessings.entries) {
-                add("  ${blessing.displayName} ${blessing.power}")
+            DungeonBlessings.entries.forEach {
+                add("  ${it.displayName} ${it.power}")
             }
         }
     }
@@ -332,7 +338,7 @@ object DungeonAPI {
         BERSERK("Berserk"),
         HEALER("Healer"),
         MAGE("Mage"),
-        TANK("Tank")
+        TANK("Tank"),
     }
 
     enum class DungeonChest(val inventory: String) {
