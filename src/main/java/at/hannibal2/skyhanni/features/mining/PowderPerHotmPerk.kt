@@ -85,6 +85,6 @@ object PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() = (config.powderSpent || config.powderFor10Levels) &&
-        LorenzUtils.inSkyBlock && HotmData.inInventory
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory &&
+        (config.powderSpent || config.powderFor10Levels)
 }
