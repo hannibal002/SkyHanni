@@ -21,7 +21,7 @@ object ColorUtils {
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
         (start.green * (1 - percent) + end.green * percent).toInt(),
-        (start.blue * (1 - percent) + end.blue * percent).toInt()
+        (start.blue * (1 - percent) + end.blue * percent).toInt(),
     )
 
     /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
