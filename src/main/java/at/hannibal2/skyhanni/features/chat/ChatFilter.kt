@@ -411,7 +411,7 @@ object ChatFilter {
 
     // §e§ka§a>>   §aAchievement Unlocked: §6§r§6Agile§r§a   <<§e§ka
     private val achievementGetPatterns = listOf(
-        "§e§ka§a>>   §aAchievement Unlocked: .*   <<§e§ka".toPattern()
+        "§e§k.§a>> {3}§aAchievement Unlocked: .* {3}<<§e§k.".toPattern()
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
