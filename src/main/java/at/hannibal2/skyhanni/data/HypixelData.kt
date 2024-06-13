@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
@@ -37,8 +38,18 @@ import kotlin.time.Duration.Companion.seconds
 class HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
+    // TODO add regex tests
+    private val serverNameConnectionPattern by patternGroup.pattern(
+        "servername.connection",
+        "(?<prefix>.+\\.)?hypixel\\.net",
+    )
+    private val serverNameScoreboardPattern by patternGroup.pattern(
+        "servername.scoreboard",
+        "§e(?<prefix>.+\\.)?hypixel\\.net",
+    )
     private val islandNamePattern by patternGroup.pattern(
-        "islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+        "islandname",
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
     )
 
     private var lastLocRaw = SimpleTimeMark.farPast()
@@ -46,41 +57,52 @@ class HypixelData {
     companion object {
         private val patternGroup = RepoPattern.group("data.hypixeldata")
         private val serverIdScoreboardPattern by patternGroup.pattern(
-            "serverid.scoreboard", "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*"
+            "serverid.scoreboard",
+            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
         )
         private val serverIdTablistPattern by patternGroup.pattern(
-            "serverid.tablist", " Server: §r§8(?<serverid>\\S+)"
+            "serverid.tablist",
+            " Server: §r§8(?<serverid>\\S+)",
         )
         private val lobbyTypePattern by patternGroup.pattern(
-            "lobbytype", "(?<lobbyType>.*lobby)\\d+"
+            "lobbytype",
+            "(?<lobbyType>.*lobby)\\d+",
         )
         private val playerAmountPattern by patternGroup.pattern(
-            "playeramount", "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+            "playeramount",
+            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
         )
         private val playerAmountCoopPattern by patternGroup.pattern(
-            "playeramount.coop", "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+            "playeramount.coop",
+            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
         )
         private val playerAmountGuestingPattern by patternGroup.pattern(
-            "playeramount.guesting", "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$"
+            "playeramount.guesting",
+            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
         )
 
         /**
          * REGEX-TEST:           §r§b§lParty §r§f(4)
          */
         private val dungeonPartyAmountPattern by patternGroup.pattern(
-            "playeramount.dungeonparty", "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$"
+            "playeramount.dungeonparty",
+            "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
         )
         private val soloProfileAmountPattern by patternGroup.pattern(
-            "solo.profile.amount", "^\\s*(?:§.)*Island\\s*$"
+            "solo.profile.amount",
+            "^\\s*(?:§.)*Island\\s*$",
         )
         private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
-            "scoreboard.visiting.amount", "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)"
+            "scoreboard.visiting.amount",
+            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
         )
         private val guestPattern by patternGroup.pattern(
-            "guesting.scoreboard", "SKYBLOCK GUEST"
+            "guesting.scoreboard",
+            "SKYBLOCK GUEST",
         )
         private val scoreboardTitlePattern by patternGroup.pattern(
-            "scoreboard.title", "SK[YI]BLOCK(?: CO-OP| GUEST)?"
+            "scoreboard.title",
+            "SK[YI]BLOCK(?: CO-OP| GUEST)?",
         )
 
         /**
@@ -88,7 +110,8 @@ class HypixelData {
          * REGEX-TEST:  §5ф §dWizard Tower
          */
         private val skyblockAreaPattern by patternGroup.pattern(
-            "skyblock.area", "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)"
+            "skyblock.area",
+            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
         )
 
         var hypixelLive = false
@@ -115,7 +138,12 @@ class HypixelData {
         // Data from locraw
         var locrawData: JsonObject? = null
         private var locraw: MutableMap<String, String> = listOf(
-            "server", "gametype", "lobbyname", "lobbytype", "mode", "map"
+            "server",
+            "gametype",
+            "lobbyname",
+            "lobbytype",
+            "mode",
+            "map",
         ).associateWith { "" }.toMutableMap()
 
         val server get() = locraw["server"] ?: ""
@@ -147,7 +175,7 @@ class HypixelData {
                 "Could not find server id",
                 "islandType" to LorenzUtils.skyBlockIsland,
                 "tablist" to TabListData.getTabList(),
-                "scoreboard" to ScoreboardData.sidebarLinesFormatted
+                "scoreboard" to ScoreboardData.sidebarLinesFormatted,
             )
         }
 
@@ -235,7 +263,7 @@ class HypixelData {
         skyBlockAreaWithSymbol = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         hypixelLive = false
         hypixelAlpha = false
@@ -279,8 +307,8 @@ class HypixelData {
         }
     }
 
-    @SubscribeEvent
     // TODO rewrite everything in here
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             // Modified from NEU.
@@ -351,12 +379,34 @@ class HypixelData {
     }
 
     private fun checkHypixel() {
-        val list = ScoreboardData.sidebarLinesFormatted
-        if (list.isEmpty()) return
+        val mc = Minecraft.getMinecraft()
+        val player = mc.thePlayer ?: return
 
-        val last = list.last()
-        hypixelLive = last == "§ewww.hypixel.net"
-        hypixelAlpha = last == "§ealpha.hypixel.net"
+        var hypixel = false
+
+        player.clientBrand?.let {
+            if (it.contains("hypixel", ignoreCase = true)) {
+                hypixel = true
+            }
+        }
+
+        serverNameConnectionPattern.matchMatcher(mc.getCurrentServerData().serverIP) {
+            hypixel = true
+            if (group("prefix") == "alpha.") {
+                hypixelAlpha = true
+            }
+        }
+
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            serverNameScoreboardPattern.matchMatcher(line) {
+                hypixel = true
+                if (group("prefix") == "alpha.") {
+                    hypixelAlpha = true
+                }
+            }
+        }
+
+        hypixelLive = hypixel && !hypixelAlpha
     }
 
     private fun checkSidebar() {

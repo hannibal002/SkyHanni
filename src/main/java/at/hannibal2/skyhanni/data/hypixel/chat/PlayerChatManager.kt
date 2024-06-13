@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
@@ -23,7 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
  */
-class PlayerChatManager {
+@SkyHanniModule
+object PlayerChatManager {
 
     private val patternGroup = RepoPattern.group("data.chat.player")
 
@@ -66,14 +68,15 @@ class PlayerChatManager {
     /**
      * REGEX-TEST: To nea89o: lol
      * REGEX-TEST: From nea89o: hiii
-     * REGEX-TEST: §eFrom stash: §r§fPufferfish
+     * REGEX-TEST: From stash: Pufferfish
+     * REGEX-TEST: From stash: Wheat
      * REGEX-TEST: To [MVP+] Eisengolem: Boop!
      * REGEX-TEST: From [MVP+] Eisengolem: Boop!
      * REGEX-TEST: To [MVP+] Eisengolem: danke
      */
     private val privateMessagePattern by patternGroup.pattern(
         "privatemessage",
-        "^(?!§eFrom stash: §r)(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
+        "^(?!From stash: )(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
     )
 
     /**
