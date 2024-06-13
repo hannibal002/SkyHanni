@@ -598,7 +598,7 @@ object CustomWardrobe {
     private fun WardrobeSlot.getOutlineColor(): Pair<Color, Color> {
         val (top, bottom) = config.color.topBorderColor.toChromaColor() to config.color.bottomBorderColor.toChromaColor()
         return when {
-            isEmpty() -> ColorUtils.TRANSPARENT_COLOR to ColorUtils.TRANSPARENT_COLOR
+            isEmpty() || locked -> ColorUtils.TRANSPARENT_COLOR to ColorUtils.TRANSPARENT_COLOR
             !isInCurrentPage() -> top.darker(0.5) to bottom.darker(0.5)
             else -> top to bottom
         }
