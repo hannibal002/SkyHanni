@@ -6,8 +6,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.findStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent

@@ -7,26 +7,31 @@ import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.IOException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class MiningEventTracker {
+@SkyHanniModule
+object MiningEventTracker {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
 
     private val patternGroup = RepoPattern.group("mining.eventtracker")
@@ -38,6 +43,7 @@ class MiningEventTracker {
         "bossbar.active",
         "§e§lEVENT (?<event>.+) §e§lACTIVE IN (?<area>.+) §e§lfor §a§l(?<time>\\S+)§r"
     )
+
     // TODO add test messages
     private val eventStartedPattern by patternGroup.pattern(
         "started",
@@ -55,6 +61,10 @@ class MiningEventTracker {
 
     private var canRequestAt = SimpleTimeMark.farPast()
 
+    var apiErrorCount = 0
+
+    val apiError get() = apiErrorCount > 0
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         eventEndTime = SimpleTimeMark.farPast()
@@ -63,7 +73,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
-        if (!LorenzUtils.inAdvancedMiningIsland()) return
+        if (!isMiningIsland()) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         if (!eventEndTime.isInPast()) {
             return
@@ -79,7 +89,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inAdvancedMiningIsland()) return
+        if (!isMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {
             sendData(group("event"), null)
@@ -92,13 +102,15 @@ class MiningEventTracker {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())) return
+        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !isMiningIsland())) return
         if (!canRequestAt.isInPast()) return
 
         fetchData()
     }
 
     private fun sendData(eventName: String, time: String?) {
+        // we now ignore mineshaft events.
+        if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
 
@@ -136,13 +148,28 @@ class MiningEventTracker {
             LorenzUtils.getPlayerUuid()
         )
         val miningEventJson = ConfigManager.gson.toJson(miningEventData)
+
+        if (apiError) {
+            ChatUtils.debug("blocked sending mining event data: api error")
+            return
+        }
         SkyHanniMod.coroutineScope.launch {
             sendData(miningEventJson)
         }
     }
 
     private fun sendData(json: String) {
-        val response = APIUtil.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+        val response = try {
+            APIUtil.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+        } catch (e: IOException) {
+            if (LorenzUtils.debug) {
+                ErrorManager.logErrorWithData(
+                    e, "Sending mining event data was unsuccessful",
+                    "sentData" to json
+                )
+            }
+            return
+        }
         if (!response.success) return
 
         val formattedResponse = ConfigManager.gson.fromJson<MiningEventDataReceive>(response.data)
@@ -156,20 +183,39 @@ class MiningEventTracker {
         }
     }
 
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (apiError) {
+            canRequestAt = SimpleTimeMark.now()
+        }
+    }
+
     private fun fetchData() {
         canRequestAt = SimpleTimeMark.now() + defaultCooldown
         SkyHanniMod.coroutineScope.launch {
-            val data = APIUtil.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+            val data = try {
+                APIUtil.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+            } catch (e: Exception) {
+                apiErrorCount++
+                canRequestAt = SimpleTimeMark.now() + 20.minutes
+                if (LorenzUtils.debug) {
+                    ErrorManager.logErrorWithData(
+                        e, "Receiving mining event data was unsuccessful",
+                    )
+                }
+                return@launch
+            }
             val miningEventData = ConfigManager.gson.fromJson(data, MiningEventDataReceive::class.java)
 
             if (!miningEventData.success) {
                 ErrorManager.logErrorWithData(
-                    Exception("PostFailure"), "Sending mining event data was unsuccessful",
+                    Exception("PostFailure"), "Receiving mining event data was unsuccessful",
                     "cause" to miningEventData.cause,
                     "recievedData" to data
                 )
                 return@launch
             }
+            apiErrorCount = 0
 
             canRequestAt = SimpleTimeMark.now() + miningEventData.data.updateIn.milliseconds
 
@@ -183,4 +229,7 @@ class MiningEventTracker {
             if (element.asString == "BOTH") JsonPrimitive("ALL") else element
         }
     }
+
+    // ignoring mineshaft here is intentional
+    fun isMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }

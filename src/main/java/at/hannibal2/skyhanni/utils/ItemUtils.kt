@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import com.google.gson.GsonBuilder
@@ -98,12 +98,12 @@ object ItemUtils {
 
     fun ItemStack.getInternalNameOrNull(): NEUInternalName? {
         val data = cachedData
-        if (data.lastInternalNameFetchTime.asTimeMark().passedSince() < 1.seconds) {
+        if (data.lastInternalNameFetchTime.passedSince() < 1.seconds) {
             return data.lastInternalName
         }
         val internalName = grabInternalNameOrNull()
         data.lastInternalName = internalName
-        data.lastInternalNameFetchTime = SimpleTimeMark.now().toMillis()
+        data.lastInternalNameFetchTime = SimpleTimeMark.now()
         return internalName
     }
 
@@ -111,7 +111,8 @@ object ItemUtils {
         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NEUInternalName.WISP_POTION
         }
-        return NEUItems.getInternalName(this)?.asInternalName()
+        val internalName = NEUItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
+        return internalName?.asInternalName()
     }
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
@@ -121,6 +122,13 @@ object ItemUtils {
 
     // Checks for hypixel enchantments in the attributes
     fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
+
+    fun ItemStack.removeEnchants(): ItemStack = apply {
+        val tag = tagCompound ?: NBTTagCompound()
+        tag.removeTag("ench")
+        tag.removeTag("StoredEnchantments")
+        tagCompound = tag
+    }
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
@@ -237,7 +245,7 @@ object ItemUtils {
 
     private fun ItemStack.updateCategoryAndRarity() {
         val data = cachedData
-        data.itemRarityLastCheck = SimpleTimeMark.now().toMillis()
+        data.itemRarityLastCheck = SimpleTimeMark.now()
         val internalName = getInternalName()
         if (internalName == NEUInternalName.NONE) {
             data.itemRarity = null
@@ -266,7 +274,7 @@ object ItemUtils {
     }
 
     private fun itemRarityLastCheck(data: CachedItemData) =
-        data.itemRarityLastCheck.asTimeMark().passedSince() > 10.seconds
+        data.itemRarityLastCheck.passedSince() > 10.seconds
 
     /**
      * Use when comparing the name (e.g. regex), not for showing to the user
@@ -343,13 +351,13 @@ object ItemUtils {
 
     fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 
-    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
+    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val ItemStack.itemName: String
         get() = getInternalName().itemName
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
-    // use when showing the item name to the user (in guis, chat message, etc), not for comparing
+    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val NEUInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
@@ -385,5 +393,24 @@ object ItemUtils {
             return "$it Pet"
         }
         return name
+    }
+
+    fun ItemStack.loreCosts(): MutableList<NEUInternalName> {
+        var found = false
+        val list = mutableListOf<NEUInternalName>()
+        for (lines in getLore()) {
+            if (lines == "§7Cost") {
+                found = true
+                continue
+            }
+
+            if (!found) continue
+            if (lines.isEmpty()) return list
+
+            NEUInternalName.fromItemNameOrNull(lines)?.let {
+                list.add(it)
+            }
+        }
+        return list
     }
 }

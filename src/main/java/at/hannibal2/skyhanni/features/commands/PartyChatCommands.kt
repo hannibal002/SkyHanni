@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.TabCompletionEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PartyChatCommands {
 
     private val config get() = SkyHanniMod.feature.misc.partyCommands
@@ -162,11 +164,14 @@ object PartyChatCommands {
             }
 
             "clear" -> {
-                ChatUtils.clickableChat("Are you sure you want to do this? Click here to confirm.",
+                ChatUtils.clickableChat(
+                    "Are you sure you want to do this? Click here to confirm.",
                     onClick = {
                         storage.blacklistedUsers.clear()
                         ChatUtils.chat("Cleared your ignored players list!")
-                    })
+                    },
+                    oneTimeClick = true
+                )
             }
 
             else -> blacklistModify(firstArg)

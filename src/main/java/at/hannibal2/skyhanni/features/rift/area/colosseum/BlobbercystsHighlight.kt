@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,11 +15,12 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-class BlobbercystsHighlight {
+@SkyHanniModule
+object BlobbercystsHighlight {
 
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
     private val entityList = mutableListOf<EntityOtherPlayerMP>()
-    private val blobberName = "Blobbercyst "
+    private const val BLOBBER_NAME = "Blobbercyst "
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -26,7 +28,7 @@ class BlobbercystsHighlight {
         if (!event.isMod(5)) return
         val color = Color.RED.withAlpha(80)
         for (player in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
-            if (player.name == blobberName) {
+            if (player.name == BLOBBER_NAME) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(player, color) { isEnabled() }
                 entityList.add(player)
             }

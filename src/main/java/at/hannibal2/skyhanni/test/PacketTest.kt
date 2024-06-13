@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -31,9 +34,8 @@ import net.minecraft.network.play.server.S1DPacketEntityEffect
 import net.minecraft.network.play.server.S20PacketEntityProperties
 import net.minecraft.network.play.server.S28PacketEffect
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object PacketTest {
 
     private var enabled = false
@@ -66,8 +68,8 @@ object PacketTest {
         ChatUtils.chat("Packet test: $enabled")
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    @HandleEvent
+    fun onSendPacket(event: PacketSentEvent) {
         if (!enabled) return
 
         val packet = event.packet
@@ -87,8 +89,8 @@ object PacketTest {
         println("Send: $packetName")
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         if (!enabled) return
         val packet = event.packet
         packet.print()

@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -17,11 +20,11 @@ import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GriffinBurrowParticleFinder {
 
     private val config get() = SkyHanniMod.feature.event.diana
@@ -30,7 +33,7 @@ object GriffinBurrowParticleFinder {
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
     private var lastDugParticleBurrow: LorenzVec? = null
 
-    // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
+    // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
     private var fakeBurrow: LorenzVec? = null
 
     @SubscribeEvent
@@ -55,8 +58,8 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatPacket(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val packet = event.packet
@@ -67,7 +70,7 @@ object GriffinBurrowParticleFinder {
             if (particleType != null) {
 
                 val location = packet.toLorenzVec().toBlockPos().down().toLorenzVec()
-                if (recentlyDugParticleBurrows.contains(location)) return
+                if (location in recentlyDugParticleBurrows) return
                 val burrow = burrows.getOrPut(location) { Burrow(location) }
 
                 when (particleType) {
@@ -172,7 +175,7 @@ object GriffinBurrowParticleFinder {
 
         if (location == fakeBurrow) {
             fakeBurrow = null
-            // This exist to detect the unlucky timing when the user opens a burrow before it gets fully deteced
+            // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
             tryDig(location, ignoreFound = true)
             return
         }

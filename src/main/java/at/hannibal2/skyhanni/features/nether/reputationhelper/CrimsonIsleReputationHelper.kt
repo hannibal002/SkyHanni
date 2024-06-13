@@ -42,6 +42,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     private var display = emptyList<List<Any>>()
     private var dirty = true
+    var tabListQuestsMissing = false
 
     /**
      *  c - Barbarian Not Accepted
@@ -87,7 +88,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!dirty && display.isEmpty()) {
             dirty = true
         }
@@ -123,17 +124,23 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         // TODO test
         if (factionType == FactionType.NONE) return
 
-        newList.addAsSingletonList("Reputation Helper:")
-        questHelper.render(newList)
-        miniBossHelper.render(newList)
-        kuudraBossHelper.render(newList)
+        newList.addAsSingletonList("§e§lReputation Helper")
+        if (tabListQuestsMissing) {
+            newList.addAsSingletonList("§cFaction Quests Widget not found!")
+            newList.addAsSingletonList("§7Open §e/tab §7and enable it!")
+        } else {
+            questHelper.render(newList)
+            miniBossHelper.render(newList)
+            kuudraBossHelper.render(newList)
+        }
+
 
         display = newList
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
         if (config.useHotkey && !config.hotkey.isKeyHeld()) {

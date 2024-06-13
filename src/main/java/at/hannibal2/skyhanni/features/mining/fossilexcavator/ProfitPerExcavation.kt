@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -11,7 +12,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ProfitPerExcavation {
+@SkyHanniModule
+object ProfitPerExcavation {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator
 
     @SubscribeEvent
@@ -27,7 +29,7 @@ class ProfitPerExcavation {
                 val pricePer = it.getPrice()
                 if (pricePer == -1.0) continue
                 val profit = amount * pricePer
-                val text = "Found $name §8${amount.addSeparators()}x §7(§6${NumberUtil.format(profit)}§7)"
+                val text = "§eFound $name §8${amount.addSeparators()}x §7(§6${NumberUtil.format(profit)}§7)"
                 map[text] = profit
                 totalProfit += profit
             }

@@ -37,11 +37,11 @@ follow [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/m
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-_An explanation how to use intellij and branches will follow here soon.
+_An explanation how to use intellij and branches will follow here soon._
 
-Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
+Please use a prefix for the name of the PR (E.g. Feature, Improvement, Fix, Backend, ...).
 
-You can write in the description of the pr the wording for the changelog as well (optional).
+When writing the description of the PR, ensure you fill out the template with the necessary information, including the "WHAT" section, and the changelog entries.
 
 If your PR relies on another PR, please include this information at the beginning of the description. Consider using a
 format like "- #821" to illustrate the dependency.
@@ -59,6 +59,12 @@ format like "- #821" to illustrate the dependency.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+- New features should be made in Kotlin objects unless there is a specific reason for it not to.
+    - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
+    - This will automatically register it to the forge event bus and load the repo patterns
+- Avoid using deprecated functions.
+    - These functions are marked for removal in future versions.
+    - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
 - Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
     - Config files should still be made in Java.
 - Please use the existing event system, or expand on it. Do not use Forge events.
@@ -75,8 +81,8 @@ format like "- #821" to illustrate the dependency.
     - Replace it with `?:` (if null return this).
     - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
-- Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
-- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
+- Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
+- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
 for more information and usages.
@@ -100,20 +106,16 @@ This start script will automatically download all required libraries.
 
 ### NotEnoughUpdates
 
-SkyHanni requires NEU.
+SkyHanni requires **[NotEnoughUpdates](https://github.com/NotEnoughUpdates/NotEnoughUpdates/)**.
 We use NEU to get auction house and bazaar price data for items and to read
 the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
 and recipes.
-
-For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
 
 ### Config
 
 SkyHanni stores the config (settings and user data) as a json object in a single text file.
 For rendering the /sh config (categories, toggles, search, etc.),
-SkyHanni uses **MoulConfig**, the same config system as NotEnoughUpdates.
-
-For more information, see https://github.com/NotEnoughUpdates/MoulConfig
+SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, the same config system as NotEnoughUpdates.
 
 ### Elite Farmers API
 

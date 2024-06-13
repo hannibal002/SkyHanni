@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -17,7 +18,8 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
-class MatriarchHelper {
+@SkyHanniModule
+object MatriarchHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.matriarchHelper
 

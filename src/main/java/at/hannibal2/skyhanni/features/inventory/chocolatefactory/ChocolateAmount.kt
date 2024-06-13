@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 enum class ChocolateAmount(val chocolate: () -> Long) {
     CURRENT({ profileStorage?.currentChocolate ?: 0 }),
@@ -26,13 +25,13 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
     fun timeUntilGoal(goal: Long): Duration {
         val profileStorage = profileStorage ?: return Duration.ZERO
-        val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
-        return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo.seconds
+        val updatedAgo = profileStorage.lastDataSave.passedSince()
+        return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo
     }
 
     companion object {
         fun chocolateSinceUpdate(): Long {
-            val lastUpdate = SimpleTimeMark(profileStorage?.lastDataSave ?: return 0)
+            val lastUpdate = profileStorage?.lastDataSave ?: return 0
             val currentTime = SimpleTimeMark.now()
             val secondsSinceUpdate = (currentTime - lastUpdate).inWholeSeconds
 
@@ -64,14 +63,22 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
                 it.currentChocolate += amount
                 it.chocolateThisPrestige += amount
                 it.chocolateAllTime += amount
-                updateBestUpgrade(amount)
+                updateBestUpgrade()
             }
         }
 
-        private fun updateBestUpgrade(price: Long) {
+        fun addToCurrent(amount: Long) {
             profileStorage?.let {
+                it.currentChocolate += amount
+                updateBestUpgrade()
+            }
+        }
+
+        private fun updateBestUpgrade() {
+            profileStorage?.let {
+                if (it.bestUpgradeAvailableAt.isFarPast() || it.bestUpgradeCost == 0L) return
                 val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
-                it.bestUpgradeAvailableAt = canAffordAt.toMillis()
+                it.bestUpgradeAvailableAt = canAffordAt
             }
         }
     }
