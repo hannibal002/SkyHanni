@@ -29,8 +29,10 @@ object ColorUtils {
         (red * factor).toInt().coerceIn(0, 255),
         (green * factor).toInt().coerceIn(0, 255),
         (blue * factor).toInt().coerceIn(0, 255),
-        alpha
+        alpha,
     )
+
+    val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
 
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
 
