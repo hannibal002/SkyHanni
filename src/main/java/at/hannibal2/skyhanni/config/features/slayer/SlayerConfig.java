@@ -71,7 +71,7 @@ public class SlayerConfig {
     public boolean questWarning = true;
 
     @Expose
-    @ConfigOption(name = "Quest Warning Title", desc = "Sends a title when warning.")
+    @ConfigOption(name = "Quest Warning Title", desc = "Send a title when warning.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questWarningTitle = true;
