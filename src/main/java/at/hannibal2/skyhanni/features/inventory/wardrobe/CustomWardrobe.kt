@@ -89,9 +89,16 @@ object CustomWardrobe {
             loadingPos.renderRenderable(loadingRenderable, posLabel = guiName, addToGuiManager = false)
         }
 
+        GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
+
         pos.renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
-        GlStateManager.translate(0f, 0f, -100f)
+
+        if (EstimatedItemValue.config.enabled) {
+            GlStateManager.translate(0f, 0f, 400f)
+            EstimatedItemValue.tryRendering()
+        }
+        GlStateManager.popMatrix()
         event.cancel()
     }
 
@@ -216,9 +223,7 @@ object CustomWardrobe {
                             !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
                         },
                         onHover = {
-                            if (EstimatedItemValue.config.enabled) {
-                                EstimatedItemValue.updateItem(stack)
-                            }
+                            if (EstimatedItemValue.config.enabled) EstimatedItemValue.updateItem(stack)
                         },
                     )
                 }
