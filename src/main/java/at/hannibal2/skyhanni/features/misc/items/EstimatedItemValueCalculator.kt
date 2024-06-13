@@ -104,8 +104,8 @@ object EstimatedItemValueCalculator {
     }
 
     private fun isKuudraSet(internalName: String) =
-        (kuudraSets.any { internalName.contains(it) }
-         && listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) })
+        (kuudraSets.any { internalName.contains(it) } &&
+            listOf("CHESTPLATE", "LEGGINGS", "HELMET", "BOOTS").any { internalName.endsWith(it) })
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
