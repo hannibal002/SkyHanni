@@ -1,18 +1,25 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.M7DragonChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.play.server.S2APacketParticles
@@ -26,14 +33,14 @@ object DragonInfoUtils {
 
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!inPhase5) return
+        if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
         if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
 
-        val matchedDragon = M7DragonInfo.entries.firstOrNull { it.dragonLocation.spawnLocation == location }
+        val matchedDragon = M7DragonInfo.entries.firstOrNull { it.dragonLocation.particleBox.isInside(location) }
         if (matchedDragon == null) {
             logLine("[Spawn] dragon ${event.mob.baseEntity.entityId}, '${location.toCleanString()}', no spawn matched")
             return
@@ -48,7 +55,7 @@ object DragonInfoUtils {
 
     @SubscribeEvent
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
-        if (!inPhase5) return
+        if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
         if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
@@ -72,7 +79,7 @@ object DragonInfoUtils {
 
     @HandleEvent
     fun onParticles(event: PacketReceivedEvent) {
-        if (!inPhase5) return
+        if (!isEnabled()) return
         if (event.packet !is S2APacketParticles) return
 
         val particle = event.packet
@@ -127,7 +134,7 @@ object DragonInfoUtils {
     @SubscribeEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("M7 Dragon Info")
-        if (!inPhase5) {
+        if (!isEnabled()) {
             event.addIrrelevant("not in phase5")
             return
         }
@@ -183,5 +190,18 @@ object DragonInfoUtils {
     private fun logLine(input: String) {
         logger.log(input)
         LorenzDebug.log(input)
+    }
+
+    fun isEnabled() = inPhase5 || PlatformUtils.isDevEnvironment
+
+    @SubscribeEvent
+    fun renderBoxes(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
+        if (!SkyHanniMod.feature.dev.debug.enabled) return
+        M7DragonInfo.entries.forEach {
+            event.drawFilledBoundingBox_nea(it.dragonLocation.particleBox, it.color.toColor().addAlpha(100))
+            event.drawWaypointFilled(it.dragonLocation.spawnLocation, it.color.toColor(), true)
+            event.drawString(it.dragonLocation.spawnLocation.add(y = 1), it.colorName, true)
+        }
     }
 }
