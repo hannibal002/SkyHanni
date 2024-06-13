@@ -24,9 +24,9 @@ object UnknownLinesHandler {
             .filter { it.isNotBlank() }
             .filter { it.trim().length > 3 }
 
-        /*
+        /**
          * Remove known lines with patterns
-        */
+         **/
         val patternsToExclude = listOf(
             PurseAPI.coinsPattern,
             SbPattern.motesPattern,
@@ -141,18 +141,17 @@ object UnknownLinesHandler {
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }
 
-        /*
+        /**
          * remove known text
-        */
+         **/
         // remove objectives
-        val objectiveLine =
-            sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
-                ?: "Objective"
+        val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
+            ?: "Objective"
         unconfirmedUnknownLines = unconfirmedUnknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         // TODO create function
         unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
-            sidebarLines.nextAfter(objectiveLine, 2) != it
-                && !SbPattern.thirdObjectiveLinePattern.matches(it)
+            sidebarLines.nextAfter(objectiveLine, 2) != it &&
+                !SbPattern.thirdObjectiveLinePattern.matches(it)
         }
 
         // Remove jacobs contest
