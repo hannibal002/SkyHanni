@@ -76,7 +76,7 @@ public class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Arachne Spawn Timer",
-        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long until the boss will spawn.\n" +
+        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long until the boss will spawn. " +
             "§eTimer may be 1 - 2 seconds off."
     )
     @ConfigEditorBoolean

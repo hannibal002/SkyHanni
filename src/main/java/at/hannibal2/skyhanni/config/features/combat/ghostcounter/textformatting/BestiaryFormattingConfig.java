@@ -8,7 +8,7 @@ public class BestiaryFormattingConfig {
 
     @Expose
     @ConfigOption(name = "Bestiary", desc = "Bestiary Progress line.\n" +
-        "§e%display% §7is replaced with your current progress to next level.\n" +
+        "§e%value% §7is replaced with your current progress to next level.\n" +
         "§e%currentLevel% §7is replaced with your current bestiary level.\n" +
         "§e%nextLevel% §7is replaced with your next bestiary level.\n" +
         "§e%value% §7is replaced with one of the text below.")

@@ -89,14 +89,14 @@ public class ChatConfig {
     public boolean compactBestiaryMessage = true;
 
     @Expose
-    @ConfigOption(name = "Arachne Fight Messages", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")
+    @ConfigOption(name = "Arachne Hider", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideArachneMessages = false;
 
     @Expose
     @ConfigOption(
-        name = "Sack Change Messages",
+        name = "Sack Change Hider",
         desc = "Hide the sack change message while allowing mods to continue accessing sack data.\n" +
             "§eUse this instead of the toggle in Hypixel Settings."
     )
@@ -122,7 +122,7 @@ public class ChatConfig {
     public boolean skyBlockXPInChat = true;
 
     @Expose
-    @ConfigOption(name = "Anita's Accessory Messages", desc = "Hide Anita's Accessories' fortune bonus messages outside the Garden.")
+    @ConfigOption(name = "Anita's Accessories", desc = "Hide Anita's Accessories' fortune bonus messages outside the Garden.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideJacob = true;
@@ -135,7 +135,7 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show Pet Drop Rarity",
+        name = "Pet Drop Rarity",
         desc = "Show the rarity of the Pet Drop in the message.\n" +
             "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
     )

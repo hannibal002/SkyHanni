@@ -142,8 +142,8 @@ public class TextFormattingConfig {
 
     @Expose
     @ConfigOption(name = "Money made", desc = "Calculate the money you made.\n" +
-        "Includes §eSorrow§7, §ePlasma§7, §eVolta§7, §e1m coins drops, §eGhostly Boots§7, §eScavenger coins§7.\n" +
-        "§cUses current Sell Offer value.")
+        "Includes §eSorrow§7, §ePlasma§7, §eVolta§7, §e1m coins drops§7, §eGhostly Boots§7, §eScavenger coins§7.\n" +
+        "§eUses current Sell Offer value.")
     @ConfigEditorText
     public String moneyMadeFormat = "  &6Money made: &b%value%";
 }
