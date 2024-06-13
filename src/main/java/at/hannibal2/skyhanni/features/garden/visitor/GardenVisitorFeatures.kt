@@ -263,8 +263,6 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$leftToCraft")
                         } else {
-                            //  Possibly extract to a RecipeAPI object?
-                            //  TBD whether internal name or 'display name' as itemName better suited here?
                             HypixelCommands.viewRecipe(internalName.toString())
                         }
                     },
