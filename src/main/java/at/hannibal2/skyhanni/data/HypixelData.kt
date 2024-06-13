@@ -40,6 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
+
     // TODO add regex tests
     private val serverNameConnectionPattern by patternGroup.pattern(
         "servername.connection",
@@ -134,15 +135,15 @@ object HypixelData {
     var skyBlockArea: String? = null
     var skyBlockAreaWithSymbol: String? = null
 
-        // Data from locraw
-        var locrawData: JsonObject? = null
+    // Data from locraw
+    var locrawData: JsonObject? = null
     private var locraw: MutableMap<String, String> = listOf(
         "server",
-            "gametype",
-            "lobbyname",
-            "lobbytype",
-            "mode",
-            "map",
+        "gametype",
+        "lobbyname",
+        "lobbytype",
+        "mode",
+        "map",
     ).associateWith { "" }.toMutableMap()
 
     val server get() = locraw["server"] ?: ""
@@ -169,14 +170,14 @@ object HypixelData {
             return
         }
 
-            ErrorManager.logErrorWithData(
-                Exception("NoServerId"),
-                "Could not find server id",
-                "islandType" to LorenzUtils.skyBlockIsland,
-                "tablist" to TabListData.getTabList(),
-                "scoreboard" to ScoreboardData.sidebarLinesFormatted,
-            )
-        }
+        ErrorManager.logErrorWithData(
+            Exception("NoServerId"),
+            "Could not find server id",
+            "islandType" to LorenzUtils.skyBlockIsland,
+            "tablist" to TabListData.getTabList(),
+            "scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        )
+    }
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0

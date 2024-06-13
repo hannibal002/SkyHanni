@@ -28,8 +28,6 @@ object ScoreboardData {
 
     private val minecraftColorCodesPattern = "(?i)[0-9a-fkmolnr]".toPattern()
 
-
-
     fun formatLines(rawList: List<String>): List<String> {
         val list = mutableListOf<String>()
         for (line in rawList) {

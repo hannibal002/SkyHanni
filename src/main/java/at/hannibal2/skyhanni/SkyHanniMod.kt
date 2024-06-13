@@ -69,9 +69,9 @@ class SkyHanniMod {
         configManager = ConfigManager()
         configManager.firstLoad()
         initLogging()
-        Runtime.getRuntime().addShutdownHook(Thread {
-            configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
-        })
+        Runtime.getRuntime().addShutdownHook(
+            Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
+        )
         repo = RepoManager(ConfigManager.configDirectory)
         loadModule(repo)
         try {
@@ -130,7 +130,7 @@ class SkyHanniMod {
         val modules: MutableList<Any> = ArrayList()
         private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
-            CoroutineName("SkyHanni") + SupervisorJob(globalJob)
+            CoroutineName("SkyHanni") + SupervisorJob(globalJob),
         )
         var screenToOpen: GuiScreen? = null
         private var screenTicks = 0

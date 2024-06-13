@@ -197,7 +197,7 @@ object SkyHanniDebugsAndTests {
                 resetConfig()
             },
             prefix = false,
-            oneTimeClick = true
+            oneTimeClick = true,
         )
     }
 
@@ -507,7 +507,7 @@ object SkyHanniDebugsAndTests {
         if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
             config.debugLocationPos.renderString(
                 "Current Area: ${HypixelData.skyBlockArea}",
-                posLabel = "SkyBlock Area (Debug)"
+                posLabel = "SkyBlock Area (Debug)",
             )
         }
 
@@ -523,7 +523,7 @@ object SkyHanniDebugsAndTests {
         val scale = 0.1
         val renderables = listOf(
             ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block)
+            ItemStack(Blocks.melon_block),
         ).map { item ->
             generateSequence(scale) { it + 0.1 }.take(25).map {
                 Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
@@ -531,7 +531,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList()
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(
@@ -540,10 +540,12 @@ object SkyHanniDebugsAndTests {
                 Renderable.horizontalContainer(
                     listOf(
                         Renderable.string("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds()
-                    ), spacing = 1
-                )
-            ), posLabel = "Item Debug"
+                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
+                    ),
+                    spacing = 1,
+                ),
+            ),
+            posLabel = "Item Debug",
         )
     }
 
