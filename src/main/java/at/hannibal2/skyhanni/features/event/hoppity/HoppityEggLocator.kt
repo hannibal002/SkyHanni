@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
@@ -215,6 +215,7 @@ object HoppityEggLocator {
 
         if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem) {
             lastClick = SimpleTimeMark.now()
+            MythicRabbitPetWarning.check()
         }
     }
 
@@ -238,7 +239,7 @@ object HoppityEggLocator {
         secondPos = LorenzVec(
             secondPoint.x + xDiff * 1000,
             secondPoint.y + yDiff * 1000,
-            secondPoint.z + zDiff * 1000
+            secondPoint.z + zDiff * 1000,
         )
 
         val sortedEggs = islandEggsLocations.map {
@@ -277,8 +278,8 @@ object HoppityEggLocator {
     private fun ReceiveParticleEvent.isEnchantmentParticle() =
         type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden()
-        && !ReminderUtils.isBusy(true) && ChocolateFactoryAPI.isHoppityEvent()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden() &&
+        !ReminderUtils.isBusy(true) && ChocolateFactoryAPI.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 

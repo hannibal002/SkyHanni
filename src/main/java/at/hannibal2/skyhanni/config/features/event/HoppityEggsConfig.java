@@ -141,4 +141,14 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactChat = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Rabbit Pet Warning",
+        desc = "Warn when using the Egglocator without having a §d§lMythic Rabbit Pet §7selected. " +
+            "§eOnly enable this setting when you own a mythic Rabbit pet."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean petWarning = false;
 }
