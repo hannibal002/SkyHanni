@@ -38,6 +38,15 @@ import kotlin.time.Duration.Companion.seconds
 class HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
+    // TODO add regex tests
+    private val serverNameConnectionPattern by patternGroup.pattern(
+        "servername.connection",
+        "(?<prefix>.+\\.)?hypixel\\.net",
+    )
+    private val serverNameScoreboardPattern by patternGroup.pattern(
+        "servername.scoreboard",
+        "§e(?<prefix>.+\\.)?hypixel\\.net",
+    )
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
@@ -370,12 +379,34 @@ class HypixelData {
     }
 
     private fun checkHypixel() {
-        val list = ScoreboardData.sidebarLinesFormatted
-        if (list.isEmpty()) return
+        val mc = Minecraft.getMinecraft()
+        val player = mc.thePlayer ?: return
 
-        val last = list.last()
-        hypixelLive = last == "§ewww.hypixel.net"
-        hypixelAlpha = last == "§ealpha.hypixel.net"
+        var hypixel = false
+
+        player.clientBrand?.let {
+            if (it.contains("hypixel", ignoreCase = true)) {
+                hypixel = true
+            }
+        }
+
+        serverNameConnectionPattern.matchMatcher(mc.getCurrentServerData().serverIP) {
+            hypixel = true
+            if (group("prefix") == "alpha.") {
+                hypixelAlpha = true
+            }
+        }
+
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            serverNameScoreboardPattern.matchMatcher(line) {
+                hypixel = true
+                if (group("prefix") == "alpha.") {
+                    hypixelAlpha = true
+                }
+            }
+        }
+
+        hypixelLive = hypixel && !hypixelAlpha
     }
 
     private fun checkSidebar() {

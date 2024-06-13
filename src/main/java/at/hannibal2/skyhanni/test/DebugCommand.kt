@@ -118,6 +118,7 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
             add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
+            add("isOnAlphaServer: '${LorenzUtils.isOnAlphaServer}'")
         }
     }
 
