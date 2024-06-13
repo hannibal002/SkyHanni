@@ -30,7 +30,7 @@ public class TunnelMapsConfig {
     public boolean autoCommission = false;
 
     @Expose
-    @ConfigOption(name = "Campfire Hotkey", desc = "Hotkey to warp to the campfire, if the travel scroll is not unlocked shows a path to the campfire.")
+    @ConfigOption(name = "Campfire Hotkey", desc = "Hotkey to warp to the campfire. If the travel scroll is not unlocked, show a path to the campfire instead.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int campfireKey = Keyboard.KEY_NONE;
 
@@ -70,7 +70,7 @@ public class TunnelMapsConfig {
     public boolean distanceFirst = false;
 
     @Expose
-    @ConfigOption(name = "Compact Gemstone", desc = "Only shows the icon for gemstones in the selection list.")
+    @ConfigOption(name = "Compact Gemstone", desc = "Only show the icon for gemstones in the selection list.")
     @ConfigEditorBoolean
     public Property<Boolean> compactGemstone = Property.of(false);
 

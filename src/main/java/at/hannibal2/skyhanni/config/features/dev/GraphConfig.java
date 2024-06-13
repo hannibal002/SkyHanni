@@ -47,7 +47,7 @@ public class GraphConfig {
     public int textKey = Keyboard.KEY_Y;
 
     @Expose
-    @ConfigOption(name = "Test Dijkstra", desc = "On key press, shows the shortest path between the nearest node and the active node.")
+    @ConfigOption(name = "Test Dijkstra", desc = "On key press, show the shortest path between the nearest node and the active node.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_G)
     public int dijkstraKey = Keyboard.KEY_G;
 
