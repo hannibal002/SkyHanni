@@ -105,6 +105,11 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean sacrifice = false;
 
+    @Expose
+    @ConfigOption(name = "Block Alpha Achievements", desc = "Hide achievement messages while on the Alpha network.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideAlphaAchievements = false;
 
     //TODO remove
     @Expose

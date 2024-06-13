@@ -488,7 +488,7 @@ object ChatFilter {
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
 
-        HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
+        config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
         config.others && isOthers(message) -> othersMsg
 
