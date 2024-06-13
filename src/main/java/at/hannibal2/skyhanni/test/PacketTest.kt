@@ -59,9 +59,7 @@ object PacketTest {
 
     private fun sendEntityPacketData(id: Int) {
         ChatUtils.chat("Packet Entity Data: $id")
-        entityMap[id]?.forEach {
-            it.print()
-        }
+        entityMap[id]?.forEach { it.print() }
         println("End of Data")
     }
 

@@ -62,21 +62,21 @@ object CruxTalismanDisplay {
         if (displayLine.isNotEmpty()) {
             addAsSingletonList("§7Crux Talisman Progress: ${if (maxed) "§a§lMAXED!" else "§a$percentValue%"}")
             if (!maxed) {
-                displayLine.forEach {
+                for (line in displayLine) {
                     percent += if (config.compactWhenMaxed) {
-                        if (!it.maxed) {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)
+                        if (!line.maxed) {
+                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)
                                 ?.toInt() ?: 0
                         } else 100
                     } else {
-                        if (it.progress.contains("MAXED"))
+                        if (line.progress.contains("MAXED"))
                             100
                         else {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)
+                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)
                                 ?.toInt() ?: 0
                         }
                     }
-                    addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
+                    addAsSingletonList("  ${line.tier} ${line.name}: ${line.progress}")
                 }
             }
         }
