@@ -690,25 +690,8 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes = listOf(
-        Triple(
-            "Mithril",
-            "§2",
-            Pair(HotmAPI.Powder.MITHRIL.getCurrent().formatNum(), HotmAPI.Powder.MITHRIL.getTotal().formatNum())
-        ),
-        Triple(
-            "Gemstone",
-            "§d",
-            Pair(HotmAPI.Powder.GEMSTONE.getCurrent().formatNum(), HotmAPI.Powder.GEMSTONE.getTotal().formatNum())
-        ),
-        Triple(
-            "Glacite",
-            "§b",
-            Pair(HotmAPI.Powder.GLACITE.getCurrent().formatNum(), HotmAPI.Powder.GLACITE.getTotal().formatNum())
-        )
-    )
-
-    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third.second == "0" }) {
+    val powderTypes = HotmAPI.Powder.values()
+    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
         return listOf("<hidden>" to HorizontalAlignment.LEFT)
     }
 
@@ -716,20 +699,24 @@ private fun getPowderDisplayPair() = buildList {
 
     val displayNumbersFirst = displayConfig.displayNumbersFirst
 
-    for ((type, color, powder) in powderTypes) {
-        val (current, total) = powder
+    for (type in powderTypes) {
+        val name = type.displayName
+        val color = type.color
+        val current = type.getCurrent().formatNum()
+        val total = type.getTotal().formatNum()
 
         when (displayConfig.powderDisplay) {
             PowderDisplay.AVAILABLE -> {
-                add(" §7- ${if (displayNumbersFirst) "$color$current $type" else "§f$type: $color$current"}" to HorizontalAlignment.LEFT)
+                add(" §7- ${if (displayNumbersFirst) "$color$current $name" else "§f$name: $color$current"}" to HorizontalAlignment.LEFT)
             }
 
             PowderDisplay.TOTAL -> {
-                add(" §7- ${if (displayNumbersFirst) "$color$total $type" else "§f$type: $color$total"}" to HorizontalAlignment.LEFT)
+                add(" §7- ${if (displayNumbersFirst) "$color$total $name" else "§f$name: $color$total"}" to HorizontalAlignment.LEFT)
             }
 
             PowderDisplay.BOTH -> {
-                add(" §7- ${if (displayNumbersFirst) "$color$current/$total $type" else "§f$type: $color$current/$total"}" to HorizontalAlignment.LEFT)
+                add(" §7- ${if (displayNumbersFirst) "$color$current/$total $name" else "§f$name: $color$current/$total"}"
+                    to HorizontalAlignment.LEFT)
             }
 
             null -> {}
