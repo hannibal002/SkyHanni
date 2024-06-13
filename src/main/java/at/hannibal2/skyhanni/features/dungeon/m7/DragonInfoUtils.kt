@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.M7DragonChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
@@ -39,10 +40,12 @@ object DragonInfoUtils {
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
+        val id = event.mob.baseEntity.entityId
 
         val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.particleBox.isInside(location) }
         if (matchedDragon == null) {
-            logLine("[Spawn] dragon ${event.mob.baseEntity.entityId}, '${location.toCleanString()}', no spawn matched")
+            logLine("[Spawn] dragon ${id}, '${location.toCleanString()}', no spawn matched")
+            ChatUtils.debug("Unknown dragon $id spawned at ${location.toCleanString()}")
             return
         }
 
@@ -50,7 +53,7 @@ object DragonInfoUtils {
         logSpawn(event.mob, matchedDragon)
 
         matchedDragon.status = M7SpawnedStatus.ALIVE
-        matchedDragon.status.id = event.mob.baseEntity.entityId
+        matchedDragon.status.id = id
     }
 
     @SubscribeEvent
@@ -65,6 +68,7 @@ object DragonInfoUtils {
         val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.status.id == id }
         if (matchedDragon == null) {
             logLine("dragon $id died, no matched dragon")
+            ChatUtils.debug("Unknown dragon $id died at ${location.toCleanString()}")
             return
         }
         val status = if (matchedDragon.deathBox.isInside(location)) M7SpawnedStatus.DEFEATED
