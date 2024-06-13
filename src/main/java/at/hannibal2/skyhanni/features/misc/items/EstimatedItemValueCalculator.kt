@@ -92,7 +92,7 @@ object EstimatedItemValueCalculator {
         ::addDrillUpgrades,
         ::addGemstoneSlotUnlockCost,
         ::addGemstones,
-        ::addEnchantments
+        ::addEnchantments,
     )
 
     fun getTotalPrice(stack: ItemStack): Double = EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first
@@ -115,17 +115,13 @@ object EstimatedItemValueCalculator {
             genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
         if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
-            val price =
-                getPriceOrCompositePriceForAttribute(
-                    "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
-                    attributes[0].second
-                )
+            val price = getPriceOrCompositePriceForAttribute(
+                "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
+                attributes[0].second,
+            )
             if (price != null) {
-                list.add(
-                    "§7Attribute §9${
-                        attributes[0].first.fixMending().allLettersFirstUppercase()
-                    } ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)"
-                )
+                val name = attributes[0].first.fixMending().allLettersFirstUppercase()
+                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)",)
                 return price
             }
         }
@@ -163,7 +159,7 @@ object EstimatedItemValueCalculator {
             list.add(
                 "  $nameColor${
                     displayName.allLettersFirstUppercase()
-                } ${attr.second}§7: $priceColor${if (price != null) NumberUtil.format(price) else "Unknown"}"
+                } ${attr.second}§7: $priceColor${if (price != null) NumberUtil.format(price) else "Unknown"}",
             )
         }
         // Adding 0.1 so that we always show the estimated item value overlay
