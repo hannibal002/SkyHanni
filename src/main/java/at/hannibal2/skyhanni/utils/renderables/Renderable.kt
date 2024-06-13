@@ -106,12 +106,12 @@ interface Renderable {
                 hoverable(
                     underlined(renderable), renderable, bypassChecks,
                     condition = condition,
-                    highlightsOnHoverSlots = highlightsOnHoverSlots
+                    highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
                 onClick,
                 0,
                 bypassChecks,
-                condition
+                condition,
             )
         }
 
@@ -125,7 +125,7 @@ interface Renderable {
             return clickable(
                 hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
                 onClick,
-                bypassChecks = bypassChecks
+                bypassChecks = bypassChecks,
             )
         }
 
@@ -139,7 +139,7 @@ interface Renderable {
             return multiClickable(
                 hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
                 click,
-                bypassChecks = bypassChecks
+                bypassChecks = bypassChecks,
             )
         }
 
@@ -359,10 +359,10 @@ interface Renderable {
                     ySpacing,
                     rescaleSkulls,
                     horizontalAlign = horizontalAlign,
-                    verticalAlign = verticalAlign
+                    verticalAlign = verticalAlign,
                 ),
                 item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
-                stack = item
+                stack = item,
             )
 
         fun itemStack(
@@ -438,7 +438,7 @@ interface Renderable {
 
             val list by lazy {
                 Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(
-                    text, (width / scale).toInt()
+                    text, (width / scale).toInt(),
                 )
             }
 
@@ -509,7 +509,7 @@ interface Renderable {
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
                         )
                         GlStateManager.popMatrix()
                     }
@@ -563,12 +563,12 @@ interface Renderable {
                     }
                 } else {
                     val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
-                        0, 64
+                        0, 64,
                     ) else Pair(0, 0)
 
                     Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
                     Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY, width, height
+                        posX, posY, textureX, textureY, width, height,
                     )
 
                     if (useChroma) {
@@ -578,7 +578,7 @@ interface Renderable {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                     }
                     Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY + height, progress, height
+                        posX, posY, textureX, textureY + height, progress, height,
                     )
 
                     if (useChroma) {
@@ -734,14 +734,14 @@ interface Renderable {
                 0,
                 virtualHeight - height,
                 velocity,
-                button
+                button,
             )
 
             private val end get() = scroll.asInt() + height
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks)
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 var renderY = 0
@@ -797,12 +797,12 @@ interface Renderable {
                 if (hasHeader) yOffsets[1] else 0,
                 virtualHeight - height,
                 velocity,
-                button
+                button,
             )
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks)
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 var renderY = 0
@@ -813,7 +813,7 @@ interface Renderable {
                             posX + xOffsets[index],
                             posY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
-                            yOffsets[1]
+                            yOffsets[1],
                         )
                         GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
@@ -840,7 +840,7 @@ interface Renderable {
                             posX + xOffsets[index],
                             posY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex]
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex],
                         )
                         GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
@@ -903,7 +903,7 @@ interface Renderable {
                     bottomOutlineColor,
                     borderOutlineThickness,
                     radius,
-                    blur
+                    blur,
                 )
 
                 GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
@@ -948,7 +948,7 @@ interface Renderable {
                     entityScale,
                     mouseXRelativeToPlayer,
                     mouseYRelativeToPlayer,
-                    player
+                    player,
                 )
                 GlStateManager.translate(0f, 0f, -100f)
             }
