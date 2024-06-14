@@ -40,19 +40,19 @@ object MiningNotifications {
     private val patternGroup = RepoPattern.group("mining.notifications")
     val mineshaftSpawn by patternGroup.pattern(
         "mineshaft.spawn",
-        "§5§lWOW! §r§aYou found a §r§bGlacite Mineshaft §r§aportal!"
+        "§5§lWOW! §r§aYou found a §r§bGlacite Mineshaft §r§aportal!",
     )
     private val scrapDrop by patternGroup.pattern(
         "scrapdrop",
-        "§6§lEXCAVATOR! §r§fYou found a §r§9Suspicious Scrap§r§f!"
+        "§6§lEXCAVATOR! §r§fYou found a §r§9Suspicious Scrap§r§f!",
     )
     val goldenGoblinSpawn by patternGroup.pattern(
         "goblin.goldspawn",
-        "§6A Golden Goblin has spawned!"
+        "§6A Golden Goblin has spawned!",
     )
     val diamondGoblinSpawn by patternGroup.pattern(
         "goblin.diamondspawn",
-        "§6A §r§bDiamond Goblin §r§6has spawned!"
+        "§6A §r§bDiamond Goblin §r§6has spawned!",
     )
 
     private val config get() = SkyHanniMod.feature.mining.notifications
@@ -83,8 +83,7 @@ object MiningNotifications {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
         }
-        if (
-            MiningAPI.inMineshaft() && config.getAscensionRope && event.cold >= config.coldAmount &&
+        if (MiningAPI.inMineshaft() && config.getAscensionRope && event.cold >= config.coldAmount &&
             !hasSentAscensionRope
         ) {
             hasSentAscensionRope = true
