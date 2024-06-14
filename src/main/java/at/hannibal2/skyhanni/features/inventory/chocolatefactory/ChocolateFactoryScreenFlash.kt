@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryRabbitWarningConfig
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryRabbitWarningConfig.FlashScreenTypeEntry
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
@@ -27,23 +27,24 @@ object ChocolateFactoryScreenFlash {
     @SubscribeEvent
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.rabbitWarning.flashScreen) return
         flashScreen = InventoryUtils.getItemsInOpenChest().any {
             when (config.rabbitWarning.flashScreenType) {
-                ChocolateFactoryRabbitWarningConfig.FlashScreenTypeEntry.REGULAR -> {
+                FlashScreenTypeEntry.REGULAR -> {
                     clickMeRabbitPattern.matches(it.stack.name)
                 }
 
-                ChocolateFactoryRabbitWarningConfig.FlashScreenTypeEntry.SPECIAL -> {
+                FlashScreenTypeEntry.SPECIAL -> {
                     clickMeGoldenRabbitPattern.matches(it.stack.name) ||
                         it.stack.getSkullTexture() in specialRabbitTextures
                 }
 
-                ChocolateFactoryRabbitWarningConfig.FlashScreenTypeEntry.BOTH -> {
+                FlashScreenTypeEntry.BOTH -> {
                     clickMeRabbitPattern.matches(it.stack.name) ||
                         clickMeGoldenRabbitPattern.matches(it.stack.name) ||
                         it.stack.getSkullTexture() in specialRabbitTextures
                 }
+
+                FlashScreenTypeEntry.NONE -> false
             }
         }
     }
@@ -51,7 +52,6 @@ object ChocolateFactoryScreenFlash {
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.rabbitWarning.flashScreen) return
         if (!flashScreen) return
         val mc = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)

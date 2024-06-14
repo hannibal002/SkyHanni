@@ -37,11 +37,6 @@ public class ChocolateFactoryRabbitWarningConfig {
     public int repeatSound = 20;
 
     @Expose
-    @ConfigOption(name = "Flash Screen", desc = "Flash the screen in the given color when a special rabbit appear.")
-    @ConfigEditorBoolean
-    public boolean flashScreen = false;
-
-    @Expose
     @ConfigOption(name = "Flash Screen", desc = "Choose the stray rabbit type to flash the screen for.")
     @ConfigEditorDropdown
     public FlashScreenTypeEntry flashScreenType = FlashScreenTypeEntry.SPECIAL;
@@ -50,6 +45,7 @@ public class ChocolateFactoryRabbitWarningConfig {
         REGULAR("Regular"),
         SPECIAL("Special"),
         BOTH("All"),
+        NONE("None"),
         ;
         private final String str;
 
