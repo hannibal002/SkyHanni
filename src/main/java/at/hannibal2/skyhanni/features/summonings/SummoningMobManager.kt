@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.NumberUtil.format
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -93,7 +93,7 @@ object SummoningMobManager {
             add("Summoning mobs: " + mobs.size)
             mobs.forEachIndexed { index, mob ->
                 val entity = mob.baseEntity
-                add("#${index + 1} §a${mob.name} ${entity.health.format()}/${entity.baseMaxHealth.format()}§c❤")
+                add("#${index + 1} §a${mob.name} ${entity.health.shortFormat()}/${entity.baseMaxHealth.shortFormat()}§c❤")
             }
         }.map { Renderable.string(it) }
 
