@@ -37,7 +37,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-
 @SkyHanniModule
 object MobDetection {
 
@@ -100,8 +99,10 @@ object MobDetection {
         MobData.previousEntityLiving.clear()
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
-        MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
-            .filter { it !is EntityArmorStand && it !is EntityPlayerSP })
+        MobData.currentEntityLiving.addAll(
+            EntityUtils.getEntities<EntityLivingBase>()
+                .filter { it !is EntityArmorStand && it !is EntityPlayerSP },
+        )
 
         if (forceReset) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
@@ -109,6 +110,8 @@ object MobDetection {
 
         (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
         (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
+
+        MobData.notSeenMobs.removeIf(::canBeSeen)
 
         if (forceReset) {
             mobDetectionReset() // Ensure that all mobs are cleared 100%
@@ -135,6 +138,19 @@ object MobDetection {
     /** @return always true */
     private fun mobDetectionError(string: String) = logger.log(string).let { true }
 
+    private fun canBeSeen(mob: Mob): Boolean {
+        val isVisible = !mob.isInvisible() && mob.canBeSeen()
+        if (isVisible) when (mob.mobType) {
+            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        }
+        return isVisible
+    }
+
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
         when (roughType) {
@@ -153,7 +169,7 @@ object MobDetection {
                             Mob.Type.SUMMON -> MobEvent.Spawn.Summon(mob)
 
                             Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(
-                                mob
+                                mob,
                             )
 
                             Mob.Type.SPECIAL -> MobEvent.Spawn.Special(mob)
@@ -275,7 +291,7 @@ object MobDetection {
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     }\n"
                         + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
-                        "}"
+                        "}",
                 )
                 // Uncomment this to make it closed a loop
                 // iterator.remove()
