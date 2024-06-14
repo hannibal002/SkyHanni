@@ -26,7 +26,6 @@ object ChocolateFactoryBarnManager {
     private val newRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.new",
         "§d§lNEW RABBIT! §6\\+\\d+ Chocolate §7and §6\\+0.\\d+x Chocolate §7per second!"
-        //§d§lNEW RABBIT! §6+4 Chocolate §7and §6+0.004x Chocolate §7per second!
     )
     private val rabbitDuplicatePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.duplicate",
