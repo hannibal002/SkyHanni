@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -25,16 +26,24 @@ object AreaMiniBossFeatures {
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+        if (!SlayerAPI.isInAnyArea) return
         val type = AreaMiniBossType.entries.find { it.displayName == event.mob.name } ?: return
         miniBossType = type
-        lastSpawnTime = SimpleTimeMark.now()
-        if (config.areaBossHighlight) event.mob.highlight(type.color.addOpacity(type.colorOpacity))
-        // TODO add sound
+        val time = SimpleTimeMark.now()
+        val diff = time - lastSpawnTime
+        if (diff in 5.seconds..20.seconds) {
+            respawnCooldown = diff
+        }
+        lastSpawnTime = time
+        if (config.areaBossHighlight) {
+            event.mob.highlight(type.color.addOpacity(type.colorOpacity))
+            SoundUtils.playPlingSound()
+        }
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SlayerAPI.isInAnyArea) return
         if (!config.areaBossRespawnTimer) return
 
         val miniBoss = miniBossType ?: return
