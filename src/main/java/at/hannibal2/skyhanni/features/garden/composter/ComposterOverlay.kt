@@ -39,8 +39,8 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -369,9 +369,9 @@ object ComposterOverlay {
         val totalCostPreview = (fuelPricePerPreview + organicMatterPricePerPreview) * timeMultiplierPreview
 
         val materialCostFormatPreview =
-            if (totalCost != totalCostPreview) " §c➜ §6" + totalCostPreview.format() else ""
+            if (totalCost != totalCostPreview) " §c➜ §6" + totalCostPreview.shortFormat() else ""
         val materialCostFormat =
-            " §7Material costs per $timeText: §6${totalCost.format()}$materialCostFormatPreview"
+            " §7Material costs per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview"
         newList.addAsSingletonList(materialCostFormat)
 
         val priceCompost = COMPOST.getPrice()
@@ -379,8 +379,8 @@ object ComposterOverlay {
         val profitPreview =
             ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
 
-        val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + profitPreview.format() else ""
-        val profitFormat = " §7Profit per $timeText: §6${profit.format()}$profitFormatPreview"
+        val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + profitPreview.shortFormat() else ""
+        val profitFormat = " §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview"
         newList.addAsSingletonList(profitFormat)
 
         newList.addAsSingletonList("")
@@ -465,17 +465,19 @@ object ComposterOverlay {
         itemsNeeded: Double,
         onClick: (NEUInternalName) -> Unit,
     ) {
-        val format = totalPrice.format()
+        val format = totalPrice.shortFormat()
         val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
         val rawItemName = itemName.removeColor()
         val name = itemName.substring(0, 2) + selected + rawItemName
-        list.add(Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
-            onClick(internalName)
-            if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
-                lastAttemptTime = SimpleTimeMark.now()
-                retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+        list.add(
+            Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
+                onClick(internalName)
+                if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                    lastAttemptTime = SimpleTimeMark.now()
+                    retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+                }
             }
-        })
+        )
     }
 
     private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
