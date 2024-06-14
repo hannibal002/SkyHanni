@@ -68,6 +68,14 @@ enum class WitheredDragonInfo(
                 it.id = null
             }
         }
+
+        fun getSpawns(): List<LorenzVec> {
+            val list = mutableListOf<LorenzVec>()
+            entries.forEach {
+                list.add(it.spawnLocation)
+            }
+            return list.toList()
+        }
     }
 }
 

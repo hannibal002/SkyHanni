@@ -56,6 +56,28 @@ data class LorenzVec(
         return (dx * dx + dz * dz)
     }
 
+    fun maxDistance(input: List<LorenzVec>): Double {
+        if (input.isEmpty()) return 0.0
+
+        var maxDistance = 0.0
+        input.forEach {
+            val distance = it.distance(this)
+            if (maxDistance < distance) maxDistance = distance
+        }
+        return maxDistance
+    }
+
+    fun minDistance(input: List<LorenzVec>): Double {
+        if (input.isEmpty()) return 0.0
+
+        var minDistance = Double.MAX_VALUE
+        input.forEach {
+            val distance = it.distance(this)
+            if (minDistance > distance) minDistance = distance
+        }
+        return minDistance
+    }
+
     operator fun plus(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
 
     operator fun minus(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
