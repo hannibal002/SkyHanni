@@ -63,10 +63,10 @@ object HoppityEggsCompactChat {
     }
 
     private fun createCompactMessage(): String {
-        val mealName = lastChatMeal?.coloredName ?: if(rabbitBought) "&aPurchased" else ""
+        val mealName = lastChatMeal?.coloredName ?: if(rabbitBought) "§aPurchased" else ""
 
         return if (duplicate) {
-            val format = lastDuplicateAmount?.let { it.shortFormat() } ?: "?"
+            val format = lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"

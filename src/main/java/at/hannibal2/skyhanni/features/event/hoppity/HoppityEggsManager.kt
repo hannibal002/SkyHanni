@@ -50,7 +50,7 @@ object HoppityEggsManager {
      */
     val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.bought",
-        "§aYou bought §.(?<rabbitname>.*?) §afor §6((\\d|,)*) Coins§a!"
+        "§aYou bought §r§.(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!"
     )
 
     /**
