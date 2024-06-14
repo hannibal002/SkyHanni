@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MineshaftPityDisplay {
+public class MineshaftPityDisplayConfig {
     @Expose
     @ConfigOption(name = "Enable Display", desc = "Enable the Mineshaft Pity Display.")
     @ConfigEditorBoolean
@@ -38,6 +38,6 @@ public class MineshaftPityDisplay {
     public boolean modifyChatMessage = true;
 
     @Expose
-    @ConfigLink(owner = MineshaftPityDisplay.class, field = "enabled")
+    @ConfigLink(owner = MineshaftPityDisplayConfig.class, field = "enabled")
     public Position position = new Position(16, 192, false, true);
 }
