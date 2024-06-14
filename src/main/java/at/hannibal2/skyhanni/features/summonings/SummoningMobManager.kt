@@ -98,33 +98,32 @@ object SummoningMobManager {
         }
 
         if (searchArmorStands) {
-            EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }
-                .forEach {
-                    val name = it.displayName.unformattedText
-                    healthPattern.matchMatcher(name) {
-                        val playerName = LorenzUtils.getPlayerName()
-                        if (name.contains(playerName)) {
-                            summoningMobNametags.add(it)
-                            if (summoningMobNametags.size == summoningsSpawned) {
-                                searchArmorStands = false
-                            }
+            for (it in EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }) {
+                val name = it.displayName.unformattedText
+                healthPattern.matchMatcher(name) {
+                    val playerName = LorenzUtils.getPlayerName()
+                    if (name.contains(playerName)) {
+                        summoningMobNametags.add(it)
+                        if (summoningMobNametags.size == summoningsSpawned) {
+                            searchArmorStands = false
                         }
                     }
                 }
+            }
         }
 
-        if (searchMobs) {
-            val playerLocation = LocationUtils.playerLocation()
-            EntityUtils.getEntities<EntityLiving>().filter {
-                it !in summoningMobs.keys && it.getLorenzVec()
-                    .distance(playerLocation) < 10 && it.ticksExisted < 2
-            }.forEach {
-                summoningMobs[it] = SummoningMob(System.currentTimeMillis(), name = "Mob")
-                it.setColor(LorenzColor.GREEN)
-                updateData()
-                if (summoningMobs.size == summoningsSpawned) {
-                    searchMobs = false
-                }
+        if (!searchMobs) return
+        val playerLocation = LocationUtils.playerLocation()
+        val list = EntityUtils.getEntities<EntityLiving>().filter {
+            it !in summoningMobs.keys && it.getLorenzVec()
+                .distance(playerLocation) < 10 && it.ticksExisted < 2
+        }
+        for (entity in list) {
+            summoningMobs[entity] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+            entity.setColor(LorenzColor.GREEN)
+            updateData()
+            if (summoningMobs.size == summoningsSpawned) {
+                searchMobs = false
             }
         }
     }

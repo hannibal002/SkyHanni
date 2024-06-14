@@ -19,66 +19,42 @@ object TimeUtils {
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
         maxUnits: Int = -1,
-    ): String = formatDuration(
-        inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
-    )
+    ): String {
+        var millis = inWholeMilliseconds
+        val parts = mutableMapOf<TimeUnit, Int>()
+
+        for (unit in TimeUnit.entries) {
+            if (unit.ordinal >= biggestUnit.ordinal) {
+                val factor = unit.factor
+                parts[unit] = (millis / factor).toInt()
+                millis %= factor
+            }
+        }
+
+        var currentUnits = 0
+        val result = buildString {
+            for ((unit, value) in parts) {
+                if (value != 0) {
+                    val formatted = unit.format(value, longName)
+                    append(formatted)
+                    if (unit == TimeUnit.SECOND && showMilliSeconds) {
+                        val formattedMillis = (millis / 100).toInt()
+                        append(".$formattedMillis")
+                    }
+
+                    append(" ")
+                    if (maxUnits != -1 && ++currentUnits == maxUnits) break
+                }
+            }
+        }
+        return result.trim()
+    }
 
     fun Duration.timerColor(default: String = "§f") = when (this) {
         in 0.seconds..60.seconds -> "§c"
         in 60.seconds..3.minutes -> "§6"
         in 3.minutes..10.minutes -> "§e"
         else -> default
-    }
-
-    @Deprecated(
-        "Has an offset of one second",
-        ReplaceWith("millis.toDuration(DurationUnit.MILLISECONDS).format(biggestUnit, showMilliSeconds, longName, maxUnits)")
-    )
-    fun formatDuration(
-        millis: Long,
-        biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = false,
-        longName: Boolean = false,
-        maxUnits: Int = -1,
-    ): String {
-        // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
-        var milliseconds = millis + 999
-        val map = mutableMapOf<TimeUnit, Int>()
-        for (unit in TimeUnit.entries) {
-            if (unit.ordinal >= biggestUnit.ordinal) {
-                val factor = unit.factor
-                map[unit] = (milliseconds / factor).toInt()
-                milliseconds %= factor
-            }
-        }
-
-        val builder = StringBuilder()
-        var count = 0
-        for ((unit, value) in map.entries) {
-            if (value > 0 || builder.isNotEmpty() || unit == TimeUnit.SECOND) {
-                builder.append(value.addSeparators())
-                val name = if (longName) {
-                    " " + unit.longName + if (value > 1) "s" else ""
-                } else {
-                    unit.shortName
-                }
-
-                if (unit == TimeUnit.SECOND) {
-                    if (showMilliSeconds) {
-                        val formatMillis = milliseconds / 100
-                        builder.append(".")
-                        builder.append(formatMillis)
-                    }
-                    builder.append(name)
-                } else {
-                    builder.append("$name ")
-                }
-
-                count++
-                if (maxUnits != -1 && count == maxUnits) break
-            }
-        }
-        return builder.toString().trim()
     }
 
     val Duration.inWholeTicks: Int
@@ -182,4 +158,10 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     MINUTE(FACTOR_MINUTES, "m", "Minute"),
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
+
+    fun format(value: Int, longFormat: Boolean = false) = if (longFormat) {
+        "${value.addSeparators()} $longName" + if (value > 1) "s" else ""
+    } else {
+        "${value.addSeparators()}$shortName"
+    }
 }

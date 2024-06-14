@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig.ArrowAmountDisplay
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getMaxPlayersForCurrentServer
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getMaxPlayersForCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
@@ -702,62 +704,49 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes: List<Triple<String, String, String>> = listOf(
-        Triple(
-            "Mithril", "§2",
-            getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.mithrilPowderPattern,
-                "mithrilpowder",
-            ).formatNum(),
-        ),
-        Triple(
-            "Gemstone", "§d",
-            getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.gemstonePowderPattern,
-                "gemstonepowder",
-            ).formatNum(),
-        ),
-        Triple(
-            "Glacite", "§b",
-            getGroupFromPattern(
-                TabListData.getTabList(),
-                ScoreboardPattern.glacitePowderPattern,
-                "glacitepowder",
-            ).formatNum(),
-        ),
-    )
+    val powderTypes = HotmAPI.Powder.values()
+    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
+        return listOf("<hidden>" to HorizontalAlignment.LEFT)
+    }
 
-    if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.third == "0" }) {
-        add("<hidden>" to HorizontalAlignment.LEFT)
-    } else {
-        add("§9§lPowder" to HorizontalAlignment.LEFT)
+    add("§9§lPowder" to HorizontalAlignment.LEFT)
 
-        if (displayConfig.displayNumbersFirst) {
-            for ((type, color, value) in powderTypes) {
-                if (value != "0") {
-                    add(" §7- $color$value $type" to HorizontalAlignment.LEFT)
-                }
+    val displayNumbersFirst = displayConfig.displayNumbersFirst
+
+    for (type in powderTypes) {
+        val name = type.displayName
+        val color = type.color
+        val current = type.getCurrent().formatNum()
+        val total = type.getTotal().formatNum()
+
+        when (displayConfig.powderDisplay) {
+            PowderDisplay.AVAILABLE -> {
+                add(" §7- ${if (displayNumbersFirst) "$color$current $name" else "§f$name: $color$current"}" to HorizontalAlignment.LEFT)
             }
-        } else {
-            for ((type, color, value) in powderTypes) {
-                if (value != "0") {
-                    add(" §7- §f$type: $color$value" to HorizontalAlignment.LEFT)
-                }
+
+            PowderDisplay.TOTAL -> {
+                add(" §7- ${if (displayNumbersFirst) "$color$total $name" else "§f$name: $color$total"}" to HorizontalAlignment.LEFT)
             }
+
+            PowderDisplay.BOTH -> {
+                add(
+                    " §7- ${if (displayNumbersFirst) "$color$current/$total $name" else "§f$name: $color$current/$total"}"
+                        to HorizontalAlignment.LEFT,
+                )
+            }
+
+            null -> {}
         }
     }
 }
 
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
-private fun getEventsDisplayPair(): List<ScoreboardElementType> {
-    return ScoreboardEvents.getEvent()
-        .filterNotNull()
-        .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
-        .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
-}
+private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEvents.getEvent()
+    .filterNotNull()
+    .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
+    .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
+
 
 private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
 
@@ -824,13 +813,12 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     }
 }
 
-private fun getFooterDisplayPair(): List<ScoreboardElementType> =
-    listOf(
-        displayConfig.titleAndFooter.customFooter.get().toString()
-            .replace("&", "§")
-            .split("\\n")
-            .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
-    ).flatten()
+private fun getFooterDisplayPair(): List<ScoreboardElementType> = listOf(
+    displayConfig.titleAndFooter.customFooter.get().toString()
+        .replace("&", "§")
+        .split("\\n")
+        .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
+).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unconfirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
