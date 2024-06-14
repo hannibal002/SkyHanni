@@ -208,10 +208,6 @@ object MiningCommissionsBlocksColor {
             "Sapphire Gemstone Collector",
             OreType.SAPPHIRE,
         ),
-        HARD_STONE(
-            "Hardstone Miner",
-            OreType.HARD_STONE,
-        ),
 
         // Glacite Tunnels
         GLACITE(
