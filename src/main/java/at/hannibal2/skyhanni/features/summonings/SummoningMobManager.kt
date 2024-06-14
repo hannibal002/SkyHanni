@@ -38,7 +38,7 @@ object SummoningMobManager {
     )
     private val despawnPattern by patternGroup.pattern(
         "despawn",
-        "§cYou have despawned your (monster|monsters)!",
+        "§cYou have despawned your monsters?!",
     )
 
     /**
