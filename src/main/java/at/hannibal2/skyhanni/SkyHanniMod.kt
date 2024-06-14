@@ -16,11 +16,12 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
+import at.hannibal2.skyhanni.test.RenderableTestSuit
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -61,7 +62,7 @@ class SkyHanniMod {
         SkyHanniEvents.init(modules)
 
         // TODO move once dev module is merged
-        if (LorenzUtils.isInDevEnvironment()) {
+        if (PlatformUtils.isDevEnvironment) {
             loadModule(RenderableTestSuit)
         }
 
