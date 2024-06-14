@@ -113,7 +113,7 @@ object MineshaftPityDisplay {
             hover.add(
                 "§7Chance: " +
                     "§e1§6/§e${chance.round(1)} " +
-                    "§7(§b${((1.0 / chance) * 100).addSeparators()}%§7)"
+                    "§7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
             )
             minedBlocks.forEach {
                 hover.add(
@@ -125,7 +125,7 @@ object MineshaftPityDisplay {
             hover.add("")
             hover.add(
                 "§7Average Blocks/Mineshaft: " +
-                    "§e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}"
+                    "§e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
             )
 
             if (!lastMineshaftSpawn.isFarPast()) {
@@ -195,10 +195,10 @@ object MineshaftPityDisplay {
                 Renderable.horizontalContainer(
                     listOf(
                         Renderable.placeholder(10, 0),
-                        Renderable.verticalContainer(blocksToPityList)
-                    )
-                )
-            )
+                        Renderable.verticalContainer(blocksToPityList),
+                    ),
+                ),
+            ),
         )
 
         val map = buildMap {
@@ -213,7 +213,7 @@ object MineshaftPityDisplay {
             put(MineshaftPityLines.NEEDED_TO_PITY, neededToPityRenderable)
             put(
                 MineshaftPityLines.TIME_SINCE_MINESHAFT,
-                Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}")
+                Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
             )
             put(
                 MineshaftPityLines.AVERAGE_BLOCKS_MINESHAFT,
@@ -233,7 +233,7 @@ object MineshaftPityDisplay {
         if (display.isEmpty()) return
         config.position.renderRenderables(
             listOf(Renderable.verticalContainer(display, 2)),
-            posLabel = "Mineshaft Pity Display"
+            posLabel = "Mineshaft Pity Display",
         )
     }
 
@@ -277,20 +277,20 @@ object MineshaftPityDisplay {
     data class PityData(
         @Expose val pityBlock: PityBlock,
         @Expose var blocksBroken: Int = 0,
-        @Expose var efficientMiner: Int = 0
+        @Expose var efficientMiner: Int = 0,
     )
 
     enum class PityBlock(
         val displayName: String,
         val oreTypes: List<OreType>,
         val multiplier: Int,
-        val displayItem: ItemStack
+        val displayItem: ItemStack,
     ) {
         MITHRIL(
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata)
+            ItemStack(Blocks.wool, 1, EnumDyeColor.LIGHT_BLUE.metadata),
         ),
 
         GEMSTONE(
@@ -298,35 +298,35 @@ object MineshaftPityDisplay {
             listOf(
                 OreType.RUBY, OreType.AMBER, OreType.AMETHYST, OreType.JADE,
                 OreType.SAPPHIRE, OreType.TOPAZ, OreType.JASPER, OreType.OPAL,
-                OreType.AQUAMARINE, OreType.CITRINE, OreType.ONYX, OreType.PERIDOT
+                OreType.AQUAMARINE, OreType.CITRINE, OreType.ONYX, OreType.PERIDOT,
             ),
             4,
-            ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata)
+            ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),
         ),
         GLACITE(
             "Glacite",
             listOf(OreType.GLACITE),
             4,
-            ItemStack(Blocks.packed_ice)
+            ItemStack(Blocks.packed_ice),
         ),
         TUNGSTEN(
             "Tungsten",
             listOf(OreType.TUNGSTEN),
             4,
-            ItemStack(Blocks.clay)
+            ItemStack(Blocks.clay),
         ),
         UMBER(
             "Umber",
             listOf(OreType.UMBER),
             4,
-            ItemStack(Blocks.red_sandstone)
+            ItemStack(Blocks.red_sandstone),
         ),
 
         TITANIUM(
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata)
+            ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata),
         ),
         ;
 
