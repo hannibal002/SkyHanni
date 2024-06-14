@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
@@ -564,6 +566,14 @@ object SkyHanniDebugsAndTests {
             ),
             posLabel = "Item Debug",
         )
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onOreMined(event: OreMinedEvent) {
+        if (!debugConfig.oreEventMessages) return
+        val originalOre = event.originalOre
+        val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
+        ChatUtils.debug("Mined: $originalOre (${extraBlocks.joinToString()})")
     }
 
     @SubscribeEvent

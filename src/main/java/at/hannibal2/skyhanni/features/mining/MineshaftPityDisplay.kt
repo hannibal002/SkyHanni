@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Comp
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -79,14 +79,17 @@ object MineshaftPityDisplay {
 
     private const val MAX_COUNTER = 2000
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
         if (!isEnabled()) return
 
         event.originalOre.getOreType()?.getPityBlock()?.let { it.blocksBroken++ }
-        event.extraBlocks.removeFirst { it.key == event.originalOre }.map { (block, amount) ->
-            block.getOreType()?.getPityBlock()?.let { it.efficientMiner += amount }
-        }
+        event.extraBlocks.toMutableMap()
+            .apply { addOrPut(event.originalOre, -1) }
+            .map { (block, amount) ->
+                block.getOreType()?.getPityBlock()?.let { it.efficientMiner += amount }
+            }
+
         update()
     }
 
