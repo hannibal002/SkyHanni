@@ -49,7 +49,7 @@ object HoppityEggsCompactChat {
         resetCompactVars()
     }
 
-    private fun resetCompactVars(){
+    private fun resetCompactVars() {
         this.hoppityEggChat = mutableListOf()
         this.duplicate = false
         this.newRabbit = false
