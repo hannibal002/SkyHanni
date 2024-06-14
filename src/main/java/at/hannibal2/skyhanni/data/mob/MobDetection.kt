@@ -88,7 +88,6 @@ object MobDetection {
             shouldClear.set(false)
         }
         if (!LorenzUtils.inSkyBlock) return
-        if (event.isMod(2)) return
 
         makeEntityReferenceUpdate()
 
