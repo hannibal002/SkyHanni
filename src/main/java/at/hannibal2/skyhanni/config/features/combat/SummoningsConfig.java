@@ -37,4 +37,9 @@ public class SummoningsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean summoningMobColored = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Summon Messages", desc = "Hide summon related chat messages.")
+    @ConfigEditorBoolean
+    public boolean hideSummonMessages = false;
 }
