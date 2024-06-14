@@ -135,7 +135,9 @@ object DragonInfoUtils {
     fun onEnd(event: DungeonCompleteEvent) {
         WitheredDragonInfo.clearSpawned()
         if (inPhase5) inPhase5 = false
-        ChatUtils.chat("spawned:$dragonSpawnCount | died:$dragonKillCount")
+        val message = "spawned:$dragonSpawnCount | died:$dragonKillCount"
+        logLine(message)
+        ChatUtils.chat(message)
         dragonKillCount = 0
         dragonSpawnCount = 0
     }
