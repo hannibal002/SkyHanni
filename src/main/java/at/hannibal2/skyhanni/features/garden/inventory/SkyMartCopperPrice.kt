@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -61,17 +61,17 @@ object SkyMartCopperPrice {
                 val profit = itemPrice - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
-                val perFormat = NumberUtil.format(factor)
+                val perFormat = factor.format()
 
                 val itemName = item.itemName
                 val hover = buildList {
                     add(itemName)
                     add("")
-                    add("§7Item price: §6${NumberUtil.format(itemPrice)} ")
+                    add("§7Item price: §6${itemPrice.format()} ")
                     otherItemsPrice?.let {
-                        add("§7Additional cost: §6${NumberUtil.format(it)} ")
+                        add("§7Additional cost: §6${it.format()} ")
                     }
-                    add("§7Profit per purchase: §6${NumberUtil.format(profit)} ")
+                    add("§7Profit per purchase: §6${profit.format()} ")
                     add("")
                     add("§7Copper amount: §c${copper.addSeparators()} ")
                     add("§7Profit per copper: §6${perFormat} ")

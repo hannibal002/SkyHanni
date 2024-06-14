@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -147,8 +148,8 @@ object SummoningMobManager {
             val maxHealth = entityLiving.baseMaxHealth
             val color = NumberUtil.percentageColor(currentHealth.toLong(), maxHealth.toLong()).getChatColor()
 
-            val currentFormat = NumberUtil.format(currentHealth)
-            val maxFormat = NumberUtil.format(maxHealth)
+            val currentFormat = currentHealth.format()
+            val maxFormat = maxHealth.format()
             summoningMob.lastDisplayName = "§a$name $color$currentFormat/$maxFormat"
         }
     }

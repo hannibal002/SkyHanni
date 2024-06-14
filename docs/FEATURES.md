@@ -850,6 +850,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + HOTM perks level and Enable Display. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1059)
 + Mineshaft Corpse and Entrance/Ladder Locators. - nobaboy (https://github.com/hannibal002/SkyHanni/pull/1500)
     + Includes keybind functionality for both.
++ HotM Perks Powder features. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1460)
+    + Added total powder cost to HotM perks.
+    + Added powder cost for 10 levels.
 
 </details>
 <details open><summary>
@@ -928,6 +931,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Display missing egg collection locations. - nea (https://github.com/hannibal002/SkyHanni/pull/1997)
     + Tracks the unique egg location requirements for rabbits from your Hoppity collection.
     + This data is partially enriched using the duplicate egg location tracker.
++ Rabbit Pet Warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2087)
+    + Warns when using the Egglocator without having a Mythic Rabbit Pet selected.
 
 </details>
 <details open><summary>
