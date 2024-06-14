@@ -58,6 +58,8 @@
 + Display missing egg collection locations. - nea (https://github.com/hannibal002/SkyHanni/pull/1997)
     + Tracks the unique egg location requirements for rabbits from your Hoppity collection.
     + This data is partially enriched using the duplicate egg location tracker.
++ Added Rabbit Pet Warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2087)
+    + Warns when using the Egglocator without having a Mythic Rabbit Pet selected.
 
 #### Mining Features
 
@@ -66,6 +68,9 @@
 + Added HOTM perks level and Enable Display. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1059)
 + Added Mineshaft Corpse and Entrance/Ladder Locators. - nobaboy (https://github.com/hannibal002/SkyHanni/pull/1500)
     + Includes keybind functionality for both.
++ Added HotM Perks Powder features. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1460)
+    + Added total powder cost to HotM perks.
+    + Added powder cost for 10 levels.
 
 #### Inventory Features
 
@@ -154,6 +159,7 @@
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/1971)
 + Powder Tracker: Auto-detect whether Great Explorer is maxed. - Luna (https://github.com/hannibal002/SkyHanni/pull/2032)
     + The configuration option to manually specify this has been removed.
++ Added different display options for mining powder in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1442)
 
 #### Commands Improvements
 
@@ -210,6 +216,7 @@
 + Improved Hypixel server detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/2064)
 + Added Carnival lines to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1995)
 + Added an exclude dungeon toggle to hide far entities. - Iceshadow (https://github.com/hannibal002/SkyHanni/pull/2036)
++ Improved Custom Wardrobe outline color. - Empa (https://github.com/hannibal002/SkyHanni/pull/2079)
 
 ### Fixes
 
@@ -274,6 +281,9 @@
 + Fixed healer orb pickup hider. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
 + Fixed Dungeon Rank Tab list color not showing the names of players with YouTube/Admin rank. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1878)
++ Fixed Dungeons in DiscordRPC not showing the elapsed time. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2089)
++ Fixed multiple empty lines appearing in Custom Scoreboard while in Dungeons. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2082)
++ Fixed Livid Finder not working with Magenta Livid. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2086)
 
 #### Commands Fixes
 
@@ -307,6 +317,9 @@
 #### Inventory Fixes
 
 + Fixed estimated item value not showing in NEU PV. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1955)
++ Fixed showing the favorite wardrobe slot background color while in "Only Favorites" mode. - Empa (https://github.com/hannibal002/SkyHanni/pull/2072)
++ Fixed incorrect stripping of some prefixes from non-Kuudra armor items in the estimated item value calculation. - Luna (https://github.com/hannibal002/SkyHanni/pull/2057)
+    + This broke other items, like Hot Bait.
 
 #### Combat Fixes
 
@@ -331,6 +344,8 @@
 + Fixed crash if a key code is set to a non-standard key. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2066)
 + Fixed corrupted config files not being reset to the default state. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2055)
 + Fixed an error with the chum bucket hider. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2043)
++ Fixed stranded highlighted placeable NPCs. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2071)
++ Fixed visual words import from SBE with special characters. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2085)
 
 ### Technical Details
 
@@ -393,6 +408,17 @@
 + Added the ability to specify a SkyHanniModule to only load in dev. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2011)
 + Migrated long to SimpleTimeMark in Storage if they are time marks. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2038)
 + Added `HotmData.isMaxLevel`, which also accounts for Blue Cheese. - Luna (https://github.com/hannibal002/SkyHanni/pull/2032)
++ Code cleanups for forEach loops. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1725)
++ Removed the deprecated TimeUtils function and cleaned up the newer one. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1898)
++ Fully utilized the module annotation for feature objects. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1983)
++ Added getPerkByName(name) and calculateTotalCost(level) to HotmAPI. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1460)
++ New Scoreboard lines are added automatically from remote. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2068)
+    + The pattern still needs to be added to the list in development.
++ Improved code around Kuudra armor sets in estimated item value checking. - Luna (https://github.com/hannibal002/SkyHanni/pull/2057)
+
+### Removed Features
+
++ Removed Mineshaft from mining event display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2083)
 
 ## Version 0.25
 

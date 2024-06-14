@@ -106,8 +106,9 @@ object EndermanSlayerFeatures {
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
-            endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }
-                .forEach { event.drawColor(it, beaconConfig.beaconColor.toChromaColor(), alpha = 0.5f) }
+            for (location in endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }) {
+                event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 0.5f)
+            }
         }
 
         for ((location, time) in sittingBeacon) {
