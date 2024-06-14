@@ -132,7 +132,6 @@ object MineshaftPityDisplay {
                 hover.add("")
                 hover.add("§7Time since Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}")
             }
-            lastMineshaftSpawn = SimpleTimeMark.now()
 
             resetCounter()
 
@@ -240,6 +239,7 @@ object MineshaftPityDisplay {
 
     private fun resetCounter() {
         minedBlocks = mutableListOf()
+        lastMineshaftSpawn = SimpleTimeMark.now()
         update()
     }
 
@@ -247,13 +247,15 @@ object MineshaftPityDisplay {
         resetCounter()
         mineshaftTotalBlocks = 0
         mineshaftTotalCount = 0
+        lastMineshaftSpawn = SimpleTimeMark.farPast()
         update()
     }
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.MINESHAFT) return
-        resetCounter()
+        if (event.newIsland == IslandType.MINESHAFT || event.oldIsland == IslandType.MINESHAFT) {
+            resetCounter()
+        }
     }
 
     fun isEnabled() = MiningAPI.inGlacialTunnels() && config.enabled
