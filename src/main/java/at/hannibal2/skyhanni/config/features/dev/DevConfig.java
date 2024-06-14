@@ -67,6 +67,14 @@ public class DevConfig {
 
     @Expose
     @ConfigOption(
+        name = "Contributor Nametags",
+        desc = "Makes SkyHanni contributors' nametags fancy too. "
+    )
+    @ConfigEditorBoolean
+    public boolean contributorNametags = true;
+
+    @Expose
+    @ConfigOption(
         name = "Flip Contributors",
         desc = "Make SkyHanni contributors appear upside down in the world.")
     @ConfigEditorBoolean
@@ -90,6 +98,10 @@ public class DevConfig {
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
+
+    @Expose
+    @Category(name = "Dev Tools", desc = "Tooling for devs")
+    public DevToolConfig devTool = new DevToolConfig();
 
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")

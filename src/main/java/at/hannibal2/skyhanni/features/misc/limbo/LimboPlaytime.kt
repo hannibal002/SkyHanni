@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -19,6 +20,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object LimboPlaytime {
     private lateinit var modifiedList: MutableList<String>
     private var setMinutes = false
@@ -146,15 +148,15 @@ object LimboPlaytime {
         val firstList = mutableListOf<String>()
         val lastList = mutableListOf<String>()
         var hasPassed = false
-        toolTip.forEach {
-            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && !hasPassed) {
-                firstList.add(it)
+        for (line in toolTip) {
+            if (!(hoursPattern.matches(line) || minutesPattern.matches(line)) && !hasPassed) {
+                firstList.add(line)
             } else hasPassed = true
         }
         hasPassed = false
-        toolTip.forEach {
-            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && hasPassed) {
-                lastList.add(it)
+        for (line in toolTip) {
+            if (!(hoursPattern.matches(line) || minutesPattern.matches(line)) && hasPassed) {
+                lastList.add(line)
             } else hasPassed = true
         }
         toolTip.clear()

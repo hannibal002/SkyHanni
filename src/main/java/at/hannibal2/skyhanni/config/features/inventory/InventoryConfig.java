@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
+import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -50,6 +51,10 @@ public class InventoryConfig {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
+    @Category(name = "Custom Wardrobe", desc = "New Wardrobe Look.")
+    public CustomWardrobeConfig customWardrobe = new CustomWardrobeConfig();
+
+    @Expose
     @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
@@ -93,16 +98,13 @@ public class InventoryConfig {
     @Accordion
     public GetFromSackConfig gfs = new GetFromSackConfig();
 
+    @Expose
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
-    @Expose
     public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
 
     @Expose
-    @ConfigOption(
-        name = "Item Number",
-        desc = "Showing the item number as a stack size for these items."
-    )
+    @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
@@ -168,10 +170,10 @@ public class InventoryConfig {
     public boolean vacuumBagCap = true;
 
     @Expose
-    @ConfigOption(
-        name = "Quick Craft Confirmation",
+    @ConfigOption(name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+        "(e.g. armor, weapons, accessories). " +
+            "Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -190,27 +192,30 @@ public class InventoryConfig {
     public boolean anvilCombineHelper = false;
 
     @Expose
-    @ConfigOption(name = "Item Stars",
-        desc = "Show a compact star count in the item name for all items.")
+    @ConfigOption(name = "Item Stars", desc = "Show a compact star count in the item name for all items.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemStars = false;
 
     @Expose
-    @ConfigOption(name = "Missing Tasks",
-        desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
+    @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
-    @ConfigOption(name = "Power Stone Guide",
-        desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
+    @ConfigOption(name = "Power Stone Guide", desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
     // TODO move( , "inventory.powerStoneGuide", "inventory.skyblockGuideConfig.powerStoneGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powerStoneGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Favorite Power Stone", desc = "Shows your favorite power stones. You can add/remove them by shift clicking a Power Stone.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean favoritePowerStone = false;
 
     @Expose
     @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")

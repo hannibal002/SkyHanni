@@ -39,6 +39,13 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
+    @ConfigOption(name = "Hide Duplicate Waypoints", desc = "Hides egg waypoints you have found. §e" +
+        "Only works when you don't have an Egglocator in your inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideDuplicateWaypoints = false;
+
+    @Expose
     @ConfigOption(name = "Mark Duplicate Locations", desc = "Marks egg location waypoints which you have already found in red.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -49,6 +56,12 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showNearbyDuplicateEggLocations = false;
+
+    @Expose
+    @ConfigOption(name = "Load from NEU PV", desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean loadFromNeuPv = true;
 
     @Expose
     @ConfigOption(name = "Show Unclaimed Eggs", desc = "Displays which eggs haven't been found in the last SkyBlock day.")
@@ -128,4 +141,14 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactChat = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Rabbit Pet Warning",
+        desc = "Warn when using the Egglocator without having a §d§lMythic Rabbit Pet §7selected. " +
+            "§eOnly enable this setting when you own a mythic Rabbit pet."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean petWarning = false;
 }

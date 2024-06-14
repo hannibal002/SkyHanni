@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
+import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker;
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity;
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
@@ -34,8 +36,10 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
+import at.hannibal2.skyhanni.utils.GenericWrapper;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -47,6 +51,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class ProfileSpecificStorage {
+
+    private static SimpleTimeMark SimpleTimeMarkFarPast() {
+        return GenericWrapper.getSimpleTimeMark(SimpleTimeMark.farPast()).getIt();
+    }
 
     @Expose
     public String currentPet = "";
@@ -83,10 +91,10 @@ public class ProfileSpecificStorage {
         public int timeTowerLevel = 0;
 
         @Expose
-        public long currentTimeTowerEnds = 0;
+        public SimpleTimeMark currentTimeTowerEnds = SimpleTimeMarkFarPast();
 
         @Expose
-        public long nextTimeTower = 0;
+        public SimpleTimeMark nextTimeTower = SimpleTimeMarkFarPast();
 
         @Expose
         public int currentTimeTowerUses = -1;
@@ -101,20 +109,21 @@ public class ProfileSpecificStorage {
         public boolean hasMuRabbit = false;
 
         @Expose
-        public long bestUpgradeAvailableAt = 0;
+        public SimpleTimeMark bestUpgradeAvailableAt = SimpleTimeMarkFarPast();
 
         @Expose
         public long bestUpgradeCost = 0;
 
         @Expose
-        public long lastDataSave = 0;
+        public SimpleTimeMark lastDataSave = SimpleTimeMarkFarPast();
 
         @Expose
         public PositionChange positionChange = new PositionChange();
 
         public static class PositionChange {
             @Expose
-            public Long lastTime = null;
+            @Nullable
+            public SimpleTimeMark lastTime = null;
 
             @Expose
             public int lastPosition = -1;
@@ -130,10 +139,13 @@ public class ProfileSpecificStorage {
         public String targetName = null;
 
         @Expose
-        public Map<String, Integer> rabbitCounts = new HashMap();
+        public Map<String, Integer> rabbitCounts = new HashMap<>();
 
         @Expose
-        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap();
+        public Map<String, HoppityCollectionStats.LocationRabbit> locationRabbitRequirements = new HashMap<>();
+
+        @Expose
+        public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap<>();
 
         @Expose
         public Integer hoppityShopYearOpened = null;
@@ -151,6 +163,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
+
+        @Expose
+        public List<String> favoritePowers = new ArrayList<>();
     }
 
     @Expose
@@ -175,7 +190,8 @@ public class ProfileSpecificStorage {
         public int bitsAvailable = -1;
 
         @Expose
-        public Long boosterCookieExpiryTime = null;
+        @Nullable
+        public SimpleTimeMark boosterCookieExpiryTime = null;
     }
 
     @Expose
@@ -186,6 +202,7 @@ public class ProfileSpecificStorage {
         @Expose
         public String displayName = "";
 
+        // TODO use SimpleTimeMark
         @Expose
         public long lastClicked = -1;
 
@@ -196,6 +213,19 @@ public class ProfileSpecificStorage {
                 ", lastClicked=" + lastClicked +
                 '}';
         }
+    }
+
+    @Expose
+    public BeaconPowerStorage beaconPower = new BeaconPowerStorage();
+
+    public static class BeaconPowerStorage {
+
+        @Expose
+        @Nullable
+        public SimpleTimeMark beaconPowerExpiryTime = null;
+
+        @Expose
+        public String boostedStat = null;
     }
 
     @Expose
@@ -247,16 +277,16 @@ public class ProfileSpecificStorage {
         public DicerRngDropTracker.Data dicerDropTracker = new DicerRngDropTracker.Data();
 
         @Expose
-        public long informedAboutLowMatter = 0;
+        public SimpleTimeMark informedAboutLowMatter = SimpleTimeMarkFarPast();
 
         @Expose
-        public long informedAboutLowFuel = 0;
+        public SimpleTimeMark informedAboutLowFuel = SimpleTimeMarkFarPast();
 
         @Expose
         public long visitorInterval = 15 * 60_000L;
 
         @Expose
-        public long nextSixthVisitorArrival = 0;
+        public SimpleTimeMark nextSixthVisitorArrival = SimpleTimeMarkFarPast();
 
         @Expose
         public ArmorDropTracker.Data armorDropTracker = new ArmorDropTracker.Data();
@@ -346,38 +376,35 @@ public class ProfileSpecificStorage {
             public Map<FarmingItems, Boolean> outdatedItems = new HashMap<>();
 
             @Expose
+            public int farmingLevel = -1;
+
+            @Expose
+            public double bestiary = -1.0;
+
+            @Expose
+            public int plotsUnlocked = -1;
+
+            @Expose
             public int anitaUpgrade = -1;
 
             @Expose
             public int farmingStrength = -1;
 
             @Expose
-            public int farmingLevel = -1;
+            public SimpleTimeMark cakeExpiring = null;
 
             @Expose
-            public int plotsUnlocked = -1;
-
-            @Expose
-            public long cakeExpiring = -1L;
-
-            @Expose
-            public boolean carrotFortune = false;
-
-            @Expose
-            public boolean pumpkinFortune = false;
-
-            @Expose
-            public boolean cocoaBeansFortune = false;
+            public Map<CropType, Boolean> carrolyn = new HashMap<>();
 
             @Expose
             public Map<FarmingItems, ItemStack> farmingItems = new HashMap<>();
         }
 
         @Expose
-        public long composterEmptyTime = 0;
+        public SimpleTimeMark composterEmptyTime = SimpleTimeMarkFarPast();
 
         @Expose
-        public long lastComposterEmptyWarningTime = 0;
+        public SimpleTimeMark lastComposterEmptyWarningTime = SimpleTimeMarkFarPast();
 
         @Expose
         public GardenStorage.FarmingWeightConfig farmingWeight = new GardenStorage.FarmingWeightConfig();
@@ -545,7 +572,7 @@ public class ProfileSpecificStorage {
         public Map<DungeonFloor, Integer> bosses = new HashMap<>();
 
         @Expose
-        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.Companion.generateMaxChestAsList();
+        public List<DungeonStorage.DungeonRunInfo> runs = CroesusChestTracker.generateMaxChestAsList();
 
         public static class DungeonRunInfo {
 
@@ -595,10 +622,25 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
-        // TODO renmae
+        // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
     }
 
     @Expose
     public Map<SkillType, SkillAPI.SkillInfo> skillData = new HashMap<>();
+
+    @Expose
+    public WardrobeStorage wardrobe = new WardrobeStorage();
+
+    public static class WardrobeStorage {
+        @Expose
+        public Map<Integer, WardrobeAPI.WardrobeData> data = new HashMap<>();
+
+        @Expose
+        @Nullable
+        public Integer currentSlot = null;
+    }
+
+    @Expose
+    public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 }
