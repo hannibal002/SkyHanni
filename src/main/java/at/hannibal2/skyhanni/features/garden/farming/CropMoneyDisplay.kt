@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import kotlinx.coroutines.launch
@@ -281,7 +281,7 @@ object CropMoneyDisplay {
     }
 
     private fun format(moneyPerHour: Double) = if (config.compactPrice) {
-        moneyPerHour.format()
+        NumberUtil.format(moneyPerHour)
     } else {
         moneyPerHour.toLong().addSeparators()
     }

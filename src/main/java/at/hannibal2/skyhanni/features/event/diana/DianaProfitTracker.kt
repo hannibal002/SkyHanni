@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -67,7 +67,7 @@ object DianaProfitTracker {
         override fun getCoinName(item: TrackedItem) = "§6Dug Out Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val burrowDugCoinsFormat = item.totalAmount.format()
+            val burrowDugCoinsFormat = NumberUtil.format(item.totalAmount)
             return listOf(
                 "§7Digging treasures gave you",
                 "§6$burrowDugCoinsFormat coins §7in total."
