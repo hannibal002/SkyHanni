@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -13,13 +12,9 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.boss.EntityDragon
@@ -67,6 +62,7 @@ object DragonInfoUtils {
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
         if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
+        ChatUtils.chat(event.mob.baseEntity.position.toLorenzVec().toCleanString())
         dragonKillCount += 1
 
         if (event.mob.mobType != Mob.Type.BOSS) return
@@ -213,17 +209,17 @@ object DragonInfoUtils {
 
     @SubscribeEvent
     fun renderBoxes(event: LorenzRenderWorldEvent) {
-        if (!isEnabled()) return
-        if (!SkyHanniMod.feature.dev.debug.enabled) return
-        WitheredDragonInfo.entries.forEach {
-            event.drawFilledBoundingBox_nea(it.particleBox, it.color.toColor().addAlpha(100))
-            event.drawWaypointFilled(it.spawnLocation, it.color.toColor(), true)
-            event.drawString(it.spawnLocation.add(y = 1), it.colorName, true)
-        }
+//         if (!isEnabled()) return
+//         if (!SkyHanniMod.feature.dev.debug.enabled) return
+//         WitheredDragonInfo.entries.forEach {
+//             event.drawFilledBoundingBox_nea(it.deathBox, it.color.toColor().addAlpha(100))
+//             event.drawWaypointFilled(it.spawnLocation, it.color.toColor(), true)
+//             event.drawString(it.spawnLocation.add(y = 1), it.colorName, true)
+//         }
     }
 
     @HandleEvent
     fun onDragonChange(event: M7DragonChangeEvent) {
-        ChatUtils.debug("${event.dragon} ${event.state}")
+        ChatUtils.debug("${event.dragon} ${event.state} ${event.defeated}")
     }
 }
