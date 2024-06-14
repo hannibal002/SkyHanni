@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -28,7 +28,7 @@ object DraconicSacrificeTracker {
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
     private val sacrificeLoot by patternGroup.pattern(
         "sacrifice",
-        "§c§lSACRIFICE! §r§eYou turned §r§\\w(?<item>.*) §r§einto §r§d(?<amount>\\d+) Dragon Essence§r§e!",
+        "§c§lSACRIFICE! §r§eYou turned §r(?<item>.*) §r§einto §r§d(?<amount>\\d+) Dragon Essence§r§e!",
     )
     private val bonusLoot by patternGroup.pattern(
         "bonus",
@@ -44,6 +44,7 @@ object DraconicSacrificeTracker {
 
         override fun reset() {
             bonusRewards.clear()
+            sacrifiedItemsMap.clear()
             itemsSacrifice = 0
             essences = 0
         }
@@ -56,11 +57,14 @@ object DraconicSacrificeTracker {
 
         @Expose
         var bonusRewards: MutableMap<BonusReward, Long> = mutableMapOf()
+
+        @Expose
+        var sacrifiedItemsMap: MutableMap<String, Long> = mutableMapOf()
     }
 
     private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
         val newList = mutableListOf<List<Any>>()
-        for (index in config.textFormat) {
+        for (index in config.textFormat.get()) {
             // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
         }
@@ -68,18 +72,29 @@ object DraconicSacrificeTracker {
     }
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList(Renderable.string("§5§lDraconic Sacrifice Tracker"))
-        addAsSingletonList(Renderable.string("§6${data.itemsSacrifice.addSeparators()} Items Sacrified"))
-        addAsSingletonList(Renderable.string("§b${data.essences.addSeparators()} §5Dragon Essences"))
+        addAsSingletonList("§5§lDraconic Sacrifice Tracker")
+        addAsSingletonList(
+            Renderable.hoverTips(
+                "§b${data.itemsSacrifice.addSeparators()} §6Items Sacrified",
+                data.sacrifiedItemsMap.map { (key, value) -> "$key: §b$value" },
+            ),
+        )
+        addAsSingletonList("§b${data.essences.addSeparators()} §5Dragon Essences")
+        addAsSingletonList(" ")
 
-        for (reward in BonusReward.entries) {
+        for (reward in BonusReward.entries.subList(0, 3)) {
             val count = data.bonusRewards[reward] ?: 0
-            add(
-                buildList {
-                    add(Renderable.itemStack(reward.internalName.getItemStack()))
-                    add("§b${count} ${reward.displayName}")
-                },
-            )
+            addAsSingletonList("§b${count} ${reward.displayName}")
+        }
+        addAsSingletonList(" ")
+        for (reward in BonusReward.entries.subList(3, 11)) {
+            val count = data.bonusRewards[reward] ?: 0
+            addAsSingletonList("§b${count} ${reward.displayName}")
+        }
+        addAsSingletonList(" ")
+        for (reward in BonusReward.entries.subList(11, 16)) {
+            val count = data.bonusRewards[reward] ?: 0
+            addAsSingletonList("§b${count} ${reward.displayName}")
         }
     }
 
@@ -88,15 +103,18 @@ object DraconicSacrificeTracker {
         val msg = event.message
         sacrificeLoot.matchMatcher(msg) {
             val amount = group("amount").toInt()
+            val item = group("item")
             tracker.modify {
                 it.itemsSacrifice += 1
                 it.essences += amount
+                it.sacrifiedItemsMap.addOrPut(item, 1)
             }
         }
 
         bonusLoot.matchMatcher(msg) {
+            val amount = groupOrNull("amount")?.toLong() ?: 1
             val item = group("item")
-            val amount = group("amount").toLongOrNull() ?: 1L
+
             BonusReward.entries.find { it.displayName == item }?.let { reward ->
                 tracker.modify {
                     it.bonusRewards.addOrPut(reward, amount)
@@ -115,24 +133,31 @@ object DraconicSacrificeTracker {
         tracker.renderDisplay(config.position)
     }
 
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.textFormat) {
+            tracker.update()
+        }
+    }
+
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    enum class BonusReward(val internalName: NEUInternalName, val displayName: String) {
-        RITUAL_RESIDUE("RITUAL_RESIDUE".asInternalName(), "§5Ritual Residue"),
-        SUMMONING_EYE("SUMMONING_EYE".asInternalName(), "§5Summoning Eye"),
-        DRAGON_HORN("DRAGON_HORN".asInternalName(), "§5Dragon Horn"),
-        DRAGON_CLAW("DRAGON_CLAW".asInternalName(), "§5Dragon Claw"),
-        ENCHANTED_ENDER_PEARL("ENCHANTED_ENDER_PEARL".asInternalName(), "§aEnchanted Ender Pearl"),
-        ENCHANTED_EYE_OF_ENDER("ENCHANTED_EYE_OF_ENDER".asInternalName(), "§aEnchanted Eye Of Ender"),
-        ENCHANTED_END_STONE("ENCHANTED_END_STONE".asInternalName(), "§aEnchanted End Stone"),
-        ENCHANTED_OBSIDIAN("ENCHANTED_OBSIDIAN".asInternalName(), "§aEnchanted Obsidian"),
-        YOUNG_DRAGON_FRAGMENT("YOUNG_FRAGMENT".asInternalName(), "§5Young Dragon Fragment"),
-        OLD_DRAGON_FRAGMENT("OLD_FRAGMENT".asInternalName(), "§5Old Dragon Fragment"),
-        STRONG_DRAGON_FRAGMENT("STRONG_FRAGMENT".asInternalName(), "§5Strong Dragon Fragment"),
-        WISE_DRAGON_FRAGMENT("WISE_FRAGMENT".asInternalName(), "§5Wise Dragon Fragment"),
-        UNSTABLE_DRAGON_FRAGMENT("UNSTABLE_FRAGMENT".asInternalName(), "§5Unstable Dragon Fragment"),
-        PROTECTOR_DRAGON_FRAGMENT("PROTECTOR_FRAGMENT".asInternalName(), "§5Protector Dragon Fragment"),
-        SUPERIOR_DRAGON_FRAGMENT("SUPERIOR_FRAGMENT".asInternalName(), "§5Superior Dragon Fragment"),
-        HOLY_DRAGON_FRAGMENT("HOLY_FRAGMENT".asInternalName(), "§5Holy Dragon Fragment"),
+    enum class BonusReward(val displayName: String) {
+        RITUAL_RESIDUE("§5Ritual Residue"),
+        SUMMONING_EYE("§5Summoning Eye"),
+        DRAGON_HORN("§5Dragon Horn"),
+        YOUNG_DRAGON_FRAGMENT("§5Young Dragon Fragment"),
+        OLD_DRAGON_FRAGMENT("§5Old Dragon Fragment"),
+        STRONG_DRAGON_FRAGMENT("§5Strong Dragon Fragment"),
+        WISE_DRAGON_FRAGMENT("§5Wise Dragon Fragment"),
+        UNSTABLE_DRAGON_FRAGMENT("§5Unstable Dragon Fragment"),
+        PROTECTOR_DRAGON_FRAGMENT("§5Protector Dragon Fragment"),
+        SUPERIOR_DRAGON_FRAGMENT("§5Superior Dragon Fragment"),
+        HOLY_DRAGON_FRAGMENT("§5Holy Dragon Fragment"),
+        DRAGON_CLAW("§5Dragon Claw"),
+        ENCHANTED_ENDER_PEARL("§aEnchanted Ender Pearl"),
+        ENCHANTED_EYE_OF_ENDER("§aEnchanted Eye Of Ender"),
+        ENCHANTED_END_STONE("§aEnchanted End Stone"),
+        ENCHANTED_OBSIDIAN("§aEnchanted Obsidian"),
     }
 }
