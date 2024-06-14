@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -202,8 +202,8 @@ object ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) this.format(true) else this
-                .format()
+            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) this.shortFormat(true) else this
+                .shortFormat()
 
             NumberFormatEntry.LONG -> this.addSeparators()
             else -> "0"

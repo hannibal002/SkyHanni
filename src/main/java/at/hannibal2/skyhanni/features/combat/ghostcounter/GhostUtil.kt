@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import io.github.moulberry.notenoughupdates.util.Utils
 import java.io.FileReader
 
@@ -132,7 +132,7 @@ object GhostUtil {
                 if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators()
             )
                 .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
-                .replace("%killNeeded%", killNeeded.format())
+                .replace("%killNeeded%", killNeeded.shortFormat())
                 .replace("%currentLevel%", currentLevel)
                 .replace("%nextLevel%", nextLevel)
                 .replace("&", "§")

@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
@@ -213,7 +213,7 @@ object EstimatedItemValue {
         val numberFormat = if (config.exactPrice) {
             totalPrice.roundToLong().addSeparators()
         } else {
-            totalPrice.format()
+            totalPrice.shortFormat()
         }
         list.add("§aTotal: §6§l$numberFormat coins")
 
