@@ -64,7 +64,7 @@ object MiningAPI {
     var inEnd = false
     var inSpidersDen = false
 
-    var currentAreaOreBlocks = listOf<OreBlock>()
+    var currentAreaOreBlocks = setOf<OreBlock>()
 
     private var recentClickedBlocks = mutableListOf<MinedBlock>()
     private var surroundingMinedBlocks = mutableListOf<MinedBlock>()
@@ -227,7 +227,7 @@ object MiningAPI {
         lastColdReset = SimpleTimeMark.now()
         recentClickedBlocks = mutableListOf()
         surroundingMinedBlocks = mutableListOf()
-        currentAreaOreBlocks = mutableListOf()
+        currentAreaOreBlocks = setOf()
         resetOreEvent()
     }
 
@@ -290,13 +290,15 @@ object MiningAPI {
             inEnd = newInEnd
             inSpidersDen = newInSpidersDen
 
-            currentAreaOreBlocks = if (newInGlacite) OreBlock.entries.filter { it.checkArea.invoke() }
-            else if (newInDwarvenMines) OreBlock.entries.filter { it.checkArea.invoke() }
-            else if (newInCrystalHollows) OreBlock.entries.filter { it.checkArea.invoke() }
-            else if (newInCrimsonIsle) OreBlock.entries.filter { it.checkArea.invoke() }
-            else if (newInEnd) OreBlock.entries.filter { it.checkArea.invoke() }
-            else if (newInSpidersDen) OreBlock.entries.filter { it.checkArea.invoke() }
+            val entries = OreBlock.entries
+            val oreBlockList: List<OreBlock> = if (newInGlacite) entries.filter { it.checkArea.invoke() }
+            else if (newInDwarvenMines) entries.filter { it.checkArea.invoke() }
+            else if (newInCrystalHollows) entries.filter { it.checkArea.invoke() }
+            else if (newInCrimsonIsle) entries.filter { it.checkArea.invoke() }
+            else if (newInEnd) entries.filter { it.checkArea.invoke() }
+            else if (newInSpidersDen) entries.filter { it.checkArea.invoke() }
             else mutableListOf()
+            currentAreaOreBlocks = oreBlockList.toSet()
         }
     }
 }

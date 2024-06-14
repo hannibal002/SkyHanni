@@ -192,7 +192,7 @@ enum class OreType(
     companion object {
 
         fun IBlockState.isOreType(oreType: OreType): Boolean {
-            return oreType.oreBlocks.intersect(MiningAPI.currentAreaOreBlocks.toSet())
+            return oreType.oreBlocks.intersect(MiningAPI.currentAreaOreBlocks)
                 .any { it.checkBlock.invoke(this) }
         }
 
