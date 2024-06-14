@@ -36,11 +36,11 @@ object NumberUtil {
         )
     )
 
-    @Deprecated("outdated", ReplaceWith("value.format(preciseBillions)"))
-    fun format(value: Number, preciseBillions: Boolean = false): String = value.format(preciseBillions)
+    @Deprecated("outdated", ReplaceWith("value.shortFormat(preciseBillions)"))
+    fun format(value: Number, preciseBillions: Boolean = false): String = value.shortFormat(preciseBillions)
 
     // 1234 -> 1.2k
-    fun Number.format(preciseBillions: Boolean = false): String {
+    fun Number.shortFormat(preciseBillions: Boolean = false): String {
         return compactFormat(this, preciseBillions)
     }
 

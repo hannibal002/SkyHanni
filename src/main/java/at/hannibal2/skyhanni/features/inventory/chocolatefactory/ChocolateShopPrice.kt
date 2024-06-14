@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -118,19 +118,19 @@ object ChocolateShopPrice {
 
             val profit = product.itemPrice - (product.otherItemPrice ?: 0.0)
             val factor = (profit / product.chocolate) * multiplier
-            val perFormat = factor.format()
+            val perFormat = factor.shortFormat()
 
             val hover = buildList {
                 add(product.name)
 
                 add("")
-                add("§7Item price: §6${product.itemPrice.format()} ")
+                add("§7Item price: §6${product.itemPrice.shortFormat()} ")
                 product.otherItemPrice?.let {
-                    add("§7Additional cost: §6${it.format()} ")
+                    add("§7Additional cost: §6${it.shortFormat()} ")
                 }
-                add("§7Profit per purchase: §6${profit.format()} ")
+                add("§7Profit per purchase: §6${profit.shortFormat()} ")
                 add("")
-                add("§7Chocolate amount: §c${product.chocolate.format()} ")
+                add("§7Chocolate amount: §c${product.chocolate.shortFormat()} ")
                 add("§7Profit per million chocolate: §6${perFormat} ")
                 add("")
                 val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(product.chocolate)
