@@ -20,6 +20,7 @@ public class SkyHanniTweaker implements ITweaker {
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
         List<String> tweakClasses = (List<String>) Launch.blackboard.get("TweakClasses");
         tweakClasses.add(MixinTweaker.class.getName());
+        tweakClasses.add(ModLoadingTweaker.class.getName());
     }
 
     @Override
