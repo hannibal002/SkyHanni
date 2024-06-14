@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggTyp
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -46,21 +46,25 @@ object HoppityEggsCompactChat {
         if (hoppityEggChat.isNotEmpty()) {
             ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
         }
+        resetCompactData()
+    }
 
+    private fun resetCompactData() {
+        this.hoppityEggChat = mutableListOf()
         this.duplicate = false
         this.newRabbit = false
-        lastRarity = ""
-        lastName = ""
-        lastProfit = ""
-        lastChatMeal = null
-        lastDuplicateAmount = null
+        this.lastRarity = ""
+        this.lastName = ""
+        this.lastProfit = ""
+        this.lastChatMeal = null
+        this.lastDuplicateAmount = null
     }
 
     private fun createCompactMessage(): String {
         val mealName = lastChatMeal?.coloredName ?: ""
 
         return if (duplicate) {
-            val format = lastDuplicateAmount?.let { NumberUtil.format(it) } ?: "?"
+            val format = lastDuplicateAmount?.let { it.shortFormat() } ?: "?"
             val timeFormatted = lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
@@ -74,7 +78,7 @@ object HoppityEggsCompactChat {
 
     fun handleChat(event: LorenzChatEvent) {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
-            hoppityEggChat = mutableListOf()
+            resetCompactData()
             lastChatMeal = getEggType(event)
             compactChat(event)
         }

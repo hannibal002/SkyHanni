@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -60,7 +60,7 @@ object BazaarBestSellMethod {
 
         val data = internalName.getBazaarDataOrError()
         val totalDiff = (data.sellOfferPrice - data.instantBuyPrice) * having
-        val result = NumberUtil.format(totalDiff.toInt())
+        val result = totalDiff.toInt().shortFormat()
 
         val name = internalName.itemName
         return "$name§7 sell difference: §6$result coins"

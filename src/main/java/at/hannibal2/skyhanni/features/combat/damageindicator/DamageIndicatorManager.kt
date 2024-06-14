@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -73,6 +74,7 @@ object DamageIndicatorManager {
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
+
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
@@ -206,7 +208,7 @@ object DamageIndicatorManager {
                     data.nameAbove,
                     sizeNameAbove,
                     -18f,
-                    smallestDistanceVew = smallestDistanceVew
+                    smallestDistanceVew = smallestDistanceVew,
                 )
             }
 
@@ -230,8 +232,8 @@ object DamageIndicatorManager {
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
-                    val formatDamage = "§c" + NumberUtil.format(currentDamage)
-                    val formatHealing = "§a+" + NumberUtil.format(currentHealing)
+                    val formatDamage = "§c" + currentDamage.shortFormat()
+                    val formatHealing = "§a+" + currentHealing.shortFormat()
                     val finalResult = if (currentHealing == 0L) {
                         formatDamage
                     } else if (currentDamage == 0L) {
@@ -244,13 +246,13 @@ object DamageIndicatorManager {
                         finalResult,
                         sizeFinalResults,
                         diff,
-                        smallestDistanceVew = smallestDistanceVew
+                        smallestDistanceVew = smallestDistanceVew,
                     )
                     diff += 9f
                 }
                 for (damage in data.damageCounter.oldDamages) {
-                    val formatDamage = "§c" + NumberUtil.format(damage.damage) + "/s"
-                    val formatHealing = "§a+" + NumberUtil.format(damage.healing) + "/s"
+                    val formatDamage = "§c" + damage.damage.shortFormat() + "/s"
+                    val formatHealing = "§a+" + damage.healing.shortFormat() + "/s"
                     val finalResult = if (damage.healing == 0L) {
                         formatDamage
                     } else if (damage.damage == 0L) {
@@ -263,7 +265,7 @@ object DamageIndicatorManager {
                         finalResult,
                         sizeFinalResults,
                         diff,
-                        smallestDistanceVew = smallestDistanceVew
+                        smallestDistanceVew = smallestDistanceVew,
                     )
                     diff += 9f
                 }
@@ -302,7 +304,7 @@ object DamageIndicatorManager {
 
             if (now > damageCounter.firstTick + 1_000) {
                 damageCounter.oldDamages.add(
-                    0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing)
+                    0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing),
                 )
                 damageCounter.firstTick = 0L
                 damageCounter.currentDamage = 0
@@ -327,7 +329,9 @@ object DamageIndicatorManager {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         data = data.editCopy {
-            EntityUtils.getEntities<EntityLivingBase>().mapNotNull(::checkEntity).forEach { this put it }
+            EntityUtils.getEntities<EntityLivingBase>()
+                .mapNotNull(::checkEntity)
+                .forEach { this put it }
         }
     }
 
@@ -375,7 +379,7 @@ object DamageIndicatorManager {
                 entityData.healthText = customHealthText
             } else {
                 val color = NumberUtil.percentageColor(health, maxHealth)
-                entityData.healthText = color.getChatColor() + NumberUtil.format(health)
+                entityData.healthText = color.getChatColor() + health.shortFormat()
             }
             entityData.timeLastTick = System.currentTimeMillis()
             return entity.uniqueID to entityData
@@ -439,7 +443,7 @@ object DamageIndicatorManager {
                 entity as EntityMagmaCube,
                 entityData,
                 health.toInt(),
-                maxHealth.toInt()
+                maxHealth.toInt(),
             )
 
             BossType.SLAYER_ZOMBIE_5 -> {
@@ -528,8 +532,8 @@ object DamageIndicatorManager {
         }
 
         return NumberUtil.percentageColor(
-            calcHealth.toLong(), calcMaxHealth.toLong()
-        ).getChatColor() + NumberUtil.format(calcHealth)
+            calcHealth.toLong(), calcMaxHealth.toLong(),
+        ).getChatColor() + calcHealth.shortFormat()
     }
 
     private fun checkMagmaCube(
@@ -548,7 +552,7 @@ object DamageIndicatorManager {
             else -> {
                 val color = NumberUtil.percentageColor(health.toLong(), 10_000_000)
                 entityData.namePrefix = "§a6/6"
-                return color.getChatColor() + NumberUtil.format(health)
+                return color.getChatColor() + health.shortFormat()
             }
         } + " §f"
 
@@ -592,7 +596,7 @@ object DamageIndicatorManager {
         if (calcHealth == -1) return null
 
         val color = NumberUtil.percentageColor(calcHealth.toLong(), maxHealth.toLong())
-        return color.getChatColor() + NumberUtil.format(calcHealth)
+        return color.getChatColor() + calcHealth.shortFormat()
     }
 
     private fun checkEnderSlayer(
@@ -649,8 +653,8 @@ object DamageIndicatorManager {
             else -> return null
         }
         var result = NumberUtil.percentageColor(
-            calcHealth.toLong(), calcMaxHealth.toLong()
-        ).getChatColor() + NumberUtil.format(calcHealth)
+            calcHealth.toLong(), calcMaxHealth.toLong(),
+        ).getChatColor() + calcHealth.shortFormat()
 
         if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
             result = ""
@@ -830,7 +834,7 @@ object DamageIndicatorManager {
             entityResult.delayedStart?.asTimeMark(),
             entityResult.finalDungeonBoss,
             entityResult.bossType,
-            foundTime = SimpleTimeMark.now()
+            foundTime = SimpleTimeMark.now(),
         )
         DamageIndicatorDetectedEvent(entityData).postAndCatch()
         return entityData

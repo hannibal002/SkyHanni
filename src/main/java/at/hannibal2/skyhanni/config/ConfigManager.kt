@@ -37,7 +37,10 @@ import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.EnumMap
 import kotlin.concurrent.fixedRateTimer
+import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KMutableProperty1
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (LorenzUtils.isBetaVersion()) {
@@ -55,19 +58,19 @@ class ConfigManager {
         var configDirectory = File("config/skyhanni")
     }
 
-    val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
-    val sackData get() = jsonHolder[ConfigFileType.SACKS] as SackData
-    val friendsData get() = jsonHolder[ConfigFileType.FRIENDS] as FriendsJson
-    val knownFeaturesData get() = jsonHolder[ConfigFileType.KNOWN_FEATURES] as KnownFeaturesJson
-    val jacobContestData get() = jsonHolder[ConfigFileType.JACOB_CONTESTS] as JacobContestsJson
-    val visualWordsData get() = jsonHolder[ConfigFileType.VISUAL_WORDS] as VisualWordsJson
-
     private val logger = LorenzLogger("config_manager")
 
-    private val jsonHolder = mutableMapOf<ConfigFileType, Any>()
+    private val jsonHolder: Map<ConfigFileType, Any> = EnumMap(ConfigFileType::class.java)
 
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
+
+    private fun setConfigHolder(type: ConfigFileType, value: Any) {
+        require(value.javaClass == type.clazz)
+        @Suppress("UNCHECKED_CAST")
+        (type.property as KMutableProperty0<Any>).set(value)
+        (jsonHolder as MutableMap<ConfigFileType, Any>)[type] = value
+    }
 
     fun firstLoad() {
         if (jsonHolder.isNotEmpty()) {
@@ -77,7 +80,7 @@ class ConfigManager {
 
 
         for (fileType in ConfigFileType.entries) {
-            jsonHolder[fileType] = firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance())
+            setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance()))
         }
 
         // TODO use SecondPassedEvent
@@ -163,7 +166,7 @@ class ConfigManager {
     private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {
         val fileName = fileType.fileName
         logger.log("Trying to load $fileName from $file")
-        var output: Any = defaultValue
+        var output: Any? = defaultValue
 
         if (file!!.exists()) {
             try {
@@ -208,6 +211,10 @@ class ConfigManager {
 
         if (output == defaultValue) {
             logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
+        }
+        if (output == null) {
+            logger.log("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
+            output = defaultValue
         }
 
         return output
@@ -267,13 +274,13 @@ class ConfigManager {
     }
 }
 
-enum class ConfigFileType(val fileName: String, val clazz: Class<*>) {
-    FEATURES("config", Features::class.java),
-    SACKS("sacks", SackData::class.java),
-    FRIENDS("friends", FriendsJson::class.java),
-    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java),
-    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java),
-    VISUAL_WORDS("visual_words", VisualWordsJson::class.java),
+enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
+    FEATURES("config", Features::class.java, SkyHanniMod::feature),
+    SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
+    FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
+    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
+    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
+    VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

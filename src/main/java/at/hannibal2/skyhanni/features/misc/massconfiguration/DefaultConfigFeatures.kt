@@ -40,7 +40,7 @@ object DefaultConfigFeatures {
                     "Click here to configure default options, or run /shdefaultoptions.",
                 onClick = {
                     onCommand("null", "null")
-                }
+                },
             )
         } else if (updated) {
             val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
@@ -50,9 +50,16 @@ object DefaultConfigFeatures {
                     "Click here to configure the newly introduced options, or run $command.",
                 onClick = {
                     onCommand(lastVersion, SkyHanniMod.version)
-                }
+                },
             )
         }
+    }
+
+    fun onCommand(args: Array<String>) {
+        onCommand(
+            args.getOrNull(0) ?: "null",
+            args.getOrNull(1) ?: "null",
+        )
     }
 
     fun onCommand(old: String, new: String) {
@@ -89,7 +96,7 @@ object DefaultConfigFeatures {
         resetSuggestionState: MutableMap<Category, ResetSuggestionState>,
         orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     ) {
-        orderedOptions.forEach { (cat, options) ->
+        for ((cat, options) in orderedOptions) {
             for (option in options) {
                 val resetState = option.toggleOverride ?: resetSuggestionState[cat]!!
                 if (resetState == ResetSuggestionState.LEAVE_DEFAULTS) continue
@@ -108,7 +115,7 @@ object DefaultConfigFeatures {
         if (strings.size <= 2)
             return CommandBase.getListOfStringsMatchingLastWord(
                 strings,
-                SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
+                SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null"),
             )
         return listOf()
     }
