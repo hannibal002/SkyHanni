@@ -97,7 +97,7 @@ object HoppityEggsCompactChat {
             // in this case, we want to reset variables to a clean state during this capture,
             // as the important capture for the purchased message is the final message in
             // the chain; "You found [rabbit]" -> "Dupe/New Rabbit" -> "You bought [rabbit]"
-            if(hoppityEggChat.isEmpty() || hoppityEggChat.size > 1) {
+            if (hoppityEggChat.isEmpty() || hoppityEggChat.size > 1) {
                 resetCompactData()
             }
 
