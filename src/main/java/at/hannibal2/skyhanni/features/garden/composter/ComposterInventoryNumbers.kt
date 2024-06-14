@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -52,7 +52,7 @@ object ComposterInventoryNumbers {
         if (slotNumber == 46 || slotNumber == 52) {
             stack.getLore().matchFirst(valuePattern) {
                 val having = group("having").removeColor().formatInt()
-                val havingFormat = having.format()
+                val havingFormat = having.shortFormat()
                 val total = group("total").removeColor()
 
                 val color = if (slotNumber == 46) {

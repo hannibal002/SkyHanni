@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
@@ -54,7 +55,7 @@ object PetExpTooltip {
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""
                 event.toolTip.add(
                     index,
-                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXp.format()}"
+                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXp.shortFormat()}"
                 )
                 event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
             }
