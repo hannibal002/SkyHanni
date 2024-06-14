@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -21,6 +22,7 @@ import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DragonInfoUtils {
@@ -36,8 +38,8 @@ object DragonInfoUtils {
         if (event.mob.baseEntity !is EntityDragon) return
         dragonSpawnCount += 1
 
-        if (event.mob.mobType != Mob.Type.BOSS) return
-        if (event.mob.name != "Withered Dragon") return
+//         if (event.mob.mobType != Mob.Type.BOSS) return
+//         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         val id = event.mob.baseEntity.entityId
@@ -65,8 +67,8 @@ object DragonInfoUtils {
         ChatUtils.chat(event.mob.baseEntity.position.toLorenzVec().toCleanString())
         dragonKillCount += 1
 
-        if (event.mob.mobType != Mob.Type.BOSS) return
-        if (event.mob.name != "Withered Dragon") return
+//         if (event.mob.mobType != Mob.Type.BOSS) return
+//         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         val id = event.mob.baseEntity.entityId
@@ -100,6 +102,7 @@ object DragonInfoUtils {
         if (matchedDragon == null) return
 
         val status = WitheredDragonSpawnedStatus.SPAWNING
+        if (matchedDragon.status == status) return
         M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated).post()
         matchedDragon.status = status
     }
@@ -133,7 +136,9 @@ object DragonInfoUtils {
         if (inPhase5) inPhase5 = false
         val message = "spawned:$dragonSpawnCount | died:$dragonKillCount"
         logLine(message)
-        ChatUtils.chat(message)
+        DelayedRun.runDelayed(2.seconds) {
+            ChatUtils.chat(message)
+        }
         dragonKillCount = 0
         dragonSpawnCount = 0
     }
