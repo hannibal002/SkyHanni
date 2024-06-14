@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -204,7 +203,14 @@ object RenderUtils {
      * @author Moulberry
      * @author Mojang
      */
-    fun renderBeaconBeam(x: Double, y: Double, z: Double, rgb: Int, alphaMultiplier: Float, partialTicks: Float) {
+    private fun renderBeaconBeam(
+        x: Double,
+        y: Double,
+        z: Double,
+        rgb: Int,
+        alphaMultiplier: Float,
+        partialTicks: Float
+    ) {
         val height = 300
         val bottomOffset = 0
         val topOffset = bottomOffset + height
@@ -293,6 +299,49 @@ object RenderUtils {
         worldrenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
             .endVertex()
         tessellator.draw()
+    }
+
+    fun LorenzRenderWorldEvent.drawWaypointFilled(
+        location: LorenzVec,
+        color: Color,
+        seeThroughBlocks: Boolean = false,
+        beacon: Boolean = false,
+        extraSize: Double = 0.0,
+        extraSizeTopY: Double = extraSize,
+        extraSizeBottomY: Double = extraSize,
+        minimumAlpha: Float = 0.2f,
+        inverseAlphaScale: Boolean = false,
+    ) {
+        val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
+        val x = location.x - viewerX
+        val y = location.y - viewerY
+        val z = location.z - viewerZ
+        val distSq = x * x + y * y + z * z
+
+        if (seeThroughBlocks) {
+            GlStateManager.disableDepth()
+        }
+
+        GlStateManager.disableCull()
+        drawFilledBoundingBox(
+            @Suppress("ktlint:standard:argument-list-wrapping")
+            AxisAlignedBB(
+                x - extraSize, y - extraSizeBottomY, z - extraSize,
+                x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
+            ).expandBlock(),
+            color,
+            if (inverseAlphaScale) (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
+            else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
+        )
+        GlStateManager.disableTexture2D()
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
+        GlStateManager.disableLighting()
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableCull()
+
+        if (seeThroughBlocks) {
+            GlStateManager.enableDepth()
+        }
     }
 
     fun LorenzRenderWorldEvent.drawString(

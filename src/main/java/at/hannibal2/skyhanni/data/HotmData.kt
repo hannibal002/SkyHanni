@@ -37,7 +37,7 @@ import kotlin.math.floor
 import kotlin.math.pow
 
 enum class HotmData(
-    guiName: String,
+    val guiName: String,
     val maxLevel: Int,
     val costFun: ((Int) -> (Double?)),
     val rewardFun: ((Int) -> (Map<HotmReward, Double>)),
@@ -372,6 +372,10 @@ enum class HotmData(
 
     fun getReward() = rewardFun(activeLevel)
 
+    fun calculateTotalCost(desiredLevel: Int) = (1 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
+
+    val totalCostMaxLevel = calculateTotalCost(maxLevel)
+
     // TODO move all object functions into hotm api?
     @SkyHanniModule
     companion object {
@@ -405,6 +409,11 @@ enum class HotmData(
             "§c§lDISABLED|§7§eClick to select!",
         ) // unused for now since the assumption is when enabled isn't found it is disabled, 
         // but the value might be useful in the future or for debugging
+
+        val perkCostPattern by patternGroup.pattern(
+            "perk.cost",
+            "(?:§.)*§7Cost",
+        )
 
         private val resetChatPattern by patternGroup.pattern(
             "reset.chat",
@@ -470,6 +479,8 @@ enum class HotmData(
                 it.chatPattern
             }
         }
+
+        fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
 
         private fun resetTree() = entries.forEach {
             it.activeLevel = 0
@@ -574,17 +585,15 @@ enum class HotmData(
         private fun handelSkyMall(lore: List<String>) {
             if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
             else {
-                val index = (
-                    lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
-                        ErrorManager.logErrorStateWithData(
-                            "Could not read the skymall effect from the hotm tree",
-                            "skyMallCurrentEffect didn't match",
-                            "lore" to lore,
-                        )
-                        return
-                    }
-                    ) + 1
-                skymallPattern.matchMatcher(lore[index]) {
+                val index = lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from the hotm tree",
+                        "skyMallCurrentEffect didn't match",
+                        "lore" to lore,
+                    )
+                    return
+                }
+                skymallPattern.matchMatcher(lore[index + 1]) {
                     val perk = group("perk")
                     HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
                         ErrorManager.logErrorStateWithData(
