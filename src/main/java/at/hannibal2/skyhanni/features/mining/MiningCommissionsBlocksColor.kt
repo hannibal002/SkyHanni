@@ -39,7 +39,7 @@ object MiningCommissionsBlocksColor {
      */
     private val commissionCompletePattern by patternGroup.pattern(
         "complete",
-        "§a§l(?<name>.*) §r§eCommission Complete! Visit the King §r§eto claim your rewards!"
+        "§a§l(?<name>.*) §r§eCommission Complete! Visit the King §r§eto claim your rewards!",
     )
 
     var color: EnumDyeColor = EnumDyeColor.RED
@@ -243,8 +243,6 @@ object MiningCommissionsBlocksColor {
         companion object {
             fun CommissionBlock.onColor(state: IBlockState): IBlockState =
                 if (oreType.isGemstone()) glass(state, highlight) else block(highlight)
-
         }
-
     }
 }
