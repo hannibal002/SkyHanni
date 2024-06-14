@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -96,10 +96,10 @@ object WardrobeAPI {
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull()) {
             val price = EstimatedItemValueCalculator.getTotalPrice(stack)
-            add("  §7- ${stack.name}: §6${NumberUtil.format(price)}")
+            add("  §7- ${stack.name}: §6${price.format()}")
             totalPrice += price
         }
-        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.format()} coins")
     }
 
     @SubscribeEvent
