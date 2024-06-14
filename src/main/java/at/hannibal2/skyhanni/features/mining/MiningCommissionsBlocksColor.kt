@@ -44,15 +44,14 @@ object MiningCommissionsBlocksColor {
 
     var color: EnumDyeColor = EnumDyeColor.RED
 
-    private fun glass(state: IBlockState, result: Boolean): IBlockState {
-        return if (result) {
+    private fun glass(state: IBlockState, result: Boolean): IBlockState =
+        if (result) {
             state.withProperty(BlockCarpet.COLOR, color)
         } else {
             state.withProperty(BlockCarpet.COLOR, EnumDyeColor.GRAY)
         }
-    }
 
-    private fun block(state: IBlockState, result: Boolean): IBlockState {
+    private fun block(result: Boolean): IBlockState {
         val wool = Blocks.wool.defaultState
         return if (result) {
             wool.withProperty(BlockCarpet.COLOR, color)
@@ -246,11 +245,8 @@ object MiningCommissionsBlocksColor {
         ;
 
         companion object {
-
-            fun CommissionBlock.onColor(state: IBlockState): IBlockState {
-                return if (oreType.isGemstone()) glass(state, highlight)
-                else block(state, highlight)
-            }
+            fun CommissionBlock.onColor(state: IBlockState): IBlockState =
+                if (oreType.isGemstone()) glass(state, highlight) else block(highlight)
 
         }
 
