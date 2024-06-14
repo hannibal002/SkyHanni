@@ -12,7 +12,8 @@ enum class WitheredDragonInfo(
     val particleBox: AxisAlignedBB,
     val deathBox: AxisAlignedBB,
     val spawnLocation: LorenzVec,
-    var status: M7SpawnedStatus = M7SpawnedStatus.UNDEFEATED,
+    var status: WitheredDragonSpawnedStatus = WitheredDragonSpawnedStatus.DEAD,
+    var defeated: Boolean = false,
     var id: Int? = null,
 ) {
     POWER(
@@ -64,24 +65,19 @@ enum class WitheredDragonInfo(
     companion object {
         fun clearSpawned() {
             entries.forEach {
-                it.status = M7SpawnedStatus.UNDEFEATED
+                it.status = WitheredDragonSpawnedStatus.DEAD
                 it.id = null
             }
         }
 
-        fun getSpawns(): List<LorenzVec> {
-            val list = mutableListOf<LorenzVec>()
-            entries.forEach {
-                list.add(it.spawnLocation)
-            }
-            return list.toList()
+        fun getClosestSpawn(input: LorenzVec): WitheredDragonInfo? {
+            return entries.minByOrNull { it.spawnLocation.distance(input) }
         }
     }
 }
 
-enum class M7SpawnedStatus {
-    UNDEFEATED,
+enum class WitheredDragonSpawnedStatus {
+    DEAD,
     SPAWNING,
     ALIVE,
-    DEFEATED
 }

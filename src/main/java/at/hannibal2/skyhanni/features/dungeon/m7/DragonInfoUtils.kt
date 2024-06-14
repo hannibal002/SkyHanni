@@ -30,36 +30,47 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DragonInfoUtils {
     private var inPhase5 = false
+    private var currentRun = 0
     private val logger = LorenzLogger("dragons")
+
+    private var dragonSpawnCount = 0
 
     @SubscribeEvent
     fun onDragonSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
+        dragonSpawnCount += 1
+        ChatUtils.debug("dragonKillCount: $dragonSpawnCount")
+
         if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         val id = event.mob.baseEntity.entityId
 
-        val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.particleBox.isInside(location) }
+        val matchedDragon = WitheredDragonInfo.getClosestSpawn(location)
         if (matchedDragon == null) {
             logLine("[Spawn] dragon ${id}, '${location.toCleanString()}', no spawn matched")
             ChatUtils.debug("Unknown dragon $id spawned at ${location.toCleanString()}")
             return
         }
 
-        M7DragonChangeEvent(matchedDragon, M7SpawnedStatus.ALIVE).post()
+        M7DragonChangeEvent(matchedDragon, WitheredDragonSpawnedStatus.ALIVE).post()
         logSpawn(event.mob, matchedDragon)
 
-        matchedDragon.status = M7SpawnedStatus.ALIVE
+        matchedDragon.status = WitheredDragonSpawnedStatus.ALIVE
         matchedDragon.id = id
     }
+
+    private var dragonKillCount = 0
 
     @SubscribeEvent
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
         if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
+        dragonKillCount += 1
+        ChatUtils.debug("dragonKillCount: $dragonKillCount")
+
         if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
 
@@ -71,9 +82,9 @@ object DragonInfoUtils {
             ChatUtils.debug("Unknown dragon $id died at ${location.toCleanString()}")
             return
         }
-        val status = if (matchedDragon.deathBox.isInside(location)) M7SpawnedStatus.DEFEATED
-        else M7SpawnedStatus.UNDEFEATED
-        M7DragonChangeEvent(matchedDragon, status)
+        if (matchedDragon.deathBox.isInside(location)) matchedDragon.defeated = true
+        val status = WitheredDragonSpawnedStatus.DEAD
+        M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated)
 
         matchedDragon.status = status
         logKill(event.mob, matchedDragon)
@@ -94,8 +105,9 @@ object DragonInfoUtils {
         logParticle(particle, matchedDragon)
         if (matchedDragon == null) return
 
-        M7DragonChangeEvent(matchedDragon, M7SpawnedStatus.SPAWNING).post()
-        matchedDragon.status = M7SpawnedStatus.SPAWNING
+        val status = WitheredDragonSpawnedStatus.SPAWNING
+        M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated).post()
+        matchedDragon.status = status
     }
 
     private fun checkParticle(particle: S2APacketParticles): Boolean {
@@ -120,8 +132,6 @@ object DragonInfoUtils {
         logLine("Starting Phase5")
         inPhase5 = true
     }
-
-    private var currentRun = 0
 
     @SubscribeEvent
     fun onEnd(event: DungeonCompleteEvent) {
@@ -184,7 +194,7 @@ object DragonInfoUtils {
         baseEntity as EntityDragon
         var string = "[Death] $location, ${baseEntity.entityId}, ${baseEntity.animTime}"
         string += if (matchedType != null) {
-            ", matched $matchedType, ${matchedType.status}"
+            ", matched $matchedType, ${matchedType.defeated}"
         } else {
             ", did not match"
         }
