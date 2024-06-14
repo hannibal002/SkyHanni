@@ -40,7 +40,6 @@ object DragonInfoUtils {
         if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
         dragonSpawnCount += 1
-        ChatUtils.debug("dragonKillCount: $dragonSpawnCount")
 
         if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
@@ -69,7 +68,6 @@ object DragonInfoUtils {
         if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
         dragonKillCount += 1
-        ChatUtils.debug("dragonKillCount: $dragonKillCount")
 
         if (event.mob.mobType != Mob.Type.BOSS) return
         if (event.mob.name != "Withered Dragon") return
@@ -128,8 +126,8 @@ object DragonInfoUtils {
     fun onStart(event: DungeonM7Phase5Start) {
         if (inPhase5) return
         logLine("------ run $currentRun -------")
-        currentRun += 1
         logLine("Starting Phase5")
+        currentRun += 1
         inPhase5 = true
     }
 
@@ -137,6 +135,9 @@ object DragonInfoUtils {
     fun onEnd(event: DungeonCompleteEvent) {
         WitheredDragonInfo.clearSpawned()
         if (inPhase5) inPhase5 = false
+        ChatUtils.chat("spawned:$dragonSpawnCount | died:$dragonKillCount")
+        dragonKillCount = 0
+        dragonSpawnCount = 0
     }
 
     @SubscribeEvent
