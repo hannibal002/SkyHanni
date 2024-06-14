@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -216,13 +216,13 @@ object EnderNodeTracker {
 
         addAsSingletonList("§5§lEnder Node Tracker")
         addAsSingletonList("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
-        addAsSingletonList("§6${format(lootProfit.values.sum())} Coins made")
+        addAsSingletonList("§6${lootProfit.values.sum().shortFormat()} Coins made")
         addAsSingletonList(" ")
         addAsSingletonList("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest")
 
         for (item in EnderNode.entries.subList(0, 11)) {
             val count = (data.lootCount[item] ?: 0).addSeparators()
-            val profit = format(lootProfit[item] ?: 0.0)
+            val profit = (lootProfit[item] ?: 0.0).shortFormat()
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         addAsSingletonList(" ")
@@ -230,16 +230,16 @@ object EnderNodeTracker {
         val totalEnderArmor = calculateEnderArmor(data)
         addAsSingletonList(
             "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                "§7(§6${format(totalEnderArmor * 10_000)}§7)"
+                "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)"
         )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (data.lootCount[item] ?: 0).addSeparators()
-            val profit = format(lootProfit[item] ?: 0.0)
+            val profit = (lootProfit[item] ?: 0.0).shortFormat()
             addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         // enderman pet rarities
         val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
-        val profit = format(EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 })
+        val profit = EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
         addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
