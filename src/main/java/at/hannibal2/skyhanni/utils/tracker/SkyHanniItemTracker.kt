@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.seconds
@@ -106,7 +106,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 internalName.itemName
             }
 
-            val priceFormat = NumberUtil.format(price)
+            val priceFormat = price.format()
             val hidden = itemProfit.hidden
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
@@ -183,7 +183,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         val tips = if (totalAmount > 0) {
             val profitPerCatch = profit / totalAmount
-            val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
+            val profitPerCatchFormat = profitPerCatch.format()
             listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
         } else emptyList()
 

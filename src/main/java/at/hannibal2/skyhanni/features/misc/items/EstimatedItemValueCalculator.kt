@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
@@ -122,7 +122,7 @@ object EstimatedItemValueCalculator {
             )
             if (price != null) {
                 val name = attributes[0].first.fixMending().allLettersFirstUppercase()
-                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${NumberUtil.format(price)}§7)")
+                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${price.format()}§7)")
                 return price
             }
         }
@@ -135,7 +135,7 @@ object EstimatedItemValueCalculator {
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
             val color = if (comboPrice > basePrice && !useless) "§6" else "§7"
-            list.add("§7Attribute Combo: ($color${NumberUtil.format(comboPrice)}§7)")
+            list.add("§7Attribute Combo: ($color${comboPrice.format()}§7)")
             if (!useless) {
                 subTotal += addAttributePrice(comboPrice, basePrice)
             }
@@ -160,7 +160,7 @@ object EstimatedItemValueCalculator {
             list.add(
                 "  $nameColor${
                     displayName.allLettersFirstUppercase()
-                } ${attr.second}§7: $priceColor${if (price != null) NumberUtil.format(price) else "Unknown"}",
+                } ${attr.second}§7: $priceColor${if (price != null) price.format() else "Unknown"}",
             )
         }
         // Adding 0.1 so that we always show the estimated item value overlay
@@ -215,8 +215,8 @@ object EstimatedItemValueCalculator {
         val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
-        list.add("  §7Stone $reforgeStoneName §7(§6" + NumberUtil.format(reforgeStonePrice) + "§7)")
-        list.add("  §7Apply cost: (§6" + NumberUtil.format(applyCost) + "§7)")
+        list.add("  §7Stone $reforgeStoneName §7(§6" + reforgeStonePrice.format() + "§7)")
+        list.add("  §7Apply cost: (§6" + applyCost.format() + "§7)")
         return reforgeStonePrice + applyCost
     }
 
@@ -265,7 +265,7 @@ object EstimatedItemValueCalculator {
         if (!stack.isRecombobulated()) return 0.0
 
         val price = "RECOMBOBULATOR_3000".asInternalName().getPrice()
-        list.add("§7Recombobulated: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Recombobulated: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -273,7 +273,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasJalapenoBook()) return 0.0
 
         val price = "JALAPENO_BOOK".asInternalName().getPrice()
-        list.add("§7Jalapeno Book: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Jalapeno Book: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -283,7 +283,7 @@ object EstimatedItemValueCalculator {
         val wtfHardcodedConduit = "ETHERWARP_CONDUIT".asInternalName()
         val wtfHardcodedMerger = "ETHERWARP_MERGER".asInternalName()
         val price = wtfHardcodedConduit.getPrice() + wtfHardcodedMerger.getPrice()
-        list.add("§7Etherwarp: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Etherwarp: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -291,7 +291,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasWoodSingularity()) return 0.0
 
         val price = "WOOD_SINGULARITY".asInternalName().getPrice()
-        list.add("§7Wood Singularity: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Wood Singularity: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -299,7 +299,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasArtOfWar()) return 0.0
 
         val price = "THE_ART_OF_WAR".asInternalName().getPrice()
-        list.add("§7The Art of War: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7The Art of War: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -307,7 +307,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasBookOfStats()) return 0.0
 
         val price = "BOOK_OF_STATS".asInternalName().getPrice()
-        list.add("§7Book of Stats: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Book of Stats: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -316,7 +316,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasArtOfPeace()) return 0.0
 
         val price = "THE_ART_OF_PEACE".asInternalName().getPrice()
-        list.add("§7The Art Of Peace: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7The Art Of Peace: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -337,13 +337,13 @@ object EstimatedItemValueCalculator {
 
         val wtfHardcodedHpb = "HOT_POTATO_BOOK".asInternalName()
         val hpbPrice = wtfHardcodedHpb.getPrice() * hpb
-        list.add("§7HPB's: §e$hpb§7/§e10 §7(§6" + NumberUtil.format(hpbPrice) + "§7)")
+        list.add("§7HPB's: §e$hpb§7/§e10 §7(§6" + hpbPrice.format() + "§7)")
         totalPrice += hpbPrice
 
         if (fuming > 0) {
             val wtfHardcodedFuming = "FUMING_POTATO_BOOK".asInternalName()
             val fumingPrice = wtfHardcodedFuming.getPrice() * fuming
-            list.add("§7Fuming: §e$fuming§7/§e5 §7(§6" + NumberUtil.format(fumingPrice) + "§7)")
+            list.add("§7Fuming: §e$fuming§7/§e5 §7(§6" + fumingPrice.format() + "§7)")
             totalPrice += fumingPrice
         }
 
@@ -355,7 +355,7 @@ object EstimatedItemValueCalculator {
 
         val wtfHardcodedDumbFarmers = "FARMING_FOR_DUMMIES".asInternalName()
         val price = wtfHardcodedDumbFarmers.getPrice() * count
-        list.add("§7Farming for Dummies: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Farming for Dummies: §e$count§7/§e5 §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -364,7 +364,7 @@ object EstimatedItemValueCalculator {
 
         val broDilloMiningSoBad = "POLARVOID_BOOK".asInternalName()
         val price = broDilloMiningSoBad.getPrice() * count
-        list.add("§7Polarvoid: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Polarvoid: §e$count§7/§e5 §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -373,7 +373,7 @@ object EstimatedItemValueCalculator {
 
         val tfHardcodedItemAgain = "BOOKWORM_BOOK".asInternalName()
         val price = tfHardcodedItemAgain.getPrice() * count
-        list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -385,7 +385,7 @@ object EstimatedItemValueCalculator {
 
         val wtfHardcodedSilex = "SIL_EX".asInternalName()
         val price = wtfHardcodedSilex.getPrice() * tier
-        list.add("§7Silex: §e$tier§7/§e$maxTier §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Silex: §e$tier§7/§e$maxTier §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -394,7 +394,7 @@ object EstimatedItemValueCalculator {
 
         val wtfHardcodedTuner = "TRANSMISSION_TUNER".asInternalName()
         val price = wtfHardcodedTuner.getPrice() * count
-        list.add("§7Transmission Tuners: §e$count§7/§e4 §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Transmission Tuners: §e$count§7/§e4 §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -403,7 +403,7 @@ object EstimatedItemValueCalculator {
 
         val wtfHardcodedTuner = "MANA_DISINTEGRATOR".asInternalName()
         val price = wtfHardcodedTuner.getPrice() * count
-        list.add("§7Mana Disintegrators: §e$count§7/§e10 §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Mana Disintegrators: §e$count§7/§e10 §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -429,7 +429,7 @@ object EstimatedItemValueCalculator {
             }
         }
 
-        list.add("§7Master Stars: §e$masterStars§7/§e5 §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Master Stars: §e$masterStars§7/§e5 §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -443,11 +443,11 @@ object EstimatedItemValueCalculator {
             val price = internalName.getPriceOrNull() ?: continue
 
             totalPrice += price
-            val format = NumberUtil.format(price)
+            val format = price.format()
             map[" $name §7(§6$format§7)"] = price
         }
         if (map.isNotEmpty()) {
-            list.add("§7Drill upgrades: §6" + NumberUtil.format(totalPrice))
+            list.add("§7Drill upgrades: §6" + totalPrice.format())
             list += map.sortedDesc().keys
         }
         return totalPrice
@@ -458,7 +458,7 @@ object EstimatedItemValueCalculator {
 
         val price = internalName.getPrice()
         val name = internalName.itemNameWithoutColor
-        list.add("§7$name: §a§l✔ §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7$name: §a§l✔ §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -482,7 +482,7 @@ object EstimatedItemValueCalculator {
         val name = internalName.getNameOrRepoError()
         val displayname = name ?: "§c${internalName.asString()}"
         val color = if (shouldIgnorePrice) "§7" else "§6"
-        list.add("§7$label: $displayname §7($color" + NumberUtil.format(price) + "§7)")
+        list.add("§7$label: $displayname §7($color" + price.format() + "§7)")
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
@@ -497,7 +497,7 @@ object EstimatedItemValueCalculator {
 
         val price = internalName.getPrice()
         val name = internalName.itemName
-        list.add("§7Enrichment: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Enrichment: $name §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -520,11 +520,11 @@ object EstimatedItemValueCalculator {
             val price = internalName.getPriceOrNull() ?: continue
 
             totalPrice += price
-            val format = NumberUtil.format(price)
+            val format = price.format()
             map[" $name §7(§6$format§7)"] = price
         }
         if (map.isNotEmpty()) {
-            list.add("§7Ability Scrolls: §6" + NumberUtil.format(totalPrice))
+            list.add("§7Ability Scrolls: §6" + totalPrice.format())
             list += map.sortedDesc().keys
         }
         return totalPrice
@@ -543,7 +543,7 @@ object EstimatedItemValueCalculator {
             return 0.0
         }
 
-        list.add("§7Base item: $name §7(§6" + NumberUtil.format(price) + "§7)")
+        list.add("§7Base item: $name §7(§6" + price.format() + "§7)")
         return price
     }
 
@@ -616,14 +616,14 @@ object EstimatedItemValueCalculator {
             val price = singlePrice * multiplier
 
             totalPrice += price
-            val format = NumberUtil.format(price)
+            val format = price.format()
 
 
             map[" $name §7(§6$format§7)"] = price
         }
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (map.isNotEmpty()) {
-            list.add("§7Enchantments: §6" + NumberUtil.format(totalPrice))
+            list.add("§7Enchantments: §6" + totalPrice.format())
             var i = 0
             for (entry in map.sortedDesc().keys) {
                 if (i == enchantmentsCap) {
@@ -656,7 +656,7 @@ object EstimatedItemValueCalculator {
             val price = internalName.getPrice() * amount
 
             totalPrice += price
-            val format = NumberUtil.format(price)
+            val format = price.format()
 
             val text = if (amount == 1) {
                 " $name §7(§6$format§7)"
@@ -667,7 +667,7 @@ object EstimatedItemValueCalculator {
         }
 
         if (priceMap.isNotEmpty()) {
-            list.add("§7Gemstones: §6" + NumberUtil.format(totalPrice))
+            list.add("§7Gemstones: §6" + totalPrice.format())
             list += priceMap.sortedDesc().keys
         }
         return totalPrice
@@ -715,17 +715,17 @@ object EstimatedItemValueCalculator {
 
             val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
             val colorCode = SkyBlockItemModifierUtils.GemstoneSlotType.getColorCode(splitSlot[0])
-            val formattedPrice = NumberUtil.format(totalPrice - previousTotal)
+            val formattedPrice = (totalPrice - previousTotal).format()
 
             // eg. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
-                // If the slot index is 0, we don't need to specify
-                if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
+                    // If the slot index is 0, we don't need to specify
+                    if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
 
             priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
         }
 
-        list.add("§7Gemstone Slot Unlock Cost: §6" + NumberUtil.format(totalPrice))
+        list.add("§7Gemstone Slot Unlock Cost: §6" + totalPrice.format())
         list += priceMap.sortedDesc().keys
         return totalPrice
     }
