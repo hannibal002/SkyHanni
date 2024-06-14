@@ -169,7 +169,7 @@ enum class OreType(
     ),
     PERIDOT(
         "Peridot",
-        "ROUGH_ERIDOT_GEM",
+        "ROUGH_PERIDOT_GEM",
         listOf(OreBlock.PERIDOT)
     ),
     UMBER(
