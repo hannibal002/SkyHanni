@@ -38,8 +38,8 @@ object DragonInfoUtils {
         if (event.mob.baseEntity !is EntityDragon) return
         dragonSpawnCount += 1
 
-//         if (event.mob.mobType != Mob.Type.BOSS) return
-//         if (event.mob.name != "Withered Dragon") return
+        if (event.mob.mobType != Mob.Type.BOSS) logLine("mobType: ${event.mob.mobType}")
+        if (event.mob.name != "Withered Dragon") logLine("mobName: ${event.mob.name}")
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         val id = event.mob.baseEntity.entityId
@@ -64,11 +64,10 @@ object DragonInfoUtils {
     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
         if (!isEnabled()) return
         if (event.mob.baseEntity !is EntityDragon) return
-        ChatUtils.chat(event.mob.baseEntity.position.toLorenzVec().toCleanString())
         dragonKillCount += 1
 
-//         if (event.mob.mobType != Mob.Type.BOSS) return
-//         if (event.mob.name != "Withered Dragon") return
+        if (event.mob.mobType != Mob.Type.BOSS) logLine("mobType: ${event.mob.mobType}")
+        if (event.mob.name != "Withered Dragon") logLine("mobName: ${event.mob.name}")
 
         val location = event.mob.baseEntity.position.toLorenzVec()
         val id = event.mob.baseEntity.entityId
