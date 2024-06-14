@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
@@ -260,6 +261,10 @@ object Commands {
             "shresetpestprofittracker",
             "Resets the Pest Profit Tracker",
         ) { PestProfitTracker.resetCommand() }
+        registerCommand(
+            "sheresetsacrificeprofittracker",
+            "Resets the Sacrifice Profit Tracker",
+        ) { DraconicSacrificeTracker.resetCommand() }
         registerCommand(
             "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker",
