@@ -38,16 +38,18 @@ import kotlin.math.floor
 import kotlin.math.pow
 
 
-private fun abc(level: Int): Map<HotmReward, Double> = buildMap {
-    for (i in 1..level) when (i) {
-        1, 5, 7 -> addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
-        2 -> addOrPut(HotmReward.EXTRA_FORGE_SLOTS, 1.0)
-        3 -> addOrPut(HotmReward.EXTRA_COMMISSION_SLOTS, 1.0)
-        4 -> addOrPut(HotmReward.MORE_BASE_MITHRIL_POWER, 1.0)
-        6 -> addOrPut(HotmReward.MORE_BASE_GEMSTONE_POWER, 2.0)
-        8 -> addOrPut(HotmReward.MORE_BASE_GLACITE_POWER, 3.0)
-        9 -> addOrPut(HotmReward.MINESHAFT_CHANCE, 10.0)
-        10 -> addOrPut(HotmReward.EXTRA_TOKENS, 2.0)
+private fun calculatePeakOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
+    for (i in 1..level) {
+        when (i) {
+            1, 5, 7 -> addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+            2 -> addOrPut(HotmReward.EXTRA_FORGE_SLOTS, 1.0)
+            3 -> addOrPut(HotmReward.EXTRA_COMMISSION_SLOTS, 1.0)
+            4 -> addOrPut(HotmReward.MORE_BASE_MITHRIL_POWER, 1.0)
+            6 -> addOrPut(HotmReward.MORE_BASE_GEMSTONE_POWER, 2.0)
+            8 -> addOrPut(HotmReward.MORE_BASE_GLACITE_POWER, 3.0)
+            9 -> addOrPut(HotmReward.MINESHAFT_CHANCE, 10.0)
+            10 -> addOrPut(HotmReward.EXTRA_TOKENS, 2.0)
+        }
     }
 }
 
@@ -264,7 +266,7 @@ enum class HotmData(
 
     PEAK_OF_THE_MOUNTAIN(
         "Peak of the Mountain", 10, { null },
-        { level -> abc(level) },
+        { level -> calculatePeakOfTheMountainLoot(level) },
     ),
 
     // Mining V3
