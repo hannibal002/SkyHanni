@@ -98,17 +98,16 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
 
         if (event.repeatSeconds(3)) {
-            TabListData.getTabList()
-                .filter { it.contains("Reputation:") }
-                .forEach {
-                    factionType = if (it.contains("Mage")) {
-                        FactionType.MAGE
-                    } else if (it.contains("Barbarian")) {
-                        FactionType.BARBARIAN
-                    } else {
-                        FactionType.NONE
-                    }
+            val list = TabListData.getTabList().filter { it.contains("Reputation:") }
+            for (line in list) {
+                factionType = if (line.contains("Mage")) {
+                    FactionType.MAGE
+                } else if (line.contains("Barbarian")) {
+                    FactionType.BARBARIAN
+                } else {
+                    FactionType.NONE
                 }
+            }
         }
     }
 

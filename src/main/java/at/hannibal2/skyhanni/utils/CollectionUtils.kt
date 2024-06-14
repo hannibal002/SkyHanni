@@ -133,6 +133,9 @@ object CollectionUtils {
         return newList
     }
 
+    /**
+     * This does not work inside a [buildList] block
+     */
     fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =

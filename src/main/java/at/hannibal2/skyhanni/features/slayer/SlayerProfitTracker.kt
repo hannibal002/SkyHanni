@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -75,7 +75,7 @@ object SlayerProfitTracker {
         override fun getCoinName(item: TrackedItem) = "§6Mob Kill Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
+            val mobKillCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7Killing mobs gives you coins (more with scavenger).",
                 "§7You got §6$mobKillCoinsFormat coins §7that way."
@@ -176,7 +176,7 @@ object SlayerProfitTracker {
         var profit = tracker.drawItems(data, { true }, this)
         val slayerSpawnCost = data.slayerSpawnCost
         if (slayerSpawnCost != 0L) {
-            val mobKillCoinsFormat = NumberUtil.format(slayerSpawnCost)
+            val mobKillCoinsFormat = slayerSpawnCost.shortFormat()
             addAsSingletonList(
                 Renderable.hoverTips(
                     " §7Slayer Spawn Costs: §c$mobKillCoinsFormat",
@@ -200,7 +200,7 @@ object SlayerProfitTracker {
     }
 
     val coinFormat: (ItemTrackerData.TrackedItem) -> Pair<String, List<String>> = { item ->
-        val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
+        val mobKillCoinsFormat = item.totalAmount.shortFormat()
         val text = " §6Mob kill coins§7: §6$mobKillCoinsFormat"
         val lore = listOf(
             "§7Killing mobs gives you coins (more with scavenger)",
