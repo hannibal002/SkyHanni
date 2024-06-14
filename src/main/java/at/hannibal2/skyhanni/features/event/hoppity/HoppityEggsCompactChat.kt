@@ -63,7 +63,8 @@ object HoppityEggsCompactChat {
     }
 
     private fun createCompactMessage(): String {
-        val mealName = lastChatMeal?.coloredName ?: if (rabbitBought) "§aPurchased" else ""
+        val mealName = lastChatMeal?.coloredName ?: ""
+        val mealNameFormatted = if (rabbitBought) "§aBought Rabbit" else "$mealName Egg"
 
         return if (duplicate) {
             val format = lastDuplicateAmount?.shortFormat() ?: "?"
@@ -72,9 +73,9 @@ object HoppityEggsCompactChat {
             } ?: "?"
 
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealName Egg! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormatted! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
-            "$mealName Egg! §d§lNEW $lastName §7(${lastProfit}§7)"
+            "$mealNameFormatted! §d§lNEW $lastName §7(${lastProfit}§7)"
         } else "?"
     }
 
