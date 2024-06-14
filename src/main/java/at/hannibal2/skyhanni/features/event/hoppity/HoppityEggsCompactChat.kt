@@ -46,10 +46,10 @@ object HoppityEggsCompactChat {
         if (hoppityEggChat.isNotEmpty()) {
             ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
         }
-        resetCompactVars()
+        resetCompactData()
     }
 
-    private fun resetCompactVars() {
+    private fun resetCompactData() {
         this.hoppityEggChat = mutableListOf()
         this.duplicate = false
         this.newRabbit = false
@@ -78,7 +78,7 @@ object HoppityEggsCompactChat {
 
     fun handleChat(event: LorenzChatEvent) {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
-            resetCompactVars()
+            resetCompactData()
             lastChatMeal = getEggType(event)
             compactChat(event)
         }
