@@ -187,7 +187,7 @@ object HoppityEggsManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
         if (!config.showClaimedEggs) return
-        if (isBusy()) return
+        if (isBusy() && !config.showWhileBusy) return
 
         val displayList = HoppityEggType.entries
             .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
@@ -236,7 +236,7 @@ object HoppityEggsManager {
 
     private fun warn() {
         if (!config.warnUnclaimedEggs) return
-        if (isBusy()) return
+        if (isBusy() && !config.warnWhileBusy) return
         if (lastWarnTime.passedSince() < 30.seconds) return
 
         lastWarnTime = now()
@@ -261,7 +261,7 @@ object HoppityEggsManager {
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
-    private fun isBusy() = ReminderUtils.isBusy(config.showDuringContest)
+    private fun isBusy() = ReminderUtils.isBusy()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -271,6 +271,7 @@ object HoppityEggsManager {
             "event.chocolateFactory.hoppityEggs.highlightHoppityShop"
         )
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
+        event.move(50, "event.hoppityEggs.showDuringContest", "event.hoppityEggs.showWhileBusy")
     }
 
     fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&

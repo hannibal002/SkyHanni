@@ -92,10 +92,16 @@ public class HoppityEggsConfig {
     public String warpDestination = "nucleus";
 
     @Expose
-    @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
+    @ConfigOption(name = "Show While Busy", desc = "Show while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showDuringContest = false;
+    public boolean showWhileBusy = false;
+
+    @Expose
+    @ConfigOption(name = "Warn While Busy", desc = "Warn while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnWhileBusy = false;
 
     @Expose
     @ConfigOption(name = "Show outside Skyblock", desc = "Show on Hypixel even when not playing Skyblock.")
