@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon.m7
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.boss.EntityDragon
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
+import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -60,32 +62,58 @@ object DragonInfoUtils {
 
     private var dragonKillCount = 0
 
+
     @SubscribeEvent
-    fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
+    fun onDragonKill(event: LivingDeathEvent) {
         if (!isEnabled()) return
-        if (event.mob.baseEntity !is EntityDragon) return
-        dragonKillCount += 1
+        if (event.entity !is EntityDragon) return
+        dragonKillCount++
 
-        if (event.mob.mobType != Mob.Type.BOSS) logLine("mobType: ${event.mob.mobType}")
-        if (event.mob.name != "Withered Dragon") logLine("mobName: ${event.mob.name}")
+        val location = event.entity.position.toLorenzVec()
+        val id = event.entity.entityId
 
-        val location = event.mob.baseEntity.position.toLorenzVec()
-        val id = event.mob.baseEntity.entityId
         val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.id == id }
         if (matchedDragon == null) {
             logLine("dragon $id died, no matched dragon")
             ChatUtils.debug("Unknown dragon $id died at ${location.toCleanString()}")
             return
         }
+
         if (matchedDragon.deathBox.isInside(location)) matchedDragon.defeated = true
         val status = WitheredDragonSpawnedStatus.DEAD
         M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated)
-
         matchedDragon.status = status
-        logKill(event.mob, matchedDragon)
 
+        MobData.entityToMob[event.entityLiving]?.let { logKill(it, matchedDragon) }
         matchedDragon.id = null
     }
+
+//     @SubscribeEvent
+//     fun onDragonKill(event: MobEvent.DeSpawn.SkyblockMob) {
+//         if (!isEnabled()) return
+//         if (event.mob.baseEntity !is EntityDragon) return
+//         dragonKillCount += 1
+//
+//         if (event.mob.mobType != Mob.Type.BOSS) logLine("mobType: ${event.mob.mobType}")
+//         if (event.mob.name != "Withered Dragon") logLine("mobName: ${event.mob.name}")
+//
+//         val location = event.mob.baseEntity.position.toLorenzVec()
+//         val id = event.mob.baseEntity.entityId
+//         val matchedDragon = WitheredDragonInfo.entries.firstOrNull { it.id == id }
+//         if (matchedDragon == null) {
+//             logLine("dragon $id died, no matched dragon")
+//             ChatUtils.debug("Unknown dragon $id died at ${location.toCleanString()}")
+//             return
+//         }
+//         if (matchedDragon.deathBox.isInside(location)) matchedDragon.defeated = true
+//         val status = WitheredDragonSpawnedStatus.DEAD
+//         M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated)
+//
+//         matchedDragon.status = status
+//         logKill(event.mob, matchedDragon)
+//
+//         matchedDragon.id = null
+//     }
 
     @HandleEvent
     fun onParticles(event: PacketReceivedEvent) {
