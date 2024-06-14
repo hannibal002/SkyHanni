@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -112,13 +112,13 @@ object SackDisplay {
                     NumberFormatEntry.DEFAULT -> {
                         addAlignedNumber("$colorCode${stored.addSeparators()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.format()}")
                     }
 
                     NumberFormatEntry.FORMATTED -> {
-                        addAlignedNumber("$colorCode${NumberUtil.format(stored)}")
+                        addAlignedNumber("$colorCode${stored.format()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.format()}")
                     }
 
                     NumberFormatEntry.UNFORMATTED -> {
@@ -174,7 +174,7 @@ object SackDisplay {
             else -> sackItems.sortedByDescending { it.second.stored }
         }.toMap().toMutableMap()
 
-        sortedPairs.toList().forEach { (k, v) ->
+        for ((k, v) in sortedPairs.toList()) {
             if (v.stored == 0 && !config.showEmpty) {
                 sortedPairs.remove(k)
             }
@@ -285,7 +285,7 @@ object SackDisplay {
     }
 
     private fun format(price: Long) = if (config.priceFormat == PriceFormatEntry.FORMATTED) {
-        NumberUtil.format(price)
+        price.format()
     } else {
         price.addSeparators()
     }

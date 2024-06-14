@@ -38,8 +38,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -369,9 +369,9 @@ object ComposterOverlay {
         val totalCostPreview = (fuelPricePerPreview + organicMatterPricePerPreview) * timeMultiplierPreview
 
         val materialCostFormatPreview =
-            if (totalCost != totalCostPreview) " §c➜ §6" + NumberUtil.format(totalCostPreview) else ""
+            if (totalCost != totalCostPreview) " §c➜ §6" + totalCostPreview.format() else ""
         val materialCostFormat =
-            " §7Material costs per $timeText: §6${NumberUtil.format(totalCost)}$materialCostFormatPreview"
+            " §7Material costs per $timeText: §6${totalCost.format()}$materialCostFormatPreview"
         newList.addAsSingletonList(materialCostFormat)
 
         val priceCompost = COMPOST.getPrice()
@@ -379,8 +379,8 @@ object ComposterOverlay {
         val profitPreview =
             ((priceCompost * multiDropFactorPreview) - (fuelPricePerPreview + organicMatterPricePerPreview)) * timeMultiplierPreview
 
-        val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + NumberUtil.format(profitPreview) else ""
-        val profitFormat = " §7Profit per $timeText: §6${NumberUtil.format(profit)}$profitFormatPreview"
+        val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + profitPreview.format() else ""
+        val profitFormat = " §7Profit per $timeText: §6${profit.format()}$profitFormatPreview"
         newList.addAsSingletonList(profitFormat)
 
         newList.addAsSingletonList("")
@@ -465,7 +465,7 @@ object ComposterOverlay {
         itemsNeeded: Double,
         onClick: (NEUInternalName) -> Unit,
     ) {
-        val format = NumberUtil.format(totalPrice)
+        val format = totalPrice.format()
         val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
         val rawItemName = itemName.removeColor()
         val name = itemName.substring(0, 2) + selected + rawItemName
@@ -550,7 +550,7 @@ object ComposterOverlay {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        organicMatter = data.organic_matter
+        organicMatter = data.organicMatter
         fuelFactors = data.fuel
         updateOrganicMatterFactors()
     }
@@ -579,7 +579,7 @@ object ComposterOverlay {
                 || internalName == "SIMPLE_CARROT_CANDY"
             ) continue
 
-            var (newId, amount) = NEUItems.getMultiplier(internalName.asInternalName())
+            var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
             if (amount <= 9) continue
             if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error

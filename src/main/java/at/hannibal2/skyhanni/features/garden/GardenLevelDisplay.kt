@@ -173,7 +173,7 @@ object GardenLevelDisplay {
             if (next && line.contains("                    ")) {
                 val progress = overflow / needForOnlyNextLvl
                 val progressBar = StringUtils.progressBar(progress, 20)
-                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${format(needForOnlyNextLvl)}")
+                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${needForOnlyNextLvl.format()}")
                 iterator.add("")
                 iterator.add("§b§lOVERFLOW XP:")
                 iterator.add("§7▸ ${overflowTotal.addSeparators()}")

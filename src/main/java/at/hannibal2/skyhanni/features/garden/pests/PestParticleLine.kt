@@ -7,8 +7,9 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -96,6 +98,7 @@ object PestParticleLine {
     private fun showMiddle(event: LorenzRenderWorldEvent) {
         if (locations.size <= 0) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        if (plot.isBarn()) return
         val middle = plot.middle.copy(y = LocationUtils.playerLocation().y)
         if (middle.distanceToPlayer() > 15) return
 
@@ -104,6 +107,7 @@ object PestParticleLine {
     }
 
     private fun draw(event: LorenzRenderWorldEvent, list: List<ParticleLocation>) {
+        3.formatNum()
         val color = LorenzColor.YELLOW.toColor()
         for ((prev, next) in list.asSequence().zipWithNext()) {
             // TODO time in config

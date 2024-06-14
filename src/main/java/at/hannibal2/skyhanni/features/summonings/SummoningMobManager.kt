@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -98,33 +99,32 @@ object SummoningMobManager {
         }
 
         if (searchArmorStands) {
-            EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }
-                .forEach {
-                    val name = it.displayName.unformattedText
-                    healthPattern.matchMatcher(name) {
-                        val playerName = LorenzUtils.getPlayerName()
-                        if (name.contains(playerName)) {
-                            summoningMobNametags.add(it)
-                            if (summoningMobNametags.size == summoningsSpawned) {
-                                searchArmorStands = false
-                            }
+            for (it in EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }) {
+                val name = it.displayName.unformattedText
+                healthPattern.matchMatcher(name) {
+                    val playerName = LorenzUtils.getPlayerName()
+                    if (name.contains(playerName)) {
+                        summoningMobNametags.add(it)
+                        if (summoningMobNametags.size == summoningsSpawned) {
+                            searchArmorStands = false
                         }
                     }
                 }
+            }
         }
 
-        if (searchMobs) {
-            val playerLocation = LocationUtils.playerLocation()
-            EntityUtils.getEntities<EntityLiving>().filter {
-                it !in summoningMobs.keys && it.getLorenzVec()
-                    .distance(playerLocation) < 10 && it.ticksExisted < 2
-            }.forEach {
-                summoningMobs[it] = SummoningMob(System.currentTimeMillis(), name = "Mob")
-                it.setColor(LorenzColor.GREEN)
-                updateData()
-                if (summoningMobs.size == summoningsSpawned) {
-                    searchMobs = false
-                }
+        if (!searchMobs) return
+        val playerLocation = LocationUtils.playerLocation()
+        val list = EntityUtils.getEntities<EntityLiving>().filter {
+            it !in summoningMobs.keys && it.getLorenzVec()
+                .distance(playerLocation) < 10 && it.ticksExisted < 2
+        }
+        for (entity in list) {
+            summoningMobs[entity] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+            entity.setColor(LorenzColor.GREEN)
+            updateData()
+            if (summoningMobs.size == summoningsSpawned) {
+                searchMobs = false
             }
         }
     }
@@ -148,8 +148,8 @@ object SummoningMobManager {
             val maxHealth = entityLiving.baseMaxHealth
             val color = NumberUtil.percentageColor(currentHealth.toLong(), maxHealth.toLong()).getChatColor()
 
-            val currentFormat = NumberUtil.format(currentHealth)
-            val maxFormat = NumberUtil.format(maxHealth)
+            val currentFormat = currentHealth.format()
+            val maxFormat = maxHealth.format()
             summoningMob.lastDisplayName = "§a$name $color$currentFormat/$maxFormat"
         }
     }

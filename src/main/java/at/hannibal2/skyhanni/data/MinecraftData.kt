@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -23,10 +24,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 @SkyHanniModule
 object MinecraftData {
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onSoundPacket(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
+    fun onSoundPacket(event: PacketReceivedEvent) {
         val packet = event.packet
         if (packet !is S29PacketSoundEffect) return
 
@@ -37,7 +36,7 @@ object MinecraftData {
                 packet.volume
             ).postAndCatch()
         ) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -46,10 +45,8 @@ object MinecraftData {
         LorenzWorldChangeEvent().postAndCatch()
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onParticlePacketReceive(event: PacketEvent.ReceiveEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
+    fun onParticlePacketReceive(event: PacketReceivedEvent) {
         val packet = event.packet
         if (packet !is S2APacketParticles) return
 
@@ -63,7 +60,7 @@ object MinecraftData {
                 packet.particleArgs,
             ).postAndCatch()
         ) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
