@@ -2,14 +2,11 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -27,12 +24,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.sin
 
 @SkyHanniModule
 object ChocolateFactoryDataLoader {
@@ -94,7 +87,7 @@ object ChocolateFactoryDataLoader {
         "timetower.recharge",
         "§7Next Charge: §a(?<duration>\\w+)",
     )
-    private val clickMeRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val clickMeRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.clickme",
         "§e§lCLICK ME!",
     )
@@ -102,7 +95,7 @@ object ChocolateFactoryDataLoader {
     /**
      * REGEX-TEST: §6§lGolden Rabbit §8- §aStampede
      */
-    private val clickMeGoldenRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val clickMeGoldenRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.clickme.golden",
         "§6§lGolden Rabbit §8- §a(?<name>.*)",
     )
@@ -155,33 +148,6 @@ object ChocolateFactoryDataLoader {
         ConditionalUtils.onToggle(soundProperty) {
             ChocolateFactoryAPI.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
         }
-    }
-
-    @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.rabbitWarning.flashScreen) return
-        ChocolateFactoryAPI.flashScreen =
-            InventoryUtils.getItemsInOpenChest().any {
-                clickMeGoldenRabbitPattern.matches(it.stack.name) || it.stack.getSkullTexture() in specialRabbitTextures
-            }
-    }
-
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.rabbitWarning.flashScreen) return
-        if (!ChocolateFactoryAPI.flashScreen) return
-        val mc = Minecraft.getMinecraft()
-        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-        Gui.drawRect(
-            0,
-            0,
-            mc.displayWidth,
-            mc.displayHeight,
-            (alpha shl 24) or (config.rabbitWarning.flashColor.toChromaColorInt() and 0xFFFFFF),
-        )
-        GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     private fun clearData() {
@@ -451,8 +417,8 @@ object ChocolateFactoryDataLoader {
                 SoundUtils.playBeepSound()
             }
 
-            if (warningConfig.specialRabbitWarning
-                && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
+            if (warningConfig.specialRabbitWarning &&
+                (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
             ) {
                 SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
             }
@@ -466,7 +432,9 @@ object ChocolateFactoryDataLoader {
 
         // removing time tower here as people like to determine when to buy it themselves
         val notMaxed =
-            list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null }
+            list.filter {
+                !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null
+            }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt ?: SimpleTimeMark.farPast()
