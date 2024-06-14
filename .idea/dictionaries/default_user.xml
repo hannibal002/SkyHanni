@@ -44,8 +44,11 @@
       <w>derpy</w>
       <w>despawn</w>
       <w>dicer</w>
-      <w>dragontail</w>
+      <w>disintegrator</w>
+            <w>disintegrators</w>
+            <w>dragontail</w>
       <w>dreadfarm</w>
+            <w>dreadlord</w>
       <w>dungeoneering</w>
       <w>dwarven</w>
       <w>egglocator</w>
@@ -57,7 +60,8 @@
       <w>endermite</w>
       <w>enderstone</w>
       <w>endstone</w>
-      <w>explosivity</w>
+      <w>etherwarp</w>
+            <w>explosivity</w>
       <w>fermento</w>
       <w>firedust</w>
       <w>firesale</w>
@@ -67,6 +71,7 @@
       <w>goldor</w>
       <w>gratitudes</w>
       <w>hatcessory</w>
+            <w>hecatomb</w>
       <w>hideparticles</w>
       <w>hoppity</w>
       <w>hoppity's</w>
@@ -74,6 +79,7 @@
       <w>hotbar</w>
       <w>hotm</w>
       <w>hoverable</w>
+            <w>hpb's</w>
       <w>hypixel</w>
       <w>hypixel's</w>
       <w>ichor</w>
@@ -139,18 +145,22 @@
       <w>pickblock</w>
       <w>pickonimbus</w>
       <w>plhlegblast</w>
-      <w>preinitialization</w>
+      <w>polarvoid</w>
+            <w>preinitialization</w>
       <w>procs</w>
       <w>pyrochaos</w>
       <w>quazii</w>
       <w>rclick</w>
-      <w>redstone</w>
+      <w>recombobulated</w>
+            <w>recombobulator</w>
+            <w>redstone</w>
       <w>reindrake</w>
       <w>renderable</w>
       <w>renderables</w>
       <w>revenant</w>
       <w>riftstalker</w>
       <w>robotron</w>
+            <w>runecrafting</w>
       <w>runecrafting</w>
       <w>sadan</w>
       <w>scatha</w>
@@ -177,6 +187,7 @@
       <w>soulweaver</w>
       <w>sprayonator</w>
       <w>stillgore</w>
+            <w>stonk</w>
       <w>superboom</w>
       <w>supercraft</w>
       <w>supercrafting</w>
