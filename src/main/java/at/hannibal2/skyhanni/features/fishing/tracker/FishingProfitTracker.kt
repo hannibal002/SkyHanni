@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -71,7 +71,7 @@ object FishingProfitTracker {
         override fun getCoinName(item: TrackedItem) = "§6Fished Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
+            val mobKillCoinsFormat = item.totalAmount.format()
             return listOf(
                 "§7You fished up §6$mobKillCoinsFormat coins §7already."
             )
