@@ -63,7 +63,7 @@ object HoppityEggsCompactChat {
     }
 
     private fun createCompactMessage(): String {
-        val mealName = lastChatMeal?.coloredName ?: if(rabbitBought) "§aPurchased" else ""
+        val mealName = lastChatMeal?.coloredName ?: if (rabbitBought) "§aPurchased" else ""
 
         return if (duplicate) {
             val format = lastDuplicateAmount?.shortFormat() ?: "?"
@@ -85,7 +85,7 @@ object HoppityEggsCompactChat {
             compactChat(event)
         }
 
-        HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message){
+        HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             rabbitBought = true
             compactChat(event)
         }
