@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -15,17 +17,22 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SummoningMobManager {
 
     private val config get() = SkyHanniMod.feature.combat.summonings
     private var mobs = mutableSetOf<Mob>()
+
+    private var lastChatTime: SimpleTimeMark = SimpleTimeMark.farPast()
+    private val timeOut = 2.seconds
 
     private val patternGroup = RepoPattern.group("summoning.mobs")
 
@@ -50,16 +57,20 @@ object SummoningMobManager {
         "§cThe Seraph recalled your (\\d+) summoned allies!",
     )
 
-    private val patternList = listOf(
-        spawnPattern,
+    private val despawnPatterns = listOf(
         despawnPattern,
         seraphRecallPattern,
     )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.hideSummonMessages) return
-        if (patternList.any { it.matches(event.message) }) event.blockedReason = "summoning_soul"
+        if (!LorenzUtils.inSkyBlock || !config.summonMessages) return
+        if (spawnPattern.matches(event.message)) event.blockedReason = "summoning_soul"
+
+        if (despawnPatterns.any { it.matches(event.message) }) {
+            event.blockedReason = "summoning_soul"
+            lastChatTime = SimpleTimeMark.now()
+        }
     }
 
     @SubscribeEvent
@@ -75,6 +86,13 @@ object SummoningMobManager {
         val mob = event.mob
         if (mob !in mobs) return
         mobs -= mob
+
+        if (!mob.isInRender()) return
+        DelayedRun.runNextTick {
+            if (lastChatTime.passedSince() > timeOut) {
+                ChatUtils.chat("Your Summoning Mob just §cdied!")
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
