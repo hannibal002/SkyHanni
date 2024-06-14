@@ -93,7 +93,7 @@ object SummoningMobManager {
             add("Summoning mobs: " + mobs.size)
             mobs.forEachIndexed { index, mob ->
                 val entity = mob.baseEntity
-                add("#${index + 1} §a${mob.name} ${entity.health.shortFormat()}/${entity.baseMaxHealth.shortFormat()}§c❤")
+                add("#${index + 1} §a${mob.name} §2${entity.health.shortFormat()}/${entity.baseMaxHealth.shortFormat()}§c❤")
             }
         }.map { Renderable.string(it) }
 
