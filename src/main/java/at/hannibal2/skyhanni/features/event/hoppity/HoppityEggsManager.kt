@@ -45,6 +45,15 @@ object HoppityEggsManager {
     )
 
     /**
+     * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     */
+    val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.bought",
+        "§aYou bought §.(?<rabbitname>.*?) §afor §6((\\d|,)*) Coins§a!"
+    )
+
+    /**
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §6Solomon §7(§6§LLEGENDARY§7)!

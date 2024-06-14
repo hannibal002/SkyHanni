@@ -23,6 +23,7 @@ object HoppityEggsCompactChat {
     private var newRabbit = false
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
+    private var rabbitBought = false
     private val config get() = ChocolateFactoryAPI.config
 
     fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
@@ -58,10 +59,11 @@ object HoppityEggsCompactChat {
         this.lastProfit = ""
         this.lastChatMeal = null
         this.lastDuplicateAmount = null
+        this.rabbitBought = false
     }
 
     private fun createCompactMessage(): String {
-        val mealName = lastChatMeal?.coloredName ?: ""
+        val mealName = lastChatMeal?.coloredName ?: if(rabbitBought) "&aPurchased" else ""
 
         return if (duplicate) {
             val format = lastDuplicateAmount?.let { it.shortFormat() } ?: "?"
@@ -83,11 +85,26 @@ object HoppityEggsCompactChat {
             compactChat(event)
         }
 
+        HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message){
+            rabbitBought = true
+            compactChat(event)
+        }
+
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
+            // The only case where "You found ..." will come in with more than 1 message,
+            // or empty for hoppityEggChat, is where the rabbit was purchased from hoppity
+            // in this case, we want to reset variables to a clean state during this capture,
+            // as the important capture for the purchased message is the final message in
+            // the chain; "You found [rabbit]" -> "Dupe/New Rabbit" -> "You bought [rabbit]"
+            if(hoppityEggChat.isEmpty() || hoppityEggChat.size > 1){
+                resetCompactData()
+            }
+
             lastName = group("name")
             lastRarity = group("rarity")
             compactChat(event)
         }
+
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
             val chocolate = groupOrNull("chocolate")
             val perSecond = group("perSecond")
