@@ -62,7 +62,7 @@ object EstimatedItemValueCalculator {
         ::addReforgeStone,
 
         // once
-        ::addRecomb,
+        ::addRecombobulator,
         ::addArtOfWar,
         ::addArtOfPeace,
         ::addEtherwarp,
@@ -269,7 +269,7 @@ object EstimatedItemValueCalculator {
         }
     }
 
-    private fun addRecomb(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addRecombobulator(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.isRecombobulated()) return 0.0
 
         val price = "RECOMBOBULATOR_3000".asInternalName().getPrice()
@@ -365,8 +365,8 @@ object EstimatedItemValueCalculator {
     private fun addPolarvoidBook(stack: ItemStack, list: MutableList<String>): Double {
         val count = stack.getPolarvoidBookCount() ?: return 0.0
 
-        val broDilloMiningSoBad = "POLARVOID_BOOK".asInternalName()
-        val price = broDilloMiningSoBad.getPrice() * count
+        val polarvoidBook = "POLARVOID_BOOK".asInternalName()
+        val price = polarvoidBook.getPrice() * count
         list.add("§7Polarvoid: §e$count§7/§e5 §7(§6" + price.shortFormat() + "§7)")
         return price
     }
@@ -480,9 +480,9 @@ object EstimatedItemValueCalculator {
     ): Double {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
-        val displayname = name ?: "§c${internalName.asString()}"
+        val displayName = name ?: "§c${internalName.asString()}"
         val color = if (shouldIgnorePrice) "§7" else "§6"
-        list.add("§7$label: $displayname §7($color" + price.shortFormat() + "§7)")
+        list.add("§7$label: $displayName §7($color" + price.shortFormat() + "§7)")
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
@@ -680,7 +680,7 @@ object EstimatedItemValueCalculator {
         val unlockedSlots =
             stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
 
-        // TODO detection for old items which doesnt have gems.unlocked_slots NBT array
+        // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0
 
         val priceMap = mutableMapOf<String, Double>()
