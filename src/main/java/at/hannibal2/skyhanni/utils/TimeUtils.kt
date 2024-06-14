@@ -39,7 +39,8 @@ object TimeUtils {
                     append(formatted)
                     if (unit == TimeUnit.SECOND && showMilliSeconds) {
                         val formattedMillis = (millis / 100).toInt()
-                        append(".$formattedMillis")
+                        removeSuffix("s")
+                        append(".${formattedMillis}s")
                     }
 
                     append(" ")

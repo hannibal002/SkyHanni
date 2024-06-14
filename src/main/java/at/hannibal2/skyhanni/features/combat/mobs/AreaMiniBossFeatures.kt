@@ -41,9 +41,7 @@ object AreaMiniBossFeatures {
 
         val time = miniBoss.getTime()
         miniBoss.spawnLocations.filter { it.distanceToPlayer() < 15 }
-            .forEach { location ->
-                event.drawDynamicText(location, time, 1.2, ignoreBlocks = false)
-            }
+            .forEach { event.drawDynamicText(it, time, 1.2, ignoreBlocks = false) }
     }
 
     private fun AreaMiniBossType.getTime(): String {
