@@ -51,7 +51,7 @@ object GuiData {
         }
         if (keys.any { it.isKeyHeld() }) return
 
-        if (CustomWardrobeKeybinds.allowClick()) return
+        if (CustomWardrobeKeybinds.allowKeyboardClick()) return
 
         if (preDrawEventCancelled) event.isCanceled = true
     }

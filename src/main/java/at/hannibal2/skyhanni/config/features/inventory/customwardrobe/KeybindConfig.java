@@ -11,7 +11,7 @@ public class KeybindConfig {
     @Expose
     @ConfigOption(
         name = "Slot Keybinds Toggle",
-        desc = "Enable/Disable the slot keybinds"
+        desc = "Enable/Disable the slot keybinds.\n§cThis only works inside the Custom Wardrobe GUI."
     )
     @ConfigEditorBoolean
     public boolean slotKeybindsToggle = true;

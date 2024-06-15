@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -32,7 +31,6 @@ object CustomWardrobeKeybinds {
     @SubscribeEvent
     fun onGui(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
-        val chest = event.guiContainer as? GuiChest ?: return
         val slots = WardrobeAPI.slots.filter { it.isInCurrentPage() }
 
         for (index in keybinds.indices) {
@@ -49,8 +47,8 @@ object CustomWardrobeKeybinds {
         }
     }
 
-    fun allowClick() = isEnabled() && keybinds.any { it.isKeyHeld() }
+    fun allowKeyboardClick() = isEnabled() && keybinds.any { it.isKeyHeld() }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.keybinds.slotKeybindsToggle && WardrobeAPI.inCustomWardrobe
+    private fun isEnabled() = LorenzUtils.inSkyBlock && WardrobeAPI.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
 
 }
