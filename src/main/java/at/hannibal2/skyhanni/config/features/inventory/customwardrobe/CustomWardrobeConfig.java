@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class CustomWardrobeConfig {
 
@@ -41,6 +43,16 @@ public class CustomWardrobeConfig {
     @ConfigOption(name = "Loading text", desc = "Shows a \"§cLoading...\" §7text when the wardrobe page hasn't fully loaded in yet.")
     @ConfigEditorBoolean
     public boolean loadingText = true;
+
+    @Expose
+    @ConfigOption(name = "Armor Tooltip Keybind", desc = "Only show the lore of the item hovered when holding a keybind.")
+    @ConfigEditorBoolean
+    public boolean showTooltipOnlyKeybind = false;
+
+    @Expose
+    @ConfigOption(name = "Tooltip Keybind", desc = "Press this key to show the item tooltip.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
+    public int tooltipKeybind = Keyboard.KEY_LSHIFT;
 
     @Expose
     @ConfigOption(name = "Colors", desc = "Change the color settings.")

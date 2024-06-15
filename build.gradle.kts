@@ -167,7 +167,7 @@ loom {
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
@@ -235,7 +235,7 @@ tasks.withType(Jar::class) {
         this["ForceLoadAsMod"] = "true"
         this["Main-Class"] = "SkyHanniInstallerFrame"
 
-        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
+        this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
 }

@@ -65,6 +65,7 @@ object AreaMiniBossFeatures {
         miniBossType = null
     }
 
+    // TODO move to repo
     private enum class AreaMiniBossType(
         val displayName: String,
         val color: LorenzColor,
