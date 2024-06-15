@@ -17,7 +17,7 @@ public class CustomWardrobeConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Follow mouse", desc = "Players follow the movement of the mouse.")
+    @ConfigOption(name = "Follow mouse", desc = "Whether the \"players\" follow the movement of the mouse.")
     @ConfigEditorBoolean
     public boolean eyesFollowMouse = true;
 

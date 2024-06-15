@@ -20,7 +20,7 @@ public class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Waypoints Immediately",
-        desc = "Show a raw estimate waypoint immediately after clicking.\n" +
+        desc = "Show an estimated waypoint immediately after clicking.\n" +
             "§cThis might cause issues with other particle sources."
     )
     @ConfigEditorBoolean
@@ -39,7 +39,7 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Hide Duplicate Waypoints", desc = "Hides egg waypoints you have found.\n" +
+    @ConfigOption(name = "Hide Duplicate Waypoints", desc = "Hide egg waypoints you have already found.\n" +
         "§eOnly works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -12,19 +12,19 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class MiningEventConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events, " +
-        "also enables you sending data. §eTakes up to a minute to sync new events.")
+    @ConfigOption(name = "Enabled", desc = "Show information about upcoming Dwarven Mines and Crystal Hollows mining events.\n" +
+        "§eAlso enables sending data from your client. May take up to a minute to sync new events.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Show Outside Mining Islands", desc = "Show the event tracker when you are not inside of the Dwarven Mines or Crystal Hollows.")
+    @ConfigOption(name = "Show Outside Mining Islands", desc = "Show the event tracker even if you're outside of the Dwarven Mines or Crystal Hollows.")
     @ConfigEditorBoolean
     public boolean outsideMining = false;
 
     @Expose
-    @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the gui.")
+    @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the GUI.")
     @ConfigEditorDropdown
     public ShowType showType = ShowType.ALL;
 
@@ -49,8 +49,7 @@ public class MiningEventConfig {
         ALL("All Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
         DWARVEN("Dwarven Mines Only"),
-        CURRENT("Current Island Only"),
-        ;
+        CURRENT("Current Island Only");
 
         private final String str;
 

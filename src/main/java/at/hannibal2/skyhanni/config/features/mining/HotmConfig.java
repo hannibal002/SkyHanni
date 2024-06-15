@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class HotmConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled Highlight", desc = "Highlight enabled perks in the hotm tree green and disabled red. Locked perks are highlighted gray.")
+    @ConfigOption(name = "Enable Highlight", desc = "Highlight enabled perks in the HOTM tree §agreen§7, and disabled §cred§7. Locked perks are highlighted gray.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightEnabledPerks = true;
@@ -29,18 +29,18 @@ public class HotmConfig {
     public boolean tokenStackSize = true;
 
     @Expose
-    @ConfigOption(name = "Powder Spent", desc = "Shows the amount of powder spent on a perk.")
+    @ConfigOption(name = "Powder Spent", desc = "Show the amount of powder spent on a perk.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powderSpent = true;
 
     @Expose
-    @ConfigOption(name = "Powder Spent Design", desc = "Changes the design of the powder spent display.")
+    @ConfigOption(name = "Powder Spent Design", desc = "Change the design of the powder spent display.")
     @ConfigEditorDropdown
     public @NotNull PowderSpentDesign powderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE;
 
     @Expose
-    @ConfigOption(name = "Powder for 10 Levels", desc = "Shows the amount of powder needed to level a perk 10 times when pressing shift.")
+    @ConfigOption(name = "Powder for 10 Levels", desc = "Show the amount of powder needed to level a perk up 10 times when holding the shift key.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powderFor10Levels = true;
