@@ -587,7 +587,7 @@ object CustomWardrobe {
         }
     }
 
-    private fun WardrobeSlot.clickSlot() {
+    fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = WardrobeAPI.currentPage ?: return
