@@ -89,6 +89,7 @@ object AreaMiniBossFeatures {
         miniBossType = null
     }
 
+    // TODO move to repo
     enum class AreaMiniBossType(
         val clazz: Class<out EntityLiving>,
         val health: Int,

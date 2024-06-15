@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -35,9 +36,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
-class HypixelData {
+@SkyHanniModule
+object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
+
     // TODO add regex tests
     private val serverNameConnectionPattern by patternGroup.pattern(
         "servername.connection",
@@ -51,199 +54,195 @@ class HypixelData {
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
     )
+    private val serverIdScoreboardPattern by patternGroup.pattern(
+        "serverid.scoreboard",
+        "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
+    )
+    private val serverIdTablistPattern by patternGroup.pattern(
+        "serverid.tablist",
+        " Server: §r§8(?<serverid>\\S+)",
+    )
+    private val lobbyTypePattern by patternGroup.pattern(
+        "lobbytype",
+        "(?<lobbyType>.*lobby)\\d+",
+    )
+    private val playerAmountPattern by patternGroup.pattern(
+        "playeramount",
+        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
+    )
+    private val playerAmountCoopPattern by patternGroup.pattern(
+        "playeramount.coop",
+        "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
+    )
+    private val playerAmountGuestingPattern by patternGroup.pattern(
+        "playeramount.guesting",
+        "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
+    )
+
+    /**
+     * REGEX-TEST:           §r§b§lParty §r§f(4)
+     */
+    private val dungeonPartyAmountPattern by patternGroup.pattern(
+        "playeramount.dungeonparty",
+        "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
+    )
+    private val soloProfileAmountPattern by patternGroup.pattern(
+        "solo.profile.amount",
+        "^\\s*(?:§.)*Island\\s*$",
+    )
+    private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+        "scoreboard.visiting.amount",
+        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
+    )
+    private val guestPattern by patternGroup.pattern(
+        "guesting.scoreboard",
+        "SKYBLOCK GUEST",
+    )
+    private val scoreboardTitlePattern by patternGroup.pattern(
+        "scoreboard.title",
+        "SK[YI]BLOCK(?: CO-OP| GUEST)?",
+    )
+
+    /**
+     * REGEX-TEST:  §7⏣ §bVillage
+     * REGEX-TEST:  §5ф §dWizard Tower
+     */
+    private val skyblockAreaPattern by patternGroup.pattern(
+        "skyblock.area",
+        "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
+    )
 
     private var lastLocRaw = SimpleTimeMark.farPast()
 
-    companion object {
-        private val patternGroup = RepoPattern.group("data.hypixeldata")
-        private val serverIdScoreboardPattern by patternGroup.pattern(
-            "serverid.scoreboard",
-            "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
-        )
-        private val serverIdTablistPattern by patternGroup.pattern(
-            "serverid.tablist",
-            " Server: §r§8(?<serverid>\\S+)",
-        )
-        private val lobbyTypePattern by patternGroup.pattern(
-            "lobbytype",
-            "(?<lobbyType>.*lobby)\\d+",
-        )
-        private val playerAmountPattern by patternGroup.pattern(
-            "playeramount",
-            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-        )
-        private val playerAmountCoopPattern by patternGroup.pattern(
-            "playeramount.coop",
-            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
-        )
-        private val playerAmountGuestingPattern by patternGroup.pattern(
-            "playeramount.guesting",
-            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
-        )
+    var hypixelLive = false
+    var hypixelAlpha = false
+    var inLobby = false
+    var inLimbo = false
+    var skyBlock = false
+    var skyBlockIsland = IslandType.UNKNOWN
+    var serverId: String? = null
 
-        /**
-         * REGEX-TEST:           §r§b§lParty §r§f(4)
-         */
-        private val dungeonPartyAmountPattern by patternGroup.pattern(
-            "playeramount.dungeonparty",
-            "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-        )
-        private val soloProfileAmountPattern by patternGroup.pattern(
-            "solo.profile.amount",
-            "^\\s*(?:§.)*Island\\s*$",
-        )
-        private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
-            "scoreboard.visiting.amount",
-            "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
-        )
-        private val guestPattern by patternGroup.pattern(
-            "guesting.scoreboard",
-            "SKYBLOCK GUEST",
-        )
-        private val scoreboardTitlePattern by patternGroup.pattern(
-            "scoreboard.title",
-            "SK[YI]BLOCK(?: CO-OP| GUEST)?",
-        )
+    // Ironman, Stranded and Bingo
+    var noTrade = false
 
-        /**
-         * REGEX-TEST:  §7⏣ §bVillage
-         * REGEX-TEST:  §5ф §dWizard Tower
-         */
-        private val skyblockAreaPattern by patternGroup.pattern(
-            "skyblock.area",
-            "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
-        )
+    var ironman = false
+    var stranded = false
+    var bingo = false
 
-        var hypixelLive = false
-        var hypixelAlpha = false
-        var inLobby = false
-        var inLimbo = false
-        var skyBlock = false
-        var skyBlockIsland = IslandType.UNKNOWN
-        var serverId: String? = null
+    var profileName = ""
+    var joinedWorld = SimpleTimeMark.farPast()
 
-        // Ironman, Stranded and Bingo
-        var noTrade = false
+    var skyBlockArea: String? = null
+    var skyBlockAreaWithSymbol: String? = null
 
-        var ironman = false
-        var stranded = false
-        var bingo = false
+    // Data from locraw
+    var locrawData: JsonObject? = null
+    private var locraw: MutableMap<String, String> = listOf(
+        "server",
+        "gametype",
+        "lobbyname",
+        "lobbytype",
+        "mode",
+        "map",
+    ).associateWith { "" }.toMutableMap()
 
-        var profileName = ""
-        var joinedWorld = SimpleTimeMark.farPast()
+    val server get() = locraw["server"] ?: ""
+    val gameType get() = locraw["gametype"] ?: ""
+    val lobbyName get() = locraw["lobbyname"] ?: ""
+    val lobbyType get() = locraw["lobbytype"] ?: ""
+    val mode get() = locraw["mode"] ?: ""
+    val map get() = locraw["map"] ?: ""
 
-        var skyBlockArea: String? = null
-        var skyBlockAreaWithSymbol: String? = null
+    fun checkCurrentServerId() {
+        if (!LorenzUtils.inSkyBlock) return
+        if (serverId != null) return
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+        if (!TabListData.fullyLoaded) return
 
-        // Data from locraw
-        var locrawData: JsonObject? = null
-        private var locraw: MutableMap<String, String> = listOf(
-            "server",
-            "gametype",
-            "lobbyname",
-            "lobbytype",
-            "mode",
-            "map",
-        ).associateWith { "" }.toMutableMap()
-
-        val server get() = locraw["server"] ?: ""
-        val gameType get() = locraw["gametype"] ?: ""
-        val lobbyName get() = locraw["lobbyname"] ?: ""
-        val lobbyType get() = locraw["lobbytype"] ?: ""
-        val mode get() = locraw["mode"] ?: ""
-        val map get() = locraw["map"] ?: ""
-
-        fun checkCurrentServerId() {
-            if (!LorenzUtils.inSkyBlock) return
-            if (serverId != null) return
-            if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
-            if (!TabListData.fullyLoaded) return
-
-            ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
-                val serverType = if (group("servertype") == "M") "mega" else "mini"
-                serverId = "$serverType${group("serverid")}"
-                return
-            }
-
-            TabListData.getTabList().matchFirst(serverIdTablistPattern) {
-                serverId = group("serverid")
-                return
-            }
-
-            ErrorManager.logErrorWithData(
-                Exception("NoServerId"),
-                "Could not find server id",
-                "islandType" to LorenzUtils.skyBlockIsland,
-                "tablist" to TabListData.getTabList(),
-                "scoreboard" to ScoreboardData.sidebarLinesFormatted,
-            )
+        ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+            val serverType = if (group("servertype") == "M") "mega" else "mini"
+            serverId = "$serverType${group("serverid")}"
+            return
         }
 
-        fun getPlayersOnCurrentServer(): Int {
-            var amount = 0
-            val playerPatternList = mutableListOf(
-                playerAmountPattern,
-                playerAmountCoopPattern,
-                playerAmountGuestingPattern,
-            )
-            if (DungeonAPI.inDungeon()) {
-                playerPatternList.add(dungeonPartyAmountPattern)
-            }
+        TabListData.getTabList().matchFirst(serverIdTablistPattern) {
+            serverId = group("serverid")
+            return
+        }
 
-            out@ for (pattern in playerPatternList) {
-                for (line in TabListData.getTabList()) {
-                    pattern.matchMatcher(line) {
-                        amount += group("amount").toInt()
-                        continue@out
-                    }
+        ErrorManager.logErrorWithData(
+            Exception("NoServerId"),
+            "Could not find server id",
+            "islandType" to LorenzUtils.skyBlockIsland,
+            "tablist" to TabListData.getTabList(),
+            "scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        )
+    }
+
+    fun getPlayersOnCurrentServer(): Int {
+        var amount = 0
+        val playerPatternList = mutableListOf(
+            playerAmountPattern,
+            playerAmountCoopPattern,
+            playerAmountGuestingPattern,
+        )
+        if (DungeonAPI.inDungeon()) {
+            playerPatternList.add(dungeonPartyAmountPattern)
+        }
+
+        out@ for (pattern in playerPatternList) {
+            for (line in TabListData.getTabList()) {
+                pattern.matchMatcher(line) {
+                    amount += group("amount").toInt()
+                    continue@out
                 }
             }
-            amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
+        }
+        amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
 
-            return amount
+        return amount
+    }
+
+    fun getMaxPlayersForCurrentServer(): Int {
+        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
+            return group("maxamount").toInt()
         }
 
-        fun getMaxPlayersForCurrentServer(): Int {
-            ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
-                return group("maxamount").toInt()
-            }
-
-            return when (skyBlockIsland) {
-                IslandType.MINESHAFT -> 4
-                IslandType.CATACOMBS -> 5
-                IslandType.CRYSTAL_HOLLOWS -> 24
-                IslandType.CRIMSON_ISLE -> 24
-                else -> if (serverId?.startsWith("mega") == true) 80 else 26
-            }
+        return when (skyBlockIsland) {
+            IslandType.MINESHAFT -> 4
+            IslandType.CATACOMBS -> 5
+            IslandType.CRYSTAL_HOLLOWS -> 24
+            IslandType.CRIMSON_ISLE -> 24
+            else -> if (serverId?.startsWith("mega") == true) 80 else 26
         }
+    }
 
-        // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
-        private val jsonBracketPattern = "^\\{.+}".toPattern()
+    // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
+    private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-        //todo convert to proper json object
-        fun checkForLocraw(message: String) {
-            jsonBracketPattern.matchMatcher(message.removeColor()) {
-                try {
-                    val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
-                    if (obj.has("server")) {
-                        locrawData = obj
-                        locraw.keys.forEach { key ->
-                            locraw[key] = obj[key]?.asString ?: ""
-                        }
-                        inLimbo = locraw["server"] == "limbo"
-                        inLobby = locraw["lobbyname"] != ""
+    //todo convert to proper json object
+    fun checkForLocraw(message: String) {
+        jsonBracketPattern.matchMatcher(message.removeColor()) {
+            try {
+                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
+                if (obj.has("server")) {
+                    locrawData = obj
+                    for (key in locraw.keys) {
+                        locraw[key] = obj[key]?.asString ?: ""
+                    }
+                    inLimbo = locraw["server"] == "limbo"
+                    inLobby = locraw["lobbyname"] != ""
 
-                        if (inLobby) {
-                            locraw["lobbyname"]?.let {
-                                lobbyTypePattern.matchMatcher(it) {
-                                    locraw["lobbytype"] = group("lobbyType")
-                                }
+                    if (inLobby) {
+                        locraw["lobbyname"]?.let {
+                            lobbyTypePattern.matchMatcher(it) {
+                                locraw["lobbytype"] = group("lobbyType")
                             }
                         }
                     }
-                } catch (e: Exception) {
-                    ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
                 }
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
             }
         }
     }
