@@ -34,8 +34,10 @@ object ForgeGfs {
         ItemUtils.createSkull(
             displayName = "§aGet items from sack",
             uuid = "75ea8094-5152-4457-8c23-1ad9b3c176c0",
-            value = "ewogICJ0aW1lc3RhbXAiIDogMTU5MTMxMDU4NTYwOSwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogI"+
-            "CJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODBhMDc3ZTI0OGQxNDI3NzJlYTgwMDg2NGY4YzU3OGI5ZDM2ODg1YjI5ZGFmODM2YjY0YTcwNjg4MmI2ZWMxMCIKICAgIH0KICB9Cn0=",
+            value = "ewogICJ0aW1lc3RhbXAiIDogMTU5MTMxMDU4NTYwOSwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsC"
+                + "iAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogI"
+                + "CJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3"
+                + "RleHR1cmUvODBhMDc3ZTI0OGQxNDI3NzJlYTgwMDg2NGY4YzU3OGI5ZDM2ODg1YjI5ZGFmODM2YjY0YTcwNjg4MmI2ZWMxMCIKICAgIH0KICB9Cn0=",
             "§8(from SkyHanni)",
             "§7Click here to try to get all of this",
             "§7recipe's ingredients from sack."
@@ -49,7 +51,9 @@ object ForgeGfs {
         if (!config) return
         if (!confirmScreenPattern.matches(event.inventoryName)) return
 
-        showFakeItem = config && confirmScreenPattern.matches(event.inventoryName)
+        // Passing 2 filters means that both are true
+        // showFakeItem = config && confirmScreenPattern.matches(event.inventoryName)
+        showFakeItem = true
     }
 
     @SubscribeEvent
