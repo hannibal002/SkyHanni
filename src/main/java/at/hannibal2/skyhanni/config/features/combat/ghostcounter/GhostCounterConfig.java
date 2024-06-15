@@ -31,7 +31,7 @@ import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCou
 public class GhostCounterConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the ghost counter (invisible creepers in The Mist in the Dwarven Mines area)")
+    @ConfigOption(name = "Enabled", desc = "Enable the ghost counter (invisible creepers within The Mist in the Dwarven Mines)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
