@@ -61,8 +61,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (type == ClickedBlockType.WITHER_ESSENCE) {
-            val text = BlockUtils.getTextureFromSkull(position)
-            if (text != WITHER_ESSENCE_TEXTURE) return
+            if (BlockUtils.getTextureFromSkull(position) != WITHER_ESSENCE_TEXTURE) return
         }
 
         val inWaterRoom = DungeonAPI.getRoomID() == WATER_ROOM_ID
