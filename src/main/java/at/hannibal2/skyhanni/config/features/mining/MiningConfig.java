@@ -93,7 +93,7 @@ public class MiningConfig {
     public boolean highlightYourGoldenGoblin = true;
 
     @Expose
-    @ConfigOption(name = "Forge GfS", desc = "Get items from Sacks to forge.")
+    @ConfigOption(name = "Forge GfS", desc = "Get Forge ingredients of a recipe.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean forgeGfs = false;
