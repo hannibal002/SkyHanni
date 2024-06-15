@@ -15,16 +15,16 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.init.Blocks
 import net.minecraft.potion.Potion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -34,15 +34,6 @@ object DungeonLividFinder {
 
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
     private val blockLocation = LorenzVec(6, 109, 43)
-    private val repoGroup = RepoPattern.group("dungeon.livid")
-
-    /**
-     * REGEX-TEST: §e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿
-     */
-    private val lividColor by repoGroup.pattern(
-        "color",
-        "§e﴾ §(?<color>.).+",
-    )
 
     private val isBlind = RecalculatingValue(100.milliseconds, ::isCurrentlyBlind)
 
@@ -55,6 +46,7 @@ object DungeonLividFinder {
         if (!inLividBossRoom()) return
         val mob = event.mob
         if (mob.name != "Livid" && mob.name != "Real Livid") return
+        if (mob.baseEntity !is EntityOtherPlayerMP) return
 
         val lividColor = mob.getLividColor() ?: return
 
@@ -66,8 +58,11 @@ object DungeonLividFinder {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!inLividBossRoom() || color != null) return
-        color = blockLocation.getBlockStateAt().getValue(BlockStainedGlass.COLOR).toLorenzColor()
+        if (!inLividBossRoom()) return
+        if (color != null) return
+        val block = blockLocation.getBlockStateAt()
+        if (block.block != Blocks.wool) return
+        color = block.getValue(BlockStainedGlass.COLOR).toLorenzColor()
     }
 
     @SubscribeEvent
@@ -91,11 +86,14 @@ object DungeonLividFinder {
     }
 
     private fun isCurrentlyBlind() =
-        Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.blindness)?.duration?.let { it > 10 } ?: false
+        Minecraft.getMinecraft().thePlayer?.getActivePotionEffect(Potion.blindness)?.duration?.let { it > 10 } ?: false
 
-    private fun Mob.getLividColor(): LorenzColor? = lividColor.matchMatcher(baseEntity.name) {
-        group("color")
-    }?.firstOrNull()?.toLorenzColor()
+    private fun Mob.getLividColor(): LorenzColor? {
+        val name = armorStand?.displayName?.formattedText ?: return null
+        if (name.startsWith("§e﴾ §c")) return null
+        return name.getOrNull(1)?.toLorenzColor()
+    }
+
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -22,7 +22,7 @@ object DungeonHighlightClickedBlocks {
 
     private val config get() = SkyHanniMod.feature.dungeon.highlightClickedBlocks
 
-    private val blocks = TimeLimitedSet<ClickedBlock>(3.seconds)
+    private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
     private var colorIndex = 0
     private val colors = listOf(LorenzColor.YELLOW, LorenzColor.AQUA, LorenzColor.GREEN, LorenzColor.LIGHT_PURPLE)
     private const val WATER_ROOM_ID = "-60,-60"
@@ -51,7 +51,7 @@ object DungeonHighlightClickedBlocks {
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         val position = event.position
-        if (blocks.toSet().any { it.position == position }) return
+        if (blocks.containsKey(position)) return
 
         val type = when (position.getBlockAt()) {
             Blocks.chest, Blocks.trapped_chest -> ClickedBlockType.CHEST
@@ -69,23 +69,22 @@ object DungeonHighlightClickedBlocks {
 
         val color = getNextColor()
         val displayText = color.getChatColor() + "Clicked " + type.display
-        blocks.add(ClickedBlock(position, displayText, color))
+        blocks[position] = ClickedBlock(displayText, color)
     }
 
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        blocks.toSet().forEach {
-            event.drawColor(it.position, it.color)
-            event.drawString(it.position.add(0.5, 0.5, 0.5), it.displayText, true)
+        blocks.forEach { (position, block) ->
+            event.drawColor(position, block.color)
+            event.drawString(position.add(0.5, 0.5, 0.5), block.displayText, true)
         }
     }
 
     private fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config
 
     class ClickedBlock(
-        val position: LorenzVec,
         val displayText: String,
         val color: LorenzColor,
     )
