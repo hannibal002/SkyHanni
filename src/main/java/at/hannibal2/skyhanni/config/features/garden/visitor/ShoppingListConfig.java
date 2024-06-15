@@ -33,7 +33,7 @@ public class ShoppingListConfig {
 
     @Expose
     @ConfigOption(name = "Farming Areas", desc = "Show the Visitor Shopping List while on the Farming Islands or inside the Farm in the Hub.\n" +
-        "This helps farming the correct amount, especially when in the early game.")
+        "§eHelps in farming the correct amount, especially when in the early game.")
     @ConfigEditorBoolean
     public boolean inFarmingAreas = false;
 
