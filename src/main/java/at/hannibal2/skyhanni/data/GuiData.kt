@@ -46,7 +46,7 @@ object GuiData {
                 Keyboard.KEY_ESCAPE,
                 it.keyBindInventory.keyCode,
                 it.keyBindScreenshot.keyCode,
-                it.keyBindForward.keyCode,
+                it.keyBindFullscreen.keyCode,
             )
         }
         if (keys.any { it.isKeyHeld() }) return
