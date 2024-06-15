@@ -111,8 +111,7 @@ object CustomWardrobe {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
-        if (!isEnabled()) return
-        DelayedRun.runDelayed(250.milliseconds) {
+        DelayedRun.runDelayed(300.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
             }

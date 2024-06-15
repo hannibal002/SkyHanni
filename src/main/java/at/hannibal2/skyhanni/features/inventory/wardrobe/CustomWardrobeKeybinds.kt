@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,7 +35,7 @@ object CustomWardrobeKeybinds {
 
         for (index in keybinds.indices) {
             val key = keybinds.getOrNull(index) ?: continue
-            if (!key.isKeyHeld()) continue
+            if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
             val slot = slots.getOrNull(index) ?: continue
 
@@ -47,7 +47,7 @@ object CustomWardrobeKeybinds {
         }
     }
 
-    fun allowKeyboardClick() = isEnabled() && keybinds.any { it.isKeyHeld() }
+    fun allowKeyboardClick() = isEnabled() && keybinds.any { it.isKeyClicked() }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && WardrobeAPI.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
 
