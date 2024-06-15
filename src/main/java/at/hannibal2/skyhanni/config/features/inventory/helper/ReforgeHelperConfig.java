@@ -11,16 +11,16 @@ public class ReforgeHelperConfig {
 
     @Expose
     @ConfigLink(owner = ReforgeHelperConfig.class, field = "enable")
-    public Position posList = new Position(80, 85, true, true);
+    public Position position = new Position(80, 85, true, true);
 
     @Expose
     @ConfigOption(name = "Enable", desc = "Enables the reforge helper.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enable = true;
+    public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Reforge Stones Hex Only", desc = "Displays reforge stones only when in Hex.")
+    @ConfigOption(name = "Stones Hex Only", desc = "Displays reforge stones only when in Hex.")
     @ConfigEditorBoolean
     public boolean reforgeStonesOnlyHex = true;
 

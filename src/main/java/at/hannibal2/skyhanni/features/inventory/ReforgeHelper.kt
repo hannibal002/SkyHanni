@@ -48,19 +48,19 @@ object ReforgeHelper {
 
     private val reforgeMenu by repoGroup.pattern(
         "menu.blacksmith",
-        "Reforge Item"
+        "Reforge Item",
     )
     private val reforgeHexMenu by repoGroup.pattern(
         "menu.hex",
-        "The Hex ➜ Reforges"
+        "The Hex ➜ Reforges",
     )
     private val reforgeChatMessage by repoGroup.pattern(
         "chat.success",
-        "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!"
+        "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!",
     )
     private val reforgeChatFail by repoGroup.pattern(
         "chat.fail",
-        "§cWait a moment before reforging again!|§cWhoa! Slow down there!"
+        "§cWait a moment before reforging again!|§cWhoa! Slow down there!",
     )
 
     private var isInReforgeMenu = false
@@ -69,7 +69,7 @@ object ReforgeHelper {
     private fun isReforgeMenu(chestName: String) = reforgeMenu.matches(chestName)
     private fun isHexReforgeMenu(chestName: String) = reforgeHexMenu.matches(chestName)
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enable && isInReforgeMenu
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && isInReforgeMenu
 
     private var itemToReforge: ItemStack? = null
     private var inventoryContainer: Container? = null
@@ -255,7 +255,7 @@ object ReforgeHelper {
                 stats = (reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList())
                 removedEffect = getReforgeEffect(
                     currentReforge,
-                    itemRarity
+                    itemRarity,
                 )?.let { listOf(rString("§cRemoves Effect:")) + it }
                     ?: emptyList()
                 addEffectText = "§aAdds Effect:"
@@ -279,7 +279,8 @@ object ReforgeHelper {
                 SoundUtils.playClickSound()
                 reforgeToSearch = reforge
                 updateDisplay()
-            }, onHover = onHover
+            },
+            onHover = onHover,
         )
     }
 
@@ -288,7 +289,7 @@ object ReforgeHelper {
             Renderable.wrappedString(
                 it,
                 190,
-                color = LorenzColor.GRAY.toColor()
+                color = LorenzColor.GRAY.toColor(),
             )
         }
 
@@ -321,24 +322,29 @@ object ReforgeHelper {
                 Renderable.hoverTips(
                     Renderable.fixedSizeLine(
                         rString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
-                        SkyblockStat.fontSizeOfLargestIcon
-                    ), listOf("§6Sort after", tip)
-                ), fieldColor.toColor(), radius = 15, padding = 1
+                        SkyblockStat.fontSizeOfLargestIcon,
+                    ),
+                    listOf("§6Sort after", tip),
+                ),
+                fieldColor.toColor(), radius = 15, padding = 1,
             )
         return if (sortAfter == stat) {
             sortField
         } else {
-            Renderable.clickable(sortField, {
-                sortAfter = stat
-                updateDisplay()
-            })
+            Renderable.clickable(
+                sortField,
+                {
+                    sortAfter = stat
+                    updateDisplay()
+                },
+            )
         }
     }
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.posList.renderRenderables(display, posLabel = "Reforge Overlay")
+        config.position.renderRenderables(display, posLabel = "Reforge Overlay")
     }
 
     @SubscribeEvent
