@@ -116,5 +116,5 @@ object DungeonLividFinder {
         event.drawFilledBoundingBox_nea(boundingBox, color, 0.5f)
     }
 
-    private fun inLividBossRoom() = DungeonAPI.inBossRoom && DungeonAPI.isOneOf("F5", "M5")
+    private fun inLividBossRoom() = DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F5
 }
