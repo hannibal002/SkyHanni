@@ -32,13 +32,13 @@ public class CommandsConfig {
     public boolean partyKickReason = true;
 
     @Expose
-    @ConfigOption(name = "Replace /warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
+    @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;
 
     @Expose
-    @ConfigOption(name = "/viewrecipe §7Lower Case", desc = "Add support for lower case item IDs to the Hypixel command §e/viewrecipe§7.")
+    @ConfigOption(name = "Lower Case §e/viewrecipe", desc = "Add support for lower case item IDs to the Hypixel command §e/viewrecipe§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean viewRecipeLowerCase = true;
