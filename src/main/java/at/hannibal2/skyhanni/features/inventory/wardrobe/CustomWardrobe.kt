@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.getFakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -207,7 +208,13 @@ object CustomWardrobe {
             if (stack != null) {
                 val toolTip = getToolTip(stack, slot, armorIndex)
                 if (toolTip != null) {
-                    renderable = Renderable.hoverTips(renderable, tips = toolTip)
+                    renderable = Renderable.hoverTips(
+                        renderable,
+                        tips = toolTip,
+                        condition = {
+                            !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
+                        },
+                    )
                 }
             }
             loreList.add(renderable)
