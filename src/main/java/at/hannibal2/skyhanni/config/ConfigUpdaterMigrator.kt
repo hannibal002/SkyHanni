@@ -33,9 +33,11 @@ object ConfigUpdaterMigrator {
     ) : LorenzEvent() {
 
         init {
-            dynamicPrefix.entries.filter { it.value.isEmpty() }.forEach {
-                logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
-            }
+            dynamicPrefix.entries
+                .filter { it.value.isEmpty() }
+                .forEach {
+                    logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
+                }
         }
 
         fun transform(since: Int, path: String, transform: (JsonElement) -> JsonElement = { it }) {
@@ -91,9 +93,8 @@ object ConfigUpdaterMigrator {
 
     private fun merge(originalObject: JsonObject, overrideObject: JsonObject): Int {
         var count = 0
-        overrideObject.entrySet().forEach {
-            val element = originalObject[it.key]
-            val newElement = it.value
+        for ((key, newElement) in overrideObject.entrySet()) {
+            val element = originalObject[key]
             if (element is JsonObject && newElement is JsonObject) {
                 count += merge(element, newElement)
             } else {
@@ -101,7 +102,7 @@ object ConfigUpdaterMigrator {
                     logger.log("Encountered destructive merge. Erasing $element in favour of $newElement.")
                     count++
                 }
-                originalObject.add(it.key, newElement)
+                originalObject.add(key, newElement)
             }
         }
         return count
