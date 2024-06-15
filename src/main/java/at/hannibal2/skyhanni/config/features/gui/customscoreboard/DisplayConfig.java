@@ -71,6 +71,29 @@ public class DisplayConfig {
     public boolean showMaxIslandPlayers = true;
 
     @Expose
+    @ConfigOption(name = "Powder Display", desc = "Select how the powder display should be formatted.")
+    @ConfigEditorDropdown
+    public PowderDisplay powderDisplay = PowderDisplay.AVAILABLE;
+
+    public enum PowderDisplay {
+        AVAILABLE("Available"),
+        TOTAL("Total"),
+        BOTH("Available / All")
+        ;
+
+        private final String str;
+
+        PowderDisplay(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
     @ConfigOption(name = "Number Format", desc = "")
     @ConfigEditorDropdown
     public NumberFormat numberFormat = NumberFormat.LONG;

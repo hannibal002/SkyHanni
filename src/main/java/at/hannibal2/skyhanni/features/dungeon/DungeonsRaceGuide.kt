@@ -39,9 +39,9 @@ object DungeonsRaceGuide {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DungeonHubRacesJson>("DungeonHubRaces")
-        data.data.forEach {
-            val nothingNoReturn = it.value["nothing:no_return"]
-            parkourHelpers[it.key] = ParkourHelper(
+        for ((key, map) in data.data) {
+            val nothingNoReturn = map["nothing:no_return"]
+            parkourHelpers[key] = ParkourHelper(
                 nothingNoReturn?.locations ?: listOf(),
                 nothingNoReturn?.shortCuts ?: listOf(),
                 platformSize = 1.0,
@@ -67,17 +67,15 @@ object DungeonsRaceGuide {
             currentRace = group("race").replace(" ", "_").lowercase()
         }
         if (currentRace == null) {
-            parkourHelpers.forEach {
-                it.value.reset()
-            }
+            parkourHelpers.forEach { it.value.reset() }
         }
     }
 
     private fun updateConfig() {
-        parkourHelpers.forEach {
-            it.value.rainbowColor = config.rainbowColor.get()
-            it.value.monochromeColor = config.monochromeColor.get().toChromaColor()
-            it.value.lookAhead = config.lookAhead.get() + 1
+        parkourHelpers.values.forEach {
+            it.rainbowColor = config.rainbowColor.get()
+            it.monochromeColor = config.monochromeColor.get().toChromaColor()
+            it.lookAhead = config.lookAhead.get() + 1
         }
     }
 

@@ -37,7 +37,7 @@ import kotlin.math.floor
 import kotlin.math.pow
 
 enum class HotmData(
-    guiName: String,
+    val guiName: String,
     val maxLevel: Int,
     val costFun: ((Int) -> (Double?)),
     val rewardFun: ((Int) -> (Map<HotmReward, Double>)),
@@ -345,7 +345,7 @@ enum class HotmData(
     var activeLevel: Int
         get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
         private set(value) {
-            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
+            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value.minus(blueEgg())
         }
 
     val isMaxLevel: Boolean
@@ -371,6 +371,10 @@ enum class HotmData(
     fun getLevelUpCost() = costFun(rawLevel)
 
     fun getReward() = rewardFun(activeLevel)
+
+    fun calculateTotalCost(desiredLevel: Int) = (1 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
+
+    val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
     // TODO move all object functions into hotm api?
     @SkyHanniModule
@@ -405,6 +409,11 @@ enum class HotmData(
             "§c§lDISABLED|§7§eClick to select!",
         ) // unused for now since the assumption is when enabled isn't found it is disabled, 
         // but the value might be useful in the future or for debugging
+
+        val perkCostPattern by patternGroup.pattern(
+            "perk.cost",
+            "(?:§.)*§7Cost",
+        )
 
         private val resetChatPattern by patternGroup.pattern(
             "reset.chat",
@@ -471,6 +480,8 @@ enum class HotmData(
             }
         }
 
+        fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
+
         private fun resetTree() = entries.forEach {
             it.activeLevel = 0
             it.enabled = false
@@ -502,8 +513,8 @@ enum class HotmData(
                 group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
             } ?: entry.maxLevel
 
-            // max level + 1 because Blue Cheese Goblin Omelette adds +1 to each level
-            if (entry.activeLevel > entry.maxLevel + 1) {
+            // raw level to ignore the blue egg buff
+            if (entry.rawLevel > entry.maxLevel) {
                 ErrorManager.skyHanniError(
                     "Hotm Perk '${entry.name}' over max level",
                     "name" to entry.name,
@@ -574,17 +585,15 @@ enum class HotmData(
         private fun handelSkyMall(lore: List<String>) {
             if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
             else {
-                val index = (
-                    lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
-                        ErrorManager.logErrorStateWithData(
-                            "Could not read the skymall effect from the hotm tree",
-                            "skyMallCurrentEffect didn't match",
-                            "lore" to lore,
-                        )
-                        return
-                    }
-                    ) + 1
-                skymallPattern.matchMatcher(lore[index]) {
+                val index = lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                    ErrorManager.logErrorStateWithData(
+                        "Could not read the skymall effect from the hotm tree",
+                        "skyMallCurrentEffect didn't match",
+                        "lore" to lore,
+                    )
+                    return
+                }
+                skymallPattern.matchMatcher(lore[index + 1]) {
                     val perk = group("perk")
                     HotmAPI.skymall = SkymallPerk.entries.firstOrNull { it.itemPattern.matches(perk) } ?: run {
                         ErrorManager.logErrorStateWithData(

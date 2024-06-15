@@ -49,7 +49,6 @@ public class MiningEventConfig {
         ALL("All Mining Islands"),
         CRYSTAL("Crystal Hollows Only"),
         DWARVEN("Dwarven Mines Only"),
-        MINESHAFT("Mineshaft Only"),
         CURRENT("Current Island Only"),
         ;
 
