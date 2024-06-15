@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object EntityUtils {
 
+    @Deprecated("Use Mob Detection Instead", ReplaceWith(""))
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
@@ -52,6 +53,7 @@ object EntityUtils {
         return list
     }
 
+    @Deprecated("Use Mob Detection Instead", ReplaceWith(""))
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
@@ -59,6 +61,7 @@ object EntityUtils {
         it.name.contains(contains)
     }
 
+    @Deprecated("Use Mob Detection Instead", ReplaceWith(""))
     fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
@@ -67,6 +70,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
+    @Deprecated("Use Mob Detection Instead", ReplaceWith(""))
     fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
