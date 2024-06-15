@@ -550,7 +550,7 @@ object Commands {
         ) { HoppityEggLocations.toggleDebug() }
         registerCommand(
             "shresetmineshaftpitystats",
-            "Resets the mineshaft pity display stats"
+            "Resets the mineshaft pity display stats",
         ) { MineshaftPityDisplay.fullResetCounter() }
     }
 

@@ -39,11 +39,11 @@ object MiningAPI {
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
     private val coldReset by group.pattern(
         "cold.reset",
-        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7."
+        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7.",
     )
     private val coldResetDeath by group.pattern(
         "cold.deathreset",
-        "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)"
+        "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)",
     )
 
     data class MinedBlock(val ore: OreBlock, var position: LorenzVec, var confirmed: Boolean, val time: SimpleTimeMark)

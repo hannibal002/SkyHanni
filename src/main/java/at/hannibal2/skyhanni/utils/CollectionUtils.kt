@@ -309,9 +309,11 @@ object CollectionUtils {
                 addString("§a[$display]")
             } else {
                 addString("§e[")
-                add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
+                add(
+                    Renderable.link("§e$display") {
+                        onChange(entry)
+                    },
+                )
                 addString("§e]")
             }
             addString(" ")
@@ -331,16 +333,20 @@ object CollectionUtils {
                 ChatUtils.lastButtonClicked = System.currentTimeMillis()
             }
         }
-        add(Renderable.horizontalContainer(buildList {
-            addString(prefix)
-            addString("§a[")
-            if (tips.isEmpty()) {
-                add(Renderable.link("§e$getName", false, onClick))
-            } else {
-                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-            }
-            addString("§a]")
-        }))
+        add(
+            Renderable.horizontalContainer(
+                buildList {
+                    addString(prefix)
+                    addString("§a[")
+                    if (tips.isEmpty()) {
+                        add(Renderable.link("§e$getName", false, onClick))
+                    } else {
+                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                    }
+                    addString("§a]")
+                },
+            ),
+        )
     }
 
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
