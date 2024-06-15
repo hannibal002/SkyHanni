@@ -45,7 +45,7 @@ public class FilterTypesConfig {
     public boolean friendJoinLeft = false;
 
     @Expose
-    @ConfigOption(name = "Winter Gifts", desc = "Hide Winter Gift messages.")
+    @ConfigOption(name = "Winter Gifts", desc = "Hide pointless Winter Gift messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean winterGift = false;
