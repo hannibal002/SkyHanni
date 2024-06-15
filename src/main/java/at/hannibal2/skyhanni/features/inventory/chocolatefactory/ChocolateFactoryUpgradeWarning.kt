@@ -27,7 +27,7 @@ object ChocolateFactoryUpgradeWarning {
         if (!LorenzUtils.inSkyBlock) return
         val profileStorage = profileStorage ?: return
 
-        val upgradeAvailableAt = SimpleTimeMark(profileStorage.bestUpgradeAvailableAt)
+        val upgradeAvailableAt = profileStorage.bestUpgradeAvailableAt
         if (upgradeAvailableAt.isInPast() && !upgradeAvailableAt.isFarPast()) {
             checkUpgradeWarning()
         }

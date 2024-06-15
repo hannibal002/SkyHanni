@@ -21,9 +21,24 @@ object HighlightPlaceableNpcs {
 
     private val config get() = SkyHanniMod.feature.misc.stranded
 
-    private val locationPattern by RepoPattern.pattern(
-        "stranded.highlightplacement.location",
-        "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]"
+    private val patternGroup = RepoPattern.group("stranded.highlightplacement")
+
+    // TODO Please add regex tests
+    private val locationPattern by patternGroup.pattern(
+        "location",
+        "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
+    )
+
+    // TODO Please add regex tests
+    private val clickToSetPattern by RepoPattern.pattern(
+        "clicktoset",
+        "§7§eClick to set the location of this NPC!",
+    )
+
+    // TODO Please add regex tests
+    private val clickToSpawnPattern by RepoPattern.pattern(
+        "clicktospawn",
+        "§elocation!",
     )
 
     private var inInventory = false
@@ -69,7 +84,9 @@ object HighlightPlaceableNpcs {
 
     private fun isPlaceableNpc(lore: List<String>): Boolean {
         // Checking if NPC & placeable
-        if (lore.isEmpty() || !(lore.last() == "§ethis NPC!" || lore.last() == "§eyour location!")) {
+        if (lore.isEmpty() ||
+            !(clickToSetPattern.matches(lore.last()) ||
+                clickToSpawnPattern.matches(lore.last()))) {
             return false
         }
 

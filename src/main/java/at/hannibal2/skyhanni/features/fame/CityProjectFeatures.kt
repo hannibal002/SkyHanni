@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -73,8 +73,9 @@ object CityProjectFeatures {
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
-        if (playerSpecific.nextCityProjectParticipationTime == 0L) return
-        if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
+        playerSpecific.nextCityProjectParticipationTime.let {
+            if (it.isFarPast() || it.isInFuture()) return
+        }
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
@@ -130,7 +131,7 @@ object CityProjectFeatures {
                 if (item.name != "§eContribute this component!") continue
                 nextTime = now
             }
-            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime.toMillis()
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 
@@ -156,16 +157,21 @@ object CityProjectFeatures {
             list.add(" §7- ")
             list.add(stack)
 
-            list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
-                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                    LorenzUtils.setTextIntoSign("$amount")
-                } else {
-                    BazaarApi.searchForBazaarItem(name, amount)
-                }
-            }) { inInventory && !NEUItems.neuHasFocus() })
+            list.add(
+                Renderable.optionalLink(
+                    "$name §ex${amount.addSeparators()}",
+                    {
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            LorenzUtils.setTextIntoSign("$amount")
+                        } else {
+                            BazaarApi.searchForBazaarItem(name, amount)
+                        }
+                    }
+                ) { inInventory && !NEUItems.neuHasFocus() }
+            )
 
             val price = internalName.getPrice(false) * amount
-            val format = NumberUtil.format(price)
+            val format = price.shortFormat()
             list.add(" §7(§6$format§7)")
             add(list)
         }
