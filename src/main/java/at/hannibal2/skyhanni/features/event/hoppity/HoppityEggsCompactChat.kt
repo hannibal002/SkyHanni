@@ -117,9 +117,8 @@ object HoppityEggsCompactChat {
         }
     }
 
-    fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.size > 0) {
-        val hover = hoppityEggChat.joinToString("\n") +
-            " \n§eClick here to share the location of this chocolate egg with the server!"
+    fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.isNotEmpty()) {
+        val hover = hoppityEggChat.joinToString("\n") + " \n§eClick here to share the location of this chocolate egg with the server!"
         hoppityEggChat.clear()
         ChatUtils.clickableChat(
             createCompactMessage(),
@@ -127,7 +126,7 @@ object HoppityEggsCompactChat {
             onClick = onClick,
             expireAt = 30.seconds.fromNow(),
             oneTimeClick = true,
-            prefix = false
+            prefix = false,
         )
         true
     } else false
