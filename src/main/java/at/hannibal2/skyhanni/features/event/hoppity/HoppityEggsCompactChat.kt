@@ -23,6 +23,7 @@ object HoppityEggsCompactChat {
     private var newRabbit = false
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
+    private var rabbitBought = false
     private val config get() = ChocolateFactoryAPI.config
 
     fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
@@ -58,21 +59,23 @@ object HoppityEggsCompactChat {
         this.lastProfit = ""
         this.lastChatMeal = null
         this.lastDuplicateAmount = null
+        this.rabbitBought = false
     }
 
     private fun createCompactMessage(): String {
         val mealName = lastChatMeal?.coloredName ?: ""
+        val mealNameFormatted = if (rabbitBought) "§aBought Rabbit" else "$mealName Egg"
 
         return if (duplicate) {
-            val format = lastDuplicateAmount?.let { it.shortFormat() } ?: "?"
+            val format = lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
 
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealName Egg! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormatted! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
-            "$mealName Egg! §d§lNEW $lastName §7(${lastProfit}§7)"
+            "$mealNameFormatted! §d§lNEW $lastName §7(${lastProfit}§7)"
         } else "?"
     }
 
@@ -83,11 +86,26 @@ object HoppityEggsCompactChat {
             compactChat(event)
         }
 
+        HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
+            rabbitBought = true
+            compactChat(event)
+        }
+
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
+            // The only case where "You found ..." will come in with more than 1 message,
+            // or empty for hoppityEggChat, is where the rabbit was purchased from hoppity
+            // in this case, we want to reset variables to a clean state during this capture,
+            // as the important capture for the purchased message is the final message in
+            // the chain; "You found [rabbit]" -> "Dupe/New Rabbit" -> "You bought [rabbit]"
+            if (hoppityEggChat.isEmpty() || hoppityEggChat.size > 1) {
+                resetCompactData()
+            }
+
             lastName = group("name")
             lastRarity = group("rarity")
             compactChat(event)
         }
+
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
             val chocolate = groupOrNull("chocolate")
             val perSecond = group("perSecond")
