@@ -90,7 +90,8 @@ object DungeonLividFinder {
         if (event.entity.mob in fakeLivids) event.cancel()
     }
 
-    private fun isCurrentlyBlind() = Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.blindness).duration > 10
+    private fun isCurrentlyBlind() =
+        Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.blindness)?.duration?.let { it > 10 } ?: false
 
     private fun Mob.getLividColor(): LorenzColor? = lividColor.matchMatcher(baseEntity.name) {
         group("color")
