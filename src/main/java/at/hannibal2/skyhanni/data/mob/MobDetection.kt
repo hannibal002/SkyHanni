@@ -36,7 +36,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-
 @SkyHanniModule
 object MobDetection {
 
@@ -72,6 +71,7 @@ object MobDetection {
         MobFilter.wokeSleepingGolemPattern
         MobFilter.jerryPattern
         MobFilter.jerryMagmaCubePattern
+        MobFilter.shinyPig
         MobUtils.defaultArmorStandName
     }
 
@@ -99,8 +99,10 @@ object MobDetection {
         MobData.previousEntityLiving.clear()
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
-        MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
-            .filter { it !is EntityArmorStand && it !is EntityPlayerSP })
+        MobData.currentEntityLiving.addAll(
+            EntityUtils.getEntities<EntityLivingBase>()
+                .filter { it !is EntityArmorStand && it !is EntityPlayerSP },
+        )
 
         if (forceReset) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
@@ -152,7 +154,7 @@ object MobDetection {
                             Mob.Type.SUMMON -> MobEvent.Spawn.Summon(mob)
 
                             Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(
-                                mob
+                                mob,
                             )
 
                             Mob.Type.SPECIAL -> MobEvent.Spawn.Special(mob)
@@ -274,7 +276,7 @@ object MobDetection {
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     }\n"
                         + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
-                        "}"
+                        "}",
                 )
                 // Uncomment this to make it closed a loop
                 // iterator.remove()
