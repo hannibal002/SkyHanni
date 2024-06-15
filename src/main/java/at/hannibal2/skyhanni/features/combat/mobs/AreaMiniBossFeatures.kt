@@ -25,7 +25,6 @@ object AreaMiniBossFeatures {
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!SlayerAPI.isInAnyArea) return
         val type = AreaMiniBossType.entries.find { it.displayName == event.mob.name } ?: return
         miniBossType = type
         val time = SimpleTimeMark.now()
