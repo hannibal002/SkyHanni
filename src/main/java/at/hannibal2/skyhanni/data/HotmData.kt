@@ -345,7 +345,7 @@ enum class HotmData(
     var activeLevel: Int
         get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
         private set(value) {
-            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
+            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value.minus(blueEgg())
         }
 
     val isMaxLevel: Boolean
@@ -513,8 +513,8 @@ enum class HotmData(
                 group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
             } ?: entry.maxLevel
 
-            // max level + 1 because Blue Cheese Goblin Omelette adds +1 to each level
-            if (entry.activeLevel > entry.maxLevel + 1) {
+            // raw level to ignore the blue egg buff
+            if (entry.rawLevel > entry.maxLevel) {
                 ErrorManager.skyHanniError(
                     "Hotm Perk '${entry.name}' over max level",
                     "name" to entry.name,
