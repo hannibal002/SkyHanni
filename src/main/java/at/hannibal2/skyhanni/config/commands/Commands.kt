@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -547,6 +548,10 @@ object Commands {
             "shtoggleegglocationdebug",
             "Shows Hoppity egg locations with their internal API names and status.",
         ) { HoppityEggLocations.toggleDebug() }
+        registerCommand(
+            "shresetmineshaftpitystats",
+            "Resets the mineshaft pity display stats"
+        ) { MineshaftPityDisplay.fullResetCounter() }
     }
 
     private fun internalCommands() {

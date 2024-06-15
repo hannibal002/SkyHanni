@@ -92,6 +92,16 @@ object CollectionUtils {
         }
     }
 
+    /** Returns a map containing the count of occurrences of each distinct result of the [selector] function. */
+    inline fun <T, K> Iterable<T>.countBy(selector: (T) -> K): Map<K, Int> {
+        val map = mutableMapOf<K, Int>()
+        for (item in this) {
+            val key = selector(item)
+            map[key] = map.getOrDefault(key, 0) + 1
+        }
+        return map
+    }
+
     fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
     fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
@@ -210,6 +220,31 @@ object CollectionUtils {
         return collection
     }
 
+    /** Removes the first element that matches the given [predicate] in the list. */
+    fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
+        val mutableList = this.toMutableList()
+        val iterator = mutableList.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableList.toList()
+    }
+
+    /** Removes the first element that matches the given [predicate] in the map. */
+    fun <K, V> Map<K, V>.removeFirst(predicate: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
+        val mutableMap = this.toMutableMap()
+        val iterator = mutableMap.entries.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableMap.toMap()
+    }
 
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
