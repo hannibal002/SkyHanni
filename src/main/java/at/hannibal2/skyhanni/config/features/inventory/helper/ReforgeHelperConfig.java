@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ReforgeHelperConfig {
 
     @Expose
-    @ConfigLink(owner = ReforgeHelperConfig.class, field = "enable")
+    @ConfigLink(owner = ReforgeHelperConfig.class, field = "enabled")
     public Position position = new Position(80, 85, true, true);
 
     @Expose
@@ -23,6 +23,11 @@ public class ReforgeHelperConfig {
     @ConfigOption(name = "Stones Hex Only", desc = "Displays reforge stones only when in Hex.")
     @ConfigEditorBoolean
     public boolean reforgeStonesOnlyHex = true;
+
+    @Expose
+    @ConfigOption(name = "Show Diff", desc = "Shows the difference of the new reforge to the current one in the slecetion list.")
+    @ConfigEditorBoolean
+    public boolean showDiff = false;
 
     @Expose
     @ConfigOption(name = "Hide chat", desc = "Hides the vanilla chat messages from reforging.")

@@ -245,11 +245,13 @@ object ReforgeHelper {
             val stats: List<Renderable>
             val removedEffect: List<Renderable>
             val addEffectText: String
+            val click: List<Renderable>
             if (currentReforge == reforge) {
                 pre = listOf(rString("§3Reforge is currently applied!"))
                 stats = (currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList())
                 removedEffect = emptyList()
                 addEffectText = "§aEffect:"
+                click = emptyList()
             } else {
                 pre = listOf(rString("§6Reforge Stats"))
                 stats = (reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList())
@@ -259,13 +261,14 @@ object ReforgeHelper {
                 )?.let { listOf(rString("§cRemoves Effect:")) + it }
                     ?: emptyList()
                 addEffectText = "§aAdds Effect:"
+                click = listOf(rString("§eClick to select"))
             }
 
             val addedEffect =
                 (getReforgeEffect(reforge, itemRarity)?.let { listOf(rString(addEffectText)) + it }
                     ?: emptyList())
 
-            return@run pre + stats + removedEffect + addedEffect
+            return@run pre + stats + removedEffect + addedEffect + click
         }
         val onHover = if (!isInHexReforgeMenu) {
             {}
@@ -324,7 +327,7 @@ object ReforgeHelper {
                         rString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                         SkyblockStat.fontSizeOfLargestIcon,
                     ),
-                    listOf("§6Sort after", tip),
+                    listOf("§6Sort after", tip, "§eClick to apply sorting"),
                 ),
                 fieldColor.toColor(), radius = 15, padding = 1,
             )
@@ -400,13 +403,13 @@ object ReforgeHelper {
     }
 
     private fun SkyblockStatList.print(appliedReforge: SkyblockStatList? = null): List<Renderable> {
-        val diff = appliedReforge?.let { this - it }
+        val diff = appliedReforge?.takeIf { config.showDiff }?.let { this - it }
         val main = ((diff ?: this).mapNotNull {
             val key = it.key
-            val value = this[key] ?: return@mapNotNull null
+            val value = this[key] ?: 0.0
             buildList<Renderable> {
-                add(rString("§9${value.toStringWithPlus()}"))
-                diff?.get(key)?.let { add(rString((if (it < 0) "§c" else "§a") + it.toStringWithPlus())) }
+                add(rString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
+                diff?.get(key)?.let { add(rString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
                 add(rString(key.iconWithName))
             }
         })

@@ -62,13 +62,9 @@ enum class SkyblockStat(val icon: String) {
 class SkyblockStatList : EnumMap<SkyblockStat, Double>(SkyblockStat::class.java), Map<SkyblockStat, Double> {
     operator fun minus(other: SkyblockStatList): SkyblockStatList {
         return SkyblockStatList().apply {
-            for ((key, value) in this@SkyblockStatList) {
-                this[key] = value - (other[key] ?: 0.0)
-            }
-            for ((key, value) in other) {
-                if (this[key] == null) {
-                    this[key] = (this@SkyblockStatList[key] ?: 0.0) - value
-                }
+            val keys = this.keys + other.keys
+            for (key in keys) {
+                this[key] = (this@SkyblockStatList[key] ?: 0.0) - (other[key] ?: 0.0)
             }
         }
     }
