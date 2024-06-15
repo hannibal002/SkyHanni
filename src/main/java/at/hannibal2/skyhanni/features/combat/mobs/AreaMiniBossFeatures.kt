@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -37,7 +36,6 @@ object AreaMiniBossFeatures {
         lastSpawnTime = time
         if (config.areaBossHighlight) {
             event.mob.highlight(type.color.addOpacity(type.colorOpacity))
-            SoundUtils.playPlingSound()
         }
     }
 
