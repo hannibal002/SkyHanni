@@ -271,6 +271,7 @@ object MiningAPI {
 
     private fun updateLocation() {
         val currentArea = LorenzUtils.skyBlockArea
+        // TODO add area change event with HypixelData.skyBlockArea instead
         if (currentArea == lastSkyblockArea) return
         lastSkyblockArea = currentArea
 
