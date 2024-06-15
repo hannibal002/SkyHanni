@@ -44,9 +44,7 @@ object DungeonLividFinder {
         "§e﴾ §(?<color>.).+",
     )
 
-    private val isBlind = RecalculatingValue(100.milliseconds) {
-        isCurrentlyBlind()
-    }
+    private val isBlind = RecalculatingValue(100.milliseconds, ::isCurrentlyBlind)
 
     var livid: Mob? = null
     private var fakeLivids = mutableSetOf<Mob>()
