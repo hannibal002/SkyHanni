@@ -44,15 +44,15 @@ data class LorenzVec(
     fun distanceChebyshevIgnoreY(other: LorenzVec) = max(abs(this.x - other.x), abs(this.z - other.z))
 
     fun distanceSq(other: LorenzVec): Double {
-        val dx = (other.x - x)
-        val dy = (other.y - y)
-        val dz = (other.z - z)
+        val dx = other.x - x
+        val dy = other.y - y
+        val dz = other.z - z
         return (dx * dx + dy * dy + dz * dz)
     }
 
     fun distanceSqIgnoreY(other: LorenzVec): Double {
-        val dx = (other.x - x)
-        val dz = (other.z - z)
+        val dx = other.x - x
+        val dz = other.z - z
         return (dx * dx + dz * dz)
     }
 
@@ -75,20 +75,15 @@ data class LorenzVec(
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
     @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
-    fun multiply(d: Double): LorenzVec = LorenzVec(x multiplyZeroSave d, y multiplyZeroSave d, z multiplyZeroSave d)
+    fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
     @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
-    fun multiply(d: Int): LorenzVec =
-        LorenzVec(x multiplyZeroSave d.toDouble(), y multiplyZeroSave d.toDouble(), z multiplyZeroSave d.toDouble())
-
-    @Deprecated("Use operator fun div instead", ReplaceWith("this / LorenzVec(x, y, z)"))
-    fun divide(d: Double) = multiply(1.0 / d)
+    fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
     @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
-    fun multiply(v: LorenzVec) = LorenzVec(x multiplyZeroSave v.x, y multiplyZeroSave v.y, z multiplyZeroSave v.z)
+    fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
 
-    fun dotProduct(other: LorenzVec): Double =
-        (x multiplyZeroSave other.x) + (y multiplyZeroSave other.y) + (z multiplyZeroSave other.z)
+    fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
 
     fun angleAsCos(other: LorenzVec) = this.normalize().dotProduct(other.normalize())
 
@@ -164,12 +159,12 @@ data class LorenzVec(
         return LorenzVec(x, y, z)
     }
 
-    fun slope(other: LorenzVec, factor: Double) = add(other.subtract(this).scale(factor))
+    fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
     fun roundLocation(): LorenzVec {
-        val x = if (this.x < 0) x.toInt().toDouble() - 1 else x.toInt().toDouble()
-        val y = y.toInt().toDouble() - 1
-        val z = if (this.z < 0) z.toInt().toDouble() - 1 else z.toInt().toDouble()
+        val x = if (this.x < 0) x.toInt() - 1 else x.toInt()
+        val y = y.toInt() - 1
+        val z = if (this.z < 0) z.toInt() - 1 else z.toInt()
         return LorenzVec(x, y, z)
     }
 
@@ -244,11 +239,6 @@ data class LorenzVec(
     }
 }
 
-private infix fun Double.multiplyZeroSave(other: Double): Double {
-    val result = this * other
-    return if (result == -0.0) 0.0 else result
-}
-
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
@@ -267,6 +257,6 @@ fun Array<Double>.toLorenzVec(): LorenzVec {
 
 fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
 
-fun AxisAlignedBB.expand(vec: LorenzVec) = this.expand(vec.x, vec.y, vec.z)
+fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = this.expand(vec.x, vec.y, vec.z)
 
-fun AxisAlignedBB.expand(amount: Double) = this.expand(amount, amount, amount)
+fun AxisAlignedBB.expand(amount: Double): AxisAlignedBB = this.expand(amount, amount, amount)

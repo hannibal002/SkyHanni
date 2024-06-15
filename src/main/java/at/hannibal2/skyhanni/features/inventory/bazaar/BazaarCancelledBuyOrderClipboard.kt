@@ -1,23 +1,29 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BazaarCancelledBuyOrderClipboard {
+@SkyHanniModule
+object BazaarCancelledBuyOrderClipboard {
 
     private val patternGroup = RepoPattern.group("bazaar.cancelledorder")
 
@@ -39,7 +45,16 @@ class BazaarCancelledBuyOrderClipboard {
         "Order options"
     )
 
+    /**
+     * REGEX-TEST: §a§lBUY §5Giant Killer VII
+     */
+    private val lastItemClickedPattern by patternGroup.pattern(
+        "lastitemclicked",
+        "§a§lBUY (?<name>.*)"
+    )
+
     private var latestAmount: Int? = null
+    private var lastClickedItem: NEUInternalName? = null
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -67,6 +82,17 @@ class BazaarCancelledBuyOrderClipboard {
     }
 
     @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!BazaarOrderHelper.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
+        val item = event.slot?.stack ?: return
+
+        val name = lastItemClickedPattern.matchMatcher(item.name) {
+            group("name")
+        } ?: return
+        lastClickedItem = NEUInternalName.fromItemName(name)
+    }
+
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
@@ -75,7 +101,13 @@ class BazaarCancelledBuyOrderClipboard {
 
         val latestAmount = latestAmount ?: return
         event.blockedReason = "bazaar cancelled buy order clipboard"
-        ChatUtils.chat("Bazaar buy order cancelled. ${latestAmount.addSeparators()} saved to clipboard. ($coins coins)")
+        val lastClicked = lastClickedItem ?: error("last clicked bz item is null")
+
+        val message = "Bazaar buy order cancelled. Click to reorder. " +
+            "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e)"
+        ChatUtils.clickableChat(message, onClick = {
+            BazaarApi.searchForBazaarItem(lastClicked, latestAmount)
+        })
         OSUtils.copyToClipboard(latestAmount.toString())
         this.latestAmount = null
     }
