@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -152,12 +154,11 @@ object PestAPI {
     private fun updatePests() {
         if (!firstScoreboardCheck) return
         fixPests()
-        PestUpdateEvent().postAndCatch()
+        PestUpdateEvent().post()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestSpawn(event: PestSpawnEvent) {
-        if (!GardenAPI.inGarden()) return
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames
         for (plotName in plotNames) {
@@ -202,14 +203,14 @@ object PestAPI {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
                 if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
 
-                GardenPlotAPI.plots.forEach {
-                    if (plotList.contains(it.id)) {
-                        if (!it.isPestCountInaccurate && it.pests == 0) {
-                            it.isPestCountInaccurate = true
+                for (plot in GardenPlotAPI.plots) {
+                    if (plotList.contains(plot.id)) {
+                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                            plot.isPestCountInaccurate = true
                         }
                     } else {
-                        it.pests = 0
-                        it.isPestCountInaccurate = false
+                        plot.pests = 0
+                        plot.isPestCountInaccurate = false
                     }
                 }
                 updatePests()

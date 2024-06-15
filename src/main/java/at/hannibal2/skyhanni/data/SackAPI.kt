@@ -275,11 +275,7 @@ object SackAPI {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NEUInternalName>()
 
-        sacksData.values.forEach { sackInfo ->
-            sackInfo.contents.forEach { content ->
-                uniqueSackItems.add(content)
-            }
-        }
+        sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()

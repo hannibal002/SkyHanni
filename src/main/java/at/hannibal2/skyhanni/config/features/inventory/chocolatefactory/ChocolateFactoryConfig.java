@@ -99,6 +99,12 @@ public class ChocolateFactoryConfig {
     public boolean showDuplicateTime = false;
 
     @Expose
+    @ConfigOption(name = "Stray Rabbit Time", desc = "Show the production time of chocolate gained from stray rabbits.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showStrayTime = false;
+
+    @Expose
     @ConfigOption(name = "Time Tower Usage Warning", desc = "Notification when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
@@ -173,6 +179,15 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightRabbitsWithRequirement = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Show Missing Location Rabbits",
+        desc = "Shows which in which locations you have not yet found enough egg locations to unlock the rabbit for that location."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLocationRequirementsRabbitsInHoppityStats = false;
 
     @Expose
     @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")

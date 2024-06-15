@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDrops
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -54,12 +54,12 @@ object DianaProfitTracker {
         @Expose
         var burrowsDug: Long = 0
 
-        override fun getDescription(timesDropped: Long): List<String> {
-            val percentage = timesDropped.toDouble() / burrowsDug
+        override fun getDescription(timesGained: Long): List<String> {
+            val percentage = timesGained.toDouble() / burrowsDug
             val perBurrow = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
 
             return listOf(
-                "§7Dropped §e${timesDropped.addSeparators()} §7times.",
+                "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop chance per burrow: §c$perBurrow",
             )
         }
@@ -67,7 +67,7 @@ object DianaProfitTracker {
         override fun getCoinName(item: TrackedItem) = "§6Dug Out Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val burrowDugCoinsFormat = NumberUtil.format(item.totalAmount)
+            val burrowDugCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7Digging treasures gave you",
                 "§6$burrowDugCoinsFormat coins §7in total."
@@ -148,7 +148,7 @@ object DianaProfitTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<DianaDrops>("DianaDrops").diana_drops
+        allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }
 
     fun resetCommand() {

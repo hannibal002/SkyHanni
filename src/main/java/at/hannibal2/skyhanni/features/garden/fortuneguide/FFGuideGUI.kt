@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack
 class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
     override val sizeX = 360
-    override val sizeY = 180
+    override val sizeY = 200
 
     companion object {
 
@@ -76,7 +76,6 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         }
         horizontalTabs.firstOrNull()?.fakeClick()
         verticalTabs.firstOrNull()?.fakeClick()
-
     }
 
     private fun GuideTab.pageSwitchHorizontal() {
@@ -91,6 +90,5 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
         OVERVIEW,
         CROP,
         UPGRADES,
-
     }
 }
