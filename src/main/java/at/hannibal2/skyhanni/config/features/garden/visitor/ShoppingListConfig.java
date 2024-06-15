@@ -27,7 +27,7 @@ public class ShoppingListConfig {
 
     @Expose
     @ConfigOption(name = "Bazaar Alley", desc = "Show the Visitor Items List while inside the Bazaar Alley in the Hub.\n" +
-        "This helps buying the correct amount when not having a Booster Cookie Buff active.")
+        "§eHelps in buying the correct amount when not having a §6Booster Cookie §ebuff active.")
     @ConfigEditorBoolean
     public boolean inBazaarAlley = true;
 
