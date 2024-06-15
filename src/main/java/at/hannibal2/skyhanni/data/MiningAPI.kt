@@ -66,6 +66,8 @@ object MiningAPI {
 
     var currentAreaOreBlocks = setOf<OreBlock>()
 
+    private var lastSkyblockArea: String? = null
+
     private var recentClickedBlocks = mutableListOf<MinedBlock>()
     private var surroundingMinedBlocks = mutableListOf<MinedBlock>()
     private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth")
@@ -268,37 +270,17 @@ object MiningAPI {
     }
 
     private fun updateLocation() {
-        val newInGlacite = inGlaciteArea()
-        val newInDwarvenMines = inRegularDwarven()
-        val newInCrystalHollows = inCrystalHollows()
-        val newInCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()
-        val newInEnd = IslandType.THE_END.isInIsland()
-        val newInSpidersDen = IslandType.SPIDER_DEN.isInIsland()
+        val currentArea = LorenzUtils.skyBlockArea
+        if (currentArea == lastSkyblockArea) return
+        lastSkyblockArea = currentArea
 
-        if (newInGlacite != inGlacite ||
-            newInDwarvenMines != inDwarvenMines ||
-            newInCrystalHollows != inCrystalHollows ||
-            newInCrimsonIsle != inCrimsonIsle ||
-            newInEnd != inEnd ||
-            newInSpidersDen != inSpidersDen
-        ) {
+        inGlacite = inGlaciteArea()
+        inDwarvenMines = inRegularDwarven()
+        inCrystalHollows = inCrystalHollows()
+        inCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()
+        inEnd = IslandType.THE_END.isInIsland()
+        inSpidersDen = IslandType.SPIDER_DEN.isInIsland()
 
-            inGlacite = newInGlacite
-            inDwarvenMines = newInDwarvenMines
-            inCrystalHollows = newInCrystalHollows
-            inCrimsonIsle = newInCrimsonIsle
-            inEnd = newInEnd
-            inSpidersDen = newInSpidersDen
-
-            val entries = OreBlock.entries
-            val oreBlockList: List<OreBlock> = if (newInGlacite) entries.filter { it.checkArea.invoke() }
-            else if (newInDwarvenMines) entries.filter { it.checkArea.invoke() }
-            else if (newInCrystalHollows) entries.filter { it.checkArea.invoke() }
-            else if (newInCrimsonIsle) entries.filter { it.checkArea.invoke() }
-            else if (newInEnd) entries.filter { it.checkArea.invoke() }
-            else if (newInSpidersDen) entries.filter { it.checkArea.invoke() }
-            else mutableListOf()
-            currentAreaOreBlocks = oreBlockList.toSet()
-        }
+        currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
     }
 }
