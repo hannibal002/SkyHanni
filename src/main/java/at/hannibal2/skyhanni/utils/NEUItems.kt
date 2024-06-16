@@ -286,8 +286,8 @@ object NEUItems {
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
     fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
-        if (itemIdCache.contains(item)) {
-            return itemIdCache[item]!!
+        itemIdCache[item]?.let {
+            return it
         }
         val result = allNeuRepoItems()
             .filter { Item.getByNameOrId(it.value.get("itemid").asString) == item }
