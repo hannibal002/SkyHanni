@@ -9,7 +9,7 @@ import net.minecraftforge.common.util.Constants
 
 object BlockUtils {
 
-    val world get() = Minecraft.getMinecraft().theWorld
+    private val world get() = Minecraft.getMinecraft().theWorld
 
     fun LorenzVec.getBlockAt(): Block = getBlockStateAt().block
 
