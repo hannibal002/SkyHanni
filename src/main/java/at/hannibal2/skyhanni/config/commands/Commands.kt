@@ -69,6 +69,7 @@ import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -440,6 +441,10 @@ object Commands {
             "shtestgriffinspots",
             "Show potential griffin spots around you.",
         ) { GriffinBurrowHelper.testGriffinSpots() }
+        registerCommand(
+            "shtestisland",
+            "Sets the current skyblock island for testing purposes.",
+        ) { SkyBlockIslandTest.onCommand(it) }
     }
 
     private fun developersCodingHelp() {
