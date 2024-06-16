@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -432,7 +431,6 @@ object DungeonAPI {
             goldorTerminalPattern.matchMatcher(message) {
                 val currentTerminal = group("currentTerminal").toIntOrNull() ?: return
                 val totalTerminals = group("total").toIntOrNull() ?: return
-                ChatUtils.chat("found message! $currentTerminal $totalTerminals")
                 if (currentTerminal != totalTerminals) return
                 changePhase(when (dungeonPhase) {
                     DungeonPhase.F7_GOLDOR_1 -> DungeonPhase.F7_GOLDOR_2
