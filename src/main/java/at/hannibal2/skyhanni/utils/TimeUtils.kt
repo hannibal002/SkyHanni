@@ -37,7 +37,7 @@ object TimeUtils {
                 if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
                     val formatted = value.addSeparators()
                     val formattedMillis = (millis / 100).toInt()
-                    val name = unit.getName(longName, value)
+                    val name = unit.getName(value, longName)
 
                     val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
                         "$formatted.$formattedMillis"
@@ -160,7 +160,9 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
 
-    fun getName(longFormat: Boolean = false, value: Int) = if (longFormat) {
+    fun getName(value: Int, longFormat: Boolean = false) = if (longFormat) {
         " $longName" + if (value > 1) "s" else ""
     } else shortName
+
+    fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }
