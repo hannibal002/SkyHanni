@@ -48,12 +48,13 @@ object DungeonLividFinder {
         if (mob.name != "Livid" && mob.name != "Real Livid") return
         if (mob.baseEntity !is EntityOtherPlayerMP) return
 
-        val lividColor = mob.getLividColor() ?: return
-
-        if (lividColor == color) {
+        val lividColor = color ?: return
+        if (mob.isLividColor(lividColor)) {
             livid = mob
             if (config.enabled) mob.highlight(lividColor.toColor())
-        } else fakeLivids += mob
+        } else {
+            fakeLivids += mob
+        }
     }
 
     @SubscribeEvent
@@ -80,31 +81,29 @@ object DungeonLividFinder {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!inLividBossRoom()) return
-        if (!config.hideWrong) return
+        if (!inLividBossRoom() || !config.hideWrong) return
+        if (livid == null) return
         if (event.entity.mob in fakeLivids) event.cancel()
     }
 
     private fun isCurrentlyBlind() =
         Minecraft.getMinecraft().thePlayer?.getActivePotionEffect(Potion.blindness)?.duration?.let { it > 10 } ?: false
 
-    private fun Mob.getLividColor(): LorenzColor? {
-        val name = armorStand?.displayName?.formattedText ?: return null
-        if (name.startsWith("§e﴾ §c")) return null
-        return name.getOrNull(1)?.toLorenzColor()
+    private fun Mob.isLividColor(color: LorenzColor): Boolean {
+        val chatColor = color.getChatColor()
+        return armorStand?.name?.startsWith("${chatColor}﴾ ${chatColor}§lLivid") ?: false
     }
-
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!inLividBossRoom()) return
-        if (!config.enabled) return
+        if (!inLividBossRoom() || !config.enabled) return
         if (isBlind.getValue()) return
 
         val entity = livid?.baseEntity ?: return
+        val lorenzColor = color ?: return
+
         val location = event.exactLocation(entity)
         val boundingBox = event.exactBoundingBox(entity)
-        val lorenzColor = color ?: return
 
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 

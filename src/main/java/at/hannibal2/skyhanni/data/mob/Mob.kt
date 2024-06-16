@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
@@ -142,13 +143,16 @@ class Mob(
         get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
             ?: baseEntity.entityBoundingBox
 
+    val health: Float get() = baseEntity.health
+    val maxHealth: Int get() = baseEntity.baseMaxHealth
+
     init {
         removeExtraEntitiesFromChecking()
         relativeBoundingBox =
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
         owner = (ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+            summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
         } else null)?.let { MobUtils.OwnerShip(it) }
     }
 
