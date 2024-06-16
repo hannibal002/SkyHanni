@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkillTooltip {
 
+    // TODO extract function into more smaller ones
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -57,9 +58,8 @@ object SkillTooltip {
                     if (line.contains(bar)) {
                         val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax)
                         val progressBar = StringUtils.progressBar(progress)
-                        iterator.set(
-                            "$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/§e${skillInfo.overflowCurrentXpMax.addSeparators()}",
-                        )
+                        val max = skillInfo.overflowCurrentXpMax.addSeparators()
+                        iterator.set("$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/§e$max",)
                         iterator.add("")
                     }
                 }

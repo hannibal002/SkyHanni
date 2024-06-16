@@ -9,7 +9,8 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class SkillColorConfig {
 
     @Expose
-    @ConfigOption(name = "Match Bar Color", desc = "Match the display color with the bar color.\n§cWill make the options below useless.")
+    @ConfigOption(name = "Match Bar Color", desc = "Match the display color with the bar color.\n" +
+        "§cWill make the options below useless.")
     @ConfigEditorBoolean
     public Property<Boolean> matchBarColor = Property.of(false);
 

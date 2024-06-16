@@ -55,6 +55,8 @@ object SkillAPI {
     val skillColorConfig get() = config.skillColorConfig
 
     private val patternGroup = RepoPattern.group("api.skilldisplay")
+
+    // TODO add regex tests
     private val skillPercentPattern by patternGroup.pattern(
         "skill.percent",
         "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)",
