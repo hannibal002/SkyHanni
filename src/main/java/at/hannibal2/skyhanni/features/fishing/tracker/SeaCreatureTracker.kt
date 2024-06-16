@@ -77,7 +77,7 @@ object SeaCreatureTracker {
         val realAmount = data.amount.filter { filter(it.key) }
 
         val total = realAmount.sumAllValues()
-        realAmount.entries.sortedByDescending { it.value }.forEach { (name, amount) ->
+        for ((name, amount) in realAmount.entries.sortedByDescending { it.value }) {
             val displayName = SeaCreatureManager.allFishingMobs[name]?.displayName ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Sea Creature Tracker can not display a name correctly",

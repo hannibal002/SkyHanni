@@ -48,7 +48,7 @@ public class CustomScoreboardConfig {
     public InformationFilteringConfig informationFiltering = new InformationFilteringConfig();
 
     @Expose
-    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard.")
+    @ConfigOption(name = "Unknown Lines warning", desc = "Give a chat warning when unknown lines are found in the scoreboard.")
     @ConfigEditorBoolean
     public boolean unknownLinesWarning = true;
 
