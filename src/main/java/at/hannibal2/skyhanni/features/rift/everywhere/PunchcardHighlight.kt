@@ -57,7 +57,7 @@ object PunchcardHighlight {
     )
 
     /**
-     * REGEX-TEST:  §c§lAWKWARD! §r§cThis player has already been punched by you... somehow!
+     * REGEX-TEST: §c§lAWKWARD! §r§cThis player has already been punched by you... somehow!
      */
     private val repeatPattern by patternGroup.pattern(
         "repeat",
@@ -65,7 +65,7 @@ object PunchcardHighlight {
     )
 
     /**
-     * REGEX-TEST:  §c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!
+     * REGEX-TEST: §c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!
      */
     private val limitPattern by patternGroup.pattern(
         "limit",
