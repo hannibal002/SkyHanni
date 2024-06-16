@@ -94,22 +94,12 @@ object UserLuckBreakdown {
 
     private fun checkItemSlot(event: ReplaceItemEvent) {
         when (event.slot) {
-            48 -> return
-            49 -> return
-            10 -> {
-                event.replace(skillsItem)
-                return
-            }
+            48, 49 -> return
 
-            11 -> {
-                event.replace(limboItem)
-                return
-            }
+            10 -> event.replace(skillsItem)
+            11 -> event.replace(limboItem)
 
-            in validItemSlots -> {
-                event.replace(null)
-                return
-            }
+            in validItemSlots -> event.replace(null)
 
             in invalidItemSlots -> {
                 if (event.originalItem.item == limboID.getItemStack().item) return
@@ -135,7 +125,6 @@ object UserLuckBreakdown {
             if (matcher.find()) {
                 showAllStats = when (matcher.group("toggle")) {
                     "Yes" -> true
-                    "Nope" -> false
                     else -> false
                 }
             }
