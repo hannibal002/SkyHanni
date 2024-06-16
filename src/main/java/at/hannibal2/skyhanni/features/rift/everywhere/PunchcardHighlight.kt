@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -75,11 +75,19 @@ object PunchcardHighlight {
 
     @SubscribeEvent
     fun onToggle(event: ConfigLoadEvent) {
-        config.enabled.onToggle { reloadColors() }
-        config.compact.onToggle { display = drawDisplay() }
-        config.color.onToggle { reloadColors() }
-        config.reverseGUI.onToggle { display = drawDisplay() }
-        config.reverse.onToggle { reloadColors() }
+        ConditionalUtils.onToggle(
+            config.enabled,
+            config.color,
+            config.reverse,
+        ) {
+            reloadColors()
+        }
+        ConditionalUtils.onToggle(
+            config.compact,
+            config.reverseGUI,
+        ) {
+            display = drawDisplay()
+        }
     }
 
     @SubscribeEvent
@@ -89,7 +97,8 @@ object PunchcardHighlight {
             reloadColors()
             if (IslandType.THE_RIFT.isInIsland() &&
                 HypixelData.server.isNotEmpty() &&
-                lastRiftServer != HypixelData.server) {
+                lastRiftServer != HypixelData.server
+            ) {
                 lastRiftServer = HypixelData.server
                 playerList.clear()
             }
@@ -101,16 +110,13 @@ object PunchcardHighlight {
             RenderLivingEntityHelper.removeEntityColor(entity)
             return
         }
-        val alpha = when (config.color.get().toChromaColor().alpha) {
+        val color = config.color.get().toChromaColor()
+        val alpha = when (color.alpha) {
             0 -> 0
             255 -> 1
-            else -> 255 - config.color.get().toChromaColor().alpha
+            else -> 255 - color.alpha
         }
-        val color = config.color.get().toChromaColor().withAlpha(alpha)
-        RenderLivingEntityHelper.setEntityColor(
-            entity,
-            color,
-        ) { IslandType.THE_RIFT.isInIsland() }
+        RenderLivingEntityHelper.setEntityColor(entity, color.withAlpha(alpha)) { IslandType.THE_RIFT.isInIsland() }
     }
 
     fun clearList() {
@@ -148,7 +154,7 @@ object PunchcardHighlight {
     fun onChat(event: LorenzChatEvent) {
         if (!IslandType.THE_RIFT.isInIsland()) return
         if (!listening) return
-        if (playerQueue.size == 0) return
+        if (playerQueue.isEmpty()) return
         val message = event.message
         val queuedName = playerQueue[0]
         punchedPattern.matchMatcher(message) {
@@ -208,14 +214,8 @@ object PunchcardHighlight {
         }
         if (!config.enabled.get()) return
         val reverse = config.reverse.get()
-        if (reverse) {
-            MobData.players.filter { it.name in playerList }.forEach {
-                colorPlayer(it.baseEntity)
-            }
-        } else {
-            MobData.players.filter { it.name !in playerList }.forEach {
-                colorPlayer(it.baseEntity)
-            }
+        for (player in MobData.players.filter { (reverse && it.name in playerList) || (!reverse && it.name !in playerList) }) {
+            colorPlayer(player.baseEntity)
         }
     }
 }
