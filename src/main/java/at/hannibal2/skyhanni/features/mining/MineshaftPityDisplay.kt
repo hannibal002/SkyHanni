@@ -202,21 +202,21 @@ object MineshaftPityDisplay {
         )
 
         val map = buildMap {
-            put(MineshaftPityLines.TITLE, Renderable.string("§9§lMineshaft Pity Counter"))
-            put(MineshaftPityLines.COUNTER, Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"))
+            put(MineshaftPityLine.TITLE, Renderable.string("§9§lMineshaft Pity Counter"))
+            put(MineshaftPityLine.COUNTER, Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"))
             put(
-                MineshaftPityLines.CHANCE,
+                MineshaftPityLine.CHANCE,
                 Renderable.string(
                     "§3Chance: §e1§6/§e${chance.round(1).addSeparators()} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
                 ),
             )
-            put(MineshaftPityLines.NEEDED_TO_PITY, neededToPityRenderable)
+            put(MineshaftPityLine.NEEDED_TO_PITY, neededToPityRenderable)
             put(
-                MineshaftPityLines.TIME_SINCE_MINESHAFT,
+                MineshaftPityLine.TIME_SINCE_MINESHAFT,
                 Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
             )
             put(
-                MineshaftPityLines.AVERAGE_BLOCKS_MINESHAFT,
+                MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT,
                 Renderable.string(
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
@@ -262,7 +262,7 @@ object MineshaftPityDisplay {
 
     private fun isDisplayEnabled() = (MiningAPI.inGlacialTunnels() || MiningAPI.inDwarvenBaseCamp()) && config.enabled
 
-    enum class MineshaftPityLines(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
+    enum class MineshaftPityLine(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         TITLE("§3§lMineshaft Pity Counter"),
         COUNTER("§3Counter: §e561§6/§e2000"),
         CHANCE("§3Chance: §e1§6/§e1439 §7(§b0.069%§7)"),
