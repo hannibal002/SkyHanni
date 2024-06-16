@@ -77,8 +77,8 @@ object VisitorListener {
         val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
 
         if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
-            VisitorAPI.getVisitors().forEach {
-                val name = it.visitorName
+            for (visitor in VisitorAPI.getVisitors()) {
+                val name = visitor.visitorName
                 val removed = name !in visitorsInTab
                 if (removed) {
                     logger.log("Removed old visitor: '$name'")

@@ -178,8 +178,7 @@ object ChocolateFactoryDataLoader {
         processLeaderboardItem(leaderboardItem)
         processBarnItem(barnItem)
 
-        profileStorage.rawChocPerSecond =
-            (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
+        profileStorage.rawChocPerSecond = (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
         profileStorage.lastDataSave = SimpleTimeMark.now()
 
         ChocolateFactoryStats.updateDisplay()
@@ -417,9 +416,7 @@ object ChocolateFactoryDataLoader {
                 SoundUtils.playBeepSound()
             }
 
-            if (warningConfig.specialRabbitWarning &&
-                (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
-            ) {
+            if (warningConfig.specialRabbitWarning && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)) {
                 SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
             }
 
@@ -427,14 +424,13 @@ object ChocolateFactoryDataLoader {
         }
     }
 
-    private fun findBestUpgrades(list: MutableList<ChocolateFactoryUpgrade>) {
+    private fun findBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
         val profileStorage = profileStorage ?: return
 
         // removing time tower here as people like to determine when to buy it themselves
-        val notMaxed =
-            list.filter {
-                !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null
-            }
+        val notMaxed = list.filter {
+            !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null
+        }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt ?: SimpleTimeMark.farPast()
