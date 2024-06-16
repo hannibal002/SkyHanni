@@ -107,16 +107,13 @@ object PunchcardHighlight {
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
-        if (IslandType.THE_RIFT !in listOf(event.newIsland, event.oldIsland)) return
+        if (event.newIsland != IslandType.THE_RIFT) return
 
-        if (event.newIsland == IslandType.THE_RIFT) {
-            display = drawDisplay()
-        }
+        display = drawDisplay()
 
         if (playerList.isEmpty()) return
         DelayedRun.runDelayed(1500.milliseconds) {
-            if (event.newIsland == IslandType.THE_RIFT &&
-                HypixelData.server.isNotEmpty() &&
+            if (HypixelData.server.isNotEmpty() &&
                 lastRiftServer != HypixelData.server
             ) {
                 reloadColors()
