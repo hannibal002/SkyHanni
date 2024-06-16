@@ -47,30 +47,7 @@ object CraftableItemList {
 
         val pricePer = mutableMapOf<NEUInternalName, Double>()
         val lines = mutableMapOf<NEUInternalName, Renderable>()
-        val availableMaterial = readItems()
-        for (internalName in NEUItems.allInternalNames) {
-            if (config.excludeVanillaItems && internalName.isVanillaItem()) continue
-
-            val recipes = NEUItems.getRecipes(internalName)
-
-            for (recipe in recipes) {
-                if (recipe !is CraftingRecipe) continue
-                val neededItems = neededItems(recipe)
-                // Just a fail save, should not happen normally
-                if (neededItems.isEmpty()) continue
-                val amount = canCraftAmount(neededItems, availableMaterial)
-                if (amount > 0) {
-                    pricePer[internalName] = pricePer(neededItems) * amount
-                    lines[internalName] = Renderable.clickAndHover(
-                        "§8x${amount.addSeparators()} ${internalName.itemName}",
-                        tips = listOf("Click to craft ${internalName.itemName}!"),
-                        onClick = {
-                            HypixelCommands.recipe(internalName.asString())
-                        },
-                    )
-                }
-            }
-        }
+        loadData(pricePer, lines)
 
         display = if (lines.isEmpty()) {
             listOf(Renderable.string("§7No Items to craft"))
@@ -80,6 +57,34 @@ object CraftableItemList {
                 Renderable.string("§7Recipes: ${list.size} total"),
                 Renderable.scrollList(list, height = 120),
             )
+        }
+    }
+
+    private fun loadData(
+        pricePer: MutableMap<NEUInternalName, Double>,
+        lines: MutableMap<NEUInternalName, Renderable>,
+    ) {
+        val availableMaterial = readItems()
+        for (internalName in NEUItems.allInternalNames) {
+            if (config.excludeVanillaItems && internalName.isVanillaItem()) continue
+
+            val recipes = NEUItems.getRecipes(internalName)
+            for (recipe in recipes) {
+                if (recipe !is CraftingRecipe) continue
+                val neededItems = neededItems(recipe)
+                // Just a fail save, should not happen normally
+                if (neededItems.isEmpty()) continue
+                val amount = canCraftAmount(neededItems, availableMaterial)
+                if (amount <= 0) continue
+                pricePer[internalName] = pricePer(neededItems) * amount
+                lines[internalName] = Renderable.clickAndHover(
+                    "§8x${amount.addSeparators()} ${internalName.itemName}",
+                    tips = listOf("Click to craft ${internalName.itemName}!"),
+                    onClick = {
+                        HypixelCommands.recipe(internalName.asString())
+                    },
+                )
+            }
         }
     }
 
