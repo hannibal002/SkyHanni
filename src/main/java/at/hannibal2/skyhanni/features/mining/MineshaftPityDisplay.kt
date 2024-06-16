@@ -130,7 +130,7 @@ object MineshaftPityDisplay {
 
             if (!lastMineshaftSpawn.isFarPast()) {
                 hover.add("")
-                hover.add("§7Time since Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}")
+                hover.add("§7Time since Last Mineshaft: §b${lastMineshaftSpawn.passedSince().format()}")
             }
 
             resetCounter()
@@ -207,7 +207,7 @@ object MineshaftPityDisplay {
             put(
                 MineshaftPityLines.CHANCE,
                 Renderable.string(
-                    "§3Chance: §e1§6/§e${chance.round(1)} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
+                    "§3Chance: §e1§6/§e${chance.round(1).addSeparators()} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
                 ),
             )
             put(MineshaftPityLines.NEEDED_TO_PITY, neededToPityRenderable)
