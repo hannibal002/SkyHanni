@@ -203,14 +203,14 @@ object PestAPI {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
                 if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
 
-                GardenPlotAPI.plots.forEach {
-                    if (plotList.contains(it.id)) {
-                        if (!it.isPestCountInaccurate && it.pests == 0) {
-                            it.isPestCountInaccurate = true
+                for (plot in GardenPlotAPI.plots) {
+                    if (plotList.contains(plot.id)) {
+                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                            plot.isPestCountInaccurate = true
                         }
                     } else {
-                        it.pests = 0
-                        it.isPestCountInaccurate = false
+                        plot.pests = 0
+                        plot.isPestCountInaccurate = false
                     }
                 }
                 updatePests()

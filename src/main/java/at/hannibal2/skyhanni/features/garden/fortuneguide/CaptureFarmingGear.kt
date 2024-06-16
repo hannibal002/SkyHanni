@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -45,6 +46,10 @@ object CaptureFarmingGear {
     private val fortuneUpgradePattern by patternGroup.pattern(
         "fortuneupgrade",
         "You claimed the Garden Farming Fortune (?<level>.*) upgrade!"
+    )
+    private val bestiaryPattern by patternGroup.pattern(
+        "bestiary",
+        ".*§6+(?<fortune>.*)☘ Farming Fortune.*"
     )
     private val anitaBuffPattern by patternGroup.pattern(
         "anitabuff",
@@ -70,7 +75,6 @@ object CaptureFarmingGear {
         "strength",
         " Strength: §r§c❁(?<strength>.*)"
     )
-
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
         "§7Progress to Tier (?<nextTier>\\w+):.*"
@@ -160,6 +164,26 @@ object CaptureFarmingGear {
             "Configure Plots" -> configurePlots(items, storage)
             "Anita" -> anita(items, storage)
             "Visitor Milestones" -> visitorMilestones(items)
+            "Bestiary", "Bestiary ➜ Garden" -> bestiary(items, storage)
+        }
+    }
+
+    private fun bestiary(
+        items: Map<Int, ItemStack>,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
+    ) {
+        for ((_, item) in items) {
+            if (item.displayName.contains("Garden")) {
+                var fortune = -1.0
+                for (line in item.getLore()) {
+                    bestiaryPattern.matchMatcher(line) {
+                        fortune = group("fortune").toDouble()
+                    }
+                }
+                if (fortune > -1.0) {
+                    storage.bestiary = fortune
+                }
+            }
         }
     }
 
@@ -314,6 +338,10 @@ object CaptureFarmingGear {
             storage.farmingLevel = group("level").romanToDecimalIfNecessary()
             return
         }
+        bestiaryPattern.matchMatcher(msg) {
+            storage.bestiary += group("fortune").toDouble()
+            return
+        }
         anitaBuffPattern.matchMatcher(msg) {
             storage.anitaUpgrade = group("level").toInt() / 4
             return
@@ -337,7 +365,7 @@ object CaptureFarmingGear {
             return
         }
         cakePattern.matchMatcher(msg) {
-            storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
+            FFStats.cakeExpireTime = 2.days.fromNow()
             return
         }
         CarrolynTable.entries.forEach {
