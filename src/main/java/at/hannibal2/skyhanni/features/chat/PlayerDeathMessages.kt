@@ -32,8 +32,8 @@ object PlayerDeathMessages {
 
         val name = event.name
 
-        if (MarkedPlayerManager.config.highlightInChat &&
-            !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)
+        if (MarkedPlayerManager.config.highlightInChat && !DungeonAPI.inDungeon() &&
+            !LorenzUtils.inKuudraFight && MarkedPlayerManager.isMarkedPlayer(name)
         ) {
             val reason = event.reason
             val color = MarkedPlayerManager.config.chatColor.getChatColor()
@@ -49,14 +49,13 @@ object PlayerDeathMessages {
     }
 
     private fun checkOtherPlayers() {
-        val location = LocationUtils.playerLocation()
-        for (otherPlayer in EntityUtils.getEntities<EntityOtherPlayerMP>()
-            .filter { it.getLorenzVec().distance(location) < 25 }) {
+        val entities = EntityUtils.getEntities<EntityOtherPlayerMP>()
+            .filter { it.getLorenzVec().distance(LocationUtils.playerLocation()) < 25 }
+        for (otherPlayer in entities) {
             lastTimePlayerSeen[otherPlayer.name] = System.currentTimeMillis()
         }
     }
 
-    private fun isHideFarDeathsEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
-    }
+    private fun isHideFarDeathsEnabled(): Boolean =
+        LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 }
