@@ -49,20 +49,20 @@ object CraftableItemList {
 
         val pricePer = mutableMapOf<NEUInternalName, Double>()
         val lines = mutableMapOf<NEUInternalName, Renderable>()
-        loadData(pricePer, lines)
+        loadItems(pricePer, lines)
 
         display = if (lines.isEmpty()) {
             listOf(Renderable.string("§7No Items to craft"))
         } else {
-            val list = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
+            val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
             listOf(
-                Renderable.string("§eCraftable items (${list.size})"),
-                Renderable.scrollList(list, height = 250, velocity = 20.0),
+                Renderable.string("§eCraftable items (${items.size})"),
+                Renderable.scrollList(items, height = 250, velocity = 20.0),
             )
         }
     }
 
-    private fun loadData(
+    private fun loadItems(
         pricePer: MutableMap<NEUInternalName, Double>,
         lines: MutableMap<NEUInternalName, Renderable>,
     ) {
@@ -73,40 +73,51 @@ object CraftableItemList {
             val recipes = NEUItems.getRecipes(internalName)
             for (recipe in recipes) {
                 if (recipe !is CraftingRecipe) continue
-                val neededItems = neededItems(recipe)
-                // Just a fail save, should not happen normally
-                if (neededItems.isEmpty()) continue
-                val canCraftAmount = canCraftAmount(neededItems, availableMaterial)
-                if (canCraftAmount <= 0) continue
-
-                val amountFormat = canCraftAmount.addSeparators()
-                val totalPrice = pricePer(neededItems)
-                pricePer[internalName] = totalPrice
-                val tooltip = buildList<String> {
-                    add(internalName.itemName)
-                    add("")
-                    add("§7Craft cost: §6${totalPrice.shortFormat()}")
-                    for ((item, amount) in neededItems) {
-                        val name = item.itemName
-                        val price = item.getPrice() * amount
-                        add(" §8x${amount.addSeparators()} $name §7(§6${price.shortFormat()}§7)")
-                    }
-                    add("")
-                    add("§7You have enough materials")
-                    val timeName = StringUtils.pluralize(canCraftAmount, "time", "times")
-                    add("§7to craft this item $amountFormat $timeName!")
-                    add("")
-                    add("§eClick to craft!")
-                }
-                lines[internalName] = Renderable.clickAndHover(
-                    "§8x$amountFormat ${internalName.itemName}",
-                    tips = tooltip,
-                    onClick = {
-                        HypixelCommands.viewRecipe(internalName.asString())
-                    },
-                )
+                val renderable = createItemRenderable(recipe, availableMaterial, pricePer, internalName) ?: continue
+                lines[internalName] = renderable
             }
         }
+    }
+
+    private fun createItemRenderable(
+        recipe: CraftingRecipe,
+        availableMaterial: Map<NEUInternalName, Long>,
+        pricePer: MutableMap<NEUInternalName, Double>,
+        internalName: NEUInternalName,
+    ): Renderable? {
+        val neededItems = neededItems(recipe)
+        // Just a fail save, should not happen normally
+        if (neededItems.isEmpty()) return null
+
+        val canCraftAmount = canCraftAmount(neededItems, availableMaterial)
+        if (canCraftAmount <= 0) return null
+
+        val amountFormat = canCraftAmount.addSeparators()
+        val totalPrice = pricePer(neededItems)
+        pricePer[internalName] = totalPrice
+        val tooltip = buildList<String> {
+            add(internalName.itemName)
+            add("")
+            add("§7Craft cost: §6${totalPrice.shortFormat()}")
+            for ((item, amount) in neededItems) {
+                val name = item.itemName
+                val price = item.getPrice() * amount
+                add(" §8x${amount.addSeparators()} $name §7(§6${price.shortFormat()}§7)")
+            }
+            add("")
+            add("§7You have enough materials")
+            val timeName = StringUtils.pluralize(canCraftAmount, "time", "times")
+            add("§7to craft this item $amountFormat $timeName!")
+            add("")
+            add("§eClick to craft!")
+        }
+        return Renderable.clickAndHover(
+            "§8x$amountFormat ${internalName.itemName}",
+            tips = tooltip,
+            onClick = {
+                HypixelCommands.viewRecipe(internalName.asString())
+            },
+        )
     }
 
     @SubscribeEvent
