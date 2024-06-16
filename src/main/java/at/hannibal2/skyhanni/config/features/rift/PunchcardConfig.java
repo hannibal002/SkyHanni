@@ -24,6 +24,7 @@ public class PunchcardConfig {
     @Expose
     @ConfigOption(name = "Enable Overlay", desc = "Shows an overlay with the amount of punched players.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public Property<Boolean> gui = Property.of(true);
 
     @Expose
