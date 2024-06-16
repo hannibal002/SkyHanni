@@ -138,7 +138,7 @@ object UserLuckBreakdown {
         inCustomBreakdown = false
     }
 
-    private fun findValidSlot(input: Map<Int, ItemStack>): Int {
+    private fun findValidSlot(input: Map<Int, ItemStack>): Int? {
         for (slot in input.keys) {
             if (slot !in validItemSlots && slot < 44) continue
             val itemStack = input[slot]
@@ -146,7 +146,7 @@ object UserLuckBreakdown {
                 return slot
             }
         }
-        return -1
+        return null
     }
 
     @SubscribeEvent
