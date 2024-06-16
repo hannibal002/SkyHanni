@@ -160,7 +160,7 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
 
-    fun getName(value: Int, longFormat: Boolean = false) = if (longFormat) {
+    fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
         " $longName" + if (value > 1) "s" else ""
     } else shortName
 
