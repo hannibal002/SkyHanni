@@ -14,17 +14,21 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
@@ -103,23 +107,38 @@ object PunchcardHighlight {
         ) {
             display = drawDisplay()
         }
+        ConditionalUtils.onToggle(
+            config.highlight,
+            config.color,
+        ) {
+            checkPunchcard()
+        }
+    }
+
+    private var warningCooldown = SimpleTimeMark.farPast()
+
+    private fun checkPunchcard() {
+        if (!RiftAPI.inRift()) return
+
+        val hasPunchcard = InventoryUtils.getItemsInOwnInventory().any { it.getInternalName() == "PUNCHCARD_ARTIFACT".asInternalName() }
+        if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
+            warningCooldown = SimpleTimeMark.now()
+            ChatUtils.chat("You don't seem to own a Punchcard Artifact, this feature will not work without one.")
+        }
     }
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.THE_RIFT) return
-
-        display = drawDisplay()
-
-        if (playerList.isEmpty()) return
         DelayedRun.runDelayed(1500.milliseconds) {
-            if (HypixelData.server.isNotEmpty() &&
-                lastRiftServer != HypixelData.server
-            ) {
+            if (playerList.isEmpty()) return@runDelayed
+            if (event.newIsland != IslandType.THE_RIFT) return@runDelayed
+
+            if (HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
                 reloadColors()
                 lastRiftServer = HypixelData.server
                 playerList.clear()
             }
+            display = drawDisplay()
         }
     }
 
