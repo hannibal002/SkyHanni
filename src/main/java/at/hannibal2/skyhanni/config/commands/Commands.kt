@@ -83,6 +83,7 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -506,6 +507,10 @@ object Commands {
             "shtestmessage",
             "Sends a custom chat message client side in the chat",
         ) { TestChatCommand.command(it) }
+        registerCommand(
+            "shtestrainbow",
+            "Sends a rainbow in chat"
+        ) { ExtendedChatColor.testCommand() }
         registerCommand(
             "shcopyinternalname",
             "Copies the internal name of the item in hand to the clipboard.",

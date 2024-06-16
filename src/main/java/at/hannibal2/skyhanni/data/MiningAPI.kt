@@ -249,7 +249,11 @@ object MiningAPI {
         }
 
         event.addData {
-            add("lastInitSound: ${lastInitSound.passedSince().format()}")
+            if (lastInitSound.isFarPast()) {
+                add("lastInitSound: never")
+            } else {
+                add("lastInitSound: ${lastInitSound.passedSince().format()}")
+            }
             add("waitingForInitSound: $waitingForInitSound")
             add("waitingForInitBlock: $waitingForInitBlock")
             add("waitingForInitBlockPos: $waitingForInitBlockPos")

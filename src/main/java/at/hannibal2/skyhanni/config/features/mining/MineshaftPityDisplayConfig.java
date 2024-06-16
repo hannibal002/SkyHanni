@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.MineshaftPityLines;
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.MineshaftPityLine;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -23,12 +23,12 @@ public class MineshaftPityDisplayConfig {
     @Expose
     @ConfigOption(name = "Stats List", desc = "Drag text to change the appearance of the display.")
     @ConfigEditorDraggableList
-    public List<MineshaftPityLines> mineshaftPityLines = new ArrayList<>(Arrays.asList(
-        MineshaftPityLines.TITLE,
-        MineshaftPityLines.COUNTER,
-        MineshaftPityLines.CHANCE,
-        MineshaftPityLines.NEEDED_TO_PITY,
-        MineshaftPityLines.TIME_SINCE_MINESHAFT
+    public List<MineshaftPityLine> mineshaftPityLines = new ArrayList<>(Arrays.asList(
+        MineshaftPityLine.TITLE,
+        MineshaftPityLine.COUNTER,
+        MineshaftPityLine.CHANCE,
+        MineshaftPityLine.NEEDED_TO_PITY,
+        MineshaftPityLine.TIME_SINCE_MINESHAFT
     ));
 
     @Expose
