@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,15 +27,15 @@ object AshfangBlazingSouls {
 
     private const val TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODI4N2IzOTdkYWY5NTE2YTBiZDc2ZjVmMWI3YmY5Nzk1MTVkZjNkNWQ4MzNlMDYzNWZhNjhiMzdlZTA4MjIxMiJ9fX0="
-    private val souls = mutableListOf<EntityArmorStand>()
+    private val souls = mutableSetOf<EntityArmorStand>()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
 
-        EntityUtils.getEntities<EntityArmorStand>()
-            .filter { it !in souls && it.hasSkullTexture(TEXTURE) }
-            .forEach { souls.add(it) }
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
+        if (!AshfangBlazes.isAshfangActive()) return
+        val entity = event.entity
+        if (!entity.hasSkullTexture(TEXTURE)) return
+        souls += entity
     }
 
     @SubscribeEvent
