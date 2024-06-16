@@ -42,9 +42,8 @@ public class ChocolateFactoryRabbitWarningConfig {
     public FlashScreenTypeEntry flashScreenType = FlashScreenTypeEntry.SPECIAL;
 
     public enum FlashScreenTypeEntry {
-        REGULAR("Regular"),
         SPECIAL("Special"),
-        BOTH("All"),
+        ALL("All"),
         NONE("None"),
         ;
         private final String str;

@@ -29,16 +29,12 @@ object ChocolateFactoryScreenFlash {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         flashScreen = InventoryUtils.getItemsInOpenChest().any {
             when (config.rabbitWarning.flashScreenType) {
-                FlashScreenTypeEntry.REGULAR -> {
-                    clickMeRabbitPattern.matches(it.stack.name)
-                }
-
                 FlashScreenTypeEntry.SPECIAL -> {
                     clickMeGoldenRabbitPattern.matches(it.stack.name) ||
                         it.stack.getSkullTexture() in specialRabbitTextures
                 }
 
-                FlashScreenTypeEntry.BOTH -> {
+                FlashScreenTypeEntry.ALL -> {
                     clickMeRabbitPattern.matches(it.stack.name) ||
                         clickMeGoldenRabbitPattern.matches(it.stack.name) ||
                         it.stack.getSkullTexture() in specialRabbitTextures
