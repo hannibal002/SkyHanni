@@ -31,7 +31,6 @@ object AshfangFreezeCooldown {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-
         if (cryogenicBlastPattern.matches(event.message)) lastHit = SimpleTimeMark.now()
     }
 

@@ -10,9 +10,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils.mob
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AshfangBlazes {
@@ -21,6 +23,8 @@ object AshfangBlazes {
 
     private val ashfangMobs = mutableSetOf<Mob>()
     var ashfang: Mob? = null
+    var nextSpawnTime = SimpleTimeMark.farPast()
+    private val ashfangResetTime = 46.1.seconds
 
     fun isAshfangActive() = ashfang != null
 
@@ -40,6 +44,7 @@ object AshfangBlazes {
             else -> return
         }
         ashfangMobs += mob
+        if (mob.baseEntity.posY > 145) nextSpawnTime = SimpleTimeMark.now() + ashfangResetTime
         if (config.highlightBlazes) mob.highlight(color.toColor())
     }
 
@@ -47,7 +52,10 @@ object AshfangBlazes {
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
         ashfangMobs -= mob
-        if (ashfang == mob) ashfang = null
+        if (ashfang == mob) {
+            ashfang = null
+            nextSpawnTime = SimpleTimeMark.farPast()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
