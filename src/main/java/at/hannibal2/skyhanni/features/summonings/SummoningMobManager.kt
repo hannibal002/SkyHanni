@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils.mob
+import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -43,6 +44,11 @@ object SummoningMobManager {
         "spawn",
         "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)",
     )
+
+    /**
+     * REGEX-TEST: §cYou have despawned your monster!
+     * REGEX-TEST: §cYou have despawned your monsters!
+     */
     private val despawnPattern by patternGroup.pattern(
         "despawn",
         "§cYou have despawned your monsters?!",
@@ -111,7 +117,10 @@ object SummoningMobManager {
             add("Summoning mobs: " + mobs.size)
             mobs.forEachIndexed { index, mob ->
                 val entity = mob.baseEntity
-                add("#${index + 1} §a${mob.name} §2${entity.health.shortFormat()}/${entity.baseMaxHealth.shortFormat()}§c❤")
+                val health = entity.health
+                val maxHealth = entity.baseMaxHealth
+                val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong()).getChatColor()
+                add("#${index + 1} §a${mob.name} $color${health.shortFormat()}§2/${maxHealth.shortFormat()}§c❤")
             }
         }.map { Renderable.string(it) }
 
