@@ -11,10 +11,10 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class PunchcardConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Highlights unpunched players in the Rift.")
+    @ConfigOption(name = "Highlight", desc = "Highlights unpunched players in the Rift.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public Property<Boolean> enabled = Property.of(false);
+    public Property<Boolean> highlight = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Color", desc = "Color used for highlighting.")

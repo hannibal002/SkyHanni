@@ -76,7 +76,7 @@ object PunchcardHighlight {
 
     @SubscribeEvent
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
-        if (!config.enabled.get()) return
+        if (!config.highlight.get()) return
         if (!IslandType.THE_RIFT.isInIsland()) return
         if (config.reverse.get()) return
         val size = playerList.size
@@ -90,7 +90,7 @@ object PunchcardHighlight {
     @SubscribeEvent
     fun onToggle(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
-            config.enabled,
+            config.highlight,
             config.color,
             config.reverse,
         ) {
@@ -229,7 +229,7 @@ object PunchcardHighlight {
         MobData.players.forEach {
             removePlayerColor(it.baseEntity)
         }
-        if (!config.enabled.get()) return
+        if (!config.highlight.get()) return
         val reverse = config.reverse.get()
         for (player in MobData.players.filter { (reverse && it.name in playerList) || (!reverse && it.name !in playerList) }) {
             colorPlayer(player.baseEntity)
