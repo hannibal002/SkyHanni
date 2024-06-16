@@ -36,13 +36,12 @@ object TimeUtils {
             for ((unit, value) in parts) {
                 if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
                     val formatted = value.addSeparators()
-                    val formattedMillis = (millis / 100).toInt()
-                    val name = unit.getName(value, longName)
-
                     val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
+                        val formattedMillis = (millis / 100).toInt()
                         "$formatted.$formattedMillis"
                     } else formatted
 
+                    val name = unit.getName(value, longName)
                     append("$text$name ")
                     if (maxUnits != -1 && ++currentUnits == maxUnits) break
                 }
@@ -58,8 +57,7 @@ object TimeUtils {
         else -> default
     }
 
-    val Duration.inWholeTicks: Int
-        get() = (inWholeMilliseconds / 50).toInt()
+    val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
     fun getDuration(string: String) = getMillis(string.replace("m", "m ").replace("  ", " ").trim())
 
@@ -96,13 +94,9 @@ object TimeUtils {
                 seconds + minutes
             }
 
-            1 -> {
-                split[0].toInt() * 1000
-            }
+            1 -> split[0].toInt() * 1000
 
-            else -> {
-                throw RuntimeException("Invalid format: '$string'")
-            }
+            else -> throw RuntimeException("Invalid format: '$string'")
         }.milliseconds
     }
 
