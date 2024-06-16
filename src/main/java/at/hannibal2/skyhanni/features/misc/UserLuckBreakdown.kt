@@ -286,9 +286,8 @@ object UserLuckBreakdown {
                     )
                 } else {
                     arrayOf(
-                        "§7SkyHanni User Luck increases",
-                        "§7your overall fortune",
-                        "§7fortune around Hypixel Skyblock.",
+                        "§7SkyHanni User Luck increases your",
+                        "§7overall fortune around Hypixel Skyblock.",
                         "",
                         "§7(Disclaimer: May not affect real drop chances)",
                         "",
