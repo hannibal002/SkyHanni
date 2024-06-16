@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object PlayerTabComplete {
 
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
@@ -55,7 +57,8 @@ object PlayerTabComplete {
         return buildList {
 
             if (config.friends && PlayerCategory.FRIENDS !in ignored) {
-                FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }
+                FriendAPI.getAllFriends()
+                    .filter { it.bestFriend || !config.onlyBestFriends }
                     .forEach { add(it.name) }
             }
 

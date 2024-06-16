@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -14,9 +15,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -26,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object ChocolateShopPrice {
     private val config get() = ChocolateFactoryAPI.config.chocolateShopPrice
 
@@ -40,10 +45,20 @@ object ChocolateShopPrice {
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!"
     )
+    /**
+     * REGEX-TEST: §7Chocolate Spent: §60
+     */
+    private val chocolateSpentPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "shop.spent",
+        "§7Chocolate Spent: §6(?<amount>[\\d,]+)"
+    )
 
     var inInventory = false
     private var callUpdate = false
     var inventoryItems = emptyMap<Int, ItemStack>()
+
+    private const val MILESTONE_INDEX = 50
+    private var chocolateSpent = 0L
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -74,8 +89,14 @@ object ChocolateShopPrice {
     private fun updateProducts() {
         val newProducts = mutableListOf<Product>()
         for ((slot, item) in inventoryItems) {
-
             val lore = item.getLore()
+
+            if (slot == MILESTONE_INDEX) {
+                lore.matchFirst(chocolateSpentPattern) {
+                    chocolateSpent = group("amount").formatLong()
+                }
+            }
+
             val chocolate = ChocolateFactoryAPI.getChocolateBuyCost(lore) ?: continue
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
@@ -97,19 +118,19 @@ object ChocolateShopPrice {
 
             val profit = product.itemPrice - (product.otherItemPrice ?: 0.0)
             val factor = (profit / product.chocolate) * multiplier
-            val perFormat = NumberUtil.format(factor)
+            val perFormat = factor.shortFormat()
 
             val hover = buildList {
                 add(product.name)
 
                 add("")
-                add("§7Item price: §6${NumberUtil.format(product.itemPrice)} ")
+                add("§7Item price: §6${product.itemPrice.shortFormat()} ")
                 product.otherItemPrice?.let {
-                    add("§7Additional cost: §6${NumberUtil.format(it)} ")
+                    add("§7Additional cost: §6${it.shortFormat()} ")
                 }
-                add("§7Profit per purchase: §6${NumberUtil.format(profit)} ")
+                add("§7Profit per purchase: §6${profit.shortFormat()} ")
                 add("")
-                add("§7Chocolate amount: §c${NumberUtil.format(product.chocolate)} ")
+                add("§7Chocolate amount: §c${product.chocolate.shortFormat()} ")
                 add("§7Profit per million chocolate: §6${perFormat} ")
                 add("")
                 val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(product.chocolate)
@@ -127,13 +148,15 @@ object ChocolateShopPrice {
             )
         }
 
-        val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§e§lCoins per million chocolate§f:"))
-        // TODO update this value every second
-        // TODO add time until can afford
-        newList.add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
-        display = newList
+        display = buildList {
+            add(Renderable.string("§e§lCoins per million chocolate§f:"))
+            // TODO update this value every second
+            // TODO add time until can afford
+            add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
+            // TODO add chocolate spend needed for next milestone
+            add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
+            add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
+        }
     }
 
     @SubscribeEvent

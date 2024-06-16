@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -13,7 +14,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
-class HideMobNames {
+@SkyHanniModule
+object HideMobNames {
 
     private val lastMobName = TimeLimitedCache<Int, String>(2.minutes)
     private val mobNamesHidden = mutableListOf<Int>()
@@ -61,16 +63,16 @@ class HideMobNames {
         val id = entity.entityId
         if (lastMobName.getOrNull(id) == name) {
             if (id in mobNamesHidden) {
-                event.isCanceled = true
+                event.cancel()
             }
             return
         }
 
-        lastMobName.put(id, name)
+        lastMobName[id] = name
         mobNamesHidden.remove(id)
 
         if (shouldNameBeHidden(name)) {
-            event.isCanceled = true
+            event.cancel()
             mobNamesHidden.add(id)
         }
     }

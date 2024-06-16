@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -7,7 +9,7 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -19,6 +21,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -37,6 +40,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PestAPI {
 
     val config get() = GardenAPI.config.pests
@@ -51,6 +55,7 @@ object PestAPI {
     var lastPestKillTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
+    // TODO move into repo
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),
@@ -150,12 +155,11 @@ object PestAPI {
     private fun updatePests() {
         if (!firstScoreboardCheck) return
         fixPests()
-        PestUpdateEvent().postAndCatch()
+        PestUpdateEvent().post()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestSpawn(event: PestSpawnEvent) {
-        if (!GardenAPI.inGarden()) return
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames
         for (plotName in plotNames) {
@@ -200,14 +204,14 @@ object PestAPI {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
                 if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
 
-                GardenPlotAPI.plots.forEach {
-                    if (plotList.contains(it.id)) {
-                        if (!it.isPestCountInaccurate && it.pests == 0) {
-                            it.isPestCountInaccurate = true
+                for (plot in GardenPlotAPI.plots) {
+                    if (plotList.contains(plot.id)) {
+                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                            plot.isPestCountInaccurate = true
                         }
                     } else {
-                        it.pests = 0
-                        it.isPestCountInaccurate = false
+                        plot.pests = 0
+                        plot.isPestCountInaccurate = false
                     }
                 }
                 updatePests()
@@ -216,10 +220,10 @@ object PestAPI {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!firstScoreboardCheck) return
-        checkScoreboardLines(event.newList)
+        checkScoreboardLines(event.scoreboard)
     }
 
     @SubscribeEvent

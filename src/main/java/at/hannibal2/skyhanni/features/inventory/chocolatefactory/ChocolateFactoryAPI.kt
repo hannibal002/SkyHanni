@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,13 +17,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ChocolateFactoryAPI {
 
     val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
@@ -31,11 +35,11 @@ object ChocolateFactoryAPI {
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
-        "(?<amount>[\\d,]+) Chocolate"
+        "(?<amount>[\\d,]+) Chocolate",
     )
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
-        "Hoppity|Chocolate Factory Milestones"
+        "Hoppity|Chocolate Factory Milestones",
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -69,29 +73,34 @@ object ChocolateFactoryAPI {
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
+    var specialRabbitTextures = listOf<String>()
+    var warningSound = SoundUtils.createSound("note.pling", 1f)
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
-            chocolateFactoryPaused = true
-            ChocolateFactoryStats.updateDisplay()
+            if (config.enabled) {
+                chocolateFactoryPaused = true
+                ChocolateFactoryStats.updateDisplay()
+            }
             return
         }
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
-        factoryUpgrades = emptyList()
-        DelayedRun.runNextTick {
-            ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+        if (config.enabled) {
+            factoryUpgrades = emptyList()
+            DelayedRun.runNextTick {
+                ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+            }
         }
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
-
-        HoppityEggLocator.eggLocations = data.eggLocations
 
         rabbitSlots = data.rabbitSlots
         otherUpgradeSlots = data.otherUpgradeSlots
@@ -108,6 +117,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        specialRabbitTextures = data.specialRabbits
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
@@ -145,9 +155,19 @@ object ChocolateFactoryAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
+    // TODO add debug toggle
     fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
+
+    fun timeTowerChargeDuration() =
+        if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
+
+    private fun timeTowerMultiplier(): Double {
+        var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1
+        if (HoppityCollectionStats.hasFoundRabbit("Mu")) multiplier += 0.7
+        return multiplier
+    }
 
     fun timeUntilNeed(goal: Long): Duration {
         var needed = goal
@@ -155,14 +175,12 @@ object ChocolateFactoryAPI {
 
         val baseMultiplier = profileStorage.rawChocolateMultiplier
         val rawChocolatePerSecond = profileStorage.rawChocPerSecond
-        var timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
-        if (profileStorage.hasMuRabbit) timeTowerMultiplier += 0.7
 
         if (rawChocolatePerSecond == 0) return Duration.INFINITE
 
         val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
 
-        val timeTowerChocPerSecond = rawChocolatePerSecond * timeTowerMultiplier
+        val timeTowerChocPerSecond = rawChocolatePerSecond * (baseMultiplier + timeTowerMultiplier())
 
         val secondsAtRate = needed / timeTowerChocPerSecond
         if (secondsAtRate < secondsUntilTowerExpires) {

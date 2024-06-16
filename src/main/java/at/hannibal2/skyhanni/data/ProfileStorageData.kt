@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ProfileStorageData {
 
     var playerSpecific: PlayerSpecificStorage? = null
@@ -57,11 +59,13 @@ object ProfileStorageData {
         val sackPlayers = sackPlayers
 
         if (playerSpecific == null) {
-            ErrorManager.logErrorStateWithData(
-                "failed to load your profile data a second time",
-                "workaround in 10 seconds did not work"
+            ErrorManager.skyHanniError(
+                "failed to load your profile data delayed ",
+                "onHypixel" to LorenzUtils.onHypixel,
+                "HypixelData.hypixelLive" to HypixelData.hypixelLive,
+                "HypixelData.hypixelAlpha" to HypixelData.hypixelAlpha,
+                "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
             )
-            ErrorManager.skyHanniError("playerSpecific is still null in ProfileJoinEvent!")
         }
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")

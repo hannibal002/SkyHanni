@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -23,6 +24,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PestProfitTracker {
     val config get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
 
@@ -61,7 +63,7 @@ object PestProfitTracker {
         override fun getCoinName(item: TrackedItem) = "§6Pest Kill Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val pestsCoinsFormat = NumberUtil.format(item.totalAmount)
+            val pestsCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7Killing pests gives you coins.",
                 "§7You got §6$pestsCoinsFormat coins §7that way."

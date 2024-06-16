@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isBait
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -17,7 +18,8 @@ import net.minecraft.entity.item.EntityItem
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
-class ShowFishingItemName {
+@SkyHanniModule
+object ShowFishingItemName {
 
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
     private var itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
@@ -51,7 +53,7 @@ class ShowFishingItemName {
                 text += name
             }
 
-            itemsOnGround.put(entityItem, text)
+            itemsOnGround[entityItem] = text
         }
     }
 

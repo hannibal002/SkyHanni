@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object HoppityEggsManager {
 
     val config get() = SkyHanniMod.feature.event.hoppityEggs
@@ -43,20 +45,31 @@ object HoppityEggsManager {
     )
 
     /**
+     * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     */
+    val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.bought",
+        "§aYou bought §r§.(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!"
+    )
+
+    /**
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
+     * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §6Solomon §7(§6§LLEGENDARY§7)!
      */
-    val rabbitFoundPatttern by ChocolateFactoryAPI.patternGroup.pattern(
+    val rabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found",
         "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\((?<rarity>.*)§7\\)!"
     )
 
     /**
      * REGEX-TEST: §d§lNEW RABBIT! §6+2 Chocolate §7and §6+0.003x Chocolate §7per second!
+     * REGEX-TEST: §d§lNEW RABBIT! §6+0.02x Chocolate §7per second!
      */
     val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found.new",
-        "§d§lNEW RABBIT! §6\\+(?<chocolate>.*) Chocolate §7and §6\\+(?<perSecond>.*)x Chocolate §7per second!"
+        "§d§lNEW RABBIT! (§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -108,6 +121,7 @@ object HoppityEggsManager {
         HoppityEggsCompactChat.handleChat(event)
 
         eggFoundPattern.matchMatcher(event.message) {
+            HoppityEggLocations.saveNearestEgg()
             HoppityEggLocator.eggFound()
             val meal = getEggType(event)
             val note = group("note").removeColor()
@@ -142,6 +156,10 @@ object HoppityEggsManager {
             getEggType(event).markSpawned()
             return
         }
+
+        rabbitFoundPattern.matchMatcher(event.message) {
+            HoppityCollectionStats.incrementRabbit(group("name"))
+        }
     }
 
     internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
@@ -173,21 +191,38 @@ object HoppityEggsManager {
         }
     }
 
+    // TODO move logic into second passed event and cache
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
         if (!config.showClaimedEggs) return
-        if (isBuzy()) return
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+        if (isBusy()) return
 
         val displayList = HoppityEggType.entries
             .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
             .toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
+
+        if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
+            val totalEggs = HoppityEggLocations.islandLocations.size
+            if (totalEggs > 0) {
+                val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
+                val collectedFormat = formatEggsCollected(collectedEggs)
+                displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
+            }
+        }
         if (displayList.size == 1) return
 
         config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
     }
+
+    private fun formatEggsCollected(collectedEggs: Int): String =
+        when (collectedEggs) {
+            in 0 until 5 -> "§c"
+            in 5 until 10 -> "§6"
+            in 10 until 15 -> "§e"
+            else -> "§a"
+        }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -198,11 +233,11 @@ object HoppityEggsManager {
 
     private fun checkWarn() {
         if (!warningActive) {
-            warningActive = HoppityEggType.entries.all { it.isClaimed() }
+            warningActive = !HoppityEggType.allEggsRemaining()
         }
 
         if (warningActive) {
-            if (HoppityEggType.entries.all { !it.isClaimed() }) {
+            if (HoppityEggType.allEggsRemaining()) {
                 warn()
             }
         }
@@ -210,24 +245,32 @@ object HoppityEggsManager {
 
     private fun warn() {
         if (!config.warnUnclaimedEggs) return
-        if (isBuzy()) return
+        if (isBusy()) return
         if (lastWarnTime.passedSince() < 30.seconds) return
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size
         val message = "All $amount Hoppity Eggs are ready to be found!"
         if (config.warpUnclaimedEggs) {
-            ChatUtils.clickableChat(
-                message,
-                onClick = { HypixelCommands.warp(config.warpDestination) },
-                "§eClick to /warp ${config.warpDestination}!"
-            )
+            if (LorenzUtils.inSkyBlock) {
+                ChatUtils.clickableChat(
+                    message,
+                    onClick = { HypixelCommands.warp(config.warpDestination) },
+                    "§eClick to /warp ${config.warpDestination}!"
+                )
+            } else {
+                ChatUtils.clickableChat(
+                    message,
+                    onClick = { HypixelCommands.skyblock() },
+                    "§eClick to join /skyblock!"
+                )
+            }
         } else ChatUtils.chat(message)
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
-    private fun isBuzy() = ReminderUtils.isBusy(config.showDuringContest)
+    private fun isBusy() = ReminderUtils.isBusy(config.showDuringContest)
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -239,5 +282,6 @@ object HoppityEggsManager {
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
     }
 
-    fun isActive() = LorenzUtils.inSkyBlock && ChocolateFactoryAPI.isHoppityEvent()
+    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&
+        ChocolateFactoryAPI.isHoppityEvent()
 }

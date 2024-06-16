@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,7 +21,8 @@ import java.util.LinkedList
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-class ArrowTrail {
+@SkyHanniModule
+object ArrowTrail {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.arrowTrail
 
@@ -39,9 +41,9 @@ class ArrowTrail {
         listAllArrow.removeIf { it.deathTime.isInPast() }
         listYourArrow.removeIf { it.deathTime.isInPast() }
 
-        EntityUtils.getEntities<EntityArrow>().forEach {
-            val line = Line(it.getPrevLorenzVec(), it.getLorenzVec(), deathTime)
-            if (it.shootingEntity == Minecraft.getMinecraft().thePlayer) {
+        for (arrow in EntityUtils.getEntities<EntityArrow>()) {
+            val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
+            if (arrow.shootingEntity == Minecraft.getMinecraft().thePlayer) {
                 listYourArrow.add(line)
             } else {
                 listAllArrow.add(line)

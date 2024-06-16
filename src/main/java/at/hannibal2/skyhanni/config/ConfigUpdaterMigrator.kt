@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
-import at.hannibal2.skyhanni.utils.shDeepCopy
+import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -12,7 +12,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 45
+    const val CONFIG_VERSION = 50
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -33,9 +33,11 @@ object ConfigUpdaterMigrator {
     ) : LorenzEvent() {
 
         init {
-            dynamicPrefix.entries.filter { it.value.isEmpty() }.forEach {
-                logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
-            }
+            dynamicPrefix.entries
+                .filter { it.value.isEmpty() }
+                .forEach {
+                    logger.log("Dynamic prefix ${it.key} does not resolve to anything.")
+                }
         }
 
         fun transform(since: Int, path: String, transform: (JsonElement) -> JsonElement = { it }) {
@@ -91,9 +93,8 @@ object ConfigUpdaterMigrator {
 
     private fun merge(originalObject: JsonObject, overrideObject: JsonObject): Int {
         var count = 0
-        overrideObject.entrySet().forEach {
-            val element = originalObject[it.key]
-            val newElement = it.value
+        for ((key, newElement) in overrideObject.entrySet()) {
+            val element = originalObject[key]
             if (element is JsonObject && newElement is JsonObject) {
                 count += merge(element, newElement)
             } else {
@@ -101,7 +102,7 @@ object ConfigUpdaterMigrator {
                     logger.log("Encountered destructive merge. Erasing $element in favour of $newElement.")
                     count++
                 }
-                originalObject.add(it.key, newElement)
+                originalObject.add(key, newElement)
             }
         }
         return count
@@ -110,7 +111,9 @@ object ConfigUpdaterMigrator {
     fun fixConfig(config: JsonObject): JsonObject {
         val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lastVersion > CONFIG_VERSION) {
-            error("Cannot downgrade config")
+            logger.log("Attempted to downgrade config version")
+            config.add("lastVersion", JsonPrimitive(CONFIG_VERSION))
+            return config
         }
         if (lastVersion == CONFIG_VERSION) return config
         return (lastVersion until CONFIG_VERSION).fold(config) { accumulator, i ->

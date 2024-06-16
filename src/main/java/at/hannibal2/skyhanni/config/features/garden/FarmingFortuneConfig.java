@@ -13,13 +13,13 @@ public class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
         name = "FF Display",
-        desc = "Displays the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
+        desc = "Display the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = false;
 
-    @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
+    @ConfigOption(name = "Farming Fortune Guide", desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")
     public Runnable open = Commands::openFortuneGuide;
 
