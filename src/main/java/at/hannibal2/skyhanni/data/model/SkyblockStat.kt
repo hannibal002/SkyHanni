@@ -46,9 +46,9 @@ enum class SkyblockStat(val icon: String) {
     FEAR("§a☠")
     ;
 
-    val capitilzedName = name.lowercase().allLettersFirstUppercase()
+    val capitalizedName = name.lowercase().allLettersFirstUppercase()
 
-    val iconWithName = "$icon $capitilzedName"
+    val iconWithName = "$icon $capitalizedName"
 
     fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
 
