@@ -39,7 +39,7 @@ public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Winter Fishing",
-        desc = "Show the Barn Fishing Timer on the Jerry's Workshop."
+        desc = "Show the Barn Fishing Timer on the Jerry's Workshop island."
     )
     @ConfigEditorBoolean
     public boolean winterIsland = true;

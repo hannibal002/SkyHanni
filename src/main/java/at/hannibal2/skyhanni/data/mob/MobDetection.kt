@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData.logger
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
@@ -133,7 +132,7 @@ object MobDetection {
     private fun getRetry(entity: EntityLivingBase) = MobData.retries[entity.entityId]
 
     /** @return always true */
-    private fun mobDetectionError(string: String) = logger.log(string).let { true }
+    private fun mobDetectionError(string: String) = MobData.logger.log(string).let { true }
 
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
@@ -267,7 +266,7 @@ object MobDetection {
 
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
-                logger.log(
+                MobData.logger.log(
                     "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
                         + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
                         + "\n Position: ${retry.entity.getLorenzVec()}\n "
