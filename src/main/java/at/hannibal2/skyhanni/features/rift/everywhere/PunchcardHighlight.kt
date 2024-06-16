@@ -97,6 +97,7 @@ object PunchcardHighlight {
             reloadColors()
         }
         ConditionalUtils.onToggle(
+            config.gui,
             config.compact,
             config.reverseGUI,
         ) {
@@ -106,16 +107,19 @@ object PunchcardHighlight {
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
-        if (!config.enabled.get()) return
-        if (event.newIsland != IslandType.THE_RIFT) return
+        if (IslandType.THE_RIFT !in listOf(event.newIsland, event.oldIsland)) return
 
-        display = drawDisplay()
+        if (event.newIsland == IslandType.THE_RIFT) {
+            display = drawDisplay()
+        }
+
+        if (playerList.isEmpty()) return
         DelayedRun.runDelayed(1500.milliseconds) {
-            reloadColors()
-            if (IslandType.THE_RIFT.isInIsland() &&
+            if (event.newIsland == IslandType.THE_RIFT &&
                 HypixelData.server.isNotEmpty() &&
                 lastRiftServer != HypixelData.server
             ) {
+                reloadColors()
                 lastRiftServer = HypixelData.server
                 playerList.clear()
             }
@@ -132,7 +136,7 @@ object PunchcardHighlight {
         RenderLivingEntityHelper.setEntityColor(entity, color.withAlpha(alpha)) { IslandType.THE_RIFT.isInIsland() }
     }
 
-    private fun uncolorPlayer(entity: EntityLivingBase) {
+    private fun removePlayerColor(entity: EntityLivingBase) {
         RenderLivingEntityHelper.removeEntityColor(entity)
     }
 
@@ -145,7 +149,7 @@ object PunchcardHighlight {
             }
         } else {
             MobData.players.forEach {
-                uncolorPlayer(it.baseEntity)
+                removePlayerColor(it.baseEntity)
             }
         }
     }
@@ -153,7 +157,6 @@ object PunchcardHighlight {
     @SubscribeEvent
     fun onPunch(event: EntityClickEvent) {
         if (!RiftAPI.inRift()) return
-        if (!config.enabled.get()) return
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
         if (entity.isNPC()) return
@@ -194,14 +197,14 @@ object PunchcardHighlight {
         playerList.add(playerName)
         playerQueue.remove(playerName)
         val player = MobData.players.firstOrNull { it.name == playerName } ?: return
-        if (!config.reverse.get()) uncolorPlayer(player.baseEntity)
+        if (!config.reverse.get()) removePlayerColor(player.baseEntity)
         else colorPlayer(player.baseEntity)
         display = drawDisplay()
     }
 
     @SubscribeEvent
     fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.gui) return
+        if (!config.gui.get()) return
         if (!RiftAPI.inRift()) return
 
         config.position.renderRenderable(display, "Punchcard Overlay")
@@ -224,7 +227,7 @@ object PunchcardHighlight {
 
     private fun reloadColors() {
         MobData.players.forEach {
-            uncolorPlayer(it.baseEntity)
+            removePlayerColor(it.baseEntity)
         }
         if (!config.enabled.get()) return
         val reverse = config.reverse.get()
