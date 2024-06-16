@@ -26,7 +26,7 @@ object MineshaftWaypoints {
 
     private const val BLOCKS_FORWARD: Int = 7
 
-    val waypoints: MutableList<MineshaftWaypoint> = mutableListOf()
+    val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
 
     @SubscribeEvent

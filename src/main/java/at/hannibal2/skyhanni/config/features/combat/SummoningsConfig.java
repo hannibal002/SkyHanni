@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class SummoningsConfig {
 
     @Expose
-    @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground. " +
+    @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground.\n" +
         "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -33,7 +33,7 @@ public class SummoningsConfig {
     public boolean summoningMobHideNametag = false;
 
     @Expose
-    @ConfigOption(name = "Summoning Mob Color", desc = "Marks own summons green.")
+    @ConfigOption(name = "Summoning Mob Color", desc = "Mark own summons green.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean summoningMobColored = false;

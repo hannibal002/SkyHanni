@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -82,6 +83,7 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -506,6 +508,10 @@ object Commands {
             "Sends a custom chat message client side in the chat",
         ) { TestChatCommand.command(it) }
         registerCommand(
+            "shtestrainbow",
+            "Sends a rainbow in chat"
+        ) { ExtendedChatColor.testCommand() }
+        registerCommand(
             "shcopyinternalname",
             "Copies the internal name of the item in hand to the clipboard.",
         ) { SkyHanniDebugsAndTests.copyItemInternalName() }
@@ -547,6 +553,10 @@ object Commands {
             "shtoggleegglocationdebug",
             "Shows Hoppity egg locations with their internal API names and status.",
         ) { HoppityEggLocations.toggleDebug() }
+        registerCommand(
+            "shresetmineshaftpitystats",
+            "Resets the mineshaft pity display stats",
+        ) { MineshaftPityDisplay.fullResetCounter() }
     }
 
     private fun internalCommands() {

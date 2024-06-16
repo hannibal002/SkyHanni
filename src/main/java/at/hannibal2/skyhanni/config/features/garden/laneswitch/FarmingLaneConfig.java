@@ -22,7 +22,7 @@ public class FarmingLaneConfig {
     public LaneSwitchNotificationConfig laneSwitchNotification = new LaneSwitchNotificationConfig();
 
     @Expose
-    @ConfigOption(name = "Distance Display", desc = "Shows the remaining distance and time until you reach the end of the current lane.")
+    @ConfigOption(name = "Distance Display", desc = "Show the remaining distance and time until you reach the end of the current lane.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean distanceDisplay = false;
