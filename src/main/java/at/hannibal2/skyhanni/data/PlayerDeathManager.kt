@@ -22,7 +22,6 @@ object PlayerDeathManager {
             val name = group("name")
             val reason = group("reason").removeColor()
             PlayerDeathEvent(name, reason, event).postAndCatch()
-
         }
     }
 }
