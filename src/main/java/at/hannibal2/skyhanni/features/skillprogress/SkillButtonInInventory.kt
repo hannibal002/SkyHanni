@@ -5,16 +5,15 @@ import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.createToggleItem
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SkillButtonInInventory {
+@SkyHanniModule
+object SkillButtonInInventory {
 
     private var showItem = false
 
@@ -55,17 +54,17 @@ class SkillButtonInInventory {
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory is ContainerLocalMenu && showItem) {
-            if (event.slotNumber == 50 && overflowConfig.tooltipButtonInSkillMenu) {
+            if (event.slot == 50 && overflowConfig.tooltipButtonInSkillMenu) {
                 val itemToShow = if (overflowConfig.enableInSkillMenuTooltip) toggleTooltipEnabled else toggleTooltipDisabled
-                event.replaceWith(itemToShow)
+                event.replace(itemToShow)
             }
-            if (event.slotNumber == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
+            if (event.slot == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
                 val itemToShow = if (overflowConfig.enableInSkillMenuAsStackSize) toggleStackSizeEnabled else toggleStackSizeDisabled
-                event.replaceWith(itemToShow)
+                event.replace(itemToShow)
             }
-            if (event.slotNumber == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
+            if (event.slot == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
                 val itemToShow = if (customGoalConfig.enableInSkillMenuTooltip) toggleCustomGoalEnabled else toggleCustomGoalDisabled
-                event.replaceWith(itemToShow)
+                event.replace(itemToShow)
             }
         }
     }
