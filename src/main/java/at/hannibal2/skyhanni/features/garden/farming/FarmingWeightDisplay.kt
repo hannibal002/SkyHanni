@@ -309,7 +309,19 @@ object FarmingWeightDisplay {
         }
 
         val timeFormat = if (weightPerSecond != -1.0) {
-            val timeTillOvertake = (weightUntilOvertake / weightPerSecond).minutes
+            val timeTillOvertake = try {
+                (weightUntilOvertake / weightPerSecond).minutes
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Error calculating Farming ETA duration",
+                    "weightPerSecond" to weightPerSecond,
+                    "weightUntilOvertake" to weightUntilOvertake,
+                    "totalWeight" to totalWeight,
+                    "nextPlayer.weight" to nextPlayer.weight,
+                )
+                return null
+            }
             val format = timeTillOvertake.format()
             " §7(§b$format§7)"
         } else ""

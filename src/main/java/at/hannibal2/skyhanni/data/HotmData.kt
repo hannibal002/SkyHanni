@@ -11,11 +11,12 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -36,11 +37,28 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.pow
 
+
+private fun calculatePeakOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
+    for (i in 1..level) {
+        when (i) {
+            1, 5, 7 -> addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+            2 -> addOrPut(HotmReward.EXTRA_FORGE_SLOTS, 1.0)
+            3 -> addOrPut(HotmReward.EXTRA_COMMISSION_SLOTS, 1.0)
+            4 -> addOrPut(HotmReward.MORE_BASE_MITHRIL_POWER, 1.0)
+            6 -> addOrPut(HotmReward.MORE_BASE_GEMSTONE_POWER, 2.0)
+            8 -> addOrPut(HotmReward.MORE_BASE_GLACITE_POWER, 3.0)
+            9 -> addOrPut(HotmReward.MINESHAFT_CHANCE, 10.0)
+            10 -> addOrPut(HotmReward.EXTRA_TOKENS, 2.0)
+        }
+    }
+}
+
+
 enum class HotmData(
     val guiName: String,
     val maxLevel: Int,
-    val costFun: ((Int) -> (Double?)),
-    val rewardFun: ((Int) -> (Map<HotmReward, Double>)),
+    val costFun: (Int) -> (Double?),
+    val rewardFun: (Int) -> (Map<HotmReward, Double>),
 ) {
 
     MINING_SPEED(
@@ -246,7 +264,10 @@ enum class HotmData(
         },
     ),
 
-    PEAK_OF_THE_MOUNTAIN("Peak of the Mountain", 10, { null }, { emptyMap() }),
+    PEAK_OF_THE_MOUNTAIN(
+        "Peak of the Mountain", 10, { null },
+        { level -> calculatePeakOfTheMountainLoot(level) },
+    ),
 
     // Mining V3
     DAILY_GRIND(
@@ -291,7 +312,7 @@ enum class HotmData(
         "Surveyor",
         20,
         { currentLevel -> (currentLevel + 1.0).pow(4) },
-        { level -> mapOf(HotmReward.UNKNOWN to 0.75 * level) },
+        { level -> mapOf(HotmReward.MINESHAFT_CHANCE to 0.75 * level) },
     ),
     EAGER_ADVENTURER(
         "Eager Adventurer",
@@ -343,9 +364,9 @@ enum class HotmData(
         get() = storage?.perks?.get(this.name)?.level ?: 0
 
     var activeLevel: Int
-        get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
+        get() = if (enabled) storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0 else 0
         private set(value) {
-            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
+            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value.minus(blueEgg())
         }
 
     val isMaxLevel: Boolean
@@ -370,7 +391,7 @@ enum class HotmData(
 
     fun getLevelUpCost() = costFun(rawLevel)
 
-    fun getReward() = rewardFun(activeLevel)
+    fun getReward() = if (enabled) rewardFun(activeLevel) else emptyMap()
 
     fun calculateTotalCost(desiredLevel: Int) = (1 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
 
@@ -382,8 +403,7 @@ enum class HotmData(
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
-        val abilities =
-            listOf(PICKOBULUS, MINING_SPEED_BOOST, VEIN_SEEKER, MANIAC_MINER, HAZARDOUS_MINER, GEMSTONE_INFUSION)
+        val abilities = listOf(PICKOBULUS, MINING_SPEED_BOOST, VEIN_SEEKER, MANIAC_MINER, HAZARDOUS_MINER, GEMSTONE_INFUSION)
 
         private val inventoryPattern by patternGroup.pattern(
             "inventory",
@@ -407,7 +427,7 @@ enum class HotmData(
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
             "§c§lDISABLED|§7§eClick to select!",
-        ) // unused for now since the assumption is when enabled isn't found it is disabled, 
+        ) // unused for now since the assumption is when enabled isn't found it is disabled,
         // but the value might be useful in the future or for debugging
 
         val perkCostPattern by patternGroup.pattern(
@@ -478,6 +498,21 @@ enum class HotmData(
             HotmAPI.MayhemPerk.entries.forEach {
                 it.chatPattern
             }
+            (0..PEAK_OF_THE_MOUNTAIN.maxLevel).forEach { level ->
+                val map = mutableMapOf<HotmReward, Double>()
+                if (level >= 1) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+                if (level >= 2) map.addOrPut(HotmReward.EXTRA_FORGE_SLOTS, 1.0)
+                if (level >= 3) map.addOrPut(HotmReward.EXTRA_COMMISSION_SLOTS, 1.0)
+                if (level >= 4) map.addOrPut(HotmReward.MORE_BASE_MITHRIL_POWER, 1.0)
+                if (level >= 5) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+                if (level >= 6) map.addOrPut(HotmReward.MORE_BASE_GEMSTONE_POWER, 2.0)
+                if (level >= 7) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
+                if (level >= 8) map.addOrPut(HotmReward.MORE_BASE_GLACITE_POWER, 3.0)
+                if (level >= 9) map.addOrPut(HotmReward.MINESHAFT_CHANCE, 10.0)
+                if (level >= 10) map.addOrPut(HotmReward.EXTRA_TOKENS, 2.0)
+
+                peakOfTheMountainPerks[level] = map
+            }
         }
 
         fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
@@ -513,8 +548,8 @@ enum class HotmData(
                 group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
             } ?: entry.maxLevel
 
-            // max level + 1 because Blue Cheese Goblin Omelette adds +1 to each level
-            if (entry.activeLevel > entry.maxLevel + 1) {
+            // raw level to ignore the blue egg buff
+            if (entry.rawLevel > entry.maxLevel) {
                 ErrorManager.skyHanniError(
                     "Hotm Perk '${entry.name}' over max level",
                     "name" to entry.name,
@@ -609,10 +644,10 @@ enum class HotmData(
         }
 
         @SubscribeEvent
-        fun onScoreboardUpdate(event: ScoreboardChangeEvent) {
+        fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
-            event.newList.matchFirst(ScoreboardPattern.powderPattern) {
+            event.scoreboard.matchFirst(ScoreboardPattern.powderPattern) {
                 val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
@@ -724,6 +759,8 @@ enum class HotmData(
     }
 }
 
+private val peakOfTheMountainPerks = mutableMapOf<Int, Map<HotmReward, Double>>()
+
 private val patternGroup = RepoPattern.group("mining.hotm")
 
 enum class HotmReward {
@@ -735,6 +772,7 @@ enum class HotmReward {
     DAILY_POWDER,
     MORE_BASE_MITHRIL_POWER,
     MORE_BASE_GEMSTONE_POWER,
+    MORE_BASE_GLACITE_POWER,
     MORE_MITHRIL_POWER,
     MORE_GEMSTONE_POWER,
     COMBAT_STAT_BOOST,
@@ -748,6 +786,10 @@ enum class HotmReward {
     ABILITY_RADIUS,
     ABILITY_COOLDOWN,
     FOSSIL_DUST,
+    MINESHAFT_CHANCE,
+    EXTRA_TOKENS,
+    EXTRA_FORGE_SLOTS,
+    EXTRA_COMMISSION_SLOTS,
     UNKNOWN,
     COLD_RESISTANCE
 }

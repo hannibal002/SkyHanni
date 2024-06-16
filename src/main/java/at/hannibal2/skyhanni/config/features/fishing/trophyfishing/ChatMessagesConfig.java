@@ -12,7 +12,7 @@ public class ChatMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Trophy Counter",
-        desc = "Counts Trophy messages from chat and tells you how many you have found."
+        desc = "Count Trophy messages from chat and tells you how many you have found."
     )
     @ConfigEditorBoolean
     @FeatureToggle

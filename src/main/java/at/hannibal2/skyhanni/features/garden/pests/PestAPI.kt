@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -55,6 +55,7 @@ object PestAPI {
     var lastPestKillTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
+    // TODO move into repo
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),
@@ -203,14 +204,14 @@ object PestAPI {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
                 if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
 
-                GardenPlotAPI.plots.forEach {
-                    if (plotList.contains(it.id)) {
-                        if (!it.isPestCountInaccurate && it.pests == 0) {
-                            it.isPestCountInaccurate = true
+                for (plot in GardenPlotAPI.plots) {
+                    if (plotList.contains(plot.id)) {
+                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                            plot.isPestCountInaccurate = true
                         }
                     } else {
-                        it.pests = 0
-                        it.isPestCountInaccurate = false
+                        plot.pests = 0
+                        plot.isPestCountInaccurate = false
                     }
                 }
                 updatePests()
@@ -219,10 +220,10 @@ object PestAPI {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!firstScoreboardCheck) return
-        checkScoreboardLines(event.newList)
+        checkScoreboardLines(event.scoreboard)
     }
 
     @SubscribeEvent

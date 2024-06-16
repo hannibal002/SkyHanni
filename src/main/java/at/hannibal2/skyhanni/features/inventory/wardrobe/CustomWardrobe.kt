@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.getFakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -110,8 +111,7 @@ object CustomWardrobe {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
-        if (!isEnabled()) return
-        DelayedRun.runDelayed(250.milliseconds) {
+        DelayedRun.runDelayed(300.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
             }
@@ -207,7 +207,13 @@ object CustomWardrobe {
             if (stack != null) {
                 val toolTip = getToolTip(stack, slot, armorIndex)
                 if (toolTip != null) {
-                    renderable = Renderable.hoverTips(renderable, tips = toolTip)
+                    renderable = Renderable.hoverTips(
+                        renderable,
+                        tips = toolTip,
+                        condition = {
+                            !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
+                        },
+                    )
                 }
             }
             loreList.add(renderable)
@@ -580,7 +586,7 @@ object CustomWardrobe {
         }
     }
 
-    private fun WardrobeSlot.clickSlot() {
+    fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = WardrobeAPI.currentPage ?: return
