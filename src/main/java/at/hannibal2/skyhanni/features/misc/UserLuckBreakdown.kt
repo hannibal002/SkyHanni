@@ -204,13 +204,13 @@ object UserLuckBreakdown {
 
     private fun skyblockMenuTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
         if (event.slot.slotIndex != 13) return
-        if (limboLuck == 0.0f) return
-
         val lastIndex = event.toolTip.indexOfLast { it == "§5§o" }
         if (lastIndex == -1) return
 
         val skillLuck = skillOverflowLuck.values.sum()
         val totalLuck = skillLuck + limboLuck
+        if (totalLuck == 0f) return
+
         val luckString = tryTruncateFloat(totalLuck)
         event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
     }
