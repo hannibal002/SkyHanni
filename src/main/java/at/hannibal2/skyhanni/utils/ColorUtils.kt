@@ -24,6 +24,8 @@ object ColorUtils {
         (start.blue * (1 - percent) + end.blue * percent).toInt(),
     )
 
+    fun Color.getExtendedColorCode(): String = ExtendedChatColor(rgb).toString()
+
     /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
     fun Color.darker(factor: Double = 0.7) = Color(
         (red * factor).toInt().coerceIn(0, 255),

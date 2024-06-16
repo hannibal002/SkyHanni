@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -97,6 +98,11 @@ object EntityData {
     @JvmStatic
     fun getDisplayName(entity: Entity, ci: CallbackInfoReturnable<IChatComponent>) {
         ci.returnValue = postRenderNametag(entity, ci.returnValue)
+    }
+
+    @JvmStatic
+    fun despawnEntity(entity: Entity) {
+        EntityLeaveWorldEvent(entity).post()
     }
 
     private fun postRenderNametag(entity: Entity, chatComponent: IChatComponent) = nametagCache.getOrPut(entity) {
