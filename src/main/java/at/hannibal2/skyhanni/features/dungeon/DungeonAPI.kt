@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -395,8 +396,14 @@ object DungeonAPI {
     )
     private val goldorStartPattern by phasePatternGroup.pattern(
         "f7.goldor.start",
-        "§4\\[BOSS] Goldor§r§c: §r§cWho dares trespass into my domain\\?"
+        "§4\\[BOSS] Goldor§r§c: §r§cWho dares trespass into my domain\\?",
     )
+
+    /**
+     * REGEX-TEST: §bmartimavocado§r§a activated a lever! (§r§c7§r§a/7)
+     * REGEX-TEST: §bmartimavocado§r§a completed a device! (§r§c3§r§a/8)
+     * REGEX-TEST: §bmartimavocado§r§a activated a terminal! (§r§c4§r§a/7)
+     */
     private val goldorTerminalPattern by phasePatternGroup.pattern(
         "f7.goldor.terminalcomplete",
         "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)"
@@ -406,8 +413,8 @@ object DungeonAPI {
         "§aThe Core entrance is opening!"
     )
     private val necronStartPattern by phasePatternGroup.pattern(
-        "f7.goldor.start",
-        "§4\\[BOSS] Necron§r§c: §r§cYou went further than any human before, congratulations\\."
+        "f7.necron.start",
+        "§4\\[BOSS] Necron§r§c: §r§cYou went further than any human before, congratulations\\.",
     )
     private val witherKingStartPattern by phasePatternGroup.pattern(
         "m7.witherking",
@@ -415,7 +422,7 @@ object DungeonAPI {
     )
 
     private fun handlePhaseMessage(message: String) {
-        if (dungeonFloor == "F6" || dungeonFloor == "M6") when {  //move to enum
+        if (dungeonFloor == "F6" || dungeonFloor == "M6") when { //move to enum
             terracottaStartPattern.matches(message) -> changePhase(DungeonPhase.F6_TERRACOTTA)
             giantsStartPattern.matches(message) -> changePhase(DungeonPhase.F6_GIANTS)
             sadanStartPattern.matches(message) -> changePhase(DungeonPhase.F6_SADAN)
@@ -425,6 +432,7 @@ object DungeonAPI {
             goldorTerminalPattern.matchMatcher(message) {
                 val currentTerminal = group("currentTerminal").toIntOrNull() ?: return
                 val totalTerminals = group("total").toIntOrNull() ?: return
+                ChatUtils.chat("found message! $currentTerminal $totalTerminals")
                 if (currentTerminal != totalTerminals) return
                 changePhase(when (dungeonPhase) {
                     DungeonPhase.F7_GOLDOR_1 -> DungeonPhase.F7_GOLDOR_2
