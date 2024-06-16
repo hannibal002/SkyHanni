@@ -34,12 +34,20 @@ object InventoryUtils {
         } else ""
     }
 
+    fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
-    fun getItemsInOwnInventory() =
-        Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.filterNotNull() ?: emptyList()
+    fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 
-    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+    fun getItemsInOwnInventory() =
+        getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
+
+    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
+
+    // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
+    fun getItemsInHotbar() =
+        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
 
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
@@ -75,7 +83,8 @@ object InventoryUtils {
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
         val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
-        return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
+        val slotUnderMouse = screen.slotUnderMouse ?: return false
+        return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
     }
 
     fun isItemInInventory(name: NEUInternalName) = name.getAmountInInventory() > 0
@@ -102,9 +111,15 @@ object InventoryUtils {
         }
     }
 
-    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? {
-        return getItemsInOpenChest().find { it.slotIndex == slotIndex }?.stack
-    }
+    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
+
+    fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+
+    fun clickSlot(slot: Int) {
+        val windowId = getWindowId() ?: return
+        val controller = Minecraft.getMinecraft().playerController
+        controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
+    }
 }

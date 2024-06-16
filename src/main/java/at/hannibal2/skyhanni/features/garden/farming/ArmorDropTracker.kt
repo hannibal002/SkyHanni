@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson.DropInfo
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -27,6 +28,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ArmorDropTracker {
 
     private val config get() = GardenAPI.config.farmingArmorDrop
@@ -94,6 +96,7 @@ object ArmorDropTracker {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
         if (!hasArmor) return
+        if (!GardenAPI.hasFarmingToolInHand()) return
 
         tracker.renderDisplay(config.pos)
     }
@@ -123,10 +126,10 @@ object ArmorDropTracker {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
-        armorDropInfo = data.special_crops
+        armorDropInfo = data.specialCrops
     }
 
-    private var armorDropInfo = mapOf<String, DropInfo>()
+    private var armorDropInfo = mapOf<String, ArmorDropInfo>()
     private var currentArmorDropChance = 0.0
     private var lastCalculationTime = SimpleTimeMark.farPast()
 
@@ -137,7 +140,7 @@ object ArmorDropTracker {
             lastCalculationTime = SimpleTimeMark.now()
 
             val armorDropName = crop.specialDropType
-            val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
+            val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
             val pieceCount = InventoryUtils.getArmor()
                 .mapNotNull { it?.getInternalName()?.asString() }
                 .count { it.contains(armorName) || it.contains("FERMENTO") }
@@ -165,7 +168,7 @@ object ArmorDropTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetarmordroptracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 }

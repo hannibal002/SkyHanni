@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
+import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -25,19 +27,23 @@ import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.It
 public class InventoryConfig {
 
     @Expose
-    @Category(name = "Skyblock Guide", desc = "")
+    @Category(name = "Skyblock Guide", desc = "Helps finding stuff to do in SkyBlock.")
     public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
 
     @Expose
-    @Category(name = "Auction House", desc = "")
+    @Category(name = "Auction House", desc = "Be smart when buying or selling expensive items in the Auctions House.")
     public AuctionHouseConfig auctions = new AuctionHouseConfig();
 
     @Expose
-    @Category(name = "Bazaar", desc = "Bazaar settings.")
+    @Category(name = "Bazaar", desc = "Be smart when buying or selling many items in the Bazaar.")
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
-    @Category(name = "Helpers", desc = "Settings for Helpers")
+    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
+    public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
+
+    @Expose
+    @Category(name = "Helpers", desc = "Some smaller Helper settings.")
     public HelperConfig helper = new HelperConfig();
 
     @Expose
@@ -45,7 +51,15 @@ public class InventoryConfig {
     public ItemAbilityConfig itemAbilities = new ItemAbilityConfig();
 
     @Expose
-    @ConfigOption(name = "Not Clickable Items", desc = "")
+    @Category(name = "Custom Wardrobe", desc = "New Wardrobe Look.")
+    public CustomWardrobeConfig customWardrobe = new CustomWardrobeConfig();
+
+    @Expose
+    @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
+    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
+
+    @Expose
+    @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
@@ -84,16 +98,13 @@ public class InventoryConfig {
     @Accordion
     public GetFromSackConfig gfs = new GetFromSackConfig();
 
+    @Expose
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
-    @Expose
     public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
 
     @Expose
-    @ConfigOption(
-        name = "Item Number",
-        desc = "Showing the item number as a stack size for these items."
-    )
+    @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
@@ -118,6 +129,7 @@ public class InventoryConfig {
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
+        DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         ;
@@ -158,10 +170,10 @@ public class InventoryConfig {
     public boolean vacuumBagCap = true;
 
     @Expose
-    @ConfigOption(
-        name = "Quick Craft Confirmation",
+    @ConfigOption(name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
+        "(e.g. armor, weapons, accessories). " +
+            "Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -180,27 +192,30 @@ public class InventoryConfig {
     public boolean anvilCombineHelper = false;
 
     @Expose
-    @ConfigOption(name = "Item Stars",
-        desc = "Show a compact star count in the item name for all items.")
+    @ConfigOption(name = "Item Stars", desc = "Show a compact star count in the item name for all items.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemStars = false;
 
     @Expose
-    @ConfigOption(name = "Missing Tasks",
-        desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
+    @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
-    @ConfigOption(name = "Power Stone Guide",
-        desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
+    @ConfigOption(name = "Power Stone Guide", desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
     // TODO move( , "inventory.powerStoneGuide", "inventory.skyblockGuideConfig.powerStoneGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powerStoneGuide = true;
+
+    @Expose
+    @ConfigOption(name = "Favorite Power Stone", desc = "Shows your favorite power stones. You can add/remove them by shift clicking a Power Stone.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean favoritePowerStone = false;
 
     @Expose
     @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
@@ -219,4 +234,10 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
+
+    @Expose
+    @ConfigOption(name = "Time Held in Lore", desc = "Shows time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeHeldInLore = false;
 }

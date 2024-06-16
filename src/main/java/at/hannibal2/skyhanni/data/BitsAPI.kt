@@ -7,17 +7,16 @@ import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.features.misc.NoBitsWarning.sendBitsGainChatMessage
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
+@SkyHanniModule
 object BitsAPI {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
     private val playerStorage get() = SkyHanniMod.feature.storage
@@ -48,12 +48,12 @@ object BitsAPI {
         }
 
     var cookieBuffTime: SimpleTimeMark?
-        get() = profileStorage?.boosterCookieExpiryTime?.asTimeMark()
+        get() = profileStorage?.boosterCookieExpiryTime
         private set(value) {
-            profileStorage?.boosterCookieExpiryTime = value?.toMillis()
+            profileStorage?.boosterCookieExpiryTime = value
         }
 
-    private const val defaultcookiebits = 4800
+    private const val defaultCookieBits = 4800
 
     private val bitsDataGroup = RepoPattern.group("data.bits")
 
@@ -153,10 +153,10 @@ object BitsAPI {
                 if (amount == bits) return
 
                 if (amount > bits) {
-                    bitsAvailable -= amount - bits
-                    sendBitsGainChatMessage(amount - bits)
+                    val difference = amount - bits
+                    bitsAvailable -= difference
                     bits = amount
-                    sendBitsGainEvent()
+                    sendBitsGainEvent(difference)
                 } else {
                     bits = amount
                     sendBitsSpentEvent()
@@ -194,7 +194,7 @@ object BitsAPI {
         }
 
         boosterCookieAte.matchMatcher(message) {
-            bitsAvailable += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
+            bitsAvailable += (defaultCookieBits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
             val cookieTime = cookieBuffTime
             cookieBuffTime = if (cookieTime == null) SimpleTimeMark.now() + 4.days else cookieTime + 4.days
             sendBitsAvailableGainedEvent()
@@ -228,7 +228,6 @@ object BitsAPI {
 
                     val difference = bits - bitsAvailable
                     if (difference > 0) {
-                        sendBitsGainChatMessage(difference)
                         bits += difference
                     }
                 }
@@ -308,7 +307,9 @@ object BitsAPI {
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
-    private fun sendBitsGainEvent() = BitsUpdateEvent.BitsGain(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsGainEvent(difference: Int) =
+        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+
     private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
     private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
 

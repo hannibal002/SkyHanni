@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -41,8 +41,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
-            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.sellPrice ?: name.getPriceOrNull() ?: 0.0
-            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.buyPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.instantBuyPrice ?: name.getPriceOrNull() ?: 0.0
+            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.sellOfferPrice ?: name.getPriceOrNull() ?: 0.0
 
             else -> name.getNpcPriceOrNull() ?: 0.0
         }
@@ -50,17 +50,13 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun isInventoryOpen() = inventoryOpen
 
-    fun resetCommand(args: Array<String>, command: String) {
-        if (args.size == 1 && args[0].lowercase() == "confirm") {
+    fun resetCommand() = ChatUtils.clickableChat(
+        "Are you sure you want to reset your total $name? Click here to confirm.",
+        onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
-            return
-        }
-
-        ChatUtils.clickableChat(
-            "Are you sure you want to reset your total $name? Click here to confirm.",
-            "$command confirm"
-        )
-    }
+        },
+        oneTimeClick = true
+    )
 
     fun modify(modifyFunction: (Data) -> Unit) {
         getSharedTracker()?.let {

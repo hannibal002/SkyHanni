@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -16,8 +17,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLiving
@@ -26,7 +28,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SummoningMobManager {
+@SkyHanniModule
+object SummoningMobManager {
 
     private val config get() = SkyHanniMod.feature.combat.summonings
 
@@ -49,9 +52,14 @@ class SummoningMobManager {
         "health",
         "§a§o(.+)'s (.+)§r §[ae]([\\dkm]+)§c❤"
     )
-    private val seraphRecallPattern by patternGroup.pattern( //§cThe Seraph recalled your 3 summoned allies!
+
+    /**
+     * REGEX-TEST: §cThe Seraph recalled your 3 summoned allies!
+     * REGEX-TEST: §cThe Seraph recalled your 10 summoned allies!
+     */
+    private val seraphRecallPattern by patternGroup.pattern(
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d) summoned allies!"
+        "§cThe Seraph recalled your (\\d+) summoned allies!"
     )
 
     @SubscribeEvent
@@ -91,33 +99,32 @@ class SummoningMobManager {
         }
 
         if (searchArmorStands) {
-            EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }
-                .forEach {
-                    val name = it.displayName.unformattedText
-                    healthPattern.matchMatcher(name) {
-                        val playerName = LorenzUtils.getPlayerName()
-                        if (name.contains(playerName)) {
-                            summoningMobNametags.add(it)
-                            if (summoningMobNametags.size == summoningsSpawned) {
-                                searchArmorStands = false
-                            }
+            for (it in EntityUtils.getEntities<EntityArmorStand>().filter { it !in summoningMobNametags }) {
+                val name = it.displayName.unformattedText
+                healthPattern.matchMatcher(name) {
+                    val playerName = LorenzUtils.getPlayerName()
+                    if (name.contains(playerName)) {
+                        summoningMobNametags.add(it)
+                        if (summoningMobNametags.size == summoningsSpawned) {
+                            searchArmorStands = false
                         }
                     }
                 }
+            }
         }
 
-        if (searchMobs) {
-            val playerLocation = LocationUtils.playerLocation()
-            EntityUtils.getEntities<EntityLiving>().filter {
-                it !in summoningMobs.keys && it.getLorenzVec()
-                    .distance(playerLocation) < 10 && it.ticksExisted < 2
-            }.forEach {
-                summoningMobs[it] = SummoningMob(System.currentTimeMillis(), name = "Mob")
-                it.setColor(LorenzColor.GREEN)
-                updateData()
-                if (summoningMobs.size == summoningsSpawned) {
-                    searchMobs = false
-                }
+        if (!searchMobs) return
+        val playerLocation = LocationUtils.playerLocation()
+        val list = EntityUtils.getEntities<EntityLiving>().filter {
+            it !in summoningMobs.keys && it.getLorenzVec()
+                .distance(playerLocation) < 10 && it.ticksExisted < 2
+        }
+        for (entity in list) {
+            summoningMobs[entity] = SummoningMob(System.currentTimeMillis(), name = "Mob")
+            entity.setColor(LorenzColor.GREEN)
+            updateData()
+            if (summoningMobs.size == summoningsSpawned) {
+                searchMobs = false
             }
         }
     }
@@ -141,8 +148,8 @@ class SummoningMobManager {
             val maxHealth = entityLiving.baseMaxHealth
             val color = NumberUtil.percentageColor(currentHealth.toLong(), maxHealth.toLong()).getChatColor()
 
-            val currentFormat = NumberUtil.format(currentHealth)
-            val maxFormat = NumberUtil.format(maxHealth)
+            val currentFormat = currentHealth.shortFormat()
+            val maxFormat = maxHealth.shortFormat()
             summoningMob.lastDisplayName = "§a$name $color$currentFormat/$maxFormat"
         }
     }

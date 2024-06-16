@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillColorConfig
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillETADisplayConfig.TextEntry
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
@@ -26,9 +26,10 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getColorForLevel
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -54,6 +55,7 @@ import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object SkillProgress {
 
     private var skillExpPercentage = 0.0
@@ -129,7 +131,7 @@ object SkillProgress {
                 startColor = Color(SpecialColour.specialToChromaRGB(color)),
                 endColor = Color(SpecialColour.specialToChromaRGB(color)),
                 texture = barConfig.texturedBar.usedTexture.get(),
-                useChroma = barConfig.useChroma.get()
+                useChroma = barConfig.useChroma.get(),
             )
 
         } else {
@@ -141,7 +143,7 @@ object SkillProgress {
                 endColor = Color(SpecialColour.specialToChromaRGB(color)),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
-                useChroma = barConfig.useChroma.get()
+                useChroma = barConfig.useChroma.get(),
             )
         }
 
@@ -157,7 +159,7 @@ object SkillProgress {
     }
 
     @SubscribeEvent
-    fun onSecondPass(event: SecondPassedEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
@@ -180,16 +182,17 @@ object SkillProgress {
         "§cReset session!",
         listOf(
             "§cThis will reset your",
-            "§ccurrent session time."
-        ), onClick = {
+            "§ccurrent session time.",
+        ),
+        onClick = {
             val xpInfo = skillXPInfoMap[activeSkill] ?: return@clickAndHover
             xpInfo.sessionTimerActive = false
             xpInfo.timeActive = 0L
             chat("Timer for §b${activeSkill?.displayName} §ehas been reset!")
-        }
+        },
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLevelUp(event: SkillOverflowLevelupEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
@@ -216,7 +219,7 @@ object SkillProgress {
                 "",
             "  §r§a§lREWARDS",
             rewards.joinToString("\n"),
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
         )
 
         chat(messages.joinToString("\n"), false)
@@ -318,12 +321,12 @@ object SkillProgress {
                 skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
             val targetLevel = skillInfo.customGoalLevel
             var xp = skillInfo.overflowTotalXp
-            if (targetLevel in 50 .. 60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50.0)
+            if (targetLevel in 50..60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50.0)
             else if (targetLevel > 60 && skillInfo.overflowLevel >= 60) xp += SkillUtil.xpRequiredForLevel(60.0)
 
             var have = skillInfo.overflowTotalXp
             val need = SkillUtil.xpRequiredForLevel(targetLevel.toDouble())
-            if (targetLevel in 51 .. 59) have += SkillUtil.xpRequiredForLevel(50.0)
+            if (targetLevel in 51..59) have += SkillUtil.xpRequiredForLevel(50.0)
             else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60.0)
 
             val (level, currentXp, currentXpMax, totalXp) =
@@ -334,7 +337,7 @@ object SkillProgress {
                         skillInfo.overflowLevel,
                         skillInfo.overflowCurrentXp,
                         skillInfo.overflowCurrentXpMax,
-                        skillInfo.overflowTotalXp
+                        skillInfo.overflowTotalXp,
                     )
                 else
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
@@ -343,7 +346,7 @@ object SkillProgress {
                 Renderable.clickAndHover(
                     "§cOpen your skills menu!",
                     listOf("§eClick here to execute §6/skills"),
-                    onClick = { ChatUtils.sendCommandToServer("skills") }
+                    onClick = { HypixelCommands.skills() },
                 )
             } else {
                 val tips = buildList {
@@ -353,16 +356,19 @@ object SkillProgress {
                     add("§6Total XP: §b${totalXp.addSeparators()}")
                 }
                 val nameColor = if (skill == activeSkill) "§2" else "§a"
-                Renderable.hoverTips(buildString {
-                    append("$nameColor${skill.displayName} $level ")
-                    append("§7(")
-                    append("§b${currentXp.addSeparators()}")
-                    if (currentXpMax != 0L) {
-                        append("§6/")
-                        append("§b${currentXpMax.addSeparators()}")
-                    }
-                    append("§7)")
-                }, tips)
+                Renderable.hoverTips(
+                    buildString {
+                        append("$nameColor${skill.displayName} $level ")
+                        append("§7(")
+                        append("§b${currentXp.addSeparators()}")
+                        if (currentXpMax != 0L) {
+                            append("§6/")
+                            append("§b${currentXpMax.addSeparators()}")
+                        }
+                        append("§7)")
+                    },
+                    tips,
+                )
             }
         }
     }
@@ -374,7 +380,9 @@ object SkillProgress {
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildMap
         oldSkillInfoMap[activeSkill] = skillInfo
         val level =
-            if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) skillInfo.overflowLevel else skillInfo.level
+            if (config.overflowConfig.enableInEtaDisplay.get() ||
+                config.customGoalConfig.enableInETADisplay
+            ) skillInfo.overflowLevel else skillInfo.level
 
         val useCustomGoalLevel =
             skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
@@ -408,16 +416,20 @@ object SkillProgress {
         } else {
             val duration = ((remaining) * 1000 * 60 * 60 / xpInterp.toLong()).milliseconds
             val format = duration.format(TimeUnit.DAY)
-            this[TextEntry.TIME] = Renderable.string("§7In §b$format " +
-                if (xpInfo.isActive) "" else "§c(PAUSED)")
+            this[TextEntry.TIME] = Renderable.string(
+                "§7In §b$format " +
+                    if (xpInfo.isActive) "" else "§c(PAUSED)",
+            )
         }
 
         if (xpInfo.xpGainLast == xpInfo.xpGainHour && xpInfo.xpGainHour <= 0) {
             this[TextEntry.XP_HOUR] = Renderable.string("§7XP/h: §cN/A")
         } else {
             xpInterp = interpolate(xpInfo.xpGainHour, xpInfo.xpGainLast, lastGainUpdate.toMillis())
-            this[TextEntry.XP_HOUR] = Renderable.string("§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
-                if (xpInfo.isActive) "" else "§c(PAUSED)")
+            this[TextEntry.XP_HOUR] = Renderable.string(
+                "§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
+                    if (xpInfo.isActive) "" else "§c(PAUSED)",
+            )
         }
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
@@ -438,7 +450,7 @@ object SkillProgress {
         }
         var have = skill.overflowTotalXp
         val need = SkillUtil.xpRequiredForLevel(targetLevel.toDouble())
-        if (targetLevel in 51 .. 59) have += SkillUtil.xpRequiredForLevel(50.0)
+        if (targetLevel in 51..59) have += SkillUtil.xpRequiredForLevel(50.0)
         else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60.0)
 
         val (level, currentXp, currentXpMax, _) =
@@ -463,53 +475,66 @@ object SkillProgress {
             add(Renderable.itemStack(item, 1.2))
         }
 
-        add(Renderable.string(buildString {
-            val gainString = if (matchColor) "+${skill.lastGain} " else "§b+${skill.lastGain} "
-            append(gainString)
+        add(
+            Renderable.string(
+                buildString {
+                    val gainString = if (matchColor) "+${skill.lastGain} " else "§b+${skill.lastGain} "
+                    append(gainString)
 
-            if (config.useSkillName.get())
-                append("${activeSkill.displayName} ")
+                    if (config.useSkillName.get())
+                        append("${activeSkill.displayName} ")
 
-            val (barCurrent, barMax) =
-                if (useCustomGoalLevel && customGoalConfig.enableInProgressBar)
-                    Pair(have, need)
-                else if (config.overflowConfig.enableInProgressBar.get())
-                    Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
-                else
-                    Pair(skill.currentXp, skill.currentXpMax)
+                    val (barCurrent, barMax) =
+                        if (useCustomGoalLevel && customGoalConfig.enableInProgressBar)
+                            Pair(have, need)
+                        else if (config.overflowConfig.enableInProgressBar.get())
+                            Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
+                        else
+                            Pair(skill.currentXp, skill.currentXpMax)
 
-            val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
-            skillExpPercentage = (barPercent.toDouble() / 100)
+                    val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
+                    skillExpPercentage = (barPercent.toDouble() / 100)
 
-            val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
+                    val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
 
-            val percentColor = if (config.skillColorConfig.enabledDisplayColor) "§${SkillUtil.getColorForPercentage(barPercent.toInt())}" else "§6"
+                    val percentColor = if (config.skillColorConfig.enabledDisplayColor) {
+                        "§${SkillUtil.getColorForPercentage(barPercent.toInt())}"
+                    } else "§6"
 
-            if (config.usePercentage.get()) {
-                val percentString = if (matchColor) "(${percent.roundToPrecision(2)}%)" else "§7($percentColor${percent.roundToPrecision(2)}%§7)"
-                append(percentString)
-            } else {
-                if (currentXpMax == 0L) {
-                    val progressString = if (matchColor) "(${currentXp.addSeparators()})" else "§7($percentColor${currentXp.addSeparators()}§7)"
-                    append(progressString)
-                } else {
-                    val progressString = if (matchColor) "(${currentXp.addSeparators()}/${currentXpMax.addSeparators()})" else "§7($percentColor${currentXp.addSeparators()}§7/$percentColor${currentXpMax.addSeparators()}§7)"
-                    append(progressString)
-                }
-            }
+                    if (config.usePercentage.get()) {
+                        val percentString = if (matchColor) "(${percent.roundToPrecision(2)}%)" else {
+                            "§7($percentColor${percent.roundToPrecision(2)}%§7)"
+                        }
+                        append(percentString)
+                    } else {
+                        if (currentXpMax == 0L) {
+                            val progressString = if (matchColor) "(${currentXp.addSeparators()})" else {
+                                "§7($percentColor${currentXp.addSeparators()}§7)"
+                            }
+                            append(progressString)
+                        } else {
+                            val progressString = if (matchColor) "(${currentXp.addSeparators()}/${currentXpMax.addSeparators()})" else {
+                                "§7($percentColor${currentXp.addSeparators()}§7/$percentColor${currentXpMax.addSeparators()}§7)"
+                            }
+                            append(progressString)
+                        }
+                    }
 
-            if (config.showActionLeft.get() && percent != 100f) {
-                append(" - ")
-                val gain = skill.lastGain.formatDouble()
-                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
-                if (skill.lastGain != "" && !actionLeft.contains("-")) {
-                    val actionLeftString = if (matchColor) "$actionLeft Left" else "$percentColor$actionLeft Left"
-                    append(actionLeftString)
-                } else {
-                    append("$percentColor∞ Left")
-                }
-            }
-        }, color = color))
+                    if (config.showActionLeft.get() && percent != 100f) {
+                        append(" - ")
+                        val gain = skill.lastGain.formatDouble()
+                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
+                        if (skill.lastGain != "" && !actionLeft.contains("-")) {
+                            val actionLeftString = if (matchColor) "$actionLeft Left" else "$percentColor$actionLeft Left"
+                            append(actionLeftString)
+                        } else {
+                            append("$percentColor∞ Left")
+                        }
+                    }
+                },
+                color = color,
+            ),
+        )
     }
 
     private fun updateSkillInfo() {

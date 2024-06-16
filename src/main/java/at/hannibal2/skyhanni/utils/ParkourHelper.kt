@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson.ShortCut
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourShortCut
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
     val locations: List<LorenzVec>,
-    private val shortCuts: List<ShortCut>,
+    private val shortCuts: List<ParkourShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
     val depth: Boolean = true,
@@ -99,7 +99,7 @@ class ParkourHelper(
                     val from = locations[shortCut.from].offsetCenter()
                     val to = locations[shortCut.to].offsetCenter()
                     event.draw3DLine_nea(from, to, Color.RED, 3, false)
-                    val textLocation = from.add(to.subtract(from).normalize())
+                    val textLocation = from + (to - from).normalize()
                     event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
 
                     val aabb = axisAlignedBB(locations[shortCut.to])
@@ -141,10 +141,10 @@ class ParkourHelper(
         if (LocationUtils.playerLocation().distance(nextPosition) > currentPosition.distance(nextPosition)) return null
 
         val factor = LocationUtils.playerLocation().distance(currentPosition) / currentPosition.distance(nextPosition)
-        val solpeLocation = lookAheadStart.slope(lookAheadEnd, factor)
+        val slopeLocation = lookAheadStart.slope(lookAheadEnd, factor)
         return Pair(
             IndexedValue(current + lookAhead - 1, lookAheadStart),
-            IndexedValue(current + lookAhead, solpeLocation)
+            IndexedValue(current + lookAhead, slopeLocation)
         )
     }
 

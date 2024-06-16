@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -17,12 +18,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -35,6 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias CategoryName = String
 
+@SkyHanniModule
 object FishingProfitTracker {
 
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
@@ -69,7 +71,7 @@ object FishingProfitTracker {
         override fun getCoinName(item: TrackedItem) = "§6Fished Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val mobKillCoinsFormat = NumberUtil.format(item.totalAmount)
+            val mobKillCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7You fished up §6$mobKillCoinsFormat coins §7already."
             )
@@ -125,7 +127,7 @@ object FishingProfitTracker {
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Times fished: §e${fishedCount.addSeparators()}",
-                listOf("§7You catched §e${fishedCount.addSeparators()} §7times something.")
+                listOf("§7You've reeled in §e${fishedCount.addSeparators()} §7catches.")
             )
         )
 
@@ -237,8 +239,8 @@ object FishingProfitTracker {
         tracker.firstUpdate()
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetfishingtracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight

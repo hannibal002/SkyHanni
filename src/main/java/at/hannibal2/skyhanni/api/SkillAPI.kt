@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevel
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getLevelExact
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -28,8 +30,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -41,6 +43,7 @@ import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object SkillAPI {
 
     val config get() = SkyHanniMod.feature.skillProgress
@@ -54,27 +57,27 @@ object SkillAPI {
     private val patternGroup = RepoPattern.group("api.skilldisplay")
     private val skillPercentPattern by patternGroup.pattern(
         "skill.percent",
-        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)"
+        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<progress>[\\d.]+)%\\)",
     )
     private val skillPattern by patternGroup.pattern(
         "skill",
-        "\\+(?<gained>[\\d.,]+) (?<skillName>\\w+) \\((?<current>[\\d.,]+)/(?<needed>[\\d.,]+)\\)"
+        "\\+(?<gained>[\\d.,]+) (?<skillName>\\w+) \\((?<current>[\\d.,]+)/(?<needed>[\\d.,]+)\\)",
     )
     private val skillMultiplierPattern by patternGroup.pattern(
         "skill.multiplier",
-        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<current>[\\d.,]+)/(?<needed>[\\d,.]+[kmb])\\)"
+        "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<current>[\\d.,]+)/(?<needed>[\\d,.]+[kmb])\\)",
     )
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab",
-        "(?:§e§lSkills: §r§a)?\\s*(?<type>\\w+) (?<level>\\d+): §r§.(?<progress>.+)%$"
+        " (?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
     )
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max",
-        " (?<type>\\w+) (?<level>\\d+): §r§c§lMAX$"
+        " (?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
     )
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent",
-        " §r§a(?<type>\\w+) (?<level>\\d+): §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[0-9kmb]+)"
+        " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[0-9kmb]+)",
     )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
@@ -90,7 +93,7 @@ object SkillAPI {
         SkillType.FORAGING,
         SkillType.FISHING,
         SkillType.ALCHEMY,
-        SkillType.CARPENTRY
+        SkillType.CARPENTRY,
     )
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
@@ -137,6 +140,9 @@ object SkillAPI {
                     skillPercentPattern -> handleSkillPatternPercent(matcher, skillType)
                     skillMultiplierPattern -> handleSkillPatternMultiplier(matcher, skillType, skillInfo)
                 }
+
+                SkillExpGainEvent(skillType, matcher.group("gained").formatDouble()).post()
+
                 showDisplay = true
                 lastUpdate = SimpleTimeMark.now()
                 skillXp.lastUpdate = SimpleTimeMark.now()
@@ -183,7 +189,7 @@ object SkillAPI {
                             skillLevel,
                             totalXp,
                             0L,
-                            totalXp
+                            totalXp,
                         )
 
                         skillInfo?.apply {
@@ -221,30 +227,8 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onDebugDataCollectCurrent(event: DebugDataCollectEvent) {
-        event.title("Current Skill")
-        val storage = storage
-        if (storage == null) {
-            event.addIrrelevant("SkillMap is empty")
-            return
-        }
-
-        val skillType = activeSkill
-        if (skillType == null) {
-            event.addIrrelevant("activeSkill is null")
-            return
-        }
-
-        event.addData {
-            storage[skillType]?.let { skillInfo ->
-                addDebug(skillType, skillInfo)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onDebugDataCollectAll(event: DebugDataCollectEvent) {
-        event.title("All Skills")
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Skills")
         val storage = storage
         if (storage == null) {
             event.addIrrelevant("SkillMap is empty")
@@ -252,6 +236,18 @@ object SkillAPI {
         }
 
         event.addIrrelevant {
+            val activeSkill = activeSkill
+            if (activeSkill == null) {
+                add("activeSkill is null")
+            } else {
+                add("active skill:")
+                storage[activeSkill]?.let { skillInfo ->
+                    addDebug(activeSkill, skillInfo)
+                }
+                add("")
+                add("")
+            }
+
             for ((skillType, skillInfo) in storage) {
                 addDebug(skillType, skillInfo)
             }
@@ -280,10 +276,10 @@ object SkillAPI {
             level,
             currentXp,
             maxXp,
-            currentXp
+            currentXp,
         )
         if (skillInfo.overflowLevel > 60 && levelOverflow == skillInfo.overflowLevel + 1)
-            SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
+            SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).post()
 
         skillInfo.apply {
             this.level = level
@@ -341,11 +337,25 @@ object SkillAPI {
                 val nextLevelDiff = levelArray.getOrNull(level)?.toDouble() ?: 7_600_000.0
                 val nextLevelProgress = nextLevelDiff * xpPercentage / 100
                 val totalXp = levelXp + nextLevelProgress
-                updateSkillInfo(existingLevel, level, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong(), matcher.group("gained"))
+                updateSkillInfo(
+                    existingLevel,
+                    level,
+                    nextLevelProgress.toLong(),
+                    nextLevelDiff.toLong(),
+                    totalXp.toLong(),
+                    matcher.group("gained"),
+                )
             } else {
                 val exactLevel = getLevelExact(needed)
-                val levelXp = calculateLevelXp(existingLevel.level - 1).toLong()
-                updateSkillInfo(existingLevel, exactLevel, current, needed, levelXp, matcher.group("gained"))
+                val levelXp = calculateLevelXp(existingLevel.level - 1).toLong() + current
+                updateSkillInfo(
+                    existingLevel,
+                    exactLevel,
+                    current,
+                    needed,
+                    levelXp,
+                    matcher.group("gained"),
+                )
             }
             storage?.set(skillType, existingLevel)
         }
@@ -353,6 +363,7 @@ object SkillAPI {
 
     private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXp: Long, maxXp: Long, totalXp: Long, gained: String) {
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) = getSkillInfo(level, currentXp, maxXp, totalXp)
+
         existingLevel.apply {
             this.totalXp = totalXp
             this.currentXp = currentXp
@@ -377,7 +388,7 @@ object SkillAPI {
             level,
             currentXp,
             maxXp,
-            levelXp
+            levelXp,
         )
         skillInfo.apply {
             this.overflowCurrentXp = currentOverflow
@@ -430,7 +441,7 @@ object SkillAPI {
                         val (overflowLevel, current, needed, _) = calculateOverFlow((xp) - XP_NEEDED_FOR_60)
                         ChatUtils.chat(
                             "With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
-                                "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP"
+                                "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP",
                         )
                     }
                     return
@@ -504,7 +515,10 @@ object SkillAPI {
                     val skill = storage?.get(skillType) ?: return
 
                     if (targetLevel <= skill.overflowLevel) {
-                        ChatUtils.userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
+                        ChatUtils.userError(
+                            "Custom goal level ($targetLevel) must be greater than your current level " +
+                                "(${skill.overflowLevel}).",
+                        )
                         return
                     }
 
@@ -522,7 +536,8 @@ object SkillAPI {
             1 -> listOf("levelwithxp", "xpforlevel", "goal", "icon")
             2 -> if (strings[0].lowercase() == "goal" || strings[0].lowercase() == "icon") CommandBase.getListOfStringsMatchingLastWord(
                 strings,
-                SkillType.entries.map { it.displayName })
+                SkillType.entries.map { it.displayName },
+            )
             else
                 listOf()
 
@@ -539,7 +554,8 @@ object SkillAPI {
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
                 "§6/shskills icon <skill> - §bChange the icon for <skill>",
                 "",
-            ).joinToString("\n"), prefix = false
+            ).joinToString("\n"),
+            prefix = false,
         )
     }
 

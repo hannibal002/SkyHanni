@@ -66,6 +66,11 @@ public class DebugConfig {
     public boolean showNpcPrice = false;
 
     @Expose
+    @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
+    @ConfigEditorBoolean
+    public boolean showBZPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show Item UUID", desc = "Show the Unique Identifier of items in the lore.")
     @ConfigEditorBoolean
     public boolean showItemUuid = false;
@@ -122,6 +127,16 @@ public class DebugConfig {
     public boolean currentAreaDebug = true;
 
     @Expose
+    @ConfigOption(name = "Oreblock Name", desc = "Show the OreBlock you are currently looking at.")
+    @ConfigEditorBoolean
+    public boolean raytracedOreblock = true;
+
+    @Expose
+    @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
+    @ConfigEditorBoolean
+    public boolean oreEventMessages = false;
+
+    @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     public Property<Mayor> assumeMayor = Property.of(Mayor.DISABLED);
@@ -139,4 +154,8 @@ public class DebugConfig {
     // Does not have a config element!
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
+
+    // Also does not have a config element!
+    @Expose
+    public Position trackParticlePosition = new Position(0, 0);
 }

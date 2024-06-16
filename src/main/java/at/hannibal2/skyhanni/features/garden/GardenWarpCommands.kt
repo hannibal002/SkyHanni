@@ -3,16 +3,19 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class GardenWarpCommands {
+@SkyHanniModule
+object GardenWarpCommands {
 
     private val config get() = GardenAPI.config.gardenCommands
 
@@ -31,21 +34,21 @@ class GardenWarpCommands {
         val message = event.message.lowercase()
 
         if (message == "/home") {
-            event.isCanceled = true
-            ChatUtils.sendCommandToServer("warp garden")
+            event.cancel()
+            HypixelCommands.warp("garden")
             ChatUtils.chat("§aTeleported you to the spawn location!", prefix = false)
         }
 
         if (message == "/barn") {
-            event.isCanceled = true
-            ChatUtils.sendCommandToServer("tptoplot barn")
+            event.cancel()
+            HypixelCommands.teleportToPlot("barn")
             LockMouseLook.autoDisable()
         }
 
         tpPlotPattern.matchMatcher(event.message) {
-            event.isCanceled = true
+            event.cancel()
             val plotName = group("plot")
-            ChatUtils.sendCommandToServer("tptoplot $plotName")
+            HypixelCommands.teleportToPlot(plotName)
             LockMouseLook.autoDisable()
         }
     }
@@ -56,18 +59,24 @@ class GardenWarpCommands {
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
 
-        val command = when (event.keyCode) {
-            config.homeHotkey -> "warp garden"
-            config.sethomeHotkey -> "sethome"
-            config.barnHotkey -> "tptoplot barn"
+        if (lastWarpTime.passedSince() < 2.seconds) return
+
+        when (event.keyCode) {
+            config.homeHotkey -> {
+                HypixelCommands.warp("garden")
+            }
+
+            config.sethomeHotkey -> {
+                HypixelCommands.setHome()
+            }
+
+            config.barnHotkey -> {
+                LockMouseLook.autoDisable()
+                HypixelCommands.teleportToPlot("barn")
+            }
 
             else -> return
         }
-        if (lastWarpTime.passedSince() < 2.seconds) return
         lastWarpTime = SimpleTimeMark.now()
-        if (command == "tptoplot barn") {
-            LockMouseLook.autoDisable()
-        }
-        ChatUtils.sendCommandToServer(command)
     }
 }

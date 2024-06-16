@@ -60,6 +60,14 @@ public class DungeonConfig {
     public boolean highlightTeammates = true;
 
     @Expose
+    @ConfigOption(name = "Architect Notifier",
+        desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed. " +
+            "§cOnly works when having enough §5Architect First Drafts §cin the sack.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean architectNotifier = true;
+
+    @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
     @Accordion
     public ObjectHiderConfig objectHider = new ObjectHiderConfig();
@@ -120,4 +128,9 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shadowAssassinJumpNotifier = false;
+
+    @Expose
+    @ConfigOption(name = "Dungeon Races Guide", desc = "")
+    @Accordion
+    public DungeonsRaceGuideConfig dungeonsRaceGuide = new DungeonsRaceGuideConfig();
 }

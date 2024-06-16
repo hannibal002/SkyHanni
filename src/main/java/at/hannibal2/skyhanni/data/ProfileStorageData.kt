@@ -9,16 +9,21 @@ import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ProfileStorageData {
 
     var playerSpecific: PlayerSpecificStorage? = null
@@ -33,18 +38,44 @@ object ProfileStorageData {
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val profileName = event.name
         if (playerSpecific == null) {
-            ChatUtils.error("playerSpecific is null in ProfileJoinEvent!")
+            DelayedRun.runDelayed(10.seconds) {
+                workaroundIn10SecondsProfileStorage(profileName)
+            }
             return
         }
         if (sackPlayers == null) {
-            ChatUtils.error("sackPlayers is null in ProfileJoinEvent!")
-            return
+            ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
 
-        val profileName = event.name
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
         ConfigLoadEvent().postAndCatch()
+    }
+
+    private fun workaroundIn10SecondsProfileStorage(profileName: String) {
+        println("workaroundIn10SecondsProfileStorage")
+        val playerSpecific = playerSpecific
+        val sackPlayers = sackPlayers
+
+        if (playerSpecific == null) {
+            ErrorManager.skyHanniError(
+                "failed to load your profile data delayed ",
+                "onHypixel" to LorenzUtils.onHypixel,
+                "HypixelData.hypixelLive" to HypixelData.hypixelLive,
+                "HypixelData.hypixelAlpha" to HypixelData.hypixelAlpha,
+                "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
+            )
+        }
+        if (sackPlayers == null) {
+            ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
+        }
+        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        ConfigLoadEvent().postAndCatch()
+    }
+
+    private fun runWorkaround() {
+
     }
 
     @SubscribeEvent
@@ -71,7 +102,9 @@ object ProfileStorageData {
                 ChatUtils.clickableChat(
                     "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
                         "This is needed for the mod to function! And therefore this warning cannot be disabled",
-                    command = "widget"
+                    onClick = {
+                        HypixelCommands.widget()
+                    }
                 )
             } else {
                 ChatUtils.chat(

@@ -31,6 +31,11 @@ public abstract class MixinGuiContainer extends GuiScreen {
         skyHanni$hook.backgroundDrawn(mouseX, mouseY, partialTicks);
     }
 
+    @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
+    private void preDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+        skyHanni$hook.preDraw(mouseX, mouseY, partialTicks, ci);
+    }
+
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/inventory/GuiContainer;drawGuiContainerForegroundLayer(II)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         skyHanni$hook.foregroundDrawn(mouseX, mouseY, partialTicks);
@@ -61,6 +66,6 @@ public abstract class MixinGuiContainer extends GuiScreen {
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         skyHanni$hook.onDrawScreenAfter(mouseX, mouseY, ci);
-        ToolTipData.Companion.setLastSlot(theSlot);
+        ToolTipData.INSTANCE.setLastSlot(theSlot);
     }
 }

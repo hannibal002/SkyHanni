@@ -8,21 +8,16 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class DevConfig {
 
     @Expose
-    @ConfigOption(name = "Repo Auto Update", desc = "Update the repository on every startup.\n" +
-        "§cOnly disable this if you know what you are doing!")
-    @ConfigEditorBoolean
-    public boolean repoAutoUpdate = true;
-
-    @Expose
-    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
-    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
-    public int logExpiryTime = 14;
+    @ConfigOption(name = "Repository", desc = "")
+    @Accordion
+    public RepositoryConfig repo = new RepositoryConfig();
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
@@ -35,6 +30,11 @@ public class DevConfig {
     public RepoPatternConfig repoPattern = new RepoPatternConfig();
 
     @Expose
+    @ConfigOption(name = "Log Expiry Time", desc = "Deletes your SkyHanni logs after this time period in days.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
+    public int logExpiryTime = 14;
+
+    @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int showSlotNumberKey = Keyboard.KEY_NONE;
@@ -43,12 +43,6 @@ public class DevConfig {
     @ConfigOption(name = "World Edit", desc = "Use wood axe or command /shworldedit to render a box, similar like the WorldEdit plugin.")
     @ConfigEditorBoolean
     public boolean worldEdit = false;
-
-    @Expose
-    @ConfigOption(name = "Unknown Lines warning", desc = "Gives a chat warning when unknown lines are found in the scoreboard." +
-        "\nCustom Scoreboard debug option")
-    @ConfigEditorBoolean
-    public boolean unknownLinesWarning = false;
 
     @ConfigOption(name = "Parkour Waypoints", desc = "")
     @Accordion
@@ -68,8 +62,55 @@ public class DevConfig {
     public Position debugItemPos = new Position(90, 70);
 
     @Expose
+    @ConfigLink(owner = DebugConfig.class, field = "raytracedOreblock")
+    public Position debugOrePos = new Position(1, 200, false, true);
+
+    @Expose
+    @ConfigOption(
+        name = "Fancy Contributors",
+        desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
+            "§eThose are the folks that coded the mod for you for free :)"
+    )
+    @ConfigEditorBoolean
+    public boolean fancyContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Contributor Nametags",
+        desc = "Makes SkyHanni contributors' nametags fancy too. "
+    )
+    @ConfigEditorBoolean
+    public boolean contributorNametags = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Flip Contributors",
+        desc = "Make SkyHanni contributors appear upside down in the world.")
+    @ConfigEditorBoolean
+    public boolean flipContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Spin Contributors",
+        desc = "Make SkyHanni contributors spin around when you are looking at them. " +
+            "§eRequires 'Flip Contributors' to be enabled.")
+    @ConfigEditorBoolean
+    public boolean rotateContributors = false;
+
+    @Expose
+    @ConfigOption(
+        name = "SBA Contributors",
+        desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
+    @ConfigEditorBoolean
+    public boolean fancySbaContributors = false;
+
+    @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
+
+    @Expose
+    @Category(name = "Dev Tools", desc = "Tooling for devs")
+    public DevToolConfig devTool = new DevToolConfig();
 
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")

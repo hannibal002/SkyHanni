@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -25,9 +27,9 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.R
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -39,8 +41,10 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -54,6 +58,16 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     val quests = mutableListOf<Quest>()
     var greatSpook = false
 
+    /**
+     * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
+     * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
+     * REGEX-TEST: §7miniboss §a1 §7time!
+     */
+    val minibossAmountPattern by RepoPattern.pattern(
+        "crimson.reputationhelper.quest.minibossamount",
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+    )
+
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @SubscribeEvent
@@ -64,10 +78,20 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!isEnabled()) return
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.enabled) {
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
+                questLoader.loadFromTabList()
+            }
+        }
+    }
 
-        questLoader.loadFromTabList()
+    @SubscribeEvent
+    fun onTabListWidgetUpdate(event: WidgetUpdateEvent) {
+        if (event.isWidget(TabWidget.FACTION_QUESTS)) {
+            if (!isEnabled()) return
+            questLoader.loadFromTabList()
+        }
     }
 
     @SubscribeEvent
@@ -306,5 +330,5 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

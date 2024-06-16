@@ -43,4 +43,21 @@ public class MiningNotificationsConfig {
     @ConfigOption(name = "Cold Threshold", desc = "Change when the Cold notification gets triggered.")
     @ConfigEditorSlider(minValue = 1, maxValue = 100, minStep = 1)
     public Property<Integer> coldThreshold = Property.of(50);
+
+    @Expose
+    @ConfigOption(
+        name = "Get Ascension Rope",
+        desc = "Click on a chat message to get an Ascension Rope when you're at a certain amount of Cold and in the §bMineshaft§7. " +
+            "§cOnly works if you have an Ascension Rope in your sacks."
+    )
+    @ConfigEditorBoolean
+    public boolean getAscensionRope = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Cold Amount to Show Message",
+        desc = "Customise the amount of Cold you need to have to get the Ascension Rope message."
+    )
+    @ConfigEditorSlider(minValue = 1, maxValue = 100, minStep = 1)
+    public int coldAmount = 90;
 }

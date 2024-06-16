@@ -7,22 +7,24 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO Remove all removeColor calls in this class. Deal with the color code in regex.
-class DungeonFinderFeatures {
+@SkyHanniModule
+object DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     //  Repo group and patterns
@@ -243,9 +245,12 @@ class DungeonFinderFeatures {
                     group("className")
                 }
             }
-            if (memberLevels.any { (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel }) {
-                map[slot] = LorenzColor.YELLOW
-                continue
+            if (config.markBelowClassLevel != 0) {
+                val hasLowLevelMembers = memberLevels.any { (it ?: Integer.MAX_VALUE) <= config.markBelowClassLevel }
+                if (hasLowLevelMembers) {
+                    map[slot] = LorenzColor.YELLOW
+                    continue
+                }
             }
 
             if (config.markMissingClass && memberClasses.none { it == selectedClass }) {

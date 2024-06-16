@@ -8,22 +8,29 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenCropMilestoneFix {
+@SkyHanniModule
+object GardenCropMilestoneFix {
     private val patternGroup = RepoPattern.group("garden.cropmilestone.fix")
+
+    /**
+     * REGEX-TEST:  Cocoa Beans 31: §r§a68%
+     * REGEX-TEST:  Potato 32: §r§a97.7%
+     */
     private val tabListPattern by patternGroup.pattern(
         "tablist",
-        " Milestone: §r§a(?<crop>.*) (?<tier>.*): §r§3(?<percentage>.*)%"
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%"
     )
     private val levelUpPattern by patternGroup.pattern(
         "levelup",
@@ -55,24 +62,24 @@ class GardenCropMilestoneFix {
             val amount = group("amount").toInt()
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + (amount * multiplier.second)
+                cropType.getCounter() + (amount * primitiveStack.amount)
             )
             GardenCropMilestoneDisplay.update()
         }
         pestRareDropPattern.matchMatcher(event.message) {
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + multiplier.second
+                cropType.getCounter() + primitiveStack.amount
             )
             GardenCropMilestoneDisplay.update()
         }

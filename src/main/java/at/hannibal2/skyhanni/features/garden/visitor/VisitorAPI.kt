@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -14,10 +15,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
+@SkyHanniModule
 object VisitorAPI {
 
     private var visitors = mapOf<String, Visitor>()
@@ -131,6 +133,8 @@ object VisitorAPI {
     ) {
         var offersAccepted: Int? = null
         var pricePerCopper: Int? = null
+        var totalPrice: Double? = null
+        var totalReward: Double? = null
         var lore: List<String> = emptyList()
         var allRewards = listOf<NEUInternalName>()
         var lastLore = listOf<String>()
@@ -195,11 +199,16 @@ object VisitorAPI {
 
     fun Visitor.blockReason(): VisitorBlockReason? = with(config.rewardWarning) {
         val pricePerCopper = pricePerCopper ?: error("pricePerCopper is null")
+        val totalPrice = totalPrice ?: error("totalPrice is null")
+        val totalReward = totalReward ?: error("totalReward is null")
+        val loss = totalPrice - totalReward;
         return when {
             preventRefusing && hasReward() != null -> VisitorBlockReason.RARE_REWARD
             preventRefusingNew && offersAccepted == 0 -> VisitorBlockReason.NEVER_ACCEPTED
             preventRefusingCopper && pricePerCopper <= coinsPerCopperPrice -> VisitorBlockReason.CHEAP_COPPER
             preventAcceptingCopper && pricePerCopper > coinsPerCopperPrice -> VisitorBlockReason.EXPENSIVE_COPPER
+            preventRefusingLowLoss && loss <= coinsLossThreshold -> VisitorBlockReason.LOW_LOSS
+            preventAcceptingHighLoss && loss > coinsLossThreshold -> VisitorBlockReason.HIGH_LOSS
 
             else -> null
         }
@@ -209,6 +218,8 @@ object VisitorAPI {
         NEVER_ACCEPTED("§cNever accepted", true),
         RARE_REWARD("§aRare visitor reward found", true),
         CHEAP_COPPER("§aCheap copper", true),
-        EXPENSIVE_COPPER("§cExpensive copper", false)
+        EXPENSIVE_COPPER("§cExpensive copper", false),
+        LOW_LOSS("§aLow Loss", true),
+        HIGH_LOSS("§cHigh Loss", false)
     }
 }

@@ -9,24 +9,37 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonCopilot {
+@SkyHanniModule
+object DungeonCopilot {
 
     private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
 
-    private val countdownPattern =
-        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern()
+    private val patternGroup = RepoPattern.group("dungeon.copilot")
+    private val countdownPattern by patternGroup.pattern(
+        "countdown",
+        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute."
+    )
+    private val witherDoorPattern by patternGroup.pattern(
+        "wither.door",
+        "(.*) opened a §r§8§lWITHER §r§adoor!"
+    )
+    private val bloodDoorPattern by patternGroup.pattern(
+        "blood.door",
+        "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
+    )
+
     private val keyPatternsList = listOf(
         "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
     )
-    private val witherDoorPattern = "(.*) opened a §r§8§lWITHER §r§adoor!".toPattern()
-    private val bloodDoorPattern = "§cThe §r§c§lBLOOD DOOR§r§c has been opened!".toPattern()
 
     private var nextStep = ""
     private var searchForKey = false
@@ -75,7 +88,7 @@ class DungeonCopilot {
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
-            if (DungeonAPI.getCurrentBoss() == DungeonFloor.ENTRANCE) {
+            if (DungeonAPI.getCurrentBoss() == DungeonFloor.E) {
                 changeNextStep("")
             } else {
                 changeNextStep("Enter Boss Room")

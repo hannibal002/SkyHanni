@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.UtilsPatterns.seasonPattern
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import kotlin.time.Duration.Companion.seconds
 
 enum class SkyblockSeason(
     val season: String,
@@ -21,7 +21,11 @@ enum class SkyblockSeason(
 
     companion object {
 
-        fun getCurrentSeason(): SkyblockSeason? = getSeasonByName(SkyBlockTime.now().monthName)
+        fun getCurrentSeason(): SkyblockSeason? = currentSeason.getValue()
+
+        private val currentSeason = RecalculatingValue(1.seconds) {
+            getSeasonByName(SkyBlockTime.now().monthName)
+        }
 
         private fun getSeasonByName(name: String): SkyblockSeason? =
             seasonPattern.matchMatcher(name) { entries.find { it.season.endsWith(group("season")) } }
