@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import net.minecraft.entity.item.EntityArmorStand
@@ -88,7 +89,7 @@ object AshfangHighlights {
         val distance = location.distanceToPlayer()
         if (distance < MAX_DISTANCE) {
             val colorCode = getColorCode(distance)
-            drawBlendedColorString(location.add(y = 2.5), colorCode + text)
+            drawString(location.add(y = 2.5), colorCode + text)
         }
     }
 
