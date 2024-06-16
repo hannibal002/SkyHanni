@@ -113,11 +113,12 @@ object DungeonLividFinder {
 
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 
-        if (location.distanceSqToPlayer() < 50) return
-
         val color = lorenzColor.toColor()
-        event.draw3DLine(event.exactPlayerEyeLocation(), location.add(0.5, 0.0, 0.5), color, 3, true)
         event.drawFilledBoundingBox_nea(boundingBox, color, 0.5f)
+
+        if (location.distanceSqToPlayer() > 50) {
+            event.draw3DLine(event.exactPlayerEyeLocation(), location.add(0.5, 0.0, 0.5), color, 3, true)
+        }
     }
 
     private fun inLividBossRoom() = DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F5

@@ -1118,14 +1118,9 @@ object RenderUtils {
     }
 
     fun LorenzRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
-        val height = entity.height
-        val width = entity.width / 2
-        val center = exactLocation(entity)
-
-        val corner1 = LorenzVec(center.x - width, center.y, center.z - width)
-        val corner2 = LorenzVec(center.x + width, center.y + height, center.z + width)
-
-        return corner1.axisAlignedTo(corner2)
+        if (entity.isDead) return entity.entityBoundingBox
+        val offset = exactLocation(entity) - entity.getLorenzVec()
+        return entity.entityBoundingBox.offset(offset.x, offset.y, offset.z)
     }
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
