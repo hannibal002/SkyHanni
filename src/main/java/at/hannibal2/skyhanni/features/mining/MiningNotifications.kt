@@ -6,19 +6,19 @@ import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI.getCold
-import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
 import at.hannibal2.skyhanni.data.MiningAPI.lastColdReset
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
-import at.hannibal2.skyhanni.e<<<vents.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -64,6 +64,10 @@ object MiningNotifications {
     }
 
     private val patternGroup = RepoPattern.group("mining.notifications")
+    val mineshaftSpawn by patternGroup.pattern(
+        "mineshaft.spawn",
+        "§5§lWOW! §r§aYou found a §r§bGlacite Mineshaft §r§aportal!",
+    )
     private val scrapDrop by patternGroup.pattern(
         "scrapdrop",
         "§6§lEXCAVATOR! §r§fYou found a §r§9Suspicious Scrap§r§f!",
