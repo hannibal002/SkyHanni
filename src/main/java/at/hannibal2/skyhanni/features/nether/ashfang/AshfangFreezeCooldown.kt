@@ -21,17 +21,16 @@ object AshfangFreezeCooldown {
 
     private val cryogenicBlastPattern by RepoPattern.pattern(
         "ashfang.freeze.cryogenic",
-        "§cAshfang Follower's Cryogenic Blast hit you for .* damage!"
+        "§cAshfang Follower's Cryogenic Blast hit you for .* damage!",
     )
 
-    private var lastHit = SimpleTimeMark.farPast()
-
-    private val maxDuration = 3.seconds
+    private var unfrozenTime = SimpleTimeMark.farPast()
+    private val duration = 3.seconds
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (cryogenicBlastPattern.matches(event.message)) lastHit = SimpleTimeMark.now()
+        if (cryogenicBlastPattern.matches(event.message)) unfrozenTime = SimpleTimeMark.now() + duration
     }
 
     @SubscribeEvent
@@ -39,18 +38,14 @@ object AshfangFreezeCooldown {
         if (!isEnabled()) return
         if (!isCurrentlyFrozen()) return
 
-        val format = (maxDuration - lastHit.passedSince()).format(showMilliSeconds = true)
+        val format = unfrozenTime.timeUntil().format(showMilliSeconds = true)
         config.freezeCooldownPos.renderString(
             "§cAshfang Freeze: §a$format",
             posLabel = "Ashfang Freeze Cooldown",
         )
     }
 
-    fun isCurrentlyFrozen(): Boolean {
-        val passedSince = lastHit.passedSince()
-        val duration = maxDuration - passedSince
-        return duration.isPositive()
-    }
+    fun isCurrentlyFrozen() = unfrozenTime.isInFuture()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
