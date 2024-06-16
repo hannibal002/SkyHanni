@@ -54,8 +54,8 @@ object CraftableItemList {
         } else {
             val list = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
             listOf(
-                Renderable.string("§7Recipes: ${list.size} total"),
-                Renderable.scrollList(list, height = 120),
+                Renderable.string("§eCraftable items (${list.size})"),
+                Renderable.scrollList(list, height = 250, velocity = 20.0),
             )
         }
     }
@@ -76,10 +76,10 @@ object CraftableItemList {
                 if (neededItems.isEmpty()) continue
                 val amount = canCraftAmount(neededItems, availableMaterial)
                 if (amount <= 0) continue
-                pricePer[internalName] = pricePer(neededItems) * amount
+                pricePer[internalName] = pricePer(neededItems)
                 lines[internalName] = Renderable.clickAndHover(
                     "§8x${amount.addSeparators()} ${internalName.itemName}",
-                    tips = listOf("Click to craft ${internalName.itemName}!"),
+                    tips = listOf("§eClick to craft ${internalName.itemName}§e!"),
                     onClick = {
                         HypixelCommands.recipe(internalName.asString())
                     },
@@ -93,12 +93,11 @@ object CraftableItemList {
         inInventory = false
     }
 
-    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double =
-        neededItems.map { it.key.getPrice() * it.value }.sum()
+    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double = neededItems.map { it.key.getPrice() * it.value }.sum()
 
     private fun canCraftAmount(
         need: Map<NEUInternalName, Int>,
-        available: MutableMap<NEUInternalName, Long>,
+        available: Map<NEUInternalName, Long>,
     ): Int {
         val canCraftTotal = mutableListOf<Int>()
         for ((name, neededAmount) in need) {
@@ -121,7 +120,7 @@ object CraftableItemList {
         return neededItems
     }
 
-    private fun readItems(): MutableMap<NEUInternalName, Long> {
+    private fun readItems(): Map<NEUInternalName, Long> {
         val materials = mutableMapOf<NEUInternalName, Long>()
         for (stack in InventoryUtils.getItemsInOwnInventory()) {
             val item = stack.toPrimitiveStackOrNull() ?: continue
