@@ -65,6 +65,7 @@ import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatur
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.GraphEditor
@@ -408,6 +409,10 @@ object Commands {
             "shclearsavedrabbits",
             "Clears the saved rabbits on this profile.",
         ) { HoppityCollectionStats.clearSavedRabbits() }
+        registerCommand(
+            "shresetpunchcard",
+            "Resets the Rift Punchcard Artifact player list."
+        ) { PunchcardHighlight.clearList() }
     }
 
     private fun developersDebugFeatures() {
