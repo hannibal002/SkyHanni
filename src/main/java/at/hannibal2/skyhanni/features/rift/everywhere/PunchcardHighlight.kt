@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -120,7 +119,7 @@ object PunchcardHighlight {
     private fun checkPunchcard() {
         if (!RiftAPI.inRift()) return
 
-        val hasPunchcard = InventoryUtils.getItemsInOwnInventory().any { it.getInternalName() == "PUNCHCARD_ARTIFACT".asInternalName() }
+        val hasPunchcard = InventoryUtils.isItemInInventory("PUNCHCARD_ARTIFACT".asInternalName())
         if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
             warningCooldown = SimpleTimeMark.now()
             ChatUtils.chat("You don't seem to own a Punchcard Artifact, this feature will not work without one.")
