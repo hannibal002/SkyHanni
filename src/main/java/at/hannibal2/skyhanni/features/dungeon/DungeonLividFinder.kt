@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -21,13 +22,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.init.Blocks
 import net.minecraft.potion.Potion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -35,10 +36,12 @@ object DungeonLividFinder {
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
     private val blockLocation = LorenzVec(6, 109, 43)
 
-    private val isBlind = RecalculatingValue(100.milliseconds, ::isCurrentlyBlind)
+    private val isBlind = RecalculatingValue(2.ticks, ::isCurrentlyBlind)
 
     var livid: Mob? = null
+    var lividArmorStandId: Int? = null
     private var fakeLivids = mutableSetOf<Mob>()
+
     private var color: LorenzColor? = null
 
     @SubscribeEvent
@@ -51,6 +54,9 @@ object DungeonLividFinder {
         val lividColor = color ?: return
         if (mob.isLividColor(lividColor)) {
             livid = mob
+            // When the real livid dies at the same time as a fake livid, Hypixel despawns the player entity,
+            // and makes it impossible to get the mob of the real livid again.
+            lividArmorStandId = mob.armorStand?.entityId
             if (config.enabled) mob.highlight(lividColor.toColor())
         } else {
             fakeLivids += mob
@@ -60,7 +66,6 @@ object DungeonLividFinder {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!inLividBossRoom()) return
-        if (color != null) return
         val block = blockLocation.getBlockStateAt()
         if (block.block != Blocks.wool) return
         color = block.getValue(BlockStainedGlass.COLOR).toLorenzColor()
@@ -77,12 +82,13 @@ object DungeonLividFinder {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         color = null
+        lividArmorStandId = null
     }
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!inLividBossRoom() || !config.hideWrong) return
-        if (livid == null) return
+        if (livid == null && lividArmorStandId == null) return // in case livid detection fails, don't hide anything
         if (event.entity.mob in fakeLivids) event.cancel()
     }
 
@@ -99,7 +105,7 @@ object DungeonLividFinder {
         if (!inLividBossRoom() || !config.enabled) return
         if (isBlind.getValue()) return
 
-        val entity = livid?.baseEntity ?: return
+        val entity = livid?.baseEntity ?: lividArmorStandId?.let { EntityUtils.getEntityByID(it) } ?: return
         val lorenzColor = color ?: return
 
         val location = event.exactLocation(entity)
