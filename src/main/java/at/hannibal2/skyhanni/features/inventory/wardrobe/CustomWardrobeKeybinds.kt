@@ -33,8 +33,7 @@ object CustomWardrobeKeybinds {
         if (!isEnabled()) return
         val slots = WardrobeAPI.slots.filter { it.isInCurrentPage() }
 
-        for (index in keybinds.indices) {
-            val key = keybinds.getOrNull(index) ?: continue
+        for ((key, index) in keybinds.withIndex().map { it.value to it.index }) {
             if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
             val slot = slots.getOrNull(index) ?: continue
