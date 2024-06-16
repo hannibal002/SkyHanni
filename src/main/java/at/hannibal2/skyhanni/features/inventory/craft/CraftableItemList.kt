@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,8 +19,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.isVanillaItem
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -27,14 +28,15 @@ import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 
-class CraftableItemList {
+@SkyHanniModule
+object CraftableItemList {
     private val config get() = SkyHanniMod.feature.inventory.craftableItemList
 
     private var display = listOf<Renderable>()
     private var inInventory = false
     private val craftItemPattern by RepoPattern.pattern(
         "craftableitemlist.craftitem",
-        "Craft Item"
+        "Craft Item",
     )
 
     @SubscribeEvent
@@ -45,7 +47,7 @@ class CraftableItemList {
 
         val pricePer = mutableMapOf<NEUInternalName, Double>()
         val lines = mutableMapOf<NEUInternalName, Renderable>()
-        val avaliableMaterial = readItems()
+        val availableMaterial = readItems()
         for (internalName in NEUItems.allInternalNames) {
             if (config.excludeVanillaItems && internalName.isVanillaItem()) continue
 
@@ -53,17 +55,19 @@ class CraftableItemList {
 
             for (recipe in recipes) {
                 if (recipe !is CraftingRecipe) continue
-                val neededItems = neededItems(recipe, internalName.toString())
+                val neededItems = neededItems(recipe)
                 // Just a fail save, should not happen normally
                 if (neededItems.isEmpty()) continue
-                val amount = canCraftAmount(neededItems, avaliableMaterial)
+                val amount = canCraftAmount(neededItems, availableMaterial)
                 if (amount > 0) {
                     pricePer[internalName] = pricePer(neededItems) * amount
-                    lines[internalName] = Renderable.clickAndHover("§8x${amount.addSeparators()} ${internalName.itemName}",
+                    lines[internalName] = Renderable.clickAndHover(
+                        "§8x${amount.addSeparators()} ${internalName.itemName}",
                         tips = listOf("Click to craft ${internalName.itemName}!"),
                         onClick = {
-                            ChatUtils.sendCommandToServer("recipe ${internalName.asString()}")
-                        })
+                            HypixelCommands.recipe(internalName.asString())
+                        },
+                    )
                 }
             }
         }
@@ -84,16 +88,16 @@ class CraftableItemList {
         inInventory = false
     }
 
-    private fun pricePer(neededItems: MutableMap<NEUInternalName, Int>): Double =
+    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double =
         neededItems.map { it.key.getPrice() * it.value }.sum()
 
     private fun canCraftAmount(
-        need: MutableMap<NEUInternalName, Int>,
-        avaliable: MutableMap<NEUInternalName, Long>,
+        need: Map<NEUInternalName, Int>,
+        available: MutableMap<NEUInternalName, Long>,
     ): Int {
         val canCraftTotal = mutableListOf<Int>()
         for ((name, neededAmount) in need) {
-            val inventory = avaliable[name] ?: 0
+            val inventory = available[name] ?: 0
             val sacks = if (config.includeSacks) name.getAmountInSacks() else 0
             val having = inventory + sacks
             val canCraft = floor(having.toDouble() / neededAmount).toInt()
@@ -102,7 +106,7 @@ class CraftableItemList {
         return canCraftTotal.min()
     }
 
-    private fun neededItems(recipe: NeuRecipe, from: String): MutableMap<NEUInternalName, Int> {
+    private fun neededItems(recipe: NeuRecipe): MutableMap<NEUInternalName, Int> {
         val neededItems = mutableMapOf<NEUInternalName, Int>()
         for (ingredient in recipe.ingredients) {
             val material = ingredient.internalItemId.asInternalName()
