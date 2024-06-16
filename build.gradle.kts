@@ -174,10 +174,7 @@ loom {
         }
     }
     forge {
-        pack200Provider.set(
-            dev.architectury.pack200.java
-                .Pack200Adapter(),
-        )
+        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
         mixinConfig("mixins.skyhanni.json")
     }
     @Suppress("UnstableApiUsage")
