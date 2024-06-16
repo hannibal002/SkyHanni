@@ -41,14 +41,28 @@ object PunchcardHighlight {
     private var listening = false
 
     private val patternGroup = RepoPattern.group("rift.punchcard")
+
+    /**
+     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§b[MVP§r§c+§r§b] ThorQOM§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
+     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§7Metafighter§r§7 §r§eand both regained §r§a+25ф Rift Time§r§e!
+     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§a[VIP] RickyLafleur22§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
+     */
     private val punchedPattern by patternGroup.pattern(
         "new",
         "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25ф Rift Time§r§e!",
     )
+
+    /**
+     * REGEX-TEST:  §c§lAWKWARD! §r§cThis player has already been punched by you... somehow!
+     */
     private val repeatPattern by patternGroup.pattern(
         "repeat",
-        "§c§lAWKWARD! §r§cThis player has already been punched by you... somehow!",
+        "§c§lAWKWARD! §r§cThis player has already been punched by you\\.\\.\\. somehow!",
     )
+
+    /**
+     * REGEX-TEST:  §c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!
+     */
     private val limitPattern by patternGroup.pattern(
         "limit",
         "§c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!",
@@ -92,6 +106,9 @@ object PunchcardHighlight {
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
+        if (!config.enabled.get()) return
+        if (event.newIsland != IslandType.THE_RIFT) return
+
         display = drawDisplay()
         DelayedRun.runDelayed(1500.milliseconds) {
             reloadColors()
@@ -105,11 +122,7 @@ object PunchcardHighlight {
         }
     }
 
-    private fun colorPlayer(entity: EntityLivingBase, remove: Boolean = false) {
-        if (remove) {
-            RenderLivingEntityHelper.removeEntityColor(entity)
-            return
-        }
+    private fun colorPlayer(entity: EntityLivingBase) {
         val color = config.color.get().toChromaColor()
         val alpha = when (color.alpha) {
             0 -> 0
@@ -117,6 +130,10 @@ object PunchcardHighlight {
             else -> 255 - color.alpha
         }
         RenderLivingEntityHelper.setEntityColor(entity, color.withAlpha(alpha)) { IslandType.THE_RIFT.isInIsland() }
+    }
+
+    private fun uncolorPlayer(entity: EntityLivingBase) {
+        RenderLivingEntityHelper.removeEntityColor(entity)
     }
 
     fun clearList() {
@@ -128,7 +145,7 @@ object PunchcardHighlight {
             }
         } else {
             MobData.players.forEach {
-                colorPlayer(it.baseEntity, true)
+                uncolorPlayer(it.baseEntity)
             }
         }
     }
@@ -170,17 +187,14 @@ object PunchcardHighlight {
             )
             return
         }
-        when {
-            limitPattern.matches(message) -> addPunch(queuedName)
-            repeatPattern.matches(message) -> addPunch(queuedName)
-        }
+        if (limitPattern.matches(message) || repeatPattern.matches(message)) addPunch(queuedName)
     }
 
     private fun addPunch(playerName: String) {
         playerList.add(playerName)
         playerQueue.remove(playerName)
         val player = MobData.players.firstOrNull { it.name == playerName } ?: return
-        if (!config.reverse.get()) colorPlayer(player.baseEntity, true)
+        if (!config.reverse.get()) uncolorPlayer(player.baseEntity)
         else colorPlayer(player.baseEntity)
         display = drawDisplay()
     }
@@ -210,7 +224,7 @@ object PunchcardHighlight {
 
     private fun reloadColors() {
         MobData.players.forEach {
-            colorPlayer(it.baseEntity, true)
+            uncolorPlayer(it.baseEntity)
         }
         if (!config.enabled.get()) return
         val reverse = config.reverse.get()
