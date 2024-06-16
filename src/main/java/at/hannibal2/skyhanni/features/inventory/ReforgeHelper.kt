@@ -268,7 +268,9 @@ object ReforgeHelper {
                 (getReforgeEffect(reforge, itemRarity)?.let { listOf(rString(addEffectText)) + it }
                     ?: emptyList())
 
-            return@run pre + stats + removedEffect + addedEffect + click
+            return@run pre + stats + (if (config.showDiff) {
+                removedEffect + addedEffect
+            } else emptyList()) + click
         }
         val onHover = if (!isInHexReforgeMenu) {
             {}
