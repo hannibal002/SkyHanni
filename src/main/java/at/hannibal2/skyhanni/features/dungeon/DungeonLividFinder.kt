@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.Entity
 import net.minecraft.init.Blocks
 import net.minecraft.potion.Potion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,7 +40,11 @@ object DungeonLividFinder {
     private val isBlind = RecalculatingValue(2.ticks, ::isCurrentlyBlind)
 
     var livid: Mob? = null
-    var lividArmorStandId: Int? = null
+    private var lividArmorStandId: Int? = null
+
+    val lividEntity: Entity?
+        get() = livid?.baseEntity ?: lividArmorStandId?.let { EntityUtils.getEntityByID(it) }
+
     private var fakeLivids = mutableSetOf<Mob>()
 
     private var color: LorenzColor? = null
@@ -105,7 +110,7 @@ object DungeonLividFinder {
         if (!inLividBossRoom() || !config.enabled) return
         if (isBlind.getValue()) return
 
-        val entity = livid?.baseEntity ?: lividArmorStandId?.let { EntityUtils.getEntityByID(it) } ?: return
+        val entity = lividEntity ?: return
         val lorenzColor = color ?: return
 
         val location = event.exactLocation(entity)
