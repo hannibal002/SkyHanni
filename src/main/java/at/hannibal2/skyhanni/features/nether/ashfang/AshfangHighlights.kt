@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
@@ -16,7 +15,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -28,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object AshfangHighlights {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
+    private val config get() = AshfangManager.config
 
     private const val BLAZING_SOUL =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODI4N2IzOTdkYWY5NTE2YTBiZDc2ZjVmMWI3YmY5Nzk1MTVkZjNkNWQ4MzNlMDYzNWZhNjhiMzdlZTA4MjIxMiJ9fX0="
@@ -40,7 +38,7 @@ object AshfangHighlights {
 
     @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
-        if (!AshfangBlazes.isAshfangActive()) return
+        if (!AshfangManager.isAshfangActive()) return
         val entity = event.entity
         DelayedRun.runNextTick {
             when {
@@ -58,7 +56,7 @@ object AshfangHighlights {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!AshfangManager.isAshfangActive()) return
 
         if (config.blazingSouls.enabled) {
             val color = config.blazingSouls.color.toChromaColor()
@@ -105,6 +103,4 @@ object AshfangHighlights {
         event.move(1, "ashfang.gravityOrbsColor", "ashfang.gravityOrbs.color")
         event.move(2, "ashfang.gravityOrbs", "crimsonIsle.ashfang.gravityOrbs")
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && AshfangBlazes.isAshfangActive()
 }

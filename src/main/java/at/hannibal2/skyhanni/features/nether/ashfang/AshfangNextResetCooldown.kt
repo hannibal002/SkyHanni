@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -14,12 +12,12 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object AshfangNextResetCooldown {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
+    private val config get() = AshfangManager.config
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        val nextSpawn = AshfangBlazes.nextSpawnTime
+        val nextSpawn = AshfangManager.nextSpawnTime
         if (nextSpawn.isFarPast()) return
 
         val format = if (nextSpawn.passedSince() < 10.seconds) "Now!"
@@ -37,5 +35,5 @@ object AshfangNextResetCooldown {
         event.move(2, "ashfang.nextResetCooldownPos", "crimsonIsle.ashfang.nextResetCooldownPos")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && AshfangBlazes.isAshfangActive() && config.nextResetCooldown
+    private fun isEnabled() = AshfangManager.isAshfangActive() && config.nextResetCooldown
 }

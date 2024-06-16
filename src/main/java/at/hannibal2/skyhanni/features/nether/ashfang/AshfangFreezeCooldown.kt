@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -17,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object AshfangFreezeCooldown {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
+    private val config get() = AshfangManager.config
 
     private val cryogenicBlastPattern by RepoPattern.pattern(
         "ashfang.freeze.cryogenic",
@@ -53,5 +51,5 @@ object AshfangFreezeCooldown {
         event.move(2, "ashfang.freezeCooldownPos", "crimsonIsle.ashfang.freezeCooldownPos")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && AshfangBlazes.isAshfangActive() && config.freezeCooldown
+    private fun isEnabled() = AshfangManager.isAshfangActive() && config.freezeCooldown
 }

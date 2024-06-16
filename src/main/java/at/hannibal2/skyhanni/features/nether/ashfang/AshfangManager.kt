@@ -17,9 +17,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object AshfangBlazes {
+object AshfangManager {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
+    val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
     private val ashfangMobs = mutableSetOf<Mob>()
     var ashfang: Mob? = null
@@ -30,7 +30,7 @@ object AshfangBlazes {
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!isEnabled()) return
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         val mob = event.mob
         val color = when (mob.name) {
             "Ashfang Follower" -> LorenzColor.DARK_GRAY
@@ -60,7 +60,7 @@ object AshfangBlazes {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
-        if (!isEnabled()) return
+        if (!isAshfangActive()) return
         if (!config.hide.fullNames) return
         if (event.entity.mob !in ashfangMobs) return
         event.cancel()
@@ -72,6 +72,4 @@ object AshfangBlazes {
         event.move(2, "ashfang.highlightBlazes", "crimsonIsle.ashfang.highlightBlazes")
         event.move(2, "ashfang.hideNames", "crimsonIsle.ashfang.hide.fullNames")
     }
-
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland()
 }
