@@ -18,9 +18,11 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.isVanillaItem
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -74,12 +76,31 @@ object CraftableItemList {
                 val neededItems = neededItems(recipe)
                 // Just a fail save, should not happen normally
                 if (neededItems.isEmpty()) continue
-                val amount = canCraftAmount(neededItems, availableMaterial)
-                if (amount <= 0) continue
-                pricePer[internalName] = pricePer(neededItems)
+                val canCraftAmount = canCraftAmount(neededItems, availableMaterial)
+                if (canCraftAmount <= 0) continue
+
+                val amountFormat = canCraftAmount.addSeparators()
+                val totalPrice = pricePer(neededItems)
+                pricePer[internalName] = totalPrice
+                val tooltip = buildList<String> {
+                    add(internalName.itemName)
+                    add("")
+                    add("§7Craft cost: §6${totalPrice.shortFormat()}")
+                    for ((item, amount) in neededItems) {
+                        val name = item.itemName
+                        val price = item.getPrice() * amount
+                        add(" §8x${amount.addSeparators()} $name §7(§6${price.shortFormat()}§7)")
+                    }
+                    add("")
+                    add("§7You have enough materials")
+                    val timeName = StringUtils.pluralize(canCraftAmount, "time", "times")
+                    add("§7to craft this item $amountFormat $timeName!")
+                    add("")
+                    add("§eClick to craft!")
+                }
                 lines[internalName] = Renderable.clickAndHover(
-                    "§8x${amount.addSeparators()} ${internalName.itemName}",
-                    tips = listOf("§eClick to craft ${internalName.itemName}§e!"),
+                    "§8x$amountFormat ${internalName.itemName}",
+                    tips = tooltip,
                     onClick = {
                         HypixelCommands.recipe(internalName.asString())
                     },
