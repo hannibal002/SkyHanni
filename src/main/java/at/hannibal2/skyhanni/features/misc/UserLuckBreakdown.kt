@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Utils
@@ -27,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object UserLuckBreakdown {
     private var inMiscStats = false
-    private var replaceSlot = -1
+    private var replaceSlot: Int? = null
     private var itemCreateCoolDown = SimpleTimeMark.farPast()
     private var skillCalcCoolDown = SimpleTimeMark.farPast()
 
@@ -55,7 +56,7 @@ object UserLuckBreakdown {
      * REGEX-TEST: §7Show all stats: §aYes
      * REGEX-TEST: §7Show all stats: §cNope
      */
-    private val showAllStatsPattern = RepoPattern.pattern(
+    private val showAllStatsPattern by RepoPattern.pattern(
         "misc.statsbreakdown.showallstats",
         "§7Show all stats: §.(?<toggle>.*)",
     )
@@ -119,11 +120,10 @@ object UserLuckBreakdown {
         if (inventoryName != "§dMisc Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItems)
-        val isAdvancedLore = event.inventoryItems[50]?.getLore() ?: listOf("")
-        isAdvancedLore.forEach {
-            val matcher = showAllStatsPattern.value.matcher(it)
-            if (matcher.find()) {
-                showAllStats = when (matcher.group("toggle")) {
+        val showAllStatsLore = event.inventoryItems[50]?.getLore() ?: listOf("")
+        for (line in showAllStatsLore) {
+            showAllStatsPattern.matchMatcher(line) {
+                showAllStats = when (group("toggle")) {
                     "Yes" -> true
                     else -> false
                 }
@@ -276,7 +276,7 @@ object UserLuckBreakdown {
                 } else {
                     arrayOf(
                         "§7SkyHanni User Luck increases your",
-                        "§7overall fortune around Hypixel Skyblock.",
+                        "§7overall fortune around Hypixel SkyBlock.",
                         "",
                         "§7(Disclaimer: May not affect real drop chances)",
                         "",
