@@ -4,18 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -27,13 +26,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -46,6 +47,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object TrevorFeatures {
     private val patternGroup = RepoPattern.group("misc.trevor")
     private val trapperPattern by patternGroup.pattern(
@@ -84,6 +86,10 @@ object TrevorFeatures {
         "clickoption",
         "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]"
     )
+    private val areaTrappersDenPattern by patternGroup.pattern(
+        "area.trappersden",
+        "Trapper's Den"
+    )
 
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
@@ -98,6 +104,7 @@ object TrevorFeatures {
 
     var questActive = false
     var inBetweenQuests = false
+    var inTrapperDen = false
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
@@ -165,10 +172,10 @@ object TrevorFeatures {
         }
 
         clickOptionPattern.findMatcher(event.message) {
-            event.chatComponent.siblings.forEach { sibling ->
+            for (sibling in event.chatComponent.siblings) {
                 if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
-                    lastChatPrompt = sibling.chatStyle.chatClickEvent.value.drop(1)
+                    lastChatPrompt = sibling.chatStyle.chatClickEvent.value.substringAfter(" ")
                 }
             }
         }
@@ -287,7 +294,7 @@ object TrevorFeatures {
             val timeSince = lastChatPromptTime.passedSince()
             if (timeSince > 200.milliseconds && timeSince < 5.seconds) {
                 lastChatPromptTime = SimpleTimeMark.farPast()
-                ChatUtils.sendCommandToServer(lastChatPrompt)
+                HypixelCommands.chatPrompt(lastChatPrompt)
                 lastChatPrompt = ""
                 timeLastWarped = SimpleTimeMark.now()
                 return
@@ -302,11 +309,11 @@ object TrevorFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!inTrapperDen()) return
+        if (!inTrapperDen) return
         if (!config.trapperTalkCooldown) return
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -323,6 +330,11 @@ object TrevorFeatures {
         resetTrapper()
     }
 
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        inTrapperDen = areaTrappersDenPattern.matches(LorenzUtils.skyBlockArea)
+    }
+
     enum class TrapperStatus(baseColor: LorenzColor) {
         READY(LorenzColor.DARK_GREEN),
         WAITING(LorenzColor.DARK_AQUA),
@@ -334,8 +346,6 @@ object TrevorFeatures {
     }
 
     fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
-
-    fun inTrapperDen() = ScoreboardData.sidebarLinesFormatted.contains(" §7⏣ §bTrapper's Den")
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

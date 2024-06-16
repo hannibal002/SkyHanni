@@ -16,7 +16,7 @@ public class CombatConfig {
     public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost counter settings")
+    @Category(name = "Ghost Counter", desc = "Ghost Counter settings")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
@@ -43,6 +43,16 @@ public class CombatConfig {
     @ConfigOption(name = "Ender Node Tracker", desc = "")
     @Accordion
     public EnderNodeConfig enderNodeTracker = new EnderNodeConfig();
+
+    @Expose
+    @ConfigOption(name = "Ferocity Display", desc = "")
+    @Accordion
+    public FerocityDisplayConfig ferocityDisplay = new FerocityDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Flare", desc = "")
+    @Accordion
+    public FlareConfig flare = new FlareConfig();
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")

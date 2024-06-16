@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -9,8 +10,10 @@ import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,45 +29,43 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
-class BingoCardDisplay {
+@SkyHanniModule
+object BingoCardDisplay {
 
     private var display = emptyList<Renderable>()
 
     private var hasHiddenPersonalGoals = false
 
-    companion object {
+    private const val MAX_PERSONAL_GOALS = 20
+    private const val MAX_COMMUNITY_GOALS = 5
 
-        private const val MAX_PERSONAL_GOALS = 20
-        private const val MAX_COMMUNITY_GOALS = 5
+    private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
+    private var displayMode = 0
 
-        private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
-        private var displayMode = 0
+    fun command() {
+        reload()
+    }
 
-        fun command() {
-            reload()
+    private fun reload() {
+        BingoAPI.bingoGoals.clear()
+    }
+
+    fun toggleCommand() {
+        if (!LorenzUtils.isBingoProfile) {
+            ChatUtils.userError("This command only works on a bingo profile!")
+            return
         }
-
-        private fun reload() {
-            BingoAPI.bingoGoals.clear()
+        if (!config.enabled) {
+            ChatUtils.userError("Bingo Card is disabled in the config!")
+            return
         }
+        toggleMode()
+    }
 
-        fun toggleCommand() {
-            if (!LorenzUtils.isBingoProfile) {
-                ChatUtils.userError("This command only works on a bingo profile!")
-                return
-            }
-            if (!config.enabled) {
-                ChatUtils.userError("Bingo Card is disabled in the config!")
-                return
-            }
-            toggleMode()
-        }
-
-        private fun toggleMode() {
-            displayMode++
-            if (displayMode == 3) {
-                displayMode = 0
-            }
+    private fun toggleMode() {
+        displayMode++
+        if (displayMode == 3) {
+            displayMode = 0
         }
     }
 
@@ -87,7 +88,7 @@ class BingoCardDisplay {
             newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
                 listOf("Click to run §e/bingo"),
                 onClick = {
-                    ChatUtils.sendCommandToServer("bingo")
+                    HypixelCommands.bingo()
                 }
             ))
         } else {
@@ -246,7 +247,7 @@ class BingoCardDisplay {
     private fun canEditDisplay() =
         Minecraft.getMinecraft().currentScreen is GuiInventory || InventoryUtils.openInventoryName() == "Bingo Card"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.isBingoProfile) return

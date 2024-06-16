@@ -7,12 +7,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.player.EnumPlayerModelParts
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class RendererLivingEntityHook {
+object RendererLivingEntityHook {
     private val config get() = SkyHanniMod.feature.dev
 
+    @JvmStatic
     fun setOutlineColor(red: Float, green: Float, blue: Float, alpha: Float, entity: EntityLivingBase) {
         val color = EntityOutlineRenderer.getCustomOutlineColor(entity)
 
@@ -26,40 +25,27 @@ class RendererLivingEntityHook {
         }
     }
 
-    fun isWearing(entityPlayer: EntityPlayer, parts: EnumPlayerModelParts?): Boolean {
-        if (!LorenzUtils.inSkyBlock) return entityPlayer.isWearing(parts)
-        return isCoolPerson(entityPlayer.name) || entityPlayer.isWearing(parts)
-    }
-
-    fun <T> rotateCorpse(displayName: String, bat: T): Boolean {
-        if (isCoolPerson(displayName)) {
-            GlStateManager.rotate(getRotation(bat).toFloat(), 0f, 1f, 0f)
-        }
-        return isCoolPerson(displayName)
-    }
-
-    fun onIsWearing(entityPlayer: EntityPlayer, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isCoolPerson(entityPlayer.name)) return
-        GlStateManager.rotate(getRotation(entityPlayer).toFloat(), 0f, 1f, 0f)
-        cir.returnValue = true
-    }
-
-    fun onEquals(displayName: String, cir: CallbackInfoReturnable<Boolean>) {
-        if (isCoolPerson(displayName)) {
-            cir.returnValue = true
-        }
-    }
-
-    private fun isCoolPerson(userName: String?): Boolean {
+    /**
+     * Check if the player is on the cool person list and if they should be flipped.
+     */
+    @JvmStatic
+    fun shouldBeUpsideDown(userName: String?): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
         if (!config.flipContributors && !LorenzUtils.isAprilFoolsDay) return false
         val name = userName ?: return false
-        return ContributorManager.canSpin(name)
+        return ContributorManager.shouldBeUpsideDown(name)
     }
 
-    private fun <T> getRotation(entity: T): Int {
-        if (!config.rotateContributors) return 0
-        if (entity !is EntityPlayer) return 0
-        return (entity.ticksExisted % 90) * 4
+    /**
+     * Check if the player should spin and rotate them if the option is on.
+     */
+    @JvmStatic
+    fun rotatePlayer(player: EntityPlayer) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.rotateContributors && !LorenzUtils.isAprilFoolsDay) return
+        val name = player.name ?: return
+        if (!ContributorManager.shouldSpin(name)) return
+        val rotation = ((player.ticksExisted % 90) * 4).toFloat()
+        GlStateManager.rotate(rotation, 0f, 1f, 0f)
     }
 }

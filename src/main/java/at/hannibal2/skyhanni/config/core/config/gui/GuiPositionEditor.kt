@@ -20,22 +20,28 @@ package at.hannibal2.skyhanni.config.core.config.gui
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsX
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.Companion.getDummySize
+import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
+import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
+import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.io.IOException
 
-class GuiPositionEditor(private val positions: List<Position>, private val border: Int) : GuiScreen() {
+class GuiPositionEditor(
+    private val positions: List<Position>,
+    private val border: Int,
+    private val oldScreen: GuiContainer? = null
+) : GuiScreen() {
 
     private var grabbedX = 0
     private var grabbedY = 0
@@ -50,10 +56,17 @@ class GuiPositionEditor(private val positions: List<Position>, private val borde
         OtherInventoryData.close()
     }
 
-    override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float) {
-        super.drawScreen(unusedX, unusedY, partialTicks)
+    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        //Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground()
+        if (oldScreen != null) {
+            val accessor = oldScreen as AccessorGuiContainer
+            accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
+        }
 
+        super.drawScreen(mouseX, mouseY, partialTicks)
+
+        GlStateManager.disableLighting()
         val hoveredPos = renderRectangles()
 
         renderLabels(hoveredPos)

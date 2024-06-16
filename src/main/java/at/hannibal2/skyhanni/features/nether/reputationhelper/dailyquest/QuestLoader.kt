@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
@@ -15,10 +16,13 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.T
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
+import net.minecraft.item.ItemStack
 
 class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
 
@@ -33,22 +37,18 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadFromTabList() {
-        var i = -1
         dailyQuestHelper.greatSpook = false
-        for (line in TabListData.getTabList()) {
-            if (line.contains("Faction Quests:")) {
-                i = 0
-                continue
-            }
-            if (i == -1) continue
+        var found = 0
 
-            i++
+
+        for (line in TabWidget.FACTION_QUESTS.lines) {
             readQuest(line)
+            found++
             if (dailyQuestHelper.greatSpook) return
-            if (i == 5) {
-                break
-            }
         }
+
+        dailyQuestHelper.reputationHelper.tabListQuestsMissing = found == 0
+        dailyQuestHelper.update()
     }
 
     private fun readQuest(line: String) {
@@ -165,6 +165,32 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             val accepted = !stack.getLore().any { it.contains("Click to start!") }
             if (accepted && quest.state == QuestState.NOT_ACCEPTED) {
                 quest.state = QuestState.ACCEPTED
+                dailyQuestHelper.update()
+            }
+            if (name == "Miniboss") {
+                fixMinibossAmount(quest, stack)
+            }
+        }
+    }
+
+    // TODO remove this workaround once hypixel fixes the bug that amount is not in tab list for minibosses
+    private fun fixMinibossAmount(quest: Quest, stack: ItemStack) {
+        if (quest !is MiniBossQuest) return
+        val storedAmount = quest.needAmount
+        if (storedAmount != 1) return
+        for (line in stack.getLore()) {
+            val realAmount = dailyQuestHelper.minibossAmountPattern.matchMatcher(line) {
+                group("amount").toInt()
+            } ?: continue
+            if (storedAmount == realAmount) continue
+
+            ChatUtils.debug("Wrong amount detected! realAmount: $realAmount, storedAmount: $storedAmount")
+            val newQuest = MiniBossQuest(quest.miniBoss, quest.state, realAmount)
+            newQuest.haveAmount = quest.haveAmount
+            DelayedRun.runNextTick {
+                dailyQuestHelper.quests.remove(quest)
+                dailyQuestHelper.quests.add(newQuest)
+                ChatUtils.chat("Fixed wrong miniboss amount from tab list.")
                 dailyQuestHelper.update()
             }
         }

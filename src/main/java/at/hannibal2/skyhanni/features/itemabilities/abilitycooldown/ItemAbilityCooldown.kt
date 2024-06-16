@@ -2,18 +2,20 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ItemRenderBackground.Companion.background
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -23,17 +25,19 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
-class ItemAbilityCooldown {
+@SkyHanniModule
+object ItemAbilityCooldown {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities
 
@@ -48,7 +52,7 @@ class ItemAbilityCooldown {
     )
 
     private var lastAbility = ""
-    private var items = mapOf<ItemStack, List<ItemText>>()
+    private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
@@ -167,12 +171,20 @@ class ItemAbilityCooldown {
             event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
+            // Royal Pigeon
+            event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+                ItemAbility.ROYAL_PIGEON.sound()
+            }
+
+            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+                ItemAbility.WAND_OF_STRENGTH.sound()
+            }
         }
     }
 
     @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        if (AshfangFreezeCooldown.iscurrentlyFrozen()) return
+        if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)
     }
 
@@ -254,7 +266,12 @@ class ItemAbilityCooldown {
             abilityItems = ItemUtils.getItemsInInventory(true).associateWith { hasAbility(it) }
         }
 
-        items = abilityItems.mapValues { kp -> kp.value.map { createItemText(it) } }
+        items = abilityItems.entries.associateByTo(
+            mutableMapOf(),
+            { it.key.getIdentifier() },
+            { kp -> kp.value.map { createItemText(it) } }
+        ).mapKeysNotNull { it.key }
+
     }
 
     private fun createItemText(ability: ItemAbility): ItemText {
@@ -291,8 +308,7 @@ class ItemAbilityCooldown {
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
         val uuid = stack.getIdentifier() ?: return
-        val list = items.filter { (it.key.getIdentifier()) == uuid }
-            .firstNotNullOfOrNull { it.value } ?: return
+        val list = items[uuid] ?: return
 
         for (itemText in list) {
             if (guiOpen && !itemText.onCooldown) continue
@@ -303,16 +319,31 @@ class ItemAbilityCooldown {
                 renderObject.offsetY = -10
             }
             event.renderObjects.add(renderObject)
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderItem(event: RenderGuiItemOverlayEvent) {
+        if (!isEnabled()) return
+        if (!config.itemAbilityCooldownBackground) return
+
+        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        val stack = event.stack
+
+        val uuid = stack?.getIdentifier() ?: return
+        val list = items[uuid] ?: return
+
+        for (itemText in list) {
+            if (guiOpen && !itemText.onCooldown) continue
+            val color = itemText.color
 
             // fix multiple problems when having multiple abilities
-            if (config.itemAbilityCooldownBackground) {
-                var opacity = 130
-                if (color == LorenzColor.GREEN) {
-                    opacity = 80
-                    if (!config.itemAbilityShowWhenReady) return
-                }
-                stack.background = color.addOpacity(opacity).rgb
+            var opacity = 130
+            if (color == LorenzColor.GREEN) {
+                opacity = 80
+                if (!config.itemAbilityShowWhenReady) return
             }
+            event highlight color.addOpacity(opacity)
         }
     }
 
