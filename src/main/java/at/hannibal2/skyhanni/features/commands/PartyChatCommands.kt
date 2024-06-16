@@ -205,9 +205,7 @@ object PartyChatCommands {
                 }
             }
         } else {
-            blacklist.forEach {
-                message += "\n§e$it"
-            }
+            blacklist.forEach { message += "\n§e$it" }
         }
         ChatUtils.chat(message)
     }

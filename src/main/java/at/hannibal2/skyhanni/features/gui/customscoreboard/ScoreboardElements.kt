@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig.Ar
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getMaxPlayersForCurrentServer
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getMaxPlayersForCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.data.MiningAPI.getCold
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -475,7 +475,7 @@ private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
-    val cold = -getCold()
+    val cold = -MiningAPI.cold
 
     return listOf(
         when {

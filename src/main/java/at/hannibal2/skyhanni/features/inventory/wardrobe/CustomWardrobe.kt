@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.getFakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -110,8 +111,7 @@ object CustomWardrobe {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
-        if (!isEnabled()) return
-        DelayedRun.runDelayed(250.milliseconds) {
+        DelayedRun.runDelayed(300.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
             }
@@ -207,7 +207,13 @@ object CustomWardrobe {
             if (stack != null) {
                 val toolTip = getToolTip(stack, slot, armorIndex)
                 if (toolTip != null) {
-                    renderable = Renderable.hoverTips(renderable, tips = toolTip)
+                    renderable = Renderable.hoverTips(
+                        renderable,
+                        tips = toolTip,
+                        condition = {
+                            !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
+                        },
+                    )
                 }
             }
             loreList.add(renderable)
@@ -464,18 +470,8 @@ object CustomWardrobe {
             add(
                 Renderable.clickable(
                     Renderable.hoverable(
-                        Renderable.string(
-                            (if (wardrobeSlot.favorite) "§c" else "§7") + "❤",
-                            scale = textScale,
-                            horizontalAlign = HorizontalAlignment.CENTER,
-                            verticalAlign = VerticalAlignment.CENTER,
-                        ),
-                        Renderable.string(
-                            (if (wardrobeSlot.favorite) "§4" else "§8") + "❤",
-                            scale = textScale,
-                            horizontalAlign = HorizontalAlignment.CENTER,
-                            verticalAlign = VerticalAlignment.CENTER,
-                        ),
+                        centerString((if (wardrobeSlot.favorite) "§c" else "§7") + "❤", scale = textScale),
+                        centerString((if (wardrobeSlot.favorite) "§4" else "§8") + "❤", scale = textScale),
                     ),
                     onClick = {
                         wardrobeSlot.favorite = !wardrobeSlot.favorite
@@ -486,12 +482,7 @@ object CustomWardrobe {
             if (config.estimatedValue && shouldRender) {
                 add(
                     Renderable.hoverTips(
-                        Renderable.string(
-                            "§2$",
-                            scale = textScale,
-                            horizontalAlign = HorizontalAlignment.CENTER,
-                            verticalAlign = VerticalAlignment.CENTER,
-                        ),
+                        centerString("§2$", scale = textScale),
                         WardrobeAPI.createPriceLore(wardrobeSlot),
                     ),
                 )
@@ -518,12 +509,7 @@ object CustomWardrobe {
                         Renderable.placeholder(buttonWidth, buttonHeight),
                         onClick,
                     ),
-                    Renderable.string(
-                        text,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER,
-                        scale = textScale,
-                    ),
+                    centerString(text, scale = textScale),
                     false,
                 ),
                 hoveredColor,
@@ -536,12 +522,7 @@ object CustomWardrobe {
             Renderable.drawInsideRoundedRect(
                 Renderable.doubleLayered(
                     Renderable.placeholder(buttonWidth, buttonHeight),
-                    Renderable.string(
-                        text,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.CENTER,
-                        scale = textScale,
-                    ),
+                    centerString(text, scale = textScale),
                 ),
                 unhoveredColor.darker(0.57),
                 padding = 0,
@@ -605,7 +586,7 @@ object CustomWardrobe {
         }
     }
 
-    private fun WardrobeSlot.clickSlot() {
+    fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = WardrobeAPI.currentPage ?: return
@@ -638,4 +619,10 @@ object CustomWardrobe {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WardrobeAPI.inWardrobe()
+
+    fun centerString(
+        text: String,
+        scale: Double = 1.0,
+        color: Color = Color.WHITE,
+    ) = Renderable.string(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
 }
