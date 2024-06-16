@@ -255,11 +255,11 @@ object ReforgeHelper {
             } else {
                 pre = listOf(rString("§6Reforge Stats"))
                 stats = (reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList())
-                removedEffect = getReforgeEffect(
+                removedEffect = if (config.showDiff) getReforgeEffect(
                     currentReforge,
                     itemRarity,
                 )?.let { listOf(rString("§cRemoves Effect:")) + it }
-                    ?: emptyList()
+                    ?: emptyList() else emptyList()
                 addEffectText = "§aAdds Effect:"
                 click = listOf(rString("§eClick to select"))
             }
@@ -268,9 +268,7 @@ object ReforgeHelper {
                 (getReforgeEffect(reforge, itemRarity)?.let { listOf(rString(addEffectText)) + it }
                     ?: emptyList())
 
-            return@run pre + stats + (if (config.showDiff) {
-                removedEffect + addedEffect
-            } else emptyList()) + click
+            return@run pre + stats + removedEffect + addedEffect + click
         }
         val onHover = if (!isInHexReforgeMenu) {
             {}
