@@ -102,15 +102,14 @@ class RepoManager(private val configLocation: File) {
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
                 val file = File(configLocation, "repo")
-                if (file.exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit
+                if (file.exists() && currentCommitJSON?.get("sha")?.asString == latestRepoCommit &&
+                    unsuccessfulConstants.isEmpty() && lastRepoUpdate.passedSince() < 1.minutes
                 ) {
-                    if (unsuccessfulConstants.isEmpty() && lastRepoUpdate.passedSince() < 1.minutes) {
-                        if (command) {
-                            ChatUtils.chat("§7The repo is already up to date!")
-                            atomicShouldManuallyReload.set(false)
-                        }
-                        return@supplyAsync false
+                    if (command) {
+                        ChatUtils.chat("§7The repo is already up to date!")
+                        atomicShouldManuallyReload.set(false)
                     }
+                    return@supplyAsync false
                 }
                 lastRepoUpdate = SimpleTimeMark.now()
                 RepoUtils.recursiveDelete(repoLocation)
