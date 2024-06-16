@@ -63,4 +63,9 @@ public class CustomWardrobeConfig {
     @ConfigOption(name = "Spacing", desc = "")
     @Accordion
     public SpacingConfig spacing = new SpacingConfig();
+
+    @Expose
+    @ConfigOption(name = "Keybinds", desc = "")
+    @Accordion
+    public KeybindConfig keybinds = new KeybindConfig();
 }
