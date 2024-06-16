@@ -34,16 +34,16 @@ object TimeUtils {
         var currentUnits = 0
         val result = buildString {
             for ((unit, value) in parts) {
-                if (value != 0) {
-                    val formatted = unit.format(value, longName)
-                    append(formatted)
-                    if (unit == TimeUnit.SECOND && showMilliSeconds) {
-                        val formattedMillis = (millis / 100).toInt()
-                        deleteCharAt(lastIndex)
-                        append(".${formattedMillis}s")
-                    }
+                if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
+                    val formatted = value.addSeparators()
+                    val formattedMillis = (millis / 100).toInt()
+                    val name = unit.getName(value, longName)
 
-                    append(" ")
+                    val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
+                        "$formatted.$formattedMillis"
+                    } else formatted
+
+                    append("$text$name ")
                     if (maxUnits != -1 && ++currentUnits == maxUnits) break
                 }
             }
@@ -160,9 +160,9 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
 
-    fun format(value: Int, longFormat: Boolean = false) = if (longFormat) {
-        "${value.addSeparators()} $longName" + if (value > 1) "s" else ""
-    } else {
-        "${value.addSeparators()}$shortName"
-    }
+    fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
+        " $longName" + if (value > 1) "s" else ""
+    } else shortName
+
+    fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }
