@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.highlight
+import at.hannibal2.skyhanni.utils.EntityUtils.matchesHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -46,7 +47,7 @@ object MobHighlight {
         val color = when {
             heldBlock == Blocks.end_portal_frame && config.specialZealotHighlighter -> LorenzColor.DARK_RED
             heldBlock == Blocks.ender_chest && config.chestZealotHighlighter -> LorenzColor.GREEN
-            event.isZealotOrBruiser() && config.zealotBruiserHighlighter -> LorenzColor.DARK_AQUA
+            entity.isZealotOrBruiser() && config.zealotBruiserHighlighter -> LorenzColor.DARK_AQUA
             else -> return
         }
 
@@ -56,23 +57,22 @@ object MobHighlight {
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
+        val name = mob.name
 
-        // TODO: get the correct names
-        when (mob.name) {
-            "Arachne Keeper" -> if (config.arachneKeeperHighlight) mob.highlight(LorenzColor.DARK_BLUE)
-            "Corleone" -> if (config.corleoneHighlighter) mob.highlight(LorenzColor.DARK_PURPLE)
-            "Arachne" -> {
-                arachne = mob
-                if (config.arachneBossHighlighter) mob.highlight(LorenzColor.RED, 50)
-            }
-            // TODO: i have no fucking idea what the mob name for this could even be
-            "Arachne Mini" -> if (config.arachneBossHighlighter) mob.highlight(LorenzColor.GOLD, 50)
+        val color = when {
+            name == "Boss Corleone" && config.corleoneHighlighter -> LorenzColor.DARK_PURPLE
+
+            name == "Arachne's Keeper" && config.arachneKeeperHighlight -> LorenzColor.DARK_BLUE
+            name == "Arachne's Brood" && config.arachneBossHighlighter -> LorenzColor.GOLD
+            name == "Arachne" && config.arachneBossHighlighter -> LorenzColor.RED.also { arachne = mob }
+
+            mob.isRunic && config.runicMobHighlighter -> LorenzColor.LIGHT_PURPLE
+            mob.isCorrupted && config.corruptedMobHighlight -> LorenzColor.DARK_PURPLE // if mob spawns already corrupted
+
+            else -> return
         }
 
-        when {
-            mob.isRunic && config.runicMobHighlighter -> mob.highlight(LorenzColor.LIGHT_PURPLE)
-            mob.isCorrupted && config.corruptedMobHighlight -> mob.highlight(LorenzColor.DARK_PURPLE) // if mob spawns already corrupted
-        }
+        mob.highlight(color)
     }
 
     @SubscribeEvent
@@ -96,9 +96,5 @@ object MobHighlight {
         )
     }
 
-    private fun EntityMaxHealthUpdateEvent.isZealotOrBruiser(): Boolean {
-        val isZealot = maxHealth == 13_000 || maxHealth == 13_000 * 4 // runic
-        val isBruiser = maxHealth == 65_000 || maxHealth == 65_000 * 4 // runic
-        return isZealot || isBruiser
-    }
+    private fun EntityEnderman.isZealotOrBruiser() = matchesHealth(13_000) || matchesHealth(65_000)
 }
