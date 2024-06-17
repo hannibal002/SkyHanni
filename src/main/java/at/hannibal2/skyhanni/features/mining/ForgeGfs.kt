@@ -78,10 +78,10 @@ object ForgeGfs {
         val itemMap: MutableMap<NEUInternalName, Int> = LinkedHashMap()
         // Search for the first 4 columns only
         // Normally would be 3, but the gemstone mixture is the only one that overflows to 4
-        val thisContainer = event.container
+
         for (i in 0..53) {
             if (i % 9 <= 3) {
-                val currentItem = thisContainer.getSlot(i).stack
+                val currentItem = event.container.getSlot(i).stack
                 val amount = currentItem.stackSize
                 val currItemInternalName = currentItem.getInternalNameOrNull() ?: continue
                 if (SackAPI.sackListInternalNames.contains(currItemInternalName.asString())) {
