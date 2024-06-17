@@ -11,16 +11,18 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUnit
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AshfangNextResetCooldown {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
-    private var spawnTime = 1L
+    private var spawnTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -29,30 +31,30 @@ object AshfangNextResetCooldown {
         if (EntityUtils.getEntities<EntityArmorStand>().any {
                 it.posY > 145 && (it.name.contains("§c§9Ashfang Acolyte§r") || it.name.contains("§c§cAshfang Underling§r"))
             }) {
-            spawnTime = System.currentTimeMillis()
+            spawnTime = SimpleTimeMark.now()
         }
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (spawnTime == -1L) return
+        if (spawnTime.isFarPast()) return
 
-        val remainingTime = spawnTime + 46_100 - System.currentTimeMillis()
-        if (remainingTime > 0) {
-            val format = TimeUtils.formatDuration(remainingTime, TimeUnit.SECOND, showMilliSeconds = true)
+        val passedSince = spawnTime.passedSince()
+        if (passedSince < 46.1.seconds) {
+            val format = passedSince.format(TimeUnit.SECOND, showMilliSeconds = true)
             config.nextResetCooldownPos.renderString(
                 "§cAshfang next reset in: §a$format",
                 posLabel = "Ashfang Reset Cooldown"
             )
         } else {
-            spawnTime = -1
+            spawnTime = SimpleTimeMark.farPast()
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        spawnTime = -1
+        spawnTime = SimpleTimeMark.farPast()
     }
 
     @SubscribeEvent

@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
@@ -33,8 +33,9 @@ object CustomScoreboardUtils {
         else -> "§e"
     }
 
+    // TODO change to a non extended function
     internal fun Number.formatNum(): String = when (displayConfig.numberFormat) {
-        DisplayConfig.NumberFormat.SHORT -> NumberUtil.format(this)
+        DisplayConfig.NumberFormat.SHORT -> this.shortFormat()
         DisplayConfig.NumberFormat.LONG -> this.addSeparators()
         else -> "0"
     }
