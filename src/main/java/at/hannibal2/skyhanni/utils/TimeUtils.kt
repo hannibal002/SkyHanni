@@ -34,15 +34,15 @@ object TimeUtils {
         var currentUnits = 0
         val result = buildString {
             for ((unit, value) in parts) {
-                if (value != 0) {
-                    val formatted = unit.format(value, longName)
-                    append(formatted)
-                    if (unit == TimeUnit.SECOND && showMilliSeconds) {
+                if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
+                    val formatted = value.addSeparators()
+                    val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
                         val formattedMillis = (millis / 100).toInt()
-                        append(".$formattedMillis")
-                    }
+                        "$formatted.$formattedMillis"
+                    } else formatted
 
-                    append(" ")
+                    val name = unit.getName(value, longName)
+                    append("$text$name ")
                     if (maxUnits != -1 && ++currentUnits == maxUnits) break
                 }
             }
@@ -57,8 +57,7 @@ object TimeUtils {
         else -> default
     }
 
-    val Duration.inWholeTicks: Int
-        get() = (inWholeMilliseconds / 50).toInt()
+    val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
     fun getDuration(string: String) = getMillis(string.replace("m", "m ").replace("  ", " ").trim())
 
@@ -95,20 +94,16 @@ object TimeUtils {
                 seconds + minutes
             }
 
-            1 -> {
-                split[0].toInt() * 1000
-            }
+            1 -> split[0].toInt() * 1000
 
-            else -> {
-                throw RuntimeException("Invalid format: '$string'")
-            }
+            else -> throw RuntimeException("Invalid format: '$string'")
         }.milliseconds
     }
 
     fun SkyBlockTime.formatted(
         dayAndMonthElement: Boolean = true,
         yearElement: Boolean = true,
-        hoursAndMinutesElement: Boolean = true
+        hoursAndMinutesElement: Boolean = true,
     ): String {
         val hour = (this.hour + 11) % 12 + 1
         val timeOfDay = if (this.hour > 11) "pm" else "am"
@@ -133,7 +128,7 @@ object TimeUtils {
                 "$datePart, $timePart"
             } else {
                 "$datePart$timePart".trim()
-            }
+            },
         ) ?: ""
     }
 
@@ -159,9 +154,9 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
 
-    fun format(value: Int, longFormat: Boolean = false) = if (longFormat) {
-        "${value.addSeparators()} $longName" + if (value > 1) "s" else ""
-    } else {
-        "${value.addSeparators()}$shortName"
-    }
+    fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
+        " $longName" + if (value > 1) "s" else ""
+    } else shortName
+
+    fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }
