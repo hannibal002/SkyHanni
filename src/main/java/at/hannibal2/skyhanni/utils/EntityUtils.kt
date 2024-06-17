@@ -187,11 +187,12 @@ object EntityUtils {
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun EntityLivingBase.matchesHealth(checkedHealth: Int): Boolean {
+    fun EntityLivingBase.matchesHealth(checkedHealth: Int, ignoreDerpy: Boolean = false): Boolean {
         var targetHealth = checkedHealth
         if (isRunic()) targetHealth *= 4
         if (isCorrupted()) targetHealth *= 3
-        return health.toInt() == targetHealth
+        val derpyHealth = if (ignoreDerpy) health.toInt() else health.toInt().derpy()
+        return derpyHealth == targetHealth
     }
 
     fun Entity.cleanName() = name.removeColor()

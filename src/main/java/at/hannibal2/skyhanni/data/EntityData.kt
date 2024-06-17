@@ -45,7 +45,7 @@ object EntityData {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        for (entity in EntityUtils.getEntities<EntityLivingBase>()) { // this completely ignores the ignored entities list?
+        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
             val maxHealth = entity.baseMaxHealth
             val oldMaxHealth = maxHealthMap.getOrDefault(entity, -1)
             if (oldMaxHealth != maxHealth) {
