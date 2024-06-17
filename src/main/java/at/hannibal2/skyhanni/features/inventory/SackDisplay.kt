@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -112,13 +112,13 @@ object SackDisplay {
                     NumberFormatEntry.DEFAULT -> {
                         addAlignedNumber("$colorCode${stored.addSeparators()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.shortFormat()}")
                     }
 
                     NumberFormatEntry.FORMATTED -> {
-                        addAlignedNumber("$colorCode${NumberUtil.format(stored)}")
+                        addAlignedNumber("$colorCode${stored.shortFormat()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.shortFormat()}")
                     }
 
                     NumberFormatEntry.UNFORMATTED -> {
@@ -285,7 +285,7 @@ object SackDisplay {
     }
 
     private fun format(price: Long) = if (config.priceFormat == PriceFormatEntry.FORMATTED) {
-        NumberUtil.format(price)
+        price.shortFormat()
     } else {
         price.addSeparators()
     }

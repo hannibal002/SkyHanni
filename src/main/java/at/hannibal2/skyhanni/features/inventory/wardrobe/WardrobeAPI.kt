@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,7 +44,7 @@ object WardrobeAPI {
         "§7Slot \\d+: §aEquipped",
     )
 
-    private const val FIRST_SLOT = 36
+    const val FIRST_SLOT = 36
     private const val FIRST_HELMET_SLOT = 0
     private const val FIRST_CHESTPLATE_SLOT = 9
     private const val FIRST_LEGGINGS_SLOT = 18
@@ -96,10 +96,10 @@ object WardrobeAPI {
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull()) {
             val price = EstimatedItemValueCalculator.getTotalPrice(stack)
-            add("  §7- ${stack.name}: §6${NumberUtil.format(price)}")
+            add("  §7- ${stack.name}: §6${price.shortFormat()}")
             totalPrice += price
         }
-        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
     @SubscribeEvent

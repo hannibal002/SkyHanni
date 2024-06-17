@@ -152,6 +152,7 @@ object GraphEditor {
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
+            maxDistance = 80,
         )
     }
 
