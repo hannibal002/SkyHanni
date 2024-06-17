@@ -419,7 +419,7 @@ private fun getActiveEventShowWhen(): Boolean =
 
 private fun getSoonEventLine(): List<String> {
     val soonActiveEvent = getTablistEvent() ?: return emptyList()
-    val soonActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
+    val soonActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeStartsPattern.matches(it) }
         ?.let {
             SbPattern.eventTimeStartsPattern.matchMatcher(it) {
                 group("time")
