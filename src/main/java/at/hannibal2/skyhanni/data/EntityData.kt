@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -35,9 +34,18 @@ object EntityData {
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
     private val nametagCache = TimeLimitedCache<Entity, IChatComponent>(50.milliseconds)
 
+    private val ignoredEntities = listOf(
+        EntityArmorStand::class.java,
+        EntityXPOrb::class.java,
+        EntityItem::class.java,
+        EntityItemFrame::class.java,
+        EntityOtherPlayerMP::class.java,
+        EntityPlayerSP::class.java,
+    )
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        for (entity in EntityUtils.getEntities<EntityLivingBase>()) {
+        for (entity in EntityUtils.getEntities<EntityLivingBase>()) { // this completely ignores the ignored entities list?
             val maxHealth = entity.baseMaxHealth
             val oldMaxHealth = maxHealthMap.getOrDefault(entity, -1)
             if (oldMaxHealth != maxHealth) {
@@ -47,11 +55,9 @@ object EntityData {
         }
     }
 
-    @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (event.repeatSeconds(30)) {
-            maxHealthMap.keys.removeIf { it.isDead }
-        }
+    @HandleEvent
+    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<*>) {
+        maxHealthMap.remove(event.entity)
     }
 
     @SubscribeEvent
@@ -69,30 +75,16 @@ object EntityData {
         val entityId = packet.entityId
 
         val entity = EntityUtils.getEntityByID(entityId) ?: return
-        if (entity is EntityArmorStand) return
-        if (entity is EntityXPOrb) return
-        if (entity is EntityItem) return
-        if (entity is EntityItemFrame) return
+        if (entity.javaClass in ignoredEntities) return
 
-        if (entity is EntityOtherPlayerMP) return
-        if (entity is EntityPlayerSP) return
-
-        for (watchableObject in watchableObjects) {
-
-            val dataValueId = watchableObject.dataValueId
-            val any = watchableObject.`object`
-            if (dataValueId != 6) continue
-
-            val health = (any as Float).toInt()
-
-            if (entity is EntityWither && health == 300 && entityId < 0) {
-                return
+        watchableObjects.find { it.dataValueId == 6 }
+            ?.let {
+                val health = (it.`object` as Float).toInt()
+                if (entity is EntityWither && health == 300 && entityId < 0) return
+                if (entity is EntityLivingBase) {
+                    EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
+                }
             }
-
-            if (entity is EntityLivingBase) {
-                EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
-            }
-        }
     }
 
     @JvmStatic
