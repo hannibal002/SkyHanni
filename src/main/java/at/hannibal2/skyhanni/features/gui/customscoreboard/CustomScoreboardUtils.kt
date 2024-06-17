@@ -33,6 +33,7 @@ object CustomScoreboardUtils {
         else -> "§e"
     }
 
+    // TODO change to a non extended function
     internal fun Number.formatNum(): String = when (displayConfig.numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> this.shortFormat()
         DisplayConfig.NumberFormat.LONG -> this.addSeparators()
