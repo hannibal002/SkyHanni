@@ -33,7 +33,7 @@ object ForgeGfs {
 
     private val gfsFakeItem by lazy {
         ItemUtils.createSkull(
-            displayName = "§aGet items from sack",
+            displayName = "§aGet items from sacks",
             uuid = "75ea8094-5152-4457-8c23-1ad9b3c176c0",
             value = "ewogICJ0aW1lc3RhbXAiIDogMTU5MTMxMDU4NTYwOSwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsC" +
                 "iAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogI" +
@@ -41,7 +41,7 @@ object ForgeGfs {
                 "RleHR1cmUvODBhMDc3ZTI0OGQxNDI3NzJlYTgwMDg2NGY4YzU3OGI5ZDM2ODg1YjI5ZGFmODM2YjY0YTcwNjg4MmI2ZWMxMCIKICAgIH0KICB9Cn0=",
             "§8(from SkyHanni)",
             "§7Click here to try to get all of this",
-            "§7recipe's ingredients from sack."
+            "§7recipe's ingredients from sacks."
         )
     }
 
@@ -93,7 +93,7 @@ object ForgeGfs {
         for ((internalName, amount) in itemMap) {
             val getItYet = GetFromSackAPI.getFromSack(internalName, amount)
             if (!getItYet) {
-                ChatUtils.chat("§cFailed to get $amount ${internalName.itemNameWithoutColor} from sack.")
+                ChatUtils.chat("§cFailed to get $amount ${internalName.itemNameWithoutColor} from sacks.")
             }
         }
     }
