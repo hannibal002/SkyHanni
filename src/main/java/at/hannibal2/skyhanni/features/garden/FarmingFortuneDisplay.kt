@@ -319,7 +319,7 @@ object FarmingFortuneDisplay {
     fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
         var pieces = 0
 
-        lore.forEach { line ->
+        for (line in lore) {
             if (internalName.contains("LOTUS")) {
                 lotusAbilityPattern.matchMatcher(line) {
                     return group("bonus").toDouble()

@@ -155,6 +155,11 @@ enum class ScoreboardEvents(
             "§7Damage Soaked:\n" +
             "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
     ),
+    CARNIVAL(
+        ::getCarnivalLines,
+        ::getCarnivalShowWhen,
+        "§7(All Carnival Lines)"
+    ),
     RIFT(
         ::getRiftLines,
         { RiftAPI.inRift() },
@@ -231,6 +236,7 @@ enum class ScoreboardEvents(
             MINING_EVENTS,
             DAMAGE,
             MAGMA_BOSS,
+            CARNIVAL,
             RIFT,
             ESSENCE,
             ACTIVE_TABLIST_EVENTS
@@ -363,7 +369,7 @@ private fun getActiveEventLine(): List<String> {
 
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
-    val blockedEvents = listOf("Spooky Festival", "5th SkyBlock Anniversary")
+    val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
     val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabListData.getTabList()) {
         group("time")
@@ -457,6 +463,23 @@ private fun getMagmaBossLines() = listOf(
 
 private fun getMagmaBossShowWhen(): Boolean = inAnyIsland(IslandType.CRIMSON_ISLE) &&
     SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
+
+private fun getCarnivalLines() = listOf(
+    SbPattern.carnivalPattern,
+    SbPattern.carnivalTokensPattern,
+    SbPattern.carnivalTasksPattern,
+    SbPattern.timeLeftPattern,
+    SbPattern.carnivalCatchStreakPattern,
+    SbPattern.carnivalFruitsPattern,
+    SbPattern.carnivalAccuracyPattern,
+    SbPattern.carnivalKillsPattern,
+    SbPattern.carnivalScorePattern,
+)
+    .mapNotNull { pattern ->
+        getSbLines().firstOrNull { pattern.matches(it) }
+    }
+
+private fun getCarnivalShowWhen(): Boolean = SbPattern.carnivalPattern.anyMatches(getSbLines())
 
 private fun getRiftLines() = listOf(
     RiftBloodEffigies.heartsPattern,

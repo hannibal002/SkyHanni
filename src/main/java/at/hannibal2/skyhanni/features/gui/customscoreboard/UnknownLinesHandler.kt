@@ -9,9 +9,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import java.util.regex.Pattern
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 object UnknownLinesHandler {
+
+    internal lateinit var remoteOnlyPatterns: Array<Pattern>
+
     fun handleUnknownLines() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
@@ -119,6 +123,15 @@ object UnknownLinesHandler {
             SbPattern.riftHayEatenPattern,
             SbPattern.fossilDustPattern,
             SbPattern.cluesPattern,
+            SbPattern.carnivalPattern,
+            SbPattern.carnivalTasksPattern,
+            SbPattern.carnivalTokensPattern,
+            SbPattern.carnivalFruitsPattern,
+            SbPattern.carnivalScorePattern,
+            SbPattern.carnivalCatchStreakPattern,
+            SbPattern.carnivalAccuracyPattern,
+            SbPattern.carnivalKillsPattern,
+            *remoteOnlyPatterns,
         )
 
         unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { line ->
@@ -128,9 +141,8 @@ object UnknownLinesHandler {
 
         // Remove known text
         // remove objectives
-        val objectiveLine =
-            sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
-                ?: "Objective"
+        val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
+            ?: "Objective"
         unconfirmedUnknownLines = unconfirmedUnknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         // TODO create function
         unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
@@ -141,33 +153,42 @@ object UnknownLinesHandler {
         // Remove jacobs contest
         for (i in 1..3)
             unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
-                sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
-                    SbPattern.jacobsContestPattern.matches(line)
-                } ?: "§eJacob's Contest", i) != it
+                sidebarLines.nextAfter(
+                    sidebarLines.firstOrNull { line ->
+                        SbPattern.jacobsContestPattern.matches(line)
+                    } ?: "§eJacob's Contest",
+                    i,
+                ) != it
             }
 
         // Remove slayer
         for (i in 1..2)
             unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
-                sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
-                    SbPattern.slayerQuestPattern.matches(line)
-                } ?: "Slayer Quest", i) != it
+                sidebarLines.nextAfter(
+                    sidebarLines.firstOrNull { line ->
+                        SbPattern.slayerQuestPattern.matches(line)
+                    } ?: "Slayer Quest",
+                    i,
+                ) != it
             }
 
         // remove trapper mob location
         unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
-            sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
-                SbPattern.mobLocationPattern.matches(line)
-            } ?: "Tracker Mob Location:") != it
+            sidebarLines.nextAfter(
+                sidebarLines.firstOrNull { line ->
+                    SbPattern.mobLocationPattern.matches(line)
+                } ?: "Tracker Mob Location:",
+            ) != it
         }
 
         // da
         unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
-            sidebarLines.nextAfter(sidebarLines.firstOrNull { line ->
-                SbPattern.darkAuctionCurrentItemPattern.matches(line)
-            } ?: "Current Item:") != it
+            sidebarLines.nextAfter(
+                sidebarLines.firstOrNull { line ->
+                    SbPattern.darkAuctionCurrentItemPattern.matches(line)
+                } ?: "Current Item:",
+            ) != it
         }
-
 
         /*
          * Handle broken scoreboard lines
