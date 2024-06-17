@@ -4,13 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.R
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -85,31 +86,13 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    // TODO use WidgetUpdateEvent once its merged
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!isEnabled()) return
-
-        questLoader.loadFromTabList()
+    fun onTabListWidgetUpdate(event: WidgetUpdateEvent) {
+        if (event.isWidget(TabWidget.FACTION_QUESTS)) {
+            if (!isEnabled()) return
+            questLoader.loadFromTabList()
+        }
     }
-
-//     @SubscribeEvent
-//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.NewValues) {
-//         if (!isEnabled()) return
-//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
-//             println("WidgetUpdateEvent.NewValues")
-//             questLoader.loadFromTabList(event.lines)
-//         }
-//     }
-//
-//     @SubscribeEvent
-//     fun onTabListWidgetUpdate(event: WidgetUpdateEvent.Clear) {
-//         if (!isEnabled()) return
-//         if (event.isWidget(TabWidget.FACTION_QUESTS)) {
-//             println("WidgetUpdateEvent.Clear")
-//             questLoader.loadFromTabList(emptyList())
-//         }
-//     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {

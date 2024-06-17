@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object HoppityEggsManager {
 
     val config get() = SkyHanniMod.feature.event.hoppityEggs
@@ -40,6 +42,15 @@ object HoppityEggsManager {
     val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!"
+    )
+
+    /**
+     * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     */
+    val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.bought",
+        "§aYou bought §r§.(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!"
     )
 
     /**
@@ -58,7 +69,7 @@ object HoppityEggsManager {
      */
     val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found.new",
-        "§d§lNEW RABBIT! §6\\+(?<chocolate>.*) Chocolate §7and §6\\+(?<perSecond>.*)x Chocolate §7per second!"
+        "§d§lNEW RABBIT! (§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",

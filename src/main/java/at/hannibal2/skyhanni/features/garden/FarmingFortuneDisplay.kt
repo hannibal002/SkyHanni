@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -36,6 +37,7 @@ import kotlin.math.log10
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object FarmingFortuneDisplay {
     private val config get() = GardenAPI.config.farmingFortunes
 
@@ -317,7 +319,7 @@ object FarmingFortuneDisplay {
     fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
         var pieces = 0
 
-        lore.forEach { line ->
+        for (line in lore) {
             if (internalName.contains("LOTUS")) {
                 lotusAbilityPattern.matchMatcher(line) {
                     return group("bonus").toDouble()
@@ -345,7 +347,8 @@ object FarmingFortuneDisplay {
 
         // TODO code cleanup (after ff rework)
 
-        for (line in tool?.getLore()!!) {
+        val lore = tool?.getLore() ?: return
+        for (line in lore) {
             tooltipFortunePattern.matchMatcher(line) {
                 displayedFortune = group("display")?.toDouble() ?: 0.0
                 reforgeFortune = groupOrNull("reforge")?.toDouble() ?: 0.0

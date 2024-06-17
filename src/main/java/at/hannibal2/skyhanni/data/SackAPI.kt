@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -36,6 +37,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object SackAPI {
 
     private val sackDisplayConfig get() = SkyHanniMod.feature.inventory.sackDisplay
@@ -273,11 +275,7 @@ object SackAPI {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NEUInternalName>()
 
-        sacksData.values.forEach { sackInfo ->
-            sackInfo.contents.forEach { content ->
-                uniqueSackItems.add(content)
-            }
-        }
+        sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
