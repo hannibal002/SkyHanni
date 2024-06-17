@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -768,13 +769,10 @@ private fun getPartyDisplayPair() =
 private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     false // Hidden bc the scoreboard lines already exist
 } else {
-    if (partyConfig.showPartyEverywhere) true
-    else {
-        inAnyIsland(
-            IslandType.DUNGEON_HUB,
-            IslandType.KUUDRA_ARENA,
-            IslandType.CRIMSON_ISLE,
-        ) || MiningAPI.inGlaciteArea()
+    if (partyConfig.showPartyEverywhere) {
+        true
+    } else {
+        inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || inGlaciteArea()
     }
 }
 
