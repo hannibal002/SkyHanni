@@ -52,6 +52,12 @@ public class MobsConfig {
     public boolean corruptedMobHighlight = false;
 
     @Expose
+    @ConfigOption(name = "Runic Mob", desc = "Highlight runic mobs in pink color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean runicMobHighlighter = false;
+
+    @Expose
     @ConfigOption(name = "Arachne Boss", desc = "Highlight the Arachne boss in red and mini-bosses in orange.")
     @ConfigEditorBoolean
     @FeatureToggle

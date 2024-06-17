@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
@@ -114,6 +115,8 @@ class Mob(
     fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
 
     private var highlightColor: Color? = null
+
+    fun highlight(color: LorenzColor, alpha: Int = 127) = highlight(color.addOpacity(alpha.coerceIn(0..255)))
 
     /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
     fun highlight(color: Color) {

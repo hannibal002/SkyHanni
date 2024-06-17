@@ -42,15 +42,7 @@ object EntityUtils {
         return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
     }
 
-    fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
-        val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
-            if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
-                list.add(entity)
-            }
-        }
-        return list
-    }
+    fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> = getEntities<EntityOtherPlayerMP>().filter { !it.isNPC() }.toMutableList()
 
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
@@ -192,26 +184,27 @@ object EntityUtils {
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.name.removeColor()
+    fun Entity.cleanName() = name.removeColor()
 
     /**
      * @return a fake player with the same skin as the real player
      */
     fun getFakePlayer(): EntityOtherPlayerMP {
         val mc = Minecraft.getMinecraft()
+        val player = mc.thePlayer
         return object : EntityOtherPlayerMP(
             mc.theWorld,
-            mc.thePlayer.gameProfile
+            player.gameProfile,
         ) {
             override fun getLocationSkin() =
-                mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
+                player.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
 
             override fun getTeam() = object : ScorePlayerTeam(null, null) {
                 override fun getNameTagVisibility() = EnumVisible.NEVER
             }
 
             override fun isWearing(part: EnumPlayerModelParts?) =
-                mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
         }
     }
 }
