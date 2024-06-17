@@ -51,7 +51,7 @@ object AshfangManager {
     @SubscribeEvent
     fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!event.mob.name.contains("Ashfang")) return
+        if (!event.mob.name.contains("Ashfang ")) return
         if (lastSpawnTime.passedSince() < 10.seconds) return
         lastSpawnTime = SimpleTimeMark.now()
     }
