@@ -197,7 +197,9 @@ object EntityUtils {
     fun Entity.cleanName() = name.removeColor()
 
     /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
-    fun EntityLivingBase.highlight(color: LorenzColor, alpha: Int = 127) = highlight(color.addOpacity(alpha.coerceIn(0..255)))
+    fun EntityLivingBase.highlight(color: LorenzColor, alpha: Int = 127, condition: () -> Boolean = { true }) {
+        highlight(color.addOpacity(alpha.coerceIn(0..255)), condition)
+    }
 
     /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
     fun EntityLivingBase.highlight(color: Color, condition: () -> Boolean = { true }) {
