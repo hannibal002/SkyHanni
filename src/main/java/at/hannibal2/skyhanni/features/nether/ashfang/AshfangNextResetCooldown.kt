@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AshfangNextResetCooldown {
@@ -20,11 +19,11 @@ object AshfangNextResetCooldown {
         val nextSpawn = AshfangManager.nextSpawnTime
         if (nextSpawn.isFarPast()) return
 
-        val format = if (nextSpawn.passedSince() < 10.seconds) "Now!"
-        else nextSpawn.timeUntil().format(TimeUnit.SECOND, showMilliSeconds = true)
+        val format = if (nextSpawn.isInPast()) "§aNow!"
+        else "§b${nextSpawn.timeUntil().format(TimeUnit.SECOND, showMilliSeconds = true)}"
 
         config.nextResetCooldownPos.renderString(
-            "§cAshfang next reset in: §a$format",
+            "§cAshfang next reset in: $format",
             posLabel = "Ashfang Reset Cooldown",
         )
     }

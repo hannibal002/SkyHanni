@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.crimsonisle.ashfang.AshfangConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object AshfangManager {
 
-    val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
+    val config: AshfangConfig get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
     private val ashfangMobs = mutableSetOf<Mob>()
     var ashfang: Mob? = null
@@ -44,7 +46,7 @@ object AshfangManager {
             else -> return
         }
         ashfangMobs += mob
-        if (mob.baseEntity.posY > 145) nextSpawnTime = SimpleTimeMark.now() + ashfangResetTime
+        if (nextSpawnTime.timeUntil() < 25.seconds) nextSpawnTime = SimpleTimeMark.now() + ashfangResetTime
         if (config.highlightBlazes) mob.highlight(color.toColor())
     }
 
@@ -54,7 +56,7 @@ object AshfangManager {
         ashfangMobs -= mob
         if (ashfang == mob) {
             ashfang = null
-            nextSpawnTime = SimpleTimeMark.farPast()
+            if (mob.isInRender()) nextSpawnTime = SimpleTimeMark.farPast()
         }
     }
 
@@ -64,6 +66,11 @@ object AshfangManager {
         if (!config.hide.fullNames) return
         if (event.entity.mob !in ashfangMobs) return
         event.cancel()
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        nextSpawnTime = SimpleTimeMark.farPast()
     }
 
     @SubscribeEvent
