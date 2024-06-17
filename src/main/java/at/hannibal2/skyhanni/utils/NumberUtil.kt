@@ -36,19 +36,25 @@ object NumberUtil {
         )
     )
 
+    @Deprecated("outdated", ReplaceWith("value.shortFormat(preciseBillions)"))
+    fun format(value: Number, preciseBillions: Boolean = false): String = value.shortFormat(preciseBillions)
+
+    // 1234 -> 1.2k
+    fun Number.shortFormat(preciseBillions: Boolean = false): String {
+        return compactFormat(this, preciseBillions)
+    }
+
     /**
      * This code was modified and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
-
-    @JvmStatic
-    fun format(value: Number, preciseBillions: Boolean = false): String {
+    private fun compactFormat(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
         // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
-        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
-        if (value < 0) return "-" + format(-value, preciseBillions)
+        if (value == Long.MIN_VALUE) return compactFormat(Long.MIN_VALUE + 1, preciseBillions)
+        if (value < 0) return "-" + compactFormat(-value, preciseBillions)
 
         if (value < 1000) return value.toString() // deal with small numbers
 
