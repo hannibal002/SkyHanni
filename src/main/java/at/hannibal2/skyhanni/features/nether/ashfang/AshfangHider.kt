@@ -32,9 +32,10 @@ object AshfangHider {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!AshfangManager.isAshfangActive() || !config.particles) return
-        if (event.entity.inventory.any { it.name == "Glowstone" }) event.cancel()
+        val entity = event.entity as? EntityArmorStand ?: return
+        if (entity.inventory.any { it?.name == "Glowstone" }) event.cancel()
     }
 
     @SubscribeEvent
