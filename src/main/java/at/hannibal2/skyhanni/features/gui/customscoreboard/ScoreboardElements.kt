@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -473,7 +474,7 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> "<hidden>"
-            displayConfig.displayNumbersFirst/* && heat != "§6IMMUNE" */ -> heat?.let { "$heat Heat" } ?: "§c♨ 0 Heat"
+            displayConfig.displayNumbersFirst -> heat?.let { "$heat Heat" } ?: "§c♨ 0 Heat"
             else -> heat?.let { "Heat: $heat" } ?: "§c♨ 0 Heat"
         } to HorizontalAlignment.LEFT,
     )
@@ -816,11 +817,7 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     if (partyConfig.showPartyEverywhere) {
         true
     } else {
-        inAnyIsland(
-            IslandType.DUNGEON_HUB,
-            IslandType.KUUDRA_ARENA,
-            IslandType.CRIMSON_ISLE,
-        ) || MiningAPI.inGlaciteArea()
+        inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || inGlaciteArea()
     }
 }
 
