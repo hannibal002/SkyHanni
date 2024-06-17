@@ -143,7 +143,7 @@ object MiningAPI {
         if (waitingForInitSound) {
             if (event.soundName in allowedSoundNames && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
-                if (recentClickedBlocks.none { it.position == pos }) return
+                if (recentClickedBlocks.toList().none { it.position == pos }) return
                 waitingForInitSound = false
                 waitingForInitBlock = true
                 waitingForInitBlockPos = event.location.roundLocationToBlock()
@@ -210,8 +210,8 @@ object MiningAPI {
         if (surroundingMinedBlocks.isEmpty()) return
 
         val originalBlock = surroundingMinedBlocks.firstOrNull { it.confirmed } ?: run {
-            surroundingMinedBlocks = mutableListOf()
-            recentClickedBlocks = mutableListOf()
+            surroundingMinedBlocks.clear()
+            recentClickedBlocks.clear()
             return
         }
 
@@ -219,7 +219,7 @@ object MiningAPI {
 
         OreMinedEvent(originalBlock.ore, extraBlocks).post()
 
-        surroundingMinedBlocks = mutableListOf()
+        surroundingMinedBlocks.clear()
         recentClickedBlocks.removeIf { it.time.passedSince() >= originalBlock.time.passedSince() }
     }
 
@@ -227,8 +227,8 @@ object MiningAPI {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
-        recentClickedBlocks = mutableListOf()
-        surroundingMinedBlocks = mutableListOf()
+        recentClickedBlocks.clear()
+        surroundingMinedBlocks.clear()
         currentAreaOreBlocks = setOf()
         resetOreEvent()
     }
