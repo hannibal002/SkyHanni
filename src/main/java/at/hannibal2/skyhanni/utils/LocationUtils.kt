@@ -79,7 +79,7 @@ object LocationUtils {
         var maxY = this.maxY
         var maxZ = this.maxZ
 
-        aabbs.forEach { aabb ->
+        for (aabb in aabbs) {
             if (aabb.minX < minX) minX = aabb.minX
             if (aabb.minY < minY) minY = aabb.minY
             if (aabb.minZ < minZ) minZ = aabb.minZ

@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -28,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -105,8 +105,9 @@ object EndermanSlayerFeatures {
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
-            endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }
-                .forEach { event.drawColor(it, beaconConfig.beaconColor.toChromaColor(), alpha = 0.5f) }
+            for (location in endermenWithBeacons.map { it.getLorenzVec().add(-0.5, 0.2, -0.5) }) {
+                event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 0.5f)
+            }
         }
 
         for ((location, time) in sittingBeacon) {

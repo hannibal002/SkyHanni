@@ -47,9 +47,9 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -204,7 +204,7 @@ object GardenVisitorFeatures {
             if (config.shoppingList.showPrice) {
                 val price = internalName.getPrice() * amount
                 totalPrice += price
-                val format = NumberUtil.format(price)
+                val format = price.shortFormat()
                 list.add(" §7(§6$format§7)")
             }
 
@@ -213,7 +213,7 @@ object GardenVisitorFeatures {
             add(list)
         }
         if (totalPrice > 0) {
-            val format = NumberUtil.format(totalPrice)
+            val format = totalPrice.shortFormat()
             this[0] = listOf("§7Visitor Shopping List: §7(§6$format§7)")
         }
     }
@@ -401,14 +401,14 @@ object GardenVisitorFeatures {
             if (config.inventory.experiencePrice) {
                 gardenExperiencePattern.matchMatcher(formattedLine) {
                     val gardenExp = group("amount").formatInt()
-                    val pricePerCopper = NumberUtil.format((totalPrice / gardenExp).toInt())
+                    val pricePerCopper = (totalPrice / gardenExp).toInt().shortFormat()
                     finalList.set(index, "$formattedLine §7(§6$pricePerCopper §7per)")
                 }
             }
 
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
-                val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
+                val pricePerCopper = (totalPrice / copper).toInt().shortFormat()
                 visitor.pricePerCopper = (totalPrice / copper).toInt()
                 visitor.totalPrice = totalPrice
                 // Estimate could be changed to most value per copper item, instead of green thumb
@@ -434,7 +434,7 @@ object GardenVisitorFeatures {
             val price = internalName.getPrice() * amount
 
             if (config.inventory.showPrice) {
-                val format = NumberUtil.format(price)
+                val format = price.shortFormat()
                 finalList[index] = "$formattedLine §7(§6$format§7)"
             }
             if (!readingShoppingList) continue

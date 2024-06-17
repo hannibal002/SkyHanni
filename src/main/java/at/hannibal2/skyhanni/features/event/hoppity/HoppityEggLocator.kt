@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
@@ -93,9 +93,14 @@ object HoppityEggLocator {
             }
         }
 
-        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
+        var islandEggsLocations = HoppityEggLocations.islandLocations ?: return
 
         if (shouldShowAllEggs()) {
+            if (config.hideDuplicateWaypoints) {
+                islandEggsLocations = islandEggsLocations.filter {
+                    !HoppityEggLocations.hasCollectedEgg(it)
+                }.toSet()
+            }
             for (eggLocation in islandEggsLocations) {
                 event.drawEggWaypoint(eggLocation, "§aEgg")
             }
@@ -114,7 +119,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>, ) {
+    private fun LorenzRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
         if (!config.highlightDuplicateEggLocations || !config.showNearbyDuplicateEggLocations) return
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
@@ -209,6 +214,7 @@ object HoppityEggLocator {
 
         if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem) {
             lastClick = SimpleTimeMark.now()
+            MythicRabbitPetWarning.check()
         }
     }
 
@@ -232,7 +238,7 @@ object HoppityEggLocator {
         secondPos = LorenzVec(
             secondPoint.x + xDiff * 1000,
             secondPoint.y + yDiff * 1000,
-            secondPoint.z + zDiff * 1000
+            secondPoint.z + zDiff * 1000,
         )
 
         val sortedEggs = islandEggsLocations.map {
@@ -271,8 +277,8 @@ object HoppityEggLocator {
     private fun ReceiveParticleEvent.isEnchantmentParticle() =
         type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden()
-        && !ReminderUtils.isBusy(true) && ChocolateFactoryAPI.isHoppityEvent()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden() &&
+        !ReminderUtils.isBusy(true) && ChocolateFactoryAPI.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
@@ -297,7 +303,7 @@ object HoppityEggLocator {
             return
         }
 
-        event.addData {
+        event.addIrrelevant {
             add("First Pos: $firstPos")
             add("Second Pos: $secondPos")
             add("Possible Egg Locations: ${possibleEggLocations.size}")
