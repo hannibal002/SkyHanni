@@ -47,6 +47,10 @@ object CaptureFarmingGear {
         "fortuneupgrade",
         "You claimed the Garden Farming Fortune (?<level>.*) upgrade!"
     )
+    private val bestiaryPattern by patternGroup.pattern(
+        "bestiary",
+        ".*§6+(?<fortune>.*)☘ Farming Fortune.*"
+    )
     private val anitaBuffPattern by patternGroup.pattern(
         "anitabuff",
         "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!"
@@ -71,7 +75,6 @@ object CaptureFarmingGear {
         "strength",
         " Strength: §r§c❁(?<strength>.*)"
     )
-
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
         "§7Progress to Tier (?<nextTier>\\w+):.*"
@@ -161,6 +164,26 @@ object CaptureFarmingGear {
             "Configure Plots" -> configurePlots(items, storage)
             "Anita" -> anita(items, storage)
             "Visitor Milestones" -> visitorMilestones(items)
+            "Bestiary", "Bestiary ➜ Garden" -> bestiary(items, storage)
+        }
+    }
+
+    private fun bestiary(
+        items: Map<Int, ItemStack>,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
+    ) {
+        for ((_, item) in items) {
+            if (item.displayName.contains("Garden")) {
+                var fortune = -1.0
+                for (line in item.getLore()) {
+                    bestiaryPattern.matchMatcher(line) {
+                        fortune = group("fortune").toDouble()
+                    }
+                }
+                if (fortune > -1.0) {
+                    storage.bestiary = fortune
+                }
+            }
         }
     }
 
@@ -313,6 +336,10 @@ object CaptureFarmingGear {
         }
         farmingLevelUpPattern.matchMatcher(msg) {
             storage.farmingLevel = group("level").romanToDecimalIfNecessary()
+            return
+        }
+        bestiaryPattern.matchMatcher(msg) {
+            storage.bestiary += group("fortune").toDouble()
             return
         }
         anitaBuffPattern.matchMatcher(msg) {

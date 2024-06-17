@@ -144,6 +144,11 @@ enum class ScoreboardEvents(
             "§7Damage Soaked:\n" +
             "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
     ),
+    CARNIVAL(
+        ::getCarnivalLines,
+        ::getCarnivalShowWhen,
+        "§7(All Carnival Lines)"
+    ),
     RIFT(
         ::getRiftLines,
         { IslandType.THE_RIFT.isInIsland() },
@@ -174,6 +179,11 @@ enum class ScoreboardEvents(
         ::getRedstoneLines,
         ::getRedstoneShowWhen,
         "§e§l⚡ §cRedstone: §e§b7%"
+    ),
+    ANNIVERSARY(
+        ::getAnniversaryLines,
+        ::getAnniversaryShowWhen,
+        "§d5th Anniversary§f 167:59:54",
     ),
     ;
 
@@ -215,6 +225,7 @@ enum class ScoreboardEvents(
             MINING_EVENTS,
             DAMAGE,
             MAGMA_BOSS,
+            CARNIVAL,
             RIFT,
             ESSENCE,
             ACTIVE_TABLIST_EVENTS
@@ -392,7 +403,7 @@ private fun getActiveEventLine(): List<String> {
 
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
-    val blockedEvents = listOf("Spooky Festival")
+    val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
 
     val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
@@ -508,6 +519,23 @@ private fun getMagmaBossLines() = getSbLines().filter { line ->
 
 private fun getMagmaBossShowWhen(): Boolean = SbPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 
+private fun getCarnivalLines() = listOf(
+    SbPattern.carnivalPattern,
+    SbPattern.carnivalTokensPattern,
+    SbPattern.carnivalTasksPattern,
+    SbPattern.timeLeftPattern,
+    SbPattern.carnivalCatchStreakPattern,
+    SbPattern.carnivalFruitsPattern,
+    SbPattern.carnivalAccuracyPattern,
+    SbPattern.carnivalKillsPattern,
+    SbPattern.carnivalScorePattern,
+)
+    .mapNotNull { pattern ->
+        getSbLines().firstOrNull { pattern.matches(it) }
+    }
+
+private fun getCarnivalShowWhen(): Boolean = SbPattern.carnivalPattern.anyMatches(getSbLines())
+
 private fun getRiftLines() = getSbLines().filter { line ->
     RiftBloodEffigies.heartsPattern.matches(line)
         || SbPattern.riftHotdogTitlePattern.matches(line)
@@ -531,3 +559,7 @@ private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getS
 private fun getRedstoneLines(): List<String> = listOf(getSbLines().first { SbPattern.redstonePattern.matches(it) })
 
 private fun getRedstoneShowWhen(): Boolean = SbPattern.redstonePattern.anyMatches(getSbLines())
+
+private fun getAnniversaryLines() = listOf(getSbLines().first { SbPattern.anniversaryPattern.matches(it) })
+
+private fun getAnniversaryShowWhen(): Boolean = SbPattern.anniversaryPattern.anyMatches(getSbLines())
