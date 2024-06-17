@@ -46,7 +46,7 @@ object MiningAPI {
         "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)",
     )
 
-    data class MinedBlock(val ore: OreBlock, var position: LorenzVec, var confirmed: Boolean, val time: SimpleTimeMark)
+    private data class MinedBlock(val ore: OreBlock, var position: LorenzVec, var confirmed: Boolean, val time: SimpleTimeMark)
 
     private var lastInitSound = SimpleTimeMark.farPast()
 
@@ -202,10 +202,12 @@ object MiningAPI {
         recentClickedBlocks.removeIf { it.time.passedSince() > 20.seconds }
         surroundingMinedBlocks.removeIf { it.time.passedSince() > 20.seconds }
 
-        if (surroundingMinedBlocks.isEmpty()) return
+        if (waitingForInitSound) return
         if (lastInitSound.passedSince() < 200.milliseconds) return
 
         resetOreEvent()
+
+        if (surroundingMinedBlocks.isEmpty()) return
 
         val originalBlock = surroundingMinedBlocks.firstOrNull { it.confirmed } ?: run {
             surroundingMinedBlocks = mutableListOf()
