@@ -200,7 +200,7 @@ enum class ScoreboardEvents(
 
     override fun toString() = configLine
 
-    fun getLines(): List<ScoreboardElementType> = displayLine.get().map { it.getElementFromAny() }
+    fun getLines(): List<ScoreboardElementType> = displayLine.get().map { getElementFromAny(it) }
 
     companion object {
         fun getEvent() = buildList<ScoreboardEvents?> {

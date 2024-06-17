@@ -12,6 +12,17 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.AlignmentConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ChunkedStatsConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.EventsConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.InformationFilteringConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MaxwellConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MayorConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.PartyConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
@@ -36,7 +47,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-internal typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
+typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
 @SkyHanniModule
 object CustomScoreboard {
@@ -103,17 +114,17 @@ object CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-    internal val displayConfig get() = config.display
-    internal val alignmentConfig get() = displayConfig.alignment
-    internal val arrowConfig get() = displayConfig.arrow
-    internal val chunkedConfig get() = displayConfig.chunkedStats
-    internal val eventsConfig get() = displayConfig.events
-    internal val mayorConfig get() = displayConfig.mayor
-    internal val partyConfig get() = displayConfig.party
-    internal val maxwellConfig get() = displayConfig.maxwell
-    internal val informationFilteringConfig get() = config.informationFiltering
-    internal val backgroundConfig get() = config.background
+    val config: CustomScoreboardConfig get() = SkyHanniMod.feature.gui.customScoreboard
+    val displayConfig: DisplayConfig get() = config.display
+    val alignmentConfig: AlignmentConfig get() = displayConfig.alignment
+    val arrowConfig: ArrowConfig get() = displayConfig.arrow
+    val chunkedConfig: ChunkedStatsConfig get() = displayConfig.chunkedStats
+    val eventsConfig: EventsConfig get() = displayConfig.events
+    val mayorConfig: MayorConfig get() = displayConfig.mayor
+    val partyConfig: PartyConfig get() = displayConfig.party
+    val maxwellConfig: MaxwellConfig get() = displayConfig.maxwell
+    val informationFilteringConfig: InformationFilteringConfig get() = config.informationFiltering
+    val backgroundConfig: BackgroundConfig get() = config.background
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
@@ -123,7 +134,8 @@ object CustomScoreboard {
             // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().first == EMPTY && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == EMPTY &&
+                lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }

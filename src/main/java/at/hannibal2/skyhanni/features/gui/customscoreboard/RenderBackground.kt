@@ -14,7 +14,7 @@ object RenderBackground {
 
     private val textureLocation by lazy { ResourceLocation("skyhanni", "scoreboard.png") }
 
-    internal fun addBackground(renderable: Renderable): Renderable {
+    fun addBackground(renderable: Renderable): Renderable {
         val backgroundConfig = CustomScoreboard.backgroundConfig
         val outlineConfig = backgroundConfig.outline
         val padding = backgroundConfig.borderSize
@@ -58,7 +58,7 @@ object RenderBackground {
         } else backgroundRenderable
     }
 
-    internal fun updatePosition(renderable: Renderable) {
+    fun updatePosition(renderable: Renderable) {
         if (GuiEditManager.isInGui()) return
         val alignmentConfig = CustomScoreboard.alignmentConfig
 

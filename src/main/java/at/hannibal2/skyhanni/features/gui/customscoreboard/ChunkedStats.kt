@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.data.MiningAPI.getCold
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
@@ -24,7 +24,7 @@ enum class ChunkedStats(
     private val configLine: String,
 ) {
     PURSE(
-        displayPair = { "§6${PurseAPI.currentPurse.formatNum()}" },
+        displayPair = { "§6${formatNumber(PurseAPI.currentPurse)}" },
         showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardElement.PURSE.showWhen() },
         configLine = "§6Purse",
     ),
@@ -59,8 +59,8 @@ enum class ChunkedStats(
         configLine = "§cHeat",
     ),
     COLD(
-        displayPair = { "§b${getCold()}❄" },
-        showWhen = { !(hideEmptyLines && getCold() == 0) && ScoreboardElement.COLD.showWhen() },
+        displayPair = { "§b${MiningAPI.cold}❄" },
+        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardElement.COLD.showWhen() },
         configLine = "§bCold",
     ),
     NORTH_STARS(

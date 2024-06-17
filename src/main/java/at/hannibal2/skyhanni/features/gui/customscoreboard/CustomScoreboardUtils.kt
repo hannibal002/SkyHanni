@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
@@ -17,9 +18,9 @@ import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
 
-    internal fun Pattern.getGroup(list: List<String>, group: String) =
+    fun getGroup(pattern: Pattern, list: List<String>, group: String) =
         list.map { it.removeResets().trimWhiteSpace() }.firstNotNullOfOrNull { line ->
-            matchGroup(line, group)
+            pattern.matchGroup(line, group)
         }
 
     fun getProfileTypeSymbol() = when {
@@ -32,39 +33,42 @@ object CustomScoreboardUtils {
         else -> "§e"
     }
 
-    // TODO change to a non extended function
-    internal fun Number.formatNum(): String = when (displayConfig.numberFormat) {
-        DisplayConfig.NumberFormat.SHORT -> this.shortFormat()
-        DisplayConfig.NumberFormat.LONG -> addSeparators()
+    fun formatNumber(number: Number): String = when (displayConfig.numberFormat) {
+        DisplayConfig.NumberFormat.SHORT -> number.shortFormat()
+        DisplayConfig.NumberFormat.LONG -> number.addSeparators()
         else -> "0"
     }
 
-    internal fun String.formatNum() = formatDouble().formatNum()
+    fun formatStringNum(string: String) = formatNumber(string.formatDouble())
 
-    internal fun getMotes() = ScoreboardPattern.motesPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "motes") ?: "0"
+    fun getMotes() = getGroup(ScoreboardPattern.motesPattern, ScoreboardData.sidebarLinesFormatted, "motes") ?: "0"
 
-    internal fun getBank() = ScoreboardPattern.bankPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "bank") ?: "0"
+    fun getSoulflow() = getGroup(ScoreboardPattern.soulflowPattern, ScoreboardData.sidebarLinesFormatted, "soulflow") ?: "0"
 
-    internal fun getBits() = BitsAPI.bits.coerceAtLeast(0).formatNum()
+    fun getPurseEarned() = getGroup(PurseAPI.coinsPattern, ScoreboardData.sidebarLinesFormatted, "earned")?.let { " §7(§e+$it§7)§6" }
 
-    internal fun getBitsToClaim() = BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
+    fun getBank() = getGroup(ScoreboardPattern.bankPattern, ScoreboardData.sidebarLinesFormatted, "bank") ?: "0"
 
-    internal fun getBitsLine() = if (displayConfig.showUnclaimedBits) {
+    fun getBits() = formatNumber(BitsAPI.bits.coerceAtLeast(0))
+
+    fun getBitsToClaim() = formatNumber(BitsAPI.bitsAvailable.coerceAtLeast(0))
+
+    fun getBitsLine() = if (displayConfig.showUnclaimedBits) {
         "§b${getBits()}§7/§b${getBitsToClaim()}"
     } else "§b${getBits()}"
 
-    internal fun getCopper() =
-        ScoreboardPattern.copperPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "copper") ?: "0"
+    fun getCopper() =
+        getGroup(ScoreboardPattern.copperPattern, ScoreboardData.sidebarLinesFormatted, "copper") ?: "0"
 
-    internal fun getGems() = ScoreboardPattern.gemsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "gems") ?: "0"
+    fun getGems() = getGroup(ScoreboardPattern.gemsPattern, ScoreboardData.sidebarLinesFormatted, "gems") ?: "0"
 
-    internal fun getHeat() = ScoreboardPattern.heatPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "heat")
+    fun getHeat() = getGroup(ScoreboardPattern.heatPattern, ScoreboardData.sidebarLinesFormatted, "heat")
 
-    internal fun getNorthStars() = ScoreboardPattern.northstarsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "northStars") ?: "0"
+    fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, ScoreboardData.sidebarLinesFormatted, "northStars") ?: "0"
 
-    internal fun Any.getElementFromAny(): ScoreboardElementType = when (this) {
-        is String -> this to HorizontalAlignment.LEFT
-        is Pair<*, *> -> this.first as String to this.second as HorizontalAlignment
+    fun getElementFromAny(element: Any): ScoreboardElementType = when (element) {
+        is String -> element to HorizontalAlignment.LEFT
+        is Pair<*, *> -> element.first as String to element.second as HorizontalAlignment
         else -> HIDDEN to HorizontalAlignment.LEFT
     }
 

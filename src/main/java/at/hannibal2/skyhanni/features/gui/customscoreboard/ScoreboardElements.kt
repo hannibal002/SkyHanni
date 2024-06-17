@@ -21,10 +21,8 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.getChunkedStats
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.getChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.arrowConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
@@ -32,7 +30,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.mayorConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.partyConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
@@ -42,6 +41,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurseEarned
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -55,7 +56,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -63,11 +63,11 @@ import java.util.function.Supplier
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
-internal var confirmedUnknownLines = mutableListOf<String>()
-internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(2.seconds) { onRemoval(it) }
-internal const val HIDDEN = "<hidden>"
-internal const val EMPTY = "<empty>"
+var confirmedUnknownLines = mutableListOf<String>()
+var unconfirmedUnknownLines = listOf<String>()
+var unknownLinesSet = TimeLimitedSet<String>(2.seconds) { onRemoval(it) }
+const val HIDDEN = "<hidden>"
+const val EMPTY = "<empty>"
 
 private fun onRemoval(line: String) {
     if (!unconfirmedUnknownLines.contains(line)) return
@@ -88,7 +88,7 @@ private fun onRemoval(line: String) {
     )
 }
 
-internal var amountOfUnknownLines = 0
+var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
     private val displayPair: Supplier<List<Any>>,
@@ -311,7 +311,7 @@ enum class ScoreboardElement(
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf(HIDDEN to HorizontalAlignment.LEFT)
 
-    private fun getPair(): List<ScoreboardElementType> = displayPair.get().map { it.getElementFromAny() }
+    private fun getPair(): List<ScoreboardElementType> = displayPair.get().map { getElementFromAny(it) }
 
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true
@@ -373,12 +373,10 @@ private fun getTitleDisplayPair(): List<ScoreboardElementType> =
 private fun getProfileDisplayPair() = listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase())
 
 private fun getPurseDisplayPair(): List<String> {
-    var purse = PurseAPI.currentPurse.formatNum()
+    var purse = formatNumber(PurseAPI.currentPurse)
 
     if (!displayConfig.hideCoinsDifference) {
-        PurseAPI.coinsPattern.getGroup(ScoreboardData.sidebarLinesFormatted, "earned")?.let { earned ->
-            purse += " §7(§e+$earned§7)§6"
-        }
+        purse += getPurseEarned() ?: ""
     }
 
     return listOf(
@@ -393,7 +391,7 @@ private fun getPurseDisplayPair(): List<String> {
 private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getMotesDisplayPair(): List<String> {
-    val motes = getMotes().formatNum()
+    val motes = formatStringNum(getMotes())
 
     return listOf(
         when {
@@ -421,11 +419,11 @@ private fun getBankDisplayPair(): List<String> {
 private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBitsDisplayPair(): List<String> {
-    val bits = BitsAPI.bits.coerceAtLeast(0).formatNum()
+    val bits = formatNumber(BitsAPI.bits.coerceAtLeast(0))
     val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {
         "§cOpen Sbmenu§b"
     } else {
-        BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
+        formatNumber(BitsAPI.bitsAvailable.coerceAtLeast(0))
     }
 
     return listOf(
@@ -440,7 +438,7 @@ private fun getBitsDisplayPair(): List<String> {
 private fun getBitsShowWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 
 private fun getCopperDisplayPair(): List<String> {
-    val copper = getCopper().formatNum()
+    val copper = formatStringNum(getCopper())
 
     return listOf(
         when {
@@ -498,7 +496,7 @@ private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType
     SbPattern.coldPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
 private fun getNorthStarsDisplayPair(): List<String> {
-    val northStars = getNorthStars().formatNum()
+    val northStars = formatStringNum(getNorthStars())
 
     return listOf(
         when {
@@ -516,7 +514,7 @@ private fun getChunkedStatsDisplayPair(): List<String> =
         .map { it.joinToString(" §f| ") }
 
 private fun getSoulflowDisplayPair(): List<String> {
-    val soulflow = SbPattern.soulflowPattern.getGroup(TabListData.getTabList(), "soulflow")?.formatNum() ?: "0"
+    val soulflow = getSoulflow()
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && soulflow == "0" -> HIDDEN
@@ -553,7 +551,7 @@ private fun getVisitShowWhen() = SbPattern.visitingPattern.anyMatches(Scoreboard
 private fun getDateDisplayPair() = listOf(SkyBlockTime.now().formatted(yearElement = false, hoursAndMinutesElement = false))
 
 private fun getTimeDisplayPair(): List<String> {
-    val symbol = SbPattern.timePattern.getGroup(ScoreboardData.sidebarLinesFormatted, "symbol") ?: ""
+    val symbol = getGroup(SbPattern.timePattern, ScoreboardData.sidebarLinesFormatted, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
             .formatted(
@@ -698,8 +696,8 @@ private fun getPowderDisplayPair() = buildList {
     for (type in powderTypes) {
         val name = type.displayName
         val color = type.color
-        val current = type.getCurrent().formatNum()
-        val total = type.getTotal().formatNum()
+        val current = formatNumber(type.getCurrent())
+        val total = formatNumber(type.getTotal())
 
         when (displayConfig.powderDisplay) {
             PowderDisplay.AVAILABLE -> {
