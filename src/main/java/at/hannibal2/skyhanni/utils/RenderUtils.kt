@@ -786,6 +786,15 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    fun LorenzRenderWorldEvent.drawCylinderInWorld(
+        color: Color,
+        location: LorenzVec,
+        radius: Float,
+        height: Float,
+    ) {
+        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
+    }
+
     fun drawCylinderInWorld(
         color: Color,
         x: Double,
