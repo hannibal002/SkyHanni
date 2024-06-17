@@ -181,7 +181,7 @@ object MiningAPI {
             return
         }
         if (waitingForEffMinerBlock) {
-            if (surroundingMinedBlocks.any { it.position == event.location }) return
+            if (surroundingMinedBlocks.toList().any { it.position == event.location }) return
             waitingForEffMinerBlock = false
             surroundingMinedBlocks.add(MinedBlock(ore, event.location, false, SimpleTimeMark.now()))
             waitingForEffMinerSound = true
