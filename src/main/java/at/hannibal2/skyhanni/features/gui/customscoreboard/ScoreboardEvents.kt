@@ -247,7 +247,7 @@ enum class ScoreboardEvents(
 private fun getVotingLines() = buildList {
     val sbLines = getSbLines()
 
-    val yearLine = SbPattern.yearVotesPattern.firstMatches(sbLines) ?: return emptyList<String>()
+    val yearLine = SbPattern.yearVotesPattern.firstMatches(sbLines) ?: return listOf<String>()
     add(yearLine)
 
     if (sbLines.nextAfter(yearLine) == "§7Waiting for") {
@@ -315,9 +315,7 @@ private fun getJacobContestLines() = buildList {
 
 private fun getJacobMedalsLines(): List<String> = SbPattern.medalsPattern.allMatches(getSbLines())
 
-private fun getJacobMedalsShowWhen(): Boolean =
-    GardenAPI.inGarden() || IslandType.HUB.isInIsland() ||
-        inAnyIsland(IslandType.GARDEN, IslandType.HUB)
+private fun getJacobMedalsShowWhen(): Boolean = inAnyIsland(IslandType.GARDEN, IslandType.HUB)
 
 private fun getTrapperLines() = buildList {
     addNotNull(SbPattern.peltsPattern.firstMatches(getSbLines()))
@@ -345,7 +343,8 @@ private fun getWinterLines() = listOf(
 ).allMatches(getSbLines()).filter { !it.endsWith("Soon!") }
 
 private fun getSpookyLines() = buildList {
-    SbPattern.spookyPattern.firstMatches(getSbLines())?.let { // Time
+    SbPattern.spookyPattern.firstMatches(getSbLines())?.let {
+        // Time
         add(it)
         add("§7Your Candy: ")
         add(
@@ -365,12 +364,12 @@ private fun getTablistEvent(): String? {
 }
 
 private fun getActiveEventLine(): List<String> {
-    val currentActiveEvent = getTablistEvent() ?: return emptyList()
+    val currentActiveEvent = getTablistEvent() ?: return listOf()
 
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
     val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary")
-    if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
+    if (blockedEvents.contains(currentActiveEvent.removeColor())) return listOf()
     val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabListData.getTabList()) {
         group("time")
     } ?: "§cUnknown"
@@ -381,8 +380,8 @@ private fun getActiveEventLine(): List<String> {
 private fun getActiveEventShowWhen(): Boolean = true
 
 private fun getSoonEventLine(): List<String> {
-    val soonActiveEvent = getTablistEvent() ?: return emptyList()
-    val soonActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabListData.getTabList()) {
+    val soonActiveEvent = getTablistEvent() ?: return listOf()
+    val soonActiveEventTime = SbPattern.eventTimeStartsPattern.firstMatcher(TabListData.getTabList()) {
         group("time")
     } ?: "§cUnknown"
 
