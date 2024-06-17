@@ -25,8 +25,7 @@ object AshfangManager {
 
     private val ashfangMobs = mutableSetOf<Mob>()
     var ashfang: Mob? = null
-    var nextSpawnTime = SimpleTimeMark.farPast()
-    private val ashfangResetTime = 46.1.seconds
+    var lastSpawnTime = SimpleTimeMark.farPast()
 
     fun isAshfangActive() = ashfang != null
 
@@ -46,8 +45,15 @@ object AshfangManager {
             else -> return
         }
         ashfangMobs += mob
-        if (nextSpawnTime.timeUntil() < 25.seconds) nextSpawnTime = SimpleTimeMark.now() + ashfangResetTime
         if (config.highlightBlazes) mob.highlight(color.toColor())
+    }
+
+    @SubscribeEvent
+    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
+        if (!event.mob.name.contains("Ashfang")) return
+        if (lastSpawnTime.passedSince() < 10.seconds) return
+        lastSpawnTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -56,7 +62,7 @@ object AshfangManager {
         ashfangMobs -= mob
         if (ashfang == mob) {
             ashfang = null
-            if (mob.isInRender()) nextSpawnTime = SimpleTimeMark.farPast()
+            if (mob.isInRender()) lastSpawnTime = SimpleTimeMark.farPast()
         }
     }
 
@@ -70,7 +76,7 @@ object AshfangManager {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        nextSpawnTime = SimpleTimeMark.farPast()
+        lastSpawnTime = SimpleTimeMark.farPast()
     }
 
     @SubscribeEvent
