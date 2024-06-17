@@ -14,7 +14,7 @@ public class ChocolateUpgradeWarningsConfig {
     public boolean upgradeWarning = false;
 
     @Expose
-    @ConfigOption(name = "Upgrade Warning Sound", desc = "Also plays a sound when an upgrade is available. " +
+    @ConfigOption(name = "Upgrade Warning Sound", desc = "Also play a sound when an upgrade is available.\n" +
         "§eUpgrade warning must be turned on.")
     @ConfigEditorBoolean
     public boolean upgradeWarningSound = false;

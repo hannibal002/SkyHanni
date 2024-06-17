@@ -29,280 +29,284 @@ enum class TabWidget(
 ) {
     PLAYER_LIST(
         // language=RegExp
-        "(?:§.)*Players (?:§.)*\\(\\d+\\)"
+        "(?:§.)*Players (?:§.)*\\(\\d+\\)",
     ),
 
     /** This line holds no information, only here because every widget must be present */
     INFO(
         // language=RegExp
-        "(?:§.)*Info"
+        "(?:§.)*Info",
     ),
     AREA(
         // language=RegExp
-        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)"
+        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
     ),
     SERVER(
         // language=RegExp
-        "Server: (?:§.)*(?<serverid>.*)"
+        "Server: (?:§.)*(?<serverid>.*)",
     ),
     GEMS(
         // language=RegExp
-        "Gems: (?:§.)*(?<gems>.*)"
+        "Gems: (?:§.)*(?<gems>.*)",
     ),
     FAIRY_SOULS(
         // language=RegExp
-        "Fairy Souls: (?:§.)*(?<got>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)"
+        "Fairy Souls: (?:§.)*(?<got>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)",
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+).*"
+        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+).*",
     ),
     SB_LEVEL(
         // language=RegExp
-        "SB Level(?:§.)*: (?:§.)*\\[(?:§.)*(?<level>\\d+)(?:§.)*\\] (?:§.)*(?<xp>\\d+).*"
+        "SB Level(?:§.)*: (?:§.)*\\[(?:§.)*(?<level>\\d+)(?:§.)*\\] (?:§.)*(?<xp>\\d+).*",
     ),
     BANK(
         // language=RegExp
-        "Bank: (?:§.)*(?<amount>[^§]+)(?:(?:§.)* \\/ (?:§.)*(?<personal>.*))?"
+        "Bank: (?:§.)*(?<amount>[^§]+)(?:(?:§.)* \\/ (?:§.)*(?<personal>.*))?",
     ),
     INTEREST(
         // language=RegExp
-        "Interest: (?:§.)*(?<time>[^§]+)(?:§.)* \\((?<amount>[^)]+)\\)"
+        "Interest: (?:§.)*(?<time>[^§]+)(?:§.)*( \\((?<amount>[^)]+)\\))?",
     ),
     SOULFLOW(
         // language=RegExp
-        "Soulflow: (?:§.)*(?<amount>.*)"
+        "Soulflow: (?:§.)*(?<amount>.*)",
     ),
     PET(
         // language=RegExp
-        "(?:§.)*Pet:"
+        "(?:§.)*Pet:",
     ),
     PET_TRANING(
         // language=RegExp
-        "(?:§.)*Pet Training:"
+        "(?:§.)*Pet Training:",
     ),
     PET_SITTER(
         // language=RegExp
-        "Kat: .*"
+        "Kat: .*",
     ),
     FIRE_SALE(
         // language=RegExp
-        "(?:§.)*Fire Sales: .*"
+        "(?:§.)*Fire Sales: .*",
     ),
     ELECTION(
         // language=RegExp
-        "(?:§.)*Election: (?:§.)*(?<time>.*)"
+        "(?:§.)*Election: (?:§.)*(?<time>.*)",
     ),
     EVENT(
         // language=RegExp
-        "(?:§.)*Event: (?:§.)*(?<event>.*)"
+        "(?:§.)*Event: (?:§.)*(?<event>.*)",
     ),
     SKILLS(
         // language=RegExp
-        "(?:§.)*Skills: ?(?:§.)*(?<avg>[\\d.]*)"
+        "(?:§.)*Skills: ?(?:§.)*(?<avg>[\\d.]*)",
     ),
     STATS(
         // language=RegExp
-        "(?:§.)*Stats:"
+        "(?:§.)*Stats:",
     ),
     GUESTS(
         // language=RegExp
-        "(?:§.)*Guests (?:§.)*.*"
+        "(?:§.)*Guests (?:§.)*.*",
     ),
     COOP(
         // language=RegExp
-        "(?:§.)*Coop (?:§.)*.*"
+        "(?:§.)*Coop (?:§.)*.*",
     ),
     MINION(
         // language=RegExp
-        "(?:§.)*Minions: (?:§.)*(?<used>\\d+)(?:§.)*/(?:§.)*(?<max>\\d+)"
+        "(?:§.)*Minions: (?:§.)*(?<used>\\d+)(?:§.)*/(?:§.)*(?<max>\\d+)",
     ),
     JERRY_ISLAND_CLOSING(
         // language=RegExp
-        "Island closes in: (?:§.)*(?<time>.*)"
+        "Island closes in: (?:§.)*(?<time>.*)",
     ),
     NORTH_STARS(
         // language=RegExp
-        "North Stars: (?:§.)*(?<amount>\\d+)"
+        "North Stars: (?:§.)*(?<amount>\\d+)",
     ),
     COLLECTION(
         // language=RegExp
-        "(?:§.)*Collection:"
+        "(?:§.)*Collection:",
     ),
     JACOB_CONTEST(
         // language=RegExp
-        "(?:§.)*Jacob's Contest:.*"
+        "(?:§.)*Jacob's Contest:.*",
     ),
     SLAYER(
         // language=RegExp
-        "(?:§.)*Slayer:"
+        "(?:§.)*Slayer:",
     ),
     DAILY_QUESTS(
         // language=RegExp
-        "(?:§.)*Daily Quests:"
+        "(?:§.)*Daily Quests:",
     ),
     ACTIVE_EFFECTS(
         // language=RegExp
-        "(?:§.)*Active Effects: (?:§.)*\\((?<amount>\\d+)\\)"
+        "(?:§.)*Active Effects: (?:§.)*\\((?<amount>\\d+)\\)",
     ),
     BESTIARY(
         // language=RegExp
-        "(?:§.)*Bestiary:"
+        "(?:§.)*Bestiary:",
     ),
     ESSENCE(
         // language=RegExp
-        "(?:§.)*Essence:.*"
+        "(?:§.)*Essence:.*",
     ),
     FORGE(
         // language=RegExp
-        "(?:§.)*Forges:"
+        "(?:§.)*Forges:",
     ),
     TIMERS(
         // language=RegExp
-        "(?:§.)*Timers:"
+        "(?:§.)*Timers:",
     ),
     DUNGEON_STATS(
         // language=RegExp
-        "Opened Rooms: (?:§.)*(?<opend>\\d+)"
+        "Opened Rooms: (?:§.)*(?<opend>\\d+)",
     ),
     PARTY(
         // language=RegExp
-        "(?:§.)*Party:.*"
+        "(?:§.)*Party:.*",
     ),
     TRAPPER(
         // language=RegExp
-        "(?:§.)*Trapper:"
+        "(?:§.)*Trapper:",
     ),
     COMMISSIONS(
         // language=RegExp
-        "(?:§.)*Commissions:"
+        "(?:§.)*Commissions:",
     ),
     POWDER(
         // language=RegExp
-        "(?:§.)*Powders:"
+        "(?:§.)*Powders:",
     ),
     CRYSTAL(
         // language=RegExp
-        "(?:§.)*Crystals:"
+        "(?:§.)*Crystals:",
     ),
     UNCLAIMED_CHESTS(
         // language=RegExp
-        "Unclaimed chests: (?:§.)*(?<amount>\\d+)"
+        "Unclaimed chests: (?:§.)*(?<amount>\\d+)",
     ),
     RAIN(
         // language=RegExp
-        "(?<type>Thunder|Rain): (?:§.)*(?<time>.*)"
+        "(?<type>Thunder|Rain): (?:§.)*(?<time>.*)",
     ),
     BROODMOTHER(
         // language=RegExp
-        "Broodmother: (?:§.)*(?<time>.*)"
+        "Broodmother: (?:§.)*(?<time>.*)",
     ),
     EYES_PLACED(
         // language=RegExp
-        "Eyes placed: (?:§.)*(?<amount>\\d).*|(?:§.)*Dragon spawned!|(?:§.)*Egg respawning!"
+        "Eyes placed: (?:§.)*(?<amount>\\d).*|(?:§.)*Dragon spawned!|(?:§.)*Egg respawning!",
     ),
     PROTECTOR(
         // language=RegExp
-        "Protector: (?:§.)*(?<time>.*)"
+        "Protector: (?:§.)*(?<time>.*)",
     ),
     DRAGON(
         // language=RegExp
-        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)])\\)"
+        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)])\\)",
     ),
     VOLCANO(
         // language=RegExp
-        "Volcano: (?:§.)*(?<time>.*)"
+        "Volcano: (?:§.)*(?<time>.*)",
     ),
     REPUTATION(
         // language=RegExp
-        "(?:§.)*(Barbarian|Mage) Reputation:"
+        "(?:§.)*(Barbarian|Mage) Reputation:",
     ),
     FACTION_QUESTS(
         // language=RegExp
-        "(?:§.)*Faction Quests:"
+        "(?:§.)*Faction Quests:",
     ),
     TROPHY_FISH(
         // language=RegExp
-        "(?:§.)*Trophy Fish:"
+        "(?:§.)*Trophy Fish:",
     ),
     RIFT_INFO(
         // language=RegExp
-        "(?:§.)*Good to know:"
+        "(?:§.)*Good to know:",
     ),
     RIFT_SHEN(
         // language=RegExp
-        "(?:§.)*Shen: (?:§.)*\\((?<time>[^)])\\)"
+        "(?:§.)*Shen: (?:§.)*\\((?<time>[^)])\\)",
     ),
     RIFT_BARRY(
         // language=RegExp
-        "(?:§.)*Advertisement:"
+        "(?:§.)*Advertisement:",
     ),
     COMPOSTER(
         // language=RegExp
-        "(?:§.)*Composter:"
+        "(?:§.)*Composter:",
     ),
     GARDEN_LEVEL(
         // language=RegExp
-        "Garden Level: (?:§.)*(?<level>.*)"
+        "Garden Level: (?:§.)*(?<level>.*)",
     ),
     COPPER(
         // language=RegExp
-        "Copper: (?:§.)*(?<amount>\\d+)"
+        "Copper: (?:§.)*(?<amount>\\d+)",
     ),
     PESTS(
         // language=RegExp
-        "(?:§.)*Pests:"
+        "(?:§.)*Pests:",
     ),
     VISITORS(
         // language=RegExp
-        "(?:§.)*Visitors: (?:§.)*\\((?<count>\\d+)\\)"
+        "(?:§.)*Visitors: (?:§.)*\\((?<count>\\d+)\\)",
     ),
     CROP_MILESTONE(
         // language=RegExp
-        "(?:§.)*Crop Milestones:"
+        "(?:§.)*Crop Milestones:",
     ),
     PRIVATE_ISLAND_CRYSTALS(
         // language=RegExp
-        "Crystals: (?:§.)*(?<count>\\d+)"
+        "Crystals: (?:§.)*(?<count>\\d+)",
     ),
     OLD_PET_SITTER(
         // language=RegExp
-        "Pet Sitter:.*"
+        "Pet Sitter:.*",
     ),
     DUNGEON_HUB_PROGRESS(
         // language=RegExp
-        "(?:§.)*Dungeons:"
+        "(?:§.)*Dungeons:",
     ),
     DUNGEON_PUZZLE(
         // language=RegExp
-        "(?:§.)*Puzzles: (?:§.)*\\((?<amount>\\d+)\\)"
+        "(?:§.)*Puzzles: (?:§.)*\\((?<amount>\\d+)\\)",
     ),
     DUNGEON_PARTY(
         // language=RegExp
-        "(?:§.)*Party (?:§.)*\\(\\d+\\)"
+        "(?:§.)*Party (?:§.)*\\(\\d+\\)",
     ),
     DUNGEON_PLAYER_STATS(
         // language=RegExp
-        "(?:§.)*Player Stats"
+        "(?:§.)*Player Stats",
     ),
     DUNGEON_SKILLS_AND_STATS(
         // language=RegExp
-        "(?:§.)*Skills: (?:§.)*\\w+ \\d+: (?:§.)*[\\d.]+%"
+        "(?:§.)*Skills: (?:§.)*\\w+ \\d+: (?:§.)*[\\d.]+%",
     ),
 
     /** This line holds no information, only here because every widget must be present */
     DUNGEON_ACCOUNT_INFO_LINE(
         // language=RegExp
-        "(?:§.)*Account Info"
+        "(?:§.)*Account Info",
     ),
     DUNGEON_STATS_LINE(
         // language=RegExp
-        "(?:§.)*Dungeon Stats"
+        "(?:§.)*Dungeon Stats",
     ),
     FROZEN_CORPSES(
         // language=RegExp
-        "§b§lFrozen Corpses:"
+        "§b§lFrozen Corpses:",
     ),
+    SCRAP(
+        // language=RegExp
+        "Scrap: (?:§.)*(?<amount>\\d)(?:§.)*/(?:§.)*\\d",
+    )
 
     ;
 
