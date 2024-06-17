@@ -119,16 +119,16 @@ class Mob(
     fun highlight(color: LorenzColor, alpha: Int = 127) = highlight(color.addOpacity(alpha.coerceIn(0..255)))
 
     /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
-    fun highlight(color: Color) {
+    fun highlight(color: Color, condition: () -> Boolean = { true }) {
         highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
-        internalHighlight()
+        internalHighlight(condition)
     }
 
-    private fun internalHighlight() {
+    private fun internalHighlight(condition: () -> Boolean = { true }) {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { true }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb, condition)
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { true }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb, condition)
             }
         }
     }

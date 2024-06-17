@@ -26,18 +26,19 @@ object MobHighlight {
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!LorenzUtils.inSkyBlock || !config.corruptedMobHighlight) return
         val mob = event.entity.mob ?: return
-
-        when {
-            mob.isCorrupted && config.corruptedMobHighlight -> mob.highlight(LorenzColor.DARK_PURPLE)
-            mob.isRunic && config.runicMobHighlighter -> mob.highlight(LorenzColor.LIGHT_PURPLE)
-        }
+        if (mob.isCorrupted) mob.highlight(LorenzColor.DARK_PURPLE)
     }
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
+
+        when {
+            mob.isRunic -> if (config.runicMobHighlighter) mob.highlight(LorenzColor.LIGHT_PURPLE)
+            mob.isCorrupted -> if (config.corruptedMobHighlight) mob.highlight(LorenzColor.DARK_PURPLE)
+        }
 
         // TODO: get the correct names
         when (mob.name) {
