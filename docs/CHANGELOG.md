@@ -372,6 +372,7 @@
 + Fixed visual words import from SBE with special characters. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2085)
 + Fixed waypoint text being hidden when more than 80 blocks away. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2103)
 + Fixed durations displaying with milliseconds. - Empa (https://github.com/hannibal002/SkyHanni/pull/2095)
++ Fixed getting security error when download from GitHub. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2111)
 
 ### Technical Details
 
