@@ -428,7 +428,7 @@ private fun getBitsDisplayPair(): List<String> {
 
     return listOf(
         when {
-            informationFilteringConfig.hideEmptyLines && bits == "0" && bitsToClaim == "0" -> "<hidden>"
+            informationFilteringConfig.hideEmptyLines && bits == "0" && bitsToClaim == "0" -> HIDDEN
             displayConfig.displayNumbersFirst -> "${getBitsLine()} Bits"
             else -> "Bits: ${getBitsLine()}"
         },
@@ -684,12 +684,12 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes = HotmAPI.Powder.values()
+    val powderTypes = HotmAPI.Powder.entries
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
-        return listOf("<hidden>" to HorizontalAlignment.LEFT)
+        return@buildList
     }
 
-    add("§9§lPowder" to HorizontalAlignment.LEFT)
+    add("§9§lPowder")
 
     val displayNumbersFirst = displayConfig.displayNumbersFirst
 
@@ -701,18 +701,15 @@ private fun getPowderDisplayPair() = buildList {
 
         when (displayConfig.powderDisplay) {
             PowderDisplay.AVAILABLE -> {
-                add(" §7- ${if (displayNumbersFirst) "$color$current $name" else "§f$name: $color$current"}" to HorizontalAlignment.LEFT)
+                add(" §7- ${if (displayNumbersFirst) "$color$current $name" else "§f$name: $color$current"}")
             }
 
             PowderDisplay.TOTAL -> {
-                add(" §7- ${if (displayNumbersFirst) "$color$total $name" else "§f$name: $color$total"}" to HorizontalAlignment.LEFT)
+                add(" §7- ${if (displayNumbersFirst) "$color$total $name" else "§f$name: $color$total"}")
             }
 
             PowderDisplay.BOTH -> {
-                add(
-                    " §7- ${if (displayNumbersFirst) "$color$current/$total $name" else "§f$name: $color$current/$total"}"
-                        to HorizontalAlignment.LEFT,
-                )
+                add(" §7- ${if (displayNumbersFirst) "$color$current/$total $name" else "§f$name: $color$current/$total"}")
             }
 
             null -> {}
