@@ -102,8 +102,10 @@ class RepoManager(private val configLocation: File) {
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
                 val file = File(configLocation, "repo")
-                if (file.exists() && currentCommitJSON?.get("sha")?.asString == latestRepoCommit &&
-                    unsuccessfulConstants.isEmpty() && lastRepoUpdate.passedSince() < 1.minutes
+                if (file.exists() &&
+                    currentCommitJSON?.get("sha")?.asString == latestRepoCommit &&
+                    unsuccessfulConstants.isEmpty() &&
+                    lastRepoUpdate.passedSince() < 1.minutes
                 ) {
                     if (command) {
                         ChatUtils.chat("§7The repo is already up to date!")
