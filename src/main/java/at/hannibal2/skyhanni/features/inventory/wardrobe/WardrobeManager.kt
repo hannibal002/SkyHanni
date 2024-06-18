@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 object WardrobeManager {
 
     val configSpacing get() = SkyHanniMod.feature.inventory.customWardrobe.spacing
-    val configColor get() = SkyHanniMod.feature.inventory.customWardrobe.color
+    private val configColor get() = SkyHanniMod.feature.inventory.customWardrobe.color
 
     @JvmStatic
     fun resetWardrobeSpacing() {
