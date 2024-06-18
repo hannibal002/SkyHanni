@@ -58,21 +58,21 @@ object HypixelData {
         "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
     )
     private val lobbyTypePattern by patternGroup.pattern(
-            "lobbytype",
-            "(?<lobbyType>.*lobby)\\d+",
-        )
-        private val playerAmountPattern by patternGroup.pattern(
-            "playeramount",
-            "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-        )
-        private val playerAmountCoopPattern by patternGroup.pattern(
-            "playeramount.coop",
-            "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
-        )
-        private val playerAmountGuestingPattern by patternGroup.pattern(
-            "playeramount.guesting",
-            "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
-        )
+        "lobbytype",
+        "(?<lobbyType>.*lobby)\\d+",
+    )
+    private val playerAmountPattern by patternGroup.pattern(
+        "playeramount",
+        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
+    )
+    private val playerAmountCoopPattern by patternGroup.pattern(
+        "playeramount.coop",
+        "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
+    )
+    private val playerAmountGuestingPattern by patternGroup.pattern(
+        "playeramount.guesting",
+        "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
+    )
 
     /**
      * REGEX-TEST:           §r§b§lParty §r§f(4)
@@ -155,24 +155,24 @@ object HypixelData {
         if (!TabListData.fullyLoaded) return
 
         TabWidget.SERVER.matchMatcherFirstLine {
-                serverId = group("serverid")
-                return
-            }
-
-            ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
-                val serverType = if (group("servertype") == "M") "mega" else "mini"
-                serverId = "$serverType${group("serverid")}"
-                return
-            }
-
-            ErrorManager.logErrorWithData(
-                Exception("NoServerId"),
-                "Could not find server id",
-                "islandType" to LorenzUtils.skyBlockIsland,
-                "tablist" to TabListData.getTabList(),
-                "scoreboard" to ScoreboardData.sidebarLinesFormatted,
-            )
+            serverId = group("serverid")
+            return
         }
+
+        ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+            val serverType = if (group("servertype") == "M") "mega" else "mini"
+            serverId = "$serverType${group("serverid")}"
+            return
+        }
+
+        ErrorManager.logErrorWithData(
+            Exception("NoServerId"),
+            "Could not find server id",
+            "islandType" to LorenzUtils.skyBlockIsland,
+            "tablist" to TabListData.getTabList(),
+            "scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        )
+    }
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
