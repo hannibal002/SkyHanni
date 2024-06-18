@@ -43,7 +43,7 @@ public class ColorConfig {
     @ConfigEditorColour
     public String bottomBorderColor = "0:255:255:0:0";
 
-    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe settings to the default.")
+    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable resetColor = WardrobeManager::resetWardrobeColor;
 }

@@ -144,7 +144,7 @@ public class SpacingConfig {
     )
     public Property<Integer> backgroundPadding = Property.of(10);
 
-    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe settings to the default.")
+    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe spacing settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable resetSpacing = WardrobeManager::resetWardrobeSpacing;
 }
