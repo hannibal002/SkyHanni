@@ -209,7 +209,7 @@ object RenderUtils {
         z: Double,
         rgb: Int,
         alphaMultiplier: Float,
-        partialTicks: Float
+        partialTicks: Float,
     ) {
         val height = 300
         val bottomOffset = 0
@@ -1009,6 +1009,7 @@ object RenderUtils {
         smallestDistanceVew: Double = 5.0,
         ignoreBlocks: Boolean = true,
         ignoreY: Boolean = false,
+        maxDistance: Int? = null,
     ) {
         val thePlayer = Minecraft.getMinecraft().thePlayer
         val x = location.x
@@ -1030,7 +1031,9 @@ object RenderUtils {
         distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
-        if (ignoreBlocks && distToPlayer > 80) return
+        maxDistance?.let {
+            if (ignoreBlocks && distToPlayer > it) return
+        }
 
         val distRender = distToPlayer.coerceAtMost(50.0)
 

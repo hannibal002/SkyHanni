@@ -108,18 +108,18 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
-    @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
 
     @Expose
-    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
+    @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideExpBottles = false;
 
     @Expose
-    @ConfigOption(name = "Armorstands", desc = "Hides Armorstands that are sometimes visible for a fraction of a second.")
+    @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideTemporaryArmorstands = true;
@@ -128,7 +128,7 @@ public class MiscConfig {
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the Item names directly inside the Brewing Stand.")
+    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean brewingStandOverlay = true;
@@ -141,7 +141,7 @@ public class MiscConfig {
     public boolean hideScoreboardNumbers = false;
 
     @Expose
-    @ConfigOption(name = "Hide Piggy", desc = "Replacing 'Piggy' with 'Purse' in the Scoreboard.")
+    @ConfigOption(name = "Hide Piggy", desc = "Replace 'Piggy' with 'Purse' in the Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hidePiggyScoreboard = true;
@@ -159,7 +159,7 @@ public class MiscConfig {
     public boolean hideExplosions = false;
 
     @Expose
-    @ConfigOption(name = "CH Join", desc = "Helps buy a Pass for accessing the Crystal Hollows if needed.")
+    @ConfigOption(name = "CH Join", desc = "Help buy a pass for accessing the Crystal Hollows if needed.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsJoin = true;
@@ -171,7 +171,7 @@ public class MiscConfig {
     public boolean hideFireOverlay = false;
 
     @Expose
-    @ConfigOption(name = "Better Sign Editing", desc = "Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
+    @ConfigOption(name = "Better Sign Editing", desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean betterSignEditing = true;
@@ -205,7 +205,7 @@ public class MiscConfig {
     public boolean accountUpgradeReminder = true;
 
     @Expose
-    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
+    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fix NEU's Heavy Pearl detection.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixNeuHeavyPearls = true;
@@ -233,7 +233,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Lesser Orb of Healing Hider",
-        desc = "Hides the Lesser Orb of Healing.")
+        desc = "Hide the Lesser Orb of Healing.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean lesserOrbHider = false;
@@ -254,14 +254,14 @@ public class MiscConfig {
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose
-    @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
-        "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+    @ConfigOption(name = "Fix Ghost Entities", desc = "Remove ghost entities caused by a Hypixel bug.\n" +
+        "This includes Diana, Dungeon and Crimson Isle mobs and nametags.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
 
     @Expose
-    @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceRomanNumerals = false;
