@@ -147,4 +147,5 @@ public class SpacingConfig {
         minStep = 1
     )
     public Property<Integer> backgroundPadding = Property.of(10);
+
 }

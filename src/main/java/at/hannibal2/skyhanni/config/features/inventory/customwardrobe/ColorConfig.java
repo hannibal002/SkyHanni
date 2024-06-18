@@ -46,4 +46,5 @@ public class ColorConfig {
     @ConfigOption(name = "Bottom Outline", desc = "Color of the bottom of the outline when hovered.")
     @ConfigEditorColour
     public String bottomBorderColor = "0:255:255:0:0";
+
 }
