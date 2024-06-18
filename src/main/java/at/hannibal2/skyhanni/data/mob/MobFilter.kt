@@ -352,7 +352,13 @@ object MobFilter {
         100 -> MobResult.found(
             MobFactories.basic(
                 baseEntity,
-                if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else if (IslandType.PRIVATE_ISLAND.isInIsland()) "Private Island Bat" else "Mega Bat",
+                if (DungeonAPI.inDungeon()) {
+                    "Dungeon Secret Bat"
+                } else if (IslandType.PRIVATE_ISLAND.isInIsland()) {
+                    "Private Island Bat"
+                } else {
+                    "Mega Bat"
+                },
             ),
         )
 
