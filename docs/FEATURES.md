@@ -203,6 +203,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to remove enchant descriptions.
     + Option to change enchant formatting.
     + Also parses tooltips from /show.
++ Favorite Power Stones. - saga (https://github.com/hannibal002/SkyHanni/pull/2002)
+    + Highlighted in the Thaumaturgy inventory.
+    + Shift-click to add/remove them.
 
 </details>
 <details open><summary>
@@ -277,7 +280,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Showing colors in the order inventory for outbid or fully bought/sold items.
 + Best Sell Method (Calculating the difference between instant-selling or using sell order for a selected bazaar item)
-+ Saves missing items from canceled buy orders to clipboard for faster re-entry.
++ Saves missing items from cancelled buy orders to clipboard for faster re-entry.
 + Update Timer showing when the next api data update happens.
 + Price Website button. - hannibal2
     + Adds a button to the bazaar product inventory that will open the item page in skyblock.bz.
@@ -669,7 +672,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show a Title when a pest spawns. - hannibal2
 + Show the time since the last pest spawned in your garden. - hannibal2
     + Option to only show the time while holding vacuum in the hand.
-+ Show the pests that are attracted when changing the selected material of the Sprayanator. - hannibal2
++ Show the pests that are attracted when changing the selected material of the Sprayonator. - hannibal2
 + Garden only commands /home, /barn and /tp, and hotkeys. - hannibal2
 + Showing a better plot name in the scoreboard. Updates faster and doesn't hide when pests are spawned. - hannibal2
 + Show a display with all known pest locations. - hannibal2
@@ -714,6 +717,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Checks if you have enough materials to craft the items and depending on that shows the button or not.
 + Overflow Garden crop milestones. - Luna & HiZe (https://github.com/hannibal002/SkyHanni/pull/997)
 + New "Craftable!" message when Visitor Items Needed are craftable. - Paloys (https://github.com/hannibal002/SkyHanni/pull/1891)
++ Added toggle for compacting Garden visitor summary messages. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2026)
 
 </details>
 <details open><summary>
@@ -792,6 +796,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Vermin Highlight. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1457)
     + Highlights Vermin mobs in the West Village in the Rift.
     + Change Highlight color.
++ Punchcard Artifact Highlighter & Overlay. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1089)
+    + Highlights unpunched players in the Rift.
 
 </details>
 <details open><summary>
@@ -844,6 +850,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays profit/loss in chat after looting a corpse in the Mineshaft.
     + Includes a breakdown of information on hover.
 + HOTM perks level and Enable Display. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1059)
++ Mineshaft Corpse and Entrance/Ladder Locators. - nobaboy (https://github.com/hannibal002/SkyHanni/pull/1500)
+    + Includes keybind functionality for both.
++ HotM Perks Powder features. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1460)
+    + Added total powder cost to HotM perks.
+    + Added powder cost for 10 levels.
++ Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1655)
+    + Displays information about Mineshaft spawns, your progress towards a Pity Mineshaft, and more.
 
 </details>
 <details open><summary>
@@ -852,7 +865,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 </summary>
 
-+ Highlight Jerries during the Jerrypoclaypse. - Erymanthus
++ Highlight Jerries during the Jerrypocalypse. - Erymanthus
 + Show waypoints for Baskets of the Halloween Event in the main Hypixel lobby. - Erymanthus
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
@@ -918,6 +931,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Mark duplicate egg locations in red for unlocking some of the new rabbits. - appable (https://github.com/hannibal002/SkyHanni/pull/1929)
     + Option to always mark nearby duplicate egg locations.
 + Show total amount of chocolate spent in the Chocolate Shop. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/1921)
++ Stray/golden chocolate rabbit production time. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/1978)
++ Display missing egg collection locations. - nea (https://github.com/hannibal002/SkyHanni/pull/1997)
+    + Tracks the unique egg location requirements for rabbits from your Hoppity collection.
+    + This data is partially enriched using the duplicate egg location tracker.
++ Rabbit Pet Warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2087)
+    + Warns when using the Egglocator without having a Mythic Rabbit Pet selected.
 
 </details>
 <details open><summary>
@@ -1170,6 +1189,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
     + A new secret method to get more SkyHanni User Luck from Limbo.
++ Added SkyHanni User Luck to the stats breakdown. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1288)
+    + This can be viewed in /sbmenu, /equipment, and the Misc Stats submenu.
 + Command `/shlimbostats` for a simple way to view your Limbo stats. -
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Support for `/playtime` and  `/pt` while in Limbo.
@@ -1211,6 +1232,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
 + In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
++ Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)
++ Added Hide Useless Armor Stands. - Empa (https://github.com/hannibal002/SkyHanni/pull/1962)
+    + Hides armor stands that briefly appear on Hypixel.
++ **Custom Wardrobe**, a new look for the wardrobe. - j10an15, Empa (https://github.com/hannibal002/SkyHanni/pull/2039)
+    + Highly customizable: Colors, display sizes.
+    + Estimated Price Integration.
+    + Favorite slots; option to only display favorite slots.
++ Added a Chat Message if the Perkapocalypse Mayor is unknown. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2009)
++ Added a source download verification checker. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1914)
+    + Warns you when the mod has been downloaded from an untrusted source (not the official GitHub or Modrinth).
 
 </details>
 <details open><summary>

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,6 +26,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ChocolateFactoryAPI {
 
     val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
@@ -34,11 +35,11 @@ object ChocolateFactoryAPI {
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
-        "(?<amount>[\\d,]+) Chocolate"
+        "(?<amount>[\\d,]+) Chocolate",
     )
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
-        "Hoppity|Chocolate Factory Milestones"
+        "Hoppity|Chocolate Factory Milestones",
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -77,27 +78,29 @@ object ChocolateFactoryAPI {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
-            chocolateFactoryPaused = true
-            ChocolateFactoryStats.updateDisplay()
+            if (config.enabled) {
+                chocolateFactoryPaused = true
+                ChocolateFactoryStats.updateDisplay()
+            }
             return
         }
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
-        factoryUpgrades = emptyList()
-        DelayedRun.runNextTick {
-            ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+        if (config.enabled) {
+            factoryUpgrades = emptyList()
+            DelayedRun.runNextTick {
+                ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+            }
         }
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
-
-        HoppityEggLocator.eggLocations = data.eggLocations
 
         rabbitSlots = data.rabbitSlots
         otherUpgradeSlots = data.otherUpgradeSlots
@@ -152,6 +155,7 @@ object ChocolateFactoryAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
+    // TODO add debug toggle
     fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige

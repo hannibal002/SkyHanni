@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object CruxTalismanDisplay {
 
     private val config get() = RiftAPI.config.cruxTalisman
@@ -60,21 +62,21 @@ object CruxTalismanDisplay {
         if (displayLine.isNotEmpty()) {
             addAsSingletonList("§7Crux Talisman Progress: ${if (maxed) "§a§lMAXED!" else "§a$percentValue%"}")
             if (!maxed) {
-                displayLine.forEach {
+                for (line in displayLine) {
                     percent += if (config.compactWhenMaxed) {
-                        if (!it.maxed) {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)
+                        if (!line.maxed) {
+                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)
                                 ?.toInt() ?: 0
                         } else 100
                     } else {
-                        if (it.progress.contains("MAXED"))
+                        if (line.progress.contains("MAXED"))
                             100
                         else {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(it.progress.removeColor())?.groupValues?.get(1)
+                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)
                                 ?.toInt() ?: 0
                         }
                     }
-                    addAsSingletonList("  ${it.tier} ${it.name}: ${it.progress}")
+                    addAsSingletonList("  ${line.tier} ${line.name}: ${line.progress}")
                 }
             }
         }

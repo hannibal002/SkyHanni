@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 
@@ -17,15 +18,15 @@ import java.util.List;
 public class MixinItemStack implements ItemStackCachedData {
 
     @Unique
-    public CachedItemData skyhanni_cachedData = new CachedItemData();
+    public CachedItemData skyhanni_cachedData = new CachedItemData((Void) null);
 
     public CachedItemData getSkyhanni_cachedData() {
         return skyhanni_cachedData;
     }
 
-    @Inject(method = "getTooltip", at = @At("RETURN"))
-    public void getTooltip(EntityPlayer playerIn, boolean advanced, CallbackInfoReturnable<List<String>> ci) {
+    @Inject(method = "getTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/event/ForgeEventFactory;onItemTooltip(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/EntityPlayer;Ljava/util/List;Z)Lnet/minecraftforge/event/entity/player/ItemTooltipEvent;", shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD)
+    public void getTooltip(EntityPlayer playerIn, boolean advanced, CallbackInfoReturnable<List<String>> cir, List<String> list) {
         ItemStack stack = (ItemStack) (Object) this;
-        ToolTipData.onHover(stack, ci.getReturnValue());
+        ToolTipData.onHover(stack, list);
     }
 }

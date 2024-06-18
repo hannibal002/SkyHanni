@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -23,7 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class SlayerQuestWarning {
+@SkyHanniModule
+object SlayerQuestWarning {
 
     private val config get() = SkyHanniMod.feature.slayer
 
@@ -40,9 +42,9 @@ class SlayerQuestWarning {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        val slayerType = event.newList.nextAfter("Slayer Quest")
-        val slayerProgress = event.newList.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        val slayerType = event.scoreboard.nextAfter("Slayer Quest")
+        val slayerProgress = event.scoreboard.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
