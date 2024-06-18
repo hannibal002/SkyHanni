@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe;
 
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeManager;
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeReset;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ColorConfig {
+
+    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
+    @ConfigEditorButton(buttonText = "Reset")
+    public Runnable resetColor = CustomWardrobeReset::resetWardrobeColor;
 
     @Expose
     @ConfigOption(name = "Background", desc = "Color of the GUI background.")
@@ -42,8 +46,4 @@ public class ColorConfig {
     @ConfigOption(name = "Bottom Outline", desc = "Color of the bottom of the outline when hovered.")
     @ConfigEditorColour
     public String bottomBorderColor = "0:255:255:0:0";
-
-    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
-    @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetColor = WardrobeManager::resetWardrobeColor;
 }

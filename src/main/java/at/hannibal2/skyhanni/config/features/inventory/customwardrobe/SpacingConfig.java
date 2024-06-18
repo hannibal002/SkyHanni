@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe;
 
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeManager;
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeReset;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -8,6 +8,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class SpacingConfig {
+
+    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe spacing settings to the default.")
+    @ConfigEditorButton(buttonText = "Reset")
+    public Runnable resetSpacing = CustomWardrobeReset::resetWardrobeSpacing;
 
     @Expose
     @ConfigOption(name = "Global Scale", desc = "Control the scale of the entirety of the wardrobe.")
@@ -143,8 +147,4 @@ public class SpacingConfig {
         minStep = 1
     )
     public Property<Integer> backgroundPadding = Property.of(10);
-
-    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe spacing settings to the default.")
-    @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetSpacing = WardrobeManager::resetWardrobeSpacing;
 }
