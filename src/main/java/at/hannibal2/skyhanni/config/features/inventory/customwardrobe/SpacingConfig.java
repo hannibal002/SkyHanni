@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe;
 
-import at.hannibal2.skyhanni.features.chroma.ChromaManager;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeManager;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
