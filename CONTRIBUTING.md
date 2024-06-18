@@ -90,6 +90,7 @@ for more information and usages.
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
   the main thread.
+- When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move(), when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L241).
 
 ## Software Used in SkyHanni
 
