@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.26.Beta.6"
+version = "0.26.Beta.12"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -133,10 +133,6 @@ dependencies {
     implementation("net.hypixel:mod-api:0.3.1")
 }
 
-ksp {
-    arg("symbolProcessor", "at.hannibal2.skyhanni.loadmodule.LoadModuleProvider")
-}
-
 configurations.getByName("minecraftNamed").dependencies.forEach {
     shot.applyTo(it as HasConfigurableAttributes<*>)
 }
@@ -171,7 +167,7 @@ loom {
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
@@ -239,7 +235,7 @@ tasks.withType(Jar::class) {
         this["ForceLoadAsMod"] = "true"
         this["Main-Class"] = "SkyHanniInstallerFrame"
 
-        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
+        this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
 }

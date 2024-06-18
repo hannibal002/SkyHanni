@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
@@ -45,7 +46,8 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
-class CustomScoreboard {
+@SkyHanniModule
+object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
@@ -67,7 +69,7 @@ class CustomScoreboard {
         config.position.renderStringsAlignedWidth(
             render,
             posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10
+            extraSpace = displayConfig.lineSpacing - 10,
         )
     }
 
@@ -102,18 +104,16 @@ class CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    companion object {
-        internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-        internal val displayConfig get() = config.display
-        internal val alignmentConfig get() = displayConfig.alignment
-        internal val arrowConfig get() = displayConfig.arrow
-        internal val eventsConfig get() = displayConfig.events
-        internal val mayorConfig get() = displayConfig.mayor
-        internal val partyConfig get() = displayConfig.party
-        internal val maxwellConfig get() = displayConfig.maxwell
-        internal val informationFilteringConfig get() = config.informationFiltering
-        internal val backgroundConfig get() = config.background
-    }
+    internal val config get() = SkyHanniMod.feature.gui.customScoreboard
+    internal val displayConfig get() = config.display
+    internal val alignmentConfig get() = displayConfig.alignment
+    internal val arrowConfig get() = displayConfig.arrow
+    internal val eventsConfig get() = displayConfig.events
+    internal val mayorConfig get() = displayConfig.mayor
+    internal val partyConfig get() = displayConfig.party
+    internal val maxwellConfig get() = displayConfig.maxwell
+    internal val informationFilteringConfig get() = config.informationFiltering
+    internal val backgroundConfig get() = config.background
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
@@ -193,7 +193,7 @@ class CustomScoreboard {
                     add(
                         "${element.name.firstLetterUppercase()} - " +
                             "${element.showWhen.invoke()} - " +
-                            "${element.getVisiblePair().map { it.first }}"
+                            "${element.getVisiblePair().map { it.first }}",
                     )
                 }
             }
@@ -212,7 +212,7 @@ class CustomScoreboard {
         event.move(
             28,
             "$prefix.displayConfig.showAllActiveEvents",
-            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents",
         )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
@@ -229,7 +229,7 @@ class CustomScoreboard {
         event.move(
             31,
             "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
-            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+            "$displayPrefix.cacheScoreboardOnIslandSwitch",
         )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
@@ -269,7 +269,7 @@ class CustomScoreboard {
                     HorizontalAlignment.RIGHT.name
                 } else {
                     HorizontalAlignment.DONT_ALIGN.name
-                }
+                },
             )
         }
         event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
@@ -278,8 +278,19 @@ class CustomScoreboard {
                     VerticalAlignment.CENTER.name
                 } else {
                     VerticalAlignment.DONT_ALIGN.name
-                }
+                },
             )
+        }
+        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
+            array.add(JsonPrimitive(ScoreboardEvents.CARNIVAL.name))
+            array
+        }
+        event.transform(51, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.NEW_YEAR.name))
+            array
         }
     }
 }
