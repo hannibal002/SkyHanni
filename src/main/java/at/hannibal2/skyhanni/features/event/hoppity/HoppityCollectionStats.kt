@@ -41,11 +41,11 @@ object HoppityCollectionStats {
     private val patternGroup = ChocolateFactoryAPI.patternGroup.group("collection")
     private val pagePattern by patternGroup.pattern(
         "page.current",
-        "\\((?<page>\\d+)/(?<maxPage>\\d+)\\) Hoppity's Collection"
+        "\\((?<page>\\d+)/(?<maxPage>\\d+)\\) Hoppity's Collection",
     )
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
-        "§7Duplicates Found: §a(?<duplicates>[\\d,]+)"
+        "§7Duplicates Found: §a(?<duplicates>[\\d,]+)",
     )
 
     /**
@@ -54,12 +54,12 @@ object HoppityCollectionStats {
      */
     private val rabbitNotFoundPattern by patternGroup.pattern(
         "rabbit.notfound",
-        "(?:§.)+You (?:have not found this rabbit yet!|cannot find this rabbit until you)"
+        "(?:§.)+You (?:have not found this rabbit yet!|cannot find this rabbit until you)",
     )
 
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
-        "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)"
+        "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)",
     )
 
     /**
@@ -67,7 +67,7 @@ object HoppityCollectionStats {
      */
     private val requirementMet by patternGroup.pattern(
         "rabbit.requirement.met",
-        "§a✔ §7Requirement"
+        "§a✔ §7Requirement",
     )
 
     /**
@@ -95,7 +95,7 @@ object HoppityCollectionStats {
      */
     private val locationRequirementDescription by patternGroup.pattern(
         "rabbit.requirement.location",
-        "Find 15 unique egg locations in (the )?(?<location>.*)\\..*"
+        "Find 15 unique egg locations in (the )?(?<location>.*)\\..*",
     )
 
     private var display = emptyList<Renderable>()
@@ -148,7 +148,7 @@ object HoppityCollectionStats {
         config.hoppityStatsPosition.renderRenderables(
             display,
             extraSpace = 5,
-            posLabel = "Hoppity's Collection Stats"
+            posLabel = "Hoppity's Collection Stats",
         )
     }
 
@@ -162,8 +162,13 @@ object HoppityCollectionStats {
             val lore = slot.stack.getLore()
             if (lore.any { requirementMet.find(it) } && !config.onlyHighlightRequirementNotMet)
                 slot highlight LorenzColor.GREEN
-            if (lore.any { requirementNotMet.find(it) })
-                slot highlight LorenzColor.RED
+            if (lore.any { requirementNotMet.find(it) }) {
+                val found = !rabbitNotFoundPattern.anyMatches(lore)
+                // Hypixel allows purchasing Rabbits from Hoppity NPC even when the requirement is not yet met.
+                if (!found) {
+                    slot highlight LorenzColor.RED
+                }
+            }
         }
     }
 
@@ -176,17 +181,21 @@ object HoppityCollectionStats {
                 it.value.foundCount + "§7/§a" + it.value.requiredCount
         }
 
-        newList.add(Renderable.hoverTips(
-            if (missingLocationRabbits.isEmpty())
-                Renderable.wrappedString("§aFound enough eggs in all locations", width = 200)
-            else
-                Renderable.wrappedString(
-                    "§cMissing Locations§7:§c " +
-                        missingLocationRabbits.joinToString("§7, §c") {
-                        it.locationName
-                    }, width = 200),
-            tips
-        ))
+        newList.add(
+            Renderable.hoverTips(
+                if (missingLocationRabbits.isEmpty()) {
+                    Renderable.wrappedString("§aFound enough eggs in all locations", width = 200)
+                } else {
+                    Renderable.wrappedString(
+                        "§cMissing Locations§7:§c " + missingLocationRabbits.joinToString("§7, §c") {
+                            it.locationName
+                        },
+                        width = 200,
+                    )
+                },
+                tips,
+            ),
+        )
     }
 
     private fun buildDisplay(event: InventoryFullyOpenedEvent): MutableList<Renderable> {
@@ -205,10 +214,9 @@ object HoppityCollectionStats {
             newList.add(Renderable.string(""))
             newList.add(
                 Renderable.wrappedString(
-                    "§cPlease Scroll through \n" +
-                        "§call pages!",
+                    "§cPlease Scroll through \n" + "§call pages!",
                     width = 200,
-                )
+                ),
             )
         }
         return newList
@@ -276,8 +284,8 @@ object HoppityCollectionStats {
                     "§a$displayFound§7/§a$displayTotal",
                     displayTotal.toDouble(),
                     rarity.item,
-                    hover
-                )
+                    hover,
+                ),
             )
         }
         return table
