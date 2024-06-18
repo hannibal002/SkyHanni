@@ -13,7 +13,7 @@ import org.lwjgl.input.Keyboard;
 
 public class EstimatedItemValueConfig {
     @Expose
-    @ConfigOption(name = "Enable Estimated Price", desc = "Displays an Estimated Item Value for the item you hover over.")
+    @ConfigOption(name = "Enable Estimated Price", desc = "Display an Estimated Item Value for the item you hover over.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
