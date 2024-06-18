@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.NEW_YEAR
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
@@ -74,7 +75,7 @@ enum class ScoreboardEvents(
     DOJO(
         ::getDojoLines,
         ::getDojoShowWhen,
-        "§7(All Dojo Lines)"
+        "§7(All Dojo Lines)",
     ),
     DARK_AUCTION(
         ::getDarkAuctionLines,
@@ -95,7 +96,7 @@ enum class ScoreboardEvents(
         ::getJacobMedalsShowWhen,
         "§6§lGOLD §fmedals: §613\n" +
             "§f§lSILVER §fmedals: §f3\n" +
-            "§c§lBRONZE §fmedals: §c4"
+            "§c§lBRONZE §fmedals: §c4",
     ),
     TRAPPER(
         ::getTrapperLines,
@@ -117,12 +118,17 @@ enum class ScoreboardEvents(
     FLIGHT_DURATION(
         ::getFlightDurationLines,
         ::getFlightDurationShowWhen,
-        "Flight Duration: §a10m 0s"
+        "Flight Duration: §a10m 0s",
     ),
     WINTER(
         ::getWinterLines,
         { WinterAPI.inWorkshop() },
         "§7(All Winter Event Lines)",
+    ),
+    NEW_YEAR(
+        ::getNewYearLines,
+        ::getNewYearShowWhen,
+        "§dNew Year Event!§f 24:25",
     ),
     SPOOKY(
         ::getSpookyLines,
@@ -139,7 +145,7 @@ enum class ScoreboardEvents(
     MINING_EVENTS(
         ::getMiningEventsLines,
         { inAdvancedMiningIsland() },
-        "§7(All Mining Event Lines)"
+        "§7(All Mining Event Lines)",
     ),
     DAMAGE(
         ::getDamageLines,
@@ -153,12 +159,12 @@ enum class ScoreboardEvents(
         "§7(All Magma Boss Lines)\n" +
             "§7Boss: §c0%\n" +
             "§7Damage Soaked:\n" +
-            "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
+            "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎",
     ),
     CARNIVAL(
         ::getCarnivalLines,
         ::getCarnivalShowWhen,
-        "§7(All Carnival Lines)"
+        "§7(All Carnival Lines)",
     ),
     RIFT(
         ::getRiftLines,
@@ -179,7 +185,7 @@ enum class ScoreboardEvents(
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
         ::getActiveEventShowWhen,
-        "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h"
+        "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h",
     ),
     STARTING_SOON_TABLIST_EVENTS(
         ::getSoonEventLine,
@@ -230,6 +236,7 @@ enum class ScoreboardEvents(
             GARDEN_CLEAN_UP,
             GARDEN_PASTING,
             FLIGHT_DURATION,
+            NEW_YEAR,
             WINTER,
             SPOOKY,
             BROODMOTHER,
@@ -239,7 +246,7 @@ enum class ScoreboardEvents(
             CARNIVAL,
             RIFT,
             ESSENCE,
-            ACTIVE_TABLIST_EVENTS
+            ACTIVE_TABLIST_EVENTS,
         )
     }
 }
@@ -273,7 +280,7 @@ private fun getDungeonsLines() = listOf(
     SbPattern.clearedPattern,
     SbPattern.soloPattern,
     SbPattern.teammatesPattern,
-    SbPattern.floor3GuardiansPattern
+    SbPattern.floor3GuardiansPattern,
 ).allMatches(getSbLines()).map { it.removePrefix("§r") }
 
 private fun getKuudraLines() = listOf(
@@ -283,14 +290,14 @@ private fun getKuudraLines() = listOf(
     SbPattern.instanceShutdownPattern,
     SbPattern.wavePattern,
     SbPattern.tokensPattern,
-    SbPattern.submergesPattern
+    SbPattern.submergesPattern,
 ).allMatches(getSbLines())
 
 private fun getDojoLines() = listOf(
     SbPattern.dojoChallengePattern,
     SbPattern.dojoDifficultyPattern,
     SbPattern.dojoPointsPattern,
-    SbPattern.dojoTimePattern
+    SbPattern.dojoTimePattern,
 ).allMatches(getSbLines())
 
 private fun getDojoShowWhen(): Boolean = IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Dojo"
@@ -342,6 +349,10 @@ private fun getWinterLines() = listOf(
     SbPattern.winterCubeDmgPattern,
 ).allMatches(getSbLines()).filter { !it.endsWith("Soon!") }
 
+private fun getNewYearLines() = listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
+
+private fun getNewYearShowWhen(): Boolean = SbPattern.newYearPattern.anyMatches(getSbLines())
+
 private fun getSpookyLines() = buildList {
     SbPattern.spookyPattern.firstMatches(getSbLines())?.let {
         // Time
@@ -352,7 +363,7 @@ private fun getSpookyLines() = buildList {
                 .removeResets()
                 .split("\n")
                 .firstOrNull { it.startsWith("§7Your Candy:") }
-                ?.removePrefix("§7Your Candy:") ?: "§cCandy not found"
+                ?.removePrefix("§7Your Candy:") ?: "§cCandy not found",
         ) // Candy
     }
 }
@@ -368,7 +379,7 @@ private fun getActiveEventLine(): List<String> {
 
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
-    val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary")
+    val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return listOf()
     val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabListData.getTabList()) {
         group("time")
