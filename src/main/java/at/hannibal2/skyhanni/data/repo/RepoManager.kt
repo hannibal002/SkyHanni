@@ -128,7 +128,7 @@ class RepoManager(private val configLocation: File) {
                     urlConnection.getInputStream().use { `is` ->
                         FileUtils.copyInputStreamToFile(
                             `is`,
-                            itemsZip
+                            itemsZip,
                         )
                     }
                 } catch (e: IOException) {
@@ -142,7 +142,7 @@ class RepoManager(private val configLocation: File) {
                 }
                 RepoUtils.unzipIgnoreFirstFolder(
                     itemsZip.absolutePath,
-                    repoLocation.absolutePath
+                    repoLocation.absolutePath,
                 )
                 if (currentCommitJSON == null || currentCommitJSON["sha"].asString != latestRepoCommit) {
                     val newCurrentCommitJSON = JsonObject()
@@ -190,7 +190,7 @@ class RepoManager(private val configLocation: File) {
                     onClick = {
                         SkyHanniMod.repo.updateRepo()
                     },
-                    prefixColor = "§c"
+                    prefixColor = "§c",
                 )
                 if (unsuccessfulConstants.isEmpty()) {
                     unsuccessfulConstants.add("All Constants")
@@ -228,7 +228,10 @@ class RepoManager(private val configLocation: File) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
                 val text = mutableListOf<IChatComponent>()
-                text.add("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. Please report this error on the Discord!".asComponent())
+                text.add(
+                    ("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                        "Please report this error on the Discord!").asComponent(),
+                )
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
                 text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
@@ -247,7 +250,7 @@ class RepoManager(private val configLocation: File) {
         ChatUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
-            prefixColor = "§a"
+            prefixColor = "§a",
         )
         for (constant in successfulConstants) {
             ChatUtils.chat("   §a- §7$constant", false)
@@ -266,8 +269,8 @@ class RepoManager(private val configLocation: File) {
             BufferedReader(
                 InputStreamReader(
                     FileInputStream(file),
-                    StandardCharsets.UTF_8
-                )
+                    StandardCharsets.UTF_8,
+                ),
             ).use { reader ->
                 return gson.fromJson(reader, JsonObject::class.java)
             }
@@ -295,8 +298,8 @@ class RepoManager(private val configLocation: File) {
         BufferedWriter(
             OutputStreamWriter(
                 FileOutputStream(file),
-                StandardCharsets.UTF_8
-            )
+                StandardCharsets.UTF_8,
+            ),
         ).use { writer -> writer.write(gson.toJson(json)) }
     }
 
@@ -322,11 +325,13 @@ class RepoManager(private val configLocation: File) {
             name = defaultName
             branch = defaultBranch
             if (manual) {
-                ChatUtils.clickableChat("Reset Repo settings to default. " +
-                    "Click §aUpdate Repo Now §ein config or run /shupdaterepo to update!",
+                ChatUtils.clickableChat(
+                    "Reset Repo settings to default. " +
+                        "Click §aUpdate Repo Now §ein config or run /shupdaterepo to update!",
                     onClick = {
                         updateRepo()
-                    })
+                    },
+                )
             }
         }
     }
