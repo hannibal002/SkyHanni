@@ -56,16 +56,14 @@ object TestChatCommand {
         val event = LorenzChatEvent(message, componentText)
         event.postAndCatch()
 
+        if (isHidden) return
+
         if (event.blockedReason != "") {
-            if (!isHidden) {
-                ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
-            }
+            ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
         } else {
             val finalMessage = event.chatComponent
             if (finalMessage.formattedText.stripHypixelMessage() != message) {
-                if (!isHidden) {
-                    ChatUtils.chat("§eChat modified!")
-                }
+                ChatUtils.chat("§eChat modified!")
             }
             ChatUtils.chat(finalMessage)
         }

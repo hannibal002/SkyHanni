@@ -96,7 +96,7 @@ object DefaultConfigFeatures {
         resetSuggestionState: MutableMap<Category, ResetSuggestionState>,
         orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     ) {
-        orderedOptions.forEach { (cat, options) ->
+        for ((cat, options) in orderedOptions) {
             for (option in options) {
                 val resetState = option.toggleOverride ?: resetSuggestionState[cat]!!
                 if (resetState == ResetSuggestionState.LEAVE_DEFAULTS) continue
