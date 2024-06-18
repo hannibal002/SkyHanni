@@ -89,9 +89,13 @@ object ChatFilter {
     )
 
     // Kill Combo
+    // To note: there is an intentional space left after the "50" kill combo test case,
+    // as said space is evidently present for 50, but no further values in the chain.
     private val killComboPatterns = listOf(
         //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
-        "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
+        //"§6§l+50 Kill Combo "
+        //§6§l+75 Kill Combo
+        "§.§l\\+(.*) Kill Combo(.*)".toPattern(),
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern()
     )
     private val killComboMessages = listOf(
