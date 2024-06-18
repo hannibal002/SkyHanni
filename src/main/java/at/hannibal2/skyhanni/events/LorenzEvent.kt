@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.mixins.transformers.AccessorEventBus
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
@@ -64,8 +64,8 @@ abstract class LorenzEvent : Event() {
             val hiddenErrors = errors - visibleErrors
             ChatUtils.chat(
                 Text.text(
-                    "§c[SkyHanni-${SkyHanniMod.version}] $hiddenErrors more errors in $eventName are hidden!"
-                )
+                    "§c[SkyHanni-${SkyHanniMod.version}] $hiddenErrors more errors in $eventName are hidden!",
+                ),
             )
         }
         return if (isCancelable) isCanceled else false
