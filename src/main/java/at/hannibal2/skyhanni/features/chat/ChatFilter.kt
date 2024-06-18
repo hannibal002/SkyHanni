@@ -95,7 +95,8 @@ object ChatFilter {
         //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
         //"§6§l+50 Kill Combo "
         //§6§l+75 Kill Combo
-        "§.§l\\+(.*) Kill Combo(.*)".toPattern(),
+        "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
+        "§.§l\\+(.*) Kill Combo$".toPattern(),
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern()
     )
     private val killComboMessages = listOf(
