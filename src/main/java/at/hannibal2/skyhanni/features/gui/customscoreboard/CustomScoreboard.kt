@@ -72,7 +72,7 @@ object CustomScoreboard {
             render.map { Renderable.string(it.first, horizontalAlign = it.second) },
             0,
             horizontalAlign = HorizontalAlignment.CENTER,
-            verticalAlign = VerticalAlignment.CENTER
+            verticalAlign = VerticalAlignment.CENTER,
         )
 
         val finalRenderable = RenderBackground.addBackground(textRenderable)

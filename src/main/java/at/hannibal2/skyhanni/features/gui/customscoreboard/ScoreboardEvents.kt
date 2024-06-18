@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.NEW_YEAR
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
@@ -314,9 +313,11 @@ private fun getDarkAuctionLines() = buildList {
 private fun getJacobContestLines() = buildList {
     SbPattern.jacobsContestPattern.firstMatches(getSbLines())?.let { line ->
         add(line)
-        addAll(getSbLines().sublistAfter(line, 3).filter {
-            !SbPattern.footerPattern.matches(it)
-        })
+        addAll(
+            getSbLines().sublistAfter(line, 3).filter {
+                !SbPattern.footerPattern.matches(it)
+            },
+        )
     }
 }
 
@@ -429,16 +430,16 @@ private fun getMiningEventsLines() = buildList {
     addAll(
         listOf(
             SbPattern.mithrilRemainingPattern,
-            SbPattern.mithrilYourMithrilPattern
-        ).allMatches(getSbLines())
+            SbPattern.mithrilYourMithrilPattern,
+        ).allMatches(getSbLines()),
     )
 
     // Raffle
     addAll(
         listOf(
             SbPattern.raffleTicketsPattern,
-            SbPattern.rafflePoolPattern
-        ).allMatches(getSbLines())
+            SbPattern.rafflePoolPattern,
+        ).allMatches(getSbLines()),
     )
 
     // Raid
@@ -446,7 +447,7 @@ private fun getMiningEventsLines() = buildList {
         listOf(
             SbPattern.yourGoblinKillsPattern,
             SbPattern.remainingGoblinPattern,
-        ).allMatches(getSbLines())
+        ).allMatches(getSbLines()),
     )
 
     // Fortunate Freezing
@@ -468,7 +469,7 @@ private fun getMagmaBossLines() = listOf(
     SbPattern.killMagmasDamagedSoakedBarPattern,
     SbPattern.reformingPattern,
     SbPattern.bossHealthPattern,
-    SbPattern.bossHealthBarPattern
+    SbPattern.bossHealthBarPattern,
 ).allMatches(getSbLines())
 
 private fun getMagmaBossShowWhen(): Boolean = inAnyIsland(IslandType.CRIMSON_ISLE) &&
@@ -498,14 +499,14 @@ private fun getRiftLines() = listOf(
     SbPattern.riftHotdogEatenPattern,
     SbPattern.riftAveikxPattern,
     SbPattern.riftHayEatenPattern,
-    SbPattern.cluesPattern
+    SbPattern.cluesPattern,
 ).allMatches(getSbLines())
 
 private fun getEssenceLines() = listOfNotNull(SbPattern.essencePattern.firstMatches(getSbLines()))
 
 private fun getQueueLines(): List<String> = listOf(
     SbPattern.queuePattern,
-    SbPattern.queuePositionPattern
+    SbPattern.queuePositionPattern,
 ).allMatches(getSbLines())
 
 private fun getRedstoneLines() = listOfNotNull(SbPattern.redstonePattern.firstMatches(getSbLines()))
