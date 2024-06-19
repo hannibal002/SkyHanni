@@ -7,8 +7,6 @@ import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.EnumChatFormatting.GREEN
-import net.minecraft.util.EnumChatFormatting.RED
 import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
@@ -42,7 +40,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
             TextRenderUtils.drawStringCenteredScaledMaxWidth(
-                "${GREEN}The update will be installed after your next restart.",
+                "§aThe update will be installed after your next restart.",
                 fr,
                 widthRemaining / 2F,
                 40F,
@@ -55,7 +53,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         GlStateManager.scale(2F, 2F, 1F)
         val sameVersion = currentVersion.equals(nextVersion, true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" + if (nextVersion != null && !sameVersion) "➜ ${GREEN}${nextVersion}" else "",
+            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" + if (nextVersion != null && !sameVersion) "➜ §a${nextVersion}" else "",
             fr,
             widthRemaining / 4F,
             10F,
