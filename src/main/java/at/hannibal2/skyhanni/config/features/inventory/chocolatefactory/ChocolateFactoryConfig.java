@@ -216,4 +216,9 @@ public class ChocolateFactoryConfig {
     @Accordion
     public ChocolateFactoryCustomReminderConfig customReminder = new ChocolateFactoryCustomReminderConfig();
 
+    @Expose
+    @ConfigOption(name = "Mythic Rabbit", desc = "Blocks running /cf without a mythic rabbit pet equipped.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean mythicRabbitRequirement = false;
 }
