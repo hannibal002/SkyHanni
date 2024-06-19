@@ -89,9 +89,15 @@ object ChangelogViewer {
 
         override fun toString(): String {
             return if (isBeta) {
-                "$first" + if (second == -1) " Beta" else ".$second" + if (third == -1) " Beta" else " Beta $third" + if (fourth == -1) "" else ".$fourth"
+                "$first" +
+                    if (second == -1) " Beta" else ".$second" +
+                        if (third == -1) " Beta" else " Beta $third" +
+                            if (fourth == -1) "" else ".$fourth"
             } else {
-                "$first" + if (second == -1) "" else ".$second" + if (third == -1) "" else ".$third" + if (fourth == -1) "" else ".$fourth"
+                "$first" +
+                    if (second == -1) "" else ".$second" +
+                        if (third == -1) "" else ".$third" +
+                            if (fourth == -1) "" else ".$fourth"
             }
         }
 
@@ -161,7 +167,9 @@ object ChangelogViewer {
                                 headline++
                             }
                             headline
-                        }.mapKeys { it.value.firstOrNull() ?: "" }.toMutableMap().also {// Change §a to §c if in removed
+                        }
+                        // Change §a to §c if in removed
+                        .mapKeys { it.value.firstOrNull() ?: "" }.toMutableMap().also {
                             val key = "§l§9Removed Features"
                             val subgroup = it[key] ?: return@also
                             it[key] = subgroup.map {
@@ -178,7 +186,10 @@ object ChangelogViewer {
     fun handelCommand(args: Array<String>) {
         when (args.size) {
             0 -> UpdateManager.getNextVersion()?.let { showChangelog(SkyHanniMod.version, it) }
-                ?: ChatUtils.userError("You are up to date, if you want to look at past change logs use the command with arguments. Usage: [version you want to look at] [your version]")
+                ?: ChatUtils.userError(
+                    "You are up to date, if you want to look at past change logs use the command " +
+                        "with arguments. Usage: [version you want to look at] [your version]"
+                )
 
             1 -> {
                 val tag = args[0].toVersionTag()
@@ -208,7 +219,10 @@ object ChangelogViewer {
                 showChangelog(current, target)
             }
 
-            else -> ChatUtils.userError("Invalid amount of arguments. Usage: [version you want to look at] [your version]")
+            else -> ChatUtils.userError(
+                "Invalid amount of arguments. Usage: [version you want to look at] " +
+                    "[your version]"
+            )
         }
 
     }
