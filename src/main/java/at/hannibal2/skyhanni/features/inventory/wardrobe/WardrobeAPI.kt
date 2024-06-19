@@ -95,7 +95,7 @@ object WardrobeAPI {
         if (slot.isEmpty()) return@buildList
         add("§aEstimated Armor Value:")
         var totalPrice = 0.0
-        for (stack in slot.armor.filter { it?.getInternalNameOrNull() != null }.filterNotNull()) {
+        for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             val price = EstimatedItemValueCalculator.getTotalPrice(stack)
             add("  §7- ${stack.name}: §6${price.shortFormat()}")
             totalPrice += price
