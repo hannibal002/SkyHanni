@@ -53,7 +53,8 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         GlStateManager.scale(2F, 2F, 1F)
         val sameVersion = currentVersion.equals(nextVersion, true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" + if (nextVersion != null && !sameVersion) "➜ §a${nextVersion}" else "",
+            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
+                if (nextVersion != null && !sameVersion) "➜ §a${nextVersion}" else "",
             fr,
             widthRemaining / 4F,
             10F,
@@ -73,7 +74,10 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
         val width = width - 20
-        if (Mouse.getEventButtonState() && (mouseX - getButtonPosition(width) - x) in (0..button.width) && (mouseY - 10 - y) in (0..button.height)) {
+        if (Mouse.getEventButtonState() &&
+            (mouseX - getButtonPosition(width) - x) in (0..button.width) &&
+            (mouseY - 10 - y) in (0..button.height)
+        ) {
             when (UpdateManager.updateState) {
                 UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
                 UpdateManager.UpdateState.QUEUED -> {}
@@ -82,7 +86,10 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             }
             return true
         }
-        if (Mouse.getEventButtonState() && (mouseX - getChangelogPosition(width) - x) in (0..changelog.width) && (mouseY - 30 - y) in (0..changelog.height)) {
+        if (Mouse.getEventButtonState() &&
+            (mouseX - getChangelogPosition(width) - x) in (0..changelog.width) &&
+            (mouseY - 30 - y) in (0..changelog.height)
+        ) {
             if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
                 ChangelogViewer.showChangelog(currentVersion, UpdateManager.getNextVersion()!!)
             }
