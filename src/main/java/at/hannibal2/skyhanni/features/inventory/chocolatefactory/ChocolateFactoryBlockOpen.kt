@@ -29,7 +29,7 @@ object ChocolateFactoryBlockOpen {
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!isEnabled()) return
         if (!commandPattern.matches(event.message)) return
-        if (PetAPI.currentPet == "§dRabbit") return
+        if (PetAPI.currentPet?.startsWith("§dRabbit") == true) return
 
         event.cancel()
         ChatUtils.chat("Blocked opening the Chocolate Factory without a mythic §dRabbit §epet equipped.")
