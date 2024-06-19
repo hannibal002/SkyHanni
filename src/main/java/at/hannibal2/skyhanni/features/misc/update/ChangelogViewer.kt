@@ -6,50 +6,40 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.containsKey
+import at.hannibal2.skyhanni.utils.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
-import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.renderer.GlStateManager
 import java.util.NavigableMap
 import java.util.TreeMap
-import kotlin.time.Duration.Companion.minutes
 
 object ChangelogViewer {
 
     private var dispatcher = Dispatchers.IO
 
-    private val cache: NavigableMap<VersionTag, Map<String, List<String>>> = TreeMap()
+    internal val cache: NavigableMap<VersionTag, Map<String, List<String>>> = TreeMap()
 
-    private var openTime = SimpleTimeMark.farPast()
+    internal var openTime = SimpleTimeMark.farPast()
 
-    private lateinit var startVersion: VersionTag
-    private lateinit var endVersion: VersionTag
+    internal lateinit var startVersion: VersionTag
+    internal lateinit var endVersion: VersionTag
 
-    private var shouldMakeNewList = false
+    internal var shouldMakeNewList = false
 
-    private var shouldShowBeta = LorenzUtils.isBetaVersion()
-    private var showTechnicalDetails = false
+    internal var shouldShowBeta = LorenzUtils.isBetaVersion()
+    internal var showTechnicalDetails = false
 
-    private val primaryColor = LorenzColor.DARK_GRAY.toColor().addAlpha(218)
-    private val primary2Color = LorenzColor.DARK_GRAY.toColor().darker().withAlpha(220)
+    internal val primaryColor = LorenzColor.DARK_GRAY.toColor().addAlpha(218)
+    internal val primary2Color = LorenzColor.DARK_GRAY.toColor().darker().withAlpha(220)
 
     fun showChangelog(currentVersion: String, targetVersion: String) =
         showChangelog(currentVersion.toVersionTag(), targetVersion.toVersionTag())
@@ -69,148 +59,11 @@ object ChangelogViewer {
     }
 
     private fun openChangelog() {
-        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewer) SkyHanniMod.screenToOpen = ChangeLogViewer()
+        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen =
+            ChangeLogViewerScreen()
     }
 
-    class ChangeLogViewer : GuiScreen() {
-        private val changelogScroll = ScrollValue()
-
-        private lateinit var scrollList: Renderable
-        private var lastWidth: Int = 0
-        private var lastHeight: Int = 0
-
-        private val buttonPanel = Renderable.horizontalContainer(
-            listOf(
-                Renderable.rectButton(Renderable.string("Include Beta's"),
-                    activeColor = primaryColor,
-                    startState = shouldShowBeta,
-                    onClick = {
-                        shouldShowBeta = it
-                        shouldMakeNewList = true
-                    }), Renderable.rectButton(Renderable.string("Show Technical Details"),
-                    activeColor = primaryColor,
-                    startState = showTechnicalDetails,
-                    onClick = {
-                        showTechnicalDetails = it
-                        shouldMakeNewList = true
-                    })
-
-            ), 10, horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT
-        )
-
-        override fun onGuiClosed() {
-            super.onGuiClosed()
-            DelayedRun.runDelayed(30.0.minutes) {
-                if (openTime.passedSince() > 20.0.minutes) {
-                    cache.clear()
-                }
-            }
-        }
-
-        override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-            openTime = SimpleTimeMark.now()
-            super.drawScreen(mouseX, mouseY, partialTicks)
-            val width = 4 * this.width / 5
-            val height = 4 * this.height / 5
-            val xTranslate = this.width / 10
-            val yTranslate = this.height / 10
-            RenderUtils.drawRoundGradientRect(
-                xTranslate - 2, yTranslate - 2, width + 4, height + 4, primary2Color, primaryColor.rgb
-            )
-            GlStateManager.translate(xTranslate.toFloat(), yTranslate.toFloat(), 0f)
-            Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
-                if (!cache.containsKey(startVersion, endVersion)) {
-                    shouldMakeNewList = true
-                    Renderable.string(
-                        "§aStill Loading",
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER
-                    )
-                } else {
-                    if (shouldMakeNewList || lastWidth != width || lastHeight != height) {
-                        lastWidth = width
-                        lastHeight = height
-                        val changelogList = (cache.subMap(startVersion, false, endVersion, true)
-                            .takeIf { it.isNotEmpty() }
-                            ?: cache.subMap(startVersion, true, endVersion, true) // If startVersion == endVersion
-                            ).descendingMap()
-                        scrollList = makeScrollList(changelogList, width, height)
-                    }
-                    scrollList
-                }.renderXYAligned(0, 0, width, height)
-                GlStateManager.translate(0f, -buttonPanel.height - 5f, 0f)
-                buttonPanel.renderXAligned(0, -buttonPanel.height - 5, width)
-                Renderable.drawInsideRoundedRect(
-                    Renderable.string(
-                        "§9$startVersion §e➜ §9$endVersion",
-                    ),
-                    primaryColor,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
-                ).renderXAligned(0, -buttonPanel.height - 5, width)
-                GlStateManager.translate(0f, buttonPanel.height + 5f, 0f)
-            }
-            GlStateManager.translate(-xTranslate.toFloat(), -yTranslate.toFloat(), 0f)
-        }
-
-        private fun makeScrollList(
-            changelogList: NavigableMap<VersionTag, Map<String, List<String>>>,
-            width: Int,
-            height: Int,
-        ): Renderable = Renderable.scrollList(
-            changelogList.filter { shouldShowBeta || !it.key.isBeta }.map { (version, body) ->
-                listOf(
-                    Renderable.string(
-                        "§l§9Version $version", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                    )
-                ) + makeChangeLogToRenderable(body, width) + listOf(
-                    Renderable.placeholder(
-                        0, 15
-                    )
-                )
-            }.flatten().transformIf({ isEmpty() }, {
-                listOf(
-                    if (changelogList.isEmpty()) {
-                        Renderable.string(
-                            "§aNo changes found", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                        )
-                    } else if (!shouldShowBeta) {
-                        Renderable.string(
-                            "§aOnly Betas where added, turn on \"Include Beta's\"",
-                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                        )
-                    } else {
-                        ErrorManager.skyHanniError(
-                            "Idk how you ended up here",
-                            "changelog" to changelogList,
-                            "transformed" to this,
-                            "show beta" to shouldShowBeta
-                        )
-                    }
-                )
-            }),
-            height,
-            velocity = 12.0,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            scrollValue = changelogScroll,
-            button = 0
-        )
-    }
-
-    private fun makeChangeLogToRenderable(
-        it: Map<String, List<String>>,
-        width: Int,
-    ) = it.mapNotNull { (key, value) ->
-        if (!showTechnicalDetails && key == "§l§9Technical Details") {
-            return@mapNotNull null
-        }
-        value.map {
-            Renderable.wrappedString(
-                it, width
-            )
-        }
-    }.flatten()
-
-    private data class VersionTag(
+    internal data class VersionTag(
         val first: Int,
         val second: Int,
         val third: Int,
@@ -262,7 +115,7 @@ object ChangelogViewer {
     private fun getChangelog(currentVersion: VersionTag, targetVersion: VersionTag) {
         startVersion = currentVersion
         endVersion = targetVersion
-        if (cache.containsKey(startVersion, endVersion)) return
+        if (cache.containsKeys(startVersion, endVersion)) return
         SkyHanniMod.coroutineScope.launch {
             try {
                 val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
