@@ -89,13 +89,16 @@ object SummoningMobManager {
 
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.Summon) {
+        // since MobEvent.DeSpawn can be fired while outside sb
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.summonMessages) return
         val mob = event.mob
         if (mob !in mobs) return
         mobs -= mob
 
         if (!mob.isInRender()) return
         DelayedRun.runNextTick {
-            if (lastChatTime.passedSince() > timeOut && config.summonMessages) {
+            if (lastChatTime.passedSince() > timeOut) {
                 ChatUtils.chat("Your Summoning Mob just §cdied!")
             }
         }
