@@ -89,7 +89,7 @@ object SummoningMobManager {
 
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.Summon) {
-        if (!config.summonMessages) return;
+        if (!config.summonMessages) return
 
         val mob = event.mob
         if (mob !in mobs) return
