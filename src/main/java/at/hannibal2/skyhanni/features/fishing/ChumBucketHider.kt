@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,7 +15,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class ChumBucketHider {
+@SkyHanniModule
+object ChumBucketHider {
 
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
     private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
@@ -34,7 +36,7 @@ class ChumBucketHider {
         if (entity !is EntityArmorStand) return
 
         if (entity in hiddenEntities) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
@@ -45,7 +47,7 @@ class ChumBucketHider {
             if (name.contains(LorenzUtils.getPlayerName()) && !config.hideOwn.get()) return
             titleEntity.add(entity)
             hiddenEntities.add(entity)
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
@@ -55,7 +57,7 @@ class ChumBucketHider {
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
-                    event.isCanceled = true
+                    event.cancel()
                     return
                 }
             }
@@ -67,7 +69,7 @@ class ChumBucketHider {
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
-                    event.isCanceled = true
+                    event.cancel()
                     return
                 }
             }

@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -61,6 +62,10 @@ public class DevConfig {
     public Position debugItemPos = new Position(90, 70);
 
     @Expose
+    @ConfigLink(owner = DebugConfig.class, field = "raytracedOreblock")
+    public Position debugOrePos = new Position(1, 200, false, true);
+
+    @Expose
     @ConfigOption(
         name = "Fancy Contributors",
         desc = "Marks §cSkyHanni's contributors §7fancy in the tab list. " +
@@ -68,6 +73,14 @@ public class DevConfig {
     )
     @ConfigEditorBoolean
     public boolean fancyContributors = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Contributor Nametags",
+        desc = "Makes SkyHanni contributors' nametags fancy too. "
+    )
+    @ConfigEditorBoolean
+    public boolean contributorNametags = true;
 
     @Expose
     @ConfigOption(
@@ -94,6 +107,10 @@ public class DevConfig {
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
+
+    @Expose
+    @Category(name = "Dev Tools", desc = "Tooling for devs")
+    public DevToolConfig devTool = new DevToolConfig();
 
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")

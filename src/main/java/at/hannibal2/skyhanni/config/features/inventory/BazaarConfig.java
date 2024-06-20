@@ -32,19 +32,21 @@ public class BazaarConfig {
     public Position bestSellMethodPos = new Position(394, 142, false, true);
 
     @Expose
-    @ConfigOption(name = "Cancelled Buy Order Clipboard", desc = "Saves missing items from cancelled buy orders to clipboard for faster re-entry.")
+    @ConfigOption(name = "Cancelled Buy Order Clipboard",
+        desc = "Send missing items from cancelled buy orders in chat.\n" +
+        "Click on the message to quickly order the same item and amount again.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean cancelledBuyOrderClipboard = false;
 
     @Expose
-    @ConfigOption(name = "Price Website", desc = "Adds a button to the Bazaar product inventory that will open the item page in §cskyblock.bz§7.")
+    @ConfigOption(name = "Price Website", desc = "Add a button to the Bazaar product inventory that will open the item page in §cskyblock.bz§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean openPriceWebsite = false;
 
     @Expose
-    @ConfigOption(name = "Max Items With Purse", desc = "Calculates the maximum amount of items that can be purchased from the Bazaar with the amount of coins in your purse.")
+    @ConfigOption(name = "Max Items With Purse", desc = "Calculate the maximum amount of items that can be purchased from the Bazaar with the amount of coins in your purse.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maxPurseItems = false;

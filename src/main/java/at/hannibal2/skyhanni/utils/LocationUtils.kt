@@ -47,6 +47,11 @@ object LocationUtils {
         return noBlocks && notTooFar && inFov
     }
 
+    fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
+        yOffsetRange.any { offset ->
+            this.add(y = offset).canBeSeen(radius)
+        }
+
     fun AxisAlignedBB.minBox() = LorenzVec(minX, minY, minZ)
 
     fun AxisAlignedBB.maxBox() = LorenzVec(maxX, maxY, maxZ)
@@ -74,7 +79,7 @@ object LocationUtils {
         var maxY = this.maxY
         var maxZ = this.maxZ
 
-        aabbs.forEach { aabb ->
+        for (aabb in aabbs) {
             if (aabb.minX < minX) minX = aabb.minX
             if (aabb.minY < minY) minY = aabb.minY
             if (aabb.minZ < minZ) minZ = aabb.minZ

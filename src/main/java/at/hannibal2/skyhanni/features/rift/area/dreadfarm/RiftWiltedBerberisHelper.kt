@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -23,7 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
-class RiftWiltedBerberisHelper {
+@SkyHanniModule
+object RiftWiltedBerberisHelper {
 
     private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
@@ -69,13 +71,13 @@ class RiftWiltedBerberisHelper {
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
             if (config.hideparticles && berberis != null) {
-                event.isCanceled = true
+                event.cancel()
             }
             return
         }
 
         if (config.hideparticles) {
-            event.isCanceled = true
+            event.cancel()
         }
 
         if (berberis == null) {
