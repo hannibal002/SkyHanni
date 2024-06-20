@@ -22,7 +22,6 @@ object ChocolateFactoryTimeTowerManager {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
-    private var lastTimeTowerReminder = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -34,10 +33,6 @@ object ChocolateFactoryTimeTowerManager {
         }
 
         if (ChocolateFactoryAPI.inChocolateFactory) return
-
-        if (config.timeTowerReminder) {
-            timeTowerReminder()
-        }
 
         val nextCharge = profileStorage.nextTimeTower
 
@@ -104,23 +99,6 @@ object ChocolateFactoryTimeTowerManager {
     }
 
     private fun timeTowerEnds(): SimpleTimeMark = profileStorage?.currentTimeTowerEnds ?: SimpleTimeMark.farPast()
-
-    private fun timeTowerReminder() {
-        if (lastTimeTowerReminder.passedSince() < 20.seconds) return
-
-        val timeUntil = timeTowerEnds().timeUntil()
-        if (timeUntil < 1.minutes && timeUntil.isPositive()) {
-            ChatUtils.clickableChat(
-                "§cYour Time Tower is about to end! " +
-                    "Open the Chocolate Factory to avoid wasting the multiplier!",
-                onClick = {
-                    HypixelCommands.chocolateFactory()
-                }
-            )
-            SoundUtils.playBeepSound()
-            lastTimeTowerReminder = SimpleTimeMark.now()
-        }
-    }
 
     fun timeTowerFullTimeMark(): SimpleTimeMark {
         val profileStorage = profileStorage ?: return SimpleTimeMark.farPast()
