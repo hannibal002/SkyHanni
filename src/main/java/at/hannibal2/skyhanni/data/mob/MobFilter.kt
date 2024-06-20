@@ -44,7 +44,7 @@ import net.minecraft.entity.passive.EntitySheep
 import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 
-@Suppress("RegExpRedundantEscape")
+@Suppress("RegExpRedundantEscape", "SkyHanniModuleInspection")
 object MobFilter {
 
     private val repoGroup = RepoPattern.group("mob.detection")

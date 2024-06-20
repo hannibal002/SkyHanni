@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
@@ -29,13 +30,16 @@ object MatriarchHelper {
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.Special) {
+        LorenzDebug.log("spawn: ${getMobInfo(event.mob)}")
         if (!isHeavyPearl(event)) return
+        LorenzDebug.log("pearl spawn: ${getMobInfo(event.mob)}")
         pearlList.add(event.mob)
+        LorenzDebug.log("pearl list: ${pearlList.map { getMobInfo(it) }}")
         if (pearlList.size > 3) {
             ErrorManager.logErrorStateWithData(
                 "Something went wrong with the Heavy Pearl detection",
                 "More then 3 pearls",
-                "pearList" to pearlList.map { getMobInfo(it) }
+                "pearList" to pearlList.map { getMobInfo(it) },
             )
             pearlList.clear()
         }
@@ -45,7 +49,9 @@ object MatriarchHelper {
 
     @SubscribeEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
+        LorenzDebug.log("despawn: ${getMobInfo(event.mob)}")
         if (!isHeavyPearl(event)) return
+        LorenzDebug.log("pearl despawn: ${getMobInfo(event.mob)}")
         pearlList.remove(event.mob)
     }
 

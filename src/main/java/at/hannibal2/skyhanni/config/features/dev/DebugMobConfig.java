@@ -44,6 +44,11 @@ public class DebugMobConfig {
         public boolean logEvents = false;
 
         @Expose
+        @ConfigOption(name = "Log Internals", desc = "Logs the internal actions of the mob detection for a more detailed information.")
+        @ConfigEditorBoolean
+        public boolean logInternals = false;
+
+        @Expose
         @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently in front of your view.")
         @ConfigEditorBoolean
         public boolean showRayHit = false;
