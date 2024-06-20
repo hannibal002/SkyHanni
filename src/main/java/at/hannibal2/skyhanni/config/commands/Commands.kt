@@ -70,6 +70,7 @@ import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.RenderableTestSuit
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -90,6 +91,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.ClientCommandHandler
@@ -169,7 +171,6 @@ object Commands {
         )
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
-
 
     private fun usersNormal() {
         registerCommand(
@@ -442,6 +443,11 @@ object Commands {
             "shtestsackapi",
             "Get the amount of an item in sacks according to internal feature SackAPI",
         ) { SackAPI.testSackAPI(it) }
+        if (PlatformUtils.isDevEnvironment) {
+            registerCommand("shrenderable", "Test for renderables") {
+                RenderableTestSuit.commandHandler(it)
+            }
+        }
         registerCommand(
             "shtestgriffinspots",
             "Show potential griffin spots around you.",

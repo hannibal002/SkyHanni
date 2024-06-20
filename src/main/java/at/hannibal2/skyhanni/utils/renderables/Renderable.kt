@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOf
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderableOutOfSpec
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
@@ -58,6 +60,10 @@ interface Renderable {
      * (the GL matrix stack should already be pre transformed)
      */
     fun render(posX: Int, posY: Int)
+
+    fun relativeMouse(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x - posX to y - posY
+    }
 
     companion object {
 
@@ -734,14 +740,14 @@ interface Renderable {
                 0,
                 virtualHeight - height,
                 velocity,
-                button,
+                dragScrollMouseButton = button,
             )
 
             private val end get() = scroll.asInt() + height
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY),
                 )
 
                 var renderY = 0
@@ -797,12 +803,12 @@ interface Renderable {
                 if (hasHeader) yOffsets[1] else 0,
                 virtualHeight - height,
                 velocity,
-                button,
+                dragScrollMouseButton = button,
             )
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
-                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY),
                 )
 
                 var renderY = 0
@@ -850,6 +856,174 @@ interface Renderable {
                 }
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
+        }
+
+        /** @param stepSize can min be ([maxValue] - [minValue]) / [sheight]
+         * @param maxValue is only reachable if ([maxValue] - [minValue]) % [stepSize] == 0*/
+        fun verticalSlider(
+            sheight: Int,
+            handler: (Double) -> Unit,
+            scrollValue: ScrollValue = ScrollValue(),
+            width: Int = 11,
+            sliderHeadThickness: Int = 6,
+            minValue: Double = 0.0,
+            maxValue: Double = 100.0,
+            stepSize: Double = (maxValue - minValue) / sheight,
+            button: Int? = 0,
+            bypassChecks: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = sheight + sliderHeadThickness + 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            init {
+                if (minValue > maxValue) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Bigger min than max for slider",
+                        "sliderType" to "verticalSlider",
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                    )
+                }
+                if (stepSize < (maxValue - minValue) / sheight) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Wrong StepSize for slider",
+                        "sliderType" to "verticalSlider",
+                        "stepSize" to stepSize,
+                        "calculated min" to (maxValue - minValue) / sheight,
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                        "sheight" to sheight,
+                    )
+                }
+            }
+
+            /** @param value is in scroll value space
+             * @return is in the handler range */
+            private fun snap(value: Double): Double {
+                val translated = (maxValue - minValue) * (value / sheight)
+                return translated - (translated) % stepSize
+            }
+
+            private fun snapScroll(value: Double): Int =
+                ((snap(value) - minValue) / (maxValue - minValue) * sheight).toInt()
+
+            private val scroll = ScrollInput.Companion.Vertical(
+                scrollValue,
+                0,
+                sheight,
+                1.0,
+                0.0,
+                dragScrollMouseButton = button,
+                inverseDrag = false
+            )
+
+            private val sliderPos get() = snapScroll(scroll.asDouble()) + 1
+
+            override fun render(posX: Int, posY: Int) {
+                val lastScroll = scroll.asDouble()
+                scroll.update(isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY))
+                val newScroll = scroll.asDouble()
+
+                Gui.drawRect(4, 0, width - 4, height, Color.GRAY.darker().rgb)
+                Gui.drawRect(5, 1, width - 5, height - 1, Color.GRAY.rgb)
+
+                val slider = sliderPos
+                Gui.drawRect(0, slider, width, slider + sliderHeadThickness, Color.GRAY.darker().rgb)
+                Gui.drawRect(1, slider + 1, width - 1, slider + sliderHeadThickness - 1, Color.GRAY.rgb)
+
+                if (lastScroll != newScroll) {
+                    handler(snap(newScroll))
+                }
+            }
+
+        }
+
+        /** @param stepSize can min be ([maxValue] - [minValue]) / [swidth]
+         * @param maxValue is only reachable if ([maxValue] - [minValue]) % [stepSize] == 0*/
+        fun hotizontalSlider(
+            swidth: Int,
+            handler: (Double) -> Unit,
+            scrollValue: ScrollValue = ScrollValue(),
+            height: Int = 11,
+            sliderHeadThickness: Int = 6,
+            minValue: Double = 0.0,
+            maxValue: Double = 100.0,
+            stepSize: Double = (maxValue - minValue) / swidth,
+            button: Int? = 0,
+            bypassChecks: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = swidth + sliderHeadThickness + 2
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            init {
+                if (minValue > maxValue) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Bigger min than max for slider",
+                        "sliderType" to "horizontalSlider",
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                    )
+                }
+                if (stepSize < (maxValue - minValue) / swidth) {
+                    ErrorManager.renderableOutOfSpec(
+                        "Wrong StepSize for slider",
+                        "sliderType" to "horizontalSlider",
+                        "stepSize" to stepSize,
+                        "calculated min" to (maxValue - minValue) / swidth,
+                        "minValue" to minValue,
+                        "maxValue" to maxValue,
+                        "sheight" to swidth,
+                    )
+                }
+            }
+
+            /** @param value is in scroll value space
+             * @return is in the handler range */
+            private fun snap(value: Double): Double {
+                val translated = (maxValue - minValue) * (value / swidth)
+                return translated - (translated) % stepSize
+            }
+
+            private fun snapScroll(value: Double): Int =
+                ((snap(value) - minValue) / (maxValue - minValue) * swidth).toInt()
+
+            private val scroll = ScrollInput.Companion.Horizontal(
+                scrollValue,
+                0,
+                swidth,
+                1.0,
+                0.0,
+                dragScrollMouseButton = button,
+                inverseDrag = false
+            )
+
+            private val sliderPos get() = snapScroll(scroll.asDouble()) + 1
+
+            override fun render(posX: Int, posY: Int) {
+                val lastScroll = scroll.asDouble()
+                scroll.update(isHovered(posX, posY) && shouldAllowLink(true, bypassChecks), relativeMouse(posX, posY))
+                val newScroll = scroll.asDouble()
+
+                Gui.drawRect(0, 4, width, height - 4, Color.GRAY.darker().rgb)
+                Gui.drawRect(1, 5, width - 1, height - 5, Color.GRAY.rgb)
+
+                val slider = sliderPos
+                Gui.drawRect(slider, 0, slider + sliderHeadThickness, height, Color.GRAY.darker().rgb)
+                Gui.drawRect(slider + 1, 1, slider + sliderHeadThickness - 1, height - 1, Color.GRAY.rgb)
+
+                if (lastScroll != newScroll) {
+                    handler(snap(newScroll))
+                }
+            }
+
         }
 
         fun drawInsideRoundedRect(

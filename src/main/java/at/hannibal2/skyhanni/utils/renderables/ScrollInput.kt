@@ -1,18 +1,19 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.ExtraOperators.minus
 import org.lwjgl.input.Mouse
 
 abstract class ScrollInput(
     private val scrollValue: ScrollValue,
-    protected val minValue: Int,
-    protected val maxValue: Int,
-    protected val velocity: Double,
+    protected val minValue: Double,
+    protected val maxValue: Double,
     protected val dragScrollMouseButton: Int?,
+    protected val inverseDrag: Boolean,
     startValue: Double?,
 ) {
 
     init {
-        scrollValue.init(startValue ?: minValue.toDouble())
+        scrollValue.init(startValue ?: minValue)
         coerceInLimit()
     }
 
@@ -22,38 +23,80 @@ abstract class ScrollInput(
         }
         get() = scrollValue.getValue()
 
+    protected fun mouseDiff(mouse: Pair<Int, Int>) = scrollValue.getMousePositionDiff(mouse)
+
     fun asInt() = scroll.toInt()
     fun asDouble() = scroll
 
     protected fun coerceInLimit() =
         if (maxValue < minValue) {
-            scroll = minValue.toDouble()
+            scroll = minValue
         } else {
-            scroll = scroll.coerceIn(minValue.toDouble(), maxValue.toDouble())
+            scroll = scroll.coerceIn(minValue, maxValue)
         }
 
     protected fun isMouseEventValid(): Boolean = scrollValue.isMouseEventValid()
 
-    abstract fun update(isValid: Boolean)
+    abstract fun update(isValid: Boolean, mouse: Pair<Int, Int>? = null)
 
     companion object {
+        class Horizontal(
+            scrollValue: ScrollValue,
+            minWidth: Number,
+            maxWidth: Number,
+            private val velocityDrag: Double,
+            private val velocityScroll: Double = velocityDrag * 2.5,
+            dragScrollMouseButton: Int?,
+            inverseDrag: Boolean = true,
+            startValue: Double? = null,
+        ) : ScrollInput(
+            scrollValue,
+            minWidth.toDouble(),
+            maxWidth.toDouble(),
+            dragScrollMouseButton,
+            inverseDrag,
+            startValue
+        ) {
+            override fun update(isValid: Boolean, mouse: Pair<Int, Int>?) {
+                if (maxValue < minValue) return
+                if (!isValid || !isMouseEventValid()) return
+                if (dragScrollMouseButton != null && mouse != null && Mouse.isButtonDown(dragScrollMouseButton)) {
+                    val diff = mouseDiff(mouse)
+                    scroll += diff.first * velocityDrag * if (inverseDrag) 1 else -1
+                }
+                val deltaWheel = Mouse.getEventDWheel()
+                scroll += -deltaWheel.coerceIn(-1, 1) * velocityScroll
+                coerceInLimit()
+            }
+
+        }
 
         class Vertical(
             scrollValue: ScrollValue,
-            minHeight: Int,
-            maxHeight: Int,
-            velocity: Double,
+            minHeight: Number,
+            maxHeight: Number,
+            private val velocityDrag: Double,
+            private val velocityScroll: Double = velocityDrag * 2.5,
             dragScrollMouseButton: Int?,
+            inverseDrag: Boolean = true,
             startValue: Double? = null,
-        ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, dragScrollMouseButton, startValue) {
-            override fun update(isValid: Boolean) {
+        ) : ScrollInput(
+            scrollValue,
+            minHeight.toDouble(),
+            maxHeight.toDouble(),
+            dragScrollMouseButton,
+            inverseDrag,
+            startValue
+        ) {
+            override fun update(isValid: Boolean, mouse: Pair<Int, Int>?) {
                 if (maxValue < minValue) return
                 if (!isValid || !isMouseEventValid()) return
-                if (dragScrollMouseButton != null && Mouse.isButtonDown(dragScrollMouseButton)) {
-                    scroll += Mouse.getEventDY() * velocity
+                if (dragScrollMouseButton != null && mouse != null && Mouse.isButtonDown(dragScrollMouseButton)) {
+                    val diff = mouseDiff(mouse)
+                    scroll += diff.second * velocityDrag * if (inverseDrag) 1 else -1
                 }
                 val deltaWheel = Mouse.getEventDWheel()
-                scroll += -deltaWheel.coerceIn(-1, 1) * 2.5 * velocity
+                scroll += -deltaWheel.coerceIn(-1, 1) * velocityScroll
                 coerceInLimit()
             }
 
@@ -63,6 +106,8 @@ abstract class ScrollInput(
 
 class ScrollValue {
     var field: Double? = null
+
+    var mousePosition: Pair<Int, Int> = Pair(0, 0)
 
     private var mouseEventTime = 0L
 
@@ -76,6 +121,12 @@ class ScrollValue {
     fun init(value: Double) {
         if (field != null) return
         field = value
+    }
+
+    fun getMousePositionDiff(newMouse: Pair<Int, Int>): Pair<Int, Int> {
+        val diff = mousePosition - newMouse
+        mousePosition = newMouse
+        return diff
     }
 
     fun isMouseEventValid(): Boolean {
