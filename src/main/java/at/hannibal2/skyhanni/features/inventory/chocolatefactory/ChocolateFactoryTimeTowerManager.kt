@@ -22,6 +22,12 @@ object ChocolateFactoryTimeTowerManager {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
+    private var justJoinedProfile = true
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        justJoinedProfile = true
+    }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -29,6 +35,7 @@ object ChocolateFactoryTimeTowerManager {
         val profileStorage = profileStorage ?: return
 
         if (profileStorage.currentTimeTowerEnds.isInPast()) {
+            if (!justJoinedProfile) onTimeTowerJustExpired()
             profileStorage.currentTimeTowerEnds = SimpleTimeMark.farPast()
         }
 
@@ -55,6 +62,19 @@ object ChocolateFactoryTimeTowerManager {
             return
         }
         checkTimeTowerWarning(false)
+    }
+
+    private fun onTimeTowerJustExpired() {
+        if (config.timeTowerWarning && currentCharges() > 0) {
+            ChatUtils.clickableChat(
+                "§cYour Time Tower just expired and has §7(${timeTowerCharges()} remaining)§c," +
+                    "Click here to use one",
+                onClick = {
+                    HypixelCommands.chocolateFactory()
+                }
+            )
+            SoundUtils.playBeepSound()
+        }
     }
 
     fun checkTimeTowerWarning(inInventory: Boolean) {
