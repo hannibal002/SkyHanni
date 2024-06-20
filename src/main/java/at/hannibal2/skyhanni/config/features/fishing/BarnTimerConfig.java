@@ -39,7 +39,7 @@ public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Winter Fishing",
-        desc = "Show the Barn Fishing Timer on the Jerry's Workshop."
+        desc = "Show the Barn Fishing Timer on the Jerry's Workshop island."
     )
     @ConfigEditorBoolean
     public boolean winterIsland = true;
@@ -61,7 +61,7 @@ public class BarnTimerConfig {
     public boolean wormLimitAlert = true;
 
     @Expose
-    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manualy")
+    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manually.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int manualResetTimer = Keyboard.KEY_NONE;
 

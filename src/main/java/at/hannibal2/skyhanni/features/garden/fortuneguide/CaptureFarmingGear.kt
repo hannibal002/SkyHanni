@@ -1,25 +1,31 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -28,8 +34,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
+@SkyHanniModule
 object CaptureFarmingGear {
-    private val farmingItems get() = GardenAPI.storage?.fortune?.farmingItems
     private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
@@ -40,6 +46,10 @@ object CaptureFarmingGear {
     private val fortuneUpgradePattern by patternGroup.pattern(
         "fortuneupgrade",
         "You claimed the Garden Farming Fortune (?<level>.*) upgrade!"
+    )
+    private val bestiaryPattern by patternGroup.pattern(
+        "bestiary",
+        ".*§6+(?<fortune>.*)☘ Farming Fortune.*"
     )
     private val anitaBuffPattern by patternGroup.pattern(
         "anitabuff",
@@ -65,7 +75,6 @@ object CaptureFarmingGear {
         "strength",
         " Strength: §r§c❁(?<strength>.*)"
     )
-
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
         "§7Progress to Tier (?<nextTier>\\w+):.*"
@@ -80,8 +89,24 @@ object CaptureFarmingGear {
         "RANCHERS", "FARMER", "RABBIT"
     )
 
+    init {
+        CarrolynTable.entries.forEach {
+            it.completeMessagePattern
+            it.thxMessagePattern
+        }
+    }
+
+    // TODO upadte armor on equpment/wardeobe update as well
     fun captureFarmingGear() {
-        val farmingItems = farmingItems ?: return
+        for (armor in InventoryUtils.getArmor()) {
+            if (armor == null) continue
+            val split = armor.getInternalName().asString().split("_")
+            if (split.first() in farmingSets) {
+                val category = armor.getItemCategoryOrNull() ?: continue
+                FarmingItems.getFromItemCategoryOne(category)?.setItem(armor)
+            }
+        }
+
         val itemStack = InventoryUtils.getItemInHand() ?: return
 
         val currentCrop = itemStack.getCropType()
@@ -90,22 +115,7 @@ object CaptureFarmingGear {
             //todo better fall back items
             //todo Daedalus axe
         } else {
-            for (item in FarmingItems.entries) {
-                if (item.name == currentCrop.name) {
-                    farmingItems[item] = itemStack
-                }
-            }
-        }
-        for (armor in InventoryUtils.getArmor()) {
-            if (armor == null) continue
-            val split = armor.getInternalName().asString().split("_")
-            if (split.first() in farmingSets) {
-                for (item in FarmingItems.entries) {
-                    if (item.name == split.last()) {
-                        farmingItems[item] = armor
-                    }
-                }
-            }
+            currentCrop.farmingItem.setItem(itemStack)
         }
 
         TabListData.getTabList().matchFirst(strengthPattern) {
@@ -113,22 +123,13 @@ object CaptureFarmingGear {
         }
     }
 
-    fun reverseCarrotFortune() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        storage.carrotFortune = !storage.carrotFortune
-        ChatUtils.chat("Toggled exportable carrot fortune to: ${storage.carrotFortune}")
-    }
-
-    fun reversePumpkinFortune() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        storage.pumpkinFortune = !storage.pumpkinFortune
-        ChatUtils.chat("Toggled expired pumpkin fortune to: ${storage.pumpkinFortune}")
-    }
-
-    fun reverseCocoaBeansFortune() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        storage.cocoaBeansFortune = !storage.cocoaBeansFortune
-        ChatUtils.chat("Toggled supreme chocolate bar fortune to: ${storage.cocoaBeansFortune}")
+    fun handelCarrolyn(input: Array<String>) {
+        val string = input.joinToString("_").uppercase()
+        val crop = CropType.entries.firstOrNull { it.name == string }
+            ?: ChatUtils.userError("Invalid Argument, no crop with the name: $string").run { return }
+        val carrolyn = CarrolynTable.getByCrop(crop)
+            ?: ChatUtils.userError("Invalid Argument, crop is not valid").run { return }
+        carrolyn.setVisibleActive(!carrolyn.get())
     }
 
     private fun getUniqueVisitorsForTier(tier: Int): Int {
@@ -150,20 +151,39 @@ object CaptureFarmingGear {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val storage = GardenAPI.storage?.fortune ?: return
-        val farmingItems = farmingItems ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
         if (PetAPI.isPetMenu(event.inventoryName)) {
-            pets(farmingItems, items, outdatedItems)
+            pets(items, outdatedItems)
             return
         }
         when (event.inventoryName) {
-            "Your Equipment and Stats" -> equipmentAndStats(items, farmingItems, outdatedItems)
+            "Your Equipment and Stats" -> equipmentAndStats(items, outdatedItems)
             "Your Skills" -> skills(items, storage)
             "Community Shop" -> communityShop(items)
             "Configure Plots" -> configurePlots(items, storage)
             "Anita" -> anita(items, storage)
             "Visitor Milestones" -> visitorMilestones(items)
+            "Bestiary", "Bestiary ➜ Garden" -> bestiary(items, storage)
+        }
+    }
+
+    private fun bestiary(
+        items: Map<Int, ItemStack>,
+        storage: ProfileSpecificStorage.GardenStorage.Fortune,
+    ) {
+        for ((_, item) in items) {
+            if (item.displayName.contains("Garden")) {
+                var fortune = -1.0
+                for (line in item.getLore()) {
+                    bestiaryPattern.matchMatcher(line) {
+                        fortune = group("fortune").toDouble()
+                    }
+                }
+                if (fortune > -1.0) {
+                    storage.bestiary = fortune
+                }
+            }
         }
     }
 
@@ -247,69 +267,54 @@ object CaptureFarmingGear {
     }
 
     private fun pets(
-        farmingItems: MutableMap<FarmingItems, ItemStack>,
         items: Map<Int, ItemStack>,
         outdatedItems: MutableMap<FarmingItems, Boolean>,
     ) {
         // If they've 2 of same pet, one will be overwritten
-        // optimize
-
-        for (pet in listOf(
-            FarmingItems.ELEPHANT,
-            FarmingItems.MOOSHROOM_COW,
-            FarmingItems.RABBIT,
-            FarmingItems.BEE
-        )) {
-            if (farmingItems[pet] == null) {
-                farmingItems[pet] = FFGuideGUI.getFallbackItem(pet)
-            }
-        }
 
         // setting to current saved level -1 to stop later pages saving low rarity pets
-        var highestElephantRarity = (farmingItems[FarmingItems.ELEPHANT]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestMooshroomRarity = (farmingItems[FarmingItems.MOOSHROOM_COW]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestRabbitRarity = (farmingItems[FarmingItems.RABBIT]?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestBeeRarity = (farmingItems[FarmingItems.BEE]?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestElephantRarity = (FarmingItems.ELEPHANT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestMooshroomRarity = (FarmingItems.MOOSHROOM_COW.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestRabbitRarity = (FarmingItems.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestBeeRarity = (FarmingItems.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
 
         for ((_, item) in items) {
-            val split = item.getInternalName().asString().split(";")
-            if (split.first() == "ELEPHANT" && split.last().toInt() > highestElephantRarity) {
-                farmingItems[FarmingItems.ELEPHANT] = item
+            if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
+            val (name, rarity) = item.getInternalName().asString().split(";")
+            if (name == "ELEPHANT" && rarity.toInt() > highestElephantRarity) {
+                FarmingItems.ELEPHANT.setItem(item)
                 outdatedItems[FarmingItems.ELEPHANT] = false
-                highestElephantRarity = split.last().toInt()
+                highestElephantRarity = rarity.toInt()
             }
-            if (split.first() == "MOOSHROOM_COW" && split.last().toInt() > highestMooshroomRarity) {
-                farmingItems[FarmingItems.MOOSHROOM_COW] = item
+            if (name == "MOOSHROOM_COW" && rarity.toInt() > highestMooshroomRarity) {
+                FarmingItems.MOOSHROOM_COW.setItem(item)
                 outdatedItems[FarmingItems.MOOSHROOM_COW] = false
-                highestMooshroomRarity = split.last().toInt()
+                highestMooshroomRarity = rarity.toInt()
             }
-            if (split.first() == "RABBIT" && split.last().toInt() > highestRabbitRarity) {
-                farmingItems[FarmingItems.RABBIT] = item
+            if (name == "RABBIT" && rarity.toInt() > highestRabbitRarity) {
+                FarmingItems.RABBIT.setItem(item)
                 outdatedItems[FarmingItems.RABBIT] = false
-                highestRabbitRarity = split.last().toInt()
+                highestRabbitRarity = rarity.toInt()
             }
-            if (split.first() == "BEE" && split.last().toInt() > highestBeeRarity) {
-                farmingItems[FarmingItems.BEE] = item
+            if (name == "BEE" && rarity.toInt() > highestBeeRarity) {
+                FarmingItems.BEE.setItem(item)
                 outdatedItems[FarmingItems.BEE] = false
-                highestBeeRarity = split.last().toInt()
+                highestBeeRarity = rarity.toInt()
             }
         }
     }
 
     private fun equipmentAndStats(
         items: Map<Int, ItemStack>,
-        farmingItems: MutableMap<FarmingItems, ItemStack>,
         outdatedItems: MutableMap<FarmingItems, Boolean>,
     ) {
         for ((_, slot) in items) {
             val split = slot.getInternalName().asString().split("_")
+            val category = slot.getItemCategoryOrNull() ?: continue
             if (split.first() == "LOTUS") {
-                for (item in FarmingItems.entries) {
-                    if (item.name == split.last()) {
-                        farmingItems[item] = slot
-                        outdatedItems[item] = false
-                    }
-                }
+                val item = FarmingItems.getFromItemCategoryOne(category) ?: continue
+                item.setItem(slot)
+                outdatedItems[item] = false
                 FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
                 val enchantments = slot.getEnchantments() ?: emptyMap()
                 val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
@@ -327,12 +332,19 @@ object CaptureFarmingGear {
         val msg = event.message.removeColor().trim()
         fortuneUpgradePattern.matchMatcher(msg) {
             ProfileStorageData.playerSpecific?.gardenCommunityUpgrade = group("level").romanToDecimal()
+            return
         }
         farmingLevelUpPattern.matchMatcher(msg) {
             storage.farmingLevel = group("level").romanToDecimalIfNecessary()
+            return
+        }
+        bestiaryPattern.matchMatcher(msg) {
+            storage.bestiary += group("fortune").toDouble()
+            return
         }
         anitaBuffPattern.matchMatcher(msg) {
             storage.anitaUpgrade = group("level").toInt() / 4
+            return
         }
         lotusUpgradePattern.matchMatcher(msg) {
             val piece = group("piece").uppercase()
@@ -341,6 +353,7 @@ object CaptureFarmingGear {
                     outdatedItems[item] = true
                 }
             }
+            return
         }
         petLevelUpPattern.matchMatcher(msg) {
             val pet = group("pet").uppercase().replace("✦", "").trim().replace(" ", "_")
@@ -349,30 +362,29 @@ object CaptureFarmingGear {
                     outdatedItems[item] = true
                 }
             }
+            return
         }
         cakePattern.matchMatcher(msg) {
-            storage.cakeExpiring = System.currentTimeMillis() + 2.days.inWholeMilliseconds
+            FFStats.cakeExpireTime = 2.days.fromNow()
+            return
         }
-        if (msg == "CARROTS EXPORTATION COMPLETE!") {
-            storage.carrotFortune = true
+        CarrolynTable.entries.forEach {
+            it.completeMessagePattern.matchMatcher(msg) {
+                it.set(true)
+                return
+            }
+            it.thxMessagePattern.matchMatcher(msg) {
+                it.set(true)
+                ChatUtils.chat(it.thxResponse)
+                return
+            }
         }
-        if (msg == "PUMPKINS EXPORTATION COMPLETE!") {
-            storage.pumpkinFortune = true
-        }
-        if (msg == "CHOCOLATE BARS EXPORTATION COMPLETE!") {
-            storage.cocoaBeansFortune = true
-        }
-        if (msg == "[NPC] Carrolyn: Thank you for the carrots.") {
-            storage.carrotFortune = true
-            ChatUtils.chat("§aYou have already given Carrolyn enough Exportable Carrots.")
-        }
-        if (msg == "[NPC] Carrolyn: Thank you for the pumpkins.") {
-            storage.pumpkinFortune = true
-            ChatUtils.chat("§aYou have already given Carrolyn enough Expired Pumpkins.")
-        }
-        if (msg == "[NPC] Carrolyn: Thank you for the chocolate.") {
-            storage.cocoaBeansFortune = true
-            ChatUtils.chat("§aYou have already given Carrolyn enough Supreme Chocolate Bars.")
-        }
+    }
+
+    @SubscribeEvent
+    fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
+        event.move(48, "#profile.garden.fortune.pumpkinFortune", "#profile.garden.fortune.carrolyn.PUMPKIN")
+        event.move(48, "#profile.garden.fortune.cocoaBeansFortune", "#profile.garden.fortune.carrolyn.COCOA_BEANS")
     }
 }

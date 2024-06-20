@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
+@SkyHanniModule
 object ChocolateFactoryKeybinds {
     private val config get() = ChocolateFactoryAPI.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()
@@ -22,7 +24,7 @@ object ChocolateFactoryKeybinds {
 
         val chest = event.guiContainer as? GuiChest ?: return
 
-        for (index in 0..4) {
+        for (index in 0..6) {
             val key = getKey(index) ?: error("no key for index $index")
             if (!key.isKeyClicked()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
@@ -32,7 +34,7 @@ object ChocolateFactoryKeybinds {
 
             Minecraft.getMinecraft().playerController.windowClick(
                 chest.inventorySlots.windowId,
-                29 + index,
+                28 + index,
                 2,
                 3,
                 Minecraft.getMinecraft().thePlayer
@@ -59,6 +61,8 @@ object ChocolateFactoryKeybinds {
         2 -> config.key3
         3 -> config.key4
         4 -> config.key5
+        5 -> config.key6
+        6 -> config.key7
         else -> null
     }
 }

@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
 import at.hannibal2.skyhanni.data.MayorAPI.foxyExtraEventPattern
-import at.hannibal2.skyhanni.data.jsonobjects.local.MayorJson
+import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
 enum class Mayor(
     val mayorName: String,
@@ -39,11 +40,21 @@ enum class Mayor(
 
     override fun toString() = mayorName
 
+    fun addAllPerks(): Mayor {
+        activePerks.addAll(perks)
+        perks.forEach { it.isActive = true }
+        return this
+    }
+
+    fun isActive() = this == currentMayor
+
     companion object {
 
         fun getMayorFromName(name: String): Mayor? = entries.firstOrNull { it.mayorName == name }
 
-        fun setAssumeMayorJson(name: String, perksJson: ArrayList<MayorJson.Perk>): Mayor? {
+        fun getMayorFromPerk(perk: Perk): Mayor? = entries.firstOrNull { it.perks.contains(perk) }
+
+        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): Mayor? {
             val mayor = getMayorFromName(name)
             if (mayor == null) {
                 ErrorManager.logErrorStateWithData(
@@ -66,13 +77,13 @@ enum class Mayor(
         fun Mayor.setAssumeMayor(perks: List<Perk>) {
             perks.forEach { it.isActive = false }
             activePerks.clear()
-            perks.filter { perks.contains(it) }.forEach {
-                it.isActive = true
-                activePerks.add(it)
+            for (perk in perks.filter { perks.contains(it) }) {
+                perk.isActive = true
+                activePerks.add(perk)
             }
         }
 
-        private fun MayorJson.Perk.renameIfFoxyExtraEventPerkFound(): String? {
+        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String? {
             val foxyExtraEventPairs = mapOf(
                 "Spooky Festival" to "Extra Event (Spooky)",
                 "Mining Fiesta" to "Extra Event (Mining)",
@@ -146,4 +157,8 @@ enum class Perk(val perkName: String) {
     ;
 
     var isActive = false
+
+    companion object {
+        fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
+    }
 }

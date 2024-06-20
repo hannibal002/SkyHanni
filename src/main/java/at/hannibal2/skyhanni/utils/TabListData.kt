@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -20,7 +23,9 @@ import net.minecraft.world.WorldSettings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object TabListData {
     private var tablistCache = emptyList<String>()
     private var debugCache: List<String>? = null
@@ -69,7 +74,10 @@ object TabListData {
         val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
         val tabFooter = footer.conditionalTransform(noColor, { this.removeColor() }, { this })
 
-        val string = "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter"
+            val widgets = TabWidget.entries.filter { it.isActive }
+                .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
+            val string =
+                "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
 
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("Tab list copied into the clipboard!")
@@ -110,8 +118,8 @@ object TabListData {
 
     var dirty = false
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         if (event.packet is S38PacketPlayerListItem) {
             dirty = true
         }
@@ -126,6 +134,9 @@ object TabListData {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateEvent(getTabList()).postAndCatch()
+            if (!LorenzUtils.onHypixel) {
+                workaroundDelayedTabListUpdateAgain()
+            }
         }
 
         val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
@@ -136,5 +147,14 @@ object TabListData {
             TablistFooterUpdateEvent(tabFooter).postAndCatch()
         }
         footer = tabFooter
+    }
+
+    private fun workaroundDelayedTabListUpdateAgain() {
+        DelayedRun.runDelayed(2.seconds) {
+            if (LorenzUtils.onHypixel) {
+                println("workaroundDelayedTabListUpdateAgain")
+                TabListUpdateEvent(getTabList()).postAndCatch()
+            }
+        }
     }
 }

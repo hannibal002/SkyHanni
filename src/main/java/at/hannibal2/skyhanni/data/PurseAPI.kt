@@ -3,14 +3,18 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
     val coinsPattern by patternGroup.pattern(
@@ -22,18 +26,18 @@ object PurseAPI {
         "Piggy: (?<coins>.*)"
     )
 
-    private var inventoryCloseTime = 0L
+    private var inventoryCloseTime = SimpleTimeMark.farPast()
     var currentPurse = 0.0
         private set
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        inventoryCloseTime = System.currentTimeMillis()
+        inventoryCloseTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        event.newList.matchFirst(coinsPattern) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        event.scoreboard.matchFirst(coinsPattern) {
             val newPurse = group("coins").formatDouble()
             val diff = newPurse - currentPurse
             if (diff == 0.0) return
@@ -55,15 +59,13 @@ object PurseAPI {
             }
 
             if (Minecraft.getMinecraft().currentScreen == null) {
-                val timeDiff = System.currentTimeMillis() - inventoryCloseTime
-                if (timeDiff > 2_000) {
+                if (inventoryCloseTime.passedSince() > 2.seconds) {
                     return PurseChangeCause.GAIN_MOB_KILL
                 }
             }
             return PurseChangeCause.GAIN_UNKNOWN
         } else {
-            val timeDiff = System.currentTimeMillis() - SlayerAPI.questStartTime
-            if (timeDiff < 1500) {
+            if (SlayerAPI.questStartTime.passedSince() < 1.5.seconds) {
                 return PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
             }
 

@@ -11,21 +11,22 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -36,6 +37,7 @@ import kotlin.math.log10
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object FarmingFortuneDisplay {
     private val config get() = GardenAPI.config.farmingFortunes
 
@@ -218,8 +220,8 @@ object FarmingFortuneDisplay {
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
             if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
             ChatUtils.clickableChat(
-                "§cCan not read Farming Fortune from tab list! Open /widget and enable the Stats Widget " +
-                    "and showing the Farming Fortune stat.",
+                "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
+                    "show the Farming Fortune stat, also give the widget enough priority.",
                 onClick = {
                     HypixelCommands.widget()
                 }
@@ -229,8 +231,8 @@ object FarmingFortuneDisplay {
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
             if (lastCropFortuneMissingError.passedSince() < 1.minutes || !GardenAPI.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
-                "§cCan not read Crop Fortune from tab list! Open /widget and enable the Stats Widget " +
-                    "and showing latest Crop Fortune.",
+                "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
+                    "show latest Crop Fortune, also give the widget enough priority.",
                 onClick = {
                     HypixelCommands.widget()
                 }
@@ -317,7 +319,7 @@ object FarmingFortuneDisplay {
     fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
         var pieces = 0
 
-        lore.forEach { line ->
+        for (line in lore) {
             if (internalName.contains("LOTUS")) {
                 lotusAbilityPattern.matchMatcher(line) {
                     return group("bonus").toDouble()
@@ -345,7 +347,8 @@ object FarmingFortuneDisplay {
 
         // TODO code cleanup (after ff rework)
 
-        for (line in tool?.getLore()!!) {
+        val lore = tool?.getLore() ?: return
+        for (line in lore) {
             tooltipFortunePattern.matchMatcher(line) {
                 displayedFortune = group("display")?.toDouble() ?: 0.0
                 reforgeFortune = groupOrNull("reforge")?.toDouble() ?: 0.0
