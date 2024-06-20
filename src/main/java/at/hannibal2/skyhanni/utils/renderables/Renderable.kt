@@ -592,7 +592,7 @@ interface Renderable {
             val startPercent: Double,
             val endPercent: Double,
             val color: Color,
-            val isChroma: Boolean = false
+            val isChroma: Boolean = false,
         )
 
         fun progressBarMultipleColors(
@@ -651,7 +651,7 @@ interface Renderable {
                     var currentWidth = 1
                     for (range in colorRanges) {
                         if (range.isChroma) ChromaShaderManager.begin(ChromaType.TEXTURED)
-                        
+
                         val rangeStart = (range.startPercent * (width - 2)).toInt()
                         val rangeEnd = (range.endPercent * (width - 2)).toInt()
                         if (currentWidth >= progress) break
