@@ -114,6 +114,7 @@ object HypixelData {
     )
 
     private var lastLocRaw = SimpleTimeMark.farPast()
+    private var hasScoreboardUpdated = false
 
     var hypixelLive = false
     var hypixelAlpha = false
@@ -275,8 +276,6 @@ object HypixelData {
         skyBlockAreaWithSymbol = null
         hasScoreboardUpdated = false
     }
-
-    private var hasScoreboardUpdated = false
 
     @SubscribeEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
