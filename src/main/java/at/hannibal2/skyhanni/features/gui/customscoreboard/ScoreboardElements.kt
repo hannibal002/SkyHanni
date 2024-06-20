@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -63,7 +64,7 @@ private fun onRemoval(line: String) {
         CustomScoreboardUtils.UndetectedScoreboardLines(message),
         message,
         "Unknown Lines" to confirmedUnknownLines,
-        "Island" to HypixelData.skyBlockIsland,
+        "Island" to LorenzUtils.skyBlockIsland,
         "Area" to HypixelData.skyBlockArea,
         "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
         noStackTrace = true,
@@ -509,7 +510,7 @@ private fun getNorthStarsShowWhen() = inAnyIsland(IslandType.WINTER)
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.LEFT)
 
 private fun getIslandDisplayPair() =
-    listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
+    listOf("§7㋖ §a" + LorenzUtils.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
 private fun getLocationDisplayPair() = buildList {
     HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }
