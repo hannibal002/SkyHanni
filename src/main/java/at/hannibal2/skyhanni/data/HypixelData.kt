@@ -409,7 +409,6 @@ object HypixelData {
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             serverNameScoreboardPattern.matchMatcher(line) {
-                println("line: $line")
                 hypixel = true
                 if (group("prefix") == "alpha.") {
                     hypixelAlpha = true
