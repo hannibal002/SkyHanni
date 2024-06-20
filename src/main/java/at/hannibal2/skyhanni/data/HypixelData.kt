@@ -279,7 +279,6 @@ object HypixelData {
 
     @SubscribeEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-        if (hasScoreboardUpdated) return
         hasScoreboardUpdated = true
     }
 
