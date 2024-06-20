@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -68,8 +68,7 @@ object CustomScoreboard {
 
         RenderBackground.updatePosition(finalRenderable)
 
-        // TODO: change to renderRenderable when custom wardrobe gets merged
-        config.position.renderRenderables(listOf(finalRenderable), posLabel = guiName)
+        config.position.renderRenderable(finalRenderable, posLabel = guiName)
     }
 
     @SubscribeEvent
