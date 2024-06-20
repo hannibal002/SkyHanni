@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -25,7 +24,7 @@ object ChocolateFactoryBlockOpen {
      */
     private val commandPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.opencommand",
-        "/(?:cf|chocolatefactory)(?: .*)?",
+        "\\/(?:cf|chocolatefactory)(?: .*)?",
     )
 
     private var commandSentTimer = SimpleTimeMark.farPast()
@@ -35,13 +34,13 @@ object ChocolateFactoryBlockOpen {
         if (!isEnabled()) return
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
-        if (PetAPI.currentPet?.startsWith("§dRabbit") == true) return
+        if (MythicRabbitPetWarning.correctPet()) return
 
         commandSentTimer = SimpleTimeMark.now()
         event.cancel()
-        ChatUtils.clickableChat(
-            "Blocked opening the Chocolate Factory without a mythic §dRabbit §epet equipped. Click here to disable!",
-            { ConfigGuiManager.openConfigGui("mythic rabbit pet equipped") },
+        ChatUtils.chatAndOpenConfig(
+            "Blocked opening the Chocolate Factory without a §dMythic Rabbit Pet §eequipped. Click here to disable!",
+            config::mythicRabbitRequirement,
         )
     }
 
