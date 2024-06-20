@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -39,7 +40,7 @@ object ChocolateFactoryTimeTowerManager {
         }
 
         checkTimeTowerExpired()
-        
+
         if (ChocolateFactoryAPI.inChocolateFactory) return
 
         val nextCharge = profileStorage.nextTimeTower
@@ -53,7 +54,7 @@ object ChocolateFactoryTimeTowerManager {
             if (!config.timeTowerWarning || timeTowerActive()) return
             ChatUtils.clickableChat(
                 "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
-                    "Click here to use one",
+                    "Click here to use one.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 }
@@ -68,9 +69,9 @@ object ChocolateFactoryTimeTowerManager {
     private fun checkTimeTowerExpired() {
         val isTimeTowerActive = timeTowerActive()
         if (!isTimeTowerActive && wasTimeTowerRecentlyActive && config.timeTowerWarning && currentCharges() > 0) {
+            val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", true)
             ChatUtils.clickableChat(
-                "§cYour Time Tower expired and has §7(${timeTowerCharges()} remaining)§c," +
-                    "Click here to use one",
+                "§cYour Time Tower expired and has $charges remaining. Click here to use one.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 }
