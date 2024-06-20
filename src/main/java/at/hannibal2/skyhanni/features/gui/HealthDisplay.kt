@@ -40,19 +40,32 @@ object HealthDisplay {
     private var absorptionRate = 0.0
     private var hasAbsorption = false
 
-    private enum class HealthColors(val range: ClosedFloatingPointRange<Double>, val color: Color) {
-        RED(0.0..1.0, Color.RED),
-        YELLOW(1.0..2.0, Color.YELLOW),
-        ORANGE(2.0..3.0, Color.ORANGE),
-        MAX(3.0..1000.0, Color.green) //test
+    private enum class HealthColors(
+        val range: ClosedFloatingPointRange<Double>,
+        val color: Color,
+    ) {
+        RED(0.0..1.0, Color(255, 19, 19)),
+        ORANGE(1.0..2.0, Color(238, 129, 0)),
+        YELLOW(2.0..3.0, Color(229, 206, 0)),
+        GREEN(3.0..4.0, Color(0, 218, 0)),
+        BLUE(4.0..5.0, Color(12, 157, 241)),
+        PURPLE(5.0..6.0, Color(180, 134, 255)),
+        PINK(6.0..7.0, Color(236, 138, 251)),
+        TAN(7.0..8.0, Color(251, 215, 139)),
+        AQUA(8.0..9.0, Color(3, 239, 236)),
+        LIGHT_BLUE(9.0..10.0, Color(183, 231, 253)),
+        ALMOST_WHITE(10.0..1000.0, Color(237, 237, 237)),
         ;
 
         companion object {
             fun getColors(input: Double): Pair<HealthColors?, HealthColors?> {
                 val color1 = entries.firstOrNull { input in it.range }
-                val color2 = if (color1 == RED) {
-                    RED
-                } else entries.firstOrNull { (input - 1.0) in it.range }
+                val color2 =
+                    if (color1 == RED) {
+                        RED
+                    } else {
+                        entries.firstOrNull { (input - 1.0) in it.range }
+                    }
                 return color1 to color2
             }
         }
@@ -63,13 +76,20 @@ object HealthDisplay {
         if (!LorenzUtils.inSkyBlock) return
         if (RiftAPI.inRift()) return
 
-        maxHealth = ActionBarStatsData.MAX_HEALTH.value.replace(",", "").toDoubleOrNull() ?: return
-        val hp = ActionBarStatsData.HEALTH.value.replace(",", "").toDoubleOrNull() ?: return
+        maxHealth = ActionBarStatsData.MAX_HEALTH.value
+            .replace(",", "")
+            .toDoubleOrNull() ?: return
+        val hp =
+            ActionBarStatsData.HEALTH.value
+                .replace(",", "")
+                .toDoubleOrNull() ?: return
         val player = LorenzUtils.getPlayer() ?: return
 
         if (config.predictHealth) {
-            if (maxHealth < hp && player.absorptionAmount != 0.0f) absorptionRate =
-                (hp - maxHealth) / player.absorptionAmount
+            if (maxHealth < hp && player.absorptionAmount != 0.0f) {
+                absorptionRate =
+                    (hp - maxHealth) / player.absorptionAmount
+            }
             return
         }
         healthUpdate = healthUpdater(hp.toInt() - actualHealth)
@@ -117,7 +137,7 @@ object HealthDisplay {
 
         return listOf(
             ColorRange(0.0, newHealth, input.first.color),
-            ColorRange(newHealth, 1.0, input.second.color)
+            ColorRange(newHealth, 1.0, input.second.color),
         )
     }
 
@@ -155,36 +175,45 @@ object HealthDisplay {
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        if (config.enabledBar) {
-            val interpolatedHealth =
-                NumberUtil.interpolate(health.toFloat(), healthLast.toFloat(), healthTimer.toMillis()).toDouble()
-            val barRenderable = Renderable.progressBarMultipleColors(
+        if (config.enabledBar) renderBar()
+        if (config.enabledText) renderText()
+    }
+
+    private fun renderBar() {
+        val interpolatedHealth =
+            NumberUtil.interpolate(health.toFloat(), healthLast.toFloat(), healthTimer.toMillis()).toDouble()
+        val barRenderable =
+            Renderable.progressBarMultipleColors(
                 if (interpolatedHealth > 1.0) 1.0 else interpolatedHealth,
                 colorList,
             )
-            config.positionBar.renderRenderables(listOf(barRenderable), posLabel = "HP Bar")
-        }
+        config.positionBar.renderRenderables(listOf(barRenderable), posLabel = "HP Bar")
+    }
 
-        if (config.enabledText) {
-            val colorCode = if (actualHealth > maxHealth) "§6"
-            else "§c"
+    private fun renderText() {
+        val colorCode =
+            if (actualHealth > maxHealth) {
+                "§6"
+            } else {
+                "§c"
+            }
 
-            var string = "$colorCode$actualHealth/${maxHealth.toInt()}❤"
-
-            val updateText = when {
+        var string = "$colorCode$actualHealth/${maxHealth.toInt()}❤"
+        val updateText =
+            when {
                 healthUpdate == 0 -> ""
                 healthUpdate > 0 -> "+$healthUpdate"
                 else -> "$healthUpdate"
             }
-            if (config.healthUpdates && updateText.isNotEmpty()) {
-                string += " §c$updateText"
-            }
-
-            val textRenderable = Renderable.string(
-                string
-            )
-            config.positionText.renderRenderables(listOf(textRenderable), posLabel = "HP Text")
+        if (config.healthUpdates && updateText.isNotEmpty()) {
+            string += " §c$updateText"
         }
+
+        val textRenderable =
+            Renderable.string(
+                string,
+            )
+        config.positionText.renderRenderables(listOf(textRenderable), posLabel = "HP Text")
     }
 
     @SubscribeEvent
