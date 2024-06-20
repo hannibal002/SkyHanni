@@ -27,7 +27,7 @@ object ChocolateFactoryTimeTowerManager {
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        wasTimeTowerRecentlyActive = true
+        wasTimeTowerRecentlyActive = false
     }
 
     @SubscribeEvent
