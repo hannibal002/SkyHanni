@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.NEW_YEAR
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
@@ -41,98 +42,103 @@ enum class ScoreboardEvents(
     VOTING(
         ::getVotingLines,
         ::getVotingShowWhen,
-        "§7(All Voting Lines)"
+        "§7(All Voting Lines)",
     ),
     SERVER_CLOSE(
         ::getServerCloseLines,
         ::getServerCloseShowWhen,
-        "§cServer closing soon!"
+        "§cServer closing soon!",
     ),
     DUNGEONS(
         ::getDungeonsLines,
         ::getDungeonsShowWhen,
-        "§7(All Dungeons Lines)"
+        "§7(All Dungeons Lines)",
     ),
     KUUDRA(
         ::getKuudraLines,
         ::getKuudraShowWhen,
-        "§7(All Kuudra Lines)"
+        "§7(All Kuudra Lines)",
     ),
     DOJO(
         ::getDojoLines,
         ::getDojoShowWhen,
-        "§7(All Dojo Lines)"
+        "§7(All Dojo Lines)",
     ),
     DARK_AUCTION(
         ::getDarkAuctionLines,
         ::getDarkAuctionShowWhen,
         "Time Left: §b11\n" +
             "Current Item:\n" +
-            " §5Travel Scroll to Sirius"
+            " §5Travel Scroll to Sirius",
     ),
     JACOB_CONTEST(
         ::getJacobContestLines,
         ::getJacobContestShowWhen,
         "§eJacob's Contest\n" +
             "§e○ §fCarrot §a18m17s\n" +
-            " Collected §e8,264"
+            " Collected §e8,264",
     ),
     JACOB_MEDALS(
         ::getJacobMedalsLines,
         ::getJacobMedalsShowWhen,
         "§6§lGOLD §fmedals: §613\n" +
             "§f§lSILVER §fmedals: §f3\n" +
-            "§c§lBRONZE §fmedals: §c4"
+            "§c§lBRONZE §fmedals: §c4",
     ),
     TRAPPER(
         ::getTrapperLines,
         ::getTrapperShowWhen,
         "Pelts: §5711\n" +
             "Tracker Mob Location:\n" +
-            "§bMushroom Gorge"
+            "§bMushroom Gorge",
     ),
     GARDEN_CLEAN_UP(
         ::getGardenCleanUpLines,
         ::getGardenCleanUpShowWhen,
-        "Cleanup: §c12.6%"
+        "Cleanup: §c12.6%",
     ),
     GARDEN_PASTING(
         ::getGardenPastingLines,
         ::getGardenPastingShowWhen,
-        "§fBarn Pasting§7: §e12.3%"
+        "§fBarn Pasting§7: §e12.3%",
     ),
     FLIGHT_DURATION(
         ::getFlightDurationLines,
         ::getFlightDurationShowWhen,
-        "Flight Duration: §a10m 0s"
+        "Flight Duration: §a10m 0s",
     ),
     WINTER(
         ::getWinterLines,
         ::getWinterShowWhen,
-        "§7(All Winter Event Lines)"
+        "§7(All Winter Event Lines)",
+    ),
+    NEW_YEAR(
+        ::getNewYearLines,
+        ::getNewYearShowWhen,
+        "§dNew Year Event!§f 24:25",
     ),
     SPOOKY(
         ::getSpookyLines,
         ::getSpookyShowWhen,
         "§6Spooky Festival§f 50:54\n" +
             "§7Your Candy:\n" +
-            "§a1 Green§7, §50 Purple §7(§61 §7pts.)"
+            "§a1 Green§7, §50 Purple §7(§61 §7pts.)",
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
         ::getBroodmotherShowWhen,
-        "§4Broodmother§7: §eDormant"
+        "§4Broodmother§7: §eDormant",
     ),
     MINING_EVENTS(
         ::getMiningEventsLines,
         { inAdvancedMiningIsland() },
-        "§7(All Mining Event Lines)"
+        "§7(All Mining Event Lines)",
     ),
     DAMAGE(
         ::getDamageLines,
         ::getDamageShowWhen,
         "Dragon HP: §a6,180,925 §c❤\n" +
-            "Your Damage: §c375,298.5"
+            "Your Damage: §c375,298.5",
     ),
     MAGMA_BOSS(
         ::getMagmaBossLines,
@@ -140,43 +146,43 @@ enum class ScoreboardEvents(
         "§7(All Magma Boss Lines)\n" +
             "§7Boss: §c0%\n" +
             "§7Damage Soaked:\n" +
-            "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
+            "§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎",
     ),
     CARNIVAL(
         ::getCarnivalLines,
         ::getCarnivalShowWhen,
-        "§7(All Carnival Lines)"
+        "§7(All Carnival Lines)",
     ),
     RIFT(
         ::getRiftLines,
         { IslandType.THE_RIFT.isInIsland() },
-        "§7(All Rift Lines)"
+        "§7(All Rift Lines)",
     ),
     ESSENCE(
         ::getEssenceLines,
         ::getEssenceShowWhen,
-        "Dragon Essence: §d1,285"
+        "Dragon Essence: §d1,285",
     ),
     QUEUE(
         ::getQueueLines,
         ::getQueueShowWhen,
         "Queued: Glacite Mineshafts\n" +
-            "Position: §b#45 §fSince: §a00:00"
+            "Position: §b#45 §fSince: §a00:00",
     ),
     ACTIVE_TABLIST_EVENTS(
         ::getActiveEventLine,
         ::getActiveEventShowWhen,
-        "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h"
+        "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h",
     ),
     STARTING_SOON_TABLIST_EVENTS(
         ::getSoonEventLine,
         ::getSoonEventShowWhen,
-        "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
+        "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min",
     ),
     REDSTONE(
         ::getRedstoneLines,
         ::getRedstoneShowWhen,
-        "§e§l⚡ §cRedstone: §e§b7%"
+        "§e§l⚡ §cRedstone: §e§b7%",
     ),
     ANNIVERSARY(
         ::getAnniversaryLines,
@@ -217,6 +223,7 @@ enum class ScoreboardEvents(
             GARDEN_CLEAN_UP,
             GARDEN_PASTING,
             FLIGHT_DURATION,
+            NEW_YEAR,
             WINTER,
             SPOOKY,
             BROODMOTHER,
@@ -226,7 +233,7 @@ enum class ScoreboardEvents(
             CARNIVAL,
             RIFT,
             ESSENCE,
-            ACTIVE_TABLIST_EVENTS
+            ACTIVE_TABLIST_EVENTS,
         )
     }
 }
@@ -265,7 +272,7 @@ private fun getDungeonsLines() = listOf(
     SbPattern.clearedPattern,
     SbPattern.soloPattern,
     SbPattern.teammatesPattern,
-    SbPattern.floor3GuardiansPattern
+    SbPattern.floor3GuardiansPattern,
 ).let { patterns ->
     // BetterMap adds a random §r at the start, making the line go black
     getSbLines().filter { line -> patterns.any { it.matches(line) } }.map { it.removePrefix("§r") }
@@ -280,7 +287,7 @@ private fun getKuudraLines() = listOf(
     SbPattern.instanceShutdownPattern,
     SbPattern.wavePattern,
     SbPattern.tokensPattern,
-    SbPattern.submergesPattern
+    SbPattern.submergesPattern,
 )
     .mapNotNull { pattern ->
         getSbLines().firstOrNull { pattern.matches(it) }
@@ -292,7 +299,7 @@ private fun getDojoLines() = listOf(
     SbPattern.dojoChallengePattern,
     SbPattern.dojoDifficultyPattern,
     SbPattern.dojoPointsPattern,
-    SbPattern.dojoTimePattern
+    SbPattern.dojoTimePattern,
 )
     .mapNotNull { pattern ->
         getSbLines().firstOrNull { pattern.matches(it) }
@@ -374,6 +381,10 @@ private fun getWinterShowWhen(): Boolean = getSbLines().any {
         || ScoreboardPattern.winterWavePattern.matches(it)
 }
 
+private fun getNewYearLines() = listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
+
+private fun getNewYearShowWhen(): Boolean = SbPattern.newYearPattern.anyMatches(getSbLines())
+
 private fun getSpookyLines() = buildList {
     getSbLines().firstOrNull { SbPattern.spookyPattern.matches(it) }?.let { add(it) } // Time
     add("§7Your Candy: ")
@@ -382,7 +393,7 @@ private fun getSpookyLines() = buildList {
             .removeResets()
             .split("\n")
             .firstOrNull { it.startsWith("§7Your Candy:") }
-            ?.removePrefix("§7Your Candy:") ?: "§cCandy not found"
+            ?.removePrefix("§7Your Candy:") ?: "§cCandy not found",
     ) // Candy
 }
 
@@ -401,7 +412,7 @@ private fun getActiveEventLine(): List<String> {
 
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
-    val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary")
+    val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
 
     val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
@@ -419,7 +430,7 @@ private fun getActiveEventShowWhen(): Boolean =
 
 private fun getSoonEventLine(): List<String> {
     val soonActiveEvent = getTablistEvent() ?: return emptyList()
-    val soonActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
+    val soonActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeStartsPattern.matches(it) }
         ?.let {
             SbPattern.eventTimeStartsPattern.matchMatcher(it) {
                 group("time")
@@ -461,8 +472,10 @@ private fun getMiningEventsLines() = buildList {
     // Zone Events but no Zone Line
     if (getSbLines().any { SbPattern.miningEventPattern.matches(it) }
         && getSbLines().none { SbPattern.miningEventZonePattern.matches(it) }) {
-        add(getSbLines().first { SbPattern.miningEventPattern.matches(it) }
-            .removePrefix("Event: "))
+        add(
+            getSbLines().first { SbPattern.miningEventPattern.matches(it) }
+                .removePrefix("Event: "),
+        )
     }
 
     // Mithril Gourmand
