@@ -22,7 +22,9 @@ object SoundUtils {
         Minecraft.getMinecraft().addScheduledTask {
             val gameSettings = Minecraft.getMinecraft().gameSettings
             val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
-            gameSettings.setSoundLevel(SoundCategory.PLAYERS, 1f)
+            if(!SkyHanniMod.feature.misc.maintainGameVolume) {
+                gameSettings.setSoundLevel(SoundCategory.PLAYERS, 1f)
+            }
             try {
                 Minecraft.getMinecraft().soundHandler.playSound(this)
             } catch (e: Exception) {
@@ -39,7 +41,9 @@ object SoundUtils {
                     "soundLocation" to this.soundLocation
                 )
             } finally {
-                gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
+                if(!SkyHanniMod.feature.misc.maintainGameVolume){
+                    gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
+                }
             }
         }
     }
