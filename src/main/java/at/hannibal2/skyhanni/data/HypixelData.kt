@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -272,6 +273,15 @@ object HypixelData {
         locrawData = null
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
+        hasScoreboardUpdated = false
+    }
+
+    private var hasScoreboardUpdated = false
+
+    @SubscribeEvent
+    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        if (hasScoreboardUpdated) return
+        hasScoreboardUpdated = true
     }
 
     @SubscribeEvent
@@ -378,6 +388,7 @@ object HypixelData {
     }
 
     private fun checkHypixel() {
+        if (!hasScoreboardUpdated) return
         val mc = Minecraft.getMinecraft()
         val player = mc.thePlayer ?: return
 
@@ -398,6 +409,7 @@ object HypixelData {
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
             serverNameScoreboardPattern.matchMatcher(line) {
+                println("line: $line")
                 hypixel = true
                 if (group("prefix") == "alpha.") {
                     hypixelAlpha = true
