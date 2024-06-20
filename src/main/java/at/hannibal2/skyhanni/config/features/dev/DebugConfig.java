@@ -24,7 +24,7 @@ public class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Mod Menu Log",
-        desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " +
+        desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
             "Useful for adding more mods to quick mod menu switch."
     )
     @ConfigEditorBoolean
@@ -106,7 +106,7 @@ public class DebugConfig {
     public boolean hotSwapDetection = false;
 
     @Expose
-    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always oudated.")
+    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")
     @ConfigEditorBoolean
     public boolean alwaysOutdated = false;
 
@@ -117,14 +117,24 @@ public class DebugConfig {
     public boolean eventCounter = false;
 
     @Expose
-    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled whie pressing this hotkey.")
+    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled while pressing this hotkey.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int bypassAdvancedPlayerTabList = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
+    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while F3 is open.")
     @ConfigEditorBoolean
     public boolean currentAreaDebug = true;
+
+    @Expose
+    @ConfigOption(name = "Oreblock Name", desc = "Show the OreBlock you are currently looking at.")
+    @ConfigEditorBoolean
+    public boolean raytracedOreblock = true;
+
+    @Expose
+    @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
+    @ConfigEditorBoolean
+    public boolean oreEventMessages = false;
 
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")

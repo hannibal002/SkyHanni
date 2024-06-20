@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -84,10 +84,10 @@ object ChatManager {
         val message = packet.message
         val component = ChatComponentText(message)
         val originatingModCall = event.findOriginatingModCall()
-        val originatingModContainer = originatingModCall?.getClassInstance()?.getModContainer()
+        val originatingModContainer = originatingModCall?.getClassInstance()?.getModInstance()
         val hoverInfo = listOf(
             "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
-            "§7Mod id: §a${originatingModContainer?.modId}",
+            "§7Mod id: §a${originatingModContainer?.id}",
             "§7Mod name: §a${originatingModContainer?.name}"
         )
         val stackTrace =
