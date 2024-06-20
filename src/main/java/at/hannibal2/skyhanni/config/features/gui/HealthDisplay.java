@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class HealthDisplay {
     @Expose
@@ -54,4 +55,20 @@ public class HealthDisplay {
     )
     @ConfigEditorBoolean
     public Boolean riftDynamicHP = false;
+
+    @Expose
+    @ConfigOption(
+        name = "hide action bar",
+        desc = "a"
+    )
+    @ConfigEditorBoolean
+    public Boolean hideActionBar = false;
+
+    @Expose
+    @ConfigOption(
+        name = "hide vanilla hp",
+        desc = "b"
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> hideVanillaHP = Property.of(false);
 }

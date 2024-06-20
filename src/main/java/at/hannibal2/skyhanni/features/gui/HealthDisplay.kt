@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
@@ -19,6 +21,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.ColorRange
 import net.minecraft.potion.Potion
+import net.minecraftforge.client.GuiIngameForge
+import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -54,7 +58,7 @@ object HealthDisplay {
         TAN(7.0..8.0, Color(251, 215, 139)),
         AQUA(8.0..9.0, Color(3, 239, 236)),
         LIGHT_BLUE(9.0..10.0, Color(183, 231, 253)),
-        ALMOST_WHITE(10.0..1000.0, Color(237, 237, 237)),
+        ALMOST_WHITE(10.0..Double.MAX_VALUE, Color(237, 237, 237)),
         ;
 
         companion object {
@@ -234,6 +238,22 @@ object HealthDisplay {
             add("absorptionRate: $absorptionRate")
             add("has absorption: ${player.hasPotionEffect(Potion.absorption)}")
             add("absroption amt: ${player.absorptionAmount}")
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderRemoveBars(event: RenderGameOverlayEvent.Pre) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.hideVanillaHP.get()) return
+        if (event.type != RenderGameOverlayEvent.ElementType.HEALTH) return
+
+        GuiIngameForge.renderHealth = false
+    }
+
+    @SubscribeEvent
+    fun onConfig(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.hideVanillaHP) {
+            GuiIngameForge.renderHealth = true
         }
     }
 
