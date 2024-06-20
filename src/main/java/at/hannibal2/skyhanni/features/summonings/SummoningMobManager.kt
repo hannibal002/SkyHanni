@@ -95,7 +95,7 @@ object SummoningMobManager {
 
         if (!mob.isInRender()) return
         DelayedRun.runNextTick {
-            if (lastChatTime.passedSince() > timeOut) {
+            if (lastChatTime.passedSince() > timeOut && config.summonMessages) {
                 ChatUtils.chat("Your Summoning Mob just §cdied!")
             }
         }
