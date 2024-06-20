@@ -44,7 +44,7 @@ object WardrobeAPI {
         "§7Slot \\d+: §aEquipped",
     )
 
-    private const val FIRST_SLOT = 36
+    const val FIRST_SLOT = 36
     private const val FIRST_HELMET_SLOT = 0
     private const val FIRST_CHESTPLATE_SLOT = 9
     private const val FIRST_LEGGINGS_SLOT = 18
