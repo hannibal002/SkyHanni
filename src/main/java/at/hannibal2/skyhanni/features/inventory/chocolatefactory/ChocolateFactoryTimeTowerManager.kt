@@ -42,7 +42,7 @@ object ChocolateFactoryTimeTowerManager {
             val nextTimeTower = profileStorage.nextTimeTower + profileStorage.timeTowerCooldown.hours
             profileStorage.nextTimeTower = nextTimeTower
 
-            if (!config.timeTowerWarning) return
+            if (!config.timeTowerWarning || timeTowerActive()) return
             ChatUtils.clickableChat(
                 "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
                     "Click here to use one",
