@@ -41,7 +41,7 @@ object SoundUtils {
                     "soundLocation" to this.soundLocation
                 )
             } finally {
-                if(!SkyHanniMod.feature.misc.maintainGameVolume){
+                if(!SkyHanniMod.feature.misc.maintainGameVolume) {
                     gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
                 }
             }
