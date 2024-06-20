@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.part
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGroupFromPattern
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
@@ -48,15 +49,16 @@ import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import java.util.function.Supplier
 import kotlin.time.Duration.Companion.seconds
 
-internal var confirmedUnknownLines = mutableListOf<String>()
+internal var confirmedUnknownLines = listOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(2.seconds) { onRemoval(it) }
+internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
     if (!LorenzUtils.inSkyBlock) return
     if (!unconfirmedUnknownLines.contains(line)) return
+    if (line !in unconfirmedUnknownLines) return
     unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
-    confirmedUnknownLines.add(line)
+    confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
     if (!config.unknownLinesWarning) return
     val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
     val message = "CustomScoreboard detected $pluralize"
