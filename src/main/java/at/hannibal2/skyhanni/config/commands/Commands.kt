@@ -62,6 +62,7 @@ import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -446,6 +447,12 @@ object Commands {
             "shtestgriffinspots",
             "Show potential griffin spots around you.",
         ) { GriffinBurrowHelper.testGriffinSpots() }
+        registerCommand(
+            "shchangelog",
+            "Shows the specified changelog."
+        ) {
+            ChangelogViewer.handelCommand(it)
+        }
     }
 
     private fun developersCodingHelp() {

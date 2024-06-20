@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.massconfiguration
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.misc.update.ChangelogViewer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
@@ -45,12 +46,18 @@ object DefaultConfigFeatures {
         } else if (updated) {
             val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
             val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.version}"
+            ChatUtils.chat("Looks like you updated SkyHanni.")
             ChatUtils.clickableChat(
-                "Looks like you updated SkyHanni. " +
-                    "Click here to configure the newly introduced options, or run $command.",
+                "Click here to configure the newly introduced options, or run $command.",
                 onClick = {
                     onCommand(lastVersion, SkyHanniMod.version)
                 },
+            )
+            ChatUtils.clickableChat(
+                "Click here to see the changelog.",
+                onClick = {
+                    ChangelogViewer.showChangelog(lastVersion, SkyHanniMod.version)
+                }
             )
         }
     }

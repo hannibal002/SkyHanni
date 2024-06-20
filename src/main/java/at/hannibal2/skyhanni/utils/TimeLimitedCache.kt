@@ -40,4 +40,6 @@ class TimeLimitedCache<K: Any, V: Any>(
     operator fun set(key: K, value: V) {
         cache.put(key, value)
     }
+
+    operator fun get(key: K): V? = getOrNull(key)
 }
