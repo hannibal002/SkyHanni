@@ -113,6 +113,12 @@ public class ChocolateFactoryConfig {
     public boolean timeTowerWarning = false;
 
     @Expose
+    @ConfigOption(name = "Time Tower Expiry Reminder", desc = "Notify when the time tower ends and you have one or more remaining charges.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeTowerReminder = true;
+
+    @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
     @Accordion
     public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
