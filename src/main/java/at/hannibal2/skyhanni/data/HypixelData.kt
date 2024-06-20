@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
@@ -108,6 +109,7 @@ object HypixelData {
     )
 
     private var lastLocRaw = SimpleTimeMark.farPast()
+    private var hasScoreboardUpdated = false
 
     var hypixelLive = false
     var hypixelAlpha = false
@@ -267,6 +269,12 @@ object HypixelData {
         locrawData = null
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
+        hasScoreboardUpdated = false
+    }
+
+    @SubscribeEvent
+    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        hasScoreboardUpdated = true
     }
 
     @SubscribeEvent
@@ -375,6 +383,7 @@ object HypixelData {
     }
 
     private fun checkHypixel() {
+        if (!hasScoreboardUpdated) return
         val mc = Minecraft.getMinecraft()
         val player = mc.thePlayer ?: return
 
