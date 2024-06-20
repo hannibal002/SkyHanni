@@ -648,13 +648,13 @@ enum class HotmData(
             if (!LorenzUtils.inSkyBlock) return
 
             event.scoreboard.matchFirst(ScoreboardPattern.powderPattern) {
-                val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
+                val type = HotmAPI.Powder.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
 
                 if (difference > 0) {
                     type.gain(difference)
-                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.lowName} Powder")
+                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.displayName} Powder")
                 }
             }
         }
@@ -742,7 +742,7 @@ enum class HotmData(
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 HotmAPI.Powder.entries.forEach {
-                    add("${it.lowName} Powder: ${it.getCurrent()}/${it.getTotal()}")
+                    add("${it.displayName} Powder: ${it.getCurrent()}/${it.getTotal()}")
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")

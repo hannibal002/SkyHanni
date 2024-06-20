@@ -37,15 +37,13 @@ object HotmAPI {
 
         ;
 
-        val lowName = name.lowercase().firstLetterUppercase()
-
         val heartPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.heart",
-            "§7$lowName Powder: §a§.(?<powder>[\\d,]+)"
+            "§7$displayName Powder: §a§.(?<powder>[\\d,]+)"
         )
         val resetPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.reset",
-            "\\s+§8- §.(?<powder>[\\d,]+) $lowName Powder"
+            "\\s+§8- §.(?<powder>[\\d,]+) $displayName Powder"
         )
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
