@@ -89,15 +89,13 @@ object SummoningMobManager {
 
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.Summon) {
-        if (!config.summonMessages) return
-
         val mob = event.mob
         if (mob !in mobs) return
         mobs -= mob
 
         if (!mob.isInRender()) return
         DelayedRun.runNextTick {
-            if (lastChatTime.passedSince() > timeOut) {
+            if (lastChatTime.passedSince() > timeOut && config.summonMessages) {
                 ChatUtils.chat("Your Summoning Mob just §cdied!")
             }
         }
