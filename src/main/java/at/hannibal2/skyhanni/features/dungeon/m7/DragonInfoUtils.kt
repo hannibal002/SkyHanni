@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.dungeon.m7
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.M7DragonChangeEvent
@@ -17,6 +19,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.entity.boss.EntityDragon
@@ -154,6 +158,7 @@ object DragonInfoUtils {
         logLine("------ run $currentRun -------")
         logLine("Starting Phase5")
         currentRun += 1
+        buildRenderable()
         inPhase5 = true
     }
 
@@ -253,5 +258,34 @@ object DragonInfoUtils {
     @HandleEvent
     fun onDragonChange(event: M7DragonChangeEvent) {
         ChatUtils.debug("${event.dragon} ${event.state} ${event.defeated}")
+        buildRenderable()
+    }
+
+    private val config get() = SkyHanniMod.feature.dungeon.m7config
+    private var renderable = listOf<Renderable>()
+
+    fun buildRenderable() {
+        val list = mutableListOf<Renderable>()
+        list.add(Renderable.string("§5§lWithered Dragon Info"))
+        for (dragon in WitheredDragonInfo.entries) {
+            list.add(
+                Renderable.string("§${dragon.color.chatColorCode}${dragon.colorName}§f: ${dragon.status} ${getSymbol(dragon.defeated)}"),
+            )
+        }
+
+        renderable = list.toList()
+    }
+
+    private fun getSymbol(isDefeated: Boolean): String {
+        return if (isDefeated) "§a✔"
+        else "§c✖"
+    }
+
+    @SubscribeEvent
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.dragonStatusGUI) return
+        if (!inPhase5) return
+
+        config.dragonStatusPosition.renderRenderables(renderable, posLabel = "Withered Dragon info")
     }
 }
