@@ -60,7 +60,7 @@ object FishingBaitWarnings {
         if (!isEnabled() || !FishingAPI.isFishing()) return
         if (event.entity.distanceToPlayer() > 10) return
         DelayedRun.runNextTick {
-            val isBait = event.entity.entityItem?.isBait() ?: false
+            val isBait = event.entity.entityItem.isBait()
             if (isBait) {
                 baitEntities += Bait(event.entity)
             }
