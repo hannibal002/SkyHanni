@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 object Gems : Element() {
-    override fun getDisplayPair(): List<Any> {
+    override fun getDisplay(): List<Any> {
         val gems = getGems()
 
         return listOf(

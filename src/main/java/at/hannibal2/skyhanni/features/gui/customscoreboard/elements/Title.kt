@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElementType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 
 object Title : Element() {
-    override fun getDisplayPair(): List<ScoreboardElementType> {
+    override fun getDisplay(): List<ScoreboardElementType> {
         val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
 
         if (!LorenzUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {

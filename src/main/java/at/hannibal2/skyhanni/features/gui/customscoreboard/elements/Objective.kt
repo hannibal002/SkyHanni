@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Objective : Element() {
-    override fun getDisplayPair() = buildList {
+    override fun getDisplay() = buildList {
         val objective = ScoreboardPattern.objectivePattern.firstMatches(ScoreboardData.sidebarLinesFormatted) ?: return@buildList
 
         add(objective)

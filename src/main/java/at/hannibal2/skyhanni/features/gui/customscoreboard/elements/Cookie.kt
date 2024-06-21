@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 object Cookie : Element() {
-    override fun getDisplayPair() = listOf(
+    override fun getDisplay() = listOf(
         "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
             if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
         } ?: "§cOpen SbMenu!"),

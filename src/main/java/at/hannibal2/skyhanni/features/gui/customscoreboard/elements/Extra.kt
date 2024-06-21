@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.amountOfUnknownLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.unconfirmedUnknownLines
 
 object Extra : Element() {
-    override fun getDisplayPair(): List<Any> {
+    override fun getDisplay(): List<Any> {
         if (unconfirmedUnknownLines.isEmpty()) return listOf(HIDDEN)
         amountOfUnknownLines = unconfirmedUnknownLines.size
 

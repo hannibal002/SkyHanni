@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 
 object Powder : Element() {
-    override fun getDisplayPair() = buildList {
+    override fun getDisplay() = buildList {
         val powderTypes = HotmAPI.Powder.entries
         if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
             return@buildList

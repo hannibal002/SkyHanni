@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 object Purse : Element() {
-    override fun getDisplayPair(): List<Any> {
+    override fun getDisplay(): List<Any> {
         var purse = formatNumber(PurseAPI.currentPurse)
 
         if (!displayConfig.hideCoinsDifference) {

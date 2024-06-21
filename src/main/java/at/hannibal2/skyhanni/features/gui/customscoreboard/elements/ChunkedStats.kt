@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsManager.C
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 
 object ChunkedStats : Element() {
-    override fun getDisplayPair() = getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
+    override fun getDisplay() = getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
         .map { it.joinToString(" §f| ") }
 
     override fun showWhen() = shouldShowChunkedStats()

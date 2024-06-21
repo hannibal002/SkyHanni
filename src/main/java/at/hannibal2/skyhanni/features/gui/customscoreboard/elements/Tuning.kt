@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 
 object Tuning : Element() {
-    override fun getDisplayPair(): List<Any> {
+    override fun getDisplay(): List<Any> {
         val tunings = MaxwellAPI.tunings ?: return listOf("§cTalk to \"Maxwell\"!")
         if (tunings.isEmpty()) return listOf("§cNo Maxwell Tunings :(")
 

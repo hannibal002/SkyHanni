@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 
 object LobbyCode : Element() {
-    override fun getDisplayPair(): List<Any> {
+    override fun getDisplay(): List<Any> {
         val lobbyCode = HypixelData.serverId
         val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
         val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: HIDDEN

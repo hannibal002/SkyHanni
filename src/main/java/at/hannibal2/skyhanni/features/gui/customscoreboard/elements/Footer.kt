@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 
 object Footer : Element() {
-    override fun getDisplayPair() = listOf(
+    override fun getDisplay() = listOf(
         displayConfig.titleAndFooter.customFooter
             .replace("&", "§")
             .split("\\n")

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 
 object NorthStars : Element() {
-    override fun getDisplayPair(): List<Any> {
+    override fun getDisplay(): List<Any> {
         val northStars = formatStringNum(getNorthStars())
 
         return listOf(

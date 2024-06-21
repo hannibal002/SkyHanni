@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 
 object Quiver : Element() {
-    override fun getDisplayPair(): List<Any> {
+    override fun getDisplay(): List<Any> {
         if (QuiverAPI.currentArrow == null)
             return listOf("§cChange your Arrow once")
         if (QuiverAPI.currentArrow == NONE_ARROW_TYPE)

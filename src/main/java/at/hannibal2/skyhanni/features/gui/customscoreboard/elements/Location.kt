@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Location : Element() {
-    override fun getDisplayPair() = buildList {
+    override fun getDisplay() = buildList {
         addNotNull(HypixelData.skyBlockAreaWithSymbol)
         addNotNull(ScoreboardPattern.plotPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
     }

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 
 object Slayer : Element() {
-    override fun getDisplayPair() = buildList {
+    override fun getDisplay() = buildList {
         add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else HIDDEN))
         add(" §7- §e${SlayerAPI.latestSlayerCategory.trim()}")
         add(" §7- §e${SlayerAPI.latestSlayerProgress.trim()}")

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Visiting : Element() {
-    override fun getDisplayPair() = listOfNotNull(ScoreboardPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
+    override fun getDisplay() = listOfNotNull(ScoreboardPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
 
     override fun showWhen() = ScoreboardPattern.visitingPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 object Mayor : Element() {
-    override fun getDisplayPair() = buildList {
+    override fun getDisplay() = buildList {
         val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: HIDDEN
         val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
             "§7 (§e${MayorAPI.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
