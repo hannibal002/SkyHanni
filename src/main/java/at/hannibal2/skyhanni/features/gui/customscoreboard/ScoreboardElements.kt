@@ -38,9 +38,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Tuning
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Visiting
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 
-const val HIDDEN = "<hidden>"
-const val EMPTY = "<empty>"
-
 enum class ScoreboardElement(val element: Element) {
     TITLE(Title),
     PROFILE(Profile),

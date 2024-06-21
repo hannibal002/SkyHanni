@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -50,6 +50,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
+
+internal const val HIDDEN = "<hidden>"
+internal const val EMPTY = "<empty>"
 
 @SkyHanniModule
 object CustomScoreboard {
@@ -81,8 +84,7 @@ object CustomScoreboard {
 
         RenderBackground.updatePosition(finalRenderable)
 
-        // TODO: change to renderRenderable when custom wardrobe gets merged
-        config.position.renderRenderables(listOf(finalRenderable), posLabel = GUI_NAME)
+        config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
     }
 
     @SubscribeEvent
