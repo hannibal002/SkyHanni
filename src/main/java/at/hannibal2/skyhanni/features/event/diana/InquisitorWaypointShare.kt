@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -49,7 +50,7 @@ object InquisitorWaypointShare {
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
 
-    //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
+    // Support for https://www.chattriggers.com/modules/v/inquisitorchecker
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
@@ -108,7 +109,7 @@ object InquisitorWaypointShare {
         inquisitorsNearby = emptyList()
     }
 
-    val inquisitorTime = mutableListOf<SimpleTimeMark>()
+    private val inquisitorTime = mutableListOf<SimpleTimeMark>()
 
     @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {
@@ -194,14 +195,13 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("Inquisitor dead!")
     }
 
-    fun sendInquisitor() {
+    private fun sendInquisitor() {
         if (!isEnabled()) return
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
-            ChatUtils.error("No Inquisitor Found!")
-            return
+            ErrorManager.skyHanniError("No Inquisitor Found!")
         }
 
         val inquisitor = EntityUtils.getEntityByID(inquisitor)
