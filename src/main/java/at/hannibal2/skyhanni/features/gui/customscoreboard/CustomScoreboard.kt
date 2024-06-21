@@ -145,7 +145,7 @@ object CustomScoreboard {
     private fun MutableList<ScoreboardElementType>.addAllNonSkyBlockLines() {
         addAll(ScoreboardElement.TITLE.getVisiblePair())
         addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
-        //addAll(ScoreboardElement.FOOTER.getVisiblePair())
+        addAll(ScoreboardElement.FOOTER.getVisiblePair())
     }
 
     private fun MutableList<ScoreboardElementType>.addDefaultSkyBlockLines() {

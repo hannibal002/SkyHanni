@@ -1,16 +1,51 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
+
+internal var confirmedUnknownLines = listOf<String>()
+internal var unconfirmedUnknownLines = listOf<String>()
+internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
+internal var amountOfUnknownLines = 0
+
+
+private fun onRemoval(line: String) {
+    if (!LorenzUtils.inSkyBlock) return
+    if (!unconfirmedUnknownLines.contains(line)) return
+    if (line !in unconfirmedUnknownLines) return
+    unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
+    confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
+    if (!config.unknownLinesWarning) return
+    val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
+    val message = "CustomScoreboard detected $pluralize"
+    ErrorManager.logErrorWithData(
+        CustomScoreboardUtils.UndetectedScoreboardLines(message),
+        message,
+        "Unknown Lines" to confirmedUnknownLines,
+        "Island" to LorenzUtils.skyBlockIsland,
+        "Area" to HypixelData.skyBlockArea,
+        "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        noStackTrace = true,
+        betaOnly = true,
+    )
+}
 
 object UnknownLinesHandler {
 
