@@ -8,21 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BridgeFormatterConfig {
-
-    /* TODO: Impl these configs:
-    *   - Enable Bridge
-	Reformats guild bridge messages
-
-        - Bridge bot name
-	IGN of the MC account acting as the bridge. Case Sensitive.
-
-        - Bridge format: %ign%, %msg%
-	Message format that will be sent when a message is sent from Discord. Uses ^ for sender and message. Use & for color codes.
-    Test mine: &4[Discord] &6&l%ign%&r:%msg%
-
-        ? (Test bridge msg)
-    * */
-
     @Expose
     @ConfigOption(
         name = "Enable Bridge Formatting",
@@ -31,8 +16,6 @@ public class BridgeFormatterConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
-
-
 
     @Expose
     @ConfigOption(
