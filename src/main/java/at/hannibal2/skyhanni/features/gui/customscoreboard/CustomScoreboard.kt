@@ -311,13 +311,6 @@ object CustomScoreboard {
                 },
             )
         }
-        event.move(
-            48,
-            "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
-            "$displayPrefix.titleAndFooter.useCustomTitle"
-        ) {
-            JsonPrimitive(!it.asBoolean)
-        }
         event.transform(50, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
             array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
@@ -328,6 +321,13 @@ object CustomScoreboard {
             val array = element.asJsonArray
             array.add(JsonPrimitive(ScoreboardEvents.NEW_YEAR.name))
             array
+        }
+        event.move(
+            52,
+            "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
+            "$displayPrefix.titleAndFooter.useCustomTitle",
+        ) {
+            JsonPrimitive(!it.asBoolean)
         }
     }
 }
