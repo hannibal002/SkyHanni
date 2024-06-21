@@ -87,7 +87,7 @@ enum class ScoreboardElement(val element: Element) {
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf(HIDDEN to HorizontalAlignment.LEFT)
 
-    private fun getPair(): List<ScoreboardElementType> = element.getDisplayPair().map { getElementFromAny(it) }
+    private fun getPair(): List<ScoreboardElementType> = element.getDisplay().map { getElementFromAny(it) }
 
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true
