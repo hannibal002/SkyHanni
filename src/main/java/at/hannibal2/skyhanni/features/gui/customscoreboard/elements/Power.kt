@@ -19,5 +19,5 @@ object Power : Element() {
 
     override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
-    override val configLine = "§Power: §aSighted §7(§61.263§7)"
+    override val configLine = "Power: §aSighted §7(§61.263§7)"
 }
