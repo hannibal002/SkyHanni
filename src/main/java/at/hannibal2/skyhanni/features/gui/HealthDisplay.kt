@@ -200,10 +200,22 @@ object HealthDisplay {
         val interpolatedHealth =
             NumberUtil.interpolate(health.toFloat(), healthLast.toFloat(), healthTimer.toMillis()).toDouble()
         val barRenderable =
-            Renderable.progressBarMultipleColors(
-                if (interpolatedHealth > 1.0) 1.0 else interpolatedHealth,
-                colorList,
-            )
+            if (config.texture.enabled) {
+                Renderable.progressBarMultipleColors(
+                    if (interpolatedHealth > 1.0) 1.0 else interpolatedHealth,
+                    colorList,
+                    texture =
+                        SkyHanniMod.feature.skillProgress.skillProgressBarConfig.texturedBar.usedTexture
+                            .get(),
+                )
+            } else {
+                Renderable.progressBarMultipleColors(
+                    if (interpolatedHealth > 1.0) 1.0 else interpolatedHealth,
+                    colorList,
+                    width = config.width,
+                    height = config.height,
+                )
+            }
         config.positionBar.renderRenderables(listOf(barRenderable), posLabel = "HP Bar")
     }
 
