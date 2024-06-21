@@ -44,7 +44,7 @@ public class BridgeFormatterConfig {
 
     @Expose
     @ConfigOption(
-        name = "Bridge Format Info",
+        name = "Format Info",
         desc = "§7For the setting below, use §e%ign% §7for sender and §e%msg% §7for message. Use & for color codes."
     )
     @ConfigEditorInfoText
@@ -56,6 +56,23 @@ public class BridgeFormatterConfig {
         desc = "Message format that will be sent when a message is sent from Discord. "
     )
     @ConfigEditorText
-    public String bridgeFormat = "&c[Discord] &6&l%ign%&r:%msg%";
+    public String bridgeFormat = "&c[Discord] &6&l%ign%&r: %msg%";
 
+    @Expose
+    @ConfigOption(
+        name = "Separator Info",
+        desc = "For the guild message:\n" +
+            "§2Guild > §7Bridge §e[rank]§f: Discord > Message\n" +
+            "§e> §7would be the separator."
+    )
+    @ConfigEditorInfoText
+    public String separatorInfo = "";
+
+    @Expose
+    @ConfigOption(
+        name = "Bridge Separator",
+        desc = "The character that separates the Discord name and the message."
+    )
+    @ConfigEditorText
+    public String separator = ":";
 }
