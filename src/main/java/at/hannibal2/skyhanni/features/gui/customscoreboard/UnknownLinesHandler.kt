@@ -24,9 +24,7 @@ object UnknownLinesHandler {
             .filter { it.isNotBlank() }
             .filter { it.trim().length > 3 }
 
-        /**
-         * Remove known lines with patterns
-         **/
+        // Remove known lines with patterns
         val patternsToExclude = listOf(
             PurseAPI.coinsPattern,
             SbPattern.motesPattern,
@@ -94,7 +92,6 @@ object UnknownLinesHandler {
             SbPattern.redstonePattern,
             SbPattern.anniversaryPattern,
             SbPattern.visitingPattern,
-            SbPattern.flightDurationPattern,
             SbPattern.dojoChallengePattern,
             SbPattern.dojoDifficultyPattern,
             SbPattern.dojoPointsPattern,
@@ -141,9 +138,8 @@ object UnknownLinesHandler {
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }
 
-        /**
-         * remove known text
-         **/
+
+        // Remove known text
         // remove objectives
         val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
             ?: "Objective"

@@ -22,6 +22,11 @@ public class DisplayConfig {
     public ArrowConfig arrow = new ArrowConfig();
 
     @Expose
+    @ConfigOption(name = "Chunked Stats Options", desc = "")
+    @Accordion
+    public ChunkedStatsConfig chunkedStats = new ChunkedStatsConfig();
+
+    @Expose
     @ConfigOption(name = "Events Options", desc = "")
     @Accordion
     public EventsConfig events = new EventsConfig();
@@ -59,6 +64,11 @@ public class DisplayConfig {
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = false;
+
+    @Expose
+    @ConfigOption(name = "Hide coins earned/lost", desc = "Hide the amount of coins earned or lost.")
+    @ConfigEditorBoolean
+    public boolean hideCoinsDifference = false;
 
     @Expose
     @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
@@ -113,6 +123,11 @@ public class DisplayConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")
+    @ConfigEditorBoolean
+    public boolean skyblockTime24hFormat = false;
 
     @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")

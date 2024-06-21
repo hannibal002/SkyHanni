@@ -1,26 +1,28 @@
 //
 // TODO LIST
 // V2 RELEASE
-//  - Soulflow API
 //  - Bank API (actually maybe not, I like the current design)
-//  - beacon power
-//  - skyblock level
-//  - more bg options (round, blurr, outline)
 //  - countdown events like fishing festival + fiesta when its not on tablist
-//  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
-//  - Rng meter display
-//  - option to hide coins earned
+//  - improve hide coin difference to also work with bits, motes, etc
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - more anchor points (alignment enums in renderutils)
-//  - 24h instead of 12h for skyblock time
-//  - only alert for lines that exist longer than 1s
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.AlignmentConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ChunkedStatsConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.EventsConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.InformationFilteringConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MaxwellConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MayorConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.PartyConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
@@ -34,9 +36,10 @@ import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
@@ -51,14 +54,12 @@ object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
-    private val guiName = "Custom Scoreboard"
+    private const val GUI_NAME = "Custom Scoreboard"
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
-
-        RenderBackground().renderBackground()
 
         val render =
             if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
@@ -66,19 +67,28 @@ object CustomScoreboard {
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(
-            render,
-            posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10,
+
+        val textRenderable = Renderable.verticalContainer(
+            render.map { Renderable.string(it.first, horizontalAlign = it.second) },
+            0,
+            horizontalAlign = HorizontalAlignment.CENTER,
+            verticalAlign = VerticalAlignment.CENTER,
         )
+
+        val finalRenderable = RenderBackground.addBackground(textRenderable)
+
+        RenderBackground.updatePosition(finalRenderable)
+
+        // TODO: change to renderRenderable when custom wardrobe gets merged
+        config.position.renderRenderables(listOf(finalRenderable), posLabel = GUI_NAME)
     }
 
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
-        if (event.guiName == guiName) {
+        if (event.guiName == GUI_NAME) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
-                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
+                    verticalAlignment != VerticalAlignment.DONT_ALIGN
                 ) {
                     horizontalAlignment = HorizontalAlignment.DONT_ALIGN
                     verticalAlignment = VerticalAlignment.DONT_ALIGN
@@ -104,16 +114,17 @@ object CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-    internal val displayConfig get() = config.display
-    internal val alignmentConfig get() = displayConfig.alignment
-    internal val arrowConfig get() = displayConfig.arrow
-    internal val eventsConfig get() = displayConfig.events
-    internal val mayorConfig get() = displayConfig.mayor
-    internal val partyConfig get() = displayConfig.party
-    internal val maxwellConfig get() = displayConfig.maxwell
-    internal val informationFilteringConfig get() = config.informationFiltering
-    internal val backgroundConfig get() = config.background
+    val config: CustomScoreboardConfig get() = SkyHanniMod.feature.gui.customScoreboard
+    val displayConfig: DisplayConfig get() = config.display
+    val alignmentConfig: AlignmentConfig get() = displayConfig.alignment
+    val arrowConfig: ArrowConfig get() = displayConfig.arrow
+    val chunkedConfig: ChunkedStatsConfig get() = displayConfig.chunkedStats
+    val eventsConfig: EventsConfig get() = displayConfig.events
+    val mayorConfig: MayorConfig get() = displayConfig.mayor
+    val partyConfig: PartyConfig get() = displayConfig.party
+    val maxwellConfig: MaxwellConfig get() = displayConfig.maxwell
+    val informationFilteringConfig: InformationFilteringConfig get() = config.informationFiltering
+    val backgroundConfig: BackgroundConfig get() = config.background
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
@@ -123,19 +134,20 @@ object CustomScoreboard {
             // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == EMPTY &&
+                lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
 
             // Adds empty lines
-            if (lines.first().first == "<empty>") {
+            if (lines.first().first == EMPTY) {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
 
             // Does not display this line
-            if (lines.any { it.first == "<hidden>" }) {
+            if (lines.any { it.first == HIDDEN }) {
                 continue
             }
 

@@ -121,6 +121,27 @@ object CollectionUtils {
         return null
     }
 
+    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1) = buildList {
+        var missing = -1
+        var found = false
+        var stored = 0
+        for (line in this@sublistAfter) {
+            if (after == line && !found) {
+                missing = skip - 1
+                found = true
+                continue
+            }
+            if (missing == 0 && stored < amount) {
+                add(line)
+                stored++
+            }
+            if (missing != -1) {
+                missing--
+            }
+            if (stored >= amount) return@buildList
+        }
+    }
+
     fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
 
     fun List<String>.removeNextAfter(after: (String) -> Boolean, skip: Int = 1): List<String> {
@@ -143,10 +164,7 @@ object CollectionUtils {
         return newList
     }
 
-    /**
-     * This does not work inside a [buildList] block
-     */
-    fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
+    fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
         toMutableMap().also { function(it) }.toMap()

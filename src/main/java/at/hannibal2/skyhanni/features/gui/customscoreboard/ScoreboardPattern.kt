@@ -198,7 +198,7 @@ object ScoreboardPattern {
      */
     val powderPattern by miningSb.pattern(
         "powder",
-        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)",
+        "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)",
     )
 
     /**
@@ -208,7 +208,7 @@ object ScoreboardPattern {
      */
     val powderGreedyPattern by miningSb.pattern(
         "powdergreedy",
-        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$",
+        "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$",
     )
     val windCompassPattern by miningSb.pattern(
         "windcompass",
@@ -342,10 +342,6 @@ object ScoreboardPattern {
         "visiting",
         "^\\s*§a✌ §7\\(§.\\d+(§.)?/\\d+(§.)?\\)$",
     )
-    val flightDurationPattern by miscSb.pattern(
-        "flightduration",
-        "^\\s*Flight Duration: §a(:?\\d{1,3})*$",
-    )
     val dojoChallengePattern by miscSb.pattern(
         "dojochallenge",
         "^(§.)*Challenge: (§.)*(?<challenge>[\\w ]+)$",
@@ -450,7 +446,7 @@ object ScoreboardPattern {
     )
     val riftHotdogEatenPattern by riftSb.pattern(
         "hotdogeaten",
-        "^Eaten: §.\\d+\\/\\d+$",
+        "^Eaten: §.\\d+/\\d+$",
     )
     val riftAveikxPattern by riftSb.pattern(
         "aveikx",
@@ -543,7 +539,11 @@ object ScoreboardPattern {
     )
     val bankPattern by tablistGroup.pattern(
         "bank",
-        "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 \\/ §6(?<coop>[\\w.,]+))?)$",
+        "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 / §6(?<coop>[\\w.,]+))?)$",
+    )
+    val soulflowPattern by tablistGroup.pattern(
+        "soulflow",
+        "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$"
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",
