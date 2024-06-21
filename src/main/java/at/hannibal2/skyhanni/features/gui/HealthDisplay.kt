@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -130,9 +129,9 @@ object HealthDisplay {
 
         healthLast = health
         if (RiftAPI.inRift()) {
-            if (maxHealth < player.maxHealth) maxHealth = player.maxHealth.toDouble()
+            if (maxHealth < player.maxHealth || config.riftDynamicHP) maxHealth = player.maxHealth.toDouble()
             healthUpdate = healthUpdater(player.health.toInt() - actualHealth)
-            actualHealth = player.health.toInt()
+            actualHealth = (player.health + 0.1f).toInt() // player hp in rift sometimes is x.98 or something like that
             health = actualHealth / maxHealth
             healthTimer = SimpleTimeMark.now()
         } else {
@@ -187,7 +186,6 @@ object HealthDisplay {
 
         val player = LorenzUtils.getPlayer() ?: return
         maxHealth = player.maxHealth.toDouble()
-        ChatUtils.chat("maxHP: $maxHealth")
     }
 
     @SubscribeEvent
@@ -249,6 +247,9 @@ object HealthDisplay {
             add("health: $health")
             add("healthUpdate: $healthUpdate")
             add("maxHealth: $maxHealth")
+
+            add("playerhp: ${player.health}")
+            add("player maxhp: ${player.maxHealth}")
 
             add("absorptionRate: $absorptionRate")
             add("has absorption: ${player.hasPotionEffect(Potion.absorption)}")
