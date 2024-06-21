@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.InformationFil
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MaxwellConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MayorConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.PartyConfig
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
@@ -127,11 +129,35 @@ object CustomScoreboard {
     val backgroundConfig: BackgroundConfig get() = config.background
 
     private fun createLines() = buildList<ScoreboardElementType> {
+        if (!LorenzUtils.inSkyBlock) {
+            addAllNonSkyBlockLines()
+            return@buildList
+        }
+
+        if (!displayConfig.useCustomLines) {
+            addDefaultSkyBlockLines()
+            return@buildList
+        }
+
+        addCustomSkyBlockLines()
+    }
+
+    private fun MutableList<ScoreboardElementType>.addAllNonSkyBlockLines() {
+        addAll(ScoreboardElement.TITLE.getVisiblePair())
+        addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
+        addAll(ScoreboardElement.FOOTER.getVisiblePair())
+    }
+
+    private fun MutableList<ScoreboardElementType>.addDefaultSkyBlockLines() {
+        add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
+    }
+
+    private fun MutableList<ScoreboardElementType>.addCustomSkyBlockLines() {
         for (element in config.scoreboardEntries) {
             val lines = element.getVisiblePair()
             if (lines.isEmpty()) continue
 
-            // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
                 lines.first().first == EMPTY &&
@@ -140,13 +166,11 @@ object CustomScoreboard {
                 continue
             }
 
-            // Adds empty lines
             if (lines.first().first == EMPTY) {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
 
-            // Does not display this line
             if (lines.any { it.first == HIDDEN }) {
                 continue
             }
@@ -182,7 +206,11 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+        onToggle(
+            config.enabled,
+            displayConfig.hideVanillaScoreboard,
+            SkyHanniMod.feature.misc.showOutsideSB,
+        ) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
@@ -190,7 +218,7 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock) dirty = true
+            if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) dirty = true
         }
     }
 
@@ -212,7 +240,9 @@ object CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isEnabled() =
+        (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
+
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent
@@ -303,6 +333,13 @@ object CustomScoreboard {
             val array = element.asJsonArray
             array.add(JsonPrimitive(ScoreboardEvents.NEW_YEAR.name))
             array
+        }
+        event.move(
+            52,
+            "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
+            "$displayPrefix.titleAndFooter.useCustomTitle",
+        ) {
+            JsonPrimitive(!it.asBoolean)
         }
     }
 }

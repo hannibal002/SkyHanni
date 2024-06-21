@@ -51,17 +51,16 @@ public class DisplayConfig {
     @Accordion
     public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
 
-
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.\n" +
-        "§cMods that add their own scoreboard will not be affected by this setting!")
+            "§cMods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideVanillaScoreboard = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Display Numbers First", desc = "Whether the number or line name displays first.\n" +
-        "§eNote: Will not update the preview above!")
+            "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = false;
 
@@ -69,6 +68,11 @@ public class DisplayConfig {
     @ConfigOption(name = "Hide coins earned/lost", desc = "Hide the amount of coins earned or lost.")
     @ConfigEditorBoolean
     public boolean hideCoinsDifference = false;
+
+    @Expose
+    @ConfigOption(name = "Use Custom Lines", desc = "Use custom lines instead of the default ones.")
+    @ConfigEditorBoolean
+    public boolean useCustomLines = true;
 
     @Expose
     @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
@@ -88,8 +92,7 @@ public class DisplayConfig {
     public enum PowderDisplay {
         AVAILABLE("Available"),
         TOTAL("Total"),
-        BOTH("Available / All")
-        ;
+        BOTH("Available / All");
 
         private final String str;
 
@@ -135,8 +138,7 @@ public class DisplayConfig {
     public int lineSpacing = 10;
 
     @Expose
-    @ConfigOption(name = "Cache Scoreboard on Island Switch",
-        desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
+    @ConfigOption(name = "Cache Scoreboard on Island Switch", desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
     @ConfigEditorBoolean
     public boolean cacheScoreboardOnIslandSwitch = false;
 }

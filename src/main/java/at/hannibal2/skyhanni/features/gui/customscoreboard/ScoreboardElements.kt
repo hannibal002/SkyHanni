@@ -73,6 +73,8 @@ internal var unconfirmedUnknownLines = listOf<String>()
 internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
+    if (!LorenzUtils.inSkyBlock) return
+    if (!unconfirmedUnknownLines.contains(line)) return
     if (line !in unconfirmedUnknownLines) return
     unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
     confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
