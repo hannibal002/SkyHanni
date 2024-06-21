@@ -204,9 +204,7 @@ object HealthDisplay {
                 Renderable.progressBarMultipleColors(
                     if (interpolatedHealth > 1.0) 1.0 else interpolatedHealth,
                     colorList,
-                    texture =
-                        SkyHanniMod.feature.skillProgress.skillProgressBarConfig.texturedBar.usedTexture
-                            .get(),
+//                     texture = SkyHanniMod.feature.skillProgress.skillProgressBarConfig.texturedBar.usedTexture.get(),
                 )
             } else {
                 Renderable.progressBarMultipleColors(
