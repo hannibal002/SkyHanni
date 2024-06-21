@@ -98,10 +98,8 @@ var amountOfUnknownLines = 0
 enum class ScoreboardElement(
     val element: Element,
 ) {
-    TITLE(Title()),
-    PROFILE(
-        Profile(),
-    ),
+    TITLE(Title),
+    PROFILE(Profile),
     /*PURSE(
         ::getPurseDisplayPair,
         ::getPurseShowWhen,
