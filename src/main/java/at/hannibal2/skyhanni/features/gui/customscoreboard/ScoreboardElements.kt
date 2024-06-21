@@ -361,18 +361,6 @@ enum class ScoreboardElement(
     }
 }
 
-private fun getTitleDisplayPair(): List<ScoreboardElementType> =
-    if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-        listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-    } else {
-        listOf(
-            displayConfig.titleAndFooter.customTitle.get().toString()
-                .replace("&", "§")
-                .split("\\n")
-                .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
-        ).flatten()
-    }
-
 private fun getProfileDisplayPair() = listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase())
 
 private fun getPurseDisplayPair(): List<String> {
@@ -780,7 +768,7 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
 }
 
 private fun getFooterDisplayPair(): List<ScoreboardElementType> = listOf(
-    displayConfig.titleAndFooter.customFooter.get().toString()
+    displayConfig.titleAndFooter.customFooter
         .replace("&", "§")
         .split("\\n")
         .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },

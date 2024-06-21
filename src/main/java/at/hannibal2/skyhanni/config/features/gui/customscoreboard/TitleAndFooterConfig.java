@@ -6,7 +6,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class TitleAndFooterConfig {
     @Expose
@@ -20,7 +19,7 @@ public class TitleAndFooterConfig {
         "\nUse & for colors." +
         "\nUse \"\\n\" for new line.")
     @ConfigEditorText
-    public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
+    public String customTitle = "&6&lSKYBLOCK";
 
     @Expose
     @ConfigOption(name = "Hypixel's Title Animation", desc = "Will overwrite the custom title with Hypixel's title animation." +
@@ -33,5 +32,5 @@ public class TitleAndFooterConfig {
         "\nUse & for colors." +
         "\nUse \"\\n\" for new line.")
     @ConfigEditorText
-    public Property<String> customFooter = Property.of("&ewww.hypixel.net");
+    public String customFooter = "&ewww.hypixel.net";
 }
