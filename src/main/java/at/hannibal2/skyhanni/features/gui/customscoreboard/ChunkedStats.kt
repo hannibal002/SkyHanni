@@ -73,12 +73,8 @@ enum class ChunkedStats(
     override fun toString() = configLine
 
     companion object {
-        fun getChunkedStats() = buildList {
-            chunkedConfig.chunkedStats.forEach { stat ->
-                if (stat.showWhen()) {
-                    add(stat.displayPair.get())
-                }
-            }
+        fun getChunkedStats() = chunkedConfig.chunkedStats.mapNotNull {
+            it.takeIf { it.showWhen() }?.displayPair?.get()
         }
 
         fun shouldShowChunkedStats() = chunkedConfig.chunkedStats.any { it.showWhen() }
