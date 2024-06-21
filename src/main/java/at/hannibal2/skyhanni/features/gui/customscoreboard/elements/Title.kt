@@ -26,4 +26,6 @@ class Title : Element() {
     }
 
     override fun showWhen() = true
+
+    override val configLine = "§6§lSKYBLOCK"
 }

@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.getChunkedStats
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStats.Companion.shouldShowChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.arrowConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
@@ -44,6 +43,9 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurseEarned
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Element
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Profile
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -57,12 +59,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import java.util.function.Supplier
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
@@ -96,21 +96,15 @@ private fun onRemoval(line: String) {
 var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
-    private val displayPair: Supplier<List<Any>>,
-    val showWhen: () -> Boolean,
-    private val configLine: String,
+    val element: Element,
 ) {
     TITLE(
-        ::getTitleDisplayPair,
-        { true },
-        "§6§lSKYBLOCK",
+        Title(),
     ),
     PROFILE(
-        ::getProfileDisplayPair,
-        { true },
-        "§7♲ Blueberry",
+        Profile(),
     ),
-    PURSE(
+    /*PURSE(
         ::getPurseDisplayPair,
         ::getPurseShowWhen,
         "Purse: §652,763,737",
@@ -309,18 +303,18 @@ enum class ScoreboardElement(
         ::getEmptyLineDisplayPair,
         { true },
         "",
-    ),
+    ),*/
     ;
 
-    override fun toString() = configLine
+    override fun toString() = element.configLine
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf(HIDDEN to HorizontalAlignment.LEFT)
 
-    private fun getPair(): List<ScoreboardElementType> = displayPair.get().map { getElementFromAny(it) }
+    private fun getPair(): List<ScoreboardElementType> = element.getDisplayPair().map { getElementFromAny(it) }
 
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true
-        return showWhen()
+        return element.showWhen()
     }
 
     companion object {
@@ -328,7 +322,7 @@ enum class ScoreboardElement(
         @JvmField
         val defaultOption = listOf(
             TITLE,
-            PROFILE,
+            /*PROFILE,
             PURSE,
             BANK,
             MOTES,
@@ -358,12 +352,10 @@ enum class ScoreboardElement(
             MAYOR,
             PARTY,
             FOOTER,
-            EXTRA,
+            EXTRA,*/
         )
     }
 }
-
-private fun getProfileDisplayPair() = listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase())
 
 private fun getPurseDisplayPair(): List<String> {
     var purse = formatNumber(PurseAPI.currentPurse)
