@@ -29,7 +29,7 @@ object FishingBaitWarnings {
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
 
     private data class Bait(
-        val entity: EntityItem,
+        private val entity: EntityItem,
         val name: String = entity.entityItem.name,
         val location: LorenzVec = entity.getLorenzVec(),
     ) {
