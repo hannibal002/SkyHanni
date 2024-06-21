@@ -12,6 +12,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.AlignmentConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.InformationFil
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MaxwellConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MayorConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.PartyConfig
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -145,7 +145,7 @@ object CustomScoreboard {
     private fun MutableList<ScoreboardElementType>.addAllNonSkyBlockLines() {
         addAll(ScoreboardElement.TITLE.getVisiblePair())
         addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
-        addAll(ScoreboardElement.FOOTER.getVisiblePair())
+        //addAll(ScoreboardElement.FOOTER.getVisiblePair())
     }
 
     private fun MutableList<ScoreboardElementType>.addDefaultSkyBlockLines() {
@@ -190,7 +190,8 @@ object CustomScoreboard {
 
     private var dirty = false
 
-    // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
+    // The ElementType for the Vanilla Scoreboard is called HELMET
+    // Thanks to APEC for showing this
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
@@ -232,7 +233,7 @@ object CustomScoreboard {
                 ScoreboardElement.entries.map { element ->
                     add(
                         "${element.name.firstLetterUppercase()} - " +
-                            "${element.showWhen.invoke()} - " +
+                            "${element.element.showWhen()} - " +
                             "${element.getVisiblePair().map { it.first }}",
                     )
                 }

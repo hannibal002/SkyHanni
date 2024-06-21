@@ -98,9 +98,7 @@ var amountOfUnknownLines = 0
 enum class ScoreboardElement(
     val element: Element,
 ) {
-    TITLE(
-        Title(),
-    ),
+    TITLE(Title()),
     PROFILE(
         Profile(),
     ),
@@ -111,7 +109,7 @@ enum class ScoreboardElement(
     ),
     MOTES(
         ::getMotesDisplayPair,
-        ::getMotesShowWhen,
+        ::getMotesShowWhAen,
         "Motes: §d64,647",
     ),
     BANK(
