@@ -57,11 +57,11 @@ object DragonInfoUtils {
             return
         }
 
-        M7DragonChangeEvent(matchedDragon, WitheredDragonSpawnedStatus.ALIVE).post()
         logSpawn(event.mob, matchedDragon)
 
         matchedDragon.status = WitheredDragonSpawnedStatus.ALIVE
         matchedDragon.id = id
+        M7DragonChangeEvent(matchedDragon, WitheredDragonSpawnedStatus.ALIVE).post()
     }
 
     private var dragonKillCount = 0
@@ -85,11 +85,11 @@ object DragonInfoUtils {
 
         if (matchedDragon.deathBox.isInside(location)) matchedDragon.defeated = true
         val status = WitheredDragonSpawnedStatus.DEAD
-        M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated)
         matchedDragon.status = status
 
         MobData.entityToMob[event.entityLiving]?.let { logKill(it, matchedDragon) }
         matchedDragon.id = null
+        M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated).post()
     }
 
 //     @SubscribeEvent
@@ -134,8 +134,8 @@ object DragonInfoUtils {
 
         val status = WitheredDragonSpawnedStatus.SPAWNING
         if (matchedDragon.status == status) return
-        M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated).post()
         matchedDragon.status = status
+        M7DragonChangeEvent(matchedDragon, status, matchedDragon.defeated).post()
     }
 
     private fun checkParticle(particle: S2APacketParticles): Boolean {
@@ -264,7 +264,7 @@ object DragonInfoUtils {
     private val config get() = SkyHanniMod.feature.dungeon.m7config
     private var renderable = listOf<Renderable>()
 
-    fun buildRenderable() {
+    private fun buildRenderable() {
         val list = mutableListOf<Renderable>()
         list.add(Renderable.string("§5§lWithered Dragon Info"))
         for (dragon in WitheredDragonInfo.entries) {
