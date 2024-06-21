@@ -12,34 +12,37 @@ object Tuning : Element() {
         val tunings = MaxwellAPI.tunings ?: return listOf("§cTalk to \"Maxwell\"!")
         if (tunings.isEmpty()) return listOf("§cNo Maxwell Tunings :(")
 
-        val title = pluralize(tunings.size, "Tuning", "Tunings")
-        return if (maxwellConfig.compactTuning) {
-            val tuning = tunings
-                .take(3)
-                .joinToString("§7, ") { tuning ->
-                    with(tuning) {
-                        if (displayConfig.displayNumbersFirst) {
-                            "$color$value$icon"
-                        } else "$color$icon$value"
-                    }
+        val title = pluralize(tunings.size, "Tuning")
 
+        if (maxwellConfig.compactTuning) {
+            val tuningDisplay = tunings.take(3).joinToString("§7, ") { tuning ->
+                with(tuning) {
+                    if (displayConfig.displayNumbersFirst) {
+                        "$color$value$icon"
+                    } else {
+                        "$color$icon$value"
+                    }
                 }
-            listOf(
-                (if (displayConfig.displayNumbersFirst) {
-                    "$tuning §f$title"
-                } else "$title: $tuning"),
+            }
+            return listOf(
+                if (displayConfig.displayNumbersFirst) {
+                    "$tuningDisplay §f$title"
+                } else {
+                    "$title: $tuningDisplay"
+                },
             )
         } else {
-            val tuning = tunings
-                .take(maxwellConfig.tuningAmount.coerceAtLeast(1))
-                .map { tuning ->
-                    with(tuning) {
-                        " §7- §f" + if (displayConfig.displayNumbersFirst) {
-                            "$color$value $icon $name"
-                        } else "$name: $color$value$icon"
+            val tuningAmount = maxwellConfig.tuningAmount.coerceAtLeast(1)
+            val tuningList = tunings.take(tuningAmount).map { tuning ->
+                with(tuning) {
+                    " §7- §f" + if (displayConfig.displayNumbersFirst) {
+                        "$color$value $icon $name"
+                    } else {
+                        "$name: $color$value$icon"
                     }
-                }.toTypedArray()
-            listOf("$title:", *tuning)
+                }
+            }
+            return listOf("$title:") + tuningList
         }
     }
 

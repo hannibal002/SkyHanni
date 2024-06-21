@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 object Power : Element() {
     override fun getDisplayPair() = listOf(
-        (MaxwellAPI.currentPower?.let {
+        MaxwellAPI.currentPower?.let {
             val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
             if (displayConfig.displayNumbersFirst) {
                 "§a${it.replace(" Power", "")} Power $mp"
             } else "Power: §a$it $mp"
-        } ?: "§cOpen \"Your Bags\"!"),
+        } ?: "§cOpen \"Your Bags\"!",
     )
 
     override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT)
