@@ -16,10 +16,12 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.ColorRange
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.potion.Potion
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -43,6 +45,11 @@ object HealthDisplay {
     private var actualHealth = 0
     private var absorptionRate = 0.0
     private var hasAbsorption = false
+
+    private val healthActionBarPattern by RepoPattern.pattern(
+        "gui.health.actionbar",
+        "(?<string>§[c6][\\d,]+/[\\d,]+❤ +).*",
+    )
 
     private enum class HealthColors(
         val range: ClosedFloatingPointRange<Double>,
@@ -103,6 +110,14 @@ object HealthDisplay {
         healthTimer = SimpleTimeMark.now()
 
         setColors()
+        if (config.hideActionBar) removeActionBar(event)
+    }
+
+    private fun removeActionBar(event: ActionBarUpdateEvent) {
+        healthActionBarPattern.matchMatcher(event.actionBar) {
+            val string = event.actionBar.replace(group("string"), "")
+            event.changeActionBar(string)
+        }
     }
 
     @SubscribeEvent
