@@ -12,9 +12,8 @@ object JacobContest : Event() {
         ScoreboardPattern.jacobsContestPattern.firstMatches(getSbLines())?.let { line ->
             add(line)
             addAll(
-                getSbLines().sublistAfter(line, 3).filter {
-                    !ScoreboardPattern.footerPattern.matches(it)
-                },
+                getSbLines().sublistAfter(line, amount = 3)
+                    .filter { !ScoreboardPattern.footerPattern.matches(it) },
             )
         }
     }

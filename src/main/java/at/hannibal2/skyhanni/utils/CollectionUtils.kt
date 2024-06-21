@@ -121,25 +121,11 @@ object CollectionUtils {
         return null
     }
 
-    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1) = buildList {
-        var missing = -1
-        var found = false
-        var stored = 0
-        for (line in this@sublistAfter) {
-            if (after == line && !found) {
-                missing = skip - 1
-                found = true
-                continue
-            }
-            if (missing == 0 && stored < amount) {
-                add(line)
-                stored++
-            }
-            if (missing != -1) {
-                missing--
-            }
-            if (stored >= amount) return@buildList
-        }
+    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1): List<String> {
+        val startIndex = indexOf(after)
+        if (startIndex == -1) return emptyList()
+
+        return this.drop(startIndex + skip).take(amount)
     }
 
     fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
