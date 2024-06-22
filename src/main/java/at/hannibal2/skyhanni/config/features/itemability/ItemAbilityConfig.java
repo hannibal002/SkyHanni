@@ -38,7 +38,7 @@ public class ItemAbilityConfig {
 
     @Expose
     @ConfigOption(name = "Depleted Bonzo's Masks",
-        desc = "Highlights used Bonzo's Masks and Spirit Masks with a background.")
+        desc = "Highlight used Bonzo's Masks and Spirit Masks with a background.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean depletedBonzosMasks = false;

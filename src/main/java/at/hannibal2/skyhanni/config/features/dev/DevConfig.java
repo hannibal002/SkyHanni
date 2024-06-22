@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
@@ -59,6 +60,10 @@ public class DevConfig {
     // Does not have a config element!
     @Expose
     public Position debugItemPos = new Position(90, 70);
+
+    @Expose
+    @ConfigLink(owner = DebugConfig.class, field = "raytracedOreblock")
+    public Position debugOrePos = new Position(1, 200, false, true);
 
     @Expose
     @ConfigOption(

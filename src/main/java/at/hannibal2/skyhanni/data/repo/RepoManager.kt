@@ -8,8 +8,12 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
@@ -98,15 +102,16 @@ class RepoManager(private val configLocation: File) {
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
                 val file = File(configLocation, "repo")
-                if (file.exists() && currentCommitJSON != null && currentCommitJSON["sha"].asString == latestRepoCommit
+                if (file.exists() &&
+                    currentCommitJSON?.get("sha")?.asString == latestRepoCommit &&
+                    unsuccessfulConstants.isEmpty() &&
+                    lastRepoUpdate.passedSince() < 1.minutes
                 ) {
-                    if (unsuccessfulConstants.isEmpty() && lastRepoUpdate.passedSince() < 1.minutes) {
-                        if (command) {
-                            ChatUtils.chat("§7The repo is already up to date!")
-                            atomicShouldManuallyReload.set(false)
-                        }
-                        return@supplyAsync false
+                    if (command) {
+                        ChatUtils.chat("§7The repo is already up to date!")
+                        atomicShouldManuallyReload.set(false)
                     }
+                    return@supplyAsync false
                 }
                 lastRepoUpdate = SimpleTimeMark.now()
                 RepoUtils.recursiveDelete(repoLocation)
@@ -125,7 +130,7 @@ class RepoManager(private val configLocation: File) {
                     urlConnection.getInputStream().use { `is` ->
                         FileUtils.copyInputStreamToFile(
                             `is`,
-                            itemsZip
+                            itemsZip,
                         )
                     }
                 } catch (e: IOException) {
@@ -139,7 +144,7 @@ class RepoManager(private val configLocation: File) {
                 }
                 RepoUtils.unzipIgnoreFirstFolder(
                     itemsZip.absolutePath,
-                    repoLocation.absolutePath
+                    repoLocation.absolutePath,
                 )
                 if (currentCommitJSON == null || currentCommitJSON["sha"].asString != latestRepoCommit) {
                     val newCurrentCommitJSON = JsonObject()
@@ -187,7 +192,7 @@ class RepoManager(private val configLocation: File) {
                     onClick = {
                         SkyHanniMod.repo.updateRepo()
                     },
-                    prefixColor = "§c"
+                    prefixColor = "§c",
                 )
                 if (unsuccessfulConstants.isEmpty()) {
                     unsuccessfulConstants.add("All Constants")
@@ -224,15 +229,19 @@ class RepoManager(private val configLocation: File) {
     fun displayRepoStatus(joinEvent: Boolean) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
-                ChatUtils.error(
-                    "§7Repo Issue! Some features may not work. Please report this error on the Discord!\n"
-                        + "§7Repo Auto Update Value: §c${config.repoAutoUpdate}\n"
-                        + "§7If you have Repo Auto Update turned off, please try turning that on.\n"
-                        + "§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):"
+                val text = mutableListOf<IChatComponent>()
+                text.add(
+                    ("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                        "Please report this error on the Discord!").asComponent(),
                 )
+                text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
+                text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
+                text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
+
                 for (constant in unsuccessfulConstants) {
-                    ChatUtils.chat("   §e- §7$constant")
+                    text.add("   §e- §7$constant".asComponent())
                 }
+                Text.multiline(text).send()
             }
             return
         }
@@ -243,7 +252,7 @@ class RepoManager(private val configLocation: File) {
         ChatUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
-            prefixColor = "§a"
+            prefixColor = "§a",
         )
         for (constant in successfulConstants) {
             ChatUtils.chat("   §a- §7$constant", false)
@@ -262,8 +271,8 @@ class RepoManager(private val configLocation: File) {
             BufferedReader(
                 InputStreamReader(
                     FileInputStream(file),
-                    StandardCharsets.UTF_8
-                )
+                    StandardCharsets.UTF_8,
+                ),
             ).use { reader ->
                 return gson.fromJson(reader, JsonObject::class.java)
             }
@@ -291,8 +300,8 @@ class RepoManager(private val configLocation: File) {
         BufferedWriter(
             OutputStreamWriter(
                 FileOutputStream(file),
-                StandardCharsets.UTF_8
-            )
+                StandardCharsets.UTF_8,
+            ),
         ).use { writer -> writer.write(gson.toJson(json)) }
     }
 
@@ -318,11 +327,13 @@ class RepoManager(private val configLocation: File) {
             name = defaultName
             branch = defaultBranch
             if (manual) {
-                ChatUtils.clickableChat("Reset Repo settings to default. " +
-                    "Click §aUpdate Repo Now §ein config or run /shupdaterepo to update!",
+                ChatUtils.clickableChat(
+                    "Reset Repo settings to default. " +
+                        "Click §aUpdate Repo Now §ein config or run /shupdaterepo to update!",
                     onClick = {
                         updateRepo()
-                    })
+                    },
+                )
             }
         }
     }

@@ -27,7 +27,7 @@ import static at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.It
 public class InventoryConfig {
 
     @Expose
-    @Category(name = "Skyblock Guide", desc = "Helps finding stuff to do in SkyBlock.")
+    @Category(name = "SkyBlock Guide", desc = "Help find stuff to do in SkyBlock.")
     public SkyblockGuideConfig skyblockGuideConfig = new SkyblockGuideConfig();
 
     @Expose
@@ -39,7 +39,7 @@ public class InventoryConfig {
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
-    @Category(name = "Enchant Parsing", desc = "Settings for Skyhanni's Enchant Parsing")
+    @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
     public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
     @Expose
@@ -57,7 +57,12 @@ public class InventoryConfig {
     @Expose
     @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
-
+  
+    @Expose
+    @Category(name = "Craftable Item List", desc = "")
+    @Accordion
+    public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
+  
     @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
@@ -186,7 +191,7 @@ public class InventoryConfig {
     public boolean displaySackName = false;
 
     @Expose
-    @ConfigOption(name = "Anvil Combine Helper", desc = "Suggests the same item in the inventory when trying to combine two items in the anvil.")
+    @ConfigOption(name = "Anvil Combine Helper", desc = "Suggest the same item in the inventory when trying to combine two items in the anvil.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean anvilCombineHelper = false;
@@ -212,31 +217,31 @@ public class InventoryConfig {
     public boolean powerStoneGuide = true;
 
     @Expose
-    @ConfigOption(name = "Favorite Power Stone", desc = "Shows your favorite power stones. You can add/remove them by shift clicking a Power Stone.")
+    @ConfigOption(name = "Favorite Power Stone", desc = "Show your favorite power stones. You can add/remove them by shift clicking a Power Stone.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean favoritePowerStone = false;
 
     @Expose
-    @ConfigOption(name = "Shift Click Equipment", desc = "Makes normal clicks to shift clicks in equipment inventory.")
+    @ConfigOption(name = "Shift Click Equipment", desc = "Change normal clicks into shift clicks in equipment inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickForEquipment = false;
 
     @Expose
-    @ConfigOption(name = "Shift Click NPC sell", desc = "Makes normal clicks to shift clicks in npc inventory for selling.")
+    @ConfigOption(name = "Shift Click NPC sell", desc = "Change normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickNPCSell = false;
 
     @Expose
-    @ConfigOption(name = "Shift Click Brewing", desc = "Makes normal clicks to shift clicks in Brewing Stand inventory.")
+    @ConfigOption(name = "Shift Click Brewing", desc = "Change normal clicks to shift clicks in Brewing Stand inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Shows time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
+    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeHeldInLore = false;
