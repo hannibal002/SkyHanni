@@ -39,22 +39,22 @@ object ChocolateFactoryDataLoader {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private val chocolatePerSecondPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.persecond", "§6(?<amount>[\\d.,]+) §8per second"
+        "chocolate.persecond", "§6(?<amount>[\\d.,]+) §8per second",
     )
     private val chocolateAllTimePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.alltime", "§7All-time Chocolate: §6(?<amount>[\\d,]+)"
+        "chocolate.alltime", "§7All-time Chocolate: §6(?<amount>[\\d,]+)",
     )
     private val prestigeLevelPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "prestige.level", "§6Chocolate Factory (?<prestige>[IVX]+)"
+        "prestige.level", "§6Chocolate Factory (?<prestige>[IVX]+)",
     )
     private val chocolateThisPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.thisprestige", "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)"
+        "chocolate.thisprestige", "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)",
     )
     private val chocolateForPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.forprestige", "§7§cRequires (?<amount>\\w+) Chocolate this.*"
+        "chocolate.forprestige", "§7§cRequires (?<amount>\\w+) Chocolate this.*",
     )
     private val chocolateMultiplierPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.multiplier", "§7Total Multiplier: §6(?<amount>[\\d.]+)x"
+        "chocolate.multiplier", "§7Total Multiplier: §6(?<amount>[\\d.]+)x",
     )
 
     /**
@@ -64,45 +64,45 @@ object ChocolateFactoryDataLoader {
      */
     private val leaderboardPlacePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.place",
-        "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time)?(?: Chocolate\\.)?"
+        "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time)?(?: Chocolate\\.)?",
     )
     private val leaderboardPercentilePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "leaderboard.percentile", "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!"
+        "leaderboard.percentile", "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!",
     )
     private val barnAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "barn.amount", "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits"
+        "barn.amount", "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits",
     )
     private val timeTowerAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "timetower.amount", "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)"
+        "timetower.amount", "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)",
     )
     private val timeTowerStatusPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "timetower.status", "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)"
+        "timetower.status", "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)",
     )
     private val timeTowerRechargePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "timetower.recharge", "§7Next Charge: §a(?<duration>\\w+)"
+        "timetower.recharge", "§7Next Charge: §a(?<duration>\\w+)",
     )
-    private val clickMeRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.clickme", "§e§lCLICK ME!"
+    val clickMeRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.clickme", "§e§lCLICK ME!",
     )
 
     /**
      * REGEX-TEST: §6§lGolden Rabbit §8- §aStampede
      */
-    private val clickMeGoldenRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val clickMeGoldenRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.clickme.golden",
-        "§6§lGolden Rabbit §8- §a(?<name>.*)"
+        "§6§lGolden Rabbit §8- §a(?<name>.*)",
     )
     private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.amount", "Rabbit \\S+ - \\[(?<amount>\\d+)].*"
+        "rabbit.amount", "Rabbit \\S+ - \\[(?<amount>\\d+)].*",
     )
     private val upgradeTierPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "upgradetier", ".*\\s(?<tier>[IVXLC]+)"
+        "upgradetier", ".*\\s(?<tier>[IVXLC]+)",
     )
     private val unemployedRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.unemployed", "Rabbit \\w+ - Unemployed"
+        "rabbit.unemployed", "Rabbit \\w+ - Unemployed",
     )
     private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "other.upgrade", "Rabbit Shrine|Coach Jackrabbit"
+        "other.upgrade", "Rabbit Shrine|Coach Jackrabbit",
     )
 
     @SubscribeEvent
@@ -127,7 +127,7 @@ object ChocolateFactoryDataLoader {
         event.move(
             47,
             "inventory.chocolateFactory.rabbitWarning",
-            "inventory.chocolateFactory.rabbitWarning.rabbitWarning"
+            "inventory.chocolateFactory.rabbitWarning.rabbitWarning",
         )
     }
 
@@ -172,8 +172,7 @@ object ChocolateFactoryDataLoader {
         processLeaderboardItem(leaderboardItem)
         processBarnItem(barnItem)
 
-        profileStorage.rawChocPerSecond =
-            (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
+        profileStorage.rawChocPerSecond = (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
         profileStorage.lastDataSave = SimpleTimeMark.now()
 
         ChocolateFactoryStats.updateDisplay()
@@ -257,7 +256,7 @@ object ChocolateFactoryDataLoader {
             }
         }
         val prestigeUpgrade = ChocolateFactoryUpgrade(
-            ChocolateFactoryAPI.prestigeIndex, ChocolateFactoryAPI.currentPrestige, prestigeCost, isPrestige = true
+            ChocolateFactoryAPI.prestigeIndex, ChocolateFactoryAPI.currentPrestige, prestigeCost, isPrestige = true,
         )
         list.add(prestigeUpgrade)
     }
@@ -659,9 +658,7 @@ object ChocolateFactoryDataLoader {
                 SoundUtils.playBeepSound()
             }
 
-            if (warningConfig.specialRabbitWarning
-                && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)
-            ) {
+            if (warningConfig.specialRabbitWarning && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)) {
                 SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
             }
 
@@ -669,12 +666,13 @@ object ChocolateFactoryDataLoader {
         }
     }
 
-    private fun findBestUpgrades(list: MutableList<ChocolateFactoryUpgrade>) {
+    private fun findBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
         val profileStorage = profileStorage ?: return
 
         // removing time tower here as people like to determine when to buy it themselves
-        val notMaxed =
-            list.filter { !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null }
+        val notMaxed = list.filter {
+            !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null
+        }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         profileStorage.bestUpgradeAvailableAt = bestUpgrade?.canAffordAt ?: SimpleTimeMark.farPast()
