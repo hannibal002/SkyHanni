@@ -55,7 +55,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import java.util.function.Supplier
 import kotlin.time.Duration.Companion.seconds
 
 internal var confirmedUnknownLines = listOf<String>()
@@ -84,7 +83,7 @@ private fun onRemoval(line: String) {
 internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
-    private val displayPair: Supplier<List<ScoreboardElementType>>,
+    private val displayPair: () -> List<ScoreboardElementType>,
     val showWhen: () -> Boolean,
     private val configLine: String,
 ) {
@@ -299,7 +298,7 @@ enum class ScoreboardElement(
 
     private fun getPair(): List<ScoreboardElementType> {
         return try {
-            displayPair.get()
+            displayPair()
         } catch (e: NoSuchElementException) {
             listOf("<hidden>" to HorizontalAlignment.LEFT)
         }
