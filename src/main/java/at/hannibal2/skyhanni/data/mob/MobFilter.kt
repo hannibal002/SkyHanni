@@ -113,7 +113,7 @@ object MobFilter {
      */
     val illegalEntitiesPattern by repoGroup.pattern(
         "pattern.pet.entities",
-        "^§8\\[§7Lv\\d+§8] §.(Horse|Armadillo|Skeleton Horse|Pig|Rat)$"
+        "^§8\\[§7Lv\\d+§8] §.(?<name>Horse|Armadillo|Skeleton Horse|Pig|Rat)$"
     )
 
     internal const val RAT_SKULL =
