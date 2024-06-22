@@ -19,7 +19,7 @@ object UnknownLinesHandler {
     fun handleUnknownLines() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
-        unconfirmedUnknownLines = sidebarLines
+        var unknownLines = sidebarLines
             .map { it.removeResets() }
             .filter { it.isNotBlank() }
             .filter { it.trim().length > 3 }
@@ -136,7 +136,7 @@ object UnknownLinesHandler {
             *remoteOnlyPatterns,
         )
 
-        unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { line ->
+        unknownLines = unknownLines.filterNot { line ->
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }
 
@@ -146,16 +146,16 @@ object UnknownLinesHandler {
         // remove objectives
         val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
             ?: "Objective"
-        unconfirmedUnknownLines = unconfirmedUnknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
+        unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
         // TODO create function
-        unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
+        unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(objectiveLine, 2) != it &&
                 !SbPattern.thirdObjectiveLinePattern.matches(it)
         }
 
         // Remove jacobs contest
-        for (i in 1..3)
-            unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
+        for (i in 1..3) {
+            unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
                         SbPattern.jacobsContestPattern.matches(line)
@@ -163,10 +163,11 @@ object UnknownLinesHandler {
                     i,
                 ) != it
             }
+        }
 
         // Remove slayer
-        for (i in 1..2)
-            unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
+        for (i in 1..2) {
+            unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
                         SbPattern.slayerQuestPattern.matches(line)
@@ -174,9 +175,10 @@ object UnknownLinesHandler {
                     i,
                 ) != it
             }
+        }
 
         // remove trapper mob location
-        unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
+        unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(
                 sidebarLines.firstOrNull { line ->
                     SbPattern.mobLocationPattern.matches(line)
@@ -185,7 +187,7 @@ object UnknownLinesHandler {
         }
 
         // da
-        unconfirmedUnknownLines = unconfirmedUnknownLines.filter {
+        unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(
                 sidebarLines.firstOrNull { line ->
                     SbPattern.darkAuctionCurrentItemPattern.matches(line)
@@ -196,19 +198,17 @@ object UnknownLinesHandler {
         /*
          * Handle broken scoreboard lines
          */
-        confirmedUnknownLines.forEach { line ->
-            if (!unconfirmedUnknownLines.contains(line)) {
-                confirmedUnknownLines = confirmedUnknownLines.filterNot { it == line }.toMutableList()
-                unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
-            }
-        }
-        unconfirmedUnknownLines.forEach { line ->
-            if (confirmedUnknownLines.contains(line)) {
-                unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
-            } else if (!unknownLinesSet.contains(line)) {
-                ChatUtils.debug("Unknown Scoreboard line: '$line'")
-                unknownLinesSet.add(line)
-            }
+        confirmedUnknownLines = confirmedUnknownLines.filter { it in unknownLines }
+
+        unknownLines = unknownLines.filter { it !in confirmedUnknownLines }
+
+        unconfirmedUnknownLines = unknownLines
+
+        unknownLines = unknownLines.filter { it !in unknownLinesSet }
+
+        unknownLines.forEach {
+            ChatUtils.debug("Unknown Scoreboard line: '$it'")
+            unknownLinesSet.add(it)
         }
     }
 }

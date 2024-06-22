@@ -69,7 +69,7 @@ object CustomScoreboard {
         config.position.renderStringsAlignedWidth(
             render,
             posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10
+            extraSpace = displayConfig.lineSpacing - 10,
         )
     }
 
@@ -193,7 +193,7 @@ object CustomScoreboard {
                     add(
                         "${element.name.firstLetterUppercase()} - " +
                             "${element.showWhen.invoke()} - " +
-                            "${element.getVisiblePair().map { it.first }}"
+                            "${element.getVisiblePair().map { it.first }}",
                     )
                 }
             }
@@ -212,7 +212,7 @@ object CustomScoreboard {
         event.move(
             28,
             "$prefix.displayConfig.showAllActiveEvents",
-            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents",
         )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
@@ -229,7 +229,7 @@ object CustomScoreboard {
         event.move(
             31,
             "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
-            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+            "$displayPrefix.cacheScoreboardOnIslandSwitch",
         )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
@@ -242,7 +242,7 @@ object CustomScoreboard {
 
         event.transform(37, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array.add(JsonPrimitive(ScoreboardEvent.QUEUE.name))
             array
         }
         event.transform(40, "$displayPrefix.events.eventEntries") { element ->
@@ -257,16 +257,10 @@ object CustomScoreboard {
             }
 
             if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
-                newArray.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
+                newArray.add(JsonPrimitive(ScoreboardEvent.RIFT.name))
             }
 
             newArray
-        }
-        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
-            array.add(JsonPrimitive(ScoreboardEvents.CARNIVAL.name))
-            array
         }
 
         event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
@@ -275,7 +269,7 @@ object CustomScoreboard {
                     HorizontalAlignment.RIGHT.name
                 } else {
                     HorizontalAlignment.DONT_ALIGN.name
-                }
+                },
             )
         }
         event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
@@ -284,8 +278,19 @@ object CustomScoreboard {
                     VerticalAlignment.CENTER.name
                 } else {
                     VerticalAlignment.DONT_ALIGN.name
-                }
+                },
             )
+        }
+        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvent.ANNIVERSARY.name))
+            array.add(JsonPrimitive(ScoreboardEvent.CARNIVAL.name))
+            array
+        }
+        event.transform(51, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvent.NEW_YEAR.name))
+            array
         }
     }
 }
