@@ -73,10 +73,6 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    private fun runWorkaround() {
-
-    }
-
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PROFILE)) return
@@ -98,6 +94,7 @@ object ProfileStorageData {
                     onClick = {
                         HypixelCommands.widget()
                     },
+                    "§eClick to run /widget!",
                 )
             } else {
                 ChatUtils.chat(

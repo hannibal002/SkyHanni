@@ -205,6 +205,7 @@ object ComposterDisplay {
                 onClick = {
                     HypixelCommands.warp("garden")
                 },
+                "§eClick to warp to the garden!",
             )
         }
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
