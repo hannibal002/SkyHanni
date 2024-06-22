@@ -50,7 +50,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -145,7 +144,7 @@ enum class ScoreboardElement(
     CHUNKED_STATS(
         ::getChunkedStatsDisplayPair,
         ::shouldShowChunkedStats,
-        "§652,763,737 §7| §d64,647 §7| §6249M §7| §b59,264 §7| §c23,495 §7| §a57,873 §7| §c♨ 0 §7| §b0❄ §7| §d756"
+        "§652,763,737 §7| §d64,647 §7| §6249M §7| §b59,264 §7| §c23,495 §7| §a57,873 §7| §c♨ 0 §7| §b0❄ §7| §d756",
     ),
     EMPTY_LINE(
         ::getEmptyLineDisplayPair,
@@ -425,7 +424,7 @@ private fun getBitsDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && bits == "0" && bitsToClaim == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "${getBitsLine()} Bits"
             else -> "Bits: ${getBitsLine()}"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 

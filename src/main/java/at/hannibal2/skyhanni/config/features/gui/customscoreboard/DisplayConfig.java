@@ -83,7 +83,7 @@ public class DisplayConfig {
     public enum PowderDisplay {
         AVAILABLE("Available"),
         TOTAL("Total"),
-        BOTH("Available / All")
+        BOTH("Available / All"),
         ;
 
         private final String str;

@@ -13,11 +13,11 @@ public class ChunkedStatsConfig {
 
     @Expose
     @ConfigOption(
-        name = "ChunkedStats",
+        name = "Chunked Stats",
         desc = "Select the stats you want to display chunked on the scoreboard."
     )
     @ConfigEditorDraggableList
-    public List<ChunkedStats> chunkedStats =  new ArrayList<>(ChunkedStats.getEntries());
+    public List<ChunkedStats> chunkedStats = new ArrayList<>(ChunkedStats.getEntries());
 
     @Expose
     @ConfigOption(

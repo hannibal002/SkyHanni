@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -69,7 +69,7 @@ object CustomScoreboard {
         config.position.renderStringsAlignedWidth(
             render,
             posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10
+            extraSpace = displayConfig.lineSpacing - 10,
         )
     }
 
@@ -171,7 +171,7 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+        ConditionalUtils.onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
@@ -194,7 +194,7 @@ object CustomScoreboard {
                     add(
                         "${element.name.firstLetterUppercase()} - " +
                             "${element.showWhen.invoke()} - " +
-                            "${element.getVisiblePair().map { it.first }}"
+                            "${element.getVisiblePair().map { it.first }}",
                     )
                 }
             }
@@ -213,7 +213,7 @@ object CustomScoreboard {
         event.move(
             28,
             "$prefix.displayConfig.showAllActiveEvents",
-            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents",
         )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
@@ -230,7 +230,7 @@ object CustomScoreboard {
         event.move(
             31,
             "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
-            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+            "$displayPrefix.cacheScoreboardOnIslandSwitch",
         )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
@@ -276,7 +276,7 @@ object CustomScoreboard {
                     HorizontalAlignment.RIGHT.name
                 } else {
                     HorizontalAlignment.DONT_ALIGN.name
-                }
+                },
             )
         }
         event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
@@ -285,7 +285,7 @@ object CustomScoreboard {
                     VerticalAlignment.CENTER.name
                 } else {
                     VerticalAlignment.DONT_ALIGN.name
-                }
+                },
             )
         }
     }
