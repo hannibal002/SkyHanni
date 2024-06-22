@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
@@ -44,6 +45,7 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 
 @Suppress("RegExpRedundantEscape")
+@SkyHanniModule
 object MobFilter {
 
     private val repoGroup = RepoPattern.group("mob.detection")
