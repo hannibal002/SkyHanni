@@ -66,9 +66,8 @@ object NewYearCakeReminder {
 
         ChatUtils.clickableChat(
             "Reminding you to grab the free New Year Cake. Click here to open the baker menu!",
-            onClick = {
-                HypixelCommands.openBaker()
-            }
+            onClick = { HypixelCommands.openBaker() },
+            "§eClick to run /openbaker!",
         )
     }
 

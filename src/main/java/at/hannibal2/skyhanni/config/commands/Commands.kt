@@ -413,7 +413,7 @@ object Commands {
         ) { HoppityCollectionStats.clearSavedRabbits() }
         registerCommand(
             "shresetpunchcard",
-            "Resets the Rift Punchcard Artifact player list."
+            "Resets the Rift Punchcard Artifact player list.",
         ) { PunchcardHighlight.clearList() }
     }
 
@@ -520,7 +520,7 @@ object Commands {
         ) { TestChatCommand.command(it) }
         registerCommand(
             "shtestrainbow",
-            "Sends a rainbow in chat"
+            "Sends a rainbow in chat",
         ) { ExtendedChatColor.testCommand() }
         registerCommand(
             "shcopyinternalname",
@@ -636,6 +636,7 @@ object Commands {
                 onClick = {
                     UpdateManager.checkUpdate(true, updateStream)
                 },
+                "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {

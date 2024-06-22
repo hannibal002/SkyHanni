@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
@@ -32,7 +32,7 @@ private fun getSbLines(): List<String> {
     return ScoreboardData.sidebarLinesFormatted
 }
 
-enum class ScoreboardEvents(
+enum class ScoreboardEvent(
     private val displayLine: () -> List<String>,
     private val showWhen: () -> Boolean,
     private val configLine: String,
@@ -194,7 +194,7 @@ enum class ScoreboardEvents(
     fun getLines(): List<String> = displayLine()
 
     companion object {
-        fun getEvent() = buildList<ScoreboardEvents?> {
+        fun getEvent() = buildList<ScoreboardEvent?> {
             if (eventsConfig.showAllActiveEvents) {
                 for (event in eventsConfig.eventEntries) {
                     if (event.showWhen()) {

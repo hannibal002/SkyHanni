@@ -192,6 +192,7 @@ class RepoManager(private val configLocation: File) {
                     onClick = {
                         SkyHanniMod.repo.updateRepo()
                     },
+                    "§eClick to update the repo!",
                     prefixColor = "§c",
                 )
                 if (unsuccessfulConstants.isEmpty()) {
@@ -333,6 +334,7 @@ class RepoManager(private val configLocation: File) {
                     onClick = {
                         updateRepo()
                     },
+                    "§eClick to update the repo!",
                 )
             }
         }

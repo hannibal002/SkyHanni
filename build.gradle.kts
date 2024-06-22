@@ -300,6 +300,3 @@ publishing.publications {
         }
     }
 }
-
-
-

@@ -149,6 +149,7 @@ object ChocolateFactoryCustomReminder {
             onClick = {
                 HypixelCommands.chocolateFactory()
             },
+            "§eClick to run /cf!",
         )
     }
 
