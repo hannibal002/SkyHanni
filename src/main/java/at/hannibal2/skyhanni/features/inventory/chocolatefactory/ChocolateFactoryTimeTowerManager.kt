@@ -75,7 +75,7 @@ object ChocolateFactoryTimeTowerManager {
                 "§cYour Time Tower just expired and has $charges remaining. Click here to use one.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
-                }
+                },
             )
             SoundUtils.playBeepSound()
         }
@@ -95,7 +95,7 @@ object ChocolateFactoryTimeTowerManager {
             "§cYour Time Tower is full §7(${timeTowerCharges()})§c, " +
                 "Use one to avoid wasting time tower usages!",
             onClick = { HypixelCommands.chocolateFactory() },
-            HOVER_TEXT
+            HOVER_TEXT,
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()
