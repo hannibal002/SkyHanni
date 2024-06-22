@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 
 private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines
 
-enum class ChunkedStats(
+enum class ChunkedStat(
     private val displayPair: () -> String,
     val showWhen: () -> Boolean,
     private val configLine: String,
