@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Essence : ScoreboardEvent() {
-    override fun getDisplay() = listOfNotNull(ScoreboardPattern.essencePattern.firstMatches(getSbLines()))
+    override fun getDisplay() = ScoreboardPattern.essencePattern.firstMatches(getSbLines())
 
     override val configLine = "Dragon Essence: §d1,285"
 }

@@ -12,7 +12,7 @@ object Voting : ScoreboardEvent() {
     override fun getDisplay() = buildList {
         val sbLines = getSbLines()
 
-        val yearLine = ScoreboardPattern.yearVotesPattern.firstMatches(sbLines) ?: return listOf<String>()
+        val yearLine = ScoreboardPattern.yearVotesPattern.firstMatches(sbLines) ?: return@buildList
         add(yearLine)
 
         if (sbLines.nextAfter(yearLine) == "§7Waiting for") {

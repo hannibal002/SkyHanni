@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Broodmother : ScoreboardEvent() {
-    override fun getDisplay() = listOfNotNull(ScoreboardPattern.broodmotherPattern.firstMatches(getSbLines()))
+    override fun getDisplay() = ScoreboardPattern.broodmotherPattern.firstMatches(getSbLines())
 
     override val configLine = "§4Broodmother§7: §eDormant"
 

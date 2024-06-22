@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Redstone : ScoreboardEvent() {
-    override fun getDisplay() = listOfNotNull(ScoreboardPattern.redstonePattern.firstMatches(getSbLines()))
+    override fun getDisplay() = ScoreboardPattern.redstonePattern.firstMatches(getSbLines())
 
     override val configLine = "§e§l⚡ §cRedstone: §e§b7%"
 

@@ -12,7 +12,7 @@ object Trapper : ScoreboardEvent() {
     override fun getDisplay() = buildList {
         addNotNull(ScoreboardPattern.peltsPattern.firstMatches(getSbLines()))
         ScoreboardPattern.mobLocationPattern.firstMatches(getSbLines())?.let {
-            add("Tracker Mob Location:")
+            add(it)
             addNotNull(getSbLines().nextAfter(it))
         }
     }

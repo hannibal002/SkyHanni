@@ -11,12 +11,12 @@ object ActiveTablist : ScoreboardEvent() {
     // but from other locations like the scoreboard
     private val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
 
-    override fun getDisplay(): List<Any> {
-        val name = getTablistEvent() ?: return listOf()
-        if (blockedEvents.contains(name.removeColor())) return listOf()
+    override fun getDisplay(): List<String>? {
+        val name = getTablistEvent() ?: return null
+        if (blockedEvents.contains(name.removeColor())) return null
         val currentActiveEventTime = ScoreboardPattern.eventTimeEndsPattern.firstMatcher(TabWidget.EVENT.lines) {
             group("time")
-        } ?: return listOf()
+        } ?: return null
 
         return listOf(name, " Ends in: §e$currentActiveEventTime")
     }

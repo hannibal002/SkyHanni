@@ -12,11 +12,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 
 object Quiver : ScoreboardElement() {
-    override fun getDisplay(): List<Any> {
-        if (QuiverAPI.currentArrow == null)
-            return listOf("§cChange your Arrow once")
-        if (QuiverAPI.currentArrow == NONE_ARROW_TYPE)
-            return listOf("No Arrows selected")
+    override fun getDisplay(): String {
+        val currentArrow = QuiverAPI.currentArrow ?: return "§cChange your Arrow once"
+        if (currentArrow == NONE_ARROW_TYPE) return "No Arrows selected"
 
         val amountString = (
             if (arrowConfig.colorArrowAmount) {
@@ -34,13 +32,8 @@ object Quiver : ScoreboardElement() {
                 }
             }
 
-        return listOf(
-            if (displayConfig.displayNumbersFirst) {
-                "$amountString ${QuiverAPI.currentArrow?.arrow}s"
-            } else {
-                "Arrows: $amountString ${QuiverAPI.currentArrow?.arrow?.replace(" Arrow", "")}"
-            },
-        )
+        return if (displayConfig.displayNumbersFirst) "$amountString ${currentArrow.arrow}s"
+        else "Arrows: $amountString ${currentArrow.arrow.replace(" Arrow", "")}"
     }
 
     override fun showWhen() = !(informationFilteringConfig.hideIrrelevantLines && !QuiverAPI.hasBowInInventory())

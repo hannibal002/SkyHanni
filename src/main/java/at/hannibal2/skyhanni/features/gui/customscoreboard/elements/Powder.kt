@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 object Powder : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val powderTypes = HotmAPI.Powder.entries
-        if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
-            return@buildList
-        }
+        if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) return@buildList
 
         add("§9§lPowder")
 

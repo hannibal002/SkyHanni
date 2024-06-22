@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Visiting : ScoreboardElement() {
-    override fun getDisplay() = listOfNotNull(ScoreboardPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
+    override fun getDisplay() = ScoreboardPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted)
 
     override val configLine = " §a✌ §7(§a1§7/6)"
 

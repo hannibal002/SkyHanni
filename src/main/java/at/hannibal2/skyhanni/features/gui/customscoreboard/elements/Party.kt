@@ -6,23 +6,20 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.partyConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 object Party : ScoreboardElement() {
     override fun getDisplay() = buildList {
-        if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) listOf(HIDDEN)
-        else {
-            add(if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})")
-            PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
-            PartyAPI.partyMembers
-                .take(partyConfig.maxPartyList)
-                .removeFirst { it == PartyAPI.partyLeader }
-                .forEach {
-                    add(" §7- §f$it")
-                }
-        }
+        if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList
+        add(if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})")
+        PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
+        PartyAPI.partyMembers
+            .take(partyConfig.maxPartyList)
+            .removeFirst { it == PartyAPI.partyLeader }
+            .forEach {
+                add(" §7- §f$it")
+            }
     }
 
     override fun showWhen() =

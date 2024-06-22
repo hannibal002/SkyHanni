@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object NewYear : ScoreboardEvent() {
-    override fun getDisplay() = listOfNotNull(getSbLines().firstOrNull { ScoreboardPattern.newYearPattern.matches(it) })
+    override fun getDisplay() = ScoreboardPattern.newYearPattern.firstMatches(getSbLines())
 
     override val configLine = "§dNew Year Event!§f 24:25"
 }

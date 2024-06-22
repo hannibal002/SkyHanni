@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 
 object StartingSoonTablist : ScoreboardEvent() {
-    override fun getDisplay(): List<Any> {
-        val name = getTablistEvent() ?: return listOf()
+    override fun getDisplay(): List<String>? {
+        val name = getTablistEvent() ?: return null
 
         val soonActiveEventTime = ScoreboardPattern.eventTimeStartsPattern.firstMatcher(TabWidget.EVENT.lines) { group("time") }
-            ?: return listOf()
+            ?: return null
 
         return listOf(name, " Starts in: §e$soonActiveEventTime")
     }

@@ -8,13 +8,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 
 object Time : ScoreboardElement() {
-    override fun getDisplay(): List<Any> {
+    override fun getDisplay(): String {
         val symbol = getGroup(ScoreboardPattern.timePattern, ScoreboardData.sidebarLinesFormatted, "symbol") ?: ""
         val time = SkyBlockTime.now()
             .formatted(dayAndMonthElement = false, yearElement = false, timeFormat24h = displayConfig.skyblockTime24hFormat)
-        return listOf(
-            "§7$time $symbol",
-        )
+        return "§7$time $symbol".trim()
     }
 
     override val configLine = "§710:40pm §b☽"

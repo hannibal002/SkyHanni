@@ -7,22 +7,19 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.disp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
-import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 object Bits : ScoreboardElement() {
-    override fun getDisplay(): List<Any> {
+    override fun getDisplay(): String? {
         val bits = formatNumber(BitsAPI.bits.coerceAtLeast(0))
         val bitsToClaim = if (BitsAPI.bitsAvailable == -1) "§cOpen Sbmenu§b"
         else formatNumber(BitsAPI.bitsAvailable.coerceAtLeast(0))
 
-        return listOf(
-            when {
-                informationFilteringConfig.hideEmptyLines && bits == "0" && bitsToClaim == "0" -> HIDDEN
-                displayConfig.displayNumbersFirst -> "${getBitsLine()} Bits"
-                else -> "Bits: ${getBitsLine()}"
-            },
-        )
+        return when {
+            informationFilteringConfig.hideEmptyLines && bits == "0" && bitsToClaim == "0" -> null
+            displayConfig.displayNumbersFirst -> "${getBitsLine()} Bits"
+            else -> "Bits: ${getBitsLine()}"
+        }
     }
 
     override fun showWhen() = !HypixelData.bingo

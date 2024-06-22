@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object Carnival : ScoreboardEvent() {
 
     private val patterns = listOf(
-        ScoreboardPattern.carnivalPattern,
         ScoreboardPattern.carnivalTokensPattern,
         ScoreboardPattern.carnivalTasksPattern,
         ScoreboardPattern.timeLeftPattern,
@@ -21,9 +20,12 @@ object Carnival : ScoreboardEvent() {
         ScoreboardPattern.carnivalScorePattern,
     )
 
-    override fun getDisplay() = patterns.allMatches(getSbLines())
-
-    override fun showWhen() = ScoreboardPattern.carnivalPattern.anyMatches(getSbLines())
+    override fun getDisplay() = buildList<String> {
+        ScoreboardPattern.carnivalPattern.firstMatches(getSbLines())?.let {
+            add(it)
+            addAll(patterns.allMatches(getSbLines()))
+        }
+    }
 
     override val configLine = "§7(All Carnival Lines)"
 

@@ -2,15 +2,14 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElementType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 
 object Title : ScoreboardElement() {
-    override fun getDisplay(): List<ScoreboardElementType> {
+    override fun getDisplay(): Any {
         val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
 
         if (!LorenzUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {
-            return listOf(ScoreboardData.objectiveTitle to alignment)
+            return ScoreboardData.objectiveTitle to alignment
         }
 
         return if (displayConfig.titleAndFooter.useCustomTitle) {
@@ -21,7 +20,7 @@ object Title : ScoreboardElement() {
                     .map { it to alignment },
             ).flatten()
         } else {
-            listOf(ScoreboardData.objectiveTitle to alignment)
+            ScoreboardData.objectiveTitle to alignment
         }
     }
 

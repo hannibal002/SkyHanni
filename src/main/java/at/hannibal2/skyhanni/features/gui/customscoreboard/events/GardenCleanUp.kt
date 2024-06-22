@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object GardenCleanUp : ScoreboardEvent() {
-    override fun getDisplay() = listOfNotNull(ScoreboardPattern.cleanUpPattern.firstMatches(getSbLines())?.trim())
+    override fun getDisplay() = ScoreboardPattern.cleanUpPattern.firstMatches(getSbLines())?.trim()
 
     override val configLine = "Cleanup: §c12.6%"
 

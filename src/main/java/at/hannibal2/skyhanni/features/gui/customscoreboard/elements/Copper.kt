@@ -5,19 +5,16 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.disp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
-import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 
 object Copper : ScoreboardElement() {
-    override fun getDisplay(): List<Any> {
+    override fun getDisplay(): String? {
         val copper = formatStringNum(getCopper())
 
-        return listOf(
-            when {
-                informationFilteringConfig.hideEmptyLines && copper == "0" -> HIDDEN
-                displayConfig.displayNumbersFirst -> "§c$copper Copper"
-                else -> "Copper: §c$copper"
-            },
-        )
+        return when {
+            informationFilteringConfig.hideEmptyLines && copper == "0" -> null
+            displayConfig.displayNumbersFirst -> "§c$copper Copper"
+            else -> "Copper: §c$copper"
+        }
     }
 
     override val configLine = "Copper: §c23,495"

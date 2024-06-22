@@ -9,16 +9,14 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
 object Cold : ScoreboardElement() {
-    override fun getDisplay(): List<Any> {
+    override fun getDisplay(): String? {
         val cold = -MiningAPI.cold
 
-        return listOf(
-            when {
-                informationFilteringConfig.hideEmptyLines && cold == 0 -> HIDDEN
-                displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
-                else -> "Cold: §b$cold❄"
-            },
-        )
+        return when {
+            informationFilteringConfig.hideEmptyLines && cold == 0 -> HIDDEN
+            displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
+            else -> "Cold: §b$cold❄"
+        }
     }
 
     override fun showWhen() = ScoreboardPattern.coldPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)

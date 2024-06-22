@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 object GardenPasting : ScoreboardEvent() {
-    override fun getDisplay() = listOfNotNull(ScoreboardPattern.pastingPattern.firstMatches(getSbLines())?.trim())
+    override fun getDisplay() = ScoreboardPattern.pastingPattern.firstMatches(getSbLines())?.trim()
 
     override val configLine = "Pasting: §c12.6%"
 
