@@ -131,9 +131,13 @@ object PestSpawn {
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
-            ChatUtils.clickableChat(message, onClick = {
-                HypixelCommands.teleportToPlot(plotName)
-            })
+            ChatUtils.clickableChat(
+                message,
+                onClick = {
+                    HypixelCommands.teleportToPlot(plotName)
+                },
+                "§eClick to run /plottp $plotName!",
+            )
         }
     }
 
