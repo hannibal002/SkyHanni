@@ -16,7 +16,7 @@ public class CombatConfig {
     public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost counter settings")
+    @Category(name = "Ghost Counter", desc = "Ghost Counter settings")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose

@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
+import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -64,10 +65,12 @@ import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatur
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -82,6 +85,7 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -406,6 +410,10 @@ object Commands {
             "shclearsavedrabbits",
             "Clears the saved rabbits on this profile.",
         ) { HoppityCollectionStats.clearSavedRabbits() }
+        registerCommand(
+            "shresetpunchcard",
+            "Resets the Rift Punchcard Artifact player list."
+        ) { PunchcardHighlight.clearList() }
     }
 
     private fun developersDebugFeatures() {
@@ -439,6 +447,10 @@ object Commands {
             "shtestgriffinspots",
             "Show potential griffin spots around you.",
         ) { GriffinBurrowHelper.testGriffinSpots() }
+        registerCommand(
+            "shtestisland",
+            "Sets the current skyblock island for testing purposes.",
+        ) { SkyBlockIslandTest.onCommand(it) }
     }
 
     private fun developersCodingHelp() {
@@ -506,6 +518,10 @@ object Commands {
             "Sends a custom chat message client side in the chat",
         ) { TestChatCommand.command(it) }
         registerCommand(
+            "shtestrainbow",
+            "Sends a rainbow in chat"
+        ) { ExtendedChatColor.testCommand() }
+        registerCommand(
             "shcopyinternalname",
             "Copies the internal name of the item in hand to the clipboard.",
         ) { SkyHanniDebugsAndTests.copyItemInternalName() }
@@ -547,6 +563,10 @@ object Commands {
             "shtoggleegglocationdebug",
             "Shows Hoppity egg locations with their internal API names and status.",
         ) { HoppityEggLocations.toggleDebug() }
+        registerCommand(
+            "shresetmineshaftpitystats",
+            "Resets the mineshaft pity display stats",
+        ) { MineshaftPityDisplay.fullResetCounter() }
     }
 
     private fun internalCommands() {

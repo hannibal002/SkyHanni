@@ -157,7 +157,7 @@ object QuickModMenuSwitch {
                         } catch (_: Exception) {
                         }
                     }
-                    ChatUtils.error("Error trying to open the gui for mod " + mod.name + "!")
+                    ErrorManager.skyHanniError("Error trying to open the gui for mod " + mod.name + "!")
                 }
 
                 "hytil" -> {

@@ -5,7 +5,7 @@ import kotlin.time.Duration
 class TimeLimitedSet<T : Any>(
     expireAfterWrite: Duration,
     private val removalListener: (T) -> Unit = {},
-) {
+) : Iterable<T> {
 
     private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _ -> key?.let { removalListener(it) } }
 
@@ -13,11 +13,15 @@ class TimeLimitedSet<T : Any>(
         cache[element] = Unit
     }
 
+    operator fun plusAssign(element: T) = add(element)
+
     fun addIfAbsent(element: T) {
         if (!contains(element)) add(element)
     }
 
     fun remove(element: T) = cache.remove(element)
+
+    operator fun minusAssign(element: T) = remove(element)
 
     operator fun contains(element: T): Boolean = cache.containsKey(element)
 
@@ -26,4 +30,6 @@ class TimeLimitedSet<T : Any>(
     fun toSet(): Set<T> = cache.keys().let { keys ->
         if (keys.isEmpty()) emptySet() else keys.toSet()
     }
+
+    override fun iterator(): Iterator<T> = toSet().iterator()
 }

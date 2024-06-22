@@ -74,10 +74,6 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    private fun runWorkaround() {
-
-    }
-
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return

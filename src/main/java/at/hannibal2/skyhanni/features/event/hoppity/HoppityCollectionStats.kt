@@ -162,8 +162,13 @@ object HoppityCollectionStats {
             val lore = slot.stack.getLore()
             if (lore.any { requirementMet.find(it) } && !config.onlyHighlightRequirementNotMet)
                 slot highlight LorenzColor.GREEN
-            if (lore.any { requirementNotMet.find(it) })
-                slot highlight LorenzColor.RED
+            if (lore.any { requirementNotMet.find(it) }) {
+                val found = !rabbitNotFoundPattern.anyMatches(lore)
+                // Hypixel allows purchasing Rabbits from Hoppity NPC even when the requirement is not yet met.
+                if (!found) {
+                    slot highlight LorenzColor.RED
+                }
+            }
         }
     }
 
