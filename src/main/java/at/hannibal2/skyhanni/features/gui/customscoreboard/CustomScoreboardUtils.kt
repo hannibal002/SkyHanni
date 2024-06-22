@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 
 object CustomScoreboardUtils {
@@ -77,31 +76,6 @@ object CustomScoreboardUtils {
     internal fun getSbLines(): List<String> {
         return ScoreboardData.sidebarLinesFormatted
     }
-
-    internal fun getMotes() = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.motesPattern, "motes")
-    internal fun getBank() = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
-
-    internal fun getBits() = BitsAPI.bits.coerceAtLeast(0).formatNum()
-
-    internal fun getBitsToClaim() = BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
-
-    internal fun getBitsLine() = if (displayConfig.showUnclaimedBits) {
-        "§b${getBits()}§7/§b${getBitsToClaim()}"
-    } else {
-        "§b${getBits()}"
-    }
-
-    internal fun getCopper() =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.copperPattern, "copper")
-
-    internal fun getGems() = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
-
-    internal fun getHeat() =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.heatPattern, "heat")
-
-    internal fun getNorthStars() =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")
-
 
     class UndetectedScoreboardLines(message: String) : Exception(message)
 }
