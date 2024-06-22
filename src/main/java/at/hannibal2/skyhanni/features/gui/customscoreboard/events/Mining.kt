@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -65,7 +65,7 @@ object Mining : ScoreboardEvent() {
         addNotNull(ScoreboardPattern.fossilDustPattern.firstMatches(getSbLines()))
     }
 
-    override fun showWhen() = inAdvancedMiningIsland()
-
     override val configLine = "§7(All Mining Event Lines)"
+
+    override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
 }

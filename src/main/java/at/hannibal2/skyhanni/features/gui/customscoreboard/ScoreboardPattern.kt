@@ -533,22 +533,6 @@ object ScoreboardPattern {
 
     // Stats from the tablist
     private val tablistGroup = group.group("tablist")
-    val gemsPattern by tablistGroup.pattern(
-        "gems",
-        "^\\s*Gems: §a(?<gems>\\d*,?(\\.\\d+)?[a-zA-Z]?)$",
-    )
-    val bankPattern by tablistGroup.pattern(
-        "bank",
-        "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 / §6(?<coop>[\\w.,]+))?)$",
-    )
-    val soulflowPattern by tablistGroup.pattern(
-        "soulflow",
-        "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$"
-    )
-    val eventNamePattern by tablistGroup.pattern(
-        "event",
-        "^\\s*§e§lEvent: §r(?<name>§.*)$",
-    )
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
         "^\\s+Ends In: §r§e(?<time>.*)$",

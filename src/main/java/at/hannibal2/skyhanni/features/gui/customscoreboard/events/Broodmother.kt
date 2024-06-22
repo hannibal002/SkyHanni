@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 object Broodmother : ScoreboardEvent() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.broodmotherPattern.firstMatches(getSbLines()))
 
-    override fun showWhen() = IslandType.SPIDER_DEN.isInIsland()
-
     override val configLine = "§4Broodmother§7: §eDormant"
+
+    override fun showIsland() = IslandType.SPIDER_DEN.isInIsland()
 }

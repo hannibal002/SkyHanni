@@ -18,7 +18,7 @@ object Dungeons : ScoreboardEvent() {
         ScoreboardPattern.floor3GuardiansPattern,
     ).allMatches(getSbLines()).map { it.removePrefix("§r") }
 
-    override fun showWhen() = DungeonAPI.inDungeon()
-
     override val configLine = "§7(All Dungeons Lines)"
+
+    override fun showIsland() = DungeonAPI.inDungeon()
 }

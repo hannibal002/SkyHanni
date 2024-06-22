@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 object Power : ScoreboardElement() {
@@ -17,7 +16,7 @@ object Power : ScoreboardElement() {
         } ?: "§cOpen \"Your Bags\"!",
     )
 
-    override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT)
-
     override val configLine = "Power: §aSighted §7(§61.263§7)"
+
+    override fun showIsland() = !RiftAPI.inRift()
 }

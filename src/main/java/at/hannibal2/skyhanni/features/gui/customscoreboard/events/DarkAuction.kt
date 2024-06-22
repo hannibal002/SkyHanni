@@ -19,7 +19,7 @@ object DarkAuction : ScoreboardEvent() {
         }
     }
 
-    override fun showWhen() = IslandType.DARK_AUCTION.isInIsland()
-
     override val configLine = "Time Left: §b11\nCurrent Item:\n §5Travel Scroll to Sirius"
+
+    override fun showIsland() = IslandType.DARK_AUCTION.isInIsland()
 }

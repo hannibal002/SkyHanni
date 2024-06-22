@@ -99,6 +99,10 @@ object MiningAPI {
         IslandType.SPIDER_DEN,
     )
 
+    fun inAdvancedMiningIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.CRYSTAL_HOLLOWS, IslandType.MINESHAFT)
+
+    fun inMiningIsland() = inAdvancedMiningIsland() || inAnyIsland(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS)
+
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
 
     @SubscribeEvent

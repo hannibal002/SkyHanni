@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 
 object Powder : ScoreboardElement() {
     override fun getDisplay() = buildList {
@@ -42,7 +42,7 @@ object Powder : ScoreboardElement() {
         }
     }
 
-    override fun showWhen() = inAdvancedMiningIsland()
-
     override val configLine = "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234\n §7- §fGlacite: §b86,574"
+
+    override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
 }

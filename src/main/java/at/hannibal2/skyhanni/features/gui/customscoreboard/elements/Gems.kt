@@ -20,7 +20,7 @@ object Gems : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
-
     override val configLine = "Gems: §a57,873"
+
+    override fun showIsland() = !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 }

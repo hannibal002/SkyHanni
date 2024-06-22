@@ -16,7 +16,7 @@ object Kuudra : ScoreboardEvent() {
         ScoreboardPattern.submergesPattern,
     ).allMatches(getSbLines())
 
-    override fun showWhen() = KuudraAPI.inKuudra()
-
     override val configLine = "§7(All Kuudra Lines)"
+
+    override fun showIsland() = KuudraAPI.inKuudra()
 }

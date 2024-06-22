@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 object GardenPasting : ScoreboardEvent() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.pastingPattern.firstMatches(getSbLines())?.trim())
 
-    override fun showWhen() = GardenAPI.inGarden()
-
     override val configLine = "Pasting: §c12.6%"
+
+    override fun showIsland() = GardenAPI.inGarden()
 }

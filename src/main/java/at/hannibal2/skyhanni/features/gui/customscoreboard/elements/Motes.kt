@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 
 object Motes : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
@@ -21,7 +20,7 @@ object Motes : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = inAnyIsland(IslandType.THE_RIFT)
-
     override val configLine = "Motes: §d64,647"
+
+    override fun showIsland() = RiftAPI.inRift()
 }

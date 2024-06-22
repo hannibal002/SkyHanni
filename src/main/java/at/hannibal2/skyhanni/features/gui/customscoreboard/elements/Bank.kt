@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 
 object Bank : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
@@ -20,7 +19,7 @@ object Bank : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT)
-
     override val configLine = "Bank: §6249M"
+
+    override fun showIsland() = !RiftAPI.inRift()
 }

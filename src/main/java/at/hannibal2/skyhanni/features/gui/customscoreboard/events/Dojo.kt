@@ -15,7 +15,9 @@ object Dojo : ScoreboardEvent() {
         ScoreboardPattern.dojoTimePattern,
     ).allMatches(getSbLines())
 
-    override fun showWhen() = IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Dojo"
+    override fun showWhen() = LorenzUtils.skyBlockArea == "Dojo"
 
     override val configLine = "§7(All Dojo Lines)"
+
+    override fun showIsland() = IslandType.CRIMSON_ISLE.isInIsland()
 }

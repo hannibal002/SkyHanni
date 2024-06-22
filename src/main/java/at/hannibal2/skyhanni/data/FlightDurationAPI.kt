@@ -55,10 +55,11 @@ object FlightDurationAPI {
         IslandType.PRIVATE_ISLAND,
         IslandType.PRIVATE_ISLAND_GUEST,
         IslandType.GARDEN,
-        IslandType.GARDEN_GUEST
+        IslandType.GARDEN_GUEST,
     )
 
-    private var inFlyingIsland = false
+    var inFlyingIsland = false
+        private set
 
     @SubscribeEvent
     fun onChatMessage(event: LorenzChatEvent) {
@@ -88,7 +89,7 @@ object FlightDurationAPI {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (isFlyingActive()) flightDuration -= 1.seconds
+        if (inFlyingIsland && isFlyingActive()) flightDuration -= 1.seconds
     }
 
     @SubscribeEvent
@@ -96,5 +97,5 @@ object FlightDurationAPI {
         inFlyingIsland = event.newIsland in flightIslands
     }
 
-    fun isFlyingActive() = inFlyingIsland && flightDuration.isPositive() && !BitsAPI.hasCookieBuff()
+    fun isFlyingActive() = flightDuration.isPositive() && !BitsAPI.hasCookieBuff()
 }

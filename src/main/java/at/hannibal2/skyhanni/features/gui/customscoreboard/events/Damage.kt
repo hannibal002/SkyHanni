@@ -12,7 +12,7 @@ object Damage : ScoreboardEvent() {
         ScoreboardPattern.bossDamagePattern,
     ).allMatches(getSbLines())
 
-    override fun showWhen() = IslandType.THE_END.isInIsland()
-
     override val configLine = "Dragon HP: §a6,180,925 §c❤\nYour Damage: §c375,298.5"
+
+    override fun showIsland() = IslandType.THE_END.isInIsland()
 }

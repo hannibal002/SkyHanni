@@ -5,11 +5,13 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -43,12 +45,14 @@ object CustomScoreboardUtils {
 
     internal fun getMotes() = getGroup(ScoreboardPattern.motesPattern, ScoreboardData.sidebarLinesFormatted, "motes") ?: "0"
 
-    internal fun getSoulflow() = getGroup(ScoreboardPattern.soulflowPattern, ScoreboardData.sidebarLinesFormatted, "soulflow") ?: "0"
+    internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
     internal fun getPurseEarned() =
         getGroup(PurseAPI.coinsPattern, ScoreboardData.sidebarLinesFormatted, "earned")?.let { " §7(§e+$it§7)§6" }
 
-    internal fun getBank() = getGroup(ScoreboardPattern.bankPattern, ScoreboardData.sidebarLinesFormatted, "bank") ?: "0"
+    internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
+        group("amount") + (groupOrNull("personal")?.let { "§7 / §6$it" } ?: "")
+    } ?: "0"
 
     internal fun getBits() = formatNumber(BitsAPI.bits.coerceAtLeast(0))
 
@@ -61,11 +65,13 @@ object CustomScoreboardUtils {
     internal fun getCopper() =
         getGroup(ScoreboardPattern.copperPattern, ScoreboardData.sidebarLinesFormatted, "copper") ?: "0"
 
-    internal fun getGems() = getGroup(ScoreboardPattern.gemsPattern, ScoreboardData.sidebarLinesFormatted, "gems") ?: "0"
+    internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
     internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, ScoreboardData.sidebarLinesFormatted, "heat")
 
     internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, ScoreboardData.sidebarLinesFormatted, "northStars") ?: "0"
+
+    internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { group("event") }
 
     internal fun getElementFromAny(element: Any): ScoreboardElementType = when (element) {
         is String -> element to HorizontalAlignment.LEFT

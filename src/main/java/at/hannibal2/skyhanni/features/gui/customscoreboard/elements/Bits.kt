@@ -28,7 +28,9 @@ object Bits : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
+    override fun showWhen() = !HypixelData.bingo
 
     override val configLine = "Bits: §b59,264"
+
+    override fun showIsland() = !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 }

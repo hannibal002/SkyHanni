@@ -19,8 +19,9 @@ object MagmaBoss : ScoreboardEvent() {
         ScoreboardPattern.bossHealthBarPattern,
     ).allMatches(getSbLines())
 
-    override fun showWhen() = IslandType.CRIMSON_ISLE.isInIsland() &&
-        ScoreboardPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
+    override fun showWhen() = ScoreboardPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 
     override val configLine = "§7(All Magma Boss Lines)\n§7Boss: §c0%\n§7Damage Soaked:\n§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"
+
+    override fun showIsland() = IslandType.CRIMSON_ISLE.isInIsland()
 }

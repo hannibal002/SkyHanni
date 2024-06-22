@@ -17,7 +17,7 @@ object Trapper : ScoreboardEvent() {
         }
     }
 
-    override fun showWhen() = IslandType.THE_FARMING_ISLANDS.isInIsland()
-
     override val configLine = "Pelts: §5711\nTracker Mob Location:\n§bMushroom Gorge"
+
+    override fun showIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 }

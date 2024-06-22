@@ -1,26 +1,21 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getTablistEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.TabListData
 
 object StartingSoonTablist : ScoreboardEvent() {
     override fun getDisplay(): List<Any> {
-        val soonActiveEvent = ScoreboardPattern.eventNamePattern.firstMatcher(TabListData.getTabList()) {
-            group("name")
-        } ?: return emptyList()
+        val name = getTablistEvent() ?: return listOf()
 
-        val soonActiveEventTime = TabListData.getTabList().firstOrNull { ScoreboardPattern.eventTimeStartsPattern.matches(it) }
-            ?.let {
-                ScoreboardPattern.eventTimeStartsPattern.matchMatcher(it) {
-                    group("time")
-                }
-            }
+        val soonActiveEventTime = ScoreboardPattern.eventTimeStartsPattern.firstMatcher(TabWidget.EVENT.lines) { group("time") }
+            ?: return listOf()
 
-        return listOf(soonActiveEvent, " Starts in: §e$soonActiveEventTime")
+        return listOf(name, " Starts in: §e$soonActiveEventTime")
     }
+
+    override fun showWhen() = TabWidget.EVENT.isActive
 
     override val configLine = "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
 }
